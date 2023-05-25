@@ -130,7 +130,7 @@ class FormModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Form');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
     }
 
     /**
@@ -388,7 +388,7 @@ class FormModel extends CommonFormModel
         $deleteActions   = [];
         foreach ($actions as $actionId) {
             if (isset($existingActions[$actionId])) {
-                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $actionEntity = $this->em->getReference(\Mautic\FormBundle\Entity\Action::class, (int) $actionId);
                 $entity->removeAction($actionEntity);
                 $deleteActions[] = $actionId;
             }

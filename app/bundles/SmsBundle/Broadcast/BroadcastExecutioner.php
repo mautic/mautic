@@ -2,10 +2,9 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,14 +12,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BroadcastExecutioner
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var SmsModel
      */
     private $smsModel;
+
+    private LeadRepository $leadRepository;
 
     /**
      * @var ContactLimiter
@@ -45,12 +41,12 @@ class BroadcastExecutioner
     /**
      * BroadcastExecutioner constructor.
      */
-    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, EntityManager $entityManager)
+    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
     {
         $this->smsModel       = $smsModel;
         $this->broadcastQuery = $broadcastQuery;
         $this->translator     = $translator;
-        $this->entityManager  = $entityManager;
+        $this->leadRepository = $leadRepository;
     }
 
     public function execute(ChannelBroadcastEvent $event)
@@ -82,6 +78,7 @@ class BroadcastExecutioner
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
         while (!empty($contacts)) {
             $reduction = 0;
+            $leads     = [];
             foreach ($contacts as $contact) {
                 $contactId  = $contact['id'];
                 $results    = $this->smsModel->sendSms($sms, $contactId, [
@@ -89,7 +86,7 @@ class BroadcastExecutioner
                         'sms', $sms->getId(),
                     ],
                     'listId'=> $contact['listId'],
-                ]);
+                ], $leads);
                 $this->result->process($results);
                 $reduction += count($results);
             }
@@ -100,7 +97,7 @@ class BroadcastExecutioner
                 $this->contactLimiter->reduceCampaignLimitRemaining($reduction);
             }
 
-            $this->entityManager->clear(Lead::class);
+            $this->leadRepository->detachEntities($leads);
 
             // Next batch
             $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);

@@ -38,7 +38,7 @@ class Event implements ChannelInterface
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -68,12 +68,12 @@ class Event implements ChannelInterface
     private $triggerDate;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $triggerInterval = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $triggerIntervalUnit;
 
@@ -98,7 +98,7 @@ class Event implements ChannelInterface
     private $triggerRestrictedDaysOfWeek = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $triggerMode;
 
@@ -108,27 +108,27 @@ class Event implements ChannelInterface
     private $campaign;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      **/
     private $children;
 
     /**
-     * @var Event
+     * @var Event|null
      **/
     private $parent;
 
     /**
-     * @var string
+     * @var string|null
      **/
     private $decisionPath;
 
     /**
-     * @var string
+     * @var string|null
      **/
     private $tempId;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
      */
     private $log;
 

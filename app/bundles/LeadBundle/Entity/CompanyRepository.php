@@ -106,7 +106,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from('MauticLeadBundle:Company', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }

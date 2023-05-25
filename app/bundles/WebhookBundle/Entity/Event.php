@@ -20,7 +20,7 @@ class Event
     private $webhook;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\WebhookQueue>
      */
     private $queues;
 

@@ -108,7 +108,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         foreach ($contacts as $key => $contact) {
             if (!$contact instanceof Lead) {
                 $id                      = is_array($contact) ? $contact['id'] : $contact;
-                $contact                 = $this->em->getReference('MauticLeadBundle:Lead', $id);
+                $contact                 = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $id);
                 $contacts[$key]          = $contact;
                 $detachContactReferences = true;
             }
@@ -135,7 +135,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
 
         if ($detachContactReferences) {
             foreach ($contacts as $contact) {

@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -36,7 +35,6 @@ use Mautic\LeadBundle\Model\NoteModel;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -305,12 +303,9 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        // When we change company data these changes get cached
-        // so we need to clear the entity manager
-        $model->getRepository()->clear();
-
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
+        $model->getRepository()->refetchEntity($lead);
 
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -387,12 +382,11 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
-        assert($integrationRepo instanceof IntegrationEntityRepository);
 
         $model = $this->getModel('lead.list');
         assert($model instanceof ListModel);
@@ -401,7 +395,6 @@ class LeadController extends FormController
         assert($leadNoteModel instanceof NoteModel);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
-        assert($leadDeviceRepository instanceof LeadDeviceRepository);
 
         return $this->delegateView(
             [
@@ -1413,7 +1406,8 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
 

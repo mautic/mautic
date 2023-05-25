@@ -21,7 +21,7 @@ class Tag
     private $tag;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 

@@ -12,16 +12,16 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class IntegrationEntityRepository extends CommonRepository
 {
     /**
-     * @param      $integration
-     * @param      $integrationEntity
-     * @param      $internalEntity
-     * @param null $internalEntityIds
-     * @param null $startDate
-     * @param null $endDate
-     * @param bool $push
-     * @param int  $start
-     * @param int  $limit
-     * @param null $integrationEntityIds
+     * @param                     $integration
+     * @param                     $integrationEntity
+     * @param                     $internalEntity
+     * @param array<int>|int|null $internalEntityIds
+     * @param null                $startDate
+     * @param null                $endDate
+     * @param bool                $push
+     * @param int                 $start
+     * @param int                 $limit
+     * @param null                $integrationEntityIds
      *
      * @return array
      */
@@ -173,14 +173,14 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param       $integration
-     * @param       $internalEntity
-     * @param       $leadFields
-     * @param int   $limit
-     * @param null  $fromDate
-     * @param null  $toDate
-     * @param array $integrationEntity
-     * @param array $excludeIntegrationIds
+     * @param              $integration
+     * @param              $internalEntity
+     * @param              $leadFields
+     * @param int          $limit
+     * @param null         $fromDate
+     * @param null         $toDate
+     * @param array|string $integrationEntity
+     * @param array        $excludeIntegrationIds
      */
     public function findLeadsToUpdate(
         $integration,
