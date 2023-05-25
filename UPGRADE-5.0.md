@@ -66,3 +66,7 @@ Possible backward compatibility breaks:
 - If your plugin does break it may be using some value objects out of common places. Get inspiration in existing `plugins/*Bundle/Config/services.php` to exclude the folders or files from autowiring.
 - Some services might need to be configured. For example if they need a config parameter in the constructor. Follow [the official Symfony docs](https://symfony.com/doc/5.4/service_container.html#explicitly-configuring-services-and-arguments) to configure such services.
 - Start converting your controllers to support DI over loading services from container as that is an anti-pattern that Symfony no longer supports. That is the reason why all the services are set as public so the old controllers can still work. This will change throughout the life of Mautic 5 and will be removed in Mautic 6. See https://symfony.com/doc/current/controller/service.html
+
+# Plugin Removal
+- Pipedrive Plugin has been removed from Mautic Core, you can use https://www.mautic.org/blog/integrator/exciting-news-new-integration-plugin-pipedrive-crm instead.
+- Citrix Plugin has been removed from Mautic Core. you can use https://www.leuchtfeuer.com/en/mautic/downloads/mautic-goto-plugin/ instead. 
