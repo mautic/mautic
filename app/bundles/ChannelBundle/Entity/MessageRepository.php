@@ -26,7 +26,7 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

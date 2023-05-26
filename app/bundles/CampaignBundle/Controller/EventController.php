@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
@@ -32,12 +33,13 @@ class EventController extends CommonFormController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         EventCollector $eventCollector,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
+        ManagerRegistry $doctrine
     ) {
         $this->eventCollector = $eventCollector;
         $this->dateHelper     = $dateHelper;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**

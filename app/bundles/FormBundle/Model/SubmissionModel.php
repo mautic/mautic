@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\ORMException;
+use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -35,7 +36,6 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -180,7 +180,6 @@ class SubmissionModel extends CommonFormModel
     public function getRepository(): SubmissionRepository
     {
         $result = $this->em->getRepository(Submission::class);
-        \assert($result instanceof SubmissionRepository);
 
         return $result;
     }
@@ -510,7 +509,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return StreamedResponse|Response
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function exportResults($format, $form, $queryArgs)
     {
@@ -518,7 +517,6 @@ class SubmissionModel extends CommonFormModel
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
         $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
-        $translator                  = $this->translator;
 
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
@@ -526,47 +524,19 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $translator, $viewOnlyFields) {
+                    function () use ($results, $form, $viewOnlyFields) {
                         $handle = fopen('php://output', 'r+');
 
                         //build the header row
-                        $fields = $form->getFields();
-                        $header = [
-                            $translator->trans('mautic.core.id'),
-                            $translator->trans('mautic.form.result.thead.date'),
-                            $translator->trans('mautic.core.ipaddress'),
-                            $translator->trans('mautic.form.result.thead.referrer'),
-                        ];
-                        foreach ($fields as $f) {
-                            if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
-                                continue;
-                            }
-                            $header[] = $f->getLabel();
-                        }
-                        //free memory
-                        unset($fields);
+                        $header = $this->getExportHeader($form, $viewOnlyFields);
 
                         //write the row
-                        fputcsv($handle, $header);
+                        $this->putCsvExportRow($handle, $header);
 
                         //build the data rows
                         foreach ($results as $k => $s) {
-                            $row = [
-                                $s['id'],
-                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
-                                $s['ipAddress'],
-                                $s['referer'],
-                            ];
-                            foreach ($s['results'] as $k2 => $r) {
-                                if (in_array($r['type'], $viewOnlyFields)) {
-                                    continue;
-                                }
-                                $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
-                                //free memory
-                                unset($s['results'][$k2]);
-                            }
-
-                            fputcsv($handle, $row);
+                            $row = $this->getExportRow($s, $viewOnlyFields);
+                            $this->putCsvExportRow($handle, $row);
 
                             //free memory
                             unset($row, $results[$k]);
@@ -576,12 +546,10 @@ class SubmissionModel extends CommonFormModel
                     }
                 );
 
-                $response->headers->set('Content-Type', 'application/force-download');
-                $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
+                $this->setResponseHeaders($response, $name.'.csv', [
+                    'application/force-download',
+                    'application/octet-stream',
+                ]);
 
                 return $response;
             case 'html':
@@ -599,28 +567,14 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $translator, $name, $viewOnlyFields) {
+                        function () use ($results, $form, $name, $viewOnlyFields) {
                             $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
                             $objPHPExcel->createSheet();
 
                             //build the header row
-                            $fields = $form->getFields();
-                            $header = [
-                                $translator->trans('mautic.core.id'),
-                                $translator->trans('mautic.form.result.thead.date'),
-                                $translator->trans('mautic.core.ipaddress'),
-                                $translator->trans('mautic.form.result.thead.referrer'),
-                            ];
-                            foreach ($fields as $f) {
-                                if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
-                                    continue;
-                                }
-                                $header[] = $f->getLabel();
-                            }
-                            //free memory
-                            unset($fields);
+                            $header = $this->getExportHeader($form, $viewOnlyFields);
 
                             //write the row
                             $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
@@ -628,20 +582,7 @@ class SubmissionModel extends CommonFormModel
                             //build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
-                                $row = [
-                                    $s['id'],
-                                    $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
-                                    $s['ipAddress'],
-                                    $s['referer'],
-                                ];
-                                foreach ($s['results'] as $k2 => $r) {
-                                    if (in_array($r['type'], $viewOnlyFields)) {
-                                        continue;
-                                    }
-                                    $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
-                                    //free memory
-                                    unset($s['results'][$k2]);
-                                }
+                                $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
@@ -658,16 +599,15 @@ class SubmissionModel extends CommonFormModel
                             $objWriter->save('php://output');
                         }
                     );
-                    $response->headers->set('Content-Type', 'application/force-download');
-                    $response->headers->set('Content-Type', 'application/octet-stream');
-                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                    $response->headers->set('Expires', '0');
-                    $response->headers->set('Cache-Control', 'must-revalidate');
-                    $response->headers->set('Pragma', 'public');
+
+                    $this->setResponseHeaders($response, $name.'.xlsx', [
+                        'application/force-download',
+                        'application/octet-stream',
+                    ]);
 
                     return $response;
                 }
-                throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                throw new Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
             default:
                 return new Response();
         }
@@ -680,13 +620,12 @@ class SubmissionModel extends CommonFormModel
      *
      * @return StreamedResponse|Response
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function exportResultsForPage($format, $page, $queryArgs)
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
-        $translator = $this->translator;
 
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
@@ -694,34 +633,17 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $translator) {
+                    function () use ($results) {
                         $handle = fopen('php://output', 'r+');
 
                         //build the header row
-                        $header = [
-                            $translator->trans('mautic.core.id'),
-                            $translator->trans('mautic.lead.report.contact_id'),
-                            $translator->trans('mautic.form.report.form_id'),
-                            $translator->trans('mautic.form.result.thead.date'),
-                            $translator->trans('mautic.core.ipaddress'),
-                            $translator->trans('mautic.form.result.thead.referrer'),
-                        ];
-
-                        //write the row
-                        fputcsv($handle, $header);
+                        $header = $this->getExportHeaderForPage();
+                        $this->putCsvExportRow($handle, $header);
 
                         //build the data rows
                         foreach ($results as $k => $s) {
-                            $row = [
-                                $s['id'],
-                                $s['leadId'],
-                                $s['formId'],
-                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
-                                $s['ipAddress'],
-                                $s['referer'],
-                            ];
-
-                            fputcsv($handle, $row);
+                            $row = $this->getExportRowForPage($s);
+                            $this->putCsvExportRow($handle, $row);
 
                             //free memory
                             unset($row, $results[$k]);
@@ -730,12 +652,9 @@ class SubmissionModel extends CommonFormModel
                         fclose($handle);
                     }
                 );
-
-                $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
+                $this->setResponseHeaders($response, $name.'.csv', [
+                    'text/csv; charset=UTF-8',
+                ]);
 
                 return $response;
             case 'html':
@@ -751,21 +670,15 @@ class SubmissionModel extends CommonFormModel
                 return new Response($content);
             case 'xlsx':
                 if (!class_exists(Spreadsheet::class)) {
-                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                    throw new Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($results, $translator, $name) {
+                    function () use ($results, $name) {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
 
                         $objPHPExcel->createSheet();
-
-                        $header = [
-                            $translator->trans('mautic.core.id'),
-                            $translator->trans('mautic.form.result.thead.date'),
-                            $translator->trans('mautic.core.ipaddress'),
-                            $translator->trans('mautic.form.result.thead.referrer'),
-                        ];
+                        $header = $this->getExportHeaderForPage('xlsx');
 
                         //write the row
                         $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
@@ -773,13 +686,7 @@ class SubmissionModel extends CommonFormModel
                         //build the data rows
                         $count = 2;
                         foreach ($results as $k => $s) {
-                            $row = [
-                                $s['id'],
-                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
-                                $s['ipAddress'],
-                                $s['referer'],
-                            ];
-
+                            $row = $this->getExportRowForPage($s, 'xlsx');
                             $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
                             //free memory
@@ -795,16 +702,138 @@ class SubmissionModel extends CommonFormModel
                         $objWriter->save('php://output');
                     }
                 );
-                $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
+                $this->setResponseHeaders($response, $name.'.xlsx', [
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ]);
 
                 return $response;
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * @param array<string> $contentType
+     */
+    private function setResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
+    {
+        foreach ($contentType as $ct) {
+            $response->headers->set('Content-Type', $ct);
+        }
+
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+    }
+
+    /**
+     * @param resource     $handle
+     * @param array<mixed> $row
+     *
+     * @return false|int
+     */
+    private function putCsvExportRow($handle, array $row): bool|int
+    {
+        return fputcsv($handle, $row);
+    }
+
+    /**
+     * @param array<mixed> $values
+     *
+     * @return array<mixed>
+     */
+    private function getExportRowForPage(array $values, string $format = 'csv'): array
+    {
+        $row = [
+            $values['id'],
+            $values['leadId'],
+            $this->dateHelper->toFull($values['dateSubmitted'], 'UTC'),
+            $values['ipAddress'],
+            $values['referer'],
+        ];
+
+        if ('csv' === $format) {
+            array_splice($row, 2, 0, $values['formId']);
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param array<mixed> $values
+     * @param array<mixed> $viewOnlyFields
+     *
+     * @return array<mixed>
+     */
+    private function getExportRow(array $values, array $viewOnlyFields = []): array
+    {
+        $row = [
+            $values['id'],
+            $values['leadId'],
+            $this->dateHelper->toFull($values['dateSubmitted'], 'UTC'),
+            $values['ipAddress'],
+            $values['referer'],
+        ];
+
+        foreach ($values['results'] as $k2 => $r) {
+            if (in_array($r['type'], $viewOnlyFields)) {
+                continue;
+            }
+
+            $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
+            //free memory
+            unset($values['results'][$k2]);
+        }
+
+        return $row;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getExportHeaderForPage(string $format = 'csv'): array
+    {
+        $header = [
+            $this->translator->trans('mautic.form.report.submission.id'),
+            $this->translator->trans('mautic.lead.report.contact_id'),
+            $this->translator->trans('mautic.form.result.thead.date'),
+            $this->translator->trans('mautic.core.ipaddress'),
+            $this->translator->trans('mautic.form.result.thead.referrer'),
+        ];
+
+        if ('csv' === $format) {
+            array_splice($header, 2, 0, $this->translator->trans('mautic.form.report.form_id'));
+        }
+
+        return $header;
+    }
+
+    /**
+     * @param array<mixed> $viewOnlyFields
+     *
+     * @return array<string>
+     */
+    private function getExportHeader(Form $form, $viewOnlyFields): array
+    {
+        $fields = $form->getFields();
+
+        $header = [
+            $this->translator->trans('mautic.form.report.submission.id'),
+            $this->translator->trans('mautic.lead.report.contact_id'),
+            $this->translator->trans('mautic.form.result.thead.date'),
+            $this->translator->trans('mautic.core.ipaddress'),
+            $this->translator->trans('mautic.form.result.thead.referrer'),
+        ];
+
+        foreach ($fields as $f) {
+            if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
+                continue;
+            }
+            $header[] = $f->getLabel();
+        }
+
+        return $header;
     }
 
     /**
@@ -1023,7 +1052,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -1135,8 +1164,9 @@ class SubmissionModel extends CommonFormModel
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if (!empty($companyFieldMatches)) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            $companyChangeLog                      = null;
             if ($leadAdded) {
-                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $companyFieldMatches);
                 $this->companyModel->saveEntity($companyEntity);
@@ -1147,7 +1177,9 @@ class SubmissionModel extends CommonFormModel
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
-            $this->em->clear(CompanyChangeLog::class);
+            if (null !== $companyChangeLog) {
+                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+            }
         }
 
         return $lead;

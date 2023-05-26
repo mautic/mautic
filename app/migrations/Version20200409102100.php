@@ -29,7 +29,7 @@ final class Version20200409102100 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $this->addSql(
-            "ALTER TABLE {$this->prefix}form_fields ADD conditions LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';"
+            "ALTER TABLE {$this->prefix}form_fields ADD conditions LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)';"
         );
     }
 }

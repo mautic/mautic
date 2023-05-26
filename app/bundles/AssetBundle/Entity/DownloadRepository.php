@@ -31,7 +31,7 @@ class DownloadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd');
 
         $q2->where(
-            $q2->expr()->andX(
+            $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
                 $q2->expr()->eq('d.asset_id', (int) $assetId)
             )

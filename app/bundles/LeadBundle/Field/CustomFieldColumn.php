@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -73,7 +72,7 @@ class CustomFieldColumn
     /**
      * @throws AbortColumnCreateException
      * @throws CustomFieldLimitException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException

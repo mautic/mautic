@@ -20,7 +20,7 @@ class TriggerEvent
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -45,7 +45,7 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadTriggerLog>
      */
     private $log;
 

@@ -24,7 +24,7 @@ class Action
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 

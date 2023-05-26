@@ -26,7 +26,6 @@ bin/phpunit
 bin/security-checker
 bin/simple-phpunit
 build/*
-index_dev.php
 modified_files.txt
 node_modules/*
 package-lock.json

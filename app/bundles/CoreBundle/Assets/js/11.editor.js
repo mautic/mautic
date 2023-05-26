@@ -278,6 +278,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
         fillEmptyBlocks: false,
         font_names: Mautic.getCKEditorFonts(mauticEditorFonts).join(';'),
         filebrowserBrowseUrl : Mautic.elfinderURL+'?editor=ckeditor',
+        customConfig: '', // disable loading the default config.js file that is disabling the Underscore button.
     };
     if (ckEditorToolbar[0].indexOf('InsertToken') > -1)
     {

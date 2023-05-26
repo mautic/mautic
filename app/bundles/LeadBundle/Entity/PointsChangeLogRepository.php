@@ -30,7 +30,7 @@ class PointsChangeLogRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('lp.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('lp.action_name', $query->expr()->literal('%'.$options['search'].'%'))
             ));
@@ -87,7 +87,7 @@ class PointsChangeLogRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

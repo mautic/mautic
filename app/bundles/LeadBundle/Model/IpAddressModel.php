@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -85,7 +84,7 @@ class IpAddressModel
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function deleteUnusedIpAddresses(int $limit): int
     {

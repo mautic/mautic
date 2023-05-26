@@ -60,7 +60,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     private $email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $position;
 
@@ -70,22 +70,22 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     private $role;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $timezone = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $locale = '';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastLogin;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -100,7 +100,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     private $preferences = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $signature;
 

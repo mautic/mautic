@@ -105,6 +105,6 @@ SQL;
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
 
-        return $this->_em->getConnection()->executeUpdate($deleteSql);
+        return $this->_em->getConnection()->executeStatement($deleteSql);
     }
 }

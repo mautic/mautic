@@ -38,12 +38,12 @@ class DoNotContact
     private $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -53,7 +53,7 @@ class DoNotContact
     private $reason = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $comments;
 
@@ -144,7 +144,7 @@ class DoNotContact
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

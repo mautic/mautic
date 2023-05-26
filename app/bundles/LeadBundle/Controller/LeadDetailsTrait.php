@@ -185,7 +185,7 @@ trait LeadDetailsTrait
         }
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
-        $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
@@ -325,7 +325,7 @@ trait LeadDetailsTrait
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
-        $chartQuery  = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
@@ -349,15 +349,13 @@ trait LeadDetailsTrait
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
             $model = $this->getModel('lead.lead');
-            // When we change lead data these changes get cached
-            // so we need to clear the entity manager
-            $model->getRepository()->clear();
 
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             if (!isset($contact['lead_id'])) {
                 continue;
             }
-            $lead            = $model->getEntity($contact['lead_id']);
+            $lead = $model->getEntity($contact['lead_id']);
+            $model->getRepository()->refetchEntity($lead);
             if (!$lead instanceof Lead) {
                 continue;
             }
@@ -410,7 +408,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [

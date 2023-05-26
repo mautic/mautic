@@ -16,13 +16,13 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $connection = $this->em->getConnection();
 
         /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
 
         $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
 
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         foreach ($this->getLeadCampaignEventData($eventId) as $row) {
-            $insertStatement->execute($row);
+            $insertStatement->executeQuery($row);
         }
         $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
 

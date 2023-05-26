@@ -35,7 +35,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $availableSocialFields = [];
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -66,14 +66,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $zipcode;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $timezone;
 
     private $country;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -93,7 +93,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -103,32 +103,32 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $actualPoints;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\CoreBundle\Entity\IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
      */
     private $pushIds;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
      */
     private $eventLog;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -160,17 +160,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $newlyCreated = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateIdentified;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadNote>
      */
     private $notes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $preferredProfileImage = 'gravatar';
 
@@ -180,27 +180,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var FrequencyRule[]
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
      */
     private $frequencyRules;
 
@@ -564,7 +564,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
 
         return $this;
     }
@@ -576,7 +576,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -949,7 +949,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return StagesChangeLog
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     public function getStageChangeLog()
     {
@@ -980,11 +980,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param      $action
      * @param null $company
      */
-    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
             // No need to record a null delta
-            return;
+            return null;
         }
 
         // Create a new company change event
@@ -996,6 +996,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setCompany($company);
         $event->setLead($this);
         $this->addCompanyChangeLog($event);
+
+        return $event;
     }
 
     /**
@@ -1011,7 +1013,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return CompanyChangeLog
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1069,7 +1071,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
      */
     public function getPushIDs()
     {
@@ -1119,7 +1121,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
     public function getDoNotContact()
     {
@@ -1434,7 +1436,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setFrequencyRules($frequencyRules)
     {
-        $this->frequencyRules = $frequencyRules;
+        $this->frequencyRules = new \Doctrine\Common\Collections\ArrayCollection($frequencyRules);
 
         return $this;
     }
@@ -1442,7 +1444,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get frequency rules.
      *
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
      */
     public function getFrequencyRules()
     {

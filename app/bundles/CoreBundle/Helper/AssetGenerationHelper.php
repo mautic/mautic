@@ -4,29 +4,48 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\Finder\Finder;
 
-/**
- * Class AssetGenerationHelper.
- */
 class AssetGenerationHelper
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    // Temporary array of libraries to load from node_modules before we switch
+    // to Symfony Encore. This is the first step to load libraries from NPM.
+    private const NODE_MODULES = [
+        'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
+        'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
+        'js-cookie/src/js.cookie.js', // Needed for cookies.
+        'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
+        'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
+        'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
+        'moment/min/moment.min.js', // Needed for date/time formatting.
+        // 'jquery-color/dist/jquery.color.js', // I can't find why is this needed. Added in https://github.com/mautic/mautic/commit/918000351e8c7657b01ef132e22c097942cf0e99. Uncoment this if we find the place. Delete this dependency after some time.
+        'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
+        'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
+        'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/xml/xml.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/javascript/javascript.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/htmlmixed/htmlmixed.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/css/css.js', // Needed for the legacy code-mode editor.
+        'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
+        'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
+        'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
+        'jquery-datetimepicker/build/jquery.datetimepicker.full.js', // Needed for the date/time UI selector.
+        'shufflejs/dist/shuffle.js', // Needed for the plugin list page.
+        '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
+        'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
+        'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
+        'chart.js/dist/Chart.js', // Needed for the charts.
+        'mousetrap/mousetrap.js',
+        'jquery/dist/jquery.js',
+        'chosen-js/chosen.jquery.js',
+        'at.js/dist/js/jquery.atwho.js',
+        'jvectormap-next/jquery-jvectormap.js',
+        'jquery.quicksearch/src/jquery.quicksearch.js',
+        // TODO: Add the rest of the libraries here.
+    ];
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private BundleHelper $bundleHelper;
+    private PathsHelper $pathsHelper;
+    private string $version;
 
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * AssetGenerationHelper constructor.
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
         $this->bundleHelper = $bundleHelper;
@@ -83,6 +102,22 @@ class AssetGenerationHelper
                         }
                     }
                     file_put_contents($inProgressFile, date('r'));
+                }
+
+                foreach (self::NODE_MODULES as $path) {
+                    $relPath  = "node_modules/{$path}";
+                    $fullPath = "{$this->pathsHelper->getRootPath()}/{$relPath}";
+                    $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
+                    $details  = [
+                        'fullPath' => $fullPath,
+                        'relPath'  => $relPath,
+                    ];
+
+                    if ('prod' == $env) {
+                        $assets[$ext]['libraries'][$relPath] = $details;
+                    } else {
+                        $assets[$ext][$relPath] = $details;
+                    }
                 }
 
                 $modifiedLast = [];

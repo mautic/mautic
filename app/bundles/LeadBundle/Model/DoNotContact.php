@@ -66,13 +66,13 @@ class DoNotContact implements MauticModelInterface
     /**
      * Create a DNC entry for a lead.
      *
-     * @param int          $contactId
-     * @param string|array $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
-     * @param int          $reason                   Must be a class constant from the DoNotContact class
-     * @param bool         $persist
-     * @param bool         $checkCurrentStatus
-     * @param bool         $allowUnsubscribeOverride
+     * @param \Mautic\LeadBundle\Entity\Lead|int|null $contactId
+     * @param string|array                            $channel                  If an array with an ID, use the structure ['email' => 123]
+     * @param string                                  $comments
+     * @param int                                     $reason                   Must be a class constant from the DoNotContact class
+     * @param bool                                    $persist
+     * @param bool                                    $checkCurrentStatus
+     * @param bool                                    $allowUnsubscribeOverride
      *
      * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
@@ -206,14 +206,6 @@ class DoNotContact implements MauticModelInterface
 
         // Re-add the entry to the lead
         $contact->addDoNotContactEntry($dnc);
-    }
-
-    /**
-     * Clear DoNotContact entities from Doctrine UnitOfWork.
-     */
-    public function clearEntities()
-    {
-        $this->dncRepo->clear();
     }
 
     /**

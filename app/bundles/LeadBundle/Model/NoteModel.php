@@ -32,7 +32,6 @@ class NoteModel extends FormModel
     public function getRepository(): LeadNoteRepository
     {
         $result = $this->em->getRepository(LeadNote::class);
-        \assert($result instanceof LeadNoteRepository);
 
         return $result;
     }

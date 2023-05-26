@@ -62,8 +62,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
