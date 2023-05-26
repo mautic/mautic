@@ -82,7 +82,7 @@ class CommonEvent extends Event
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
