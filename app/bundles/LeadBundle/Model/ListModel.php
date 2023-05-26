@@ -1343,12 +1343,17 @@ class ListModel extends FormModel
         return $leadCounts;
     }
 
-    public function getSegmentsBuildTime($limit = 10, string $order = 'DESC', array $segmentsFilter = [], $canViewOthers = true)
+    /**
+     * @param array<int,int> $segmentsFilter
+     *
+     * @return array<int,LeadList>
+     */
+    public function getSegmentsBuildTime(int $limit = 10, string $order = 'DESC', array $segmentsFilter = [], bool $canViewOthers = true): array
     {
         $criteria = ['isPublished' => true];
 
         if (!$canViewOthers) {
-            $criteria['userId'] = $this->userHelper->getUser()->getId();
+            $criteria['createdBy'] = $this->userHelper->getUser()->getId();
         }
 
         if (!empty($segmentsFilter)) {

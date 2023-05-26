@@ -9,14 +9,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DashboardSegmentsBuildTime extends AbstractType
 {
-    private $segmentModel;
+    private ListModel $segmentModel;
 
     public function __construct(ListModel $segmentModel)
     {
         $this->segmentModel = $segmentModel;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'order',

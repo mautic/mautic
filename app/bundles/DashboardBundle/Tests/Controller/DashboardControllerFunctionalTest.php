@@ -124,6 +124,9 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         return $segment;
     }
 
+    /**
+     * @return array<int,array<int,string>>
+     */
     private function widgetHtmlWithTableToArray(string $widgetHtml): array
     {
         $doc = new DOMDocument();
