@@ -349,7 +349,7 @@ class ReportController extends FormController
 
                 if ($oldSchedule != $newSchedule) {
                     $entity->setHasScheduleChanged(true);
-                }//check if schedule has changes, if yes, set unique check to true (how?)
+                }
 
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);
