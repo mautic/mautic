@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -21,7 +21,7 @@ class Tag
     private $tag;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -42,8 +42,8 @@ class Tag
             ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
-        $builder->addField('tag', Type::STRING);
-        $builder->addNamedField('description', Type::TEXT, 'description', true);
+        $builder->addField('tag', Types::STRING);
+        $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata)

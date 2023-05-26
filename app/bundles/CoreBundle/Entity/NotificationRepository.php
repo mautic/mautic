@@ -11,8 +11,6 @@ class NotificationRepository extends CommonRepository
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -73,7 +71,7 @@ class NotificationRepository extends CommonRepository
 
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
-                $this->getEntityManager()->getConnection()->executeUpdate(
+                $this->getEntityManager()->getConnection()->executeStatement(
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {

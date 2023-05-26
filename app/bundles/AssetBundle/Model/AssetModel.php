@@ -163,6 +163,11 @@ class AssetModel extends FormModel
 
         $download = new Download();
         $download->setDateDownload(new \Datetime());
+        $download->setUtmCampaign($request->get('utm_campaign'));
+        $download->setUtmContent($request->get('utm_content'));
+        $download->setUtmMedium($request->get('utm_medium'));
+        $download->setUtmSource($request->get('utm_source'));
+        $download->setUtmTerm($request->get('utm_term'));
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -202,7 +207,7 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                    $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -229,7 +234,7 @@ class AssetModel extends FormModel
                 $lead = $systemEntry['lead'];
                 if (!$lead instanceof Lead) {
                     $leadId = is_array($lead) ? $lead['id'] : $lead;
-                    $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                    $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
                 }
 
                 $download->setLead($lead);
@@ -244,7 +249,7 @@ class AssetModel extends FormModel
                 $email = $systemEntry['email'];
                 if (!$email instanceof Email) {
                     $emailId = is_array($email) ? $email['id'] : $email;
-                    $email   = $this->em->getReference('MauticEmailBundle:Email', $emailId);
+                    $email   = $this->em->getReference(\Mautic\EmailBundle\Entity\Email::class, $emailId);
                 }
 
                 $download->setEmail($email);
@@ -333,7 +338,7 @@ class AssetModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Asset');
+        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Asset::class);
     }
 
     /**
@@ -341,7 +346,7 @@ class AssetModel extends FormModel
      */
     public function getDownloadRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Download');
+        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
     }
 
     /**

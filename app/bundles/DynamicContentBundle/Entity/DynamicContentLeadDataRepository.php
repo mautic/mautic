@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class DynamicContentLeadDataRepository extends CommonRepository
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\ChannelBundle\Entity\MessageRepository;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -368,9 +368,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
                     ]
                 )
             );
@@ -506,9 +506,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
                     ]
                 )
             );
@@ -568,9 +568,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
                     ]
                 )
             );
@@ -604,10 +604,10 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticChannelBundle:MessageQueue', $this->createMock(MessageRepository::class)],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
                     ]
                 )
             );
@@ -825,9 +825,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:DoNotContact', $doNotContactRepo],
-                        ['MauticPageBundle:Trackable', $trackableRepo],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\DoNotContact::class, $doNotContactRepo],
+                        [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
                     ]
                 )
             );

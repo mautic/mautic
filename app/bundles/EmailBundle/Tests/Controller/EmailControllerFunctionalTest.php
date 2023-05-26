@@ -39,7 +39,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->persist($email);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($email);
 
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();

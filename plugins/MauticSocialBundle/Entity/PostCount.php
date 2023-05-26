@@ -16,7 +16,7 @@ class PostCount
     private $id;
 
     /**
-     * @var Monitoring
+     * @var Monitoring|null
      */
     private $monitor;
 

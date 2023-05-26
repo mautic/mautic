@@ -31,7 +31,7 @@ class ProcessEmailQueueCommand extends ModeratedCommand
         CoreParametersHelper $parametersHelper,
         PathsHelper $pathsHelper
     ) {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $parametersHelper);
 
         $this->swiftTransport   = $swiftTransport;
         $this->eventDispatcher  = $eventDispatcher;

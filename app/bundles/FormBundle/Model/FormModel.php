@@ -130,7 +130,7 @@ class FormModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Form');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
     }
 
     /**
@@ -388,7 +388,7 @@ class FormModel extends CommonFormModel
         $deleteActions   = [];
         foreach ($actions as $actionId) {
             if (isset($existingActions[$actionId])) {
-                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $actionEntity = $this->em->getReference(\Mautic\FormBundle\Entity\Action::class, (int) $actionId);
                 $entity->removeAction($actionEntity);
                 $deleteActions[] = $actionId;
             }
@@ -541,19 +541,20 @@ class FormModel extends CommonFormModel
         $html               = $this->twig->render(
             $formToRender,
             [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $viewOnlyFields,
-                'fields'         => $fields,
-                'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
-                'form'           => $entity,
-                'theme'          => '@themes/'.$entity->getTemplate().'/Field/',
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
-                'displayManager' => $displayManager,
+                'fieldSettings'          => $this->getCustomComponents()['fields'],
+                'viewOnlyFields'         => $viewOnlyFields,
+                'fields'                 => $fields,
+                'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'                   => $entity,
+                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'submissions'            => $submissions,
+                'lead'                   => $lead,
+                'formPages'              => $pages,
+                'lastFormPage'           => $lastPage,
+                'style'                  => $style,
+                'inBuilder'              => false,
+                'displayManager'         => $displayManager,
+                'successfulSubmitAction' => $this->coreParametersHelper->get('successful_submit_action'),
             ]
         );
 

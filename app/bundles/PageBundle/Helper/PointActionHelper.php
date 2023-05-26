@@ -62,7 +62,7 @@ class PointActionHelper
             return false;
         }
 
-        $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $hitRepository = $factory->getEntityManager()->getRepository(\Mautic\PageBundle\Entity\Hit::class);
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 

@@ -178,6 +178,7 @@ class CoreSubscriberTest extends TestCase
 
         $controller = $this->getMockBuilder(CommonController::class)
             ->onlyMethods(['initialize', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag', 'setModelFactory'])
+            ->disableOriginalConstructor()
             ->getMock();
 
         $kernel  = new AppKernel(MAUTIC_ENV, false);

@@ -497,8 +497,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if ($integrationEntities) {
-                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
                 // No use checking the next page if there are less records than the requested page size
@@ -579,7 +579,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
             $this->getName(),
             $object,
@@ -659,8 +659,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if (!empty($integrationEntities)) {
-                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
                 $leadPushed = true;
@@ -989,9 +989,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         if ($persistEntities) {
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
+            $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
-            $this->em->clear(IntegrationEntity::class);
         }
     }
 

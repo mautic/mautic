@@ -29,27 +29,27 @@ class Asset extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $storageLocation = 'local';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remotePath;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $originalFileName;
 
@@ -123,22 +123,22 @@ class Asset extends FormEntity
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $extension;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mime;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $size;
 
@@ -148,7 +148,7 @@ class Asset extends FormEntity
     private $downloadUrl;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $disallow = false;
 

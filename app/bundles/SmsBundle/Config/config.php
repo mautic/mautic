@@ -89,6 +89,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
+                    'mautic.lead.repository.lead',
                 ],
             ],
             'mautic.sms.broadcast.query' => [

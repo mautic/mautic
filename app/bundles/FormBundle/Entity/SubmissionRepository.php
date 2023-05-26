@@ -442,7 +442,7 @@ class SubmissionRepository extends CommonRepository
         $q->select('s.id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('s.form_id', (int) $formId),
                     $q->expr()->in('s.id', $ids)
                 )
@@ -495,7 +495,7 @@ class SubmissionRepository extends CommonRepository
             ->from($this->getResultsTableName($form, $formAlias), 'r')
             ->leftJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 's.id = r.submission_id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('s.lead_id', ':lead'),
                     $q->expr()->eq('s.form_id', ':form')
                 )
@@ -547,7 +547,7 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

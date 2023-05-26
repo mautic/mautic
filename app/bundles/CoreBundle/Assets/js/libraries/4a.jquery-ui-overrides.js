@@ -1,3 +1,4 @@
+// Mautic note: This seem to be an addition to the original jQuery UI library specific for Mautic. It is not part of the original library.
 (function( $ ) {
     $.ui.ddmanager.frameOffsets = {};
 

@@ -41,7 +41,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void
     {

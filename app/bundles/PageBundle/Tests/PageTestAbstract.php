@@ -140,8 +140,8 @@ class PageTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticPageBundle:Page', $pageRepository],
-                        ['MauticPageBundle:Hit', $hitRepository],
+                        [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
+                        [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
                     ]
                 )
             );

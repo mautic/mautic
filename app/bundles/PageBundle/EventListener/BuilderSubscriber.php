@@ -158,7 +158,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $expr           = $this->connection->getExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -527,7 +527,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->twig->render('@MauticPage/SubscribedEvents\PageToken/sharebtn_css.html.twig');
+            $this->twig->render('@MauticPage/SubscribedEvents/PageToken/sharebtn_css.html.twig');
         }
 
         return $content;
@@ -705,7 +705,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->twig->render('@MauticPage/SubscribedEvents\PageToken/langbar.html.twig', ['pages' => $related]);
+            $langbar = $this->twig->render('@MauticPage/SubscribedEvents/PageToken/langbar.html.twig', ['pages' => $related]);
         }
 
         return $langbar;

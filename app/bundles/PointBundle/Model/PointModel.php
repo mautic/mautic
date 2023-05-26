@@ -76,7 +76,7 @@ class PointModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Point');
+        return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
     }
 
     /**
@@ -313,11 +313,10 @@ class PointModel extends CommonFormModel
 
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
-            // Detach logs to reserve memory
-            $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+            $this->getRepository()->detachEntities($persist);
         }
 
-        if (!empty($lead->getpointchanges())) {
+        if (!empty($lead->getPointChanges())) {
             $this->leadModel->saveEntity($lead);
         }
     }
