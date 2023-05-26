@@ -64,6 +64,11 @@ class AssetGenerationHelper
         'jquery-ui/ui/effects/effect-size.js',
         'jquery-ui/ui/effects/effect-slide.js',
         'jquery-ui/ui/effects/effect-transfer.js',
+        'jquery-ui/ui/safe-active-element.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/button.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/resizable.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/slider.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/controlgroup.js', // needed for ElFinder
         // TODO: Add the rest of the libraries here.
     ];
 
