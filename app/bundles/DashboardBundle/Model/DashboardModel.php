@@ -64,7 +64,6 @@ class DashboardModel extends FormModel
     public function getRepository(): WidgetRepository
     {
         $result = $this->em->getRepository(Widget::class);
-        \assert($result instanceof WidgetRepository);
 
         return $result;
     }

@@ -248,8 +248,7 @@ Mautic.processPageContent = function (response) {
 
         if (response.route) {
             //update URL in address bar
-            MauticVars.manualStateChange = false;
-            History.pushState(null, "Mautic", response.route);
+            history.pushState(null, "Mautic", response.route);
 
             //update Title
             Mautic.generatePageTitle( response.route );
@@ -1517,12 +1516,13 @@ Mautic.activateListFilterSelect = function(el) {
  * @param el
  */
 Mautic.activateColorPicker = function(el, options) {
-    var pickerOptions = mQuery(el).data('color-options');
+    let input = mQuery(el);
+    var pickerOptions = input.data('color-options');
     if (!pickerOptions) {
         pickerOptions = {
             theme: 'bootstrap',
-            change: function (hex, opacity) {
-                mQuery(el).trigger('change.minicolors', hex);
+            change: function (hex) {
+                input.trigger('change.minicolors', hex);
             }
         };
     }
@@ -1531,7 +1531,12 @@ Mautic.activateColorPicker = function(el, options) {
         pickerOptions = mQuery.extend(pickerOptions, options);
     }
 
-    mQuery(el).minicolors(pickerOptions);
+    input.minicolors(pickerOptions);
+
+    // The previous version of the Minicolors library did not use the # in the value. This is for backwards compatibility.
+    input.on('blur', function() {
+        input.val(input.val().replace('#', ''));
+    });
 };
 
 /**

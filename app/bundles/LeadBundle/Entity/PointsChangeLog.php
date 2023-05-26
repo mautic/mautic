@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class PointsChangeLog
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -88,7 +88,7 @@ class PointsChangeLog
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

@@ -65,7 +65,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $campaignResults = [];
                 foreach ($campaigns as $campaign) {
                     $campaignResults[] = $this->twig->render(
-                        '@MauticCampaign/SubscribedEvents\Search/global.html.twig',
+                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
                         [
                             'campaign' => $campaign,
                         ]
@@ -73,7 +73,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($campaigns) > 5) {
                     $campaignResults[] = $this->twig->render(
-                        '@MauticCampaign/SubscribedEvents\Search/global.html.twig',
+                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

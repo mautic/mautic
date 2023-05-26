@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -280,7 +281,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $mauticSecurity,
             $this->createMock(UserHelper::class),
             $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $controller->setContainer($container);
         $controller->setModelFactory($modelFactory);
@@ -362,7 +364,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->createMock(CorePermissions::class),
             $this->createMock(UserHelper::class),
             $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $controller->setContainer($this->internalContainer);
         $controller->setModelFactory($this->modelFactory);
@@ -447,7 +450,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->createMock(CorePermissions::class),
             $this->createMock(UserHelper::class),
             $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $controller->setContainer($this->internalContainer);
         $controller->setModelFactory($this->modelFactory);
@@ -531,7 +535,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $security,
             $this->createMock(UserHelper::class),
             $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $publicController->setModelFactory($modelFactory);
         $publicController->setDispatcher($eventDispatcher);
@@ -581,7 +586,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             $security,
             $this->createMock(UserHelper::class),
             $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $publicController->setModelFactory($modelFactory);
 

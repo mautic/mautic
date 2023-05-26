@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -68,6 +69,7 @@ class FieldApiControllerTest extends CampaignTestAbstract
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),
             $requestStack,
+            $this->createMock(ManagerRegistry::class)
         );
 
         if ($request) {

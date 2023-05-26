@@ -69,7 +69,7 @@ final class Version20191219155630 extends AbstractMauticMigration
             `integration_object_name` varchar(191) COLLATE utf8_unicode_ci NOT NULL,
             `integration_object_id` varchar(191) COLLATE utf8_unicode_ci NOT NULL,
             `last_sync_date` datetime NOT NULL COMMENT '(DC2Type:datetime)',
-            `internal_storage` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT '(DC2Type:json_array)',
+            `internal_storage` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT '(DC2Type:json)',
             `is_deleted` tinyint(1) NOT NULL,
             PRIMARY KEY (`id`),
             KEY `{$this->prefix}internal_object` (`integration`,`internal_object_name`,`internal_object_id`),

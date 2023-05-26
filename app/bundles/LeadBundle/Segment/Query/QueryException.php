@@ -2,12 +2,10 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Doctrine\DBAL\DBALException;
-
 /**
  * @since 2.1.4
  */
-class QueryException extends DBALException
+class QueryException extends \Doctrine\DBAL\Exception
 {
     /**
      * @param $alias

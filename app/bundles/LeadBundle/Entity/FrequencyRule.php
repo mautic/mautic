@@ -32,12 +32,12 @@ class FrequencyRule extends CommonEntity
     private $dateAdded;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $frequencyNumber;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $frequencyTime;
 
@@ -157,7 +157,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -165,7 +165,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $dateAdded
+     * @param \DateTimeInterface $dateAdded
      *
      * @return FrequencyRule
      */
@@ -187,7 +187,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param int $frequencyNumber
+     * @param int|null $frequencyNumber
      *
      * @return FrequencyRule
      */
@@ -209,7 +209,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param string $frequencyTime
+     * @param string|null $frequencyTime
      *
      * @return FrequencyRule
      */

@@ -361,9 +361,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * @param array<string, mixed> $filter
+     * @param CompositeExpression|null $groupExpr
+     * @param array<string, mixed>     $filter
      */
-    public function applyTagFilter(CompositeExpression $groupExpr, array $filter): void
+    public function applyTagFilter($groupExpr, array $filter): CompositeExpression
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')
@@ -374,14 +375,16 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            $groupExpr->add(
+            $groupExpr = $groupExpr->with(
                 $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
             );
         } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            $groupExpr->add(
+            $groupExpr = $groupExpr->with(
                 $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
             );
         }
+
+        return $groupExpr;
     }
 
     public function hasColumnWithPrefix(string $prefix): bool

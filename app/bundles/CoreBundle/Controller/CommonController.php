@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -77,6 +78,13 @@ class CommonController extends AbstractController implements MauticController
      * @var FlashBag
      */
     private $flashBag;
+
+    protected ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
 
     public function setFactory(MauticFactory $factory)
     {
@@ -435,7 +443,7 @@ class CommonController extends AbstractController implements MauticController
         $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
-            // Prevent error in case installer is loaded via index_dev.php
+            // Prevent error in case installer is loaded via dev environment
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 

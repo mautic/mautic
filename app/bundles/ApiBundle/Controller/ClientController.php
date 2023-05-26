@@ -3,6 +3,7 @@
 namespace Mautic\ApiBundle\Controller;
 
 use function assert;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -24,12 +25,12 @@ class ClientController extends FormController
 
     private ClientModel $clientModel;
 
-    public function __construct(CorePermissions $corePermissions, UserHelper $userHelper, ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    public function __construct(CorePermissions $corePermissions, UserHelper $userHelper, ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine)
     {
         $this->corePermissions = $corePermissions;
         $this->clientModel     = $clientModel;
 
-        parent::__construct($corePermissions, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($corePermissions, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**

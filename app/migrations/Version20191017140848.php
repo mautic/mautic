@@ -40,7 +40,7 @@ class Version20191017140848 extends AbstractMauticMigration
         }
 
         if (!$smsStatsTable->hasColumn('details')) {
-            $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD details LONGTEXT NOT NULL COMMENT '(DC2Type:json_array)';");
+            $this->addSql("ALTER TABLE {$this->prefix}sms_message_stats ADD details LONGTEXT NOT NULL COMMENT '(DC2Type:json)';");
         }
     }
 }

@@ -14,13 +14,18 @@ use IteratorAggregate;
  * This is a fast paginator (unlike \Doctrine\ORM\Tools\Pagination\Paginator) that can handle simple queries using no joins or ManyToOne joins.
  * Do not use it if the $query uses oneToMany/ManyToMany joins or other complex parts (use \Doctrine\ORM\Tools\Pagination\Paginator instead).
  *
+ * @template T
  * @implements IteratorAggregate<mixed>
  */
 class SimplePaginator implements IteratorAggregate, Countable
 {
+    /** @var Query<T> */
     private Query $query;
     private ?int $count = null;
 
+    /**
+     * @param Query<T> $query a Doctrine ORM query or query builder
+     */
     public function __construct(Query $query)
     {
         $this->query = $query;

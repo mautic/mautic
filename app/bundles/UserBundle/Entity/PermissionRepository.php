@@ -17,7 +17,7 @@ class PermissionRepository extends CommonRepository
     {
         $query = $this
             ->createQueryBuilder('p')
-            ->delete('MauticUserBundle:Permission', 'p')
+            ->delete(\Mautic\UserBundle\Entity\Permission::class, 'p')
             ->where('p.role = :role')
             ->setParameter(':role', $role)
             ->getQuery();

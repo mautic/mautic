@@ -3,10 +3,9 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -47,42 +46,42 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $subject;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $useOwnerAsMailer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $replyToAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $bccAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
@@ -97,17 +96,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $utmTags = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $plainText;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customHtml;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $emailType = 'template';
 
@@ -122,9 +121,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $publishDown;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $publicPreview = 0;
+    private $publicPreview = false;
 
     /**
      * @var int
@@ -142,17 +141,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -167,17 +166,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form
+     * @var \Mautic\FormBundle\Entity\Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 
@@ -259,24 +258,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-        $builder->addNullableField('subject', Type::TEXT);
-        $builder->addNullableField('fromAddress', Type::STRING, 'from_address');
-        $builder->addNullableField('fromName', Type::STRING, 'from_name');
-        $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
-        $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
-        $builder->addNullableField('useOwnerAsMailer', Type::BOOLEAN, 'use_owner_as_mailer');
-        $builder->addNullableField('template', Type::STRING);
-        $builder->addNullableField('content', Type::TARRAY);
-        $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
-        $builder->addNullableField('plainText', Type::TEXT, 'plain_text');
-        $builder->addNullableField('customHtml', Type::TEXT, 'custom_html');
-        $builder->addNullableField('emailType', Type::TEXT, 'email_type');
+        $builder->addNullableField('subject', Types::TEXT);
+        $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
+        $builder->addNullableField('fromName', Types::STRING, 'from_name');
+        $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
+        $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
+        $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
+        $builder->addNullableField('template', Types::STRING);
+        $builder->addNullableField('content', Types::ARRAY);
+        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
+        $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
+        $builder->addNullableField('emailType', Types::TEXT, 'email_type');
         $builder->addPublishDates();
-        $builder->addNamedField('readCount', Type::INTEGER, 'read_count');
-        $builder->addNamedField('sentCount', Type::INTEGER, 'sent_count');
-        $builder->addNamedField('variantSentCount', Type::INTEGER, 'variant_sent_count');
-        $builder->addNamedField('variantReadCount', Type::INTEGER, 'variant_read_count');
-        $builder->addField('revision', Type::INTEGER);
+        $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
+        $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
+        $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
+        $builder->addNamedField('variantReadCount', Types::INTEGER, 'variant_read_count');
+        $builder->addField('revision', Types::INTEGER);
         $builder->addCategory();
 
         $builder->createManyToMany('lists', LeadList::class)
@@ -313,9 +312,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->build();
 
-        $builder->addField('headers', 'json_array');
+        $builder->addField('headers', 'json');
 
-        $builder->addNullableField('publicPreview', Type::BOOLEAN, 'public_preview');
+        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -889,7 +888,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     public function getLists()
     {
@@ -913,7 +912,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setLists(array $lists = [])
     {
-        $this->lists = $lists;
+        $this->lists = new ArrayCollection($lists);
 
         return $this;
     }
