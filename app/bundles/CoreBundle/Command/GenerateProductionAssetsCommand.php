@@ -44,7 +44,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Check that the directory node_modules exists.
-        $nodeModulesDir = $this->pathsHelper->getSystemPath('root', true).'/node_modules';
+        $nodeModulesDir = $this->pathsHelper->getVendorPath().'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
             $output->writeln('<error>'.$this->translator->trans("{$nodeModulesDir} does not exist. Execute `npm install` to generate it.").'</error>');
 
