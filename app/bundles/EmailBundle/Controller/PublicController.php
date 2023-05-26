@@ -19,24 +19,21 @@ use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\QueueBundle\Queue\QueueName;
+use Mautic\QueueBundle\Queue\QueueService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
-
-    private MessageBusInterface $messageBus;
-    private LoggerInterface $logger;
 
     /**
      * @param $idHash
@@ -100,17 +97,18 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function trackingImageAction(
-        Request $request,
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger,
-        $idHash
-    ) {
-        try {
-            $messageBus->dispatch(new EmailHitNotification($idHash, $request));
-        } catch (\Exception $exception) {
-            $logger->error($exception->getMessage(), ['idHash' => $idHash]);
-            $this->getModel('email')->hitEmail($idHash, $request);
+    public function trackingImageAction(Request $request, QueueService $queueService, $idHash)
+    {
+        if ($queueService->isQueueEnabled()) {
+            $msg = [
+                'request' => $request,
+                'idHash'  => $idHash,
+            ];
+            $queueService->publishToQueue(QueueName::EMAIL_HIT, $msg);
+        } else {
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+            $model->hitEmail($idHash, $request);
         }
 
         return TrackingPixelHelper::getResponse($request);

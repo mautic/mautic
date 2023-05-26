@@ -23,7 +23,6 @@ class MauticCoreExtension extends Extension
         'DTO',
         'Migrations',
         'Migration',
-        'Message',
         'Form/DataTransformer',
         'Security',
     ];

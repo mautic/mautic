@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,14 +18,11 @@ class UnusedIpDeleteCommand extends ModeratedCommand
 
     private IpAddressModel $ipAddressModel;
 
-    public function __construct(
-        IpAddressModel $ipAddressModel,
-        PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
-    ) {
+    public function __construct(IpAddressModel $ipAddressModel, PathsHelper $pathsHelper)
+    {
         $this->ipAddressModel = $ipAddressModel;
 
-        parent::__construct($pathsHelper, $coreParametersHelper);
+        parent::__construct($pathsHelper);
     }
 
     protected function configure(): void

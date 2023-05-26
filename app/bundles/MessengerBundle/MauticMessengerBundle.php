@@ -1,20 +1,22 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Mautic\MessengerBundle;
 
+use Mautic\MessengerBundle\DependencyInjection\Compiler\MessengerTransportPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Class MessengerBundle.
+ */
 class MauticMessengerBundle extends Bundle
 {
-    public const LOG_PREFIX = 'messenger: ';
-
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
-
-        include __DIR__.'/Config/parameters.php';
+        $container->addCompilerPass(new MessengerTransportPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }
