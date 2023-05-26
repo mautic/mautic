@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -26,11 +25,6 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var DoNotContact|(DoNotContact&MockObject)|MockObject
      */
     private DoNotContact|MockObject $doNotContact;
-
-    /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $emailModel;
 
     /**
      * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
