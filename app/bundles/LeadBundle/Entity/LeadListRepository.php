@@ -233,7 +233,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
             ->orderBy('l.name');
 
@@ -252,7 +252,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, publicName, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 

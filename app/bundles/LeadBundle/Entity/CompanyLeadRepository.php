@@ -82,7 +82,7 @@ class CompanyLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
 
         $q->where($q->expr()->eq('cl.company_id', ':company'))
-            ->setParameter(':company', $companyId);
+            ->setParameter('company', $companyId);
 
         return $q->execute()->fetchAllAssociative();
     }
@@ -160,7 +160,7 @@ class CompanyLeadRepository extends CommonRepository
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
             ->set('company', ':company')
-            ->setParameter(':company', $company->getName())
+            ->setParameter('company', $company->getName())
             ->where(
                 $q->expr()->in('id', $leadIds)
             )->execute();

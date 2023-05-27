@@ -147,7 +147,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              */
             $valueParams = [];
             for ($i = 0; $i < count($value); ++$i) {
-                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
+                $valueParams[$this->generateRandomParameterName()] = $value[$i];
             }
 
             $q->andWhere(
@@ -197,7 +197,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
-            ->setParameter(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->setParameter('emails', $emails, Connection::PARAM_STR_ARRAY)
             ->getArrayResult();
 
         return array_map(

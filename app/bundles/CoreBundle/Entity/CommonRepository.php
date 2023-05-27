@@ -250,10 +250,10 @@ class CommonRepository extends ServiceEntityRepository
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias())
-                      ->setParameter(':alias', $alias);
+                      ->setParameter('alias', $alias);
 
             $expr = $q->expr()->andX(
-                $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
+                $q->expr()->eq($this->getTableAlias().'.alias', 'alias')
             );
 
             $metadata = $this->getClassMetadata();
