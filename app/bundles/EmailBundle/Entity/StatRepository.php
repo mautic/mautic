@@ -672,8 +672,8 @@ class StatRepository extends CommonRepository
             ->where('s.email_id = :email')
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('s.is_failed = 0')
-            ->setParameter(':email', $emailId)
-            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('email', $emailId)
+            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy('s.lead_id');
 
         $results = $query->execute()->fetchAllAssociative();

@@ -156,9 +156,9 @@ class NotificationRepository extends CommonRepository
             ->where('user_id = :userId')
             ->andWhere('deduplicate = :deduplicate')
             ->andWhere('date_added >= :from')
-            ->setParameter(':userId', $userId)
-            ->setParameter(':deduplicate', $deduplicate)
-            ->setParameter(':from', $from->format('Y-m-d H:i:s'))
+            ->setParameter('userId', $userId)
+            ->setParameter('deduplicate', $deduplicate)
+            ->setParameter('from', $from->format('Y-m-d H:i:s'))
             ->setMaxResults(1);
 
         return (bool) $qb->execute()

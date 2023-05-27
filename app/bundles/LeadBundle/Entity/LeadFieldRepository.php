@@ -37,7 +37,7 @@ class LeadFieldRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('is_published', ':true')
             )
-                ->setParameter(':true', true, 'boolean');
+                ->setParameter('true', true, 'boolean');
         }
 
         if ($object) {
