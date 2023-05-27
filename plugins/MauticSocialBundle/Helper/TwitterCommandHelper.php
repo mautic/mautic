@@ -413,7 +413,7 @@ class TwitterCommandHelper
         $monitorLead->setDateAdded(new \DateTime());
 
         /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository('MauticSocialBundle:lead');
+        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);
     }
