@@ -46,8 +46,14 @@ class AppKernel extends Kernel
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
-            define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
+            /**
+            * Temporarily stopping the detection until I figure out something to detect the database version
+            * for now I am fixing it to the current version of MariaDB
+            *
+            * $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
+            * define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
+             */
+            define('MAUTIC_DB_SERVER_VERSION', 'mariadb-10.3.38');
         }
 
         parent::__construct($environment, $debug);

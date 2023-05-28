@@ -246,6 +246,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
         $this->runCommand('doctrine:database:create');
         $this->runCommand('doctrine:schema:create');
+        $this->runCommand('doctrine:migration:sync-metadata-storage');
     }
 
     private function generateResetDatabaseSql(string $file): void
