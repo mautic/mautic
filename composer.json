@@ -28,7 +28,7 @@
     "friendsofphp/php-cs-fixer": "^3.5",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
-    "liip/test-fixtures-bundle": "^2.0",
+    "liip/test-fixtures-bundle": "^2.6",
     "mautic/transifex": "^5.0",
     "php-http/mock-client": "^1.4",
     "phpstan/extension-installer": "^1.3",
