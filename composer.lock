@@ -5707,7 +5707,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "23b8f438dc07c608430f5bc38bcc389d617cc910"
+                "reference": "fab7fa182e86516a5484aa550f0ac1cc508f00e7"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5746,7 +5746,7 @@
                 "lightsaml/sp-bundle": "dev-symfony5",
                 "matomo/device-detector": "^4.0",
                 "mrclay/minify": "2.2.0",
-                "noxlogic/ratelimit-bundle": "^1.11",
+                "noxlogic/ratelimit-bundle": "^1.19",
                 "oneup/uploader-bundle": "^3.1.0",
                 "php": "~8.0",
                 "php-amqplib/rabbitmq-bundle": "^2.5.1",
@@ -6343,30 +6343,30 @@
         },
         {
             "name": "noxlogic/ratelimit-bundle",
-            "version": "v1.18.0",
+            "version": "v1.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaytaph/RateLimitBundle.git",
-                "reference": "27f31b17ae46740f8948c38291db59cf7e663e4b"
+                "reference": "f5fe8e0ae8e1481f16c7c9ad89fae66c89512d37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaytaph/RateLimitBundle/zipball/27f31b17ae46740f8948c38291db59cf7e663e4b",
-                "reference": "27f31b17ae46740f8948c38291db59cf7e663e4b",
+                "url": "https://api.github.com/repos/jaytaph/RateLimitBundle/zipball/f5fe8e0ae8e1481f16c7c9ad89fae66c89512d37",
+                "reference": "f5fe8e0ae8e1481f16c7c9ad89fae66c89512d37",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
                 "sensio/framework-extra-bundle": "^3.0|^4.0|^5.0|^6.0",
-                "symfony/framework-bundle": "^3.4.23|^4.3|^4.4|^5.0"
+                "symfony/framework-bundle": "^3.4.23|^4.4|^5.4.2|^6.1"
             },
             "require-dev": {
                 "doctrine/cache": "^1.5",
                 "friendsofsymfony/oauth-server-bundle": "^1.5",
-                "phpunit/phpunit": "^7.0|^8.5|^9.0",
+                "phpunit/phpunit": "^8.5.31|^9.5",
                 "predis/predis": "^0.8|^1.1",
-                "psr/cache": "^1.0",
-                "psr/simple-cache": "^1.0"
+                "psr/cache": "^1.0|^2.0",
+                "psr/simple-cache": "^1.0|^2.0"
             },
             "suggest": {
                 "doctrine/doctrine-cache-bundle": "Use Doctrine Cache as a storage engine.",
@@ -6398,9 +6398,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jaytaph/RateLimitBundle/issues",
-                "source": "https://github.com/jaytaph/RateLimitBundle/tree/v1.18.0"
+                "source": "https://github.com/jaytaph/RateLimitBundle/tree/v1.19.0"
             },
-            "time": "2022-01-24T15:00:19+00:00"
+            "time": "2023-03-13T12:24:37+00:00"
         },
         {
             "name": "oneup/uploader-bundle",
