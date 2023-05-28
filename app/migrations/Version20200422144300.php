@@ -68,10 +68,9 @@ class Version20200422144300 extends AbstractMauticMigration
                 type = 'lookup' AND
                 properties LIKE '%|%'
 SQL;
-
-        $stmt = $this->connection->prepare($sql);
-        $stmt->executeQuery();
-        $this->rowsToMigrateLookup = $stmt->fetchAllAssociative();
+        $stmt                      = $this->connection->prepare($sql);
+        $result                    = $stmt->execute();
+        $this->rowsToMigrateLookup = $result->fetchAllAssociative();
     }
 
     private function migrateLookups()
@@ -101,10 +100,9 @@ SQL;
                 ) AND
                     properties LIKE '%|%'
 SQL;
-
-        $stmt = $this->connection->prepare($sql);
-        $stmt->executeQuery();
-        $this->rowsToMigrateSelectMultiselect = $stmt->fetchAllAssociative();
+        $stmt                                 = $this->connection->prepare($sql);
+        $result                               = $stmt->execute();
+        $this->rowsToMigrateSelectMultiselect = $result->fetchAllAssociative();
     }
 
     private function migrateSelects()

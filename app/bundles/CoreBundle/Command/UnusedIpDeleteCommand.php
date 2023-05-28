@@ -53,7 +53,7 @@ EOT
         }
 
         try {
-            $limit       = $input->getOption('limit');
+            $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (\Doctrine\DBAL\Exception $e) {

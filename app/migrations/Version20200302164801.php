@@ -25,9 +25,9 @@ class Version20200302164801 extends AbstractMauticMigration
             WHERE properties LIKE '%s:11:\"empty_value\"%'
         ";
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->executeQuery();
-        $found = (bool) $stmt->fetchAssociative();
+        $stmt   = $this->connection->prepare($sql);
+        $result = $stmt->execute();
+        $found  = (bool) $result->fetchAssociative();
 
         if (!$found) {
             throw new SkipMigration('Schema includes this migration');

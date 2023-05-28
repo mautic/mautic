@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -241,22 +241,22 @@ class DBALMocker
 
     public function getMockResultStatement()
     {
-        $mock = $this->testCase->getMockBuilder(ResultStatement::class)
+        $mock = $this->testCase->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
             ->setMethods([
-                'closeCursor',
-                'columnCount',
-                'setFetchMode',
-                'fetch',
-                'fetchAll',
-                'fetchOne',
-                'fetchAllAssociative',
-                'fetchColumn',
+                'fetchNumeric',
                 'fetchAssociative',
+                'fetchOne',
+                'fetchAllNumeric',
+                'fetchAllAssociative',
+                'fetchFirstColumn',
+                'rowCount',
+                'columnCount',
+                'free',
             ])
             ->getMock();
 
-        $mock->method('closeCursor')
+        $mock->method('free')
             ->willReturn(true);
 
         $mock->method('setFetchMode')
