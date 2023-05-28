@@ -65,7 +65,7 @@
     "doctrine/orm": "^2.8.0",
     "knplabs/gaufrette": "~0.9.0",
     "aws/aws-sdk-php": "~3.0",
-    "friendsofsymfony/rest-bundle": "^3.0.2",
+    "friendsofsymfony/rest-bundle": "^3.5.0",
     "friendsofsymfony/oauth-server-bundle": "dev-upgrade-2",
     "jms/serializer-bundle": "^5.0",
     "joomla/filter": "~1.4.4",
