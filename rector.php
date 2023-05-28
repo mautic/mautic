@@ -47,12 +47,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30, this rule should run after the upgrade to doctrine 3.0
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30,
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_213,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
 
         // @todo implement the whole set. Start rule by rule below.
