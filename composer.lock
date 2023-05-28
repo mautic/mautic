@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "852a78cb8b70eca39244256a43c72433",
+    "content-hash": "025adfd3c96bf7373c5bd918259c4923",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -17647,27 +17647,27 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v5.1.11",
+            "version": "v5.4.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "057e963e15dd45fe920981a56708314028db1995"
+                "reference": "1572c5b7cad812bdf0414d89a32a33a2dafb38ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/057e963e15dd45fe920981a56708314028db1995",
-                "reference": "057e963e15dd45fe920981a56708314028db1995",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/1572c5b7cad812bdf0414d89a32a33a2dafb38ba",
+                "reference": "1572c5b7cad812bdf0414d89a32a33a2dafb38ba",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=7.1.3",
+                "symfony/deprecation-contracts": "^2.1|^3"
             },
             "conflict": {
-                "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0|<6.4,>=6.0|9.1.2"
+                "phpunit/phpunit": "<7.5|9.1.2"
             },
             "require-dev": {
-                "symfony/deprecation-contracts": "^2.1",
-                "symfony/error-handler": "^4.4|^5.0"
+                "symfony/error-handler": "^4.4|^5.0|^6.0"
             },
             "suggest": {
                 "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
@@ -17710,7 +17710,7 @@
             "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/phpunit-bridge/tree/v5.1.11"
+                "source": "https://github.com/symfony/phpunit-bridge/tree/v5.4.23"
             },
             "funding": [
                 {
@@ -17726,7 +17726,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-25T13:53:56+00:00"
+            "time": "2023-04-18T09:42:03+00:00"
         },
         {
             "name": "symfony/web-profiler-bundle",
