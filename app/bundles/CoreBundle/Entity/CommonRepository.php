@@ -252,7 +252,7 @@ class CommonRepository extends ServiceEntityRepository
                       ->setParameter('alias', $alias);
 
             $expr = $q->expr()->andX(
-                $q->expr()->eq($this->getTableAlias().'.alias', 'alias')
+                $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
             );
 
             $metadata = $this->getClassMetadata();
