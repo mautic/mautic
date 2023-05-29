@@ -16,8 +16,6 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param $trackingHash
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -192,7 +190,7 @@ class StatRepository extends CommonRepository
 
         $result = $q->execute()->fetchAllAssociative();
 
-        //index by lead
+        // index by lead
         $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
@@ -342,7 +340,7 @@ class StatRepository extends CommonRepository
             )->setParameter('false', false, 'boolean');
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
                 $sq->expr()->gte('e.date_sent', $sq->expr()->literal($dt->toUtcString()))
@@ -350,7 +348,7 @@ class StatRepository extends CommonRepository
         }
         $sq->groupBy('e.email_id');
 
-        //get a total number of sent emails first
+        // get a total number of sent emails first
         $totalCounts = $sq->execute()->fetchAllAssociative();
 
         $return = [];
@@ -368,7 +366,7 @@ class StatRepository extends CommonRepository
             }
         }
 
-        //now get a read count
+        // now get a read count
         $sq->andWhere('e.is_read = :true')
             ->setParameter('true', true, 'boolean');
         $readCounts = $sq->execute()->fetchAllAssociative();
@@ -559,7 +557,7 @@ class StatRepository extends CommonRepository
             )->setParameter('false', false, 'boolean');
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('e.date_read', $q->expr()->literal($dt->toUtcString()))
@@ -567,7 +565,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.email_id');
 
-        //get a total number of sent emails first
+        // get a total number of sent emails first
         $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
@@ -581,9 +579,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -596,8 +591,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
     public function deleteStat($id)
     {
@@ -624,9 +617,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $emailId
-     *
      * @return array
      */
     public function findContactEmailStats($leadId, $emailId)
@@ -640,9 +630,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $contacts
-     * @param $emailId
-     *
      * @return mixed
      */
     public function checkContactsSentEmail($contacts, $emailId)
@@ -660,8 +647,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
-     *
      * @return array Formatted as [contactId => sentCount]
      */
     public function getSentCountForContacts(array $contacts, $emailId)
@@ -739,10 +724,10 @@ class StatRepository extends CommonRepository
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             )->andWhere("{$leadAlias}.id in (:contacts)")
-            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy("{$leadAlias}.id");
 
-        $results = $queryBuilder->execute()->fetchAllAssociative();
+        $results = $queryBuilder->executeQuery()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -754,9 +739,9 @@ class StatRepository extends CommonRepository
                 'sent_count'              => $sentCount,
                 'read_count'              => $readCount,
                 'clicked_count'           => $clickedCount,
-                'open_rate'               => round(($sentCount > 0 ? ($readCount / $sentCount) : 0), 4),
-                'click_through_rate'      => round(($sentCount > 0 ? ($clickedCount / $sentCount) : 0), 4),
-                'click_through_open_rate' => round(($readCount > 0 ? ($clickedCount / $readCount) : 0), 4),
+                'open_rate'               => round($sentCount > 0 ? ($readCount / $sentCount) : 0, 4),
+                'click_through_rate'      => round($sentCount > 0 ? ($clickedCount / $sentCount) : 0, 4),
+                'click_through_open_rate' => round($readCount > 0 ? ($clickedCount / $readCount) : 0, 4),
             ];
         }
 
