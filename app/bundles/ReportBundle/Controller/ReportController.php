@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
@@ -655,20 +656,23 @@ class ReportController extends FormController
             ]
         );
 
+        $reportDataResult = new ReportDataResult($reportData);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'data'         => $reportData['data'],
-                    'columns'      => $reportData['columns'],
-                    'dataColumns'  => $reportData['dataColumns'],
-                    'totalResults' => $reportData['totalResults'],
-                    'debug'        => $reportData['debug'],
-                    'report'       => $entity,
-                    'reportPage'   => $reportPage,
-                    'graphs'       => $reportData['graphs'],
-                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'limit'        => $reportData['limit'],
-                    'permissions'  => $security->isGranted(
+                    'data'             => $reportData['data'],
+                    'columns'          => $reportData['columns'],
+                    'dataColumns'      => $reportData['dataColumns'],
+                    'totalResults'     => $reportData['totalResults'],
+                    'debug'            => $reportData['debug'],
+                    'report'           => $entity,
+                    'reportPage'       => $reportPage,
+                    'graphs'           => $reportData['graphs'],
+                    'reportDataResult' => $reportDataResult,
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'limit'            => $reportData['limit'],
+                    'permissions'      => $security->isGranted(
                         [
                             'report:reports:viewown',
                             'report:reports:viewother',
@@ -793,13 +797,28 @@ class ReportController extends FormController
                     $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
                     $options['page']            = 1;
                     $handle                     = fopen('php://output', 'r+');
+                    $batchTotals                = [];
+                    $batchDataSize              = 0;
                     do {
                         $reportData = $model->getReportData($entity, null, $options);
+
+                        // Calculate number of pages only once
+                        if (1 === $options['page']) {
+                            $totalPages = (int) ceil($reportData['totalResults'] / $options['limit']);
+                        }
+
+                        // Build the data rows
+                        $isLastBatch = (isset($totalPages) && $totalPages === $options['page']);
+                        $reportDataResult = new ReportDataResult($reportData, $batchTotals, $batchDataSize, $isLastBatch);
+
+                        // Store batch totals and size
+                        $batchTotals = $reportDataResult->getTotals();
+                        $batchDataSize += $reportDataResult->getDataCount();
 
                         // Note this so that it's not recalculated on each batch
                         $options['totalResults'] = $reportData['totalResults'];
 
-                        $model->exportResults($format, $entity, $reportData, $handle, $options['page']);
+                        $model->exportResults($format, $entity, $reportDataResult, $handle, $options['page']);
                         ++$options['page'];
                     } while (!empty($reportData['data']));
 
@@ -812,8 +831,9 @@ class ReportController extends FormController
             if ('xlsx' === $format) {
                 $options['ignoreGraphData'] = true;
             }
-            $reportData = $model->getReportData($entity, null, $options);
-            $response   = $model->exportResults($format, $entity, $reportData);
+            $reportData       = $model->getReportData($entity, null, $options);
+            $reportDataResult = new ReportDataResult($reportData);
+            $response         = $model->exportResults($format, $entity, $reportDataResult);
         }
 
         return $response;
