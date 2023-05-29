@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -17,9 +18,9 @@ class BatchSegmentController extends AbstractFormController
 
     private $segmentModel;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, SegmentActionModel $segmentModel, ListModel $listModel)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, SegmentActionModel $segmentModel, ListModel $listModel, ManagerRegistry $doctrine)
     {
-        parent::__construct($security, $userHelper);
+        parent::__construct($security, $userHelper, $doctrine);
 
         $this->actionModel  = $listModel;
         $this->segmentModel = $segmentModel;
@@ -47,11 +48,11 @@ class BatchSegmentController extends AbstractFormController
                 $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%' => count($contactIds),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([

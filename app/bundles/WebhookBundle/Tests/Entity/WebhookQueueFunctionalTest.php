@@ -89,6 +89,6 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $query  = sprintf('SELECT payload, payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])
-            ->fetch();
+            ->fetchAssociative();
     }
 }

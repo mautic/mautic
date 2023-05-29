@@ -8,9 +8,9 @@ use Mautic\UserBundle\Entity\User;
 class PathsHelper
 {
     /**
-     * @var array
+     * @var array<string, string>
      */
-    private $paths;
+    private array $paths;
 
     /**
      * @var string
@@ -129,6 +129,16 @@ class PathsHelper
     public function getPluginsPath(): string
     {
         return $this->getSystemPath('plugins', true);
+    }
+
+    /**
+     * Returns absolute path to the root directory where the "vendor" directory is located.
+     */
+    public function getVendorRootPath(): string
+    {
+        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+
+        return dirname($reflection->getFileName(), 3);
     }
 
     /**

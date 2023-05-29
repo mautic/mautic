@@ -51,7 +51,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
                 'pauseToDate'      => '',
             ],
             'channel6' => [
-                'frequencyNumber'  => '10',
+                'frequencyNumber'  => 10,
                 'frequencyTime'    => FrequencyRule::TIME_MONTH, // 10
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',

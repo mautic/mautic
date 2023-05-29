@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -418,16 +417,13 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, array $reportData, $handle = null, $page = null)
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                //build the data rows
-                $reportDataResult = new ReportDataResult($reportData);
-
                 if (!is_null($handle)) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
@@ -451,15 +447,9 @@ class ReportModel extends FormModel
                 $content = $this->twig->render(
                     '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData'       => $reportData,
-                        'data'             => $reportData['data'],
-                        'columns'          => $reportData['columns'],
                         'pageTitle'        => $name,
-                        'graphs'           => $reportData['graphs'],
                         'report'           => $report,
-                        'dateFrom'         => $reportData['dateFrom'],
-                        'dateTo'           => $reportData['dateTo'],
-                        'reportDataResult' => new ReportDataResult($reportData),
+                        'reportDataResult' => $reportDataResult,
                     ]
                 );
 
@@ -471,8 +461,8 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 
@@ -639,7 +629,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -748,7 +738,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**
@@ -787,7 +777,7 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $this->em->getConnection()->connect('slave');
         }
 

@@ -131,7 +131,7 @@ class ListApiController extends CommonApiController
      */
     public function addLeadsAction(Request $request, $id)
     {
-        $contactIds = $request->request->get('ids');
+        $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
             return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }

@@ -34,7 +34,7 @@ class FocusBundleExtension extends AbstractExtension
 
     public function compileLess(string $less): string
     {
-        require_once __DIR__.'/../../../Include/lessc.inc.php';
+        require_once __DIR__.'/../../Include/lessc.inc.php';
 
         return (new \lessc())->compile($less);
     }

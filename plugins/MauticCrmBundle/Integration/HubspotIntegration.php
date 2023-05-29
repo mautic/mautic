@@ -553,7 +553,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+                $stage = $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class)->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -596,7 +596,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->em->detach($company);
                     }
                 } catch (\Exception $exception) {
-                    $this->logger->addWarning($exception->getMessage());
+                    $this->logger->warning($exception->getMessage());
 
                     return;
                 }
@@ -661,7 +661,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
                 $integrationEntity     = (empty($integrationId)) ?
                     $this->createIntegrationEntity(

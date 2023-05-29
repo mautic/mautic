@@ -53,7 +53,7 @@ class DataExporterHelper
             }
         }
 
-        $model->getRepository()->clear();
+        $model->getRepository()->detachEntities($items);
 
         return $toExport;
     }

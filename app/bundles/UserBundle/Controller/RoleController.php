@@ -132,14 +132,14 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', [
@@ -243,14 +243,14 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', [
@@ -300,7 +300,7 @@ class RoleController extends FormController
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -445,7 +445,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository('MauticUserBundle:User')->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [

@@ -393,7 +393,7 @@ class PageController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_page_index',
                         '%url%'       => $this->generateUrl('mautic_page_action', [
@@ -548,7 +548,7 @@ class PageController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_page_index',
                         '%url%'       => $this->generateUrl('mautic_page_action', [
@@ -874,7 +874,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function abtestAction($objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model  = $this->getModel('page.page');
@@ -905,7 +905,7 @@ class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($clone);
+        return $this->newAction($request, $assetsHelper, $translator, $clone);
     }
 
     /**

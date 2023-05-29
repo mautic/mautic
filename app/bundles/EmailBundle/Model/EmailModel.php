@@ -206,7 +206,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticEmailBundle:Email');
+        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
     }
 
     /**
@@ -214,7 +214,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticEmailBundle:Stat');
+        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
     }
 
     /**
@@ -222,7 +222,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getCopyRepository()
     {
-        return $this->em->getRepository('MauticEmailBundle:Copy');
+        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Copy::class);
     }
 
     /**
@@ -230,7 +230,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatDeviceRepository()
     {
-        return $this->em->getRepository('MauticEmailBundle:StatDevice');
+        return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
     }
 
     /**
@@ -621,7 +621,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (empty($stat['segment_id']) && !empty($stat['campaign_id'])) {
                 // Let's fetch the segment based on current campaign/segment membership
-                $segmentMembership = $this->em->getRepository('MauticCampaignBundle:Campaign')
+                $segmentMembership = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class)
                     ->getContactSingleSegmentByCampaign($stat['lead_id'], $stat['campaign_id']);
 
                 if ($segmentMembership) {
@@ -750,13 +750,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
 
         /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
+        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 
@@ -1017,7 +1017,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $minContactId = null,
         $maxContactId = null,
         $countWithMaxMin = false,
-        $storeToCache = true
+        $storeToCache = true,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $total      = $this->getRepository()->getEmailPendingLeads(
@@ -1028,7 +1030,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $limit,
             $minContactId,
             $maxContactId,
-            $countWithMaxMin
+            $countWithMaxMin,
+            $maxThreads,
+            $threadId
         );
 
         if ($storeToCache) {
@@ -1083,7 +1087,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $batch = false,
         OutputInterface $output = null,
         $minContactId = null,
-        $maxContactId = null
+        $maxContactId = null,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         //get the leads
         if (empty($lists)) {
@@ -1117,7 +1123,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $progress = false;
         if ($batch && $output) {
             $progressCounter = 0;
-            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false);
+            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             if (!$totalLeadCount) {
                 return [0, 0, []];
             }
@@ -1134,7 +1140,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             $leadCount         = count($leads);
 
             while ($leadCount) {
@@ -1163,7 +1169,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     // Get the next batch of leads
-                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
                     $leadCount = count($leads);
                 } else {
                     $leadCount = 0;
@@ -1784,7 +1790,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function removeDoNotContact($email)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
         $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
@@ -1811,7 +1817,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
 
         if (null === $leadId) {
             $leadId = (array) $leadRepo->getLeadByEmail($email, true);
@@ -1822,7 +1828,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $dnc = [];
         foreach ($leadId as $lead) {
             $dnc[] = $this->doNotContact->addDncForContact(
-                $this->em->getReference('MauticLeadBundle:Lead', $lead),
+                $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead),
                 'email',
                 $reason,
                 $comments,
@@ -1892,7 +1898,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $chart  = new BarChart(array_column($result, 'hour'));
         $counts = array_column($result, 'count');
@@ -2112,7 +2118,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2143,7 +2149,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2157,7 +2163,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getUpcomingEmails($limit = 10, $canViewOthers = true)
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
         $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
 
         return $leadEventLogRepository->getUpcomingEvents(

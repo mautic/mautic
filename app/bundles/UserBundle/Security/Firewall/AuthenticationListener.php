@@ -135,6 +135,7 @@ final class AuthenticationListener
     private function setActivePermissionsOnAuthToken(): void
     {
         $token = $this->tokenStorage->getToken();
+        /** @var User|null $user */
         $user  = $token->getUser();
 
         // If no user associated with a token, it's a client credentials grant type. Handle accordingly.

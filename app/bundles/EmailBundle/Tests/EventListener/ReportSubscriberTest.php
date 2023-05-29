@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -213,13 +213,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph(): void
     {
-        $eventMock        = $this->createMock(ReportGraphEvent::class);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $chartQueryMock   = $this->createMock(ChartQuery::class);
-        $statementMock    = $this->createMock(Statement::class);
-        $translatorMock   = $this->createMock(TranslatorInterface::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $resultMock        = $this->createMock(Result::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($statementMock);
+        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')

@@ -24,27 +24,27 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $publicName;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $alias;
 
@@ -64,12 +64,12 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
     private $leads;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastBuiltDate;
 
@@ -277,7 +277,7 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->addLegacyParams($this->filters);
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
         }
 
         return $this->filters;
@@ -404,7 +404,7 @@ class LeadList extends FormEntity
         );
     }
 
-    public function getLastBuiltDate(): ?\DateTime
+    public function getLastBuiltDate(): ?\DateTimeInterface
     {
         return $this->lastBuiltDate;
     }
@@ -437,5 +437,20 @@ class LeadList extends FormEntity
     public function setLastBuiltTime(?float $lastBuiltTime): void
     {
         $this->lastBuiltTime = $lastBuiltTime;
+    }
+
+    /**
+     * @param mixed[] $filters
+     *
+     * @return mixed[]
+     */
+    private function setFirstFilterGlueToAnd(array $filters): array
+    {
+        foreach ($filters as &$filter) {
+            $filter['glue'] = 'and';
+            break;
+        }
+
+        return $filters;
     }
 }

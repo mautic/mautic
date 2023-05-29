@@ -31,9 +31,7 @@ use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
-use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -472,7 +470,7 @@ class EmailController extends FormController
         //set the page we came from
         $page         = $session->get('mautic.email.page', 1);
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-        $emailForm    = $request->request->get('emailform', []);
+        $emailForm    = $request->request->get('emailform') ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailForm['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -490,8 +488,8 @@ class EmailController extends FormController
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
+                $formData = $request->request->all()['emailform'] ?? [];
+                if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
 
                     $entity->setCustomHtml($content);
@@ -499,7 +497,7 @@ class EmailController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -677,7 +675,7 @@ class EmailController extends FormController
 
         //Create the form
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $emailform    = $request->request->get('emailform', []);
+        $emailform    = $request->request->get('emailform') ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailform['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -693,15 +691,14 @@ class EmailController extends FormController
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
+                if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -760,7 +757,7 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            } elseif ($valid && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
             }
@@ -1421,9 +1418,9 @@ class EmailController extends FormController
                 }
 
                 if (0 != count($errors)) {
-                    $this->addFlash(implode('; ', $errors));
+                    $this->addFlashMessage(implode('; ', $errors));
                 } else {
-                    $this->addFlash('mautic.email.notice.test_sent_multiple.success');
+                    $this->addFlashMessage('mautic.email.notice.test_sent_multiple.success');
                 }
             }
 
@@ -1476,59 +1473,6 @@ class EmailController extends FormController
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php
         $slotsHelper->stop();
-    }
-
-    /**
-     * Checks the form data for webinar tokens and validates that the segment has webinar filters.
-     *
-     * @return int
-     */
-    protected function isFormValidForWebinar(array $data, Form &$form, Email $email)
-    {
-        if (!CitrixHelper::isAuthorized('Gotowebinar')) {
-            return true;
-        }
-
-        // search for webinar filters in the email segments
-        if (!array_key_exists('lists', $data) || 0 === count($data['lists'])) {
-            return true;
-        }
-
-        // search for token in content
-        $html         = $email->getCustomHtml();
-        $isTokenFound = preg_match('/\{webinar_button\}/', $html);
-        if (!$isTokenFound) {
-            return true;
-        }
-
-        $isWebinarFilterPresent = false;
-        $webinarFiltersCount    = 0;
-        $lists                  = $data['lists'];
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-        foreach ($lists as $listId) {
-            $list    = $model->getEntity($listId);
-            $filters = $list->getFilters();
-            foreach ($filters as $filter) {
-                if ('webinar-registration' == $filter['field'] && 'in' == $filter['operator']) {
-                    $isWebinarFilterPresent = true;
-                    ++$webinarFiltersCount;
-                }
-            }
-        }
-        // make sure that each list has a webinar-registration filter
-        if (count($lists) !== $webinarFiltersCount) {
-            $isWebinarFilterPresent = false;
-        }
-        if (!$isWebinarFilterPresent) {
-            $error = $this->translator->trans('plugin.citrix.webinar.token_error');
-            $form->addError(new FormError($error));
-
-            return false;
-        }
-
-        // everything is ok
-        return true;
     }
 
     /**

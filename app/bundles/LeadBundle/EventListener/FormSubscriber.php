@@ -113,6 +113,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'       => 'mautic.lead.lead.events.changetags_descr',
             'formType'          => ModifyLeadTagsType::class,
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [

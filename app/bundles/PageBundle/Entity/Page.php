@@ -38,12 +38,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $alias;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customHtml;
 
@@ -53,12 +53,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $content = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -83,42 +83,42 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $revision = 1;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $metaDescription;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $headScript;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $footerScript;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $redirectType;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $redirectUrl;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isPreferenceCenter;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $noIndex;
 
@@ -425,7 +425,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -450,7 +450,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

@@ -59,7 +59,7 @@ class ThemeController extends FormController
                                 try {
                                     $fileData->move($dir, $fileName);
                                     $themeHelper->install($dir.'/'.$fileName);
-                                    $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                                    $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
                                 } catch (\Exception $e) {
                                     $form->addError(
                                         new FormError(

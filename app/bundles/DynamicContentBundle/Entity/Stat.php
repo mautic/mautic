@@ -13,27 +13,27 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sentCount;
 
@@ -48,12 +48,12 @@ class Stat
     private $sentDetails = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -155,7 +155,7 @@ class Stat
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -163,7 +163,7 @@ class Stat
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
     }
 
     /**
@@ -196,7 +196,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {

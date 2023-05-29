@@ -45,7 +45,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticNotificationBundle:Notification');
+        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Notification::class);
     }
 
     /**
@@ -53,7 +53,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticNotificationBundle:Stat');
+        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Stat::class);
     }
 
     /**

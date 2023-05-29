@@ -67,12 +67,12 @@ class StageRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 
@@ -133,7 +133,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from('MauticStageBundle:Stage', 's', 's.id');
+            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -173,7 +173,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from('MauticStageBundle:Stage', 's', 's.id');
+            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))

@@ -55,7 +55,8 @@ JSON;
         $this->em->persist($channel);
         $this->em->persist($message);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($channel);
+        $this->em->detach($message);
 
         $patchPayload = ['id' => $message->getId()] + $payload;
         $this->client->request('PATCH', "/api/messages/{$message->getId()}/edit", $patchPayload);
@@ -142,7 +143,10 @@ JSON;
         $this->em->persist($message1);
         $this->em->persist($message2);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($channel1);
+        $this->em->detach($channel2);
+        $this->em->detach($message1);
+        $this->em->detach($message2);
 
         $patchPayload = [
             ['id' => $message1->getId(), 'name' => 'API message 1 (updated)'],

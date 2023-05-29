@@ -40,6 +40,12 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(new CsrfToken($aCsrfTokenId, $aCsrfTokenValue));
 
+        $csrfTokenManagerMock
+          ->method('isTokenValid')
+          ->will($this->returnCallback(function (CsrfToken $token) use ($aCsrfTokenValue) {
+              return $token->getValue() === $aCsrfTokenValue;
+          }));
+
         $this->request = new Request();
 
         $this->event = $this->getMockBuilder(RequestEvent::class)

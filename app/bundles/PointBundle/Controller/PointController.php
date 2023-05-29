@@ -120,7 +120,7 @@ class PointController extends AbstractFormController
         //set the page we came from
         $page       = $request->getSession()->get('mautic.point.page', 1);
         $method     = $request->getMethod();
-        $point      = $request->request->get('point', []);
+        $point      = $request->request->get('point') ?? [];
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
         $actions    = $model->getPointActions();
@@ -139,7 +139,7 @@ class PointController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_point_index',
                         '%url%'       => $this->generateUrl('mautic_point_action', [
@@ -253,7 +253,7 @@ class PointController extends AbstractFormController
         }
 
         $method     = $request->getMethod();
-        $point      = $request->request->get('point', []);
+        $point      = $request->request->get('point') ?? [];
         $actionType = 'POST' === $method ? ($point['type'] ?? '') : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -272,7 +272,7 @@ class PointController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_point_index',
                         '%url%'       => $this->generateUrl('mautic_point_action', [

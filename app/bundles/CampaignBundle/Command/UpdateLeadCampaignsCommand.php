@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private CampaignRepository $campaignRepository;
+
     private TranslatorInterface $translator;
     private MembershipBuilder $membershipBuilder;
     private LoggerInterface $logger;
@@ -33,7 +35,8 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         MembershipBuilder $membershipBuilder,
         LoggerInterface $logger,
         FormatterHelper $formatterHelper,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->campaignRepository = $campaignRepository;
         $this->translator         = $translator;
@@ -41,7 +44,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->logger             = $logger;
         $this->formatterHelper    = $formatterHelper;
 
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
@@ -139,7 +142,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 0;
+                return 1;
             }
 
             $this->updateCampaign($campaign);

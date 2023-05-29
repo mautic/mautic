@@ -12,8 +12,7 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
@@ -71,8 +70,8 @@ class Version20200422144300 extends AbstractMauticMigration
 SQL;
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $this->rowsToMigrateLookup = $stmt->fetchAll(FetchMode::ASSOCIATIVE);
+        $stmt->executeQuery();
+        $this->rowsToMigrateLookup = $stmt->fetchAllAssociative();
     }
 
     private function migrateLookups()
@@ -104,8 +103,8 @@ SQL;
 SQL;
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $this->rowsToMigrateSelectMultiselect = $stmt->fetchAll(FetchMode::ASSOCIATIVE);
+        $stmt->executeQuery();
+        $this->rowsToMigrateSelectMultiselect = $stmt->fetchAllAssociative();
     }
 
     private function migrateSelects()

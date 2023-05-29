@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -17,11 +18,11 @@ class CategoryController extends AbstractFormController
 {
     private FormFactoryInterface $formFactory;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, ManagerRegistry $doctrine)
     {
         $this->formFactory = $formFactory;
 
-        parent::__construct($security, $userHelper);
+        parent::__construct($security, $userHelper, $doctrine);
     }
 
     /**
@@ -229,7 +230,7 @@ class CategoryController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.category.notice.created', [
+                    $this->addFlashMessage('mautic.category.notice.created', [
                         '%name%' => $entity->getTitle(),
                     ]);
                 }
@@ -335,7 +336,7 @@ class CategoryController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.category.notice.updated',
                         [
                             '%name%' => $entity->getTitle(),

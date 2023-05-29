@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -45,11 +46,12 @@ class CampaignApiController extends CommonApiController
         AppVersion $appVersion,
         RequestStack $requestStack,
         MembershipManager $membershipManager,
+        ManagerRegistry $doctrine
     ) {
         $this->requestStack      = $requestStack;
         $this->membershipManager = $membershipManager;
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
     }
 
     public function initialize(ControllerEvent $event)
@@ -274,8 +276,8 @@ class CampaignApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $where = InputHelper::clean($request->query->get('where', []));
-        $order = InputHelper::clean($request->query->get('order', []));
+        $where = InputHelper::clean($request->query->get('where') ?? []);
+        $order = InputHelper::clean($request->query->get('order') ?? []);
         $start = (int) $request->query->get('start', 0);
         $limit = (int) $request->query->get('limit', 100);
 

@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
@@ -32,12 +33,13 @@ class EventController extends CommonFormController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         EventCollector $eventCollector,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
+        ManagerRegistry $doctrine
     ) {
         $this->eventCollector = $eventCollector;
         $this->dateHelper     = $dateHelper;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**
@@ -52,7 +54,7 @@ class EventController extends CommonFormController
         $method  = $request->getMethod();
         $session = $request->getSession();
         if ('POST' == $method) {
-            $event                = $request->request->get('campaignevent');
+            $event                = $request->request->all()['campaignevent'] ?? [];
             $type                 = $event['type'];
             $eventType            = $event['eventType'];
             $campaignId           = $event['campaignId'];
@@ -194,7 +196,7 @@ class EventController extends CommonFormController
                 );
             } elseif ('date' == $event['triggerMode']) {
                 /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
-                $dh    = $this->factory->getHelper('template.date');
+                $dh    = $this->factory->getHelper('twig.date');
                 $label = 'mautic.campaign.connection.trigger.date.label';
                 if ('no' == $anchorName) {
                     $label .= '_inaction';
@@ -237,7 +239,7 @@ class EventController extends CommonFormController
         $session       = $request->getSession();
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
-        $campaignEvent = $request->request->get('campaignevent', []);
+        $campaignEvent = $request->request->get('campaignevent') ?? [];
         $campaignId    = 'POST' === $method
             ? ($campaignEvent['campaignId'] ?? '')
             : $request->query->get('campaignId');

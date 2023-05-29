@@ -31,7 +31,7 @@ class DownloadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd');
 
         $q2->where(
-            $q2->expr()->andX(
+            $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
                 $q2->expr()->eq('d.asset_id', (int) $assetId)
             )
@@ -42,7 +42,7 @@ class DownloadRepository extends CommonRepository
             )
             ->setParameter('id', $trackingId);
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -90,7 +90,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -113,7 +113,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -132,7 +132,8 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAll();
+        $results = $query->execute()->fetchAllAssociative();
+
         $chart   = new PieChart();
 
         foreach ($results as $result) {
@@ -172,7 +173,7 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {
@@ -215,7 +216,7 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {

@@ -21,7 +21,7 @@ class TriggerEventModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:TriggerEvent');
+        return $this->em->getRepository(\Mautic\PointBundle\Entity\TriggerEvent::class);
     }
 
     /**

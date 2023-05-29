@@ -1,0 +1,67 @@
+<table class="table">
+    <tr>
+        <th>{{ 'mautic.lead.audit.log.field'|trans }}</th>
+        <th>{{ 'mautic.lead.audit.log.new_value'|trans }}</th>
+        <th>{{ 'mautic.lead.audit.log.old_value'|trans }}</th>
+    </tr>
+    {% for field, values in objects %}
+        <tr>
+        {% if values is iterable %}
+            {% if values|length >= 2 %}
+                <td>{{ field|e }}</td>
+                {% if values['added'] is defined or values['removed'] is defined %}
+                        {% if values['added'] is defined and values['added'] is not empty and values['added'] is not null and values['added'] is iterable %}
+                            {# should merge the values of the array #}
+                            {% set v = '' %}
+                            {% for l, addedValue in values['added'] %}
+                                {% set v = addedValue|join(', ')|e %}
+                            {% endfor %}
+                            <td>{{ normalizeStringValue(v)|e }}</td>
+                        {% elseif values['added'] is defined and values['added'] is not empty and values['added'] is not null and values['added'] is not iterable %}
+                            {# can just display the single value #}
+                            <td>{{ normalizeStringValue(values['added'])|e }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                        {% if values['removed'] is defined and values['removed'] is not empty and values['removed'] is not null and values['removed'] is iterable %}
+                            {# should merge the values of the array #}
+                            {% set v = '' %}
+                            {% for l, removedValue in values['removed'] %}
+                                {% set v = removedValue|join(', ')|e %}
+                            {% endfor %}
+                            <td>{{ normalizeStringValue(v)|e }}</td>
+                        {% elseif values['removed'] is defined and values['removed'] is not empty and values['removed'] is not null and values['removed'] is not iterable %}
+                            {# can just display the single value #}
+                            <td>{{ normalizeStringValue(values['removed'])|e }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                {% elseif values[0] is defined or values[1] is defined %}
+                        {% if values[1] is defined and values[1] is not empty %}
+                            <td>{{ normalizeStringValue(values[1])|e }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                        {% if values[0] is defined and values[0] is not empty %}
+                            <td>{{ normalizeStringValue(values[0])|e }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                {% endif %}
+            {% else %}
+                {% set v = '' %}
+                {% for k, value in values %}
+                    {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                {% endfor %}
+                <td>{{ field|e }}</td>
+                <td>{{ v|e }}</td>
+                <td>&nbsp;</td>
+            {% endif %}
+        {% else %}
+            <td>{{ field|e }}</td>
+            <td>{% if values is string %}{{ normalizeStringValue(values)|e }}{% endif %}</td>
+            <td>&nbsp;</td>
+        {% endif %}
+        </tr>
+    {% endfor %}
+</table>	

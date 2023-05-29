@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
@@ -76,9 +77,10 @@ class TriggerCampaignCommand extends ModeratedCommand
         FormatterHelper $formatterHelper,
         ListModel $listModel,
         SegmentCountCacheHelper $segmentCountCacheHelper,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->campaignRepository        = $campaignRepository;
         $this->dispatcher                = $dispatcher;
@@ -217,16 +219,18 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         // Specific campaign;
         if ($id) {
+            $statusCode = 0;
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+                $statusCode = 1;
             }
 
             $this->completeRun();
 
-            return 0;
+            return (int) $statusCode;
         }
 
         // All published campaigns

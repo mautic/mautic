@@ -263,7 +263,7 @@ class SmsController extends FormController
         //set the page we came from
         $page         = $session->get('mautic.sms.page', 1);
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
-        $sms          = $request->request->get('sms', []);
+        $sms          = $request->request->get('sms') ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -283,7 +283,7 @@ class SmsController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -430,7 +430,7 @@ class SmsController extends FormController
 
         //Create the form
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $sms          = $request->request->get('sms', []);
+        $sms          = $request->request->get('sms') ?? [];
         $updateSelect = 'POST' === $method
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -445,7 +445,7 @@ class SmsController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),

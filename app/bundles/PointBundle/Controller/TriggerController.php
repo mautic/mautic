@@ -175,7 +175,7 @@ class TriggerController extends FormController
         }
 
         $session      = $request->getSession();
-        $pointTrigger = $request->request->get('pointtrigger', []);
+        $pointTrigger = $request->request->get('pointtrigger') ?? [];
         $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(random_int(1, PHP_INT_MAX), true));
 
         if (!$this->security->isGranted('point:triggers:create')) {
@@ -213,7 +213,7 @@ class TriggerController extends FormController
 
                         $model->saveEntity($entity);
 
-                        $this->addFlash('mautic.core.notice.created', [
+                        $this->addFlashMessage('mautic.core.notice.created', [
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [
@@ -362,7 +362,7 @@ class TriggerController extends FormController
                             $triggerEventModel->deleteEntities($deletedEvents);
                         }
 
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [

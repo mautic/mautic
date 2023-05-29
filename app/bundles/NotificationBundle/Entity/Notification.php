@@ -30,7 +30,7 @@ class Notification extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -40,7 +40,7 @@ class Notification extends FormEntity
     private $language = 'en';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $url;
 
@@ -55,7 +55,7 @@ class Notification extends FormEntity
     private $message;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $button;
 
@@ -65,12 +65,12 @@ class Notification extends FormEntity
     private $utmTags = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -85,22 +85,22 @@ class Notification extends FormEntity
     private $sentCount = 0;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\NotificationBundle\Entity\Stat>
      */
     private $stats;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $notificationType = 'template';
 

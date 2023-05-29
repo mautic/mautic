@@ -105,7 +105,7 @@ class AppKernel extends Kernel
         return parent::handle($request, $type, $catch);
     }
 
-    public function registerBundles(): array
+    public function registerBundles(): iterable
     {
         $bundles = [
             // Symfony/Core Bundles
@@ -203,7 +203,6 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
             $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
@@ -239,14 +238,12 @@ class AppKernel extends Kernel
         // load parameters with defaults into the environment
         $parameterLoader = $this->getParameterLoader();
         $parameterLoader->loadIntoEnvironment();
-
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             // Set the table prefix before boot.
             // Firstly look into environment variables.
-            $prefix = getenv('MAUTIC_TABLE_PREFIX');
-
+            $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
             // Secondly look into the local.php file.
-            if (false === $prefix) {
+            if (empty($prefix)) {
                 $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');
             }
 
@@ -292,9 +289,9 @@ class AppKernel extends Kernel
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
             $dbDriver        = $localParameters->get('db_driver');
-            $mailerFromName  = $localParameters->get('mailer_from_name');
+            $siteUrl         = $localParameters->get('site_url');
 
-            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
+            $this->installed = !empty($dbDriver) && !empty($siteUrl);
         }
 
         return $this->installed;
