@@ -147,10 +147,12 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $this->columnSchemaHelper->expects($this->once())
             ->method('addColumn');
 
-        $driverException = $this->createMock(\Doctrine\DBAL\Exception\DriverException::class);
-        $driverException->expects($this->once())
+        $driverExceptionInterface = $this->createMock(\Doctrine\DBAL\Driver\Exception::class);
+        $driverExceptionInterface->expects($this->once())
             ->method('getCode')
             ->willReturn(1118);
+
+        $driverException = new \Doctrine\DBAL\Exception\DriverException($driverExceptionInterface, null);
 
         $this->columnSchemaHelper->expects($this->once())
             ->method('executeChanges')

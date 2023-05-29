@@ -67,7 +67,8 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
     private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);
-        $mockStatement->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
+        $resultMock    = $this->createMock(Result::class);
+        $resultMock->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);

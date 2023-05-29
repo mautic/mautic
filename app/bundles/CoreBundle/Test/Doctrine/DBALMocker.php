@@ -256,9 +256,6 @@ class DBALMocker
             ])
             ->getMock();
 
-        $mock->method('free')
-            ->willReturn(true);
-
         $mock->method('setFetchMode')
             ->willReturn(true);
 
