@@ -372,7 +372,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
-        $groupExpr = CompositeExpression::and('');
+        $groupExpr = [];
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
@@ -380,26 +380,22 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
-                    if ($groupExpr->count()) {
+                    if ($groupExpr) {
                         $groups[]  = $groupExpr;
-                        $groupExpr = CompositeExpression::and('');
+                        $groupExpr = [];
                     }
                 }
 
                 if ('tag' === $filter['column']) {
-                    $groupExpr = $event->applyTagFilter($groupExpr, $filter);
+                    $groupExpr[] = $this->applyTagFilter($filter);
                     continue;
                 }
 
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $groupExpr = $groupExpr->with(
-                            $expr->isNotNull($filter['column'])
-                        );
+                        $groupExpr[] = $expr->isNotNull($filter['column']);
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $groupExpr = $groupExpr->with(
-                                $expr->neq($filter['column'], $expr->literal(''))
-                            );
+                            $groupExpr[] = $expr->neq($filter['column'], $expr->literal(''));
                         }
                         break;
                     case 'empty':
@@ -412,9 +408,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             );
                         }
 
-                        $groupExpr = $groupExpr->with(
-                            $expression
-                        );
+                        $groupExpr[] = $expression;
                         break;
                     case 'neq':
                         $columnValue = ":$paramName";
@@ -423,9 +417,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
-                        $groupExpr = $groupExpr->with(
-                            $expression
-                        );
+                        $groupExpr[] = $expression;
                         break;
                     default:
                         if ('' == trim($filter['value'])) {
@@ -483,15 +475,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-                        $groupExpr = $groupExpr->with(
-                            $expr->{$exprFunction}($filter['column'], $columnValue)
-                        );
+                        $groupExpr[] = $expr->{$exprFunction}($filter['column'], $columnValue);
                 }
             }
         }
 
         // Get the last of the filters
-        if ($groupExpr->count()) {
+        if (count($groupExpr)) {
             $groups[] = $groupExpr;
         }
 
@@ -511,13 +501,33 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filterExpr = $groupExpr;
         }
 
-        if ($filterExpr->count()) {
-            $queryBuilder->andWhere($filterExpr);
+        if (count($filterExpr)) {
+            $queryBuilder->andWhere(CompositeExpression::and(...$filterExpr));
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     */
+    public function applyTagFilter(array $filter): ?string
+    {
+        $tagSubQuery = $this->db->createQueryBuilder();
+        $tagSubQuery->select('DISTINCT lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
+
+        if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
+            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+        }
+
+        if (in_array($filter['condition'], ['in', 'notEmpty'])) {
+            return $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL());
+        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
+            return $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL());
+        }
     }
 
     /**

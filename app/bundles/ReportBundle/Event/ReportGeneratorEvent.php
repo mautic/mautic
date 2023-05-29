@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -358,33 +357,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return $this;
-    }
-
-    /**
-     * @param CompositeExpression|null $groupExpr
-     * @param array<string, mixed>     $filter
-     */
-    public function applyTagFilter($groupExpr, array $filter): CompositeExpression
-    {
-        $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
-        $tagSubQuery->select('DISTINCT lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
-
-        if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
-            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
-        }
-
-        if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            $groupExpr = $groupExpr->with(
-                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
-            );
-        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            $groupExpr = $groupExpr->with(
-                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
-            );
-        }
-
-        return $groupExpr;
     }
 
     public function hasColumnWithPrefix(string $prefix): bool
