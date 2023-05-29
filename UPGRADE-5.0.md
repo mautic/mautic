@@ -31,7 +31,8 @@
     * Libraries `jquery-color`, `jquery-play-sound` and `html5notifications` were removed as unused. Details in https://github.com/mautic/mautic/pull/12265.
     * Library `jvectormap` was replaced with its accessor `jvectormap-next` as it was unmaintaned. Details in https://github.com/mautic/mautic/pull/12359.
     * Library `quicksearch` was updated from unmaintained vendor to latest version of its successor. Details in https://github.com/mautic/mautic/pull/12372.
-    * Library `jQueryUI` was updated from version 1.12.1 to 1.13.2
+    * Library `jQueryUI` was updated from version 1.12.1 to 1.13.2. Details in https://github.com/mautic/mautic/pull/12394.
+    * Modernizr JS was upgraded from 2.8.3 to 3.12.0 and reduced to only used features. Details in https://github.com/mautic/mautic/pull/12402.
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
