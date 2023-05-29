@@ -220,6 +220,52 @@ class InputHelperTest extends TestCase
     }
 
     /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
      * @dataProvider minifyHTMLProvider
      */
     public function testMinifyHTML(string $html, string $expected): void
