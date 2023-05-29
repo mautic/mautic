@@ -584,7 +584,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }

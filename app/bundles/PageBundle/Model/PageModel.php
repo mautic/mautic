@@ -37,6 +37,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -159,7 +160,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -170,7 +171,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Hit');
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
     /**
@@ -523,7 +524,11 @@ class PageModel extends FormModel
 
         //save hit to the cookie to use to update the exit time
         if ($hit) {
-            $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
+            $this->cookieHelper->setCookie(
+                name: 'mautic_referer_id',
+                value: $hit->getId() ?: null,
+                sameSite: Cookie::SAMESITE_NONE
+            );
         }
 
         if ($this->queueService->isQueueEnabled()) {
@@ -580,7 +585,7 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
                 if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
@@ -1081,7 +1086,7 @@ class PageModel extends FormModel
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);

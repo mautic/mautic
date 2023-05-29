@@ -39,7 +39,6 @@ class EventLogModel extends AbstractCommonModel
     public function getRepository(): LeadEventLogRepository
     {
         $result = $this->em->getRepository(LeadEventLog::class);
-        \assert($result instanceof LeadEventLogRepository);
 
         return $result;
     }

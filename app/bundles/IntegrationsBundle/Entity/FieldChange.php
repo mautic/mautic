@@ -21,7 +21,7 @@ class FieldChange
     private $integration;
 
     /**
-     * @var int
+     * @var string
      */
     private $objectId;
 
@@ -125,14 +125,14 @@ class FieldChange
      */
     public function setObjectId(int $id): self
     {
-        $this->objectId = $id;
+        $this->objectId = (string) $id;
 
         return $this;
     }
 
     public function getObjectId(): int
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
     /**

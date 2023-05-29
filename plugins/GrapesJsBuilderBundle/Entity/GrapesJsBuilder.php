@@ -17,12 +17,12 @@ class GrapesJsBuilder
     protected $id;
 
     /**
-     * @var Email
+     * @var Email|null
      */
     protected $email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customMjml;
 

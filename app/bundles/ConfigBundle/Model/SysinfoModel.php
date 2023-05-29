@@ -156,7 +156,7 @@ class SysinfoModel
     {
         return [
             'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
-            'driver'   => $this->connection->getDriver()->getName(),
+            'driver'   => $this->connection->getParams()['driver'],
             'platform' => get_class($this->connection->getDatabasePlatform()),
         ];
     }

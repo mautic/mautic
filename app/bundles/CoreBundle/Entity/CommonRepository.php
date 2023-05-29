@@ -23,7 +23,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @template T
+ * @template T of object
  * @extends ServiceEntityRepository<T>
  */
 class CommonRepository extends ServiceEntityRepository
@@ -133,7 +133,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param $className
+     * @param class-string $className
      * @param $data
      *
      * @return mixed
@@ -229,8 +229,7 @@ class CommonRepository extends ServiceEntityRepository
         if ($this->getEntityManager()->contains($entity)) {
             $this->getEntityManager()->detach($entity);
 
-            $metadata = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
-            $this->getEntityManager()->clear($metadata->name);
+            $metadata         = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
             $identifierValues = $metadata->getIdentifierValues($entity);
             if (count($identifierValues) > 1) {
                 throw new \RuntimeException('Multiple identifiers are not supported.');
@@ -357,7 +356,7 @@ class CommonRepository extends ServiceEntityRepository
             $q = $this->_em
                 ->createQueryBuilder()
                 ->select($alias)
-                ->from($this->_entityName, $alias, "{$alias}.id");
+                ->from($this->getEntityName(), $alias, "{$alias}.id");
 
             if ($this->getClassMetadata()->hasAssociation('category')) {
                 $q->leftJoin($this->getTableAlias().'.category', 'cat');
@@ -404,7 +403,8 @@ class CommonRepository extends ServiceEntityRepository
             if (is_array($id)) {
                 $q = $this->createQueryBuilder($this->getTableAlias());
                 $this->buildSelectClause($q, $id['select']);
-                $q->where($this->getTableAlias().'.id = '.(int) $id['id']);
+                $q->where($this->getTableAlias().'.id = :id')
+                ->setParameter('id', (int) $id['id']);
                 $entity = $q->getQuery()->getSingleResult();
             } else {
                 $entity = $this->find((int) $id);
@@ -746,7 +746,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return string
+     * @return literal-string
      */
     public function getTableAlias()
     {

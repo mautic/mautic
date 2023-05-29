@@ -66,7 +66,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository('MauticSmsBundle:Stat');
+        $statRepository        = $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
         $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
