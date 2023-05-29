@@ -197,7 +197,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build WHERE clause
         if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($standardFilters, $queryBuilder, $options['filters'], $event);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
@@ -365,14 +365,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return $case.' ELSE NULL END ';
     }
 
-    /**
-     * @return bool
-     */
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions, ReportGeneratorEvent $event)
+    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
     {
-        $expr      = $queryBuilder->expr();
-        $groups    = [];
-        $groupExpr = [];
+        $expr     = $queryBuilder->expr();
+        $orGroups = [];
+        $andGroup = [];
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
@@ -380,22 +377,23 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
-                    if ($groupExpr) {
-                        $groups[]  = $groupExpr;
-                        $groupExpr = [];
+                    if ($andGroup) {
+                        $orGroups[] = CompositeExpression::and(...$andGroup);
+                        $andGroup   = [];
                     }
                 }
 
-                if ('tag' === $filter['column']) {
-                    $groupExpr[] = $this->applyTagFilter($filter);
+                $tagCondition = $this->getTagCondition($filter);
+                if ($tagCondition) {
+                    $andGroup[] = $tagCondition;
                     continue;
                 }
 
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $groupExpr[] = $expr->isNotNull($filter['column']);
+                        $andGroup[] = $expr->isNotNull($filter['column']);
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $groupExpr[] = $expr->neq($filter['column'], $expr->literal(''));
+                            $andGroup[] = $expr->neq($filter['column'], $expr->literal(''));
                         }
                         break;
                     case 'empty':
@@ -408,7 +406,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             );
                         }
 
-                        $groupExpr[] = $expression;
+                        $andGroup[] = $expression;
                         break;
                     case 'neq':
                         $columnValue = ":$paramName";
@@ -417,7 +415,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
-                        $groupExpr[] = $expression;
+                        $andGroup[] = $expression;
                         break;
                     default:
                         if ('' == trim($filter['value'])) {
@@ -475,46 +473,30 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-                        $groupExpr[] = $expr->{$exprFunction}($filter['column'], $columnValue);
+                        $andGroup[] = $expr->{$exprFunction}($filter['column'], $columnValue);
                 }
             }
         }
 
-        // Get the last of the filters
-        if (count($groupExpr)) {
-            $groups[] = $groupExpr;
-        }
-
-        if (1 === count($groups)) {
-            // Only one andX expression
-            $filterExpr = $groups[0];
-        } elseif (count($groups) > 1) {
-            // Sets of expressions grouped by OR
-            $orX = $queryBuilder->expr()->or('');
-            foreach ($groups as $group) {
-                $orX = $orX->with($group);
-            }
-
+        if (count($orGroups) > 1) {
             // Wrap in a andX for other functions to append
-            $filterExpr = $queryBuilder->expr()->and($orX);
-        } else {
-            $filterExpr = $groupExpr;
+            $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
         }
 
-        if (count($filterExpr)) {
-            $queryBuilder->andWhere(CompositeExpression::and(...$filterExpr));
-
-            return true;
+        if (count($andGroup)) {
+            $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
-
-        return false;
     }
 
     /**
      * @param array<string, mixed> $filter
      */
-    public function applyTagFilter(array $filter): ?string
+    public function getTagCondition(array $filter): ?string
     {
+        if ('tag' !== $filter['column']) {
+            return null;
+        }
+
         $tagSubQuery = $this->db->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
@@ -528,6 +510,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
         } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
             return $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL());
         }
+
+        return null;
     }
 
     /**

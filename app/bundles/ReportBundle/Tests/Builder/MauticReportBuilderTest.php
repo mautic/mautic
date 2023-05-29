@@ -284,11 +284,18 @@ final class MauticReportBuilderTest extends TestCase
                 'value'     => ['3'],
                 'condition' => 'notIn',
             ],
+            [
+                'column'    => 'unicorn',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
         ];
 
         $builder   = $this->buildBuilder(new Report());
-        $groupExpr = CompositeExpression::and($builder->applyTagFilter($filters[0]), $builder->applyTagFilter($filters[1]));
+        $groupExpr = CompositeExpression::and($builder->getTagCondition($filters[0]), $builder->getTagCondition($filters[1]));
         Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
+        Assert::assertNull($builder->getTagCondition($filters[2]));
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder
