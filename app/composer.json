@@ -135,6 +135,7 @@
         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
         "[project-root]/package.json": "assets/scaffold/files/package.json",
         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
+        "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
         "[project-root]/app/config/bootstrap.php": "assets/scaffold/files/bootstrap.php",
         "[project-root]/bin/console": "assets/scaffold/files/console",
         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
