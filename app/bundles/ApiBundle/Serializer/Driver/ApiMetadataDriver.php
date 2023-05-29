@@ -8,8 +8,11 @@ use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
 use ReflectionClass;
 use ReflectionException;
+use JMS\Serializer\Metadata\Driver\AnnotationDriver as BaseAnnotationDriver;
 
-class ApiMetadataDriver implements DriverInterface
+
+
+class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 {
     /**
      * @var ClassMetadata
@@ -53,9 +56,9 @@ class ApiMetadataDriver implements DriverInterface
             $this->resetDefaults();
 
             return $metadata;
-        }
-
-        return null;
+        }else{
+            return new ClassMetadata($class->getName());
+        }        
     }
 
     private function resetDefaults()
