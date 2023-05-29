@@ -69,6 +69,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
     {
         $mockStatement = $this->createMock(Statement::class);
         $resultMock    = $this->createMock(Result::class);
+        $mockStatement->method('executeQuery')->withAnyParameters()->willReturn($resultMock);
         $resultMock->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
