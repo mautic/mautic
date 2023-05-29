@@ -37,6 +37,7 @@ class AssetGenerationHelper
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
+        'modernizr/modernizr-mautic-dist.js',
         'jquery.quicksearch/src/jquery.quicksearch.js',
         'jquery-ui/ui/version.js',
         'jquery-ui/ui/widget.js',
