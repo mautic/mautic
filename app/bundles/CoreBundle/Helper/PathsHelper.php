@@ -131,7 +131,10 @@ class PathsHelper
         return $this->getSystemPath('plugins', true);
     }
 
-    public function getVendorPath(): string
+    /**
+     * Returns absolute path to the root directory where the "vendor" directory is located.
+     */
+    public function getVendorRootPath(): string
     {
         $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
 

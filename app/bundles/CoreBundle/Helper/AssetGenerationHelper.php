@@ -136,7 +136,7 @@ class AssetGenerationHelper
 
                 foreach (self::NODE_MODULES as $path) {
                     $relPath  = "node_modules/{$path}";
-                    $fullPath = "{$this->pathsHelper->getVendorPath()}/{$relPath}";
+                    $fullPath = "{$this->pathsHelper->getVendorRootPath()}/{$relPath}";
                     $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
                     $details  = [
                         'fullPath' => $fullPath,
