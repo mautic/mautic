@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand;

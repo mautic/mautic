@@ -256,9 +256,6 @@ class DBALMocker
             ])
             ->getMock();
 
-        $mock->method('setFetchMode')
-            ->willReturn(true);
-
         $mock->method('columnCount')
             ->willReturnCallback(function () {
                 if (isset($this->queryResponse[0]) && is_array($this->queryResponse[0])) {
