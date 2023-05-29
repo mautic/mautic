@@ -172,7 +172,7 @@ jobs:
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
-          composer phpstan
+          composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
