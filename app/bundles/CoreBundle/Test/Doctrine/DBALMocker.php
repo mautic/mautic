@@ -266,11 +266,7 @@ class DBALMocker
             });
 
         $mock->expects($this->testCase->any())
-            ->method('fetchAll')
-            ->willReturn($this->queryResponse);
-
-        $mock->expects($this->testCase->any())
-            ->method('fetch')
+            ->method('fetchOne')
             ->willReturn($this->queryResponse);
 
         $mock->expects($this->testCase->any())
