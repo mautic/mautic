@@ -132,6 +132,16 @@ class PathsHelper
     }
 
     /**
+     * Returns absolute path to the root directory where the "vendor" directory is located.
+     */
+    public function getVendorRootPath(): string
+    {
+        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+
+        return dirname($reflection->getFileName(), 3);
+    }
+
+    /**
      * Get the path to specified area.  Returns relative by default with the exception of cache and log
      * which will be absolute regardless of $fullPath setting.
      *

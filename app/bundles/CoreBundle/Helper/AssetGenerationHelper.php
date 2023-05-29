@@ -37,6 +37,7 @@ class AssetGenerationHelper
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
+        'modernizr/modernizr-mautic-dist.js',
         'jquery.quicksearch/src/jquery.quicksearch.js',
         'jquery-ui/ui/version.js',
         'jquery-ui/ui/widget.js',
@@ -136,7 +137,7 @@ class AssetGenerationHelper
 
                 foreach (self::NODE_MODULES as $path) {
                     $relPath  = "node_modules/{$path}";
-                    $fullPath = "{$this->pathsHelper->getRootPath()}/{$relPath}";
+                    $fullPath = "{$this->pathsHelper->getVendorRootPath()}/{$relPath}";
                     $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
                     $details  = [
                         'fullPath' => $fullPath,
