@@ -46,14 +46,8 @@ class AppKernel extends Kernel
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            /**
-            * Temporarily stopping the detection until I figure out something to detect the database version
-            * for now I am fixing it to the current version of MariaDB
-            *
-            * $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
-            * define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
-             */
-            define('MAUTIC_DB_SERVER_VERSION', 'mariadb-10.3.38');
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
+            define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
         parent::__construct($environment, $debug);
@@ -70,7 +64,7 @@ class AppKernel extends Kernel
             if (false === strpos($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
-                //check to see if the .htaccess file exists or if not running under apache
+                // check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
                     || !file_exists($this->getProjectDir().'/.htaccess')
                     && false === strpos(
@@ -189,7 +183,7 @@ class AppKernel extends Kernel
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
-            $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
+            $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
             if (class_exists($class)) {
                 $plugin = new $class();
 
