@@ -72,6 +72,22 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('no', $result);
     }
 
+    public function testFloatFormat(): void
+    {
+        $result = $this->formatterHelper->_(1.55, 'float');
+
+        $this->assertEquals('1.5500', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
+    public function testIntFormat(): void
+    {
+        $result = $this->formatterHelper->_(10, 'int');
+
+        $this->assertSame('10', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
     /**
      * @dataProvider stringProvider
      *

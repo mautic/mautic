@@ -1311,20 +1311,20 @@ blockquote > p:after {
   padding-right: 40px;
   border-width: 0px;
 }
-.touch .scroll-content {
+.touchevents .scroll-content {
   height: 100%;
   overflow-y: scroll;
   -ms-overflow-style: -ms-autohiding-scrollbar;
   -webkit-overflow-scrolling: touch;
 }
-.no-touch .scroll-wrapper,
-.no-touch .scroll-wrapper > .scroll-content {
+.no-touchevents .scroll-wrapper,
+.no-touchevents .scroll-wrapper > .scroll-content {
   height: 100%;
 }
-.no-touch .scroll-wrapper > .scroll-rail {
+.no-touchevents .scroll-wrapper > .scroll-rail {
   display: none !important;
 }
-.no-touch .scroll-wrapper > .scroll-bar {
+.no-touchevents .scroll-wrapper > .scroll-bar {
   background-color: gray !important;
   right: 3px !important;
 }

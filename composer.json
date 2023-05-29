@@ -45,7 +45,6 @@
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
-    "mautic/plugin-citrix": "self.version",
     "mautic/plugin-clearbit": "self.version",
     "mautic/plugin-cloudstorage": "self.version",
     "mautic/plugin-crm": "self.version",

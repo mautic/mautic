@@ -1,3 +1,7 @@
+# User facing changes
+- The Pipedrive Plugin has been removed from Mautic Core, you can use https://www.mautic.org/blog/integrator/exciting-news-new-integration-plugin-pipedrive-crm instead.
+- The Citrix Plugin has been removed from Mautic Core. you can use https://www.leuchtfeuer.com/en/mautic/downloads/mautic-goto-plugin/ instead.
+
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
@@ -27,6 +31,8 @@
     * Libraries `jquery-color`, `jquery-play-sound` and `html5notifications` were removed as unused. Details in https://github.com/mautic/mautic/pull/12265.
     * Library `jvectormap` was replaced with its accessor `jvectormap-next` as it was unmaintaned. Details in https://github.com/mautic/mautic/pull/12359.
     * Library `quicksearch` was updated from unmaintained vendor to latest version of its successor. Details in https://github.com/mautic/mautic/pull/12372.
+    * Library `jQueryUI` was updated from version 1.12.1 to 1.13.2. Details in https://github.com/mautic/mautic/pull/12394.
+    * Modernizr JS was upgraded from 2.8.3 to 3.12.0 and reduced to only used features. Details in https://github.com/mautic/mautic/pull/12402.
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
@@ -49,6 +55,7 @@
     * There are no unsubscribe headers in transactional emails.
     * The SortablePanels templates, JS and CSS was removed as unused.
     * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
+    * Region names in Austria, Germany and Switzerland were updated based on Standard: ISO_3166-2.
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
 
 # Dependency injection improvements

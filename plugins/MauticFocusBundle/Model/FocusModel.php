@@ -123,7 +123,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFocusBundle:Focus');
+        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
     }
 
     /**
@@ -133,7 +133,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticFocusBundle:Stat');
+        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
     }
 
     /**
