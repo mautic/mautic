@@ -62,7 +62,7 @@
   </div>
 {% endif %}
 
-{% if fieldKeys|filter(k => k in ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'do_not_track_email_bots', 'transliterate_page_title'])|length > 0 %}
+{% if fieldKeys|filter(k => k in ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'transliterate_page_title'])|length > 0 %}
   <div class="panel panel-primary">
       <div class="panel-heading">
           <h3 class="panel-title">{{ 'mautic.core.config.header.misc'|trans }}</h3>
@@ -89,17 +89,11 @@
               </div>
           </div>
 
-          {% if fields.do_not_track_ips is defined%}
+          {% if fields.do_not_track_ips is defined or fields.do_not_track_bots is defined %}
               <hr class="text-muted" />
               <div class="row">
                   {%- if form.do_not_track_ips is defined %}<div class="col-md-6">{{ form_row(form.do_not_track_ips) }}</div>{% endif %}
-              </div>
-          {% endif %}
-
-          {% if fields.do_not_track_bots is defined %}
-              <div class="row">
-                <div class="col-md-6">{{ form_row(form.do_not_track_bots) }}</div>
-                    {% if fields.do_not_track_email_bots is defined %}<div class="col-md-6">{{ form_row(form.do_not_track_email_bots) }}</div>{% endif %}
+                  {%- if form.do_not_track_bots is defined %}<div class="col-md-6">{{ form_row(form.do_not_track_bots) }}</div>{% endif %}
               </div>
           {% endif %}
 

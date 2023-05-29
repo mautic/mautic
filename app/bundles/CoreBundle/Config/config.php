@@ -966,7 +966,6 @@ return [
         'cookie_secure'                   => true,
         'cookie_httponly'                 => false,
         'do_not_track_ips'                => [],
-        'do_not_track_email_bots'         => false,
         'do_not_track_bots'               => [
             'MSNBOT',
             'msnbot-media',

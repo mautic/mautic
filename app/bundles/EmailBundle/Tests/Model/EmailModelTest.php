@@ -202,11 +202,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private $statsCollectionHelper;
 
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -239,7 +234,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->connection               = $this->createMock(Connection::class);
-        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -265,7 +259,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setTranslator($this->translator);
         $this->emailModel->setEntityManager($this->entityManager);
         $this->emailModel->setSecurity($this->corePermissions);
-        $this->emailModel->setCoreParametersHelper($this->coreParametersHelper);
     }
 
     /**
@@ -730,11 +723,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper->expects($this->any())
             ->method('getIpAddress')
             ->willReturn($ipAddress);
-
-        $this->coreParametersHelper->expects($this->any())
-            ->method('get')
-            ->with('do_not_track_email_bots')
-            ->willReturn(true);
     }
 
     /**

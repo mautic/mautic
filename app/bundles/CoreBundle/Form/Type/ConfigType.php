@@ -286,21 +286,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'do_not_track_email_bots',
-            YesNoButtonGroupType::class,
-            [
-                'label'      => 'mautic.core.config.form.do_not_track_email_bots',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.do_not_track_email_bots.tooltip',
-                ],
-                'data'     => isset($options['data']['do_not_track_email_bots']) && (bool) $options['data']['do_not_track_email_bots'],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'default_pagelimit',
             ChoiceType::class,
             [
