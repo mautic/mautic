@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -28,6 +29,7 @@ class DynamicContentTypeTest extends TestCase
         $listModelMock           = $this->createMock(ListModel::class);
         $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
         $leadModelMock           = $this->createMock(LeadModel::class);
+        $relativeDateMock        = $this->createMock(RelativeDate::class);
 
         $listModelMock->expects($this->once())
             ->method('getChoiceFields')
@@ -53,7 +55,8 @@ class DynamicContentTypeTest extends TestCase
             $entityManagerMock,
             $listModelMock,
             $translatorInterfaceMock,
-            $leadModelMock
+            $leadModelMock,
+            $relativeDateMock
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
