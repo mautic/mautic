@@ -64,7 +64,6 @@ class FieldFilterTransformer implements DataTransformerInterface
 
                 if (in_array($filter, $this->defaultStrings)) {
                     $rawFilters[$k]['properties']['filter'] = $this->translator->trans(array_search($filter, $this->defaultStrings));
-//                    $rawFilters[$k]['properties']['filter'] = $this->translator->trans('mautic.lead.list.'.$filter);
 
                     continue;
                 }
@@ -102,9 +101,8 @@ class FieldFilterTransformer implements DataTransformerInterface
                 }
 
                 if (in_array($filter, $this->relativeDateStrings)) {
-                    $key    = array_search($filter, $this->relativeDate->getRelativeDateStrings());
-//                    $filter = str_replace('mautic.lead.list.', '', $key);
-                    $rawFilters[$k]['properties']['filter'] = $this->defaultStrings[$key];
+                    $translationKey                         = array_search($filter, $this->relativeDate->getRelativeDateStrings());
+                    $rawFilters[$k]['properties']['filter'] = $this->defaultStrings[$translationKey];
 
                     continue;
                 }
