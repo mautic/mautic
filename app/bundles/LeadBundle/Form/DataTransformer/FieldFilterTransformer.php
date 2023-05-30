@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,12 +22,19 @@ class FieldFilterTransformer implements DataTransformerInterface
      */
     private $default;
 
-    public function __construct(TranslatorInterface $translator, array $default = [])
+    /**
+     * @var string[]
+     */
+    private array $defaultStrings;
+
+    public function __construct(private TranslatorInterface $translator, private RelativeDate $relativeDate, array $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
-            $string = $translator->trans($string);
+            $this->defaultStrings[$string] = $translator->trans($string, [], null, 'en_US');
+            $string                        = $translator->trans($string);
         }
+
         $this->default = $default;
     }
 
@@ -51,6 +59,13 @@ class FieldFilterTransformer implements DataTransformerInterface
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
                 if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
+                    continue;
+                }
+
+                if (in_array($filter, $this->defaultStrings)) {
+                    $rawFilters[$k]['properties']['filter'] = $this->translator->trans(array_search($filter, $this->defaultStrings));
+//                    $rawFilters[$k]['properties']['filter'] = $this->translator->trans('mautic.lead.list.'.$filter);
+
                     continue;
                 }
 
@@ -82,7 +97,15 @@ class FieldFilterTransformer implements DataTransformerInterface
             if ('datetime' == $f['type']) {
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
-                if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
+                if (empty($filter) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
+                    continue;
+                }
+
+                if (in_array($filter, $this->relativeDateStrings)) {
+                    $key    = array_search($filter, $this->relativeDate->getRelativeDateStrings());
+//                    $filter = str_replace('mautic.lead.list.', '', $key);
+                    $rawFilters[$k]['properties']['filter'] = $this->defaultStrings[$key];
+
                     continue;
                 }
 

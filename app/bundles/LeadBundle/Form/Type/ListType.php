@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -30,10 +31,13 @@ class ListType extends AbstractType
      */
     private $listModel;
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel)
+    private RelativeDate $relativeDate;
+
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, RelativeDate $relativeDate)
     {
-        $this->translator = $translator;
-        $this->listModel  = $listModel;
+        $this->translator   = $translator;
+        $this->listModel    = $listModel;
+        $this->relativeDate = $relativeDate;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -123,7 +127,7 @@ class ListType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object' => 'lead']);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate, ['object' => 'lead']);
         $builder->add(
             $builder->create(
                 'filters',
