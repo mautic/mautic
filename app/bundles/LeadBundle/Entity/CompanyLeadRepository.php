@@ -46,9 +46,6 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      *
-     * @param $leadId
-     * @param $companyId
-     *
      * @return array
      */
     public function getCompaniesByLeadId($leadId, $companyId = null)
@@ -71,8 +68,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param $companyId
-     *
      * @return array
      */
     public function getCompanyLeads($companyId)
@@ -88,8 +83,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     *
      * @return array
      */
     public function getLatestCompanyForLead($leadId)
@@ -108,18 +101,14 @@ class CompanyLeadRepository extends CommonRepository
         return !empty($result) ? $result[0] : [];
     }
 
-    /**
-     * @param $leadId
-     * @param $companyId
-     */
     public function getCompanyLeadEntity($leadId, $companyId)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->where(
-                    $qb->expr()->eq('cl.lead_id', ':leadId'),
-                    $qb->expr()->eq('cl.company_id', ':companyId')
+                $qb->expr()->eq('cl.lead_id', ':leadId'),
+                $qb->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 

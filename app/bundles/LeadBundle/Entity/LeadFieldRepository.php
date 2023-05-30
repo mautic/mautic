@@ -54,7 +54,7 @@ class LeadFieldRepository extends CommonRepository
         }
 
         if ($includeEntityFields) {
-            //add lead main column names to prevent attempt to create a field with the same name
+            // add lead main column names to prevent attempt to create a field with the same name
             $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
@@ -240,7 +240,7 @@ class LeadFieldRepository extends CommonRepository
                 $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
                 $compositeExpression              = ('empty' === $operatorExpr) ?
                     $q->expr()->or(
-                         $q->expr()->isNull($property),
+                        $q->expr()->isNull($property),
                         $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
                     )
                     :
@@ -301,7 +301,7 @@ class LeadFieldRepository extends CommonRepository
                 } else {
                     $expr = $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
-                        ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
+                        'in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values')
                     );
 
                     $q->where($expr)
@@ -428,8 +428,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param $type
-     *
      * @return LeadField[]
      */
     public function getFieldsByType($type)
