@@ -1785,4 +1785,19 @@ class CommonRepository extends EntityRepository
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
     }
+
+    public function beginTransaction(): void
+    {
+        $this->_em->beginTransaction();
+    }
+
+    public function commit(): void
+    {
+        $this->_em->commit();
+    }
+
+    public function rollback(): void
+    {
+        $this->_em->rollback();
+    }
 }
