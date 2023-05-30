@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine\Paginator;
 
-use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Logging\Middleware;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Monolog\Handler\TestHandler;
-use Monolog\Logger;
+use Symfony\Bridge\Monolog\Logger;
 
 class SimplePaginatorTest extends MauticMysqlTestCase
 {
@@ -20,24 +17,14 @@ class SimplePaginatorTest extends MauticMysqlTestCase
      * @var array<string,mixed>
      */
     protected array $clientOptions = ['debug' => true];
+
     private Logger $logger;
-    private TestHandler $testHandler;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $logger      = new Logger('test');
-        $testHandler = new TestHandler();
-        $logger->setHandlers([$testHandler]);
-        $middleware = new Middleware($logger);
-
-        $config = new Configuration();
-        $config->setMiddlewares([$middleware]);
-        $this->em->getConnection()->getConfiguration()->setMiddlewares([$middleware]);
-
-        $this->testHandler = $testHandler;
-        $this->logger      = $logger;
+        $this->logger = self::$container->get('monolog.logger.doctrine');
     }
 
     public function testPaginator(): void
@@ -70,8 +57,8 @@ class SimplePaginatorTest extends MauticMysqlTestCase
 
         $prefix = self::$container->getParameter('mautic.db_table_prefix');
 
-        $this->assertCount(5, $this->testHandler->getRecords(), 'There should be exactly 5 queries executed.');
+        $this->assertCount(5, $this->logger->getLogs(), 'There should be exactly 5 queries executed.');
         $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $this->logger->queries[4]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
-        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $this->logger->queries[5]['sql'], 'Ordering and limit/offset have to be reflected.');
+        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $this->logger->getLogs()[5]['sql'], 'Ordering and limit/offset have to be reflected.');
     }
 }
