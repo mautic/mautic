@@ -1373,7 +1373,7 @@ class EmailController extends FormController
 
         // Get the quick add form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
-        $user   = $this->userHelper->getUser();
+        $user   = $this->user;
 
         // We have to add prefix to example emails
         $subject = sprintf('%s %s', static::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());

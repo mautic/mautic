@@ -2,18 +2,14 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
@@ -30,7 +26,6 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
@@ -75,11 +70,6 @@ class CoreSubscriber implements EventSubscriberInterface
     private $dispatcher;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var RequestStack
      */
     private $requestStack;
@@ -89,24 +79,6 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     private $formRepository;
 
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private $modelFactory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @param ModelFactory<object> $modelFactory
-     */
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
@@ -116,12 +88,8 @@ class CoreSubscriber implements EventSubscriberInterface
         AuthorizationCheckerInterface $securityContext,
         UserModel $userModel,
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
-        MauticFactory $factory,
-        ModelFactory $modelFactory,
-        FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -142,7 +110,6 @@ class CoreSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::CONTROLLER => [
-                ['onKernelController', 0],
                 ['onKernelRequestAddGlobalJS', 0],
             ],
             CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
@@ -211,28 +178,6 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         } else {
             $session->remove('mautic.user');
-        }
-    }
-
-    /**
-     * Populates namespace, bundle, controller, and action into request to be used throughout application.
-     */
-    public function onKernelController(ControllerEvent $event)
-    {
-        $controller = $event->getController();
-
-        if ($controller instanceof \Closure) {
-            $controller = [$controller()];
-        }
-
-        if (!is_array($controller)) {
-            return;
-        }
-
-        //only affect Mautic controllers
-        if ($controller[0] instanceof MauticController) {
-            //run any initialize functions
-            $controller[0]->initialize($event);
         }
     }
 

@@ -26,7 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -65,15 +64,7 @@ class CommonController extends AbstractController implements MauticController
 
     private ?RequestStack $requestStack = null;
 
-    /**
-     * Remove this whenever you move all required services to constructor.
-     */
     protected ?CorePermissions $security = null;
-
-    /**
-     * Remove this whenever you move all required services to constructor.
-     */
-    private ?ExportHelper $exportHelper = null;
 
     /**
      * @var FlashBag
@@ -82,95 +73,21 @@ class CommonController extends AbstractController implements MauticController
 
     protected ManagerRegistry $doctrine;
 
-    public function __construct(ManagerRegistry $doctrine)
-    {
-        $this->doctrine = $doctrine;
-    }
-
-    /**
-     * @required
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * @param ModelFactory<object> $modelFactory
-     * @required
      */
-    public function setModelFactory(ModelFactory $modelFactory): void
+    public function __construct(ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->modelFactory = $modelFactory;
-    }
-
-    /**
-     * @required
-     */
-    public function setUserHelper(UserHelper $userHelper): void
-    {
-        $this->setUser($userHelper->getUser());
-    }
-
-    public function setUser(User $user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * @required
-     */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
-    {
+        $this->doctrine             = $doctrine;
+        $this->factory              = $factory;
+        $this->modelFactory         = $modelFactory;
+        $this->user                 = $userHelper->getUser();
         $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    /**
-     * @required
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * @required
-     */
-    public function setTranslator(Translator $translator)
-    {
-        $this->translator = $translator;
-    }
-
-    /**
-     * @required
-     */
-    public function setFlashBag(FlashBag $flashBag)
-    {
-        $this->flashBag = $flashBag;
-    }
-
-    /**
-     * @required
-     */
-    public function setRequestStack(RequestStack $requestStack): void
-    {
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * @required
-     */
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    /**
-     * @required
-     */
-    public function setExportHelper(ExportHelper $exportHelper): void
-    {
-        $this->exportHelper = $exportHelper;
+        $this->dispatcher           = $dispatcher;
+        $this->translator           = $translator;
+        $this->flashBag             = $flashBag;
+        $this->requestStack         = $requestStack;
+        $this->security             = $security;
     }
 
     protected function getCurrentRequest(): Request
@@ -182,11 +99,6 @@ class CommonController extends AbstractController implements MauticController
         }
 
         return $request;
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        // the method to initialize controllers
     }
 
     /**
@@ -757,10 +669,8 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return StreamedResponse
      */
-    public function exportResultsAs($toExport, $type, $filename)
+    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper)
     {
-        $exportHelper = $this->exportHelper;
-
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
