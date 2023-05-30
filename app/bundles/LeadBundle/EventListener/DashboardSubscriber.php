@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateInterval;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType;
@@ -74,12 +76,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $translator;
 
-    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
+    /** @var DateHelper */
+    protected $dateHelper;
+
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator, DateHelper $dateHelper)
     {
         $this->leadModel     = $leadModel;
         $this->leadListModel = $leadListModel;
         $this->router        = $router;
         $this->translator    = $translator;
+        $this->dateHelper    = $dateHelper;
     }
 
     /**
@@ -482,18 +488,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 if ($segments) {
                     foreach ($segments as $segment) {
                         $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
-
-                        $time = $segment->getLastBuiltTime();
-                        if ($time >= 60) {
-                            $timeString = $this->translator->trans('mautic.core.date.minute', ['%count%' => floor($time / 60)]);
-                            if ($time % 60 > 0) {
-                                $timeString .= ' '.$this->translator->trans('mautic.core.date.second', ['%count%' => round($time % 60)]);
-                            }
-                        } elseif ($time >= 1) {
-                            $timeString =  $this->translator->trans('mautic.core.date.second', ['%count%' => round($time)]);
-                        } else {
-                            $timeString =  $this->translator->trans('mautic.core.date.less.than.second');
-                        }
+                        $buildTime  = explode(':', gmdate('H:i:s', (int) $segment->getLastBuiltTime()));
+                        $timeString = $this->dateHelper->formatRange(
+                            new DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
+                        );
 
                         $row        = [
                             [

@@ -50,12 +50,4 @@ class DashboardSegmentsBuildTime extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'segments_build_time';
-    }
 }
