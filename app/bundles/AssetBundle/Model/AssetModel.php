@@ -234,7 +234,7 @@ class AssetModel extends FormModel
                 $lead = $systemEntry['lead'];
                 if (!$lead instanceof Lead) {
                     $leadId = is_array($lead) ? $lead['id'] : $lead;
-                    $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                    $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
                 }
 
                 $download->setLead($lead);
@@ -249,7 +249,7 @@ class AssetModel extends FormModel
                 $email = $systemEntry['email'];
                 if (!$email instanceof Email) {
                     $emailId = is_array($email) ? $email['id'] : $email;
-                    $email   = $this->em->getReference('MauticEmailBundle:Email', $emailId);
+                    $email   = $this->em->getReference(\Mautic\EmailBundle\Entity\Email::class, $emailId);
                 }
 
                 $download->setEmail($email);

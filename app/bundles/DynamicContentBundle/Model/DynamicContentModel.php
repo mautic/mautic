@@ -182,7 +182,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 return;
             }
 
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $lead = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead['id']);
         }
 
         $stat = new Stat();

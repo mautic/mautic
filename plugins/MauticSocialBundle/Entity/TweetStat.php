@@ -137,7 +137,7 @@ class TweetStat
 
         $builder->addNullableField('favoriteCount', 'integer', 'favorite_count');
         $builder->addNullableField('retweetCount', 'integer', 'retweet_count');
-        $builder->addNullableField('responseDetails', 'json_array', 'response_details');
+        $builder->addNullableField('responseDetails', 'json', 'response_details');
     }
 
     /**

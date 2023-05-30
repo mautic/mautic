@@ -98,7 +98,7 @@ class DBALMocker
                 ->method('getReference')
                 ->willReturnCallback(function () {
                     switch (func_get_arg(0)) {
-                        case 'MauticLeadBundle:Lead':
+                        case \Mautic\LeadBundle\Entity\Lead::class:
                             $entity = new Lead();
                             break;
                     }

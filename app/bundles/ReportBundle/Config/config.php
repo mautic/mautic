@@ -101,12 +101,14 @@ return [
                 'arguments' => [
                     'mautic.helper.twig.formatter',
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
             'mautic.report.model.excel_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
                 'arguments' => [
                     'mautic.helper.twig.formatter',
+                    'translator',
                 ],
             ],
             'mautic.report.model.scheduler_builder' => [
