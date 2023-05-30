@@ -35,7 +35,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($id, $parameters, $domain, $locale): string {
-                return match($id) {
+                return match ($id) {
                     'mautic.lead.list.month_last'  => isset($locale) ? 'last month' : 'letzter Monat',
                     'mautic.lead.list.month_next'  => isset($locale) ? 'next month' : 'nächster Monat',
                     'mautic.lead.list.month_this'  => isset($locale) ? 'this month' : 'dieser Monat',
