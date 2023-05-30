@@ -7,6 +7,7 @@ use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Filesystem;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
@@ -85,6 +86,30 @@ class AmazonS3Integration extends CloudStorageIntegration
                     'required' => false,
                 ]
             );
+
+            $builder->add(
+                'endpoint',
+                TextType::class,
+                [
+                    'label'    => 'mautic.integration.Amazon.endpoint',
+                    'attr'     => ['class' => 'form-control'],
+                    'data'     => empty($data['endpoint']) ? null : $data['endpoint'],
+                    'required' => false,
+                ]
+            );
+
+            $builder->add(
+                'path-style',
+                YesNoButtonGroupType::class,
+                [
+                    'label'    => 'mautic.integration.Amazon.pathStyle',
+                    'attr'     => [
+                        'tooltip' => 'mautic.integration.Amazon.pathStyle.tooltip',
+                    ],
+                    'data'     => empty($data['path-style']) ? false : $data['path-style'],
+                    'required' => false,
+                ]
+            );
         }
     }
 
@@ -98,16 +123,21 @@ class AmazonS3Integration extends CloudStorageIntegration
         if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
 
-            $service = new S3Client(
-                [
-                    'version'     => 'latest',
-                    'region'      => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
-                    'credentials' => [
-                        'key'    => $keys['client_id'],
-                        'secret' => $keys['client_secret'],
-                    ],
-                ]
-            );
+            $s3Args = [
+                'version'                 => 'latest',
+                'region'                  => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
+                'use_path_style_endpoint' => boolval(empty($keys['path-style']) ? false : $keys['path-style']),
+                'credentials'             => [
+                    'key'    => $keys['client_id'],
+                    'secret' => $keys['client_secret'],
+                ],
+            ];
+
+            if (!empty($keys['endpoint'])) {
+                $s3Args['endpoint'] = $keys['endpoint'];
+            }
+
+            $service = new S3Client($s3Args);
 
             $this->adapter    = new AwsS3($service, $keys['bucket']);
             $decorated        = new Filesystem($this->adapter);
