@@ -64,7 +64,7 @@ class FilterSelectorType extends AbstractType
                 ]
             );
 
-            if (array_key_exists('in', $choices)) {
+            if (array_key_exists('in', $choices) && is_array($form->getViewData()) && array_key_exists('value', $form->getViewData()) && is_array($form->getViewData()['value'])) {
                 $form->add('value', CollectionType::class, [
                     'entry_type'    => TextType::class,
                     'allow_add'     => true,
