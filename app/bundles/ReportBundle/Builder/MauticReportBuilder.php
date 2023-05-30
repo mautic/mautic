@@ -478,12 +478,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        if (count($orGroups) > 1) {
-            // Wrap in a andX for other functions to append
+        if ($orGroups) {
+            // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
+            $orGroups[] = CompositeExpression::and(...$andGroup);
             $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
-        }
-
-        if (count($andGroup)) {
+        } else {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
     }
