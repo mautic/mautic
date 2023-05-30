@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -266,6 +267,35 @@ final class MauticReportBuilderTest extends TestCase
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
         ')), $query->getSql());
+    }
+
+    public function testApplyTagFilter(): void
+    {
+        $filters = [
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['1', '2'],
+                'condition' => 'in',
+            ],
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+            [
+                'column'    => 'unicorn',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+        ];
+
+        $builder   = $this->buildBuilder(new Report());
+        $groupExpr = CompositeExpression::and($builder->getTagCondition($filters[0]), $builder->getTagCondition($filters[1]));
+        Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
+        Assert::assertNull($builder->getTagCondition($filters[2]));
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder
