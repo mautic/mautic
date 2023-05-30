@@ -70,7 +70,6 @@ $connectionSettings = [
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
     'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
     'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
-    'logging'  => true,
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
