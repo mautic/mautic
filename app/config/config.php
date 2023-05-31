@@ -65,7 +65,7 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'session'         => [ //handler_id set to null will use default session handler from php.ini
+    'session'         => [ // handler_id set to null will use default session handler from php.ini
         'handler_id'           => null,
         'name'                 => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure'        => $secureCookie,
@@ -105,7 +105,7 @@ $container->loadFromExtension('framework', [
 
 $container->setParameter('mautic.famework.csrf_protection', true);
 
-//Doctrine Configuration
+// Doctrine Configuration
 $connectionSettings = [
     'driver'                => '%mautic.db_driver%',
     'host'                  => '%mautic.db_host%',
@@ -155,6 +155,7 @@ $container->loadFromExtension('doctrine', [
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
                 ],
             ]),
+            'profiler' => '%kernel.debug%',
         ],
         'types'    => [
             'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
@@ -174,7 +175,7 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
-//MigrationsBundle Configuration
+// MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
     'migrations_paths' => [
         'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
@@ -202,7 +203,7 @@ $container->loadFromExtension('swiftmailer', [
     ],
 ]);
 
-//KnpMenu Configuration
+// KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
     'default_renderer' => 'mautic',
 ]);
@@ -230,7 +231,7 @@ $container->loadFromExtension('oneup_uploader', [
     ],
 ]);
 
-//FOS Rest for API
+// FOS Rest for API
 $container->loadFromExtension('fos_rest', [
     'routing_loader' => false,
     'body_listener'  => true,
@@ -244,7 +245,7 @@ $container->loadFromExtension('fos_rest', [
     'disable_csrf_role' => 'ROLE_API',
 ]);
 
-//JMS Serializer for API and Webhooks
+// JMS Serializer for API and Webhooks
 $container->loadFromExtension('jms_serializer', [
     'handlers' => [
         'datetime' => [
@@ -276,7 +277,7 @@ $container->loadFromExtension('framework', [
     ],
 ]);
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'exception_controller' => null,
 ]);
@@ -308,7 +309,7 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('includeStacktraces', [true])
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
-//Register command line logging
+// Register command line logging
 $container->setParameter(
     'console_error_listener.class',
     ConsoleErrorListener::class
@@ -353,7 +354,7 @@ $container->loadFromExtension('fm_elfinder', [
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
-            //'include_assets'  => true,
+            // 'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
