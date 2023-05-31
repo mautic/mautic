@@ -1466,6 +1466,7 @@ return [
             ],
         ],
         'composer_updates'   => false,
+        'load_froala_assets' => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only' => false,
     ],
 ];
