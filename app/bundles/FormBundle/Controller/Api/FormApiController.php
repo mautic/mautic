@@ -113,6 +113,7 @@ class FormApiController extends CommonApiController
         $isNew          = false;
         $alias          = $entity->getAlias();
         $formRepository = $this->model->getRepository();
+        $entityManager  = $this->getDoctrine()->getManager();
 
         if (empty($alias)) {
             // Set clean alias to prevent SQL errors
@@ -123,7 +124,7 @@ class FormApiController extends CommonApiController
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
-        $formRepository->beginTransaction();
+        $entityManager->beginTransaction();
 
         if (!$entity->getId()) {
             $isNew = true;
@@ -252,9 +253,9 @@ class FormApiController extends CommonApiController
                 $this->model->setActions($entity, $actions);
             }
 
-            $formRepository->commit();
+            $entityManager->commit();
         } catch (InvalidArgumentException $e) {
-            $formRepository->rollback();
+            $entityManager->rollback();
 
             return $this->returnError($e->getMessage(), $e->getCode());
         }
