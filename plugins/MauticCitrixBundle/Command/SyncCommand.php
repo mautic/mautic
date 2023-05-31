@@ -5,9 +5,11 @@ namespace MauticPlugin\MauticCitrixBundle\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
+use MauticPlugin\MauticCitrixBundle\Integration\CitrixAbstractIntegration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * CLI Command : Synchronizes registrant information from Citrix products.
@@ -16,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SyncCommand extends ModeratedCommand
 {
+    private SymfonyStyle $io;
+
     /**
      * {@inheritdoc}
      *
@@ -45,6 +49,9 @@ class SyncCommand extends ModeratedCommand
         $model   = $this->getContainer()->get('mautic.citrix.model.citrix');
         $options = $input->getOptions();
         $product = $options['product'];
+
+        $this->io  = new SymfonyStyle($input, $output);
+        $this->io->warning(CitrixAbstractIntegration::DEPRECATION_MESSAGE);
 
         if (!$this->checkRunStatus($input, $output, $options['product'].$options['id'])) {
             return 0;
