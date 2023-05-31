@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -45,11 +46,6 @@ final class AssetsHelper
     private $version;
 
     /**
-     * @var Packages
-     */
-    private $packages;
-
-    /**
      * @var string
      */
     private $siteUrl;
@@ -62,9 +58,8 @@ final class AssetsHelper
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
     private InstallService $installService;
 
-    public function __construct(Packages $packages)
+    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->packages = $packages;
     }
 
     /**
@@ -513,11 +508,13 @@ final class AssetsHelper
 
     /**
      * Load Froala JS source files.
-     *
-     * @return array<string>
      */
-    public function getFroalaScripts()
+    public function getFroalaScripts(): array
     {
+        if (!$this->coreParametersHelper->get('load_froala_assets')) {
+            return [];
+        }
+
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
         $plugins = $base.'plugins/';
 

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
@@ -29,6 +30,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class PageController extends FormController
 {
@@ -358,7 +360,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page.page');
@@ -457,7 +459,7 @@ class PageController extends FormController
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
                 'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request))), // strip new lines
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
                 'permissions'   => $permissions,
             ],
@@ -485,8 +487,10 @@ class PageController extends FormController
         Request $request,
         AssetsHelper $assetsHelper,
         Translator $translator,
-                     $objectId,
-                     $ignorePost = false
+        RouterInterface $routerHelper,
+        CoreParametersHelper $coreParametersHelper,
+        $objectId,
+        $ignorePost = false
     ) {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page.page');
@@ -612,7 +616,7 @@ class PageController extends FormController
                 'themes'        => $this->factory->getInstalledThemes('page', true),
                 'slots'         => $this->buildSlotForms($slotTypes),
                 'sections'      => $this->buildSlotForms($sections),
-                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request))), // strip new lines
+                'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'permissions'   => $security->isGranted(
