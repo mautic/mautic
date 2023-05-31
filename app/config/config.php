@@ -155,7 +155,9 @@ $container->loadFromExtension('doctrine', [
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
                 ],
             ]),
-            'profiler' => '%kernel.debug%',
+            'profiling' => [
+                'profiling' => '%kernel.debug%',
+            ],
         ],
         'types'    => [
             'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
