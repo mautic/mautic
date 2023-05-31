@@ -79,15 +79,20 @@ class AjaxController extends CommonAjaxController
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $viewsCount = $model->getViewsCount($focus);
-            $cacheItem->set($viewsCount);
+            $viewsCount       = $model->getViewsCount($focus);
+            $uniqueViewsCount = $model->getUniqueViewsCount($focus);
+            $cacheItem->set([
+                'views'       => $viewsCount,
+                'uniqueViews' => $uniqueViewsCount,
+            ]);
             $cacheItem->expiresAfter($cacheTimeout * 60);
             $this->cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
-            'success' => 1,
-            'views'   => $viewsCount,
+            'success'     => 1,
+            'views'       => $viewsCount,
+            'uniqueViews' => $uniqueViewsCount,
         ]);
     }
 

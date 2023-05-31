@@ -27,6 +27,25 @@ class FocusModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(3, $focusModel->getViewsCount($focus));
     }
 
+    public function testUniqueViewsCount(): void
+    {
+        /** @var FocusModel $focusModel */
+        $focusModel = self::$container->get('mautic.focus.model.focus');
+        $focus      = $this->createFocus('popup');
+        $focusModel->saveEntity($focus);
+
+        $leads = [
+            $this->createLead(),
+            $this->createLead(),
+        ];
+
+        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[0]);
+        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[0]);
+        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[1]);
+
+        $this->assertEquals(2, $focusModel->getUniqueViewsCount($focus));
+    }
+
     public function testClickThroughCount(): void
     {
         /** @var FocusModel $focusModel */

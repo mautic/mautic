@@ -423,29 +423,33 @@ Mautic.focusLoadConversionRateTable = function() {
     var $conversionRateCells = mQuery('[data-conversion-rate-cell]', $conversionRateTable);
     var $conversionRateTotalCell = mQuery('[data-conversion-rate-total-cell]', $conversionRateTable);
     var $focusTotalViewsCell = mQuery('[data-focus-total-views-cell]');
+    var $focusTotalUniqueViewsCell = mQuery('[data-focus-total-unique-views-cell]');
     var focusId = $conversionRateTable.data('entity-id');
     var views = null;
+    var uniqueViews = null;
     var clickThrough = null;
 
     var updateTotalClickThroughRate = function() {
-        if (views === null || clickThrough === null) return;
+        if (uniqueViews === null || clickThrough === null) return;
 
-        var totalConversionRate = views > 0 ? Math.round(clickThrough / views * 10000) / 100 : 0;
+        var totalConversionRate = uniqueViews > 0 ? Math.round(clickThrough / uniqueViews * 10000) / 100 : 0;
         $conversionRateTotalCell.children('.spinner').remove();
         $conversionRateTotalCell.prepend(totalConversionRate + '%')
     };
 
     Mautic.ajaxActionRequest('plugin:focus:getViewsCount', {focusId: focusId}, function(response){
         views = response.views;
+        uniqueViews = response.uniqueViews;
 
         $conversionRateCells.each(function(i, el) {
             var $cell = mQuery(el);
-            var uniqueHits = $cell.data('unique-hits');
-            var conversionRate = views > 0 ? Math.round(uniqueHits / views * 10000) / 100 : 0;
+            var uniqueClicks = $cell.data('unique-hits');
+            var conversionRate = views > 0 ? Math.round(uniqueClicks / uniqueViews * 10000) / 100 : 0;
             $cell.html(conversionRate + '%');
         })
 
         $focusTotalViewsCell.html(views);
+        $focusTotalUniqueViewsCell.html(uniqueViews);
         updateTotalClickThroughRate();
     }, false, true, "GET");
 
