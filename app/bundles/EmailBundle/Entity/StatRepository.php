@@ -640,8 +640,8 @@ class StatRepository extends CommonRepository
             ->where('s.email_id = :email')
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
-            ->setParameter(':email', $emailId)
-            ->setParameter(':contacts', $contacts);
+            ->setParameter('email', $emailId)
+            ->setParameter('contacts', $contacts);
 
         return $query->execute()->fetchAssociative();
     }
@@ -703,7 +703,7 @@ class StatRepository extends CommonRepository
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
             ->andWhere("{$pageHitsAlias}.lead_id in (:contacts)")
-            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query

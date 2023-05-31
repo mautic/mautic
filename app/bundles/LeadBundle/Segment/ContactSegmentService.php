@@ -274,7 +274,7 @@ class ContactSegmentService
         $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
         $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
         $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
-        $qbO->setParameter(':orpsegid', $segment->getId());
+        $qbO->setParameter('orpsegid', $segment->getId());
         $this->addLeadAndMinMaxLimiters($qbO, $batchLimiters, 'lead_lists_leads');
 
         if ($limit) {
@@ -294,8 +294,6 @@ class ContactSegmentService
 
     /**
      * Formatting helper.
-     *
-     * @param $inputSeconds
      *
      * @return string
      */
