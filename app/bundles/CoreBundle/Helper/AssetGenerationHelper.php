@@ -16,7 +16,6 @@ class AssetGenerationHelper
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
         'moment/min/moment.min.js', // Needed for date/time formatting.
-        // 'jquery-color/dist/jquery.color.js', // I can't find why is this needed. Added in https://github.com/mautic/mautic/commit/918000351e8c7657b01ef132e22c097942cf0e99. Uncoment this if we find the place. Delete this dependency after some time.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
         'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
         'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
@@ -38,7 +37,39 @@ class AssetGenerationHelper
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
+        'modernizr/modernizr-mautic-dist.js',
         'jquery.quicksearch/src/jquery.quicksearch.js',
+        'jquery-ui/ui/version.js',
+        'jquery-ui/ui/widget.js',
+        'jquery-ui/ui/plugin.js',
+        'jquery-ui/ui/position.js',
+        'jquery-ui/ui/data.js',
+        'jquery-ui/ui/disable-selection.js',
+        'jquery-ui/ui/focusable.js',
+        'jquery-ui/ui/form-reset-mixin.js',
+        'jquery-ui/ui/jquery-patch.js',
+        'jquery-ui/ui/keycode.js',
+        'jquery-ui/ui/labels.js',
+        'jquery-ui/ui/scroll-parent.js',
+        'jquery-ui/ui/tabbable.js',
+        'jquery-ui/ui/unique-id.js',
+        'jquery-ui/ui/effect.js',
+        'jquery-ui/ui/widgets/mouse.js',
+        'jquery-ui/ui/widgets/draggable.js',
+        'jquery-ui/ui/widgets/droppable.js',
+        'jquery-ui/ui/widgets/selectable.js',
+        'jquery-ui/ui/widgets/sortable.js',
+        'jquery-ui/ui/vendor/jquery-color/jquery.color.js',
+        'jquery-ui/ui/effects/effect-drop.js',
+        'jquery-ui/ui/effects/effect-fade.js',
+        'jquery-ui/ui/effects/effect-size.js',
+        'jquery-ui/ui/effects/effect-slide.js',
+        'jquery-ui/ui/effects/effect-transfer.js',
+        'jquery-ui/ui/safe-active-element.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/button.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/resizable.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/slider.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/controlgroup.js', // needed for ElFinder
         // TODO: Add the rest of the libraries here.
     ];
 
@@ -106,7 +137,7 @@ class AssetGenerationHelper
 
                 foreach (self::NODE_MODULES as $path) {
                     $relPath  = "node_modules/{$path}";
-                    $fullPath = "{$this->pathsHelper->getRootPath()}/{$relPath}";
+                    $fullPath = "{$this->pathsHelper->getVendorRootPath()}/{$relPath}";
                     $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
                     $details  = [
                         'fullPath' => $fullPath,

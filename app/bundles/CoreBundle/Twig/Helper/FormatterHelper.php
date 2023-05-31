@@ -8,6 +8,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelper
 {
+    public const FLOAT_PRECISION = 4;
+
     /**
      * @var DateHelper
      */
@@ -35,7 +37,7 @@ final class FormatterHelper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && 'bool' !== $type) {
+        if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
         }
 
@@ -79,7 +81,10 @@ final class FormatterHelper
                 $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
                 break;
             case 'int':
-                $string = (int) $val;
+                $string = strval((int) $val);
+                break;
+            case 'float':
+                $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);

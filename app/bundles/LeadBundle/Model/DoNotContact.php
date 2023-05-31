@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -86,7 +88,7 @@ class DoNotContact implements MauticModelInterface
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false
     ) {
-        $dnc     = false;
+        $dnc     = null;
         $contact = $this->leadModel->getEntity($contactId);
 
         if (null === $contact) {
@@ -97,14 +99,16 @@ class DoNotContact implements MauticModelInterface
         // if !$checkCurrentStatus, assume is contactable due to already being validated
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($contact, $channel) : DNC::IS_CONTACTABLE;
 
+        /** @var ArrayCollection<int, DNC> $dncEntities */
+        $dncEntities = new ArrayCollection();
         // If they don't have a DNC entry yet
         if (DNC::IS_CONTACTABLE === $isContactable) {
-            $dnc = $this->createDncRecord($contact, $channel, $reason, $comments);
+            $dnc = $dncEntities[] = $this->createDncRecord($contact, $channel, $reason, $comments);
         } elseif ($isContactable !== $reason) {
             // Or if the given reason is different than the stated reason
 
-            /** @var DNC $dnc */
-            foreach ($contact->getDoNotContact() as $dnc) {
+            $dncEntities = $contact->getDoNotContact();
+            foreach ($dncEntities as $dnc) {
                 // Only update if the contact did not unsubscribe themselves or if the code forces it
                 $allowOverride = ($allowUnsubscribeOverride || DNC::UNSUBSCRIBED !== $dnc->getReason());
 
@@ -121,9 +125,15 @@ class DoNotContact implements MauticModelInterface
             }
         }
 
-        if ($dnc && $persist) {
+        if (null !== $dnc && $persist) {
             // Use model saveEntity to trigger events for DNC change
             $this->leadModel->saveEntity($contact);
+            $this->dncRepo->detachEntities($dncEntities->toArray());
+            // need to force a collection to load items in the next call.
+            $collection = $contact->getDoNotContact();
+            if ($collection instanceof PersistentCollection) {
+                $collection->setInitialized(false);
+            }
         }
 
         return $dnc;
@@ -134,7 +144,7 @@ class DoNotContact implements MauticModelInterface
      *
      * @return int
      *
-     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
+     * @see DNC This method can return boolean false, so be
      *                                             sure to always compare the return value against
      *                                             the class constants of DoNotContact
      */
@@ -144,7 +154,6 @@ class DoNotContact implements MauticModelInterface
             $channel = key($channel);
         }
 
-        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $this->dncRepo->getEntriesByLeadAndChannel($contact, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
