@@ -142,7 +142,7 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], string $emailType = null)
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -151,6 +151,7 @@ class SendEmailToContact
         $this->mailer->enableQueue();
 
         if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
+            $this->mailer->setEmailType($emailType);
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
@@ -234,9 +235,6 @@ class SendEmailToContact
      */
     public function reset()
     {
-        [];
-        [];
-        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];
@@ -247,8 +245,6 @@ class SendEmailToContact
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];
-
-        $this->dncModel->clearEntities();
 
         $this->mailer->reset();
     }

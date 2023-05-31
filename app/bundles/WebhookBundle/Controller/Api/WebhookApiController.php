@@ -2,10 +2,18 @@
 
 namespace Mautic\WebhookBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Webhook>
@@ -16,6 +24,22 @@ class WebhookApiController extends CommonApiController
      * @var WebhookModel|null
      */
     protected $model = null;
+
+    private RequestStack $requestStack;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine
+    ) {
+        $this->requestStack = $requestStack;
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
+    }
 
     public function initialize(ControllerEvent $event)
     {
@@ -51,7 +75,7 @@ class WebhookApiController extends CommonApiController
         }
 
         // Remove events missing in the PUT request
-        if ('PUT' === $this->request->getMethod()) {
+        if ('PUT' === $this->requestStack->getCurrentRequest()->getMethod()) {
             foreach ($entity->getEvents() as $event) {
                 if (!in_array($event->getEventType(), $eventsToKeep)) {
                     $entity->removeEvent($event);

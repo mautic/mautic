@@ -246,7 +246,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -260,7 +260,7 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function getSocialProfileTemplate()
     {
-        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.twig";
     }
 
     /**

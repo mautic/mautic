@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
@@ -11,11 +12,13 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
@@ -72,7 +75,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
-        $form    = $crawler->filterXPath('//form[@name="leadlist"]')->form();
+        $form = $crawler->filterXPath('//form[@name="leadlist"]')->form();
         $form->setValues(
             [
                 'leadlist[name]'               => 'Segment 1',
@@ -115,7 +118,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(4, $leadListsTableRows->count());
-        $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text());
+        $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text(null, false));
         $this->assertEquals('Lead List 1 - Segment Category 1 (lead-list-1)', $firstLeadListLinkTest);
 
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
@@ -267,23 +270,43 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * Only tests if an actual CSV file is returned and if the content size isn't suspiciously small.
-     * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
+     * Only tests if a contact export is scheduled for CSV file.
      */
-    public function testCsvIsExportedCorrectly(): void
+    public function testCsvIsScheduledForExport(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
-
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
-        $content = ob_get_contents();
-        ob_end_clean();
-
         $clientResponse = $this->client->getResponse();
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString(
+            'Contact export scheduled for CSV file type.',
+            $clientResponse->getContent()
+        );
+        $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
+        $data                   = $contactExportScheduler->getData();
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
 
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
-        $this->assertEquals(true, (strlen($content) > 5000));
+        Assert::assertSame(
+            [
+                'start'  => 0,
+                'limit'  => $coreParametersHelper->get('contact_export_batch_size', 1000),
+                'filter' => [
+                    'string' => '',
+                    'force'  => [
+                        [
+                            'column' => 'l.dateIdentified',
+                            'expr'   => 'isNotNull',
+                        ],
+                    ],
+                ],
+                'orderBy'        => 'l.last_active',
+                'orderByDir'     => 'DESC',
+                'withTotalCount' => true,
+                'fileType'       => 'csv',
+            ],
+            $data
+        );
     }
 
     /**
@@ -337,7 +360,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([]);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue([]);
         $this->client->submit($form);
         $companies  = $this->getCompanyLeads(1);
         $collection = new Collection($companies);
@@ -379,7 +404,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         // Test that a locale option is present correctly.
         $this->assertStringContainsString(
-            '<option value="cs_CZ" >Czech (Czechia)</option>',
+            '<option value="cs_CZ">Czech (Czechia)</option>',
             $this->client->getResponse()->getContent()
         );
     }
@@ -547,7 +572,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Lead[]
+     * @return array<int, array<string, mixed>>
      */
     private function getCompanyLeads(int $leadId): array
     {
@@ -558,7 +583,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("cl.lead_id = {$leadId}")
             ->orderBy('cl.company_id')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     private function getLeadPrimaryCompany(int $leadId): ?string
@@ -568,7 +593,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**
@@ -579,7 +604,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue($expectedCompanies);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue($expectedCompanies);
         $crawler    = $this->client->submit($form);
         $companies  = $this->getCompanyLeads($leadId);
         $collection = (new Collection($companies))->keyBy('company_id');
@@ -648,6 +675,53 @@ class LeadControllerTest extends MauticMysqlTestCase
             ],
             $updateAuditLog->getDetails()
         );
+    }
+
+    public function testSetNullCompanyToContact(): void
+    {
+        /** @var LeadModel $contactModel */
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        $company = new Company();
+        $company->setName('Doe Corp');
+
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[firstname]' => 'John',
+                'lead[lastname]'  => 'Doe',
+                'lead[email]'     => 'john_23657@doe.com',
+                'lead[companies]' => [$company->getId()],
+            ]
+        );
+
+        $this->client->submit($form);
+
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
+        /** @var Lead $contact */
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
+
+        $companies  = $this->getCompanyLeads($contact->getId());
+        $collection = new Collection($companies);
+        // Should have no companies associated
+        $this->assertCount(1, $collection);
+
+        $this->em->flush();
+
+        $contact->addUpdatedField('company', null);
+        $contactModel->saveEntity($contact);
+
+        $companies  = $this->getCompanyLeads($contact->getId());
+        $collection = new Collection($companies);
+        // Should have no companies associated
+        $this->assertCount(0, $collection);
     }
 
     private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog

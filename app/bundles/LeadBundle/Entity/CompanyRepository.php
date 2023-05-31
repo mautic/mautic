@@ -98,14 +98,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param $order
+     * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order)
+    public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from('MauticLeadBundle:Company', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
@@ -142,7 +143,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -237,8 +238,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             return $companies[$key];
         }
 
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->select('comp.*, cl.is_primary')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id');
 
         if (!empty($id)) {
             $q->where(
@@ -253,7 +255,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->orderBy('comp.companyname', 'ASC');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $companies[$key] = $results;
 
@@ -285,7 +287,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         )
             ->groupBy('cl.company_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -341,7 +343,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             )->setParameter('state', $state);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -360,12 +362,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-        $companies = $qb->execute()->fetchAll();
+
+        $companies = $qb->execute()->fetchAllAssociative();
 
         // Group companies per contact
         $contactCompanies = [];
@@ -401,7 +404,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -416,7 +419,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -475,7 +478,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 ->setParameter('true', true, 'boolean');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -546,8 +549,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', 'DESC')
-            ->addOrderBy('c.id', 'DESC');
+            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
 
         $entities = $q->getQuery()
             ->getResult();

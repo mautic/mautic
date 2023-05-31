@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -25,6 +24,7 @@ use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use RuntimeException;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -484,10 +484,7 @@ class FieldModel extends FormModel
         $this->leadFieldSaver             = $leadFieldSaver;
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }
@@ -571,7 +568,7 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -598,7 +595,7 @@ class FieldModel extends FormModel
             $this->customFieldColumn->createLeadColumn($entity);
         } catch (CustomFieldLimitException $e) {
             // Convert to original Exception not to cause BC
-            throw new DBALException($this->translator->trans($e->getMessage()));
+            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.
@@ -614,7 +611,7 @@ class FieldModel extends FormModel
      * @return array|void
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -780,7 +777,6 @@ class FieldModel extends FormModel
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param       $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -788,7 +784,7 @@ class FieldModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -804,7 +800,7 @@ class FieldModel extends FormModel
     /**
      * @param $properties
      *
-     * @return bool
+     * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {

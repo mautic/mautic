@@ -38,7 +38,7 @@ class MessageQueueRepository extends CommonRepository
      * @param null $channel
      * @param null $channelId
      *
-     * @return mixed
+     * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
     {
@@ -52,7 +52,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('processStarted', $processStarted)
             ->indexBy('mq', 'mq.id');
 
-        $q->orderBy('mq.priority, mq.scheduledDate', 'ASC');
+        $q->orderBy('mq.priority, mq.scheduledDate', \Doctrine\Common\Collections\Criteria::ASC);
 
         if ($limit) {
             $q->setMaxResults((int) $limit);
@@ -79,13 +79,13 @@ class MessageQueueRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq($this->getTableAlias().'.channel', ':channel'),
             $q->expr()->neq($this->getTableAlias().'.status', ':status')
         );
 
         if (!empty($ids)) {
-            $expr->add(
+            $expr = $expr->with(
                 $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
             );
         }
@@ -100,7 +100,7 @@ class MessageQueueRepository extends CommonRepository
                 ]
             )
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**
@@ -123,7 +123,7 @@ class MessageQueueRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('mq.channel', $query->expr()->literal('%'.$options['search'].'%'))
             ));
         }

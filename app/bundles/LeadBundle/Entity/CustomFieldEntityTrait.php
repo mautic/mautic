@@ -25,7 +25,7 @@ trait CustomFieldEntityTrait
 
     /**
      * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
-     * to the origin of creation in a webhook (like Pipedrive).
+     * to the origin of creation in a webhook.
      *
      * @var array
      */
@@ -175,10 +175,8 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get field value.
-     *
-     * @param string $field
-     * @param string $group
+     * @param string      $field
+     * @param string|null $group
      *
      * @return mixed
      */

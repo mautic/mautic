@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -15,6 +14,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Twig\Environment;
 
 class IntegrationHelper
 {
@@ -44,9 +44,9 @@ class IntegrationHelper
     protected $coreParametersHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var PluginModel
@@ -67,7 +67,7 @@ class IntegrationHelper
         PathsHelper $pathsHelper,
         BundleHelper $bundleHelper,
         CoreParametersHelper $coreParametersHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         PluginModel $pluginModel
     ) {
         $this->container            = $container;
@@ -76,7 +76,7 @@ class IntegrationHelper
         $this->bundleHelper         = $bundleHelper;
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->templatingHelper     = $templatingHelper;
+        $this->twig                 = $twig;
     }
 
     /**
@@ -88,7 +88,7 @@ class IntegrationHelper
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
-     * @return mixed
+     * @return array<AbstractIntegration>
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -105,7 +105,7 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository('MauticPluginBundle:Integration');
+            $integrationRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class);
             //get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -129,7 +129,7 @@ class IntegrationHelper
 
                     $id                  = $installedPlugins[$plugin['bundle']]['id'];
                     $this->byPlugin[$id] = [];
-                    $pluginReference     = $this->em->getReference('MauticPluginBundle:Plugin', $id);
+                    $pluginReference     = $this->em->getReference(\Mautic\PluginBundle\Entity\Plugin::class, $id);
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
@@ -331,7 +331,7 @@ class IntegrationHelper
      *
      * @param $name
      *
-     * @return AbstractIntegration|bool
+     * @return AbstractIntegration|false
      */
     public function getIntegrationObject($name)
     {
@@ -424,12 +424,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getCoreIntegrations();
     }
 
     /**
@@ -496,7 +496,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -529,7 +529,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
 
         return $socialCache;
     }
@@ -543,7 +543,6 @@ class IntegrationHelper
 
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
-            $templating         = $this->templatingHelper->getTemplating();
 
             /**
              * @var string
@@ -560,7 +559,7 @@ class IntegrationHelper
 
                 //add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $templating->render($plugin->getBundle().":Integration/$integration:share.html.php", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }

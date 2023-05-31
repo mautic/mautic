@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -75,7 +76,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -86,7 +87,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Event');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Event::class);
     }
 
     /**
@@ -94,7 +95,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Lead');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
     }
 
     /**
@@ -102,7 +103,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadEventLogRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
     /**
@@ -119,7 +120,6 @@ class CampaignModel extends CommonFormModel
      * {@inheritdoc}
      *
      * @param object      $entity
-     * @param object      $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -127,7 +127,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -468,10 +468,10 @@ class CampaignModel extends CommonFormModel
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->addList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        $entity->addForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
                         break;
                     default:
                         break;
@@ -483,10 +483,10 @@ class CampaignModel extends CommonFormModel
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->removeList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        $entity->removeForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
                         break;
                     default:
                         break;
@@ -642,7 +642,7 @@ class CampaignModel extends CommonFormModel
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -658,7 +658,7 @@ class CampaignModel extends CommonFormModel
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
     }
 
     /**
@@ -737,7 +737,7 @@ class CampaignModel extends CommonFormModel
 
                     if ($this->coreParametersHelper->get('campaign_use_summary')) {
                         $q       = $query->prepareTimeDataQuery('campaign_summary', 'date_triggered', $filter, 'triggered_count + non_action_path_taken_count', 'sum');
-                        $rawData = $q->execute()->fetchAll();
+                        $rawData = $q->execute()->fetchAllAssociative();
                     } else {
                         // Exclude failed events
                         $failedSq = $this->em->getConnection()->createQueryBuilder();
@@ -751,7 +751,7 @@ class CampaignModel extends CommonFormModel
                         ];
 
                         $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                        $rawData = $q->execute()->fetchAll();
+                        $rawData = $q->execute()->fetchAllAssociative();
                     }
 
                     if (!empty($rawData)) {

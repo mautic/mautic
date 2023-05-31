@@ -48,11 +48,11 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         if ($errorMessage) {
-            self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), $response->getContent());
+            self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
             self::assertStringContainsString('error', $response->getContent());
             self::assertStringContainsString($errorMessage, $response->getContent());
         } else {
-            self::assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+            self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
             self::assertStringNotContainsString('error', $response->getContent());
         }
     }
@@ -105,13 +105,11 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     private function testPointData(Form $form, int $delta, string $errorMessage): void
     {
         $form['point[delta]']->setValue((string) $delta);
-        $form['point[isPublished]']->setValue(true);
+        $form['point[isPublished]']->setValue('1');
         $form['point[type]']->setValue('form.submit');
 
         $this->client->submit($form);
         self::assertTrue($this->client->getResponse()->isOk());
-
-        $this->em->clear();
 
         $response = $this->client->getResponse()->getContent();
         self::assertStringContainsString($errorMessage, (string) $response);

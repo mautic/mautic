@@ -8,6 +8,7 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -20,7 +21,6 @@ class RoleModel extends FormModel
     public function getRepository(): RoleRepository
     {
         $result = $this->em->getRepository(Role::class);
-        \assert($result instanceof RoleRepository);
 
         return $result;
     }
@@ -48,7 +48,7 @@ class RoleModel extends FormModel
 
         if (!$isNew) {
             //delete all existing
-            $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
+            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -88,7 +88,7 @@ class RoleModel extends FormModel
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
+        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
@@ -101,7 +101,7 @@ class RoleModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);

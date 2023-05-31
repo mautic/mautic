@@ -1,0 +1,30 @@
+{% block _submit_action_repost_widget %}
+  <div class="row">
+      <div class="col-sm-12">
+          {{ form_row(form.post_url) }}
+      </div>
+  </div>
+
+  <div class="row">
+      <div class="col-sm-12">
+          {{ form_row(form.failure_email) }}
+      </div>
+  </div>
+
+  <div class="row">
+      <div class="col-sm-12">
+          {{ form_row(form.authorization_header) }}
+      </div>
+  </div>
+
+  <h4>{{ 'mautic.form.action.repost.field_mapping'|trans }}</h4>
+  <div class="row mt-lg">
+      {% for k, child in form %}
+        {% if k not in ['post_url', 'failure_email', 'authorization_header'] %}
+          <div class="col-sm-6">
+              {{ form_row(child) }}
+          </div>
+        {% endif %}
+      {% endfor %}
+  </div>
+{% endblock %}

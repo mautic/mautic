@@ -27,7 +27,7 @@ class LeadRepository extends CommonRepository
     public function getLeadDetails($campaignId, $leads = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:Lead', 'lc')
+            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
             ->select('lc')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -62,7 +62,7 @@ class LeadRepository extends CommonRepository
     public function getLeads($campaignId, $eventId = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:Lead', 'lc')
+            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
             ->select('lc, l')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -78,7 +78,7 @@ class LeadRepository extends CommonRepository
         if (null != $eventId) {
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
-                ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+                ->from(\Mautic\CampaignBundle\Entity\LeadEventLog::class, 'ell')
                 ->leftJoin('ell.lead', 'el')
                 ->leftJoin('ell.event', 'ev')
                 ->where(
@@ -106,7 +106,8 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $campaigns = [];
         foreach ($results as $r) {
             $campaigns[] = $r['campaign_id'];
@@ -149,7 +150,7 @@ class LeadRepository extends CommonRepository
         $q->select('l.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
         $q->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('l.lead_id', ':leadId'),
                     $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
                 )
@@ -163,7 +164,7 @@ class LeadRepository extends CommonRepository
 
         $q->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -180,7 +181,7 @@ class LeadRepository extends CommonRepository
         $q->select('l.lead_id, l.date_added')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('l.campaign_id', ':campaignId'),
                     $q->expr()->eq('l.manually_removed', 0)
                 )
@@ -199,7 +200,7 @@ class LeadRepository extends CommonRepository
         $eventQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
-                $eventQb->expr()->andX(
+                $eventQb->expr()->and(
                     $eventQb->expr()->eq('log.event_id', ':decisionId'),
                     $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
                     $eventQb->expr()->eq('log.rotation', 'l.rotation')
@@ -244,7 +245,8 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $results  = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $contacts = [];
         foreach ($results as $result) {
             $contacts[$result['lead_id']] = new \DateTime($result['date_added'], new \DateTimeZone('UTC'));
@@ -275,7 +277,7 @@ class LeadRepository extends CommonRepository
             $q->select('count(*)')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
                 ->where(
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->eq('l.campaign_id', ':campaignId'),
                         $q->expr()->eq('l.manually_removed', 0)
                     )
@@ -292,7 +294,7 @@ class LeadRepository extends CommonRepository
             $eventQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
                 ->where(
-                    $eventQb->expr()->andX(
+                    $eventQb->expr()->and(
                         $eventQb->expr()->eq('log.event_id', $decisionId),
                         $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
                         $eventQb->expr()->eq('log.rotation', 'l.rotation')
@@ -302,7 +304,7 @@ class LeadRepository extends CommonRepository
                 sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
             );
 
-            $totalCount += (int) $q->execute()->fetchColumn();
+            $totalCount += (int) $q->execute()->fetchOne();
         }
 
         return $totalCount;
@@ -347,7 +349,7 @@ class LeadRepository extends CommonRepository
         $qb->select('cl.lead_id, cl.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', ':campaignId'),
                     $qb->expr()->in('cl.lead_id', ':contactIds')
                 )
@@ -355,7 +357,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contactRotations = [];
         foreach ($results as $result) {
@@ -381,7 +383,7 @@ class LeadRepository extends CommonRepository
         $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
@@ -394,7 +396,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $result = $qb->execute()->fetch();
+        $result = $qb->execute()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
@@ -420,7 +422,7 @@ class LeadRepository extends CommonRepository
         $qb->select('distinct(ll.lead_id) as id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
                 )
@@ -433,7 +435,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -456,7 +458,7 @@ class LeadRepository extends CommonRepository
         $qb->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
@@ -466,7 +468,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $result = $qb->execute()->fetch();
+        $result = $qb->execute()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
@@ -484,7 +486,7 @@ class LeadRepository extends CommonRepository
         $qb->select('cl.lead_id as id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.manually_added', 0)
@@ -494,7 +496,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -520,7 +522,7 @@ class LeadRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->set('cl.rotation', 'cl.rotation + 1')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('cl.lead_id', ':contactIds'),
                     $q->expr()->eq('cl.campaign_id', ':campaignId')
                 )
@@ -544,7 +546,7 @@ class LeadRepository extends CommonRepository
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
             ->where('cl.campaign_id = '.(int) $campaignId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         if (empty($segmentResults)) {
             // No segments so no contacts
@@ -583,7 +585,7 @@ class LeadRepository extends CommonRepository
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX($membershipConditions)
+                $qb->expr()->and($membershipConditions)
             );
 
         $qb->andWhere(
@@ -602,7 +604,7 @@ class LeadRepository extends CommonRepository
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
@@ -625,7 +627,7 @@ class LeadRepository extends CommonRepository
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'el')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('el.lead_id', 'll.lead_id'),
                     $qb->expr()->eq('el.campaign_id', (int) $campaignId)
                 )

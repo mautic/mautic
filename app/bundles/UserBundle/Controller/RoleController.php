@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity as Entity;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 class RoleController extends FormController
@@ -18,24 +19,22 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('user:roles:view')) {
+        if (!$this->security->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
 
         $this->setListFilters();
 
-        /** @var PageHelperFactoryInterface $pageHelperFacotry */
-        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
-        $pageHelper        = $pageHelperFacotry->make('mautic.role', $page);
+        $pageHelper = $pageHelperFactory->make('mautic.role', $page);
 
         $limit      = $pageHelper->getLimit();
         $start      = $pageHelper->getStart();
-        $orderBy    = $this->get('session')->get('mautic.role.orderby', 'r.name');
-        $orderByDir = $this->get('session')->get('mautic.role.orderbydir', 'ASC');
-        $filter     = $this->request->get('search', $this->get('session')->get('mautic.role.filter', ''));
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $orderBy    = $request->getSession()->get('mautic.role.orderby', 'r.name');
+        $orderByDir = $request->getSession()->get('mautic.role.orderbydir', 'ASC');
+        $filter     = $request->get('search', $request->getSession()->get('mautic.role.filter', ''));
+        $tmpl       = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $model      = $this->getModel('user.role');
         \assert($model instanceof RoleModel);
         $items = $model->getEntities(
@@ -48,7 +47,7 @@ class RoleController extends FormController
             ]
         );
 
-        $this->get('session')->set('mautic.role.filter', $filter);
+        $request->getSession()->set('mautic.role.filter', $filter);
 
         $count = count($items);
         if ($count && $count < ($start + 1)) {
@@ -87,12 +86,12 @@ class RoleController extends FormController
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,
                 'permissions' => [
-                    'create' => $this->get('mautic.security')->isGranted('user:roles:create'),
-                    'edit'   => $this->get('mautic.security')->isGranted('user:roles:edit'),
-                    'delete' => $this->get('mautic.security')->isGranted('user:roles:delete'),
+                    'create' => $this->security->isGranted('user:roles:create'),
+                    'edit'   => $this->security->isGranted('user:roles:edit'),
+                    'delete' => $this->security->isGranted('user:roles:delete'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:list.html.twig',
+            'contentTemplate' => '@MauticUser/Role/list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_role_index', ['page' => $page]),
                 'mauticContent' => 'role',
@@ -105,9 +104,9 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        if (!$this->get('mautic.security')->isGranted('user:roles:create')) {
+        if (!$this->security->isGranted('user:roles:create')) {
             return $this->accessDenied();
         }
 
@@ -120,27 +119,27 @@ class RoleController extends FormController
         $returnUrl = $this->generateUrl('mautic_role_index');
 
         //set the page we came from
-        $page   = $this->get('session')->get('mautic.role.page', 1);
+        $page   = $request->getSession()->get('mautic.role.page', 1);
         $action = $this->generateUrl('mautic_role_action', ['objectAction' => 'new']);
 
         //get the user form factory
         $permissionsConfig = $this->getPermissionsConfig($entity);
-        $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $this->request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', [
@@ -162,16 +161,16 @@ class RoleController extends FormController
                     ],
                 ]);
             } else {
-                return $this->editAction($entity->getId());
+                return $this->editAction($request, $entity->getId());
             }
         }
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -189,9 +188,9 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction($objectId, $ignorePost = true)
+    public function editAction(Request $request, $objectId, $ignorePost = true)
     {
-        if (!$this->get('mautic.security')->isGranted('user:roles:edit')) {
+        if (!$this->security->isGranted('user:roles:edit')) {
             return $this->accessDenied();
         }
 
@@ -200,7 +199,7 @@ class RoleController extends FormController
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.role.page', 1);
+        $page = $request->getSession()->get('mautic.role.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_role_index', ['page' => $page]);
@@ -235,23 +234,23 @@ class RoleController extends FormController
 
         $permissionsConfig = $this->getPermissionsConfig($entity);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' === $this->request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $this->request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_role_index',
                         '%url%'       => $this->generateUrl('mautic_role_action', [
@@ -270,7 +269,7 @@ class RoleController extends FormController
             } else {
                 //the form has to be rebuilt because the permissions were updated
                 $permissionsConfig = $this->getPermissionsConfig($entity);
-                $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
+                $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
             }
         } else {
             //lock the entity
@@ -279,10 +278,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,
@@ -297,11 +296,11 @@ class RoleController extends FormController
      */
     private function getPermissionsConfig(Entity\Role $role)
     {
-        $permissionObjects = $this->get('mautic.security')->getPermissionObjects();
+        $permissionObjects = $this->security->getPermissionObjects();
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine.orm.entity_manager')->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -351,15 +350,15 @@ class RoleController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('user:roles:delete')) {
+        if (!$this->security->isGranted('user:roles:delete')) {
             return $this->accessDenied();
         }
 
-        $page           = $this->get('session')->get('mautic.role.page', 1);
+        $page           = $request->getSession()->get('mautic.role.page', 1);
         $returnUrl      = $this->generateUrl('mautic_role_index', ['page' => $page]);
         $success        = 0;
         $flashes        = [];
@@ -374,7 +373,7 @@ class RoleController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $this->request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             try {
                 $model = $this->getModel('user.role');
                 \assert($model instanceof RoleModel);
@@ -418,11 +417,11 @@ class RoleController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        $page      = $this->get('session')->get('mautic.role.page', 1);
+        $page      = $request->getSession()->get('mautic.role.page', 1);
         $returnUrl = $this->generateUrl('mautic_role_index', ['page' => $page]);
         $flashes   = [];
 
@@ -436,17 +435,17 @@ class RoleController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $this->request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var RoleModel $model */
             $model = $this->getModel('user.role');
             \assert($model instanceof RoleModel);
-            $ids         = json_decode($this->request->query->get('ids', ''));
+            $ids         = json_decode($request->query->get('ids', ''));
             $deleteIds   = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine.orm.entity_manager')->getRepository('MauticUserBundle:User')->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -460,7 +459,7 @@ class RoleController extends FormController
                         'msg'     => 'mautic.user.role.error.deletenotallowed',
                         'msgVars' => ['%name%' => $entity->getName()],
                     ];
-                } elseif (!$this->get('mautic.security')->isGranted('user:roles:delete')) {
+                } elseif (!$this->security->isGranted('user:roles:delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'user.role', true);

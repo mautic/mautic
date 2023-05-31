@@ -25,7 +25,7 @@ class Point extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -40,12 +40,12 @@ class Point extends FormEntity
     private $repeatable = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -60,12 +60,12 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
      */
     private $log;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
@@ -301,7 +301,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -322,7 +322,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

@@ -6,11 +6,13 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
@@ -18,6 +20,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Class MailHelper.
@@ -39,9 +42,9 @@ class MailHelper
     protected $transport;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var null
@@ -119,6 +122,8 @@ class MailHelper
      * @var Email|null
      */
     protected $email;
+
+    protected ?string $emailType = null;
 
     /**
      * @var array
@@ -882,11 +887,11 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->templating) {
-            $this->templating = $this->factory->getTemplating();
+        if (null == $this->twig) {
+            $this->twig = $this->factory->getTwig();
         }
 
-        $content = $this->templating->renderResponse($template, $vars)->getContent();
+        $content = $this->twig->render($template, $vars);
 
         unset($vars);
 
@@ -1080,8 +1085,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string $address
-     * @param null   $name
+     * @param string      $address
+     * @param string|null $name
      *
      * @return bool
      */
@@ -1344,6 +1349,16 @@ class MailHelper
         $this->source = $source;
     }
 
+    public function getEmailType(): ?string
+    {
+        return $this->emailType;
+    }
+
+    public function setEmailType(?string $emailType): void
+    {
+        $this->emailType = $emailType;
+    }
+
     /**
      * @return Email|null
      */
@@ -1362,6 +1377,10 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
+        if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
+            $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
+        }
+
         $this->email = $email;
 
         $subject = $email->getSubject();
@@ -1432,7 +1451,7 @@ class MailHelper
 
             $this->processSlots($slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -1505,6 +1524,12 @@ class MailHelper
     public function getCustomHeaders()
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
+
+        // Personal and transactional emails do not contain unsubscribe header
+        $email = $this->getEmail();
+        if (empty($email) || 'transactional' === $this->getEmailType()) {
+            return $headers;
+        }
 
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
@@ -1850,7 +1875,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+                $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1872,7 +1897,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+                $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1913,7 +1938,7 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -2025,7 +2050,7 @@ class MailHelper
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

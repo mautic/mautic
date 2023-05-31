@@ -10,7 +10,7 @@ use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -72,11 +72,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:Message');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
     /**
@@ -94,14 +94,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param object      $entity
-     * @param FormFactory $formFactory
-     * @param null        $action
-     * @param array       $options
+     * @param object $entity
+     * @param null   $action
+     * @param array  $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -165,8 +164,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                 $entities = $this->getRepository()->getMessageList(
                     $filter,
                     $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother')
+                    $start
                 );
 
                 foreach ($entities as $entity) {

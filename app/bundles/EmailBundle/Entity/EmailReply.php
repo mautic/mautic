@@ -20,7 +20,7 @@ class EmailReply
     private $stat;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateReplied;
 
@@ -100,7 +100,7 @@ class EmailReply
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateReplied()
     {

@@ -2,10 +2,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateInterval;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType;
 use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
+use Mautic\LeadBundle\Form\Type\DashboardSegmentsBuildTime;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
@@ -33,8 +36,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead.lifetime'                 => [
             'formAlias' => DashboardLeadsLifetimeWidgetType::class,
         ],
-        'map.of.leads'  => [],
-        'top.lists'     => [],
+        'map.of.leads'            => [],
+        'top.lists'               => [],
+        'segments.build.time'     => [
+            'formAlias' => DashboardSegmentsBuildTime::class,
+        ],
         'top.creators'  => [],
         'top.owners'    => [],
         'created.leads' => [],
@@ -70,12 +76,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $translator;
 
-    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
+    /** @var DateHelper */
+    protected $dateHelper;
+
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator, DateHelper $dateHelper)
     {
         $this->leadModel     = $leadModel;
         $this->leadListModel = $leadListModel;
         $this->router        = $router;
         $this->translator    = $translator;
+        $this->dateHelper    = $dateHelper;
     }
 
     /**
@@ -109,7 +119,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -125,7 +135,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -140,7 +150,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
+            $event->setTemplate('@MauticCore/Helper/map.html.twig');
             $event->stopPropagation();
 
             return;
@@ -191,7 +201,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -292,7 +302,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'stages'      => $stages,
                     'devices'     => $deviceGranularity,
                 ]);
-                $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.php');
+                $event->setTemplate('@MauticCore/Helper/lifecycle.html.twig');
                 $event->stopPropagation();
             }
 
@@ -348,7 +358,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -403,7 +413,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -454,7 +464,64 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
+            $event->stopPropagation();
+
+            return;
+        }
+
+        if ('segments.build.time' == $event->getType()) {
+            if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the list limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $segments = $this->leadListModel->getSegmentsBuildTime($limit, $params['order'] ?? 'desc', $params['segments'] ?? [], $canViewOthers);
+                $items    = [];
+
+                // Build table rows with links
+                if ($segments) {
+                    foreach ($segments as $segment) {
+                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
+                        $buildTime  = explode(':', gmdate('H:i:s', (int) $segment->getLastBuiltTime()));
+                        $timeString = $this->dateHelper->formatRange(
+                            new DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
+                        );
+
+                        $row        = [
+                            [
+                                'value' => $segment->getName(),
+                                'type'  => 'link',
+                                'link'  => $listUrl,
+                            ],
+                            [
+                                'value' => $segment->getCreatedByUser(),
+                            ],
+                            [
+                                'value' => $timeString,
+                            ],
+                        ];
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData([
+                    'headItems' => [
+                        'mautic.dashboard.label.title',
+                        'mautic.core.createdby',
+                        'mautic.lead.list.last_built_time',
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $segments,
+                ]);
+            }
+
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;

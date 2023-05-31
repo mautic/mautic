@@ -141,6 +141,9 @@ return [
                 'class'       => FieldType::class,
                 'arguments'   => [
                     'translator',
+                    'mautic.form.collector.object',
+                    'mautic.form.collector.field',
+                    'mautic.form.collector.already.mapped.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -180,7 +183,7 @@ return [
                 'class'     => FormModel::class,
                 'arguments' => [
                     'request_stack',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.helper.theme',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
@@ -190,13 +193,14 @@ return [
                     'mautic.tracker.contact',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
+                    'mautic.form.collector.mapped.object',
                 ],
             ],
             'mautic.form.model.submission' => [
                 'class'     => SubmissionModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.form.model.form',
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
@@ -209,7 +213,7 @@ return [
                     'mautic.form.helper.form_uploader',
                     'mautic.lead.service.device_tracking_service',
                     'mautic.form.service.field.value.transformer',
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                     'mautic.tracker.contact',
                     'mautic.lead.merger',
                 ],
@@ -234,6 +238,22 @@ return [
             ],
         ],
         'other' => [
+            'mautic.form.collector.object' => [
+                'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.field' => [
+                'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.mapped.object' => [
+                'class'     => \Mautic\FormBundle\Collector\MappedObjectCollector::class,
+                'arguments' => ['mautic.form.collector.field'],
+            ],
+            'mautic.form.collector.already.mapped.field' => [
+                'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
+                'arguments' => ['mautic.cache.provider'],
+            ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
                 'arguments' => [
@@ -305,5 +325,6 @@ return [
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,
+        'successful_submit_action'  => 'top',
     ],
 ];

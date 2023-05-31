@@ -67,7 +67,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -84,7 +84,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':company'))
             ->setParameter(':company', $companyId);
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -102,7 +102,8 @@ class CompanyLeadRepository extends CommonRepository
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId);
         $q->orderBy('cl.date_added', 'DESC');
-        $result = $q->execute()->fetchAll();
+
+        $result = $q->execute()->fetchAllAssociative();
 
         return !empty($result) ? $result[0] : [];
     }
@@ -122,7 +123,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     /**
@@ -154,7 +155,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter(':companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
-        $leadIds = $q->execute()->fetchColumn();
+        $leadIds = $q->execute()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
@@ -164,5 +165,16 @@ class CompanyLeadRepository extends CommonRepository
                 $q->expr()->in('id', $leadIds)
             )->execute();
         }
+    }
+
+    public function removeContactPrimaryCompany(int $leadId): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
+        $qb->where(
+            $qb->expr()->eq('lead_id', $leadId)
+        )->andWhere(
+            $qb->expr()->eq('is_primary', 1)
+        )->execute();
     }
 }

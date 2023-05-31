@@ -1,0 +1,28 @@
+{#
+  Variables
+    - title
+    - stats
+#}
+{% if stats is defined and stats is not empty %}
+  <table class="table table-bordered table-striped mb-0">
+    <tbody>
+      <tr>
+        <th colspan="2" class="bg-primary segment-title">{{- title -}}</th>
+      </tr>
+      {% for stat in stats %}
+        {% if stat.ids|length > 0 %}
+          <tr>
+            <td>{{ stat.label|trans }}</td>
+            <td width="5%">
+              <span class="mt-xs label label-primary has-click-event clickable-stat">
+                <a href="{{ path(stat.route, {'search': 'mautic.core.searchcommand.ids'|trans~':'~stat.ids|join(',')}) }}">
+                  {{ stat.ids|length }}
+                </a>
+              </span>
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}

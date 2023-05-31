@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -33,7 +33,7 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, Trackable>
      */
     private $trackables;
 
@@ -102,7 +102,7 @@ class Redirect extends FormEntity
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

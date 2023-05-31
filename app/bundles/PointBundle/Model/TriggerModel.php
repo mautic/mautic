@@ -15,6 +15,7 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -99,7 +100,7 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -420,7 +421,7 @@ class TriggerModel extends CommonFormModel
                 if ($this->triggerEvent($event, $lead, true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
-                    $log->setEvent($this->em->getReference('MauticPointBundle:TriggerEvent', $event['id']));
+                    $log->setEvent($triggerEvent = $this->getEventRepository()->find($event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
                     $persist[] = $log;
@@ -429,9 +430,10 @@ class TriggerModel extends CommonFormModel
 
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
-
-                $this->em->clear('Mautic\PointBundle\Entity\LeadTriggerLog');
-                $this->em->clear('Mautic\PointBundle\Entity\TriggerEvent');
+                $this->getEventRepository()->detachEntities($persist);
+                if (isset($triggerEvent)) {
+                    $this->getEventRepository()->deleteEntity($triggerEvent);
+                }
             }
         }
     }

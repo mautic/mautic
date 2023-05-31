@@ -12,10 +12,11 @@
 !.gitpod.yml
 !.ddev/commands/web/dd
 .php_cs.cache
-/.env
+/.env.local
+/.env.local.php
+/.env.*.local
 /composer.phar
 /coverage.xml
-
 /app/bootstrap*
 /app/console
 /app/tests.bootstrap*
@@ -70,6 +71,7 @@
 /upgrade
 /upgrade_errors.txt
 
+/media/bundles/*
 /media/dashboards/*
 !/media/dashboards/*.json
 /media/files/*
@@ -83,10 +85,14 @@
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
+/media/css/app.css
+/media/css/libraries.css
+/media/js/app.js
+/media/js/libraries.js
+/media/js/mautic-form.js
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
-!/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle
 !/plugins/MauticCrmBundle

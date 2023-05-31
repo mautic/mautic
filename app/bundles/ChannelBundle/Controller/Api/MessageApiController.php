@@ -2,13 +2,21 @@
 
 namespace Mautic\ChannelBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Message>
@@ -19,6 +27,14 @@ class MessageApiController extends CommonApiController
      * @var MessageModel|null
      */
     protected $model = null;
+
+    private RequestStack $requestStack;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine)
+    {
+        $this->requestStack = $requestStack;
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
+    }
 
     public function initialize(ControllerEvent $event)
     {
@@ -37,7 +53,7 @@ class MessageApiController extends CommonApiController
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
-        if ('PATCH' === $this->request->getMethod() && !isset($params['channels'])) {
+        if ('PATCH' === $this->requestStack->getCurrentRequest()->getMethod() && !isset($params['channels'])) {
             return;
         } elseif (!isset($params['channels'])) {
             $params['channels'] = [];
@@ -62,13 +78,11 @@ class MessageApiController extends CommonApiController
     {
         $event = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
 
-        if ($channels = $entity->getChannels()) {
-            foreach ($channels as $channel) {
-                $repository = $event->getRepositoryName($channel->getChannel());
-                $nameColumn = $event->getNameColumn($channel->getChannel());
-                $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);
-                $channel->setChannelName($name);
-            }
+        foreach ($entity->getChannels() as $channel) {
+            $repository = $event->getRepositoryName($channel->getChannel());
+            $nameColumn = $event->getNameColumn($channel->getChannel());
+            $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);
+            $channel->setChannelName($name);
         }
     }
 }

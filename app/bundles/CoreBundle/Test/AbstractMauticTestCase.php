@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
-use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -21,8 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
@@ -30,6 +28,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected EntityManager $em;
     protected Connection $connection;
     protected KernelBrowser $client;
+    protected Router $router;
     protected array $clientOptions = [];
     protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
@@ -40,13 +39,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,
-        'mailer_from_name'                  => 'Mautic',
+        'site_url'                          => 'https://localhost',
     ];
-
-    /**
-     * Flag to turn off the mockServices() method.
-     */
-    protected bool $useMockServices = true;
 
     protected AbstractDatabaseTool $databaseTool;
 
@@ -59,7 +53,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
+        EnvLoader::load();
 
+        self::ensureKernelShutdown();
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
@@ -67,22 +63,17 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->em         = self::$container->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
-        /** @var RouterInterface $router */
-        $router = self::$container->get('router');
-        $scheme = $router->getContext()->getScheme();
-        $secure = 0 === strcasecmp($scheme, 'https');
+        $this->router = self::$container->get('router');
+        $scheme       = $this->router->getContext()->getScheme();
+        $secure       = 0 === strcasecmp($scheme, 'https');
 
-        $this->client->setServerParameter('HTTPS', $secure);
-
-        if ($this->useMockServices) {
-            $this->mockServices();
-        }
+        $this->client->setServerParameter('HTTPS', (string) $secure);
     }
 
     /**
      * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
      */
-    protected function getContainer(): ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
         return self::$container;
     }
@@ -101,11 +92,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function loadFixtureFiles(array $paths = [], bool $append = true): array
     {
         return $this->databaseTool->loadAliceFixture($paths, $append);
-    }
-
-    private function mockServices(): void
-    {
-        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations(): void
@@ -154,13 +140,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
      *
      * @deprecated use testSymfonyCommand() instead
      */
-    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0): string
+    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0, bool $catchExceptions = false): string
     {
         $params      = array_merge(['command' => $name], $params);
         $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
+        $application->setCatchExceptions($catchExceptions);
 
         if ($command) {
             // Register the command
@@ -170,14 +156,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input      = new ArrayInput($params);
         $output     = new BufferedOutput();
         $statusCode = $application->run($input, $output);
+        $message    = $output->fetch();
 
-        Assert::assertSame($expectedStatusCode, $statusCode);
+        Assert::assertSame($expectedStatusCode, $statusCode, $message);
 
-        return $output->fetch();
+        return $message;
     }
 
     protected function loginUser(string $username): void
     {
+        /** @var User|null $user */
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $username]);
 
@@ -187,7 +175,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $firewall = 'mautic';
         $session  = self::$container->get('session');
-        $token    = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
+        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
