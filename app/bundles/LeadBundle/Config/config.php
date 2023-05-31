@@ -1,6 +1,5 @@
 <?php
 
-
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use JMS\Serializer\EventDispatcher\Events;
@@ -111,7 +110,6 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\LegacyLeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
 use Mautic\LeadBundle\Model\TagModel;
