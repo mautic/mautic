@@ -2,11 +2,17 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +23,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FocusController extends AbstractStandardFormController
 {
+    private CacheProvider $cacheProvider;
+
+    public function __construct(
+        CorePermissions $security,
+        UserHelper $userHelper,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $managerRegistry,
+        CacheProvider $cacheProvider,
+    ) {
+        $this->cacheProvider = $cacheProvider;
+
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $managerRegistry);
+    }
+
     protected function getTemplateBase(): string
     {
         return '@MauticFocus/Focus';
@@ -118,6 +139,8 @@ class FocusController extends AbstractStandardFormController
      */
     public function getViewArguments(array $args, $action)
     {
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
         if ('view' == $action) {
             /** @var Focus $item */
             $item = $args['viewParameters']['item'];
@@ -152,9 +175,18 @@ class FocusController extends AbstractStandardFormController
             $args['viewParameters']['showConversionRate']    = true;
 
             if ('link' === $item->getType()) {
-                $trackableModel = $this->getModel('page.trackable');
-                \assert($trackableModel instanceof TrackableModel);
-                $args['viewParameters']['trackables'] = $trackableModel->getTrackableList('focus', $item->getId());
+                $cacheItem    = $this->cacheProvider->getItem('focus.trackables.'.$item->getId());
+                if ($cacheItem->isHit()) {
+                    $trackableList = $cacheItem->get();
+                } else {
+                    $trackableModel = $this->getModel('page.trackable');
+                    \assert($trackableModel instanceof TrackableModel);
+                    $trackableList = $trackableModel->getTrackableList('focus', $item->getId());
+                    $cacheItem->set($trackableList);
+                    $cacheItem->expiresAfter($cacheTimeout * 60);
+                    $this->cacheProvider->save($cacheItem);
+                }
+                $args['viewParameters']['trackables'] = $trackableList;
             }
         }
 

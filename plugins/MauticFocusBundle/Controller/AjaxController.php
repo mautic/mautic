@@ -67,7 +67,9 @@ class AjaxController extends CommonAjaxController
         $cacheItem    = $this->cacheProvider->getItem('focus.viewsCount.'.$focusId);
 
         if ($cacheItem->isHit()) {
-            $viewsCount = $cacheItem->get();
+            $cacheItemValue   = $cacheItem->get();
+            $viewsCount       = $cacheItemValue['views'];
+            $uniqueViewsCount = $cacheItemValue['uniqueViews'];
         } else {
             /** @var FocusModel $model */
             $model   = $this->getModel('focus');
