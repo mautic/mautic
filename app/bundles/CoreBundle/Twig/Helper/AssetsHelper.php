@@ -508,6 +508,8 @@ final class AssetsHelper
 
     /**
      * Load Froala JS source files.
+     *
+     * @return string[]
      */
     public function getFroalaScripts(): array
     {

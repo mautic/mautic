@@ -523,7 +523,7 @@ class EmailController extends FormController
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -845,7 +845,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         $model = $this->getModel('email');
         /** @var Email $entity */
@@ -869,7 +869,7 @@ class EmailController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $entity);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity);
     }
 
     /**
@@ -1016,7 +1016,7 @@ class EmailController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
@@ -1044,7 +1044,7 @@ class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
     }
 
     /**

@@ -413,7 +413,7 @@ class PageController extends FormController
                         $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
                     }
                 }
             } else {
@@ -648,7 +648,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model  = $this->getModel('page.page');
@@ -677,7 +677,7 @@ class PageController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $entity);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity);
     }
 
     /**
@@ -878,7 +878,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model  = $this->getModel('page.page');
@@ -909,7 +909,7 @@ class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($request, $assetsHelper, $translator, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
     }
 
     /**
