@@ -191,12 +191,8 @@ class InputHelper
 
     /**
      * Strips tags.
-     *
-     * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function string($value, $urldecode = false)
+    public static function string(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
