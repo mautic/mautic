@@ -394,6 +394,8 @@ class InputHelper
     /**
      * Returns clean HTML.
      *
+     * @param array|string $value
+     *
      * @return mixed|string
      */
     public static function html($value)
@@ -404,9 +406,9 @@ class InputHelper
             }
         } else {
             // Special handling for doctype
-            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
+            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', (string) $value, $doctype);
             // Special handling for CDATA tags
-            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
+            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], (string) $value, $cdataCount);
             // Special handling for conditional blocks
             preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
             if (!empty($matches[0])) {
