@@ -150,9 +150,7 @@ class PublicControllerTest extends MauticMysqlTestCase
      */
     private function getVariantContent($aCount, $bCount, $cCount)
     {
-        $pageEntityB = $this->getMockBuilder(Page::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pageEntityB = $this->createMock(Page::class);
         $pageEntityB->method('getId')
             ->will($this->returnValue(2));
         $pageEntityB->method('isPublished')
@@ -170,9 +168,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $pageEntityB->method('getVariantSettings')
             ->will($this->returnValue(['weight' => '25']));
 
-        $pageEntityC = $this->getMockBuilder(Page::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pageEntityC = $this->createMock(Page::class);
         $pageEntityC->method('getId')
             ->will($this->returnValue(3));
         $pageEntityC->method('isPublished')
@@ -190,9 +186,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $pageEntityC->method('getVariantSettings')
             ->will($this->returnValue(['weight' => '25']));
 
-        $pageEntityA = $this->getMockBuilder(Page::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pageEntityA = $this->createMock(Page::class);
         $pageEntityA->method('getId')
             ->will($this->returnValue(1));
         $pageEntityA->method('isPublished')
@@ -212,27 +206,23 @@ class PublicControllerTest extends MauticMysqlTestCase
         $pageEntityA->method('getVariantSettings')
             ->will($this->returnValue(['weight' => '50']));
 
-        $cookieHelper = $this->getMockBuilder(CookieHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $cookieHelper = $this->createMock(CookieHelper::class);
 
-        $packagesMock = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
 
-        $assetHelper = new AssetsHelper($packagesMock);
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $mauticSecurity = $this->getMockBuilder(CorePermissions::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $assetHelper = new AssetsHelper($packagesMock, $coreParametersHelper);
+
+        $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
             ->will($this->returnValue(false));
 
         $analyticsHelper = new AnalyticsHelper($this->createMock(CoreParametersHelper::class));
 
-        $pageModel = $this->getMockBuilder(PageModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pageModel = $this->createMock(PageModel::class);
         $pageModel->method('getHitQuery')
             ->will($this->returnValue([]));
         $pageModel->method('getEntityBySlugs')
@@ -243,15 +233,11 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->contactRequestHelper->method('getContactFromQuery')
             ->will($this->returnValue(new Lead()));
 
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $router = $this->createMock(Router::class);
 
         $dispatcher = new EventDispatcher();
 
-        $modelFactory = $this->getMockBuilder(ModelFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $modelFactory = $this->createMock(ModelFactory::class);
         $modelFactory->method('getModel')
             ->will(
                 $this->returnValueMap(
@@ -262,9 +248,7 @@ class PublicControllerTest extends MauticMysqlTestCase
                 )
             );
 
-        $container = $this->getMockBuilder(Container::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = $this->createMock(Container::class);
         $container->method('has')
             ->will($this->returnValue(true));
         $container->expects(self::once())

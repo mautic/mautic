@@ -51,6 +51,7 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
+    $services->alias('mautic.helper.assetgeneration', \Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
 
     $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 };

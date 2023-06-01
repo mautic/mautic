@@ -542,15 +542,6 @@ return [
                 ],
             ],
             // Helpers
-            'mautic.helper.assetgeneration' => [
-                'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.bundle',
-                    'mautic.helper.paths',
-                    'mautic.helper.app_version',
-                ],
-            ],
             'mautic.helper.cookie' => [
                 'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
@@ -1466,6 +1457,7 @@ return [
             ],
         ],
         'composer_updates'   => false,
+        'load_froala_assets' => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only' => false,
     ],
 ];

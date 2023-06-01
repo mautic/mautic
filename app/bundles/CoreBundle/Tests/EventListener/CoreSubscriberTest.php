@@ -115,11 +115,9 @@ class CoreSubscriberTest extends TestCase
         $this->bundleHelper         = $this->createMock(BundleHelper::class);
         $this->menuHelper           = $this->createMock(MenuHelper::class);
         $this->userHelper           = $this->createMock(UserHelper::class);
-        $packagesMock               = $this->getMockBuilder(Packages::class)
-        ->disableOriginalConstructor()
-        ->getMock();
-        $this->assetsHelper         = new AssetsHelper($packagesMock);
+        $packagesMock               = $this->createMock(Packages::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->assetsHelper         = new AssetsHelper($packagesMock, $this->coreParametersHelper);
         $this->securityContext      = $this->createMock(AuthorizationChecker::class);
         $this->userModel            = $this->createMock(UserModel::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);

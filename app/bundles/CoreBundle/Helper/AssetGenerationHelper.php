@@ -33,7 +33,6 @@ class AssetGenerationHelper
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
         'chart.js/dist/Chart.js', // Needed for the charts.
         'mousetrap/mousetrap.js',
-        'jquery/dist/jquery.js',
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
@@ -54,6 +53,7 @@ class AssetGenerationHelper
         'jquery-ui/ui/tabbable.js',
         'jquery-ui/ui/unique-id.js',
         'jquery-ui/ui/effect.js',
+        'jquery-ui/ui/safe-blur.js', // needed for the legacy builder
         'jquery-ui/ui/widgets/mouse.js',
         'jquery-ui/ui/widgets/draggable.js',
         'jquery-ui/ui/widgets/droppable.js',
@@ -70,18 +70,17 @@ class AssetGenerationHelper
         'jquery-ui/ui/widgets/resizable.js', // needed for ElFinder
         'jquery-ui/ui/widgets/slider.js', // needed for ElFinder
         'jquery-ui/ui/widgets/controlgroup.js', // needed for ElFinder
-        // TODO: Add the rest of the libraries here.
     ];
 
-    private BundleHelper $bundleHelper;
-    private PathsHelper $pathsHelper;
     private string $version;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
-    {
-        $this->bundleHelper = $bundleHelper;
-        $this->pathsHelper  = $pathsHelper;
-        $this->version      = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        AppVersion $appVersion
+    ) {
+        $this->version = substr(hash('sha1', $coreParametersHelper->get('secret_key').$appVersion->getVersion()), 0, 8);
     }
 
     /**
