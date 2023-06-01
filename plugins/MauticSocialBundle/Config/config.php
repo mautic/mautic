@@ -46,17 +46,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.social.model.monitoring' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\MonitoringModel',
-            ],
-            'mautic.social.model.postcount' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
-            ],
-            'mautic.social.model.tweet' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\TweetModel',
-            ],
-        ],
         'others' => [
             'mautic.social.helper.campaign' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper',

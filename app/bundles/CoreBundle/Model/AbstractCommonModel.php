@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -22,7 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -37,7 +36,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     protected $dispatcher;
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
     protected $router;
 
@@ -61,49 +60,15 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     protected $coreParametersHelper;
 
-    public function setEntityManager(EntityManager $em): void
+    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->em = $em;
-    }
-
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function setRouter(Router $router): void
-    {
-        $this->router = $router;
-    }
-
-    public function setTranslator(Translator $translator): void
-    {
-        $this->translator = $translator;
-    }
-
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Initialize the user parameter for use in locking procedures.
-     */
-    public function setUserHelper(UserHelper $userHelper): void
-    {
-        $this->userHelper = $userHelper;
-    }
-
-    /**
-     * Initialize the CoreParameters parameter.
-     */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper): void
-    {
+        $this->em                   = $em;
+        $this->security             = $security;
+        $this->dispatcher           = $dispatcher;
+        $this->router               = $router;
+        $this->translator           = $translator;
+        $this->userHelper           = $userHelper;
+        $this->logger               = $mauticLogger;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 

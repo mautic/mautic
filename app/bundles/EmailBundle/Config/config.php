@@ -260,57 +260,6 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
         ],
-        'models' => [
-            'mautic.email.model.email' => [
-                'class'     => \Mautic\EmailBundle\Model\EmailModel::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.helper.theme',
-                    'mautic.helper.mailbox',
-                    'mautic.helper.mailer',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.page.model.trackable',
-                    'mautic.user.model.user',
-                    'mautic.channel.model.queue',
-                    'mautic.email.model.send_email_to_contacts',
-                    'mautic.tracker.device',
-                    'mautic.page.repository.redirect',
-                    'mautic.helper.cache_storage',
-                    'mautic.tracker.contact',
-                    'mautic.lead.model.dnc',
-                    'mautic.email.helper.stats_collection',
-                    'mautic.security',
-                    'doctrine.dbal.default_connection',
-                ],
-            ],
-            'mautic.email.model.send_email_to_user' => [
-                'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
-                'arguments' => [
-                    'mautic.email.model.email',
-                    'event_dispatcher',
-                    'mautic.lead.validator.custom_field',
-                    'mautic.validator.email',
-                ],
-            ],
-            'mautic.email.model.send_email_to_contacts' => [
-                'class'     => \Mautic\EmailBundle\Model\SendEmailToContact::class,
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'mautic.email.helper.stat',
-                    'mautic.lead.model.dnc',
-                    'translator',
-                ],
-            ],
-            'mautic.email.model.transport_callback' => [
-                'class'     => \Mautic\EmailBundle\Model\TransportCallback::class,
-                'arguments' => [
-                    'mautic.lead.model.dnc',
-                    'mautic.message.search.contact',
-                    'mautic.email.repository.stat',
-                ],
-            ],
-        ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
                 'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,

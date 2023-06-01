@@ -829,27 +829,6 @@ return [
                 'tag' => 'mautic.update_check',
             ],
         ],
-        'models' => [
-            'mautic.core.model.auditlog' => [
-                'class' => 'Mautic\CoreBundle\Model\AuditLogModel',
-            ],
-            'mautic.core.model.notification' => [
-                'class'     => 'Mautic\CoreBundle\Model\NotificationModel',
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.helper.update',
-                    'mautic.helper.core_parameters',
-                ],
-                'methodCalls' => [
-                    'setDisableUpdates' => [
-                        '%mautic.security.disableUpdates%',
-                    ],
-                ],
-            ],
-            'mautic.core.model.form' => [
-                'class' => 'Mautic\CoreBundle\Model\FormModel',
-            ],
-        ],
         'validator' => [
             'mautic.core.validator.file_upload' => [
                 'class'     => \Mautic\CoreBundle\Validator\FileUploadValidator::class,
