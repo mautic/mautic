@@ -90,6 +90,10 @@
 /media/js/app.js
 /media/js/libraries.js
 /media/js/mautic-form.js
+/media/js/froogaloop.min.js
+/media/js/jquery.min.js
+/media/js/ckeditor4/ckeditor.js
+/media/js/ckeditor4/adapters/jquery.js
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
