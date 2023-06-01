@@ -220,11 +220,9 @@ class QueryBuilder extends BaseQueryBuilder
 
             return $result;
         }, []);
-        dd($queryParts);
 
         foreach ($queryParts['join'] as $join) {
             foreach ($join as $joinPart) {
-                dd($joinPart);
                 $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
             }
         }

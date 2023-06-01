@@ -156,7 +156,7 @@ class ContactSegmentQueryBuilder
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
             ->andWhere($expr->eq($tableAlias.'.leadlist_id', $segmentIdParameter));
 
-        $queryBuilder->setParameter($segmentIdParameter, $segmentId);
+        $queryBuilder->setParameter("{$tableAlias}segmentId", $segmentId);
 
         $this->addLeadAndMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
 
