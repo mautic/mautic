@@ -87,6 +87,7 @@ class AjaxController extends CommonAjaxController
                 'views'       => $viewsCount,
                 'uniqueViews' => $uniqueViewsCount,
             ]);
+            $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
             $this->cacheProvider->save($cacheItem);
         }
@@ -127,6 +128,7 @@ class AjaxController extends CommonAjaxController
             }
             $clickThroughCount = $model->getClickThroughCount($focus);
             $cacheItem->set($clickThroughCount);
+            $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
             $this->cacheProvider->save($cacheItem);
         }

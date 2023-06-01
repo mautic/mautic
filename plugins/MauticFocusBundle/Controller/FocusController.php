@@ -161,32 +161,43 @@ class FocusController extends AbstractStandardFormController
                 ]
             );
 
-            /** @var FocusModel $model */
-            $model = $this->getModel('focus');
-            $stats = $model->getStats(
-                $item,
-                null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()),
-                new \DateTime($dateRangeForm->get('date_to')->getData())
-            );
+            $statsDateFrom = new \DateTime($dateRangeForm->get('date_from')->getData());
+            $statsDateTo   = new \DateTime($dateRangeForm->get('date_to')->getData());
+            $cacheKey      = "focus.viewArguments.{$item->getId()}.{$statsDateFrom->getTimestamp()}.{$statsDateTo->getTimestamp()}";
+            $cacheItem     = $this->cacheProvider->getItem($cacheKey);
+
+            if ($cacheItem->isHit()) {
+                [$stats, $trackables] = $cacheItem->get();
+            } else {
+                // invalidate cache for entire focus item to keep AJAX loaded data consistent
+                $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
+
+                /** @var FocusModel $model */
+                $model = $this->getModel('focus');
+                $stats = $model->getStats(
+                    $item,
+                    null,
+                    $statsDateFrom,
+                    $statsDateTo
+                );
+
+                if ('link' === $item->getType()) {
+                    $trackableModel = $this->getModel('page.trackable');
+                    \assert($trackableModel instanceof TrackableModel);
+                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                }
+
+                $cacheItem->set([$stats, $trackables]);
+                $cacheItem->expiresAfter($cacheTimeout * 60);
+                $cacheItem->tag("focus.{$item->getId()}");
+                $this->cacheProvider->save($cacheItem);
+            }
 
             $args['viewParameters']['stats']                 = $stats;
             $args['viewParameters']['dateRangeForm']         = $dateRangeForm->createView();
             $args['viewParameters']['showConversionRate']    = true;
-
-            if ('link' === $item->getType()) {
-                $cacheItem    = $this->cacheProvider->getItem('focus.trackables.'.$item->getId());
-                if ($cacheItem->isHit()) {
-                    $trackableList = $cacheItem->get();
-                } else {
-                    $trackableModel = $this->getModel('page.trackable');
-                    \assert($trackableModel instanceof TrackableModel);
-                    $trackableList = $trackableModel->getTrackableList('focus', $item->getId());
-                    $cacheItem->set($trackableList);
-                    $cacheItem->expiresAfter($cacheTimeout * 60);
-                    $this->cacheProvider->save($cacheItem);
-                }
-                $args['viewParameters']['trackables'] = $trackableList;
+            if (isset($trackables)) {
+                $args['viewParameters']['trackables'] = $trackables;
             }
         }
 
