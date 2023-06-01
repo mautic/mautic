@@ -198,7 +198,7 @@
                             {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
                         </div>
                     {% endif %}
-                    <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ url('mautic_contact_stats', {'objectId': lead.id}) }}">
+                    <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
                         <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                     </div>
                 </div>
