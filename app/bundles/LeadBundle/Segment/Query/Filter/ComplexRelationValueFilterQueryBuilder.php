@@ -118,7 +118,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $queryBuilder->expr()->and($expressions);
+                $expression = $queryBuilder->expr()->and(...$expressions);
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');

@@ -105,7 +105,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $expressions[] = $event->getQueryBuilder()->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
-        $event->addExpression($event->getQueryBuilder()->expr()->and($expressions));
+        $event->addExpression($event->getQueryBuilder()->expr()->and(...$expressions));
         $event->stopPropagation();
     }
 

@@ -43,7 +43,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->connection);
+        $this->_expr = new ExpressionBuilder($this->getConnection());
 
         return $this->_expr;
     }
@@ -73,7 +73,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function addJoinCondition($alias, $expr)
     {
         $result = $parts = $this->getQueryPart('join');
-        $this->resetQueryParts('join');
+        $this->resetQueryPart('join');
 
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
@@ -98,7 +98,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
-        $this->resetQueryParts('join');
+        $this->resetQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
@@ -311,7 +311,7 @@ class QueryBuilder extends BaseQueryBuilder
         //  Different handling
         if ('or' == $glue) {
             //  Is this the first condition in query builder?
-            if (!is_null($this->sqlParts['where'])) {
+            if (!is_null($this->getQueryPart('where'))) {
                 // Are the any queued conditions?
                 if ($this->hasLogicStack()) {
                     // We need to apply current stack to the query builder
