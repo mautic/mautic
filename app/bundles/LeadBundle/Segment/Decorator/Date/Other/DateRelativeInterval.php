@@ -45,12 +45,11 @@ class DateRelativeInterval extends DateOptionAbstract
         $dateTimeHelper = $this->dateOptionParameters->getDefaultDate();
 
         $this->modifyBaseDate($dateTimeHelper);
+        $dateTimeHelper->modify($this->originalValue);
 
         if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getValueForBetweenRange($dateTimeHelper);
         }
-
-        $dateTimeHelper->modify($this->originalValue);
 
         if (!$this->dateOptionParameters->hasTimePart()) {
             return $dateTimeHelper->getString('Y-m-d');
@@ -61,16 +60,12 @@ class DateRelativeInterval extends DateOptionAbstract
 
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->modify('today midnight');
-
         if (!$this->dateOptionParameters->hasTimePart()) {
             return $dateTimeHelper->getString('Y-m-d');
         }
 
         $dateFormat = 'Y-m-d H:i:s';
-        $modifier   = $this->originalValue;
-        $dateTimeHelper->modify($modifier);
-        $startWith = $dateTimeHelper->toUtcString($dateFormat);
+        $startWith  = $dateTimeHelper->toUtcString($dateFormat);
         $dateTimeHelper->modify('+1 day');
         $endWith = $dateTimeHelper->toUtcString($dateFormat);
 

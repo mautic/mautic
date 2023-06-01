@@ -146,8 +146,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
     public function testSegmentCountIsCorrectForRelativeMinus()
     {
         $name = 'Relative minus';
-        $lead = $this->createLead($name, 'now -1 sec', '-4 days');
-
+        $lead = $this->createLead($name, 'now +1 sec', '-4 days');
         $this->checkSegmentResult($name, $lead);
     }
 

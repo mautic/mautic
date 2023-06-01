@@ -229,9 +229,9 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $filterDecorator = new DateRelativeInterval($dateDecorator, $interval, $dateOptionParameters);
         $results         = $filterDecorator->getParameterValue($contactSegmentFilterCrate);
 
-        $endDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
-        $date->modify('-'.$interval);
-        $startDate     = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $endDate  = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $date->modify('-1 day');
+        $startDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
         $this->assertEquals([$startDate, $endDate], $results);
     }
 }
