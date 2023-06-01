@@ -53,7 +53,7 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
+     * @param string|null               $fromFormat
      * @param string                    $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
