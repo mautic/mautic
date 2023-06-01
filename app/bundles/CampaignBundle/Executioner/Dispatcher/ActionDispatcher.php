@@ -131,7 +131,7 @@ class ActionDispatcher
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
             );
 
             $this->dispatcher->dispatch(
