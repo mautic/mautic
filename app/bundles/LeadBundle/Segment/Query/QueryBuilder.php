@@ -73,14 +73,24 @@ class QueryBuilder extends BaseQueryBuilder
     public function addJoinCondition($alias, $expr)
     {
         $result = $parts = $this->getQueryPart('join');
-        $this->resetQueryPart('join');
-
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
-                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and ('.$expr.')';
+                    $this->add('join', [$tbl => [
+                        'joinType'      => $join['joinType'],
+                        'joinTable'     => $join['joinTable'],
+                        'joinAlias'     => $join['joinAlias'],
+                        'joinCondition' => $join['joinCondition'].' and ('.$expr.')',
+                    ]]);
                     $inserted                            = true;
-                    $this->join($result['joinType'], $result['joinTable'], $result['joinAlias'], $result[$tbl][$key]['joinCondition']);
+                    continue;
+                } else {
+                    $this->add('join', [$tbl => [
+                        'joinType'      => $join['joinType'],
+                        'joinTable'     => $join['joinTable'],
+                        'joinAlias'     => $join['joinAlias'],
+                        'joinCondition' => $join['joinCondition'],
+                    ]]);
                 }
             }
         }
@@ -204,15 +214,17 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function getTableAliases()
     {
-        $queryParts = $this->getQueryParts();
+        $queryParts = $this->getQueryParts('join');
         $tables     = array_reduce($queryParts['from'], function ($result, $item) {
             $result[$item['table']] = $item['alias'];
 
             return $result;
         }, []);
+        dd($queryParts);
 
         foreach ($queryParts['join'] as $join) {
             foreach ($join as $joinPart) {
+                dd($joinPart);
                 $tables[$joinPart['joinTable']] = $joinPart['joinAlias'];
             }
         }
