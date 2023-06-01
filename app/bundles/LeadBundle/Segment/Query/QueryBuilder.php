@@ -73,12 +73,14 @@ class QueryBuilder extends BaseQueryBuilder
     public function addJoinCondition($alias, $expr)
     {
         $result = $parts = $this->getQueryPart('join');
+        $this->resetQueryParts('join');
 
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
                 if ($join['joinAlias'] == $alias) {
                     $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and ('.$expr.')';
                     $inserted                            = true;
+                    $this->join($result['joinType'], $result['joinTable'], $result['joinAlias'], $result[$tbl][$key]['joinCondition']);
                 }
             }
         }
@@ -86,8 +88,6 @@ class QueryBuilder extends BaseQueryBuilder
         if (!isset($inserted)) {
             throw new QueryException('Inserting condition to nonexistent join '.$alias);
         }
-
-        $this->setQueryPart('join', $result);
 
         return $this;
     }
@@ -98,13 +98,13 @@ class QueryBuilder extends BaseQueryBuilder
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
+        $this->resetQueryParts('join');
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
             }
+            $this->join($part['joinType'], $part['joinTable'], $part['joinAlias'], $parts['l'][$key]['joinCondition']);
         }
-
-        $this->setQueryPart('join', $parts);
 
         return $this;
     }

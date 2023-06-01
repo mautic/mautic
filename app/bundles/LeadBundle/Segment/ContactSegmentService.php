@@ -152,7 +152,8 @@ class ContactSegmentService
         $distinct = is_array($join) && (0 < count($join)) ? 'DISTINCT ' : '';
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
-        $queryBuilder->setQueryPart('select', $select);
+        $queryBuilder->resetQueryPart('select');
+        $queryBuilder->select($select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
