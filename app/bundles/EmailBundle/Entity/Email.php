@@ -1072,14 +1072,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function cleanUrlsInContent()
     {
-        $this->decodeAmpersands($this->plainText);
-        $this->decodeAmpersands($this->customHtml);
+        if (is_string($this->plainText)) {
+            $this->decodeAmpersands($this->plainText);
+        }
+
+        if (is_string($this->customHtml)) {
+            $this->decodeAmpersands($this->customHtml);
+        }
     }
 
     /**
      * Check all links in content and decode ampersands.
      */
-    private function decodeAmpersands(&$content)
+    private function decodeAmpersands(string &$content): void
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
