@@ -48,10 +48,8 @@ class CheckStep implements StepInterface
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
-     *
-     * @var string
      */
-    public $site_url;
+    public string $site_url = '';
 
     /**
      * Recommended minimum memory limit for Mautic.
