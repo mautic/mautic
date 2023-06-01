@@ -78,7 +78,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
-                $expression = $subQueryBuilder->expr()->orX(
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
@@ -92,7 +92,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.lead_id = '.$leadsTableAlias.'.id');
 
-                $expression = $subQueryBuilder->expr()->orX(
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
                 );

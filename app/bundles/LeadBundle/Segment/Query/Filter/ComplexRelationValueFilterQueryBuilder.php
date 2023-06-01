@@ -77,7 +77,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 break;
             case 'neq':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->$filterOperator(
                         $tableAlias.'.'.$filter->getField(),
@@ -105,7 +105,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'notLike':
             case 'notBetween': // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             case 'notIn':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
@@ -118,7 +118,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $queryBuilder->expr()->andX($expressions);
+                $expression = $queryBuilder->expr()->and($expressions);
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');

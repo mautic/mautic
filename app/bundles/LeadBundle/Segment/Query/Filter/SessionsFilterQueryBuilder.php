@@ -30,7 +30,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
             ->select($exclusionAlias.'.id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $exclusionAlias)
             ->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $exclusionAlias.'.lead_id'),
                     $queryBuilder->expr()->gt(
                         $exclusionAlias.'.date_hit',
@@ -45,7 +45,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
             ->select('count(id)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $pageHitsAlias)
             ->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $pageHitsAlias.'.lead_id'),
                     $queryBuilder->expr()->isNull($pageHitsAlias.'.email_id'),
                     $queryBuilder->expr()->isNull($pageHitsAlias.'.redirect_id'),

@@ -177,7 +177,7 @@ class ContactSegmentQueryBuilder
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq($tableAlias.'.manually_added', 1),
                     $queryBuilder->expr()->eq($tableAlias.'.manually_removed', $queryBuilder->expr()->literal(''))
                 )
