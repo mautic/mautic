@@ -237,7 +237,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', $value));
+        return trim(preg_replace($regex, '', (string) $value));
     }
 
     /**
