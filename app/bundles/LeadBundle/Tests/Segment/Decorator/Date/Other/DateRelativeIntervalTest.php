@@ -207,7 +207,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
-    public function testGetParameterValueDaysWithEqualOperatorWithDateTimeTimezone()
+    public function testGetParameterValueDaysWithEqualOperatorWithDateTimeTimezone(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

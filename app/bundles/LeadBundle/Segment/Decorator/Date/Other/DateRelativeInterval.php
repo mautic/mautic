@@ -58,6 +58,9 @@ class DateRelativeInterval extends DateOptionAbstract
         return $dateTimeHelper->toUtcString('Y-m-d H:i:s');
     }
 
+    /**
+     * @return array<string>|string
+     */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         if (!$this->dateOptionParameters->hasTimePart()) {

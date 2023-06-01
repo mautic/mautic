@@ -104,7 +104,7 @@ class DateDayTomorrowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    public function testGetParameterValueBetweenDateTimeTimezone()
+    public function testGetParameterValueBetweenDateTimeTimezone(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

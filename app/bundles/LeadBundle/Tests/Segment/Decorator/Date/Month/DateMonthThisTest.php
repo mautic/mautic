@@ -111,7 +111,7 @@ class DateMonthThisTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis::getParameterValue
      */
-    public function testGetParameterValueBetweenDateTimeTimezone()
+    public function testGetParameterValueBetweenDateTimeTimezone(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
