@@ -232,7 +232,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
                 ],
                 'orderBy'        => $this->addAliasIfNotPresent($request->query->get('orderBy', ''), $tableAlias),
                 'orderByDir'     => $request->query->get('orderByDir', 'ASC'),
-                'withTotalCount' => true, //for repositories that break free of Paginator
+                'withTotalCount' => true, // for repositories that break free of Paginator
             ],
             $this->extraGetEntitiesArguments
         );
@@ -394,6 +394,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param ModelFactory<E> $modelFactory
+     *
      * @required
      */
     public function setModelFactory(ModelFactory $modelFactory): void
@@ -809,7 +810,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         if ($data instanceof Paginator) {
             // Get iterator out of Paginator class so that the entities are properly serialized by the serializer
-            $data = $data->getIterator()->getArrayCopy();
+            $data = iterator_to_array($data->getIterator(), true);
         }
 
         $headers['Mautic-Version'] = $this->appVersion->getVersion();

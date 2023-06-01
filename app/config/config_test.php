@@ -13,7 +13,7 @@ EnvLoader::load();
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',

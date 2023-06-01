@@ -12,11 +12,11 @@ final class Version20201102133546 extends AbstractMauticMigration
 {
     public function preUp(Schema $schema): void
     {
-        $sql  = "SHOW INDEX FROM {$this->getTableName()} WHERE Key_name = '{$this->getIndexName()}';";
-        $stmt = $this->connection->prepare($sql);
-        $stmt->executeQuery();
-        $found = (bool) $stmt->fetchAssociative();
-        $stmt->closeCursor();
+        $sql    = "SHOW INDEX FROM {$this->getTableName()} WHERE Key_name = '{$this->getIndexName()}';";
+        $stmt   = $this->connection->prepare($sql);
+        $result = $stmt->executeQuery();
+        $found  = (bool) $result->fetchAssociative();
+        $result->free();
 
         if (!$found) {
             throw new SkipMigration('Schema includes this migration');

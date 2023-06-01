@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\MySqlSchemaManager;
+use Doctrine\DBAL\Schema\MySQLSchemaManager;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -133,7 +133,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->schemaManager->expects($this->once())
             ->method('listTableColumns')
-            ->willReturn(['generated_hit_date' => new \StdClass()]);
+            ->willReturn(['generated_hit_date' => new \stdClass()]);
 
         $this->connection->expects($this->never())
             ->method('executeQuery');
@@ -157,7 +157,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->schemaManager->expects($this->once())
             ->method('listTableColumns')
-            ->willReturn(['id' => new \StdClass()]);
+            ->willReturn(['id' => new \stdClass()]);
 
         $this->connection->expects($this->once())
             ->method('executeQuery');

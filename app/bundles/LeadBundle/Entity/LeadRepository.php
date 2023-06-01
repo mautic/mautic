@@ -147,7 +147,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              */
             $valueParams = [];
             for ($i = 0; $i < count($value); ++$i) {
-                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
+                $valueParams[$this->generateRandomParameterName()] = $value[$i];
             }
 
             $q->andWhere(
@@ -167,8 +167,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $email
-     *
      * @return Lead[]
      */
     public function getContactsByEmail($email)
@@ -197,7 +195,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
-            ->setParameter(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->setParameter('emails', $emails, Connection::PARAM_STR_ARRAY)
             ->getArrayResult();
 
         return array_map(
@@ -211,7 +209,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param     $uniqueFieldsWithData
      * @param int $leadId
      * @param int $limit
      *
@@ -325,7 +322,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get leads by IP address.
      *
-     * @param      $ip
      * @param bool $byId
      *
      * @return array
@@ -349,8 +345,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $id
-     *
      * @return array
      */
     public function getLead($id)
@@ -561,7 +555,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $order
      * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
@@ -684,7 +677,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the "catch all" where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -711,7 +703,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the command where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -720,10 +711,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $command             = $filter->command;
         $string              = $filter->string;
         $unique              = $this->generateRandomParameterName();
-        $returnParameter     = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter     = false; // returning a parameter that is not used will lead to a Doctrine error
         [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
-        //DBAL QueryBuilder does not have an expr()->not() function; boo!!
+        // DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
         // This will be switched by some commands that use join tables as NOT EXISTS queries will be used
         $exprType = ($filter->not) ? 'negate_expr' : 'expr';
@@ -866,9 +857,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 
-                //logic. In query, Sum(manually_removed) should be less than the current)
+                // logic. In query, Sum(manually_removed) should be less than the current)
                 $pluck    = count($imploder);
-                $imploder = (string) (implode(',', $imploder));
+                $imploder = (string) implode(',', $imploder);
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('duplicate.lead_id')
@@ -1345,7 +1336,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param     $id
      * @param int $tries
      */
     protected function updateContactPoints(array $changes, $id, $tries = 1)
@@ -1407,9 +1397,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    /**
-     * @param $fields
-     */
     protected function prepareDbalFieldsForSave(&$fields)
     {
         // Do not save points as they are handled by postSaveEntity

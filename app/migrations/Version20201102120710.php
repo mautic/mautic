@@ -20,8 +20,9 @@ final class Version20201102120710 extends AbstractMauticMigration
 
         $sql         = 'SHOW INDEX FROM '.$this->table.' WHERE Key_name = "'.$this->index.'"';
         $stmt        = $this->connection->prepare($sql);
-        $indexExists = (bool) $stmt->executeQuery()->fetchAssociative();
-        $stmt->closeCursor();
+        $result      = $stmt->executeQuery();
+        $indexExists = (bool) $result->fetchAssociative();
+        $result->free();
 
         if (!$indexExists) {
             throw new SkipMigration('Schema includes this migration');
