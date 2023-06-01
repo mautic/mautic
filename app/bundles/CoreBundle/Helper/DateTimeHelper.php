@@ -73,11 +73,11 @@ class DateTimeHelper
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
             $this->timezone = $datetime->getTimezone()->getName();
-            $this->string   = $this->datetime->format($fromFormat);
+            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
-            $this->string   = $this->datetime->format($fromFormat);
-        } elseif (null == $fromFormat) {
+            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
+        } elseif (null === $fromFormat) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
         } else {
