@@ -14,7 +14,7 @@ class PlainTextMessageHelper
      *
      * @return string
      */
-    public function getPlainTextFromMessageNotStatic(Email $message)
+    public static function getPlainTextFromMessage(Email $message)
     {
         return $message->getTextBody();
     }

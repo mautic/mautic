@@ -15,6 +15,8 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Mautic\CoreBundle\Helper\InputHelper;
+
 
 class MailHelperTest extends TestCase
 {
