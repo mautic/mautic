@@ -101,7 +101,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             }
         }
 
-        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'] ?? '', (string) $b['label'] ?? ''));
+        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
 
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
