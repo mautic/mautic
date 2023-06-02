@@ -16,6 +16,8 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+
 
 class Bounce implements ProcessorInterface
 {

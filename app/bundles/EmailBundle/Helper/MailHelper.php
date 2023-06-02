@@ -24,6 +24,8 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Mautic\EmailBundle\Form\Type\ConfigType;
+
 
 /**
  * Class MailHelper.
