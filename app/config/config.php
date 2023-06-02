@@ -197,21 +197,6 @@ $container->loadFromExtension('doctrine_migrations', [
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
-// Swiftmailer Configuration
-$container->loadFromExtension('swiftmailer', [
-    'transport'  => '%mautic.mailer_transport%',
-    'host'       => '%mautic.mailer_host%',
-    'port'       => '%mautic.mailer_port%',
-    'username'   => '%mautic.mailer_user%',
-    'password'   => '%mautic.mailer_password%',
-    'encryption' => '%mautic.mailer_encryption%',
-    'auth_mode'  => '%mautic.mailer_auth_mode%',
-    'spool'      => [
-        'type' => 'service',
-        'id'   => 'mautic.transport.spool',
-    ],
-]);
-
 // KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
     'default_renderer' => 'mautic',
