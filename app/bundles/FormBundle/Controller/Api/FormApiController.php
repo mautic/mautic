@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Model\FormModel;
@@ -113,7 +114,9 @@ class FormApiController extends CommonApiController
         $isNew          = false;
         $alias          = $entity->getAlias();
         $formRepository = $this->model->getRepository();
-        $entityManager  = $this->getDoctrine()->getManager();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->get('doctrine.orm.entity_manager');
 
         if (empty($alias)) {
             // Set clean alias to prevent SQL errors
