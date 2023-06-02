@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObjectTranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private $translator;
 
