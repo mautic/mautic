@@ -375,7 +375,7 @@ class MailHelper
                 foreach ($this->queuedRecipients as $email => $name) {
                     $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                 }
-                
+
                 if (!empty($tokens)) {
                     // Replace tokens
                     $search  = array_keys($tokens);
