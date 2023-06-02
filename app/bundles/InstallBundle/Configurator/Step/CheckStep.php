@@ -48,8 +48,10 @@ class CheckStep implements StepInterface
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
+     *
+     * @var string
      */
-    public string $site_url = '';
+    public $site_url = '';
 
     /**
      * Recommended minimum memory limit for Mautic.
@@ -217,7 +219,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if ('https' !== substr($this->site_url, 0, 5)) {
+        if (!$this->site_url || 'https' !== substr($this->site_url, 0, 5)) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
