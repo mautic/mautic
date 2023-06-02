@@ -169,7 +169,7 @@ $view['slots']->set(
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0 page-list" id="contacts-container" data-target-url="<?php
-            echo $view['router']->url(
+            echo $view['router']->path(
                 'mautic_segment_contacts',
                 ['objectId' => $list->getId(), 'page' => $app->getSession()->get('mautic.segment.contact.page', 1)]
             );
