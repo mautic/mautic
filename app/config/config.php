@@ -73,12 +73,17 @@ $container->loadFromExtension('framework', [
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'mailer'               => [
+        // 'message_bus' => 'email.bus', //TODO: start using buseses when we upgrade to Symfony 5.1.
+        'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
+    ],
     'messenger'            => [
         'default_bus' => 'email.bus',
         'buses'       => [
             'email.bus' => null,
         ],
-        'transports'  => [
+        'failure_transport' => 'failed_default',
+        'transports'        => [
             'email_transport' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
                 'options'        => [
@@ -91,10 +96,15 @@ $container->loadFromExtension('framework', [
                     'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
                 ],
             ],
+            'failed_default' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
+                ],
+            ],
         ],
         'routing' => [
-            // TODO: Enable this line when you want to merge symfony/mailer
-            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
         ],
     ],
 
