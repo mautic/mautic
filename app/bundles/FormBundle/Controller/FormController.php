@@ -4,12 +4,17 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
@@ -21,9 +26,11 @@ use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
@@ -38,12 +45,12 @@ class FormController extends CommonFormController
      */
     private $mappedObjectCollector;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
         $this->mappedObjectCollector       = $mappedObjectCollector;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

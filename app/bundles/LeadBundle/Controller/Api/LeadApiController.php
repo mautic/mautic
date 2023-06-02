@@ -6,8 +6,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -23,12 +26,12 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -55,27 +58,24 @@ class LeadApiController extends CommonApiController
 
     private IpLookupHelper $ipLookupHelper;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         $this->doNotContactModel = $doNotContactModel;
         $this->contactMerger     = $contactMerger;
         $this->userHelper        = $userHelper;
         $this->ipLookupHelper    = $ipLookupHelper;
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        $leadModel = $this->getModel(self::MODEL_ID);
+        $leadModel = $modelFactory->getModel(self::MODEL_ID);
         \assert($leadModel instanceof LeadModel);
         $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+
         $this->setCleaningRules();
-        parent::initialize($event);
     }
 
     /**

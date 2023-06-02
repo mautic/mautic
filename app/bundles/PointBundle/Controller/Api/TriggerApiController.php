@@ -5,17 +5,20 @@ namespace Mautic\PointBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -38,16 +41,15 @@ class TriggerApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
         RequestStack $requestStack,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
     ) {
         $this->requestStack = $requestStack;
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        $triggerModel = $this->getModel('point.trigger');
+        $triggerModel = $modelFactory->getModel('point.trigger');
         \assert($triggerModel instanceof TriggerModel);
 
         $this->model            = $triggerModel;
@@ -56,7 +58,7 @@ class TriggerApiController extends CommonApiController
         $this->entityNameMulti  = 'triggers';
         $this->serializerGroups = ['triggerDetails', 'categoryList', 'publishDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**

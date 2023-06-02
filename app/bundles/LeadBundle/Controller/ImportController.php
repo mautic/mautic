@@ -5,10 +5,14 @@ namespace Mautic\LeadBundle\Controller;
 use function assert;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Event\ImportInitEvent;
@@ -21,6 +25,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
@@ -31,9 +36,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -60,22 +65,16 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->logger = $mauticLogger;
-
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
         /** @var ImportModel $model */
-        $model = $this->getModel($this->getModelName());
+        $model = $modelFactory->getModel($this->getModelName());
 
-        $this->session     = $event->getRequest()->getSession();
+        $this->session     = $requestStack->getMainRequest()->getSession();
         $this->importModel = $model;
 
-        parent::initialize($event);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

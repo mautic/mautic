@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
@@ -972,7 +973,7 @@ class CompanyController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function companyExportAction(Request $request, $companyId)
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId)
     {
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -1005,6 +1006,6 @@ class CompanyController extends FormController
             ];
         }
 
-        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']));
+        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $exportHelper);
     }
 }

@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use RuntimeException;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
@@ -14,18 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractFormController extends CommonController
 {
     protected $permissionBase;
-
-    protected ?CorePermissions $security;
-
-    protected UserHelper $userHelper;
-
-    public function __construct(CorePermissions $security, UserHelper $userHelper, ManagerRegistry $managerRegistry)
-    {
-        $this->security   = $security;
-        $this->userHelper = $userHelper;
-
-        parent::__construct($managerRegistry);
-    }
 
     /**
      * @param $id
@@ -222,7 +207,7 @@ abstract class AbstractFormController extends CommonController
             }
         }
 
-        return $this->userHelper->getUser()->isAdmin();
+        return $this->user->isAdmin();
     }
 
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)

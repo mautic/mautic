@@ -4,8 +4,13 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
@@ -14,9 +19,11 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FieldController extends CommonFormController
@@ -35,17 +42,16 @@ class FieldController extends CommonFormController
      */
     private $alreadyMappedFieldCollector;
 
-    public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine)
+    public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->formModel                   = $formModel;
         $this->formFieldModel              = $formFieldModel;
         $this->fieldHelper                 = $fieldHelper;
-        $this->security                    = $security;
         $this->formFactory                 = $formFactory;
         $this->mappedObjectCollector       = $mappedObjectCollector;
         $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

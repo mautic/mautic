@@ -6,31 +6,35 @@ use function assert;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ClientController extends FormController
 {
-    private CorePermissions $corePermissions;
-
     private ClientModel $clientModel;
 
-    public function __construct(CorePermissions $corePermissions, UserHelper $userHelper, ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine)
+    public function __construct(ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->corePermissions = $corePermissions;
         $this->clientModel     = $clientModel;
 
-        parent::__construct($corePermissions, $userHelper, $formFactory, $fieldHelper, $doctrine);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -42,7 +46,7 @@ class ClientController extends FormController
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        if (!$this->corePermissions->isGranted('api:clients:view')) {
+        if (!$this->security->isGranted('api:clients:view')) {
             return $this->accessDenied();
         }
 
@@ -105,9 +109,9 @@ class ClientController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => [
-                        'create' => $this->corePermissions->isGranted('api:clients:create'),
-                        'edit'   => $this->corePermissions->isGranted('api:clients:editother'),
-                        'delete' => $this->corePermissions->isGranted('api:clients:deleteother'),
+                        'create' => $this->security->isGranted('api:clients:create'),
+                        'edit'   => $this->security->isGranted('api:clients:editother'),
+                        'delete' => $this->security->isGranted('api:clients:deleteother'),
                     ],
                     'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'searchValue' => $filter,
@@ -192,7 +196,7 @@ class ClientController extends FormController
      */
     public function newAction(Request $request, $objectId = 0)
     {
-        if (!$this->corePermissions->isGranted('api:clients:create')) {
+        if (!$this->security->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
 
@@ -294,7 +298,7 @@ class ClientController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        if (!$this->corePermissions->isGranted('api:clients:editother')) {
+        if (!$this->security->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
 
@@ -400,7 +404,7 @@ class ClientController extends FormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        if (!$this->corePermissions->isGranted('api:clients:delete')) {
+        if (!$this->security->isGranted('api:clients:delete')) {
             return $this->accessDenied();
         }
 

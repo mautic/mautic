@@ -2031,7 +2031,7 @@ class LeadController extends FormController
             return $exportHelper->parseLeadToExport($contact);
         });
 
-        return $this->exportResultsAs($iterator, $fileType, 'contacts');
+        return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
     }
 
     /**
@@ -2039,7 +2039,7 @@ class LeadController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function contactExportAction(Request $request, $contactId)
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, $contactId)
     {
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -2072,7 +2072,7 @@ class LeadController extends FormController
             ];
         }
 
-        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
+        return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
     }
 
     public function downloadExportAction(string $fileName = ''): Response

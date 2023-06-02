@@ -4,12 +4,23 @@ namespace Mautic\ReportBundle\Controller\Api;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Report>
@@ -21,9 +32,9 @@ class ReportApiController extends CommonApiController
      */
     protected $model = null;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $reportModel = $this->getModel('report');
+        $reportModel = $modelFactory->getModel('report');
         \assert($reportModel instanceof ReportModel);
 
         $this->model            = $reportModel;
@@ -32,7 +43,7 @@ class ReportApiController extends CommonApiController
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
