@@ -6,13 +6,17 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\EmailBundle\Mailer\EmailSender;
+use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
+use Mautic\EmailBundle\Mailer\Transport\TestConnectionInterface;
+use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Address;
 
 class AjaxController extends CommonAjaxController
 {
@@ -184,68 +188,26 @@ class AjaxController extends CommonAjaxController
         if ($user->isAdmin()) {
             $settings = $request->request->all();
 
-            $transport = $settings['transport'];
+            /** @var TransportWrapper $transportWrapper */
+            $transportWrapper = $this->container->get('mautic.email.transport_wrapper');
 
-            switch ($transport) {
-                case 'gmail':
-                    $mailer = new \Swift_SmtpTransport('smtp.gmail.com', 465, 'ssl');
-                    break;
-                case 'smtp':
-                    $mailer = new \Swift_SmtpTransport($settings['host'], $settings['port'], $settings['encryption']);
-                    break;
-                default:
-                    if ($this->container->has($transport)) {
-                        $mailer = $this->container->get($transport);
+            try {
+                /** @var TestConnectionInterface $extension */
+                $extension = $transportWrapper->getTransportExtension($settings['mailer_transport']);
+            } catch (\LogicException $exception) {
+                $dataArray['message'] = 'Transport is not found.';
 
-                        if ('mautic.transport.amazon' == $transport) {
-                            $amazonHost = $mailer->buildHost($settings['amazon_region'], $settings['amazon_other_region']);
-                            $mailer->setHost($amazonHost, $settings['port']);
-                        }
-
-                        if ('mautic.transport.amazon_api' == $transport) {
-                            $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
-                        }
-                    }
+                return $this->sendJsonResponse($dataArray);
             }
 
-            if (method_exists($mailer, 'setMauticFactory')) {
-                $mailer->setMauticFactory($this->factory);
-            }
-
-            if (!empty($mailer)) {
-                try {
-                    if (method_exists($mailer, 'setApiKey')) {
-                        if (empty($settings['api_key'])) {
-                            $settings['api_key'] = $this->coreParametersHelper->get('mailer_api_key');
-                        }
-                        $mailer->setApiKey($settings['api_key']);
-                    }
-                } catch (\Exception $exception) {
-                    // Transport had magic method defined and threw an exception
-                }
-
-                try {
-                    if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
-                        if (empty($settings['password'])) {
-                            $settings['password'] = $this->coreParametersHelper->get('mailer_password');
-                        }
-                        $mailer->setUsername($settings['user']);
-                        $mailer->setPassword($settings['password']);
-                    }
-                } catch (\Exception $exception) {
-                    // Transport had magic method defined and threw an exception
-                }
-
-                $logger = new \Swift_Plugins_Loggers_ArrayLogger();
-                $mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($logger));
-
-                try {
-                    $mailer->start();
+            try {
+                // Pass all the settings to the extension and it should handle the rest
+                if ($extension->testConnection($settings)) {
                     $dataArray['success'] = 1;
                     $dataArray['message'] = $this->translator->trans('mautic.core.success');
-                } catch (\Exception $e) {
-                    $dataArray['message'] = $e->getMessage().'<br />'.$logger->dump();
                 }
+            } catch (ConnectionErrorException $exception) {
+                $dataArray['message'] = $exception->getMessage();
             }
         }
 
@@ -263,17 +225,17 @@ class AjaxController extends CommonAjaxController
         $user         = $userHelper->getUser();
         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
         if (empty($userFullName)) {
-            $userFullName = null;
+            $userFullName = '';
         }
-        $mailer->setTo([$user->getEmail() => $userFullName]);
-
-        $success = 1;
-        $message = $translator->trans('mautic.core.success');
-        if (!$mailer->send(true)) {
-            $success   = 0;
-            $errors    = $mailer->getErrors();
-            unset($errors['failures']);
-            $message = implode('; ', $errors);
+        /** @var EmailSender $emailSender */
+        $emailSender = $this->get('mautic.email.mailer.email_sender');
+        $success     = 1;
+        $message     = $translator->trans('mautic.core.success');
+        try {
+            $emailSender->sendTestEmail(new Address($user->getEmail(), $userFullName));
+        } catch (\Exception $exception) {
+            $success = 0;
+            $message = $exception->getMessage();
         }
 
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
