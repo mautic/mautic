@@ -40,7 +40,7 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
         $longTransportName = '';
 
         for ($i = 0; $i < 5; ++$i) {
-            $longTransportName .= MomentumTransport::class;
+            $longTransportName .= NullTransport::class;
         }
 
         $this->cacheStorageMock->expects($this->never())

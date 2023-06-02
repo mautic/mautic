@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Address;
+use Mautic\EmailBundle\Helper\MailHelper;
 
 class AjaxController extends CommonAjaxController
 {

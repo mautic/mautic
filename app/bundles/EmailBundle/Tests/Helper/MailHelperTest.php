@@ -529,9 +529,9 @@ class MailHelperTest extends TestCase
                 ['mailer_append_tracking_pixel', false, false],
             ]
         );
-        $swiftMailer = new Swift_Mailer(new SmtpTransport());
+        $mailer = new Mailer(new SmtpTransport());
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
 
         $email = new Email();

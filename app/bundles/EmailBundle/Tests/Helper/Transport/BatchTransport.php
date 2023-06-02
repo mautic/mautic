@@ -86,7 +86,7 @@ class BatchTransport extends AbstractTokenArrayTransport
     public function getBatchRecipientCount(Email $message, $toBeAdded = 1, $type = 'to')
     {
         $to      = $message->getTo();
-        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
+        $toCount = count($to);
 
         return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }

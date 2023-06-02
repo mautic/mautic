@@ -372,11 +372,10 @@ class MailHelper
                 }
 
                 // Set metadata if applicable
-                if (method_exists($this->message, 'addMetadata')) {
-                    foreach ($this->queuedRecipients as $email => $name) {
-                        $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
-                    }
+                foreach ($this->queuedRecipients as $email => $name) {
+                    $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                 }
+                
                 if (!empty($tokens)) {
                     // Replace tokens
                     $search  = array_keys($tokens);
