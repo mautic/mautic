@@ -7,7 +7,10 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Helper\MailerDsnConvertor;
+use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -16,9 +19,29 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    private TransportType $transportType;
+
+    /**
+     * Temp fields that will not be saved in env file
+     * but will be converted to Dsn string.
+     *
+     * @var array<string, null>
+     */
+    private array $tempFields = [
+        'mailer_transport'  => null,
+        'mailer_host'       => null,
+        'mailer_port'       => null,
+        'mailer_user'       => null,
+        'mailer_password'   => null,
+        'mailer_encryption' => null,
+        'mailer_auth_mode'  => null,
+        'mailer_api_key'    => null,
+    ];
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, TransportType $transportType)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->transportType        = $transportType;
     }
 
     /**
@@ -45,13 +68,6 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigBeforeSave(ConfigEvent $event)
     {
-        $event->unsetIfEmpty(
-            [
-                'mailer_password',
-                'mailer_api_key',
-            ]
-        );
-
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
@@ -77,6 +93,39 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
+        $data['mailer_dsn'] = MailerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
+
+        // remove options that are now part of the DSN string
+        $mailerKeys = array_filter($data, fn ($key) => 0 === strpos($key, 'mailer_option'), ARRAY_FILTER_USE_KEY);
+
+        $removeKeys = \array_merge($this->tempFields, $mailerKeys);
+
+        // remove the parameters that are not to be saved in the env file
+        foreach ($removeKeys as $key => $tempField) {
+            unset($data[$key]);
+        }
+
         $event->setConfig($data, 'emailconfig');
+    }
+
+    /**
+     * return parsed paramters from the config.
+     *
+     * @param ConfigBuilderEvent $event config builder event
+     *
+     * @return array<string, string> the parsed parameters
+     */
+    private function getParameters(ConfigBuilderEvent $event): array
+    {
+        $parameters       = $event->getParametersFromConfig('MauticEmailBundle');
+        $loadedParameters = $this->coreParametersHelper->all();
+
+        // parse dsn parameters to user friendly
+        if (!empty($loadedParameters['mailer_dsn'])) {
+            $mailerParameters = MailerDsnConvertor::convertDsnToArray($loadedParameters['mailer_dsn']);
+            $parameters       = array_merge($parameters, $mailerParameters);
+        }
+
+        return $parameters;
     }
 }

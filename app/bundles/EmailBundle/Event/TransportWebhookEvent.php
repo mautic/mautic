@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
+use Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
