@@ -28,7 +28,7 @@ abstract class AbstractLookup
     /**
      * Authorization for lookup service.
      */
-    protected string $auth;
+    protected ?string $auth;
 
     protected ?string $cacheDir;
     protected ?LoggerInterface $logger;
@@ -56,7 +56,7 @@ abstract class AbstractLookup
      * @param null $ipLookupConfig
      * @param null $cacheDir
      */
-    public function __construct(string $auth, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
+    public function __construct(?string $auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
     {
         $this->cacheDir  = $cacheDir;
         $this->logger    = $logger;
