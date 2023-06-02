@@ -32,6 +32,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
+        $email->setSubject('Test subject');
         $email->setCustomHtml(
             <<<'CONTENT'
 <html xmlns="http://www.w3.org/1999/xhtml">
