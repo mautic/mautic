@@ -21,8 +21,8 @@ class Message
 
     public $textPlain;
     public $textHtml;
-    public $dsnReport;
-    public $dsnMessage;
+    public string $dsnReport  = '';
+    public string $dsnMessage = '';
     public $fblReport;
     public $fblMessage;
     public $xHeaders = [];
