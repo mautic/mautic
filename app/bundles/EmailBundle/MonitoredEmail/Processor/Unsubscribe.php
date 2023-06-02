@@ -10,9 +10,8 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Unsubscribe implements ProcessorInterface
 {

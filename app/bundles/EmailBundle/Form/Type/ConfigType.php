@@ -488,7 +488,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        //Inject config elements for SMTP transport (buit-in)
+        // Inject config elements for SMTP transport (buit-in)
         $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
 
         $builder->add(
@@ -542,7 +542,7 @@ class ConfigType extends AbstractType
         foreach ($this->transportType->getTrasportConfig() as $class) {
             $configForm = new $class($this->translator, $builder, $options);
             $configForm->buildForm($builder, $options);
-        }        
+        }
 
         $builder->add(
             'mailer_is_owner',

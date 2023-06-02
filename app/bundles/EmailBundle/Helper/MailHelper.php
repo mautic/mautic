@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
@@ -24,8 +25,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
-use Mautic\EmailBundle\Form\Type\ConfigType;
-
 
 /**
  * Class MailHelper.
