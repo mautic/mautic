@@ -53,10 +53,8 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
-     * @param string                    $timezone
      */
-    public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
+    public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local')
     {
         if ('local' == $timezone) {
             $timezone = self::$defaultLocalTimezone;
