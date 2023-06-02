@@ -390,7 +390,7 @@ class InputHelper
     /**
      * Returns clean HTML.
      *
-     * @param array|string $value
+     * @param string[]|string $value
      *
      * @return mixed|string
      */
