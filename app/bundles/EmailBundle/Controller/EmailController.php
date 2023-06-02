@@ -981,7 +981,7 @@ class EmailController extends FormController
         }
 
         // Replace short codes to emoji
-        $content = EmojiHelper::toEmoji($content, 'short');
+        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $this->processSlots($slotsHelper, $slots, $entity);
 
