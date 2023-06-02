@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -15,8 +16,6 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Header\HeaderInterface;
-use Mautic\CoreBundle\Helper\InputHelper;
-
 
 class MailHelperTest extends TestCase
 {
