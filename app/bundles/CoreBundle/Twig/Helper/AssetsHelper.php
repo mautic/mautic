@@ -169,7 +169,7 @@ final class AssetsHelper
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
-                //special place for these so that declarations and scripts can be mingled
+                // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
                 if (!isset($assets['scripts'][$location])) {
@@ -204,7 +204,7 @@ final class AssetsHelper
     public function addScriptDeclaration($script, $location = 'head')
     {
         if ('head' == $location) {
-            //special place for these so that declarations and scripts can be mingled
+            // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
             if (!isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
@@ -543,7 +543,7 @@ final class AssetsHelper
             $plugins.'quote.js?v'.$this->version,
             $plugins.'table.js?v'.$this->version,
             $plugins.'url.js?v'.$this->version,
-            //$plugins . 'video.js?v' . $this->version,
+            // $plugins . 'video.js?v' . $this->version,
             $plugins.'gatedvideo.js?v'.$this->version,
             $plugins.'token.js?v'.$this->version,
             $plugins.'dynamic_content.js?v'.$this->version,
@@ -747,8 +747,6 @@ final class AssetsHelper
     }
 
     /**
-     * @param $string
-     *
      * @return string
      */
     private function escape(string $string)

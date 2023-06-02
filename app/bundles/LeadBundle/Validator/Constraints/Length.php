@@ -6,6 +6,7 @@ use Symfony\Component\Validator\Constraints\Length as SymfonyLength;
 
 /**
  * @Annotation
+ *
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  */
 class Length extends SymfonyLength

@@ -35,8 +35,6 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param $identifier
-     *
      * @return Redirect|null
      */
     public function getRedirectById($identifier)
@@ -102,8 +100,6 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param $url
-     *
      * @return Redirect|null
      */
     public function getRedirectByUrl($url)
@@ -168,8 +164,6 @@ class RedirectModel extends FormModel
 
     /**
      * Create a Redirect entity for URL.
-     *
-     * @param $url
      *
      * @return Redirect
      */

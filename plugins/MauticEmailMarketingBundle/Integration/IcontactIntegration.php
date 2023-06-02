@@ -99,7 +99,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param        $url
      * @param array  $parameters
      * @param string $method
      * @param array  $settings

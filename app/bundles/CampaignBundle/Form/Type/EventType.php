@@ -283,8 +283,6 @@ class EventType extends AbstractType
     }
 
     /**
-     * @param $name
-     *
      * @return \DateTime|mixed|null
      */
     private function getTimeValue(array $data, $name)

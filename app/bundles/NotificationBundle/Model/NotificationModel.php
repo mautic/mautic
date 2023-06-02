@@ -21,6 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Notification>
+ *
  * @implements AjaxLookupModelInterface<Notification>
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
@@ -67,20 +68,17 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param $entities
-     * @param $unlock
-     *
      * @return array
      */
     public function saveEntities($entities, $unlock = true)
     {
-        //iterate over the results so the events are dispatched on each delete
+        // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
-            //set some defaults
+            // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
             if ($dispatchEvent = $entity instanceof Notification) {
@@ -129,8 +127,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Notification|null
      */
     public function getEntity($id = null)
@@ -162,11 +158,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -254,8 +245,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $idHash
-     *
      * @return Stat
      */
     public function getNotificationStatus($idHash)
@@ -265,9 +254,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Search for an notification stat by notification and lead IDs.
-     *
-     * @param $notificationId
-     * @param $leadId
      *
      * @return array
      */
@@ -285,8 +271,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get an array of tracked links.
      *
-     * @param $notificationId
-     *
      * @return array
      */
     public function getNotificationClickStats($notificationId)
@@ -295,7 +279,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -320,7 +303,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;
@@ -337,7 +320,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;

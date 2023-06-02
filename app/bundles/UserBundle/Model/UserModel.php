@@ -104,7 +104,7 @@ class UserModel extends FormModel
         }
 
         if (!empty($submittedPassword)) {
-            //hash the clear password submitted via the form
+            // hash the clear password submitted via the form
             return $encoder->encodePassword($entity, $submittedPassword);
         }
 
@@ -140,7 +140,7 @@ class UserModel extends FormModel
         $entity = parent::getEntity($id);
 
         if ($entity) {
-            //add user's permissions
+            // add user's permissions
             $entity->setActivePermissions(
                 $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
             );
@@ -339,7 +339,6 @@ class UserModel extends FormModel
     /**
      * Set user preference.
      *
-     * @param      $key
      * @param null $value
      * @param User $user
      */
@@ -360,7 +359,6 @@ class UserModel extends FormModel
     /**
      * Get user preference.
      *
-     * @param      $key
      * @param null $default
      * @param User $user
      */

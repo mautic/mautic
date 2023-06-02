@@ -48,8 +48,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cloneAction(Request $request, $objectId)
@@ -58,7 +56,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
@@ -87,8 +84,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
@@ -97,9 +92,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $args
-     * @param $action
-     *
      * @return mixed
      */
     protected function getViewArguments(array $args, $action)
@@ -202,8 +194,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function deleteAction(Request $request, $objectId)
@@ -217,8 +207,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $view
-     *
      * @return \Symfony\Component\Form\FormView
      */
     protected function getFormView(Form $form, $view)
@@ -269,7 +257,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

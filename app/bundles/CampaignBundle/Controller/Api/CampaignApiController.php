@@ -137,9 +137,7 @@ class CampaignApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param Campaign &$entity
-     * @param $parameters
-     * @param $form
-     * @param string $action
+     * @param string   $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -262,8 +260,6 @@ class CampaignApiController extends CommonApiController
     /**
      * Obtains a list of campaign contacts.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getContactsAction(Request $request, $id)
@@ -327,7 +323,7 @@ class CampaignApiController extends CommonApiController
         $this->model->saveEntity($entity);
 
         $headers = [];
-        //return the newly created entities location if applicable
+        // return the newly created entities location if applicable
 
         $route               = 'mautic_api_campaigns_getone';
         $headers['Location'] = $this->generateUrl(

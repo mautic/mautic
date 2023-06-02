@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Entity;
 
 use Doctrine\Persistence\Mapping\MappingException;
-use Exception;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
@@ -86,7 +85,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
     /**
      * @return iterable<string, array<mixed>>
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function deltaScenariosProvider(): iterable
     {

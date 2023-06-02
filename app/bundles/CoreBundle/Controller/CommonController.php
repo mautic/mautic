@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -95,7 +94,7 @@ class CommonController extends AbstractController implements MauticController
         $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
 
         if (null === $request) {
-            throw new RuntimeException('Request is not set.');
+            throw new \RuntimeException('Request is not set.');
         }
 
         return $request;
@@ -103,8 +102,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Check if a security level is granted.
-     *
-     * @param $level
      *
      * @return bool
      */
@@ -211,8 +208,6 @@ class CommonController extends AbstractController implements MauticController
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
      *
-     * @param $url
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delegateRedirect($url)
@@ -258,10 +253,10 @@ class CommonController extends AbstractController implements MauticController
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : [];
 
-        //forward the controller by default
+        // forward the controller by default
         $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
 
-        //set flashes
+        // set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->addFlashMessage(
@@ -283,7 +278,7 @@ class CommonController extends AbstractController implements MauticController
             return $this->redirect($returnUrl, $code);
         }
 
-        //load by ajax
+        // load by ajax
         return $this->ajaxAction($request, $args);
     }
 
@@ -311,7 +306,7 @@ class CommonController extends AbstractController implements MauticController
             return new JsonResponse($passthrough);
         }
 
-        //set the route to the returnUrl
+        // set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
             $passthrough['route'] = $args['returnUrl'];
         }
@@ -333,26 +328,26 @@ class CommonController extends AbstractController implements MauticController
                     ]
                 );
             } catch (\Exception $e) {
-                //do nothing
+                // do nothing
             }
 
-            //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
+            // breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
             $request->query->set('overrideRouteUri', $passthrough['route']);
             if ($ajaxRouteName) {
                 if (isset($routeParams['objectAction'])) {
-                    //action urls share same route name so tack on the action to differentiate
+                    // action urls share same route name so tack on the action to differentiate
                     $ajaxRouteName .= "|{$routeParams['objectAction']}";
                 }
                 $request->query->set('overrideRouteName', $ajaxRouteName);
             }
         }
 
-        //Ajax call so respond with json
+        // Ajax call so respond with json
         $newContent = '';
         if ($contentTemplate) {
             if ($forward) {
-                //the content is from another controller action so we must retrieve the response from it instead of
-                //directly parsing the template
+                // the content is from another controller action so we must retrieve the response from it instead of
+                // directly parsing the template
                 $query              = ['ignoreAjax' => true, 'request' => $request, 'subrequest' => true];
                 $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
                 if ($newContentResponse instanceof RedirectResponse) {
@@ -369,13 +364,13 @@ class CommonController extends AbstractController implements MauticController
             }
         }
 
-        //there was a redirect within the controller leading to a double call of this function so just return the content
-        //to prevent newContent from being json
+        // there was a redirect within the controller leading to a double call of this function so just return the content
+        // to prevent newContent from being json
         if ($request->get('ignoreAjax', false)) {
             return new Response($newContent, $code);
         }
 
-        //render flashes
+        // render flashes
         $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
@@ -395,7 +390,7 @@ class CommonController extends AbstractController implements MauticController
                 $updatedContent
             );
         } else {
-            //just retrieve the content
+            // just retrieve the content
             $dataArray = array_merge(
                 $passthrough,
                 ['newContent' => $newContent]
@@ -635,7 +630,6 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param           $message
      * @param null      $type
      * @param bool|true $isRead
      * @param null      $header
@@ -664,8 +658,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param array|\Iterator $toExport
-     * @param                 $type
-     * @param                 $filename
      *
      * @return StreamedResponse
      */
@@ -677,7 +669,7 @@ class CommonController extends AbstractController implements MauticController
 
         $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $filename   = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        $filename   = strtolower($filename.'_'.(new \DateTime())->format($dateFormat).'.'.$type);
 
         return $exportHelper->exportDataAs($toExport, $type, $filename);
     }

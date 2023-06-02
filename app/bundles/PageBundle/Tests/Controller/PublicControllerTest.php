@@ -3,7 +3,6 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -146,10 +145,6 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param $aCount
-     * @param $bCount
-     * @param $cCount
-     *
      * @return string
      */
     private function getVariantContent($aCount, $bCount, $cCount)
@@ -403,7 +398,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testAssetRedirectUrlWithClickThrough(): void
     {

@@ -18,6 +18,7 @@ class IteratorExportDataModel implements \Iterator
     /**
      * @param AbstractCommonModel<T> $model
      * @param array<mixed>           $args
+     *
      * @template T of object
      */
     public function __construct(AbstractCommonModel $model, array $args, callable $callback, bool $skipOrdering = false)

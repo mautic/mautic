@@ -25,8 +25,6 @@ class CallbackEnum
     }
 
     /**
-     * @param $event
-     *
      * @return string|null
      */
     public static function convertEventToDncReason($event)

@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Crate;
 
-use DateTime;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
 class ReportDataResult
@@ -42,9 +41,9 @@ class ReportDataResult
      */
     private array $graphs = [];
 
-    private ?DateTime $dateFrom;
+    private ?\DateTime $dateFrom;
 
-    private ?DateTime $dateTo;
+    private ?\DateTime $dateTo;
 
     private ?int $limit;
 
@@ -142,12 +141,12 @@ class ReportDataResult
         return $this->graphs;
     }
 
-    public function getDateTo(): ?DateTime
+    public function getDateTo(): ?\DateTime
     {
         return $this->dateTo;
     }
 
-    public function getDateFrom(): ?DateTime
+    public function getDateFrom(): ?\DateTime
     {
         return $this->dateFrom;
     }

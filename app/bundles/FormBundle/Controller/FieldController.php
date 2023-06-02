@@ -82,7 +82,7 @@ class FieldController extends CommonFormController
 
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$fieldType ||
             !$request->isXmlHttpRequest() ||
             !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
@@ -98,16 +98,16 @@ class FieldController extends CommonFormController
             $formField['customParameters'] = $customParams;
         }
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    //save the properties to session
+                    // save the properties to session
                     $fields          = $session->get('mautic.form.'.$formId.'.fields.modified', []);
                     $formData        = $form->getData();
                     $formField       = array_merge($formField, $formData);
@@ -201,7 +201,7 @@ class FieldController extends CommonFormController
         }
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -235,7 +235,7 @@ class FieldController extends CommonFormController
         if ($formField) {
             $fieldType = $formField['type'];
 
-            //ajax only for form fields
+            // ajax only for form fields
             if (!$fieldType ||
                 !$request->isXmlHttpRequest() ||
                 !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
@@ -246,20 +246,20 @@ class FieldController extends CommonFormController
             // Generate the form
             $form = $this->getFieldForm($formId, $formField);
 
-            //Check for a submitted form and process it
+            // Check for a submitted form and process it
             if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
 
-                        //form is valid so process the data
+                        // form is valid so process the data
 
-                        //save the properties to session
+                        // save the properties to session
                         $session  = $request->getSession();
                         $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
                         $formData = $form->getData();
 
-                        //overwrite with updated data
+                        // overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
                         if (false !== strpos($objectId, 'new')) {
@@ -320,7 +320,7 @@ class FieldController extends CommonFormController
             $passthroughVars['fieldId'] = $objectId;
             $template                   = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
 
-            //prevent undefined errors
+            // prevent undefined errors
             $entity       = new Field();
             $blank        = $entity->convertToArray();
             $formField    = array_merge($blank, $formField);
@@ -345,7 +345,7 @@ class FieldController extends CommonFormController
             );
 
             if ($closeModal) {
-                //just close the modal
+                // just close the modal
                 $passthroughVars['closeModal'] = 1;
 
                 return new JsonResponse($passthroughVars);
@@ -378,7 +378,7 @@ class FieldController extends CommonFormController
         $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', []);
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$request->isXmlHttpRequest() ||
             !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
@@ -393,7 +393,7 @@ class FieldController extends CommonFormController
                 $this->alreadyMappedFieldCollector->removeField($formId, $formField['mappedObject'], $formField['mappedField']);
             }
 
-            //add the field to the delete list
+            // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
                 $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
@@ -419,7 +419,7 @@ class FieldController extends CommonFormController
      */
     private function getFieldForm($formId, array $formField)
     {
-        //fire the form builder event
+        // fire the form builder event
         $formModel = $this->getModel('form.form');
         \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();

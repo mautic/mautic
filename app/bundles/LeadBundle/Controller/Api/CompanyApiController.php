@@ -79,8 +79,6 @@ class CompanyApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param Lead   &$entity
-     * @param        $parameters
-     * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

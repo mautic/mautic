@@ -182,7 +182,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -270,7 +270,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function triggerCampaign(Campaign $campaign)
     {
@@ -309,7 +309,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
@@ -335,7 +335,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private function executeKickoff()
     {
-        //trigger starting action events for newly added contacts
+        // trigger starting action events for newly added contacts
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
 
         $counter = $this->kickoffExecutioner->execute($this->campaign, $this->limiter, $this->output);
@@ -367,7 +367,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private function executeInactive()
     {
-        //find and trigger "no" path events
+        // find and trigger "no" path events
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.negative').'</comment>');
 
         $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
@@ -376,7 +376,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {

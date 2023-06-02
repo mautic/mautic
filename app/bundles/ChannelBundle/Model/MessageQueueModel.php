@@ -53,8 +53,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param        $channel
-     * @param        $channelId
      * @param null   $campaignEventId
      * @param int    $attempts
      * @param int    $priority
@@ -209,8 +207,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param $queue
-     *
      * @return int
      */
     public function processMessageQueue($queue)
@@ -297,7 +293,7 @@ class MessageQueueModel extends FormModel
             } // otherwise assume the listener did something such as rescheduling the message
         }
 
-        //add listener
+        // add listener
         $this->saveEntities($queue);
 
         return $counter;
@@ -336,7 +332,6 @@ class MessageQueueModel extends FormModel
     /**
      * @deprecated to be removed in 3.0; use reschedule method instead
      *
-     * @param        $message
      * @param string $rescheduleInterval
      * @param null   $leadId
      * @param null   $channel
@@ -351,7 +346,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param       $channel
      * @param array $channelIds
      */
     public function getQueuedChannelCount($channel, $channelIds = [])
@@ -361,11 +355,6 @@ class MessageQueueModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

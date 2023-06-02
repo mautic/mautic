@@ -120,9 +120,6 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setObjectId(int $id): self
     {
         $this->objectId = (string) $id;
@@ -135,9 +132,6 @@ class FieldChange
         return (int) $this->objectId;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setObjectType(string $type): self
     {
         $this->objectType = $type;
@@ -150,9 +144,6 @@ class FieldChange
         return $this->objectType;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setModifiedAt(\DateTime $time): self
     {
         $this->modifiedAt = $time;
@@ -165,9 +156,6 @@ class FieldChange
         return $this->modifiedAt;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnName(string $name): self
     {
         $this->columnName = $name;
@@ -180,9 +168,6 @@ class FieldChange
         return $this->columnName;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnType(string $type): self
     {
         $this->columnType = $type;
@@ -195,9 +180,6 @@ class FieldChange
         return $this->columnType;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnValue(string $value): self
     {
         $this->columnValue = $value;

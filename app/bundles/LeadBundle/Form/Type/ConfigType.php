@@ -82,7 +82,7 @@ class ConfigType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
-                $data = $event->getData();
+                $data    = $event->getData();
                 $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
                 $formModifier($event->getForm(), $columns);
             }

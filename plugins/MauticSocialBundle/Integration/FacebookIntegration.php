@@ -86,8 +86,6 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * @param $endpoint
-     *
      * @return string
      */
     public function getApiUrl($endpoint)
@@ -97,9 +95,6 @@ class FacebookIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @param $identifier
-     * @param $socialCache
      *
      * @return array
      */

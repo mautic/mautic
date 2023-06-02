@@ -13,7 +13,6 @@ use Mautic\Transifex\Exception\ResponseException;
 use Mautic\Transifex\Exception\TransifexException;
 use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
-use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -57,7 +56,7 @@ You can optionally choose to update resources for one bundle only with the --bun
 
 <info>php %command.full_name% --bundle AssetBundle</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -79,7 +78,7 @@ EOT
         \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
-        $promises          = new SplQueue();
+        $promises          = new \SplQueue();
 
         foreach ($files as $bundle => $stringFiles) {
             foreach ($stringFiles as $file) {

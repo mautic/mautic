@@ -8,8 +8,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Sparkpost;
 interface SparkpostFactoryInterface
 {
     /**
-     * @param      $host
-     * @param      $apiKey
      * @param null $port
      *
      * @return mixed

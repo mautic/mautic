@@ -15,9 +15,9 @@ final class Version20201228041109 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        //Not doing anything to throw SkipMigration here.
-        //It is ok if the migration is already run and if the data types are LONGTEXT already
-        //And if the alter statement changes it to LONGTEXT again
+        // Not doing anything to throw SkipMigration here.
+        // It is ok if the migration is already run and if the data types are LONGTEXT already
+        // And if the alter statement changes it to LONGTEXT again
     }
 
     public function up(Schema $schema): void

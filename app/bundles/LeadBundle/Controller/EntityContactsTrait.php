@@ -74,7 +74,7 @@ trait EntityContactsTrait
         $orderBy    = $orderBy ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
         $orderByDir = $orderByDir ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
 
-        //set limits
+        // set limits
         $limit = $request->getSession()->get(
             'mautic.'.$sessionVar.'.contact.limit',
             $this->coreParametersHelper->get('default_pagelimit')
@@ -119,7 +119,7 @@ trait EntityContactsTrait
         }
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));

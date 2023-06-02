@@ -24,10 +24,10 @@ class PublicController extends FormController
         $action = $this->generateUrl('mautic_user_passwordreset');
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
@@ -69,10 +69,10 @@ class PublicController extends FormController
             $request->getSession()->set('resetToken', $token);
         }
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 /** @var User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);

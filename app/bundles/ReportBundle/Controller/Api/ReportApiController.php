@@ -2,8 +2,6 @@
 
 namespace Mautic\ReportBundle\Controller\Api;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -84,11 +82,11 @@ class ReportApiController extends CommonApiController
         $options = ['paginate'=> false, 'ignoreGraphData' => true];
 
         if ($request->query->has('dateFrom')) {
-            $options['dateFrom'] = new DateTimeImmutable($request->query->get('dateFrom'), new DateTimeZone('UTC'));
+            $options['dateFrom'] = new \DateTimeImmutable($request->query->get('dateFrom'), new \DateTimeZone('UTC'));
         }
 
         if ($request->query->has('dateTo')) {
-            $options['dateTo']   = new DateTimeImmutable($request->query->get('dateTo'), new DateTimeZone('UTC'));
+            $options['dateTo']   = new \DateTimeImmutable($request->query->get('dateTo'), new \DateTimeZone('UTC'));
         }
 
         if ($request->query->has('page')) {

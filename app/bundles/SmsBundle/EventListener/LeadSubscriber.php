@@ -87,7 +87,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $label,
                         'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                     ];
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
 

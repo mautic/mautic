@@ -118,8 +118,6 @@ class Trigger extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -152,7 +150,7 @@ class Trigger extends FormEntity
     protected function isChanged($prop, $val)
     {
         if ('events' == $prop) {
-            //changes are already computed so just add them
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -221,8 +219,6 @@ class Trigger extends FormEntity
 
     /**
      * Add events.
-     *
-     * @param $key
      *
      * @return Point
      */

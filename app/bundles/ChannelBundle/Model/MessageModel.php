@@ -16,6 +16,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Message>
+ *
  * @implements AjaxLookupModelInterface<Message>
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
@@ -148,7 +149,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -181,8 +181,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -191,8 +189,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -201,7 +197,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      * @param null $channel
@@ -225,7 +220,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      *

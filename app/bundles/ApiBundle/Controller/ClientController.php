@@ -2,7 +2,6 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use function assert;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
@@ -132,9 +131,9 @@ class ClientController extends FormController
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage)
     {
         $apiClientModel = $this->clientModel;
-        assert($apiClientModel instanceof ClientModel);
+        \assert($apiClientModel instanceof ClientModel);
         $me = $tokenStorage->getToken()->getUser();
-        assert($me instanceof User);
+        \assert($me instanceof User);
         $clients = $apiClientModel->getUserClients($me);
 
         return $this->render('@MauticApi/Client/authorized.html.twig', ['clients' => $clients]);
@@ -207,29 +206,29 @@ class ClientController extends FormController
         $model = $this->clientModel;
         $model->setApiMode($apiMode);
 
-        //retrieve the entity
+        // retrieve the entity
         $client = $model->getEntity();
 
-        //set the return URL for post actions
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_client_index');
 
-        //get the user form factory
+        // get the user form factory
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'new']);
         $form   = $model->createForm($client, $this->formFactory, $action);
 
-        //remove the client id and secret fields as they'll be auto generated
+        // remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
         $form->remove('secret');
         $form->remove('publicId');
         $form->remove('consumerKey');
         $form->remove('consumerSecret');
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     // If the admin is creating API credentials, enable 'Client Credential' grant type
                     /** @var User $user */
                     $user = $this->getUser();
@@ -316,7 +315,7 @@ class ClientController extends FormController
             ],
         ];
 
-        //client not found
+        // client not found
         if (null === $client) {
             return $this->postActionRedirect(
                 array_merge(
@@ -333,7 +332,7 @@ class ClientController extends FormController
                 )
             );
         } elseif ($model->isLocked($client)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }
 
@@ -343,11 +342,11 @@ class ClientController extends FormController
         // remove api_mode field
         $form->remove('api_mode');
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -369,13 +368,13 @@ class ClientController extends FormController
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($client);
 
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($client);
         }
 
@@ -433,7 +432,7 @@ class ClientController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif ($model->isLocked($entity)) {
-                //deny access if the entity is locked
+                // deny access if the entity is locked
                 return $this->isLocked($postActionVars, $entity, 'api.client');
             } else {
                 $model->deleteEntity($entity);

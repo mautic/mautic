@@ -937,7 +937,7 @@ return [
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
         'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'             => 31536000, //365 days in seconds
+        'rememberme_lifetime'             => 31536000, // 365 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,

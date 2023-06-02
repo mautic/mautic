@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests;
 
-use DateTime;
-
 class Fixtures
 {
     /**
@@ -439,13 +437,13 @@ class Fixtures
         ];
     }
 
-    public static function getDateFrom(): DateTime
+    public static function getDateFrom(): \DateTime
     {
-        return new DateTime('2023-02-24 00:00');
+        return new \DateTime('2023-02-24 00:00');
     }
 
-    public static function getDateTo(): DateTime
+    public static function getDateTo(): \DateTime
     {
-        return new DateTime('2023-03-24 00:00');
+        return new \DateTime('2023-03-24 00:00');
     }
 }

@@ -36,8 +36,8 @@ class ChangeOwnerType extends AbstractType
         );
 
         $builder->add(
-          'buttons',
-          FormButtonsType::class
+            'buttons',
+            FormButtonsType::class
         );
     }
 }

@@ -35,7 +35,6 @@ class Client
      */
 
     /**
-     * @param $url
      * @param null $secret
      *
      * @return mixed|ResponseInterface

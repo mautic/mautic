@@ -122,7 +122,7 @@ class UserApiController extends CommonApiController
             if ('PATCH' === $method ||
                 ('PUT' === $method && !$this->security->isGranted('user:users:create'))
             ) {
-                //PATCH requires that an entity exists or must have create access for PUT
+                // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
             } else {
                 $entity = $this->model->getEntity();
@@ -132,19 +132,19 @@ class UserApiController extends CommonApiController
                 }
             }
         } else {
-            //Changing passwords via API is forbidden
+            // Changing passwords via API is forbidden
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
             if ('PATCH' == $method) {
-                //PATCH will accept a diff so just remove the entities
+                // PATCH will accept a diff so just remove the entities
 
-                //Changing username via API is forbidden
+                // Changing username via API is forbidden
                 if (!empty($parameters['username'])) {
                     unset($parameters['username']);
                 }
             } else {
-                //PUT requires the entire entity so overwrite the username with the original
+                // PUT requires the entire entity so overwrite the username with the original
                 $parameters['username'] = $entity->getUsername();
                 $parameters['role']     = $entity->getRole()->getId();
             }

@@ -74,8 +74,6 @@ class WebhookController extends FormController
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function viewAction(Request $request, $objectId)

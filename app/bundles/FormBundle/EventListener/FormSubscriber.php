@@ -378,8 +378,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $post
-     *
      * @return string
      */
     private function postToHtml($post)
@@ -399,8 +397,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $emailString
-     *
      * @return array<string, null>
      */
     private function getEmailsFromString($emailString): array

@@ -46,7 +46,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             /** @var \Mautic\PointBundle\Model\PointModel $model */
             $model   = $this->getModel('point');
             $actions = $model->getPointActions();
@@ -65,7 +65,7 @@ class AjaxController extends CommonAjaxController
                     'formThemes' => $themes,
                 ]);
 
-                //replace pointaction with point
+                // replace pointaction with point
                 $html                 = str_replace('pointaction', 'point', $html);
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;

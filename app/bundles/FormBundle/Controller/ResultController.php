@@ -59,7 +59,7 @@ class ResultController extends CommonFormController
         $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
@@ -93,7 +93,7 @@ class ResultController extends CommonFormController
 
         $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
-        //set limits
+        // set limits
         $limit = $pageHelper->getLimit();
         $start = $pageHelper->getStart();
 
@@ -113,7 +113,7 @@ class ResultController extends CommonFormController
             $session->set("mautic.formresult.$objectId.filters", $filters);
         }
 
-        //get the results
+        // get the results
         $entities = $model->getEntities(
             [
                 'start'          => $start,
@@ -133,7 +133,7 @@ class ResultController extends CommonFormController
         unset($entities);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_results', ['objectId' => $objectId, 'page' => $lastPage]);
@@ -151,7 +151,7 @@ class ResultController extends CommonFormController
             );
         }
 
-        //set what page currently on so that we can return here if need be
+        // set what page currently on so that we can return here if need be
         $pageHelper->rememberPage($page);
 
         return $this->delegateView(
@@ -250,7 +250,7 @@ class ResultController extends CommonFormController
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
@@ -336,7 +336,7 @@ class ResultController extends CommonFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         $viewParameters = [
             'objectId' => $formId,
@@ -406,9 +406,6 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    /**
-     * @param $action
-     */
     public function getPostActionRedirectArguments(array $args, $action)
     {
         switch ($action) {

@@ -125,10 +125,6 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);

@@ -49,8 +49,6 @@ class NoteApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
      * @param string                         $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

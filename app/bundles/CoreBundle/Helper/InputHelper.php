@@ -113,9 +113,6 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
-     * @param $name
-     * @param $arguments
-     *
      * @return mixed
      */
     public static function __callStatic($name, $arguments)
@@ -173,7 +170,6 @@ class InputHelper
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed|string
@@ -196,7 +192,6 @@ class InputHelper
     /**
      * Strips tags.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed
@@ -271,7 +266,6 @@ class InputHelper
     /**
      * Returns raw value.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return string
@@ -288,7 +282,6 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs.
      *
-     * @param                    $value
      * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
      * @param mixed              $defaultProtocol
@@ -358,7 +351,6 @@ class InputHelper
     /**
      * Removes all characters except those allowed in emails.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed
@@ -378,7 +370,6 @@ class InputHelper
     /**
      * Returns a clean array.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return array|mixed|string
@@ -402,8 +393,6 @@ class InputHelper
 
     /**
      * Returns clean HTML.
-     *
-     * @param $value
      *
      * @return mixed|string
      */
@@ -525,8 +514,6 @@ class InputHelper
     /**
      * Converts UTF8 into Latin.
      *
-     * @param $value
-     *
      * @return mixed
      */
     public static function transliterate($value)
@@ -559,10 +546,10 @@ class InputHelper
         // Remove extra white-space(s) between HTML attribute(s)
         $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function ($matches) {
             return '<'.$matches[1].preg_replace(
-                    '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
-                    ' $1$2',
-                    $matches[2]
-                ).$matches[3].'>';
+                '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
+                ' $1$2',
+                $matches[2]
+            ).$matches[3].'>';
         }, str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
         if (false !== strpos($html, ' style=')) {

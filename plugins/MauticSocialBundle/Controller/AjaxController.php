@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
 
             $formType = $monitoringModel->getFormByType($type);
 

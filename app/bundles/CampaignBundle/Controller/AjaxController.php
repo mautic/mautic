@@ -117,9 +117,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param $eventId
-     * @param $contactId
-     *
      * @return LeadEventLog|null
      */
     protected function getContactEventLog($eventId, $contactId)
