@@ -6,117 +6,53 @@ class TransportType
 {
     public const TRANSPORT_ALIAS = 'transport_alias';
 
-    public const FIELD_HOST     = 'field_host';
-    public const FIELD_PORT     = 'field_port';
-    public const FIELD_USER     = 'field_user';
-    public const FIELD_PASSWORD = 'field_password';
-    public const FIELD_API_KEY  = 'field_api_key';
+    public const FIELD_HOST        = 'field_host';
+    public const FIELD_PORT        = 'field_port';
+    public const FIELD_USER        = 'field_user';
+    public const FIELD_PASSWORD    = 'field_password';
+    public const FIELD_API_KEY     = 'field_api_key';
+    public const TRANSPORT_OPTIONS = 'transport_options';
+    public const DSN_CONVERTOR     = 'transport_dsn';
 
     /**
      * @var array
      */
-    private $transportTypes = [
-        'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
-        'mautic.transport.amazon_api'   => 'mautic.email.config.mailer_transport.amazon_api',
-        'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
-        'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
-        'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
-        'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
-        'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
-        'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
-        'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
-        'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
-        'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
-        'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
-        'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
-    ];
+    private $transportTypes = [];
 
     /**
      * @var array
      */
-    private $showHost = [
-        'smtp',
-    ];
+    private $showHost = [];
 
     /**
      * @var array
      */
-    private $showPort = [
-        'smtp',
-        'mautic.transport.amazon',
-    ];
+    private $showPort = [];
 
     /**
      * @var array
      */
-    private $showUser = [
-        'mautic.transport.mailjet',
-        'mautic.transport.sendgrid',
-        'mautic.transport.pepipost',
-        'mautic.transport.elasticemail',
-        'mautic.transport.amazon',
-        'mautic.transport.amazon_api',
-        'mautic.transport.postmark',
-        'gmail',
-        // smtp is left out on purpose as the auth_mode will manage displaying this field
-    ];
+    private $showUser = [];
 
     /**
      * @var array
      */
-    private $showPassword = [
-        'mautic.transport.mailjet',
-        'mautic.transport.sendgrid',
-        'mautic.transport.pepipost',
-        'mautic.transport.elasticemail',
-        'mautic.transport.amazon',
-        'mautic.transport.amazon_api',
-        'mautic.transport.postmark',
-        'gmail',
-        // smtp is left out on purpose as the auth_mode will manage displaying this field
-    ];
+    private $showPassword = [];
 
     /**
      * @var array
      */
-    private $showApiKey = [
-        'mautic.transport.sparkpost',
-        'mautic.transport.mandrill',
-        'mautic.transport.sendgrid_api',
-    ];
+    private $showApiKey = [];
 
     /**
-     * @var array
+     * @var array<array<string>>
      */
-    private $showAmazonRegion = [
-        'mautic.transport.amazon',
-        'mautic.transport.amazon_api',
-    ];
+    private $transportConfigModels = [];
 
-    public function addTransport($serviceId, $translatableAlias, $showHost, $showPort, $showUser, $showPassword, $showApiKey)
-    {
-        $this->transportTypes[$serviceId] = $translatableAlias;
-
-        if ($showHost) {
-            $this->showHost[] = $serviceId;
-        }
-
-        if ($showPort) {
-            $this->showPort[] = $serviceId;
-        }
-
-        if ($showUser) {
-            $this->showUser[] = $serviceId;
-        }
-
-        if ($showPassword) {
-            $this->showPassword[] = $serviceId;
-        }
-
-        if ($showApiKey) {
-            $this->showApiKey[] = $serviceId;
-        }
-    }
+    /**
+     * @var string[]
+     */
+    private $transportDsnConvertors = [];
 
     /**
      * @return array
@@ -153,41 +89,18 @@ class TransportType
     /**
      * @return string
      */
-    public function getServiceDoNotNeedAmazonRegion()
-    {
-        $tempTransports     = $this->transportTypes;
-
-        $transports               = array_keys($tempTransports);
-        $doNotRequireAmazonRegion = array_diff($transports, $this->showAmazonRegion);
-
-        return $this->getString($doNotRequireAmazonRegion);
-    }
-
-    /**
-     * @return string
-     */
     public function getServiceDoNotNeedUser()
     {
-        // The auth_mode data-show-on will handle smtp
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['smtp']);
-
-        $transports       = array_keys($tempTransports);
-        $doNotRequireUser = array_diff($transports, $this->showUser);
+        $doNotRequireUser = array_diff($this->transportTypes, $this->showUser);
 
         return $this->getString($doNotRequireUser);
     }
 
     public function getServiceDoNotNeedPassword()
     {
-        // The auth_mode data-show-on will handle smtp
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['smtp']);
+        $doNotRequirePassword = array_diff($this->transportTypes, $this->showPassword);
 
-        $transports       = array_keys($tempTransports);
-        $doNotRequireUser = array_diff($transports, $this->showPassword);
-
-        return $this->getString($doNotRequireUser);
+        return $this->getString($doNotRequirePassword);
     }
 
     /**
@@ -196,6 +109,11 @@ class TransportType
     public function getServiceRequiresPassword()
     {
         return $this->getString($this->showPassword);
+    }
+
+    public function isServiceRequiresPassword(): bool
+    {
+        return ('' !== $this->getServiceRequiresPassword()) ? true : false;
     }
 
     /**
@@ -215,27 +133,19 @@ class TransportType
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
-    public function getAmazonService()
+    public function getTrasportConfig(): array
     {
-        return $this->getString($this->showAmazonRegion);
+        return $this->transportConfigModels;
     }
 
     /**
-     * @return string
+     * @return array<string>
      */
-    public function getSparkPostService()
+    public function getTransportDsnConvertors(): array
     {
-        return '"mautic.transport.sparkpost"';
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailjetService()
-    {
-        return '"mautic.transport.mailjet"';
+        return $this->transportDsnConvertors;
     }
 
     /**
@@ -244,5 +154,37 @@ class TransportType
     private function getString(array $services)
     {
         return '"'.implode('","', $services).'"';
+    }
+
+    public function addTransport(string $serviceId, string $translatableAlias, bool $showHost, bool $showPort, bool $showUser, bool $showPassword, bool $showApiKey, string $options, string $dsnConvertor): void
+    {
+        $this->transportTypes[$serviceId] = $translatableAlias;
+
+        if ($showHost) {
+            $this->showHost[] = $serviceId;
+        }
+
+        if ($showPort) {
+            $this->showPort[] = $serviceId;
+        }
+
+        if ($showUser) {
+            $this->showUser[] = $serviceId;
+        }
+
+        if ($showPassword) {
+            $this->showPassword[] = $serviceId;
+        }
+
+        if ($showApiKey) {
+            $this->showApiKey[] = $serviceId;
+        }
+
+        if ($options) {
+            $this->transportConfigModels[$serviceId] = $options;
+        }
+        if ($dsnConvertor) {
+            $this->transportDsnConvertors[$serviceId] = $dsnConvertor;
+        }
     }
 }

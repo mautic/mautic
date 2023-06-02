@@ -2,15 +2,28 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Transport\AbstractTokenArrayTransport;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mime\Email;
 
-class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
+class BatchTransport extends AbstractTokenArrayTransport
 {
+    /**
+     * @var array<string, mixed>
+     */
+    private $transports = []; // @phpstan-ignore-line
+
     private $fromAddresses = [];
-    private $fromNames     = [];
-    private $metadatas     = [];
-    private $validate      = false;
+
+    private $fromNames = [];
+
+    private $metadatas = [];
+
+    private $validate = false;
+
     private $maxRecipients;
+
     private $numberToFail;
 
     /**
@@ -20,18 +33,22 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
     {
-        $this->validate      = $validate;
-        $this->maxRecipients = $maxRecipients;
-        $this->numberToFail  = (int) $numberToFail;
+        $this->validate           = $validate;
+        $this->maxRecipients      = $maxRecipients;
+        $this->numberToFail       = (int) $numberToFail;
+        $this->transports['main'] = $this;
     }
 
-    /**
-     * @param null $failedRecipients
-     */
-    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function __toString(): string
     {
-        $this->message         = $message;
-        $from                  = $message->getFrom();
+        return 'batch://';
+    }
+
+    protected function doSend(SentMessage $message): void
+    {
+        // TODO: @escopecz if you have a better approach, please let me know
+        $this->message         = $message->getOriginalMessage(); // @phpstan-ignore-line it will return either Email or MauticMessage
+        $from                  = $this->message->getFrom(); // @phpstan-ignore-line we are sure this function exists
         $fromEmail             = key($from);
         $this->fromAddresses[] = $fromEmail;
         $this->fromNames[]     = $from[$fromEmail];
@@ -50,8 +67,6 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
                 $this->throwException('To empty');
             }
         }
-
-        return true;
     }
 
     /**
@@ -68,7 +83,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      *
      * @return int
      */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    public function getBatchRecipientCount(Email $message, $toBeAdded = 1, $type = 'to')
     {
         $to      = $message->getTo();
         $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
@@ -98,13 +113,5 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function getMetadatas()
     {
         return $this->metadatas;
-    }
-
-    /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
     }
 }
