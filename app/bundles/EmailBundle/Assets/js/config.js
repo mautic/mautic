@@ -78,7 +78,13 @@ Mautic.testEmailServerConnection = function() {
         transport:           mQuery('#config_emailconfig_mailer_transport').val(),
         user:                mQuery('#config_emailconfig_mailer_user').val()
     };
-
+    var data = {}
+    mQuery('.used-in-test').each(function(){
+        const id = mQuery(this).attr('id')
+        const key = id.substring(id.indexOf('mailer'));
+        data[key] = mQuery(this).val()
+    })    
+    
     mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');
 
     Mautic.ajaxActionRequest('email:testEmailServerConnection', data, function(response) {
