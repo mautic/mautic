@@ -19,7 +19,7 @@ class Message
     public $returnPath = false;
     public $references = [];
 
-    public $textPlain;
+    public string $textPlain = '';
     public $textHtml;
     public string $dsnReport  = '';
     public string $dsnMessage = '';
