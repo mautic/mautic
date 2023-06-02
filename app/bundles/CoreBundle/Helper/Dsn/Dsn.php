@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper\Dsn;
 
-class Dsn
+final class Dsn
 {
     private string $scheme;
 
@@ -124,7 +124,7 @@ class Dsn
     /**
      * @return array<string, string>
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

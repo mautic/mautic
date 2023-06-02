@@ -422,6 +422,16 @@ return [
                     '%kernel.environment%',
                 ],
             ],
+            'mautic.guzzle.client.factory' => [
+                'class' => \Mautic\CoreBundle\Guzzle\ClientFactory::class,
+            ],
+            'mautic.guzzle.client' => [
+                'class'     => \Http\Adapter\Guzzle7\Client::class,
+                'factory'   => ['@mautic.guzzle.client.factory', 'create'],
+            ],
+            'mautic.http.client' => [
+                'class' => GuzzleHttp\Client::class,
+            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,

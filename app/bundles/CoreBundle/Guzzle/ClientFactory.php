@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\EmailBundle\Swiftmailer\Guzzle;
+namespace Mautic\CoreBundle\Guzzle;
 
 use GuzzleHttp\ClientInterface;
 use Http\Adapter\Guzzle7\Client;
