@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Symfony\Component\Mime\Email;
+
 /**
  * Class PlainTextMessageHelper.
  */
@@ -12,27 +14,8 @@ class PlainTextMessageHelper
      *
      * @return string
      */
-    public static function getPlainTextFromMessage(\Swift_Mime_SimpleMessage $message)
+    public function getPlainTextFromMessageNotStatic(Email $message)
     {
-        $children = (array) $message->getChildren();
-
-        foreach ($children as $child) {
-            $childType = $child->getContentType();
-            if ('text/plain' === $childType && $child instanceof \Swift_MimePart) {
-                return $child->getBody();
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Extract plain text from message.
-     *
-     * @return string
-     */
-    public function getPlainTextFromMessageNotStatic(\Swift_Mime_SimpleMessage $message)
-    {
-        return self::getPlainTextFromMessage($message);
+        return $message->getTextBody();
     }
 }
