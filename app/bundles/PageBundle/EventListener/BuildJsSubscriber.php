@@ -480,7 +480,6 @@ JS;
         $lead   = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
-
             $gtagSettings = [];
 
             if ($this->trackingHelper->getAnonymizeIp()) {
