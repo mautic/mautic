@@ -558,7 +558,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setContent($content)
     {
         // Ensure safe emoji
-        $content = EmojiHelper::toShort($content);
+        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
 
         $this->isChanged('content', $content);
         $this->content = $content;
