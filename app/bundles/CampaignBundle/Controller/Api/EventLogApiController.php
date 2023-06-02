@@ -96,7 +96,6 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * Get a list of events.
      *
-     * @param      $contactId
      * @param null $campaignId
      *
      * @return Response
@@ -149,9 +148,6 @@ class EventLogApiController extends FetchCommonApiController
     }
 
     /**
-     * @param $eventId
-     * @param $contactId
-     *
      * @return Response
      */
     public function editContactEventAction(Request $request, $eventId, $contactId)

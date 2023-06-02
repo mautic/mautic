@@ -284,8 +284,6 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @param $entity
-     *
      * @return FormInterface
      */
     protected function createActionEntityForm(Action $entity, array $action)
@@ -312,8 +310,6 @@ class FormApiController extends CommonApiController
 
     /**
      * Creates the form instance.
-     *
-     * @param $entity
      *
      * @return FormInterface
      */

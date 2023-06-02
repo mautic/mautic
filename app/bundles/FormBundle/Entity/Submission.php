@@ -98,8 +98,6 @@ class Submission
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -250,8 +248,6 @@ class Submission
     /**
      * Get results.
      *
-     * @param $results
-     *
      * @return Submission
      */
     public function setResults($results)
@@ -312,8 +308,6 @@ class Submission
     }
 
     /**
-     * @param $trackingId
-     *
      * @return $this
      */
     public function setTrackingId($trackingId)

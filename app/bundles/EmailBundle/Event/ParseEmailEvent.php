@@ -43,8 +43,6 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * @param $messages
-     *
      * @return $this
      */
     public function setMessages($messages)
@@ -76,9 +74,6 @@ class ParseEmailEvent extends Event
 
     /**
      * Check if the set of messages is applicable and should be processed by the listener.
-     *
-     * @param $bundleKey
-     * @param $folderKeys
      *
      * @return bool
      */

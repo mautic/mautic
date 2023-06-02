@@ -49,9 +49,6 @@ class SmsApiController extends CommonApiController
     }
 
     /**
-     * @param $id
-     * @param $contactId
-     *
      * @return JsonResponse|Response
      */
     public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId)

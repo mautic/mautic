@@ -401,7 +401,7 @@ class InstallService
     {
         $entityManager = $this->entityManager;
 
-        //ensure the username and email are unique
+        // ensure the username and email are unique
         try {
             /** @var User $existingUser */
             $existingUser = $entityManager->getRepository(User::class)->find(1);

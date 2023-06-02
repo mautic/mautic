@@ -132,7 +132,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        //Add actions
+        // Add actions
         $action = [
             'label'       => 'mautic.lead.lead.events.changepoints',
             'description' => 'mautic.lead.lead.events.changepoints_descr',
@@ -295,7 +295,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null !== $lead && !empty($points)) {
             $lead->adjustPoints($points);
 
-            //add a lead point change log
+            // add a lead point change log
             $log = new PointsChangeLog();
             $log->setDelta($points);
             $log->setLead($lead);
@@ -516,11 +516,11 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (false !== strpos($event->getConfig()['value'], '+P')) { //add date
-                    $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
+                if (false !== strpos($event->getConfig()['value'], '+P')) { // add date
+                    $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { //subtract date
-                    $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
+                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { // subtract date
+                    $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {
                     /**

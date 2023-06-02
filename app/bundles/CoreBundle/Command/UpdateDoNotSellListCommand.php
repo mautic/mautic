@@ -56,16 +56,16 @@ EOT
 
             if ($remoteUrl && $localPath) {
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.do_not_sell.remote_fetch_error',
-                        [
-                            '%remoteUrl%' => $remoteUrl,
-                            '%localPath%' => $localPath,
-                        ]
-                    ).'</error>');
+                    'mautic.core.do_not_sell.remote_fetch_error',
+                    [
+                        '%remoteUrl%' => $remoteUrl,
+                        '%localPath%' => $localPath,
+                    ]
+                ).'</error>');
             } else {
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.do_not_sell.remote_fetch_error_generic'
-                    ).'</error>');
+                    'mautic.core.do_not_sell.remote_fetch_error_generic'
+                ).'</error>');
             }
         }
 

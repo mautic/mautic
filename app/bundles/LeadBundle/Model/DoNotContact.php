@@ -171,8 +171,6 @@ class DoNotContact implements MauticModelInterface
     }
 
     /**
-     * @param      $channel
-     * @param      $reason
      * @param null $comments
      *
      * @return DNC
@@ -200,8 +198,6 @@ class DoNotContact implements MauticModelInterface
     }
 
     /**
-     * @param      $channel
-     * @param      $reason
      * @param null $comments
      */
     public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null)

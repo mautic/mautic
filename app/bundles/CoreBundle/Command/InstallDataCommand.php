@@ -42,7 +42,7 @@ You can optionally specify to bypass the verification check with the --force opt
 
 <info>php %command.full_name% --force</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -66,7 +66,7 @@ EOT
         $verbosity = $output->getVerbosity();
         $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        //due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
+        // due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
         $command = $this->getApplication()->find('doctrine:schema:drop');
         $input   = new ArrayInput([
             'command' => 'doctrine:schema:drop',
@@ -80,7 +80,7 @@ EOT
             return (int) $returnCode;
         }
 
-        //recreate the database
+        // recreate the database
         $command = $this->getApplication()->find('doctrine:schema:create');
         $input   = new ArrayInput([
             'command' => 'doctrine:schema:create',
@@ -92,7 +92,7 @@ EOT
             return (int) $returnCode;
         }
 
-        //now populate the tables with fixture
+        // now populate the tables with fixture
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = [
             'command'  => 'doctrine:fixtures:load',

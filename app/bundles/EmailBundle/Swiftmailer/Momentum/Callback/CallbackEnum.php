@@ -41,8 +41,6 @@ class CallbackEnum
     }
 
     /**
-     * @param $event
-     *
      * @return string|null
      */
     public static function convertEventToDncReason($event)
@@ -120,8 +118,6 @@ class CallbackEnum
     }
 
     /**
-     * @param $event
-     *
      * @return mixed|null
      */
     private static function getCommentsKeyForEvent($event)

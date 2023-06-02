@@ -37,7 +37,7 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         $packagesMock->method('getUrl')
             ->will($this->returnCallback(function (string $path) {
                 $packageName = $version = null;
-                $absolute = $ignorePrefix = false;
+                $absolute    = $ignorePrefix = false;
 
                 return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
             }));

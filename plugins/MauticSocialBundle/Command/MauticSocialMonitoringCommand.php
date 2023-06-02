@@ -94,8 +94,6 @@ class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @param $listItem
-     *
      * @return bool|int
      *
      * @throws \Exception

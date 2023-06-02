@@ -131,8 +131,6 @@ class TweetController extends FormController
     /**
      * Get the template file.
      *
-     * @param $file
-     *
      * @return string
      */
     protected function getTemplateName($file)
@@ -159,8 +157,6 @@ class TweetController extends FormController
 
     /**
      * Displays details.
-     *
-     * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */

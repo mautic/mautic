@@ -96,10 +96,6 @@ class FieldApiController extends CommonApiController
     }
 
     /**
-     * @param $parameters
-     * @param $entity
-     * @param $action
-     *
      * @return mixed|void
      */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
@@ -117,8 +113,6 @@ class FieldApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param LeadField &$entity
-     * @param           $parameters
-     * @param           $form
      * @param string    $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

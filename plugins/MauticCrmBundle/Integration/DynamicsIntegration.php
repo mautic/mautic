@@ -195,8 +195,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)
@@ -213,9 +211,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
-     * @param $config
-     *
      * @return array
      */
     public function populateLeadData($lead, $config = [], $object = 'Contacts')
@@ -807,7 +802,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
         unset($toUpdate);
 
-        //create lead records, including deleted on D side (last_sync = null)
+        // create lead records, including deleted on D side (last_sync = null)
         /** @var array $leadsToCreate */
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $totalToCreate, $params['start'], $params['end']);
         if (is_array($leadsToCreate)) {
@@ -909,8 +904,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $ids
-     * @param $object
+     * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
     private function createIntegrationEntities($ids, $object, $integrationEntityRepo)

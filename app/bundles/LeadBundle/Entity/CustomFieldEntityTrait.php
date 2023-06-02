@@ -32,8 +32,6 @@ trait CustomFieldEntityTrait
     protected $eventData = [];
 
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function __get($name)
@@ -42,9 +40,6 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param $name
-     * @param $value
-     *
      * @return $this
      */
     public function __set($name, $value)
@@ -54,7 +49,6 @@ trait CustomFieldEntityTrait
 
     /**
      * @param string $name
-     * @param        $arguments
      *
      * @return mixed
      */
@@ -75,9 +69,6 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    /**
-     * @param $fields
-     */
     public function setFields($fields)
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
@@ -105,8 +96,6 @@ trait CustomFieldEntityTrait
     /**
      * Add an updated field to persist to the DB and to note changes.
      *
-     * @param        $alias
-     * @param        $value
      * @param string $oldValue
      *
      * @return $this
@@ -264,18 +253,12 @@ trait CustomFieldEntityTrait
         return !empty($this->fields);
     }
 
-    /**
-     * @param $key
-     */
     public function getEventData($key)
     {
         return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function setEventData($key, $value)

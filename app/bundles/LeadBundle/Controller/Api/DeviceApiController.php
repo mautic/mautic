@@ -44,8 +44,6 @@ class DeviceApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param LeadDevice &$entity
-     * @param            $parameters
-     * @param            $form
      * @param string     $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

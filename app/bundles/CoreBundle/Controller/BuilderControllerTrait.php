@@ -37,8 +37,6 @@ trait BuilderControllerTrait
     }
 
     /**
-     * @param $slotTypes
-     *
      * @return array
      */
     protected function buildSlotForms($slotTypes)

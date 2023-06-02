@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
@@ -36,7 +35,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -203,7 +202,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -599,7 +598,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSegmentCacheCount(): void
     {

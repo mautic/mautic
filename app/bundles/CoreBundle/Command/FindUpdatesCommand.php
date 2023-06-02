@@ -33,7 +33,7 @@ The <info>%command.name%</info> command checks for updates for the Mautic applic
 
 <info>php %command.full_name%</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

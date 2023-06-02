@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -196,7 +195,7 @@ class AjaxController extends CommonAjaxController
         $formHtml = $this->renderView(
             '@MauticLead/List/filterpropform.html.twig',
             [
-                //'form' => $this->setFormTheme($form, '@MauticLead/List/filterpropform.html.twig', []),
+                // 'form' => $this->setFormTheme($form, '@MauticLead/List/filterpropform.html.twig', []),
                 'form' => $form->createView(),
             ]
         );
@@ -225,7 +224,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -285,7 +284,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -328,7 +327,7 @@ class AjaxController extends CommonAjaxController
         $leadId        = (int) $request->request->get('leadId');
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -559,7 +558,7 @@ class AjaxController extends CommonAjaxController
         $maxId     = $request->get('maxId');
 
         if (!empty($maxId)) {
-            //set some permissions
+            // set some permissions
             $permissions = $this->security->isGranted(
                 [
                     'lead:leads:viewown',
@@ -593,7 +592,7 @@ class AjaxController extends CommonAjaxController
 
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
             if ('list' != $indexMode) {
-                //remove anonymous leads unless requested to prevent clutter
+                // remove anonymous leads unless requested to prevent clutter
                 $filter['force'][] = "!$anonymous";
             }
 
@@ -951,7 +950,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getLeadCountAction(Request $request): JsonResponse
     {

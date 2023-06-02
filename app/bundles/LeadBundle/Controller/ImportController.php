@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use function assert;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -196,7 +195,7 @@ class ImportController extends FormController
      */
     public function newAction(Request $request, $objectId = 0, $ignorePost = false)
     {
-        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
+        // Auto detect line endings for the file to work around MS DOS vs Unix new line characters
         ini_set('auto_detect_line_endings', '1');
 
         $dispatcher = $this->dispatcher;
@@ -317,7 +316,7 @@ class ImportController extends FormController
                 }
         }
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!isset($form) || $this->isFormCancelled($form)) {
                 $this->resetImport($object);
@@ -649,8 +648,6 @@ class ImportController extends FormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     public function getViewArguments(array $args, $action)
@@ -691,7 +688,7 @@ class ImportController extends FormController
     {
         if (!isset($parameters['object'])) {
             $request = $this->getCurrentRequest();
-            assert(null !== $request);
+            \assert(null !== $request);
             $parameters['object'] = $request->get('object', 'contacts');
         }
 
@@ -757,7 +754,7 @@ class ImportController extends FormController
     private function dispatchImportOnInit(): ImportInitEvent
     {
         $request = $this->getCurrentRequest();
-        assert(null !== $request);
+        \assert(null !== $request);
         $event = new ImportInitEvent($request->get('object'));
 
         $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);

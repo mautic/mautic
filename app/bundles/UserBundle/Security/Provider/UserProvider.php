@@ -85,7 +85,7 @@ class UserProvider implements UserProviderInterface
             throw new UserNotFoundException($message, 0);
         }
 
-        //load permissions
+        // load permissions
         if ($user->getId()) {
             $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
             $user->setActivePermissions($permissions);

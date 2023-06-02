@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Crate;
 
-use DateTime;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
@@ -113,7 +112,7 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $expectedDateFrom = Fixtures::getDateFrom();
 
         $this->assertEquals($expectedDateFrom, $reportDataResult->getDateFrom());
-        $this->assertTrue($reportDataResult->getDateFrom() instanceof DateTime);
+        $this->assertTrue($reportDataResult->getDateFrom() instanceof \DateTime);
     }
 
     public function testGetDateTo(): void
@@ -122,7 +121,7 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $dateTo           = Fixtures::getDateTo();
 
         $this->assertEquals($dateTo, $reportDataResult->getDateTo());
-        $this->assertTrue($reportDataResult->getDateTo() instanceof DateTime);
+        $this->assertTrue($reportDataResult->getDateTo() instanceof \DateTime);
     }
 
     public function testIsLastPage(): void

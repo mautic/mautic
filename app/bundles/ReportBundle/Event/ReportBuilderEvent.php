@@ -169,8 +169,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns lead columns.
      *
-     * @param $prefix
-     *
      * @return array
      */
     public function getLeadColumns($prefix = 'l.')
@@ -319,9 +317,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * @param       $context
-     * @param       $type
-     * @param       $graphId
      * @param array $options
      *
      * @return $this

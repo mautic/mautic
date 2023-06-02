@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use function assert;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -159,7 +158,7 @@ abstract class MonitorTwitterBaseCommand extends Command
             return 1;
         }
 
-        assert($twitterIntegration instanceof TwitterIntegration);
+        \assert($twitterIntegration instanceof TwitterIntegration);
         $this->twitter = $twitterIntegration;
 
         if (!$this->twitter->isAuthorized()) {

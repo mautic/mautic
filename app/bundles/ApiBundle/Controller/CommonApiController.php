@@ -27,6 +27,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @template E of object
+ *
  * @extends FetchCommonApiController<E>
  */
 class CommonApiController extends FetchCommonApiController
@@ -165,13 +166,13 @@ class CommonApiController extends FetchCommonApiController
             $statusCode = Response::HTTP_OK;
             if (null === $entity || !$entity->getId()) {
                 if ('PATCH' === $method) {
-                    //PATCH requires that an entity exists
+                    // PATCH requires that an entity exists
                     $this->setBatchError($key, 'mautic.core.error.notfound', Response::HTTP_NOT_FOUND, $errors, $entities, $entity);
                     $statusCodes[$key] = Response::HTTP_NOT_FOUND;
                     continue;
                 }
 
-                //PUT can create a new entity if it doesn't exist
+                // PUT can create a new entity if it doesn't exist
                 $entity = $this->model->getEntity();
                 if (!$this->checkEntityAccess($entity, 'create')) {
                     $this->setBatchError($key, 'mautic.core.error.accessdenied', Response::HTTP_FORBIDDEN, $errors, $entities, $entity);
@@ -227,11 +228,11 @@ class CommonApiController extends FetchCommonApiController
 
         if (null === $entity || !$entity->getId()) {
             if ('PATCH' === $method) {
-                //PATCH requires that an entity exists
+                // PATCH requires that an entity exists
                 return $this->notFound();
             }
 
-            //PUT can create a new entity if it doesn't exist
+            // PUT can create a new entity if it doesn't exist
             $entity = $this->model->getEntity();
             if (!$this->checkEntityAccess($entity, 'create')) {
                 return $this->accessDenied();
@@ -328,8 +329,6 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Creates the form instance.
-     *
-     * @param $entity
      */
     protected function createEntityForm($entity): Form
     {
@@ -350,7 +349,6 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param        $parameters
      * @param string $action
      *
      * @return mixed
@@ -361,11 +359,6 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Give the controller an opportunity to process the entity before persisting.
-     *
-     * @param $entity
-     * @param $form
-     * @param $parameters
-     * @param $action
      *
      * @return mixed
      */
@@ -387,14 +380,6 @@ class CommonApiController extends FetchCommonApiController
         return $parameters;
     }
 
-    /**
-     * @param $key
-     * @param $entity
-     * @param $params
-     * @param $method
-     * @param $errors
-     * @param $entities
-     */
     protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
     {
         $this->inBatchMode = true;
@@ -427,7 +412,6 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
-     * @param                   $entity
      * @param array<mixed>|null $parameters
      * @param string            $method
      *
@@ -438,19 +422,19 @@ class CommonApiController extends FetchCommonApiController
         $categoryId = null;
 
         if (null === $parameters) {
-            //get from request
+            // get from request
             $parameters = $request->request->all();
         }
 
         // Store the original parameters from the request so that callbacks can have access to them as needed
         $this->entityRequestParameters = $parameters;
 
-        //unset the ID in the parameters if set as this will cause the form to fail
+        // unset the ID in the parameters if set as this will cause the form to fail
         if (isset($parameters['id'])) {
             unset($parameters['id']);
         }
 
-        //is an entity being updated or created?
+        // is an entity being updated or created?
         if ($entity->getId()) {
             $statusCode = Response::HTTP_OK;
             $action     = 'edit';
@@ -519,7 +503,7 @@ class CommonApiController extends FetchCommonApiController
             $statusCode = $this->saveEntity($entity, $statusCode);
 
             $headers = [];
-            //return the newly created entities location if applicable
+            // return the newly created entities location if applicable
             if (in_array($statusCode, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED])) {
                 $route = (null !== $this->router->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;

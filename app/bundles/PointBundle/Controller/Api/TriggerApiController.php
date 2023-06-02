@@ -123,8 +123,6 @@ class TriggerApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @param $entity
-     *
      * @return Form
      */
     protected function createTriggerEventEntityForm($entity)

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use RuntimeException;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -13,9 +12,6 @@ abstract class AbstractFormController extends CommonController
     protected $permissionBase;
 
     /**
-     * @param $id
-     * @param $modelName
-     *
      * @return mixed
      */
     public function unlockAction(Request $request, $id, $modelName)
@@ -132,7 +128,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -149,7 +145,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -168,10 +164,10 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
-        //bind request to the form
+        // bind request to the form
         $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();
@@ -234,7 +230,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         if (empty($request->server->get('HTTP_REFERER'))) {

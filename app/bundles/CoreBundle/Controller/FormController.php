@@ -67,8 +67,6 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     public function getViewArguments(array $args, $action)
@@ -77,9 +75,6 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
-     * @param $args
-     * @param $action
-     *
      * @deprecated 2.6.0 to be removed in 3.0; use getViewArguments instead
      *
      * @return array

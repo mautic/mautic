@@ -41,8 +41,6 @@ class ConstantContactApi extends EmailMarketingApi
     }
 
     /**
-     * @param       $email
-     * @param       $listId
      * @param array $fields
      * @param array $config
      *

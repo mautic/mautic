@@ -157,10 +157,10 @@ class FullContactController extends FormController
             /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess(
-                        'lead:leads:editown',
-                        'lead:leads:editother',
-                        $lead->getPermissionUser()
-                    )
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                )
                     && $lead->getEmail()
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();

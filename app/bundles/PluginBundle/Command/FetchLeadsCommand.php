@@ -143,7 +143,7 @@ class FetchLeadsCommand extends Command
                 $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                 $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
-                //Handle case when integration object are named "Contacts" and "Leads"
+                // Handle case when integration object are named "Contacts" and "Leads"
                 $leadObjectName = 'Lead';
                 if (in_array('Leads', $config['objects'])) {
                     $leadObjectName = 'Leads';

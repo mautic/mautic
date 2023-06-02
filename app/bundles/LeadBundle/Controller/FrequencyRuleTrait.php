@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use function assert;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -27,7 +26,6 @@ trait FrequencyRuleTrait
     private ?RequestStack $requestStack = null;
 
     /**
-     * @param       $lead
      * @param array $viewParameters
      * @param null  $data
      * @param bool  $isPublic
@@ -54,11 +52,11 @@ trait FrequencyRuleTrait
             ]
         );
 
-        //find the email
+        // find the email
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
-            assert($emailModel instanceof EmailModel);
+            \assert($emailModel instanceof EmailModel);
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
@@ -83,7 +81,7 @@ trait FrequencyRuleTrait
         );
 
         $request = $this->requestStack->getCurrentRequest();
-        assert(null !== $request);
+        \assert(null !== $request);
         $method = $request->getMethod();
         if ('GET' !== $method) {
             if (!$this->isFormCancelled($form)) {
@@ -160,7 +158,6 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param     $leadChannels
      * @param int $currentChannelId
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
@@ -169,10 +166,10 @@ trait FrequencyRuleTrait
         $leadModel = $this->getModel('lead.lead');
 
         $dncModel = $this->doNotContactModel;
-        assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
+        \assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
 
         $request = $this->requestStack->getCurrentRequest();
-        assert(null !== $request);
+        \assert(null !== $request);
         // iF subscribed_channels are enabled in form, then touch DNC
         if (isset($request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {

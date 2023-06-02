@@ -309,9 +309,6 @@ class FocusModel extends FormModel
     /**
      * Get whether the color is light or dark.
      *
-     * @param $hex
-     * @param $level
-     *
      * @return bool
      */
     public static function isLightColor($hex, $level = 200)
@@ -423,7 +420,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param      $unit
      * @param null $dateFormat
      * @param bool $canViewOthers
      *

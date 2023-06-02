@@ -1404,7 +1404,7 @@ class lessc
         $darkColor  = $this->coerceColor($darkColor);
         $lightColor = $this->coerceColor($lightColor);
 
-        //Figure out which is actually light and dark!
+        // Figure out which is actually light and dark!
         if ($this->lib_luma($darkColor) > $this->lib_luma($lightColor)) {
             $t          = $lightColor;
             $lightColor = $darkColor;
@@ -1459,7 +1459,7 @@ class lessc
                     $name = $name.': ';
                 }
 
-                $this->throwError("${name}expecting $expectedArgs arguments, got $numValues");
+                $this->throwError("{$name}expecting $expectedArgs arguments, got $numValues");
             }
 
             return $values;
@@ -1888,7 +1888,7 @@ class lessc
         }
 
         // type based operators
-        $fname = "op_${ltype}_${rtype}";
+        $fname = "op_{$ltype}_{$rtype}";
         if (is_callable([$this, $fname])) {
             $out = $this->$fname($op, $left, $right);
             if (!is_null($out)) {
@@ -2069,7 +2069,7 @@ class lessc
 
     protected function makeOutputBlock($type, $selectors = null)
     {
-        $b            = new stdclass();
+        $b            = new stdClass();
         $b->lines     = [];
         $b->children  = [];
         $b->selectors = $selectors;
@@ -2082,7 +2082,7 @@ class lessc
     // the state of execution
     protected function pushEnv($block = null)
     {
-        $e         = new stdclass();
+        $e         = new stdClass();
         $e->parent = $this->env;
         $e->store  = [];
         $e->block  = $block;
@@ -2308,7 +2308,7 @@ class lessc
 
         if (null == $str) {
             if (empty($this->_parseFile)) {
-                throw new exception('nothing to parse');
+                throw new Exception('nothing to parse');
             }
 
             $out = $this->compileFile($this->_parseFile);
@@ -2401,7 +2401,7 @@ class lessc
         if ($this->sourceLoc >= 0) {
             $this->sourceParser->throwError($msg, $this->sourceLoc);
         }
-        throw new exception($msg);
+        throw new Exception($msg);
     }
 
     // compile file $in to file $out if $in is newer than $out
@@ -2684,7 +2684,7 @@ class lessc_parser
 
         // TODO report where the block was opened
         if (!property_exists($this->env, 'parent') || !is_null($this->env->parent)) {
-            throw new exception('parse error: unclosed block');
+            throw new Exception('parse error: unclosed block');
         }
 
         return $this->env;
@@ -2843,7 +2843,7 @@ class lessc_parser
         if ($this->literal('}', false)) {
             try {
                 $block = $this->pop();
-            } catch (exception $e) {
+            } catch (Exception $e) {
                 $this->seek($s);
                 $this->throwError($e->getMessage());
             }
@@ -3923,7 +3923,7 @@ class lessc_parser
 
                     return true;
                 }
-                // goes below...
+            // goes below...
             } else {
                 return false;
             }
@@ -4068,15 +4068,15 @@ class lessc_parser
 
         // TODO this depends on $this->count
         if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-            throw new exception("$msg: failed at `$m[1]` $loc");
+            throw new Exception("$msg: failed at `$m[1]` $loc");
         } else {
-            throw new exception("$msg: $loc");
+            throw new Exception("$msg: $loc");
         }
     }
 
     protected function pushBlock($selectors = null, $type = null)
     {
-        $b         = new stdclass();
+        $b         = new stdClass();
         $b->parent = $this->env;
 
         $b->type = $type;

@@ -12,9 +12,6 @@ class EmojiHelper
     /**
      * Convert to html.
      *
-     * @param $text
-     * @param $from
-     *
      * @return mixed
      */
     public static function toHtml($text, $from = 'emoji')
@@ -24,9 +21,6 @@ class EmojiHelper
 
     /**
      * Convert to emoji.
-     *
-     * @param $text
-     * @param $from
      *
      * @return mixed
      */
@@ -38,7 +32,6 @@ class EmojiHelper
     /**
      * Convert to short code.
      *
-     * @param        $text
      * @param string $from
      *
      * @return mixed
@@ -50,10 +43,6 @@ class EmojiHelper
 
     /**
      * Converts emojis.
-     *
-     * @param $text
-     * @param $from
-     * @param $to
      *
      * @return mixed
      */
@@ -114,8 +103,6 @@ class EmojiHelper
 
     /**
      * Remove emojis from text.
-     *
-     * @param $text
      *
      * @return mixed
      */

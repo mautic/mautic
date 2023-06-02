@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
-use DOMDocument;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -129,7 +128,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function widgetHtmlWithTableToArray(string $widgetHtml): array
     {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->loadHTML($widgetHtml);
         $crawler      = new Crawler($doc);
         $crawlerTable = $crawler->filter('table')->first();

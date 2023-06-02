@@ -74,26 +74,26 @@ class AmazonCallback
     {
         switch ($type) {
             case 'SubscriptionConfirmation':
-                    // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-                    try {
-                        $response = $this->httpClient->get($payload['SubscribeURL']);
-                        if (200 == $response->getStatusCode()) {
-                            $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
-                            break;
-                        }
-
-                        $reason = 'HTTP Code '.$response->getStatusCode().', '.$response->getBody();
-                    } catch (TransferException $e) {
-                        $reason = $e->getMessage();
+                // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
+                try {
+                    $response = $this->httpClient->get($payload['SubscribeURL']);
+                    if (200 == $response->getStatusCode()) {
+                        $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
+                        break;
                     }
 
-                    $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
-            break;
+                    $reason = 'HTTP Code '.$response->getStatusCode().', '.$response->getBody();
+                } catch (TransferException $e) {
+                    $reason = $e->getMessage();
+                }
+
+                $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
+                break;
             case 'Notification':
                 $message = json_decode($payload['Message'], true);
 
                 $this->processJsonPayload($message, $message['notificationType']);
-            break;
+                break;
             case 'Complaint':
                 foreach ($payload['complaint']['complainedRecipients'] as $complainedRecipient) {
                     $reason = null;
@@ -121,7 +121,7 @@ class AmazonCallback
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
 
-            break;
+                break;
             case 'Bounce':
                 if ('Permanent' == $payload['bounce']['bounceType']) {
                     $emailId = null;
@@ -142,11 +142,11 @@ class AmazonCallback
                         $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
                     }
                 }
-            break;
+                break;
             default:
                 $this->logger->warning("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
                 $this->logger->debug('SES webhook payload: '.json_encode($payload));
-            break;
+                break;
         }
     }
 

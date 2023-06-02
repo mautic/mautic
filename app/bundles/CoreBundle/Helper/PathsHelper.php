@@ -177,7 +177,7 @@ class PathsHelper
 
             case 'dashboard.user':
             case 'dashboard.global':
-                //these are absolute regardless as they are configurable
+                // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
                 if ('dashboard.global' == $name) {

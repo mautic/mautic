@@ -32,9 +32,6 @@ class ReportDAO
      */
     private $relationsDAO;
 
-    /**
-     * @param $integration
-     */
     public function __construct($integration)
     {
         $this->integration     = $integration;
@@ -79,10 +76,6 @@ class ReportDAO
     }
 
     /**
-     * @param $objectName
-     * @param $objectId
-     * @param $fieldName
-     *
      * @return InformationChangeRequestDAO
      *
      * @throws ObjectNotFoundException

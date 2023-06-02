@@ -32,7 +32,6 @@ trait TranslationEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      * @param string        $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
@@ -222,8 +221,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)

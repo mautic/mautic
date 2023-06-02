@@ -54,8 +54,6 @@ class Message
     }
 
     /**
-     * @param $baseUri
-     *
      * @return mixed
      */
     public function replaceInternalLinks($baseUri)

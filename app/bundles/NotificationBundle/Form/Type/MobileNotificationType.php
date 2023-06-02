@@ -102,7 +102,7 @@ class MobileNotificationType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,

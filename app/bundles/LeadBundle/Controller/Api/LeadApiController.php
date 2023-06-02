@@ -140,8 +140,6 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getNotesAction(Request $request, $id)
@@ -193,8 +191,6 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of devices on a specific lead.
-     *
-     * @param $id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -248,8 +244,6 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getListsAction($id)
@@ -288,8 +282,6 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getCompaniesAction($id)
@@ -319,8 +311,6 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of campaigns the lead is part of.
-     *
-     * @param $id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -366,8 +356,6 @@ class LeadApiController extends CommonApiController
 
     /**
      * Obtains a list of contact events.
-     *
-     * @param $id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -417,9 +405,6 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @param $id
-     * @param $channel
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function addDncAction(Request $request, $id, $channel)
@@ -462,9 +447,6 @@ class LeadApiController extends CommonApiController
 
     /**
      * Removes a DNC from the contact.
-     *
-     * @param $id
-     * @param $channel
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -594,7 +576,6 @@ class LeadApiController extends CommonApiController
      *
      * @param Lead   $entity
      * @param array  $parameters
-     * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -645,7 +626,7 @@ class LeadApiController extends CommonApiController
             $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
         }
 
-        //Since the request can be from 3rd party, check for an IP address if included
+        // Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
             $ipAddress = $this->ipLookupHelper->getIpAddress($this->entityRequestParameters['ipAddress']);
             \assert($ipAddress instanceof IpAddress);

@@ -100,8 +100,6 @@ class FieldModel extends CommonFormModel
     /**
      * Get the fields saved in session.
      *
-     * @param $formId
-     *
      * @return array
      */
     public function getSessionFields($formId)
@@ -113,16 +111,13 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param $label
-     * @param $aliases
-     *
      * @return string
      */
     public function generateAlias($label, &$aliases)
     {
         $alias = $this->cleanAlias($label, 'f_', 25);
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $testAlias = $alias;
 
         $count    = (int) in_array($alias, $aliases);

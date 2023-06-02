@@ -123,9 +123,6 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param $a
-     * @param $b
-     *
      * @return int
      */
     private function cmp($a, $b)
@@ -377,8 +374,6 @@ trait LeadDetailsTrait
 
     /**
      * Get company graph for points and engagements.
-     *
-     * @param $contacts
      *
      * @return mixed
      */

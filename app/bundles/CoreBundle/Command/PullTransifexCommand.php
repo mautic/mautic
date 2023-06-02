@@ -14,7 +14,6 @@ use Mautic\Transifex\Exception\InvalidConfigurationException;
 use Mautic\Transifex\Exception\ResponseException;
 use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
-use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -63,7 +62,7 @@ The command can optionally only pull files for a specific language with the --la
 
 <info>php %command.full_name% --language=<language_code></info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -88,8 +87,8 @@ EOT
         $translations = $transifex->getConnector(Translations::class);
         \assert($translations instanceof Translations);
 
-        /** @var SplQueue<Promise> $queue */
-        $queue = new SplQueue();
+        /** @var \SplQueue<Promise> $queue */
+        $queue = new \SplQueue();
 
         foreach ($files as $bundle => $stringFiles) {
             if ($bundleFilter && $bundle !== $bundleFilter) {

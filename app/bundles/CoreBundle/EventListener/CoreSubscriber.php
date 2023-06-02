@@ -148,10 +148,10 @@ class CoreSubscriber implements EventSubscriberInterface
             /** @var User $user */
             $user = $event->getAuthenticationToken()->getUser();
 
-            //set a session var for filemanager to know someone is logged in
+            // set a session var for filemanager to know someone is logged in
             $session->set('mautic.user', $user->getId());
 
-            //mark the user as last logged in
+            // mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
                 $this->userModel->getRepository()->setLastLogin($user);
@@ -171,7 +171,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $session->set('_locale', $locale);
             }
 
-            //dispatch on login events
+            // dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
                 $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
@@ -332,11 +332,6 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $type
-     * @param $name
-     * @param $details
-     */
     private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
     {
         // Set defaults and controller

@@ -95,7 +95,6 @@ class StatsEvent extends Event
     /**
      * StatsEvent constructor.
      *
-     * @param     $table
      * @param int $start
      * @param int $limit
      */
@@ -112,7 +111,6 @@ class StatsEvent extends Event
     /**
      * Returns if event is for this table.
      *
-     * @param                               $table
      * @param CommonRepository<object>|null $repository
      *
      * @return bool

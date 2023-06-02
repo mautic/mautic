@@ -40,34 +40,34 @@ class PublicController extends CommonFormController
         $return        = (isset($post['return'])) ? $post['return'] : false;
 
         if (empty($return)) {
-            //try to get it from the HTTP_REFERER
+            // try to get it from the HTTP_REFERER
             $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
         }
 
         if (!empty($return)) {
-            //remove mauticError and mauticMessage from the referer so it doesn't get sent back
+            // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
             $query  = (false === strpos($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;
 
-        //check to ensure there is a formId
+        // check to ensure there is a formId
         if (!isset($post['formId'])) {
             $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
         } else {
             $formModel = $this->getModel('form.form');
             $form      = $formModel->getEntity($post['formId']);
 
-            //check to see that the form was found
+            // check to see that the form was found
             if (null === $form) {
                 $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
-                //get what to do immediately after successful post
+                // get what to do immediately after successful post
                 $postAction         = $form->getPostAction();
                 $postActionProperty = $form->getPostActionProperty();
 
-                //check to ensure the form is published
+                // check to ensure the form is published
                 $status             = $form->getPublishStatus();
                 if ('pending' == $status) {
                     $error = $translator->trans(
@@ -406,10 +406,6 @@ class PublicController extends CommonFormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    /**
-     * @param $string
-     * @param $submissionEvent
-     */
     private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
     {
         if (empty($this->tokens)) {

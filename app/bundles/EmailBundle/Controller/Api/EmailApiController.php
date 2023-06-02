@@ -74,7 +74,7 @@ class EmailApiController extends CommonApiController
      */
     public function getEntitiesAction(Request $request, UserHelper $userHelper)
     {
-        //get parent level only
+        // get parent level only
         $this->listFilters[] = [
             'column' => 'e.variantParent',
             'expr'   => 'isNull',

@@ -2,9 +2,7 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-use Exception;
-
-abstract class FlattenableException extends Exception
+abstract class FlattenableException extends \Exception
 {
     /**
      * @return array{'message': string, 'file': string, 'line': int, 'trace': string}

@@ -18,9 +18,7 @@ trait CustomFieldsApiControllerTrait
     /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
-     * @param $parameters
      * @param Lead $entity
-     * @param $action
      *
      * @return mixed|void
      */
@@ -147,8 +145,8 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
-        //set the custom field values
-        //pull the data from the form in order to apply the form's formatting
+        // set the custom field values
+        // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
             $parameters[$f->getName()] = $f->getData();
         }
