@@ -480,19 +480,33 @@ JS;
         $lead   = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
-            $gaUserId      = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
-            $gaAnonymizeIp = $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
+
+            $gtagSettings = [];
+
+            if ($this->trackingHelper->getAnonymizeIp()) {
+                $gtagSettings['anonymize_ip'] = true;
+            }
+
+            if ($lead && $lead->getId()) {
+                $gtagSettings['user_id'] = $lead->getId();
+            }
+
+            if (count($gtagSettings) > 0) {
+                $gtagSettings = ', '.json_encode($gtagSettings);
+            } else {
+                $gtagSettings = '';
+            }
 
             $js .= <<<JS
-            dataLayer = window.dataLayer ? window.dataLayer : [];
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', '{$id}', 'auto');
-  {$gaAnonymizeIp}
-  {$gaUserId}
-  ga('send', 'pageview');
+a = document.createElement('script');
+a.async = 1;
+a.src = 'https://www.googletagmanager.com/gtag/js?id={$id}';
+document.getElementsByTagName('head')[0].appendChild(a);
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '{$id}'{$gtagSettings});
 JS;
         }
 
