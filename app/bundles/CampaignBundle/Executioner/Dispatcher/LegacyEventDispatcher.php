@@ -320,7 +320,7 @@ class LegacyEventDispatcher
     private function processFailedLog(LeadEventLog $log, PendingEvent $pendingEvent)
     {
         $this->logger->debug(
-            'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+            'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? '').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
         );
 
         $metadata = $log->getMetadata();

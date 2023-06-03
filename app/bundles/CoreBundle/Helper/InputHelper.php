@@ -202,7 +202,7 @@ class InputHelper
             $value = urldecode($value);
         }
 
-        return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        return filter_var($value, FILTER_UNSAFE_RAW, FILTER_FLAG_NO_ENCODE_QUOTES);
     }
 
     /**
