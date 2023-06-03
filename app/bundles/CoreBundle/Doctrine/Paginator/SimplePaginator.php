@@ -31,9 +31,9 @@ class SimplePaginator implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return iterable<mixed>
+     * @return \Traversable<T>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->query->getResult());
     }

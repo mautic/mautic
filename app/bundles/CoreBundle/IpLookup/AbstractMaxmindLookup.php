@@ -19,7 +19,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
-        return ['Authorization' => 'Basic '.base64_encode($this->auth)];
+        return ['Authorization' => 'Basic '.base64_encode($this->auth ?? '')];
     }
 
     /**

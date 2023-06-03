@@ -14,7 +14,7 @@ class ElFinderEnvVars implements EnvVarsInterface
         $absoluteImageFolderPath = $root.'/'.$relativeImageFolderPath;
         $envVars->set('MAUTIC_EL_FINDER_PATH', $absoluteImageFolderPath);
 
-        $url = rtrim($config->get('site_url'), '/').'/'.$relativeImageFolderPath;
+        $url = rtrim($config->get('site_url') ?? '', '/').'/'.$relativeImageFolderPath;
         $envVars->set('MAUTIC_EL_FINDER_URL', $url);
     }
 }

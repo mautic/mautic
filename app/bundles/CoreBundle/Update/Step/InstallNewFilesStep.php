@@ -94,7 +94,7 @@ final class InstallNewFilesStep implements StepInterface
     {
         if ($package = $this->input->getOption('update-package')) {
             if (!file_exists($package)) {
-                throw new UpdateFailedException($this->translator->trans('mautic.core.update.archive_no_such_file'));
+                throw new UpdateFailedException($this->translator->trans('mautic.core.update.archive_no_such_file') ?? '');
             }
 
             $this->progressBar->setMessage($this->translator->trans('mautic.core.command.update.step.loading_package').'                  ');

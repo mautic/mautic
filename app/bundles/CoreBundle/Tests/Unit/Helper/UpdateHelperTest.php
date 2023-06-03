@@ -410,8 +410,7 @@ class UpdateHelperTest extends TestCase
             ->willReturnCallback(
                 function (string $method, string $url, array $options) {
                     $request = $this->createMock(RequestInterface::class);
-
-                    throw new RequestException('something bad happened', $request, $this->response);
+                    throw new RequestException('something bad happened', $request, null);
                 }
             );
 
@@ -597,7 +596,7 @@ class UpdateHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('GET', $updateUrl)
-            ->willThrowException(new RequestException('bad', $this->createMock(RequestInterface::class), $this->response));
+            ->willThrowException(new RequestException('bad', $this->createMock(RequestInterface::class), null));
 
         $this->releaseParser->expects($this->never())
             ->method('getLatestSupportedRelease');
