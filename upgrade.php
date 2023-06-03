@@ -185,15 +185,15 @@ function get_local_config()
         // Include local config to get cache_path
         $localConfig = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
-        /** @var array<string> $parameters */
+        /** @var array<string, mixed> $parameters */
         $parameters = [];
         include $localConfig;
 
         $localParameters = $parameters;
 
-        //check for parameter overrides
+        // check for parameter overrides
         if (file_exists(MAUTIC_APP_ROOT.'/../local_config/parameters_local.php')) {
-            /** @var $parameters */
+            /** @var array<string, mixed> $parameters */
             include MAUTIC_APP_ROOT.'/../local_config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
