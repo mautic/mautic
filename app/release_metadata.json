@@ -1,8 +1,8 @@
 {
   "version": "5.0.0",
   "stability": "stable",
-  "minimum_php_version": "8.0.0",
-  "maximum_php_version": "8.0.99",
+  "minimum_php_version": "8.1.0",
+  "maximum_php_version": "8.1.99",
   "minimum_mysql_version": "5.7.14",
   "minimum_mariadb_version": "10.2.7",
   "show_php_version_warning_if_under": "8.0.0",

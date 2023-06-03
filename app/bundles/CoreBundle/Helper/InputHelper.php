@@ -237,7 +237,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', $value));
+        return trim(preg_replace($regex, '', $value ?? ''));
     }
 
     /**
@@ -403,6 +403,7 @@ class InputHelper
                 $val = self::html($val);
             }
         } else {
+            $value = $value ?? '';
             // Special handling for doctype
             $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
             // Special handling for CDATA tags

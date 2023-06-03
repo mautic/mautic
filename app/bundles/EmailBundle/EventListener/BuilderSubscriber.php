@@ -309,7 +309,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         $signatureText = $this->coreParametersHelper->get('default_signature_text');
         $fromName      = $this->coreParametersHelper->get('mailer_from_name');
-        $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
+        $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText ?? ''));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));

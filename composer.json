@@ -22,7 +22,8 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "^4.0",
+    "php-http/message-factory": "*"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.5",
@@ -141,7 +142,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.0.2"
+      "php": "8.1.17"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",
@@ -151,7 +152,8 @@
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
       "symfony/flex": true,
-      "phpstan/extension-installer": true
+      "phpstan/extension-installer": true,
+      "php-http/discovery": true
     }
   },
   "extra": {

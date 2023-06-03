@@ -104,7 +104,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         uasort(
             $data['columns'],
             function ($a, $b) {
-                return strnatcmp($a['label'], $b['label']);
+                return strnatcmp($a['label']?? '', $b['label']?? '');
             }
         );
 
