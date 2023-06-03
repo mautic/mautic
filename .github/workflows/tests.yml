@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0']
+        php-versions: ['8.1']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -50,7 +50,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.0' && matrix.db-types == 'mariadb'}}
+      if: ${{matrix.php-versions == '8.1' && matrix.db-types == 'mariadb'}}
       uses: actions/cache@v3
       with:
         path: ./var/cache/phpunit
@@ -89,14 +89,14 @@ jobs:
       run: |
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+        if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
         else
           composer test
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
@@ -125,7 +125,7 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
-        php-versions: ['8.0']
+        php-versions: ['8.1']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
