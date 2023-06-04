@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Php80\Rector\Class_\DoctrineAnnotationClassToAttributeRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
@@ -102,5 +103,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
             'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
         ],
+    ]);
+
+    $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
+        DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
     ]);
 };
