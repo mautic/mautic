@@ -167,11 +167,12 @@ jobs:
     - name: Install dependencies
       run: |
         composer validate
-        composer install --prefer-dist --no-progress --no-suggest
+        composer install --no-progress --no-suggest
     
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
+          export SYMFONY_ENV=dev
           bin/console cache:warmup --env=dev
           ls -la var/cache
           composer phpstan -- --no-progress
