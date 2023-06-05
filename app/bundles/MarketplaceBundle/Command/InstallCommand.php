@@ -27,7 +27,6 @@ class InstallCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME);
-        $this->setDescription('Installs a plugin that is available at Packagist.org');
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
         $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
 
@@ -75,6 +74,7 @@ class InstallCommand extends Command
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';
 }

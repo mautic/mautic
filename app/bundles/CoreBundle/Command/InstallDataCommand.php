@@ -27,7 +27,6 @@ class InstallDataCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:install:data')
-            ->setDescription('Installs Mautic with sample data')
             ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
@@ -56,7 +55,7 @@ EOT
             $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -114,6 +113,7 @@ EOT
             $this->translator->trans('mautic.core.command.install_data_success')
         );
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Installs Mautic with sample data';
 }
