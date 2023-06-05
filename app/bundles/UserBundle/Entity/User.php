@@ -392,6 +392,9 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     {
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function __serialize(): array
     {
         return [
@@ -410,6 +413,9 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return serialize($this->__serialize());
     }
 
+    /**
+     * @param array<int, mixed> $data
+     */
     public function __unserialize(array $data): void
     {
         [
