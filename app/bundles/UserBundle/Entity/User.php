@@ -424,7 +424,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->__unserialize(unserialize($serialized));
     }
