@@ -83,6 +83,7 @@ jobs:
       run: |
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
+        composer update --lock --no-progress --no-suggest
         rm -rf var/cache
         
     - name: Run tests - database = ${{ matrix.db-types }}
