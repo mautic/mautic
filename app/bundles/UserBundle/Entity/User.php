@@ -392,17 +392,33 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     {
     }
 
+    public function __serialize(): array
+    {
+        return [
+            $this->id,
+            $this->username,
+            $this->password,
+            $this->isPublished(),
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function serialize()
     {
-        return serialize([
+        return serialize($this->__serialize());
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [
             $this->id,
             $this->username,
             $this->password,
-            $this->isPublished(),
-        ]);
+            $published
+        ] = $data;
+        $this->setIsPublished($published);
     }
 
     /**
@@ -410,13 +426,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
      */
     public function unserialize($serialized)
     {
-        list(
-            $this->id,
-            $this->username,
-            $this->password,
-            $published
-        ) = unserialize($serialized);
-        $this->setIsPublished($published);
+        $this->__unserialize(unserialize($serialized));
     }
 
     /**
