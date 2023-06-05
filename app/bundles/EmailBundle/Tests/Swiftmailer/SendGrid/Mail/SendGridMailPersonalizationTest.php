@@ -4,9 +4,12 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
-use SendGrid\Email;
-use SendGrid\Mail;
-use SendGrid\Personalization;
+use SendGrid\Mail\Content;
+use SendGrid\Mail\From;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\Personalization;
+use SendGrid\Mail\Subject;
+use SendGrid\Mail\To;
 
 class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,21 +31,21 @@ class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
             ->method('getTo')
             ->willReturn($to);
 
-        $mail                  = new Mail('from', 'subject', 'to', 'content');
-        $mail->personalization = [];
+        //        $mail                  = new Mail('from', 'subject', 'to', 'content');
+        $mail = new Mail();
 
         $sendGridMailPersonalization->addPersonalizedDataToMail($mail, $message);
 
         $personalization = $mail->getPersonalizations();
-        $this->assertCount(1, $personalization);
+        $this->assertCount(2, $personalization);
 
         /**
          * @var Personalization
          */
-        $personalization = $personalization[0];
+        $personalization = $personalization[1];
         $tos             = $personalization->getTos();
         $to              = $tos[0];
-        $toExpected      = new Email('Name 1', 'info1@example.com');
+        $toExpected      = new To('info1@example.com', 'Name 1');
         $this->assertEquals($toExpected, $to);
     }
 
@@ -54,8 +57,7 @@ class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mail                  = new Mail('from', 'subject', 'to', 'content');
-        $mail->personalization = [];
+        $mail = new Mail();
 
         $to = [
             'info1@example.com' => 'Name 1',
@@ -84,28 +86,28 @@ class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
         $sendGridMailPersonalization->addPersonalizedDataToMail($mail, $message);
 
         $personalization = $mail->getPersonalizations();
-        $this->assertCount(2, $personalization);
+        $this->assertCount(3, $personalization);
 
-        $ccExpected = new Email('Name cc', 'cc@example.com');
+        $ccExpected = new To('cc@example.com', 'Name cc');
 
         /**
          * @var Personalization
          * @var Personalization $personalization2
          */
-        $personalization1 = $personalization[0];
+        $personalization1 = $personalization[1];
         $tos              = $personalization1->getTos();
         $to               = $tos[0];
-        $toExpected       = new Email('Name 1', 'info1@example.com');
+        $toExpected       = new To('info1@example.com', 'Name 1');
         $this->assertEquals($toExpected, $to);
 
         $ccs = $personalization1->getCcs();
         $cc  = $ccs[0];
         $this->assertEquals($ccExpected, $cc);
 
-        $personalization2 = $personalization[1];
+        $personalization2 = $personalization[2];
         $tos              = $personalization2->getTos();
         $to               = $tos[0];
-        $toExpected       = new Email('Name 2', 'info2@example.com');
+        $toExpected       = new To('info2@example.com', 'Name 2');
         $this->assertEquals($toExpected, $to);
 
         $ccs = $personalization2->getCcs();

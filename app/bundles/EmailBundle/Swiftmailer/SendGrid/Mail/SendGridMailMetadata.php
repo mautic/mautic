@@ -2,10 +2,10 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
-use SendGrid\BccSettings;
-use SendGrid\Mail;
-use SendGrid\MailSettings;
-use SendGrid\ReplyTo;
+use SendGrid\Mail\BccSettings;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\MailSettings;
+use SendGrid\Mail\ReplyTo;
 
 class SendGridMailMetadata
 {

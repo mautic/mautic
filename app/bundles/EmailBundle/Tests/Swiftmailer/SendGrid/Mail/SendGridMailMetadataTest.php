@@ -4,9 +4,13 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use SendGrid\BccSettings;
-use SendGrid\Mail;
-use SendGrid\MailSettings;
-use SendGrid\ReplyTo;
+use SendGrid\Mail\Content;
+use SendGrid\Mail\From;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\MailSettings;
+use SendGrid\Mail\ReplyTo;
+use SendGrid\Mail\Subject;
+use SendGrid\Mail\To;
 
 class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
@@ -51,7 +55,12 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
             ->method('getHeaders')
             ->willReturn($headers);
 
-        $mail = new Mail('from', 'subject', 'to', 'content');
+        $mail = new Mail(
+            new From('email@example.com'),
+            new To('nobody@email.com'),
+            new Subject('subject'),
+            new Content('content')
+        );
 
         $sendGridMailMetadata->addMetadataToMail($mail, $message);
 

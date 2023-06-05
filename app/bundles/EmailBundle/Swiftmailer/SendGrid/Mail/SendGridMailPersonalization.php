@@ -3,9 +3,9 @@
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use SendGrid\Email;
-use SendGrid\Mail;
-use SendGrid\Personalization;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\Personalization;
+use SendGrid\Mail\To;
 
 class SendGridMailPersonalization
 {
@@ -14,7 +14,7 @@ class SendGridMailPersonalization
         if (!$message instanceof MauticMessage) { // Used for "Send test email" in settings
             foreach ($message->getTo() as $recipientEmail => $recipientName) {
                 $personalization = new Personalization();
-                $to              = new Email($recipientName, $recipientEmail);
+                $to              = new To($recipientEmail, $recipientName);
                 $personalization->addTo($to);
                 $mail->addPersonalization($personalization);
             }
@@ -25,7 +25,7 @@ class SendGridMailPersonalization
         $metadata = $message->getMetadata();
         $ccEmail  = $message->getCc();
         if ($ccEmail) {
-            $cc = new Email(current($ccEmail), key($ccEmail));
+            $cc = new To(key($ccEmail), current($ccEmail));
         }
         foreach ($message->getTo() as $recipientEmail => $recipientName) {
             if (empty($metadata[$recipientEmail])) {
@@ -33,7 +33,7 @@ class SendGridMailPersonalization
                 continue;
             }
             $personalization = new Personalization();
-            $to              = new Email($recipientName, $recipientEmail);
+            $to              = new To($recipientEmail, $recipientName);
             $personalization->addTo($to);
 
             if (isset($cc)) {

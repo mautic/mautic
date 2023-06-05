@@ -3,8 +3,8 @@
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use SendGrid\Attachment;
-use SendGrid\Mail;
+use SendGrid\Mail\Attachment;
+use SendGrid\Mail\Mail;
 
 class SendGridMailAttachment
 {

@@ -4,8 +4,12 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
-use SendGrid\Content;
-use SendGrid\Email;
+use SendGrid\Mail\Content;
+use SendGrid\Mail\From;
+use SendGrid\Mail\Personalization;
+use SendGrid\Mail\Subject;
+
+// use SendGrid\Mail\
 
 class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,6 +27,10 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        //        $subject = $this->getMockBuilder(Subject::class)
+        // //            ->disableOriginalConstructor()
+        //            ->getMock();
 
         $message->expects($this->once())
             ->method('getFrom')
@@ -51,13 +59,14 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 
         $mail = $sendGridMailBase->getSendGridMail($message);
 
-        $personalizations = $mail->getPersonalizations();
-        $this->assertSame([], $personalizations);
+        $this->assertSame(1, $mail->getPersonalizationCount());
+        $this->assertInstanceOf(Personalization::class, $mail->getPersonalizations()[0]);
 
-        $from = new Email('My name', 'email@example.com');
+        $from = new From('email@example.com', 'My name');
         $this->assertEquals($from, $mail->getFrom());
 
-        $this->assertSame('My subject', $mail->getSubject());
+        $subject = new Subject('My subject');
+        $this->assertSame($subject, $mail->getSubject());
 
         $contents = $mail->getContents();
         $this->assertCount(2, $contents);
@@ -113,10 +122,11 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 
         $mail = $sendGridMailBase->getSendGridMail($message);
 
-        $personalizations = $mail->getPersonalizations();
-        $this->assertSame([], $personalizations);
+        //        $personalizations = $mail->getPersonalizations();
+        $this->assertSame(1, $mail->getPersonalizationCount());
+        $this->assertInstanceOf(Personalization::class, $mail->getPersonalizations()[0]);
 
-        $from = new Email('My name', 'email@example.com');
+        $from = new From('email@example.com', 'My name');
         $this->assertEquals($from, $mail->getFrom());
 
         $this->assertSame('My subject', $mail->getSubject());
@@ -167,10 +177,10 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 
         $mail = $sendGridMailBase->getSendGridMail($message);
 
-        $personalizations = $mail->getPersonalizations();
-        $this->assertSame([], $personalizations);
+        $this->assertSame(1, $mail->getPersonalizationCount());
+        $this->assertInstanceOf(Personalization::class, $mail->getPersonalizations()[0]);
 
-        $from = new Email('My name', 'email@example.com');
+        $from = new From('email@example.com', 'My name');
         $this->assertEquals($from, $mail->getFrom());
 
         $this->assertSame('My subject', $mail->getSubject());
