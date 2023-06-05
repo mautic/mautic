@@ -389,12 +389,12 @@ export default class BuilderService {
       window.MauticGrapesJsPlugins.forEach((item) => {
         if (!item.context || !Array.isArray(item.context) || item.context.length === 0) {
           // if no context is given, the plugin is always added
-          pluginOptions[item.name] = item.pluginsOpts ?? {};
+          pluginOptions[item.name] = item.pluginOptions ?? {};
         } else {
           // check if the plugin should be added for the current editor context
           item.context.forEach((pluginContext) => {
             if (pluginContext === context) {
-              pluginOptions[item.name] = item.pluginsOpts ?? {};
+              pluginOptions[item.name] = item.pluginOptions ?? {};
             }
           })
         }
