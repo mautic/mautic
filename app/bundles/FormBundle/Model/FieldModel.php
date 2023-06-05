@@ -111,9 +111,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return string
+     * @param string[] $aliases
      */
-    public function generateAlias($label, &$aliases)
+    public function generateAlias(string $label, array &$aliases): string
     {
         $alias = $this->cleanAlias($label, 'f_', 25);
 
