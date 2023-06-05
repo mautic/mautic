@@ -116,8 +116,7 @@ EOT
      */
     private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
     {
-        $this->filesystem->copy("{$nodeModulesDir}/ckeditor4/ckeditor.js", "{$assetsDir}/js/ckeditor4/ckeditor.js");
-        $this->filesystem->copy("{$nodeModulesDir}/ckeditor4/adapters/jquery.js", "{$assetsDir}/js/ckeditor4/adapters/jquery.js");
+        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
         $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
         $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
     }
