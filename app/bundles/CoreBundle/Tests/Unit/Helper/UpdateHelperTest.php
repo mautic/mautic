@@ -85,6 +85,7 @@ class UpdateHelperTest extends TestCase
         $this->response
             ->method('getBody')
             ->willReturn($this->streamBody);
+        $this->response->method('getStatusCode')->willReturn(200);
         $this->client = $this->createMock(Client::class);
 
         $this->helper = new UpdateHelper(
