@@ -5777,7 +5777,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "061b48f2b0897bf414b32056f1d71a0fb3bf1301"
+                "reference": "7dcbb23cd0d48577a9df709090fdadfa03c3f9ba"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5825,7 +5825,7 @@
                 "predis/predis": "^1.1",
                 "ramsey/uuid": "^4.7",
                 "sendgrid/sendgrid": "~6.0",
-                "simshaun/recurr": "^3.0",
+                "simshaun/recurr": "^5.0",
                 "sparkpost/sparkpost": "^2.3",
                 "stack/builder": "^1.0",
                 "symfony/asset": "~5.4.0",
@@ -8670,24 +8670,25 @@
         },
         {
             "name": "simshaun/recurr",
-            "version": "v3.1.1",
+            "version": "v5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simshaun/recurr.git",
-                "reference": "2702aedc996d4c6520731a1661ab4dc2501799a4"
+                "reference": "6887b7bd7075de97c8c69835e0939ff68d23c47e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simshaun/recurr/zipball/2702aedc996d4c6520731a1661ab4dc2501799a4",
-                "reference": "2702aedc996d4c6520731a1661ab4dc2501799a4",
+                "url": "https://api.github.com/repos/simshaun/recurr/zipball/6887b7bd7075de97c8c69835e0939ff68d23c47e",
+                "reference": "6887b7bd7075de97c8c69835e0939ff68d23c47e",
                 "shasum": ""
             },
             "require": {
-                "doctrine/collections": "~1.3",
-                "php": ">=5.5.0"
+                "doctrine/collections": "~1.6",
+                "php": "^7.2||^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.5"
+                "phpunit/phpunit": "^8.5.16",
+                "symfony/yaml": "^5.3"
             },
             "type": "library",
             "extra": {
@@ -8697,8 +8698,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Recurr\\": "src/Recurr/",
-                    "Recurr\\Test\\": "tests/"
+                    "Recurr\\": "src/Recurr/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -8708,8 +8708,8 @@
             "authors": [
                 {
                     "name": "Shaun Simmons",
-                    "email": "shaun@envysphere.com",
-                    "homepage": "http://envysphere.com"
+                    "email": "shaun@shaun.pub",
+                    "homepage": "https://shaun.pub"
                 }
             ],
             "description": "PHP library for working with recurrence rules",
@@ -8723,9 +8723,9 @@
             ],
             "support": {
                 "issues": "https://github.com/simshaun/recurr/issues",
-                "source": "https://github.com/simshaun/recurr/tree/master"
+                "source": "https://github.com/simshaun/recurr/tree/v5.0.1"
             },
-            "time": "2019-01-03T18:08:41+00:00"
+            "time": "2022-09-09T05:37:22+00:00"
         },
         {
             "name": "sparkpost/sparkpost",
