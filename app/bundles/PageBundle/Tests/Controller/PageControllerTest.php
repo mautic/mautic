@@ -185,6 +185,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $page->setAlias($alias);
         $page->setIsPublished($isPublished);
         $page->setTemplate($template);
+        $page->setCustomHtml('some content');
 
         $this->em->persist($page);
         $this->em->flush();
