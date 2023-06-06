@@ -1027,12 +1027,15 @@ class PageModel extends FormModel
     {
         $query             = [];
         $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
-        parse_str($urlQuery, $urlQueryArray);
 
-        foreach ($urlQueryArray as $key => $value) {
-            if (is_string($value)) {
-                $key         = strtolower($key);
-                $query[$key] = urldecode($value);
+        if (is_string($urlQuery)) {
+            parse_str($urlQuery, $urlQueryArray);
+
+            foreach ($urlQueryArray as $key => $value) {
+                if (is_string($value)) {
+                    $key         = strtolower($key);
+                    $query[$key] = urldecode($value);
+                }
             }
         }
 
