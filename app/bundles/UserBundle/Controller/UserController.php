@@ -13,7 +13,7 @@ use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
@@ -104,7 +104,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder)
+    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
         if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
@@ -133,7 +133,7 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
+                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
@@ -187,7 +187,7 @@ class UserController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $languageHelper, $encoder, $user->getId(), true);
+                return $this->editAction($request, $languageHelper, $hasher, $user->getId(), true);
             }
         }
 
@@ -210,7 +210,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();
@@ -263,7 +263,7 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
+                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data

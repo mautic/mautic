@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class ProfileController.
@@ -19,7 +19,7 @@ class ProfileController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder)
+    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
         // get current user
         $me    = $this->get('security.token_storage')->getToken()->getUser();
@@ -148,7 +148,7 @@ class ProfileController extends FormController
             // check to see if the password needs to be rehashed
             $formUser              = $request->request->get('user') ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            $overrides['password'] = $model->checkNewPassword($me, $hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {

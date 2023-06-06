@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Php80\Rector\Class_\DoctrineAnnotationClassToAttributeRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
@@ -19,7 +20,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             \Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
                 __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
                 __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
-                __DIR__.'/app/bundles/CoreBundle/Helper/TemplatingHelper.php', // Will be removed once Twig refactoring is done.
             ],
         ]
     );
@@ -40,7 +40,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
@@ -102,5 +102,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
             'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
         ],
+    ]);
+
+    $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
+        DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
     ]);
 };

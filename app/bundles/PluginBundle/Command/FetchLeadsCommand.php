@@ -32,7 +32,6 @@ class FetchLeadsCommand extends Command
                     'mautic:integration:synccontacts',
                 ]
             )
-            ->setDescription('Fetch leads from integration.')
             ->addOption(
                 '--integration',
                 '-i',
@@ -291,6 +290,7 @@ class FetchLeadsCommand extends Command
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch leads from integration.';
 }
