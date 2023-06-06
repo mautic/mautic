@@ -114,6 +114,7 @@ CONTENT
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
         $mailHelper->message->setBody($email->getCustomHtml());
+        $mailHelper->message->setSubject($email->getSubject());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
         $parsedBody = $mailHelper->message->getBody();
