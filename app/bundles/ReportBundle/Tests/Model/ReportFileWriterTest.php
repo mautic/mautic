@@ -98,6 +98,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
 
+        $report->setName('Report A');
+
         $exportHandler->expects($this->once())
             ->method('getPath');
 

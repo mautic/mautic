@@ -204,14 +204,9 @@ class InputHelper
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param string       $value
-     * @param bool|false   $urldecode
-     * @param string|false $convertSpacesTo
-     * @param array        $allowedCharacters
-     *
-     * @return string
+     * @param string[] $allowedCharacters
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
+    public static function alphanum(string $value, bool $urldecode = false, ?string $convertSpacesTo = null, array $allowedCharacters = []): string
     {
         if ($urldecode) {
             $value = urldecode($value);
