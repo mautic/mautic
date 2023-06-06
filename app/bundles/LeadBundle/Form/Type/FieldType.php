@@ -279,7 +279,7 @@ class FieldType extends AbstractType
                             'required'   => false,
                             'choices'    => array_flip($list),
                             'multiple'   => 'multiselect' === $type,
-                            'data'       => 'multiselect' === $type ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'data'       => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
                             'disabled'   => $disableDefaultValue,
                         ]
                     );
