@@ -2,14 +2,13 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
@@ -444,7 +443,7 @@ class EmailRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -537,30 +536,54 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param VariantEntityInterface|FormEntity $parent
+     * Clones email list cross-reference records and updates child emails to match the parent email.
+     *
+     * @param Email $parent the parent email entity
      */
-    public function clonePublishStatusToChildren($parent)
+    public function cloneFromParentToVariant(Email $parent): void
     {
-        $conn = $this->getEntityManager()->getConnection();
+        $connection = $this->getEntityManager()->getConnection();
+        $tableName  = MAUTIC_TABLE_PREFIX.'email_list_xref';
+        $idsArray   = array_map('intval', (array) $parent->getOnlyChildrenRelatedEntityIds());
 
-        $sql = '
-            UPDATE '.MAUTIC_TABLE_PREFIX.'emails e
-            JOIN  '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id
-            SET e.is_published = :isPublished,
-                e.publish_up = :publishUp,
-                e.publish_down = :publishDown
-            WHERE parent.id = :parentId
-        ';
+        // Delete existing cross-reference records for child emails.
+        $connection->createQueryBuilder()
+            ->delete($tableName)
+            ->where('email_id IN (:ids)')
+            ->setParameter('ids', $idsArray, Connection::PARAM_INT_ARRAY)
+            ->execute();
 
-        $stmt        = $conn->prepare($sql);
+        // Add new cross-reference records for child emails.
+        foreach ($idsArray as $newEmailId) {
+            foreach ($parent->getLists()->toArray() as $listId => $parentList) {
+                $connection->executeStatement(
+                    'INSERT INTO  email_list_xref  ( email_id ,  leadlist_id ) VALUES (:new_email_id, :list_id);',
+                    [
+                        'new_email_id' => $newEmailId,
+                        'list_id'      => $listId,
+                    ]
+                );
+            }
+        }
+
+        // Update child emails to match the parent email's publish status.
+        $sql = ' 
+        UPDATE '.MAUTIC_TABLE_PREFIX.'emails e 
+        JOIN '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id 
+        SET e.is_published = :is_published, 
+            e.publish_up = :publish_up, 
+            e.publish_down = :publish_down 
+        WHERE parent.id = :parent_id 
+    ';
+        $stmt        = $connection->prepare($sql);
         $id          = $parent->getId();
         $isPublished = (int) $parent->getIsPublished();
-        $stmt->bindParam('parentId', $id);
-        $stmt->bindParam('isPublished', $isPublished);
+        $stmt->bindParam('parent_id', $id);
+        $stmt->bindParam('is_published', $isPublished);
         $publishUp = $parent->getPublishUp() ? $parent->getPublishUp()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
-        $stmt->bindParam('publishUp', $publishUp);
+        $stmt->bindParam('publish_up', $publishUp);
         $publishDown = $parent->getPublishDown() ? $parent->getPublishDown()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
-        $stmt->bindParam('publishDown', $publishDown);
+        $stmt->bindParam('publish_down', $publishDown);
         $stmt->executeQuery();
     }
 

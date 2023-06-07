@@ -60,7 +60,7 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::EMAIL_PRE_SAVE       => ['onEmailPreSave', 0],
+            EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailData', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
@@ -69,10 +69,10 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailPreSave(Events\EmailEvent $event)
+    public function cloneParentEmailData(Events\EmailEvent $event)
     {
         if ($event->getEmail()->isVariant()) {
-            $this->emailModel->clonePublishStatusToChildren($event->getEmail());
+            $this->emailModel->cloneFromParentToVariant($event->getEmail());
         }
     }
 
@@ -145,13 +145,13 @@ class EmailSubscriber implements EventSubscriberInterface
 
                 $retries = $stat->getRetryCount();
                 if ($retries > 3) {
-                    //tried too many times so just fail
+                    // tried too many times so just fail
                     $reason = $this->translator->trans('mautic.email.dnc.retries', [
                         '%subject%' => EmojiHelper::toShort($message->getSubject()),
                     ]);
                     $this->emailModel->setDoNotContact($stat, $reason);
                 } else {
-                    //set it to try again
+                    // set it to try again
                     $event->tryAgain();
                 }
 
