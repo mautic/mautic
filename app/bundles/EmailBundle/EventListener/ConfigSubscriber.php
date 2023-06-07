@@ -62,7 +62,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'formType'   => ConfigType::class,
             'formAlias'  => 'emailconfig',
             'formTheme'  => '@MauticEmail/FormTheme/Config/_config_emailconfig_widget.html.twig',
-            'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
+            'parameters' => $this->getParameters($event),
         ]);
     }
 
