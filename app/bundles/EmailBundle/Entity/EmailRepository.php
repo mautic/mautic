@@ -542,49 +542,42 @@ class EmailRepository extends CommonRepository
      */
     public function cloneFromParentToVariant(Email $parent): void
     {
-        $connection = $this->getEntityManager()->getConnection();
-        $tableName  = MAUTIC_TABLE_PREFIX.'email_list_xref';
-        $idsArray   = array_map('intval', (array) $parent->getOnlyChildrenRelatedEntityIds());
-
+        $connection    = $this->getEntityManager()->getConnection();
+        $tableName     = MAUTIC_TABLE_PREFIX.'email_list_xref';
+        $childrenIds   = array_map('intval', (array) $parent->getOnlyChildrenRelatedEntityIds());
         // Delete existing cross-reference records for child emails.
         $connection->createQueryBuilder()
             ->delete($tableName)
             ->where('email_id IN (:ids)')
-            ->setParameter('ids', $idsArray, Connection::PARAM_INT_ARRAY)
+            ->setParameter('ids', $childrenIds, Connection::PARAM_INT_ARRAY)
             ->execute();
 
         // Add new cross-reference records for child emails.
-        foreach ($idsArray as $newEmailId) {
+        foreach ($childrenIds as $children) {
             foreach ($parent->getLists()->toArray() as $listId => $parentList) {
                 $connection->executeStatement(
-                    'INSERT INTO  email_list_xref  ( email_id ,  leadlist_id ) VALUES (:new_email_id, :list_id);',
+                    'INSERT INTO '.MAUTIC_TABLE_PREFIX.'email_list_xref (email_id, leadlist_id) VALUES (:new_email_id, :list_id);',
                     [
-                        'new_email_id' => $newEmailId,
+                        'new_email_id' => $children,
                         'list_id'      => $listId,
                     ]
                 );
             }
         }
-
         // Update child emails to match the parent email's publish status.
-        $sql = ' 
-        UPDATE '.MAUTIC_TABLE_PREFIX.'emails e 
-        JOIN '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id 
-        SET e.is_published = :is_published, 
-            e.publish_up = :publish_up, 
-            e.publish_down = :publish_down 
-        WHERE parent.id = :parent_id 
-    ';
-        $stmt        = $connection->prepare($sql);
-        $id          = $parent->getId();
-        $isPublished = (int) $parent->getIsPublished();
-        $stmt->bindParam('parent_id', $id);
-        $stmt->bindParam('is_published', $isPublished);
-        $publishUp = $parent->getPublishUp() ? $parent->getPublishUp()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
-        $stmt->bindParam('publish_up', $publishUp);
-        $publishDown = $parent->getPublishDown() ? $parent->getPublishDown()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
-        $stmt->bindParam('publish_down', $publishDown);
-        $stmt->executeQuery();
+        $connection->executeStatement('  
+        UPDATE '.MAUTIC_TABLE_PREFIX.'emails e  
+        JOIN '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id  
+        SET e.is_published = :is_published,  
+            e.publish_up = :publish_up,  
+            e.publish_down = :publish_down  
+        WHERE parent.id = :parent_id  
+    ', [
+            'parent_id'      => $parent->getId(),
+            'is_published'   => (int) $parent->getIsPublished(),
+            'publish_up'     => $parent->getPublishUp() ? $parent->getPublishUp()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null,
+            'publish_down'   => $parent->getPublishDown() ? $parent->getPublishDown()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null,
+        ]);
     }
 
     /**
