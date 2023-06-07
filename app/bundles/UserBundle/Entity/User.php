@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class User extends FormEntity implements UserInterface, \Serializable, EquatableInterface, PasswordAuthenticatedUserInterface
+class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @var int
@@ -406,14 +406,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize($this->__serialize());
-    }
-
-    /**
      * @param array<int, mixed> $data
      */
     public function __unserialize(array $data): void
@@ -425,14 +417,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
             $published
         ] = $data;
         $this->setIsPublished($published);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized): void
-    {
-        $this->__unserialize(unserialize($serialized));
     }
 
     /**
