@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FocusApiControllerTest extends MauticMysqlTestCase
 {
+    /**
+     * @var array<string,mixed>
+     */
     private array $testPayload = [
         'name'       => 'test',
         'type'       => 'notice',
