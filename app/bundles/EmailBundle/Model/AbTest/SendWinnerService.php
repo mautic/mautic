@@ -121,7 +121,6 @@ class SendWinnerService
             $this->emailModel->convertWinnerVariant($winner);
 
             // send winner email
-            $this->emailModel->sendEmailToLists($winner);
             $this->addOutputMessage('Winner email '.$winner->getId().' has been sent to remaining contacts.');
         }
     }
