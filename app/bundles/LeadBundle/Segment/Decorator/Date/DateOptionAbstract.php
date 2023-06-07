@@ -9,6 +9,10 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 abstract class DateOptionAbstract implements FilterDecoratorInterface
 {
+    public const Y_M_D       = 'Y-m-d';
+
+    public const Y_M_D_H_I_S = 'Y-m-d H:i:s';
+
     /**
      * @var DateDecorator
      */
@@ -101,8 +105,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
 
         $this->modifyBaseDate($dateTimeHelper);
 
-        $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
-
+        $dateFormat = $this->dateOptionParameters->hasTimePart() ? self::Y_M_D_H_I_S : self::Y_M_D;
         if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getValueForBetweenRange($dateTimeHelper);
         }
@@ -113,7 +116,11 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
             $dateTimeHelper->modify($modifier);
         }
 
-        return $dateTimeHelper->toLocalString($dateFormat);
+        if (!$this->dateOptionParameters->hasTimePart()) {
+            return $dateTimeHelper->getString($dateFormat);
+        }
+
+        return $dateTimeHelper->toUtcString($dateFormat);
     }
 
     /**

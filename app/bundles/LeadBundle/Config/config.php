@@ -814,9 +814,6 @@ return [
             ],
             'mautic.lead.model.lead_segment.timezoneResolver' => [
                 'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
             ],
             'mautic.lead.provider.fillterOperator' => [
                 'class'     => \Mautic\LeadBundle\Provider\FilterOperatorProvider::class,
@@ -913,7 +910,7 @@ return [
             'mautic.lead.factory.device_detector_factory' => [
                 'class'     => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
                 'arguments' => [
-                  'mautic.cache.provider',
+                    'mautic.cache.provider',
                 ],
             ],
             'mautic.lead.service.contact_tracking_service' => [

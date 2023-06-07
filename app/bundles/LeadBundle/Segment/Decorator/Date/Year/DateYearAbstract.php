@@ -21,7 +21,18 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $dateTimeHelper->toLocalString('Y-%');
+        if (!$this->dateOptionParameters->hasTimePart()) {
+            return $dateTimeHelper->getString('Y-%');
+        }
+
+        $dateFormat = 'Y-m-d H:i:s';
+        $startWith  = $dateTimeHelper->toUtcString($dateFormat);
+
+        $modifier = $this->getModifierForBetweenRange().' -1 second';
+        $dateTimeHelper->modify($modifier);
+        $endWith = $dateTimeHelper->toUtcString($dateFormat);
+
+        return [$startWith, $endWith];
     }
 
     /**
@@ -29,6 +40,10 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
+        if ($this->dateOptionParameters->hasTimePart()) {
+            return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notBetween' : 'between';
+        }
+
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
 }

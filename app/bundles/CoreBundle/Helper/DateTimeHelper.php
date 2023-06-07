@@ -42,7 +42,7 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $string
-     * @param string                    $fromFormat Format the string is in
+     * @param string|null               $fromFormat Format the string is in
      * @param string                    $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
@@ -53,7 +53,7 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
+     * @param string|null               $fromFormat
      * @param string                    $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')

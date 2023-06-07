@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Day;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
@@ -61,7 +62,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper(DateDayYesterday::MIDNIGHT_YESTERDAY);
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
@@ -75,7 +76,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2018-03-01%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D).'%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
     /**
@@ -86,7 +87,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper(DateDayYesterday::MIDNIGHT_YESTERDAY);
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
@@ -100,6 +101,31 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('2018-03-01', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    public function testGetParameterValueBetweenDateTimeTimezone(): void
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $date = new DateTimeHelper(DateDayYesterday::MIDNIGHT_YESTERDAY, null, 'Europe/Paris');
+
+        $timezoneResolver->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => '!=',
+            'type'     => 'datetime',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+        $filterDecorator           = new DateDayYesterday($dateDecorator, $dateOptionParameters);
+
+        $startDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $date->modify('+1 day -1 second');
+        $endDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $this->assertEquals([$startDate, $endDate], $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

@@ -6,11 +6,13 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class DateDayTomorrow extends DateDayAbstract
 {
+    public const MIDNIGHT_TOMORROW = 'midnight tomorrow';
+
     /**
      * {@inheritdoc}
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->modify('+1 day');
+        $dateTimeHelper->setDateTime(self::MIDNIGHT_TOMORROW, null);
     }
 }
