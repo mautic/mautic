@@ -190,7 +190,7 @@ class AjaxController extends CommonAjaxController
             $settings = $request->request->all();
 
             /** @var TransportWrapper $transportWrapper */
-            $transportWrapper = $this->container->get('mautic.email.transport_wrapper');
+            $transportWrapper = $this->get('mautic.email.transport_wrapper');
 
             try {
                 /** @var TestConnectionInterface $extension */
@@ -286,5 +286,16 @@ class AjaxController extends CommonAjaxController
         }
 
         return new JsonResponse($data);
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'mautic.email.transport_wrapper'   => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
+                'mautic.email.mailer.email_sender' => \Mautic\EmailBundle\Mailer\EmailSender::class,
+            ]
+        );
     }
 }

@@ -420,7 +420,7 @@ class PublicController extends CommonFormController
         ignore_user_abort(true);
 
         /** @var TransportWrapper $realTransport */
-        $realTransport = $this->container->get('mautic.email.transport_wrapper');
+        $realTransport = $this->get('mautic.email.transport_wrapper');
         if (!$realTransport->isSupportCallback($transport)) {
             return $this->notFound();
         }
@@ -747,6 +747,16 @@ class PublicController extends CommonFormController
                 $stat->getEmailAddress(),
             ],
             $message
+        );
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'mautic.email.transport_wrapper' => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
+            ]
         );
     }
 }

@@ -280,7 +280,7 @@ class ConfigType extends AbstractType
                 'label'             => 'mautic.email.config.mailer.transport',
                 'required'          => false,
                 'attr'              => [
-                    'class'    => 'form-control',
+                    'class'    => 'form-control  used-in-test',
                     'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
