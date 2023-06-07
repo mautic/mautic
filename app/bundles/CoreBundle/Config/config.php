@@ -946,7 +946,7 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
-        'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
+        'rememberme_key'                  => '%mautic.secret_key%',
         'rememberme_lifetime'             => 31536000, // 365 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
