@@ -179,12 +179,12 @@ return [
                 ],
             ],
             'mautic.security.logout_handler' => [
-                'class'     => \Mautic\UserBundle\EventListener\LogoutListener::class,
+                'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
                 'tagArguments' => [
-                    'event'      => 'Symfony\Component\Security\Http\Event\LogoutEvent'                  
-                ],                
+                    'event'      => 'Symfony\Component\Security\Http\Event\LogoutEvent',
+                ],
                 'tag'          => 'kernel.event_listener',
-                'arguments' => [
+                'arguments'    => [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
