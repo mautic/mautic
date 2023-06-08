@@ -408,7 +408,7 @@ class UserController extends FormController
      *
      * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, EmailSender $emailSender, $objectId) 
+    public function contactAction(Request $request, SerializerInterface $serializer, EmailSender $emailSender, $objectId)
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
