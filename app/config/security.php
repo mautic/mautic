@@ -74,9 +74,6 @@ $firewalls = [
             'check_path'           => '/s/login_check',
         ],
         'logout' => [
-            'handlers' => [
-                'mautic.security.logout_handler',
-            ],
             'path'   => '/s/logout',
             'target' => '/s/login',
         ],
