@@ -56,7 +56,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $excelExporter->expects($this->once())
             ->method('export')
-            ->with($reportDataResult, (new \DateTime())->format('Y-m-d') . '_test', 'tmp/test.xlsx')
+            ->with($reportDataResult, (new \DateTime())->format('Y-m-d').'_test', 'tmp/test.xlsx')
             ->willReturn($handler);
 
         $reportFileWriter = new ReportFileWriter($csvExporter, $excelExporter, $exportHandler);
@@ -156,10 +156,14 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $report    = new Report();
-        $scheduler = new Scheduler($report, new \DateTime());
+        $report->setName('my report');
+        $report->setScheduleFormat('xlsx');
+        $date      = new \DateTime();
+        $scheduler = new Scheduler($report, $date);
 
         $exportHandler->expects($this->once())
-            ->method('getPath');
+            ->method('getPath')
+            ->willReturn("/tmp/{$date->format('Y-m-d')}_my-report.csv");
 
         $reportFileWriter = new ReportFileWriter($csvExporter, $excelExporter, $exportHandler);
 
