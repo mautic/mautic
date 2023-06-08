@@ -80,7 +80,7 @@
     "sparkpost/sparkpost": "^2.3",
     "lightsaml/sp-bundle": "dev-symfony5",
     "php-amqplib/rabbitmq-bundle": "^2.5.1",
-    "simshaun/recurr": "^3.0",
+    "simshaun/recurr": "^5.0",
     "ramsey/uuid": "^4.7",
     "sendgrid/sendgrid": "~6.0",
     "noxlogic/ratelimit-bundle": "^1.19",
