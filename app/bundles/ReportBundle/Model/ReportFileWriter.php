@@ -36,18 +36,16 @@ class ReportFileWriter
      */
     public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
     {
-        $filePath = $this->getFilePath($scheduler);
         switch ($scheduler->getReport()->getScheduleFormat()) {
           case 'csv':
-            $this->exportCsv($scheduler, $reportDataResult);
+            $this->exportCsv($scheduler, $reportDataResult, $reportExportOptions);
             break;
           case 'xlsx':
+            $filePath = $this->getFilePath($scheduler);
             $name = $this->getName($scheduler, $reportExportOptions);
             $this->excelExporter->export($reportDataResult, $name, $filePath);
             break;
         }
-
-        return $filePath;
     }
 
     public function clear(Scheduler $scheduler)
@@ -80,11 +78,11 @@ class ReportFileWriter
         return $dateString.'_'.InputHelper::alphanum($reportName, false, '-').'.'.$this->getSuffix($scheduler);
     }
 
-    private function exportCsv($scheduler, $reportDataResult)
+    private function exportCsv($scheduler, $reportDataResult, ReportExportOptions $reportExportOptions)
     {
         $fileName = $this->getFileName($scheduler);
         $handler  = $this->exportHandler->getHandler($fileName);
-        $this->csvExporter->export($reportDataResult, $handler);
+        $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
         $this->exportHandler->closeHandler($handler);
     }
 

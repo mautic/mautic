@@ -25,7 +25,7 @@ class ReportDataResult
     private $types = [];
 
     /**
-     * @var array<array>
+     * @var array<mixed>
      */
     private $columns = [];
 
