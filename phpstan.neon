@@ -29,7 +29,6 @@ parameters:
 	ignoreErrors:
 		- '/Variable \$\w+ might not be defined\./'
 	scanFiles:
-		- plugins/MauticFocusBundle/Include/lessc.inc.php
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
 	doctrine:

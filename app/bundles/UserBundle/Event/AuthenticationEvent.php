@@ -168,7 +168,7 @@ class AuthenticationEvent extends Event
      */
     public function getUsername()
     {
-        return $this->token->getUsername();
+        return $this->token->getUserIdentifier();
     }
 
     /**

@@ -49,7 +49,6 @@ class PullTransifexCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Fetches translations for Mautic from Transifex')
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.', null)
@@ -78,7 +77,7 @@ EOT
         } catch (InvalidConfigurationException $e) {
             $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $statistics = $transifex->getConnector(Statistics::class);
@@ -133,7 +132,7 @@ EOT
                 } catch (\Exception $exception) {
                     $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pulling_data', ['%message%' => $exception->getMessage()]));
 
-                    return 1;
+                    return \Symfony\Component\Console\Command\Command::FAILURE;
                 }
             }
         }
@@ -154,6 +153,7 @@ EOT
 
         $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_downloaded'));
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetches translations for Mautic from Transifex';
 }

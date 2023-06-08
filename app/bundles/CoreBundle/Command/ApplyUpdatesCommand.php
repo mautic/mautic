@@ -39,7 +39,6 @@ class ApplyUpdatesCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:update:apply')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -87,7 +86,7 @@ EOT
         if (true === $this->coreParametersHelper->get('composer_updates', false)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         try {
@@ -109,7 +108,7 @@ EOT
             );
         }
 
-        return 1;
+        return \Symfony\Component\Console\Command\Command::FAILURE;
     }
 
     /**
@@ -145,4 +144,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

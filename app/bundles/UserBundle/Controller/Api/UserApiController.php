@@ -19,8 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @extends CommonApiController<User>
@@ -32,7 +32,7 @@ class UserApiController extends CommonApiController
      */
     protected $model = null;
 
-    private UserPasswordEncoderInterface $encoder;
+    private UserPasswordHasherInterface $hasher;
 
     public function __construct(
         CorePermissions $security,
@@ -41,7 +41,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        UserPasswordEncoderInterface $encoder,
+        UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -49,7 +49,7 @@ class UserApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->encoder = $encoder;
+        $this->hasher  = $hasher;
         $userModel     = $modelFactory->getModel('user.user');
         \assert($userModel instanceof UserModel);
 
@@ -93,7 +93,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
         }
 
         return $this->processForm($request, $entity, $parameters, 'POST');
@@ -128,7 +128,7 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
+                    $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
                 }
             }
         } else {
@@ -166,7 +166,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword, true));
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
                 break;
         }
     }

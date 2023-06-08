@@ -193,9 +193,7 @@ trait FrequencyRuleTrait
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setDoNotContactModel(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel): void
     {
         $this->doNotContactModel = $doNotContactModel;
@@ -203,9 +201,8 @@ trait FrequencyRuleTrait
 
     /**
      * The name is different, so it won't collide with other setters.
-     *
-     * @required
      */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setRequestStackObject(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
