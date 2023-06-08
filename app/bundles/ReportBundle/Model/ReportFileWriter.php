@@ -94,8 +94,8 @@ class ReportFileWriter
     private function getName(Scheduler $scheduler, ReportExportOptions $reportExportOptions): string
     {
         $parts      = [$scheduler->getReport()->getName()];
-        $date_parts = [($reportExportOptions->getDateFrom() ?: $scheduler->getScheduleDate())->format('Y-m-d')];
-        if ($reportExportOptions->getDateTo() && $reportExportOptions->getDateFrom() != $reportExportOptions->getDateTo()) {
+        $date_parts = [$reportExportOptions->getDateFrom()->format('Y-m-d')];
+        if ($reportExportOptions->getDateFrom()->format('Y-m-d') != $reportExportOptions->getDateTo()->format('Y-m-d')) {
             $date_parts[] = $reportExportOptions->getDateTo()->format('Y-m-d');
         }
         $parts[] = implode(' - ', $date_parts);

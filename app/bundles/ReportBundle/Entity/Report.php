@@ -544,10 +544,7 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->settings;
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduled()
+    public function isScheduled(): bool
     {
         return $this->isScheduled;
     }
@@ -616,10 +613,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->scheduleUnit = $scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
@@ -634,10 +628,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->scheduleDay = $scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }
@@ -706,34 +697,22 @@ class Report extends FormEntity implements SchedulerInterface
         return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledDaily()
+    public function isScheduledDaily(): bool
     {
         return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledWeekly()
+    public function isScheduledWeekly(): bool
     {
         return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledMonthly()
+    public function isScheduledMonthly(): bool
     {
         return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledWeekDays()
+    public function isScheduledWeekDays(): bool
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }
