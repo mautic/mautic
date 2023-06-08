@@ -37,7 +37,7 @@ class SchedulerEntity implements SchedulerInterface
      */
     private $scheduleTime;
 
-    public function __construct($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, $scheduleTimezone = 'UTC', $scheduleTime = '00:00')
+    public function __construct(bool $isScheduled, ?string $scheduleUnit, ?string $scheduleDay, ?string $scheduleMonthFrequency, ?string $scheduleTimezone = 'UTC', ?string $scheduleTime = '00:00')
     {
         $this->isScheduled            = $isScheduled;
         $this->scheduleUnit           = $scheduleUnit;
@@ -47,34 +47,22 @@ class SchedulerEntity implements SchedulerInterface
         $this->scheduleTime           = $scheduleTime;
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduled()
+    public function isScheduled(): bool
     {
         return $this->isScheduled;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleUnit()
+    public function getScheduleUnit(): ?string
     {
         return $this->scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }
@@ -84,32 +72,32 @@ class SchedulerEntity implements SchedulerInterface
         return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
-    public function isScheduledDaily()
+    public function isScheduledDaily(): bool
     {
         return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
-    public function isScheduledWeekly()
+    public function isScheduledWeekly(): bool
     {
         return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
-    public function isScheduledMonthly()
+    public function isScheduledMonthly(): bool
     {
         return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
-    public function isScheduledWeekDays()
+    public function isScheduledWeekDays(): bool
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }
 
-    public function getScheduleTimezone()
+    public function getScheduleTimezone(): ?string
     {
         return $this->scheduleTimezone;
     }
 
-    public function getScheduleTime()
+    public function getScheduleTime(): ?string
     {
         return $this->scheduleTime;
     }

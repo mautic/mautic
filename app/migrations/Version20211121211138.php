@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;

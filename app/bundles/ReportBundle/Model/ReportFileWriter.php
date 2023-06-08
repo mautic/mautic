@@ -42,7 +42,7 @@ class ReportFileWriter
             break;
           case 'xlsx':
             $filePath = $this->getFilePath($scheduler);
-            $name = $this->getName($scheduler, $reportExportOptions);
+            $name     = $this->getName($scheduler, $reportExportOptions);
             $this->excelExporter->export($reportDataResult, $name, $filePath);
             break;
         }
@@ -78,7 +78,7 @@ class ReportFileWriter
         return $dateString.'_'.InputHelper::alphanum($reportName, false, '-').'.'.$this->getSuffix($scheduler);
     }
 
-    private function exportCsv($scheduler, $reportDataResult, ReportExportOptions $reportExportOptions)
+    private function exportCsv(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions): void
     {
         $fileName = $this->getFileName($scheduler);
         $handler  = $this->exportHandler->getHandler($fileName);
@@ -86,12 +86,12 @@ class ReportFileWriter
         $this->exportHandler->closeHandler($handler);
     }
 
-    private function getSuffix($scheduler)
+    private function getSuffix(Scheduler $scheduler): ?string
     {
         return $scheduler->getReport()->getScheduleFormat();
     }
 
-    private function getName(Scheduler $scheduler, ReportExportOptions $reportExportOptions)
+    private function getName(Scheduler $scheduler, ReportExportOptions $reportExportOptions): string
     {
         $parts      = [$scheduler->getReport()->getName()];
         $date_parts = [($reportExportOptions->getDateFrom() ?: $scheduler->getScheduleDate())->format('Y-m-d')];

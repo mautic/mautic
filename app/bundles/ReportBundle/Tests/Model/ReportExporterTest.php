@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessExport()
+    public function testProcessExport(): void
     {
         $batchSize = 2;
 
@@ -109,7 +109,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $reportExporter->processExport($exportOption);
     }
 
-    public function testDoesNotSendIfEmptyReport()
+    public function testDoesNotSendIfEmptyReport(): void
     {
         $batchSize = 2;
 
@@ -177,7 +177,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $reportExporter->processExport($exportOption);
     }
 
-    public function testDoesSendIfEmptyReportAndFlagSendEmptyReportSet()
+    public function testDoesSendIfEmptyReportAndFlagSendEmptyReportSet(): void
     {
         $batchSize = 2;
 

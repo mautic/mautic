@@ -4,23 +4,23 @@ namespace Mautic\ReportBundle\Scheduler;
 
 interface SchedulerInterface
 {
-    public function isScheduled();
+    public function isScheduled(): bool;
 
     public function isScheduledNow(): bool;
 
-    public function isScheduledDaily();
+    public function isScheduledDaily(): bool;
 
-    public function isScheduledWeekly();
+    public function isScheduledWeekly(): bool;
 
-    public function isScheduledMonthly();
+    public function isScheduledMonthly(): bool;
 
-    public function isScheduledWeekDays();
+    public function isScheduledWeekDays(): bool;
 
-    public function getScheduleDay();
+    public function getScheduleDay(): ?string;
 
-    public function getScheduleMonthFrequency();
+    public function getScheduleMonthFrequency(): ?string;
 
-    public function getScheduleTimezone();
+    public function getScheduleTimezone(): ?string;
 
-    public function getScheduleTime();
+    public function getScheduleTime(): ?string;
 }

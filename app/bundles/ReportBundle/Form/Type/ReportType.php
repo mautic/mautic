@@ -333,7 +333,7 @@ class ReportType extends AbstractType
                 'label'      => 'mautic.report.schedule.scheduleFormat',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                'class'                => 'form-control',
+                'class'                       => 'form-control',
                 'data-report-schedule-format' => 'scheduleFormat',
                 ],
                 'choices'  => ['csv' => 'csv', 'xlsx' => 'xlsx'],

@@ -573,7 +573,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @param bool $sendEmpty
      */
-    public function setSendEmpty($sendEmpty)
+    public function setSendEmpty($sendEmpty): void
     {
         $this->isChanged('sendEmpty', $sendEmpty);
 

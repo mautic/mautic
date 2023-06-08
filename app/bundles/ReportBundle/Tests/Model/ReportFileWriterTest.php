@@ -15,7 +15,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWriteReportDataAsXlsx()
+    public function testWriteReportDataAsXlsx(): void
     {
         $excelExporter = $this->getMockBuilder(ExcelExporter::class)
             ->disableOriginalConstructor()
@@ -64,7 +64,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->writeReportData($scheduler, $reportDataResult, $reportExportOptions);
     }
 
-    public function testWriteReportDataAsCsv()
+    public function testWriteReportDataAsCsv(): void
     {
         $excelExporter = $this->getMockBuilder(ExcelExporter::class)
       ->disableOriginalConstructor()
@@ -116,7 +116,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->writeReportData($scheduler, $reportDataResult, $reportExportOptions);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $excelExporter = $this->getMockBuilder(ExcelExporter::class)
             ->disableOriginalConstructor()
@@ -141,7 +141,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->clear($scheduler);
     }
 
-    public function testGetFilePath()
+    public function testGetFilePath(): void
     {
         $excelExporter = $this->getMockBuilder(ExcelExporter::class)
             ->disableOriginalConstructor()
