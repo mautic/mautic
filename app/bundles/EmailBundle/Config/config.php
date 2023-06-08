@@ -274,7 +274,6 @@ return [
             ],
             'mautic.email.transport_wrapper' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
-                'arguments' => [],
             ],
             'smtp' => [
                 'class'        => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
