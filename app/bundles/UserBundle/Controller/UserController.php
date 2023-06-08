@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Mailer\EmailSender;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -407,7 +408,7 @@ class UserController extends FormController
      *
      * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, EmailSender $emailSender, $objectId) 
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -443,7 +444,7 @@ class UserController extends FormController
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
 
-                    $this->get('mautic.email.mailer.email_sender')->sendEmail(
+                    $emailSender->sendEmail(
                         new Address($currentUser->getEmail(), $currentUser->getName()),
                         new Address($user->getEmail(), $user->getName()),
                         $subject,

@@ -415,12 +415,10 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function mailerCallbackAction(Request $request, $transport)
+    public function mailerCallbackAction(Request $request, TransportWrapper $realTransport, $transport)
     {
         ignore_user_abort(true);
 
-        /** @var TransportWrapper $realTransport */
-        $realTransport = $this->get('mautic.email.transport_wrapper');
         if (!$realTransport->isSupportCallback($transport)) {
             return $this->notFound();
         }
@@ -747,16 +745,6 @@ class PublicController extends CommonFormController
                 $stat->getEmailAddress(),
             ],
             $message
-        );
-    }
-
-    public static function getSubscribedServices()
-    {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                'mautic.email.transport_wrapper' => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
-            ]
         );
     }
 }

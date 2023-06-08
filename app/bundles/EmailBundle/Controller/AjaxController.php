@@ -181,16 +181,13 @@ class AjaxController extends CommonAjaxController
      *
      * @return JsonResponse
      */
-    public function testEmailServerConnectionAction(Request $request, UserHelper $userHelper)
+    public function testEmailServerConnectionAction(Request $request, UserHelper $userHelper, TransportWrapper $transportWrapper)
     {
         $dataArray = ['success' => 0, 'message' => ''];
         $user      = $userHelper->getUser();
 
         if ($user->isAdmin()) {
             $settings = $request->request->all();
-
-            /** @var TransportWrapper $transportWrapper */
-            $transportWrapper = $this->get('mautic.email.transport_wrapper');
 
             try {
                 /** @var TestConnectionInterface $extension */
@@ -215,7 +212,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function sendTestEmailAction(MailHelper $mailer, UserHelper $userHelper)
+    public function sendTestEmailAction(MailHelper $mailer, UserHelper $userHelper, EmailSender $emailSender)
     {
         /** @var Translator $translator */
         $translator = $this->translator;
@@ -228,10 +225,8 @@ class AjaxController extends CommonAjaxController
         if (empty($userFullName)) {
             $userFullName = '';
         }
-        /** @var EmailSender $emailSender */
-        $emailSender = $this->get('mautic.email.mailer.email_sender');
-        $success     = 1;
-        $message     = $translator->trans('mautic.core.success');
+        $success = 1;
+        $message = $translator->trans('mautic.core.success');
         try {
             $emailSender->sendTestEmail(new Address($user->getEmail(), $userFullName));
         } catch (\Exception $exception) {
@@ -286,16 +281,5 @@ class AjaxController extends CommonAjaxController
         }
 
         return new JsonResponse($data);
-    }
-
-    public static function getSubscribedServices()
-    {
-        return array_merge(
-            parent::getSubscribedServices(),
-            [
-                'mautic.email.transport_wrapper'   => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
-                'mautic.email.mailer.email_sender' => \Mautic\EmailBundle\Mailer\EmailSender::class,
-            ]
-        );
     }
 }
