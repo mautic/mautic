@@ -10,7 +10,8 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\EmailSender;
 use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
-use Mautic\EmailBundle\Mailer\Transport\TestConnectionInterface;
+use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
+use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
 use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
@@ -62,7 +63,7 @@ class AjaxController extends CommonAjaxController
 
             if ($pending && !$inProgress && $entity->isPublished()) {
                 $session->set('mautic.email.send.active', true);
-                list($batchSentCount, $batchFailedCount, $batchFailedRecipients) = $model->sendEmailToLists($entity, null, $limit);
+                [$batchSentCount, $batchFailedCount, $batchFailedRecipients] = $model->sendEmailToLists($entity, null, $limit);
 
                 $progress[0] += ($batchSentCount + $batchFailedCount);
                 $stats['sent'] += $batchSentCount;
@@ -190,10 +191,9 @@ class AjaxController extends CommonAjaxController
             $settings = $request->request->all();
 
             try {
-                /** @var TestConnectionInterface $extension */
-                $extension = $transportWrapper->getTransportExtension($settings['mailer_transport']);
-            } catch (\LogicException $exception) {
-                $dataArray['message'] = 'Transport is not found.';
+                $extension = $transportWrapper->getTestConnectionExtension($settings['mailer_transport']);
+            } catch (TransportNotFoundException|UnsupportedTransportException $exception) {
+                $dataArray['message'] = $exception->getMessage();
 
                 return $this->sendJsonResponse($dataArray);
             }

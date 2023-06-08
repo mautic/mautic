@@ -2,6 +2,9 @@
 
 namespace Mautic\EmailBundle\Mailer\Transport;
 
+use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
+use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
+
 class TransportWrapper
 {
     /** @var array <string, TransportExtensionInterface> */
@@ -14,24 +17,45 @@ class TransportWrapper
         }
     }
 
-    public function isSupportCallback(string $transportName): bool
-    {
-        if (!array_key_exists($transportName, $this->transportExtensions)) {
-            return false;
-        }
-
-        return $this->transportExtensions[$transportName] instanceof CallbackTransportInterface;
-    }
-
     /**
-     * @throws \LogicException
+     * @throws TransportNotFoundException
      */
     public function getTransportExtension(string $transportName): TransportExtensionInterface
     {
-        if (!array_key_exists($transportName, $this->transportExtensions)) {
-            throw new \LogicException('Transport Extension '.$transportName.' is not found');
+        if (!isset($this->transportExtensions[$transportName])) {
+            throw TransportNotFoundException::fromName($transportName);
         }
 
         return $this->transportExtensions[$transportName];
+    }
+
+    /**
+     * @throws TransportNotFoundException
+     * @throws UnsupportedTransportException
+     */
+    public function getCallbackSupportExtension(string $transportName): CallbackTransportInterface
+    {
+        $transportExtension = $this->getTransportExtension($transportName);
+
+        if (!$transportExtension instanceof CallbackTransportInterface) {
+            throw UnsupportedTransportException::fromName($transportName, 'Request callback');
+        }
+
+        return $transportExtension;
+    }
+
+    /**
+     * @throws TransportNotFoundException
+     * @throws UnsupportedTransportException
+     */
+    public function getTestConnectionExtension(string $transportName): TestConnectionInterface
+    {
+        $transportExtension = $this->getTransportExtension($transportName);
+
+        if (!$transportExtension instanceof TestConnectionInterface) {
+            throw UnsupportedTransportException::fromName($transportName, 'Connection test');
+        }
+
+        return $transportExtension;
     }
 }
