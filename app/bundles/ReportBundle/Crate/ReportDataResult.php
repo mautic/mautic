@@ -25,12 +25,12 @@ class ReportDataResult
     private $types = [];
 
     /**
-     * @var array
+     * @var array<array>
      */
     private $columns = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $dataColumns = [];
 

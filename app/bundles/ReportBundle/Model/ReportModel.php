@@ -166,6 +166,7 @@ class ReportModel extends FormModel
         if (null === $id) {
             $report =  new Report();
             $report->setScheduleTimezone($this->userHelper->getUser() ? $this->userHelper->getUser()->getTimezone() : $this->coreParametersHelper->get('default_timezone', 'UTC'));
+
             return $report;
         }
 
