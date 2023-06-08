@@ -167,7 +167,7 @@ jobs:
     - name: Install dependencies
       run: |
         composer validate
-        composer install --no-progress --no-suggest
+        composer install --prefer-dist --no-progress --no-suggest
     
     - name: Run ${{ matrix.commands }}
       run: |
