@@ -38,7 +38,10 @@ class ReportFileWriter
     {
         switch ($scheduler->getReport()->getScheduleFormat()) {
           case 'csv':
-            $this->exportCsv($scheduler, $reportDataResult, $reportExportOptions);
+            $fileName = $this->getFileName($scheduler);
+            $handler  = $this->exportHandler->getHandler($fileName);
+            $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
+            $this->exportHandler->closeHandler($handler);
             break;
           case 'xlsx':
             $filePath = $this->getFilePath($scheduler);
@@ -55,35 +58,27 @@ class ReportFileWriter
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getFilePath(Scheduler $scheduler)
+    public function getFilePath(Scheduler $scheduler): string
     {
         $fileName = $this->getFileName($scheduler);
 
         return $this->exportHandler->getPath($fileName);
     }
 
-    /**
-     * @return string
-     */
-    private function getFileName(Scheduler $scheduler)
+    private function getName(Scheduler $scheduler): string
     {
         $date       = $scheduler->getScheduleDate();
         $dateString = $date->format('Y-m-d');
         $reportName = $scheduler->getReport()->getName();
 
-        return $dateString.'_'.InputHelper::alphanum($reportName, false, '-').'.'.$this->getSuffix($scheduler);
+        return $dateString.'_'.InputHelper::alphanum($reportName, false, '-');
     }
 
-    private function exportCsv(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions): void
+    private function getFileName(Scheduler $scheduler): string
     {
-        $fileName = $this->getFileName($scheduler);
-        $handler  = $this->exportHandler->getHandler($fileName);
-        $this->csvExporter->export($reportDataResult, $handler, $reportExportOptions->getPage());
-        $this->exportHandler->closeHandler($handler);
+        return $this->getName($scheduler).'.'.$this->getSuffix($scheduler);
     }
 
     private function getSuffix(Scheduler $scheduler): ?string
@@ -91,15 +86,4 @@ class ReportFileWriter
         return $scheduler->getReport()->getScheduleFormat();
     }
 
-    private function getName(Scheduler $scheduler, ReportExportOptions $reportExportOptions): string
-    {
-        $parts      = [$scheduler->getReport()->getName()];
-        $date_parts = [$reportExportOptions->getDateFrom()->format('Y-m-d')];
-        if ($reportExportOptions->getDateFrom()->format('Y-m-d') != $reportExportOptions->getDateTo()->format('Y-m-d')) {
-            $date_parts[] = $reportExportOptions->getDateTo()->format('Y-m-d');
-        }
-        $parts[] = implode(' - ', $date_parts);
-
-        return implode(' ', $parts);
-    }
 }
