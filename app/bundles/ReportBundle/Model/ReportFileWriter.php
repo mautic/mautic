@@ -45,7 +45,7 @@ class ReportFileWriter
             break;
           case 'xlsx':
             $filePath = $this->getFilePath($scheduler);
-            $name     = $this->getName($scheduler, $reportExportOptions);
+            $name     = $this->getName($scheduler);
             $this->excelExporter->export($reportDataResult, $name, $filePath);
             break;
         }
