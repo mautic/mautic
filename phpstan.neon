@@ -36,5 +36,5 @@ parameters:
 		allowNullablePropertyForRequiredField: true
 	symfony:
 		containerXmlPath: var/cache/dev/AppKernelDevDebugContainer.xml
-		consoleApplicationLoader: tests/console-application.php
+		consoleApplicationLoader: app/console-application.php
 		

@@ -19,7 +19,6 @@ define('MAUTIC_ROOT_DIR', realpath(__DIR__.'/..'));
 
 require_once __DIR__.'/../autoload.php';
 
-use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\ErrorHandler\Debug;
@@ -43,7 +42,6 @@ if ($_SERVER['APP_DEBUG']) {
         Debug::enable();
     }
 }
-$output = (false !== $input->getParameterOption(['--no-interaction', '-n'])) ? new ConsoleDatetimeOutput() : null;
 
 $kernel      = new AppKernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $application = new Application($kernel);
