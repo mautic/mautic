@@ -49,6 +49,7 @@ class ReportFileWriter
             $this->excelExporter->export($reportDataResult, $name, $filePath);
             break;
         }
+
     }
 
     public function clear(Scheduler $scheduler)

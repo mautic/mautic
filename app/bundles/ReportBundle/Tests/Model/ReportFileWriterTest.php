@@ -56,7 +56,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $excelExporter->expects($this->once())
             ->method('export')
-            ->with($reportDataResult, 'test '.(new \DateTime())->format('Y-m-d'), 'tmp/test.xlsx')
+            ->with($reportDataResult, (new \DateTime())->format('Y-m-d') . '_test', 'tmp/test.xlsx')
             ->willReturn($handler);
 
         $reportFileWriter = new ReportFileWriter($csvExporter, $excelExporter, $exportHandler);
