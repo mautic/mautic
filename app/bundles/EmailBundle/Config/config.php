@@ -283,8 +283,6 @@ return [
                     \Mautic\EmailBundle\Model\TransportType::FIELD_PORT        => true,
                     \Mautic\EmailBundle\Model\TransportType::FIELD_USER        => true,
                     \Mautic\EmailBundle\Model\TransportType::FIELD_PASSWORD    => true,
-                    \Mautic\EmailBundle\Model\TransportType::FIELD_API_KEY     => false,
-                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_OPTIONS => false,
                     \Mautic\EmailBundle\Model\TransportType::DSN_CONVERTOR     => Mautic\EmailBundle\Helper\MailerDsnConvertor::class,
                 ],
                 'tag'      => 'mautic.email.transport_extension',
