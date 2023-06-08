@@ -27,12 +27,24 @@ class SchedulerEntity implements SchedulerInterface
      */
     private $scheduleMonthFrequency;
 
-    public function __construct($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    /**
+     * @var string|null
+     */
+    private $scheduleTimezone;
+
+    /**
+     * @var string|null
+     */
+    private $scheduleTime;
+
+    public function __construct($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, $scheduleTimezone = 'UTC', $scheduleTime = '00:00')
     {
         $this->isScheduled            = $isScheduled;
         $this->scheduleUnit           = $scheduleUnit;
         $this->scheduleDay            = $scheduleDay;
         $this->scheduleMonthFrequency = $scheduleMonthFrequency;
+        $this->scheduleTimezone       = $scheduleTimezone;
+        $this->scheduleTime           = $scheduleTime;
     }
 
     /**
@@ -90,5 +102,15 @@ class SchedulerEntity implements SchedulerInterface
     public function isScheduledWeekDays()
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+    }
+
+    public function getScheduleTimezone()
+    {
+        return $this->scheduleTimezone;
+    }
+
+    public function getScheduleTime()
+    {
+        return $this->scheduleTime;
     }
 }

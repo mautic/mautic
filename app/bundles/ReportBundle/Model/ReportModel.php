@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -90,7 +91,8 @@ class ReportModel extends FormModel
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
         CsvExporter $csvExporter,
-        ExcelExporter $excelExporter
+        ExcelExporter $excelExporter,
+        UserHelper $userHelper
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->templatingHelper  = $templatingHelper;
@@ -99,6 +101,7 @@ class ReportModel extends FormModel
         $this->reportHelper      = $reportHelper;
         $this->csvExporter       = $csvExporter;
         $this->excelExporter     = $excelExporter;
+        $this->userHelper        = $userHelper;
     }
 
     public function setSession(Session $session)
@@ -161,7 +164,9 @@ class ReportModel extends FormModel
     public function getEntity($id = null)
     {
         if (null === $id) {
-            return new Report();
+            $report =  new Report();
+            $report->setScheduleTimezone($this->userHelper->getUser() ? $this->userHelper->getUser()->getTimezone() : $this->coreParametersHelper->get('default_timezone', 'UTC'));
+            return $report;
         }
 
         return parent::getEntity($id);
@@ -471,7 +476,8 @@ class ReportModel extends FormModel
 
                 $response = new StreamedResponse(
                     function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                        $reportDataResult = new ReportDataResult($reportData);
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 

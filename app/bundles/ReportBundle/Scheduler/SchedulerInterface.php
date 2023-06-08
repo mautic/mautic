@@ -19,4 +19,8 @@ interface SchedulerInterface
     public function getScheduleDay();
 
     public function getScheduleMonthFrequency();
+
+    public function getScheduleTimezone();
+
+    public function getScheduleTime();
 }

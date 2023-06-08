@@ -28,21 +28,16 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(array $reportData, $name, string $output = 'php://output')
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-        }
-
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
         }
 
         try {
             $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
             $objPHPExcel->createSheet();
-            $reportDataResult = new ReportDataResult($reportData);
 
             //build the data rows
             foreach ($reportDataResult->getData() as $count=>$data) {
@@ -61,7 +56,7 @@ class ExcelExporter
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
                 //free memory
-                unset($row, $reportData['data'][$count]);
+                unset($row);
             }
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');

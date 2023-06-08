@@ -24,10 +24,19 @@ class ReportDataResult
      */
     private $types = [];
 
+    /**
+     * @var array
+     */
+    private $columns = [];
+
+    /**
+     * @var array
+     */
+    private $dataColumns = [];
+
     public function __construct(array $data)
     {
-        if (
-            !array_key_exists('data', $data) ||
+        if (!array_key_exists('data', $data) ||
             !array_key_exists('dataColumns', $data) ||
             !array_key_exists('columns', $data)
         ) {
@@ -36,6 +45,8 @@ class ReportDataResult
 
         $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
+        $this->columns      = $data['columns'];
+        $this->dataColumns  = $data['dataColumns'];
 
         $this->buildHeader($data);
         $this->buildTypes($data);
@@ -116,5 +127,21 @@ class ReportDataResult
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDataColumns()
+    {
+        return $this->dataColumns;
     }
 }
