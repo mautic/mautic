@@ -39,23 +39,6 @@ class MauticMessage extends Email
         $this->metadata = [];
     }
 
-    /**
-     * @param string     $filePath
-     * @param null       $fileName
-     * @param null       $contentType
-     * @param bool|false $inline
-     */
-    public function addAttachment($filePath, $fileName = null, $contentType = null, $inline = false): void
-    {
-        if (true === $inline) {
-            $this->embedFromPath($filePath, $fileName, $contentType);
-
-            return;
-        }
-
-        $this->attachFromPath($filePath, $fileName, $contentType);
-    }
-
     public function updateLeadIdHash(?string $hash): void
     {
         $this->leadIdHash = $hash;
