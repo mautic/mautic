@@ -111,11 +111,6 @@ class TransportType
         return $this->getString($this->showPassword);
     }
 
-    public function isServiceRequiresPassword(): bool
-    {
-        return ('' !== $this->getServiceRequiresPassword()) ? true : false;
-    }
-
     /**
      * @return string
      */
