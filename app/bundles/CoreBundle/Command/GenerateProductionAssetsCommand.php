@@ -63,7 +63,7 @@ EOT
         // Minify Mautic Form SDK
         file_put_contents(
             $assetsDir.'/js/mautic-form-tmp.js',
-            \Minify::combine([$assetsDir.'/js/mautic-form-src.js'])
+            (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
         );
         // Fix the MauticSDK loader
         file_put_contents(
