@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailType extends AbstractType
 {
-    const REPLY_TO_ADDRESS = 'replyToAddress';
+    public const REPLY_TO_ADDRESS = 'replyToAddress';
 
     /**
      * @var UserHelper
@@ -49,15 +49,15 @@ class EmailType extends AbstractType
         $builder->add(
             'fromname',
             TextType::class,
-             [
-                'label'      => 'mautic.lead.email.from_name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'preaddon' => 'fa fa-user',
-                ],
-                'required'   => false,
-                'data'       => $default,
+            [
+               'label'      => 'mautic.lead.email.from_name',
+               'label_attr' => ['class' => 'control-label'],
+               'attr'       => [
+                   'class'    => 'form-control',
+                   'preaddon' => 'fa fa-user',
+               ],
+               'required'   => false,
+               'data'       => $default,
             ]
         );
 
