@@ -263,15 +263,6 @@ return [
                 ],
                 'tag' => 'mautic.email_stat_helper',
             ],
-            'mautic.email.mailer.email_sender' => [
-                'class'     => \Mautic\EmailBundle\Mailer\EmailSender::class,
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'translator',
-                    '%mautic.mailer_from_email%',
-                    '%mautic.mailer_from_name%',
-                ],
-            ],
             'mautic.email.transport_wrapper' => [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
             ],

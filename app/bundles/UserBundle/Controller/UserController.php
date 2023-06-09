@@ -9,12 +9,11 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Mailer\EmailSender;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
@@ -408,7 +407,7 @@ class UserController extends FormController
      *
      * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, EmailSender $emailSender, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -444,12 +443,11 @@ class UserController extends FormController
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
 
-                    $emailSender->sendEmail(
-                        new Address($currentUser->getEmail(), $currentUser->getName()),
-                        new Address($user->getEmail(), $user->getName()),
-                        $subject,
-                        $body
-                    );
+                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                    $mailer->setSubject($subject);
+                    $mailer->setTo($user->getEmail(), $user->getName());
+                    $mailer->setBody($body);
+                    $mailer->send();
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
