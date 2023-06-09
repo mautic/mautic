@@ -109,6 +109,9 @@
     "symfony/doctrine-messenger": "^5.4",
     "wikimedia/less.php": "^4.1"
   },
+  "conflict": {
+    "psr/simple-cache": ">=3.0.0"
+  },
   "repositories": [
     {
       "type": "git",
