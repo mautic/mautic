@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\DependencyInjection\EnvProcessor;
 
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
@@ -11,10 +13,10 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
     {
         $env = $getEnv($name);
         try {
-            $dsn = Dsn::fromString($env);
+            Dsn::fromString($env);
 
             return $env;
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             // if the DSN is invalid, return null transport and then show a warning
             return 'null://null';
         }
