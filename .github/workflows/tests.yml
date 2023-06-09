@@ -90,7 +90,7 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
@@ -101,6 +101,15 @@ jobs:
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        path: |
+          ./junit.xml
+          ./coverage.xml
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
