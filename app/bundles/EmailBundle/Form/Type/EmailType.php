@@ -379,7 +379,7 @@ class EmailType extends AbstractType
                     'required'    => false,
                     'is_parent'   => $isParent,
                     'is_existing' => $isExisting,
-                    'data'        => $event->getData()->getVariantSettings(),
+                    'data'        => $event->getData() instanceof Email ? $event->getData()->getVariantSettings() : [],
                 ]
             );
         };
