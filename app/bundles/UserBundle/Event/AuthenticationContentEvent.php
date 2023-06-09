@@ -50,9 +50,6 @@ class AuthenticationContentEvent extends Event
         return $this->postLogout;
     }
 
-    /**
-     * @param $content
-     */
     public function addContent($content)
     {
         $this->content[] = $content;

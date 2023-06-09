@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -75,8 +75,6 @@ class Redirect extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -102,7 +100,7 @@ class Redirect extends FormEntity
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

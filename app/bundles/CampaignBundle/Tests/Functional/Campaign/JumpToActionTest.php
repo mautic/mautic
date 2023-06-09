@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
@@ -185,7 +184,6 @@ final class JumpToActionTest extends MauticMysqlTestCase
     private function getEventLogsForContact(Lead $contact): array
     {
         $eventLogRepository = $this->em->getRepository(LeadEventLog::class);
-        \assert($eventLogRepository instanceof LeadEventLogRepository);
 
         return $eventLogRepository->findBy(['lead' => $contact->getId()]);
     }

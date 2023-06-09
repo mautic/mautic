@@ -267,7 +267,7 @@ class FormSubscriber implements EventSubscriberInterface
         $utmValues->setQuery($event->getRequest()->query->all());
         $utmValues->setReferer($refererURL);
         $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
-        $utmValues->setDateAdded(new \Datetime());
+        $utmValues->setDateAdded(new \DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
         $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);

@@ -211,8 +211,6 @@ class ReportModel extends FormModel
     /**
      * Build the table and graph data.
      *
-     * @param $context
-     *
      * @return mixed
      */
     public function buildAvailableReports($context, ?string $reportSource = null)
@@ -223,7 +221,7 @@ class ReportModel extends FormModel
                 $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
-                //build them
+                // build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
@@ -417,16 +415,13 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, array $reportData, $handle = null, $page = null)
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                //build the data rows
-                $reportDataResult = new ReportDataResult($reportData);
-
                 if (!is_null($handle)) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
@@ -450,15 +445,9 @@ class ReportModel extends FormModel
                 $content = $this->twig->render(
                     '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData'       => $reportData,
-                        'data'             => $reportData['data'],
-                        'columns'          => $reportData['columns'],
                         'pageTitle'        => $name,
-                        'graphs'           => $reportData['graphs'],
                         'report'           => $report,
-                        'dateFrom'         => $reportData['dateFrom'],
-                        'dateTo'           => $reportData['dateTo'],
-                        'reportDataResult' => new ReportDataResult($reportData),
+                        'reportDataResult' => $reportDataResult,
                     ]
                 );
 
@@ -470,8 +459,8 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 
@@ -561,7 +550,7 @@ class ReportModel extends FormModel
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data

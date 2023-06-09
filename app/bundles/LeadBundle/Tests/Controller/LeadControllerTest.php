@@ -326,7 +326,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, (strlen($content) > 10000));
+        $this->assertEquals(true, strlen($content) > 10000);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void

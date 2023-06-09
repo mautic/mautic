@@ -27,8 +27,6 @@ class ReportQueryEvent extends AbstractReportEvent
 
     /**
      * ReportDataEvent constructor.
-     *
-     * @param $totalResults
      */
     public function __construct(Report $report, QueryBuilder $query, $totalResults, array $options)
     {

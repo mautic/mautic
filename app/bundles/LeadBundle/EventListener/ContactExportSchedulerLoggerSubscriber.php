@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use DateTime;
-use DateTimeImmutable;
-use DateTimeZone;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
@@ -51,16 +48,16 @@ class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
         $this->logger->debug(
             'Contact export #ID '.$event->getContactExportScheduler()->getId()
             .' scheduled at '.$utcScheduledDateTimeStr.' UTC has been processed at '
-            .(new DateTime())->setTimezone(new DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB)
+            .(new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB)
             .' UTC'
         );
     }
 
     private function getContactExportScheduledDateTimeStr(ContactExportScheduler $contactExportScheduler): string
     {
-        /** @var DateTimeImmutable $scheduledDateTime */
+        /** @var \DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
 
-        return $scheduledDateTime->setTimezone(new DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB);
+        return $scheduledDateTime->setTimezone(new \DateTimeZone('UTC'))->format(DateTimeHelper::FORMAT_DB);
     }
 }

@@ -19,7 +19,6 @@ class ClickthroughHelper
     /**
      * Decode a string appended to URL into an array.
      *
-     * @param      $string
      * @param bool $urlDecode
      *
      * @return array

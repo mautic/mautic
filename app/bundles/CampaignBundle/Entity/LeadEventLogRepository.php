@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
@@ -48,7 +47,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -197,7 +196,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('userId', $this->currentUser->getId());
         }
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -213,8 +212,8 @@ class LeadEventLogRepository extends CommonRepository
         $excludeScheduled = false,
         $excludeNegative = true,
         $all = false,
-        DateTimeInterface $dateFrom = null,
-        DateTimeInterface $dateTo = null,
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null,
         int $eventId = null
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
@@ -284,20 +283,20 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
-        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
-            $results = $q->getConnection()->executeCacheQuery(
+        if ($this->_em->getConnection()->getConfiguration()->getResultCache()) {
+            $results = $this->_em->getConnection()->executeCacheQuery(
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600, __METHOD__)
+                new QueryCacheProfile(600)
             )->fetchAllAssociative();
         } else {
-            $results = $q->execute()->fetchAllAssociative();
+            $results = $q->executeQuery()->fetchAllAssociative();
         }
 
         $return = [];
 
-        //group by event id
+        // group by event id
         foreach ($results as $l) {
             if (!$excludeNegative) {
                 if (!isset($return[$l['event_id']])) {
@@ -319,9 +318,6 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -330,7 +326,7 @@ class LeadEventLogRepository extends CommonRepository
             ->select('cl.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $exists = [];
         foreach ($results as $r) {
@@ -345,21 +341,19 @@ class LeadEventLogRepository extends CommonRepository
         if (!empty($exists)) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', $exists)
-            )->execute();
+            )->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
                 ->where('lead_id = '.(int) $fromLeadId)
-                ->execute();
+                ->executeStatement();
         } else {
-            $q->execute();
+            $q->executeStatement();
         }
     }
 
     /**
-     * @param $options
-     *
      * @return array
      */
     public function getChartQuery($options)
@@ -503,7 +497,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $events = [];
@@ -516,8 +510,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param $eventId
-     *
      * @return array
      */
     public function getDatesExecuted($eventId, array $contactIds)
@@ -532,7 +524,7 @@ class LeadEventLogRepository extends CommonRepository
                 )
             );
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $dates = [];
         foreach ($results as $result) {
@@ -553,7 +545,7 @@ class LeadEventLogRepository extends CommonRepository
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
@@ -608,11 +600,11 @@ SQL;
 
         $connection = $this->getEntityManager()->getConnection();
         $stmt       = $connection->prepare($sql);
-        $stmt->bindParam('dateAdded', $dateAdded, \PDO::PARAM_STR);
-        $stmt->bindParam('message', $message, \PDO::PARAM_STR);
-        $stmt->bindParam('contactId', $contactId, \PDO::PARAM_INT);
-        $stmt->bindParam('campaignId', $campaignId, \PDO::PARAM_INT);
-        $stmt->bindParam('rotation', $rotation, \PDO::PARAM_INT);
+        $stmt->bindValue('dateAdded', $dateAdded, \PDO::PARAM_STR);
+        $stmt->bindValue('message', $message, \PDO::PARAM_STR);
+        $stmt->bindValue('contactId', $contactId, \PDO::PARAM_INT);
+        $stmt->bindValue('campaignId', $campaignId, \PDO::PARAM_INT);
+        $stmt->bindValue('rotation', $rotation, \PDO::PARAM_INT);
         $stmt->executeStatement();
 
         // Now unschedule them
@@ -634,7 +626,7 @@ SQL;
                     'rotation'      => (int) $rotation,
                 ]
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**

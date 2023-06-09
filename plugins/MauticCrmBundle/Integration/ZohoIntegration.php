@@ -146,8 +146,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @param $data
      */
     public function prepareResponseForExtraction($data)
     {
@@ -181,7 +179,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (isset($data['data'])) {
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+            $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
             $objects               = $data['data'];
             /** @var array $rows */
             $integrationEntities = [];
@@ -440,7 +438,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             unset($integrationEntities);
         }
@@ -850,7 +848,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $params['end']   = null;
         }
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated = $totalErrors = 0;
@@ -875,9 +873,9 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $progress      = false;
         $totalToUpdate = array_sum(
-            $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'], ['Contacts', 'Leads'])
+            $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, 0, $params['start'], $params['end'], ['Contacts', 'Leads'])
         );
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, $params['start'], $params['end']);
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, 0, $params['start'], $params['end']);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -947,7 +945,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                         $lead['integration_entity'] = 'Leads';
                         $leadsToUpdateInZ[$key]     = $lead;
-                        $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                        $integrationEntity          = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
                         $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                     }
                 }
@@ -964,7 +962,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $lead['internal_entity_id']
             );
             if (count($integrationId)) { // lead exists, then update
-                $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                $integrationEntity     = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
                 $integrationEntity->setLastSyncDate(new \DateTime());
                 $integrationEntity->setInternalEntity('lead-converted');
                 $integrationEntities[] = $integrationEntity;
@@ -972,7 +970,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             }
         }
 
-        //create lead records, including deleted on Zoho side (last_sync = null)
+        // create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $totalToCreate, $params['start'], $params['end']);
 
@@ -1096,7 +1094,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $mapper = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
 
         $counter      = 0;
@@ -1135,22 +1133,16 @@ class ZohoIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @param $fields
-     * @param $sfRecord
-     * @param $config
-     * @param $objectFields
-     */
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
-        //check if update blank fields is selected
+        // check if update blank fields is selected
         if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0]) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently
                 }
                 if ('null' === $sfField && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
-                    //map to mautic field
+                    // map to mautic field
                     $fields[$fieldName] = $objectFields['create'][$fieldName];
                 }
             }
@@ -1243,9 +1235,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @param $fields
-     *
      * @return array
      */
     private function parseZohoRecord($data, $fields)
@@ -1295,7 +1284,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $fieldsToUpdate
      * @param array $objects
      *
      * @return array

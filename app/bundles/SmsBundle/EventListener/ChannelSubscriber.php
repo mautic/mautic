@@ -47,7 +47,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => SmsListType::class,
-                        'repository'     => 'MauticSmsBundle:Sms',
+                        'repository'     => \Mautic\SmsBundle\Entity\Sms::class,
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
                     ReportModel::CHANNEL_FEATURE => [

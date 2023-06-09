@@ -11,8 +11,6 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 class CampaignEventHelper
 {
     /**
-     * @param $event
-     *
      * @return bool
      */
     public static function validatePointChange($event, Lead $lead)
@@ -31,8 +29,6 @@ class CampaignEventHelper
     }
 
     /**
-     * @param $event
-     *
      * @return bool
      */
     public static function validateListChange(ListChangeEvent $eventDetails, $event)

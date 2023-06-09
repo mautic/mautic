@@ -90,7 +90,7 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
@@ -101,6 +101,15 @@ jobs:
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        path: |
+          ./junit.xml
+          ./coverage.xml
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -172,7 +181,11 @@ jobs:
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
-          composer phpstan
+          export SYMFONY_ENV=dev
+          export APP_ENV=dev
+          export APP_DEBUG=1
+          bin/console cache:warmup --env=dev        
+          composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
@@ -218,9 +231,14 @@ jobs:
           cd test_composer
           cp ../.github/ci-files/composer.json ./
           composer install
-          
+
+          # install NPM packages
+          npm install
+
           # test if console works by generating assets for next step
           php ./bin/console mautic:assets:generate
+
+          echo "All production assets were generated sucessfully."
           
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"

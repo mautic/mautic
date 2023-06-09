@@ -37,7 +37,6 @@ class ExportSchedulerCommand extends Command
     {
         $this
             ->setName('mautic:reports:scheduler')
-            ->setDescription('Processes scheduler for report\'s export')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
@@ -53,7 +52,7 @@ class ExportSchedulerCommand extends Command
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
@@ -64,6 +63,7 @@ class ExportSchedulerCommand extends Command
             $output->writeln('<error>'.$e->getMessage().'</error>');
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Processes scheduler for report\'s export';
 }

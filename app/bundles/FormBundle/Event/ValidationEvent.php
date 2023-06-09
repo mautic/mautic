@@ -54,9 +54,6 @@ class ValidationEvent extends CommonEvent
         return $this->value;
     }
 
-    /**
-     * @param $reason
-     */
     public function failedValidation($reason)
     {
         $this->valid         = false;

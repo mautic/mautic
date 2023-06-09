@@ -51,7 +51,7 @@ class StageModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticStageBundle:Stage');
+        return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
     }
 
     /**
@@ -145,7 +145,7 @@ class StageModel extends CommonFormModel
         static $actions;
 
         if (empty($actions)) {
-            //build them
+            // build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);

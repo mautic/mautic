@@ -23,7 +23,7 @@ class CompanyLead
     private $dateAdded;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $primary = false;
 

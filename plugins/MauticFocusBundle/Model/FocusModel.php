@@ -123,7 +123,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFocusBundle:Focus');
+        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
     }
 
     /**
@@ -133,7 +133,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticFocusBundle:Stat');
+        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
     }
 
     /**
@@ -309,9 +309,6 @@ class FocusModel extends FormModel
     /**
      * Get whether the color is light or dark.
      *
-     * @param $hex
-     * @param $level
-     *
      * @return bool
      */
     public static function isLightColor($hex, $level = 200)
@@ -423,7 +420,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param      $unit
      * @param null $dateFormat
      * @param bool $canViewOthers
      *

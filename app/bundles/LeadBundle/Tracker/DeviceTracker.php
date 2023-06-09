@@ -57,8 +57,6 @@ class DeviceTracker
     }
 
     /**
-     * @param $userAgent
-     *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
