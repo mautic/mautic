@@ -379,6 +379,7 @@ class EmailType extends AbstractType
                     'required'    => false,
                     'is_parent'   => $isParent,
                     'is_existing' => $isExisting,
+                    'data'        => $event->getData()->getVariantSettings(),
                 ]
             );
         };
@@ -388,10 +389,10 @@ class EmailType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier) {
                 /** @var Email $emailEntity */
-                $emailEntity = $event->getData();
+                $emailEntity     = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
-                $isParent = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
-                $isExisting = $event->getData()->getId() > 0;
+                $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
+                $isExisting      = $event->getData()->getId() > 0;
                 $variantSettingsModifier($event, $isParent, $isExisting);
             }
         );
@@ -403,9 +404,9 @@ class EmailType extends AbstractType
                 $data = $event->getData();
 
                 /** @var Email $emailEntity */
-                $emailEntity = $event->getForm()->getData();
+                $emailEntity     = $event->getForm()->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
-                $isParent = $variantChildren && count($variantChildren) > 0;
+                $isParent        = $variantChildren && count($variantChildren) > 0;
 
                 $variantSettingsModifier($event, $isParent);
 
