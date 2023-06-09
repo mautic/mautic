@@ -72,34 +72,34 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'required' => false,
                     ],
                     ],
+                [
+                    'any',
+                    YesNoButtonGroupType::class,
                     [
-                        'any',
-                        YesNoButtonGroupType::class,
-                        [
-                            'label' => 'mautic.form.field.form.condition.any_value',
-                            'attr'  => [
-                                'data-show-on' => '{"formfield_conditions_expr": "in"}',
-                            ],
-                            'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        'label' => 'mautic.form.field.form.condition.any_value',
+                        'attr'  => [
+                            'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
+                        'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
                     ],
+                ],
+                [
+                    'expr',
+                    ChoiceType::class,
                     [
-                        'expr',
-                        ChoiceType::class,
-                        [
-                            'choices'  => [
-                                'mautic.core.operator.in'    => 'in',
-                                'mautic.core.operator.notin' => 'notIn',
-                            ],
-                            'label'       => false,
-                            'placeholder' => false,
-                            'attr'        => [
-                                'class' => 'form-control',
-                            ],
-                            'required' => false,
+                        'choices'  => [
+                            'mautic.core.operator.in'    => 'in',
+                            'mautic.core.operator.notin' => 'notIn',
                         ],
-                    ]
-                );
+                        'label'       => false,
+                        'placeholder' => false,
+                        'attr'        => [
+                            'class' => 'form-control',
+                        ],
+                        'required' => false,
+                    ],
+                ]
+            );
 
         $this->form->buildForm($this->formBuilder, $options);
     }

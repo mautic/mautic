@@ -340,7 +340,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var textarea      = itemContainer.find('.editor');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
-    if (textarea.hasClass('legacy-builder')) {
+    if (mauticFroalaEnabled && textarea.hasClass('legacy-builder')) {
         textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
             toolbarSticky: false,
@@ -415,7 +415,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         }
     });
 
-    if (altTextarea.hasClass('legacy-builder')) {
+    if (mauticFroalaEnabled && altTextarea.hasClass('legacy-builder')) {
         altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
             toolbarSticky: false,

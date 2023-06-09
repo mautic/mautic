@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Swift_Transport;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,12 +20,12 @@ use Symfony\Component\Finder\Finder;
  */
 class ProcessEmailQueueCommand extends ModeratedCommand
 {
-    private Swift_Transport $swiftTransport;
+    private \Swift_Transport $swiftTransport;
     private EventDispatcherInterface $eventDispatcher;
     private CoreParametersHelper $parametersHelper;
 
     public function __construct(
-        Swift_Transport $swiftTransport,
+        \Swift_Transport $swiftTransport,
         EventDispatcherInterface $eventDispatcher,
         CoreParametersHelper $parametersHelper,
         PathsHelper $pathsHelper
@@ -42,7 +41,6 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:emails:send')
-            ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
@@ -54,7 +52,7 @@ The <info>%command.name%</info> command is used to process the application's e-m
 
 <info>php %command.full_name%</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -72,11 +70,11 @@ EOT
         if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
-            return ExitCode::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if (!$this->checkRunStatus($input, $output, $lockName)) {
-            return ExitCode::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if (empty($timeout)) {
@@ -84,8 +82,8 @@ EOT
         }
 
         if (!$skipClear) {
-            //Swift mailer's send command does not handle failed messages well rather it will retry sending forever
-            //so let's first handle emails stuck in the queue and remove them if necessary
+            // Swift mailer's send command does not handle failed messages well rather it will retry sending forever
+            // so let's first handle emails stuck in the queue and remove them if necessary
             if (!$this->swiftTransport->isStarted()) {
                 $this->swiftTransport->start();
             }
@@ -99,7 +97,7 @@ EOT
 
                     $lockedtime = filectime($file);
                     if (!(time() - $lockedtime) > $timeout) {
-                        //the file is not old enough to be resent yet
+                        // the file is not old enough to be resent yet
                         continue;
                     }
                     if (!$handle = @fopen($file, 'r+')) {
@@ -110,7 +108,7 @@ EOT
                         continue;
                     }
 
-                    //rename the file so no other process tries to find it
+                    // rename the file so no other process tries to find it
                     $tmpFilename = str_replace(['.finalretry', '.sending', '.tryagain'], '', $file);
                     $tmpFilename .= '.finalretry';
                     rename($file, $tmpFilename);
@@ -140,7 +138,7 @@ EOT
                         $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
                         rename($tmpFilename, $retryFilename, $handle);
                     } else {
-                        //delete the file, either because it sent or because it failed
+                        // delete the file, either because it sent or because it failed
                         unlink($tmpFilename);
                     }
                     fclose($handle);
@@ -148,7 +146,7 @@ EOT
             }
         }
 
-        //now process new emails
+        // now process new emails
         if (!$quiet) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
@@ -162,21 +160,21 @@ EOT
             $commandArgs['--quiet'] = true;
         }
 
-        //set spool message limit
+        // set spool message limit
         if ($msgLimit = $input->getOption('message-limit')) {
             $commandArgs['--message-limit'] = $msgLimit;
         } elseif ($msgLimit = $this->parametersHelper->get('mautic.mailer_spool_msg_limit')) {
             $commandArgs['--message-limit'] = $msgLimit;
         }
 
-        //set time limit
+        // set time limit
         if ($timeLimit = $input->getOption('time-limit')) {
             $commandArgs['--time-limit'] = $timeLimit;
         } elseif ($timeLimit = $this->parametersHelper->get('mautic.mailer_spool_time_limit')) {
             $commandArgs['--time-limit'] = $timeLimit;
         }
 
-        //set the recover timeout
+        // set the recover timeout
         if ($timeout = $input->getOption('recover-timeout')) {
             $commandArgs['--recover-timeout'] = $timeout;
         } elseif ($timeout = $this->parametersHelper->get('mautic.mailer_spool_recover_timeout')) {
@@ -191,6 +189,7 @@ EOT
             return (int) $returnCode;
         }
 
-        return $returnCode;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Processes SwiftMail\'s mail queue';
 }

@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use InvalidArgumentException;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\UserBundle\Entity\User;
@@ -170,7 +169,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
             ->findOneBy(['username' => $username]);
 
         if (!$user) {
-            throw new InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
+            throw new \InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
         }
 
         $firewall = 'mautic';

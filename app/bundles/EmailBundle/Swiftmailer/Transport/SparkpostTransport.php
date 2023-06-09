@@ -474,9 +474,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         return null;
     }
 
-    /**
-     * @param $hashId
-     */
     private function processCallbackByHashId($hashId, array $event)
     {
         switch ($event['type']) {
@@ -497,9 +494,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * @param $email
-     */
     private function processCallbackByEmailAddress($email, array $event)
     {
         switch ($event['type']) {

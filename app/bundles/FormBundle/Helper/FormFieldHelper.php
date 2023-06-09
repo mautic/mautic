@@ -118,8 +118,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get fields input filter.
      *
-     * @param $type
-     *
      * @return string
      */
     public function getFieldFilter($type)
@@ -136,8 +134,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param       $type
-     * @param       $value
      * @param Field $f
      *
      * @return array
@@ -147,7 +143,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
-                //don't check empty values unless the constraint is NotBlank
+                // don't check empty values unless the constraint is NotBlank
                 if (NotBlank::class === $constraint && empty($value)) {
                     continue;
                 }
@@ -187,12 +183,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
-    /**
-     * @param $field
-     * @param $value
-     * @param $formName
-     * @param $formHtml
-     */
     public function populateField($field, $value, $formName, &$formHtml)
     {
         $alias = $field->getAlias();

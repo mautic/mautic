@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Swift_Events_EventListener;
 
 class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Transport
 {
@@ -95,7 +94,7 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         // ignore
     }
 
-    public function registerPlugin(Swift_Events_EventListener $plugin)
+    public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
         // ignore
     }

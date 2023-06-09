@@ -13,6 +13,7 @@ class DataExporterHelper
      *
      * @param int|null               $start
      * @param AbstractCommonModel<T> $model
+     *
      * @template T of object
      *
      * @return array

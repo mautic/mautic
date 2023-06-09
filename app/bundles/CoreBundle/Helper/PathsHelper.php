@@ -132,6 +132,16 @@ class PathsHelper
     }
 
     /**
+     * Returns absolute path to the root directory where the "vendor" directory is located.
+     */
+    public function getVendorRootPath(): string
+    {
+        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+
+        return dirname($reflection->getFileName(), 3);
+    }
+
+    /**
      * Get the path to specified area.  Returns relative by default with the exception of cache and log
      * which will be absolute regardless of $fullPath setting.
      *
@@ -167,7 +177,7 @@ class PathsHelper
 
             case 'dashboard.user':
             case 'dashboard.global':
-                //these are absolute regardless as they are configurable
+                // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
                 if ('dashboard.global' == $name) {

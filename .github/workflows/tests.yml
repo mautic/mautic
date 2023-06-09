@@ -172,7 +172,7 @@ jobs:
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
-          composer phpstan
+          composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
@@ -218,9 +218,14 @@ jobs:
           cd test_composer
           cp ../.github/ci-files/composer.json ./
           composer install
-          
+
+          # install NPM packages
+          npm install
+
           # test if console works by generating assets for next step
           php ./bin/console mautic:assets:generate
+
+          echo "All production assets were generated sucessfully."
           
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"

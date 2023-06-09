@@ -55,8 +55,6 @@ class Copy
     }
 
     /**
-     * @param $id
-     *
      * @return $this
      */
     public function setId($id)

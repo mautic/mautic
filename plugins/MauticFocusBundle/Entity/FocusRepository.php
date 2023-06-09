@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FocusRepository extends CommonRepository
 {
     /**
-     * @param $formId
-     *
      * @return array
      */
     public function findByForm($formId)
@@ -43,7 +41,6 @@ class FocusRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -54,7 +51,6 @@ class FocusRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */

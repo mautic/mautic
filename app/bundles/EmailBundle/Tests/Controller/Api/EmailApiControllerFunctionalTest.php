@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Swift_Mailer;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -31,7 +30,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
-        $mailer     = new Swift_Mailer($transport);
+        $mailer     = new \Swift_Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
 
@@ -304,7 +303,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Send to segment:
-        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -324,7 +323,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmail();
 
         // Send to contact:
-        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -342,7 +341,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Send to segment:
-        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -362,7 +361,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Send to contact:
-        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());

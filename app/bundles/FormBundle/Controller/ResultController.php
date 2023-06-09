@@ -4,25 +4,32 @@ namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -35,7 +42,7 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -52,7 +59,7 @@ class ResultController extends CommonFormController
         $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
@@ -86,7 +93,7 @@ class ResultController extends CommonFormController
 
         $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
-        //set limits
+        // set limits
         $limit = $pageHelper->getLimit();
         $start = $pageHelper->getStart();
 
@@ -106,7 +113,7 @@ class ResultController extends CommonFormController
             $session->set("mautic.formresult.$objectId.filters", $filters);
         }
 
-        //get the results
+        // get the results
         $entities = $model->getEntities(
             [
                 'start'          => $start,
@@ -126,7 +133,7 @@ class ResultController extends CommonFormController
         unset($entities);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_results', ['objectId' => $objectId, 'page' => $lastPage]);
@@ -144,7 +151,7 @@ class ResultController extends CommonFormController
             );
         }
 
-        //set what page currently on so that we can return here if need be
+        // set what page currently on so that we can return here if need be
         $pageHelper->rememberPage($page);
 
         return $this->delegateView(
@@ -243,7 +250,7 @@ class ResultController extends CommonFormController
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
@@ -329,7 +336,7 @@ class ResultController extends CommonFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         $viewParameters = [
             'objectId' => $formId,
@@ -399,9 +406,6 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    /**
-     * @param $action
-     */
     public function getPostActionRedirectArguments(array $args, $action)
     {
         switch ($action) {

@@ -34,7 +34,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                     'mautic:campaigns:messages',
                 ]
             )
-            ->setDescription('Process sending of messages queue.')
             ->addOption(
                 '--channel',
                 '-c',
@@ -57,7 +56,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
@@ -74,6 +73,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Process sending of messages queue.';
 }

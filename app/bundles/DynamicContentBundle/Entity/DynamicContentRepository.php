@@ -34,7 +34,6 @@ class DynamicContentRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -52,7 +51,7 @@ class DynamicContentRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -121,7 +120,6 @@ class DynamicContentRepository extends CommonRepository
     /**
      * Up the sent counts.
      *
-     * @param     $id
      * @param int $increaseBy
      */
     public function upSentCount($id, $increaseBy = 1)
@@ -168,7 +166,7 @@ class DynamicContentRepository extends CommonRepository
         }
 
         if ('translation' == $topLevel) {
-            //only get top level pages
+            // only get top level pages
             $q->andWhere($q->expr()->isNull('e.translationParent'));
         } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
@@ -194,8 +192,6 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @param $slot
-     *
      * @return bool|object|null
      */
     public function getDynamicContentForSlotFromCampaign($slot)

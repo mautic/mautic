@@ -220,8 +220,6 @@ class Asset extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -692,7 +690,7 @@ class Asset extends FormEntity
             $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {
-                //get it from the original name
+                // get it from the original name
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
@@ -1311,7 +1309,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param        $size
      * @param string $unit
      *
      * @return string
@@ -1330,7 +1327,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param        $size
      * @param string $unit
      *
      * @return array

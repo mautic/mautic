@@ -161,7 +161,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG, $data);
 
         // Register graphs
-        //$event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
+        // $event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
     }
 
     /**

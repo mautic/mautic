@@ -6,8 +6,7 @@
     <link href="{{ asset("#{prefix}/../../media/bundles/fmelfinder/css/theme.css") }}" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <script src="{{ asset("#{prefix}/../../node_modules/jquery/dist/jquery.js") }}"></script>
-    <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/jquery-ui.min.js") }}"></script>
+    <script src="{{ asset("#{prefix}/../../media/js/libraries.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/elfinder.min.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
     var editorType = '';
@@ -21,7 +20,7 @@
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
-            i18nBaseUrl : '{{ asset("#{prefix}/../../node_modules/bundles/fmelfinder/js/i18n/") }}',
+            i18nBaseUrl : '{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/i18n/") }}',
             onlyMimes: {{ onlyMimes|raw }},
             getFileCallback : function(file, fm) {
                 let fileUrl = file.url;

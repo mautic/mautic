@@ -59,9 +59,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $entity
-     * @param $unlock
-     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
@@ -72,7 +69,7 @@ class CategoryModel extends FormModel
         }
         $alias = $this->cleanAlias($alias, '', false, '-');
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
@@ -95,7 +92,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -118,8 +114,6 @@ class CategoryModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Category|null
      */
     public function getEntity($id = null)
@@ -133,11 +127,6 @@ class CategoryModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -180,10 +169,6 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $bundle
-     * @param $filter
-     * @param $limit
      *
      * @return array
      */

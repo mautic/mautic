@@ -18,12 +18,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Tweet>
+ *
  * @implements AjaxLookupModelInterface<Tweet>
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -56,7 +56,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 unset($entities);
@@ -168,11 +168,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

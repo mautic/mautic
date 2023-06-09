@@ -115,9 +115,6 @@ class FieldModelTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param $table
-     * @param $column
-     *
      * @return array
      */
     private function getColumns($table, $column)

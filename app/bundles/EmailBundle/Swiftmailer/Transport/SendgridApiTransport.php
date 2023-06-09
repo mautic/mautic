@@ -4,8 +4,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
-use Swift_Events_EventListener;
-use Swift_Mime_SimpleMessage;
 use Symfony\Component\HttpFoundation\Request;
 
 class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
@@ -75,7 +73,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      *
      * @throws \Swift_TransportException
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->sendGridApiFacade->send($message);
 
@@ -85,7 +83,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     /**
      * Register a plugin in the Transport.
      */
-    public function registerPlugin(Swift_Events_EventListener $plugin)
+    public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
         $this->getDispatcher()->bindEventListener($plugin);
     }
@@ -109,7 +107,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     public function getMaxBatchLimit()
     {
-        //Sengrid allows to include max 1000 email address into 1 batch
+        // Sengrid allows to include max 1000 email address into 1 batch
         return 1000;
     }
 
@@ -123,8 +121,8 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        //Sengrid counts all email address (to, cc and bcc)
-        //https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.personalizations
+        // Sengrid counts all email address (to, cc and bcc)
+        // https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.personalizations
 
         $toCount  = is_countable($message->getTo()) ? count($message->getTo()) : 0;
         $ccCount  = is_countable($message->getCc()) ? count($message->getCc()) : 0;

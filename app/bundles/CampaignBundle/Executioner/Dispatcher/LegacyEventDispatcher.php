@@ -79,9 +79,6 @@ class LegacyEventDispatcher
         $this->contactTracker     = $contactTracker;
     }
 
-    /**
-     * @param $wasBatchProcessed
-     */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
         ArrayCollection $logs,
@@ -193,8 +190,6 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param $eventName
-     *
      * @return CampaignExecutionEvent
      */
     private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
@@ -266,9 +261,6 @@ class LegacyEventDispatcher
         }
     }
 
-    /**
-     * @param $result
-     */
     private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result)
     {
         $eventArray = $this->getEventArray($log->getEvent());
@@ -316,8 +308,6 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param $result
-     *
      * @return bool
      */
     private function isFailed($result)

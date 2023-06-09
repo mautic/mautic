@@ -32,8 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PublicController extends CommonFormController
 {
     /**
-     * @param $slug
-     *
      * @return Response
      *
      * @throws \Exception
@@ -143,15 +141,15 @@ class PublicController extends CommonFormController
                     }
 
                     if (count($variants)) {
-                        //check to see if this user has already been displayed a specific variant
+                        // check to see if this user has already been displayed a specific variant
                         $variantCookie = $request->cookies->get('mautic_page_'.$entity->getId());
 
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
-                                //if not the parent, show the specific variant already displayed to the visitor
+                                // if not the parent, show the specific variant already displayed to the visitor
                                 if ($variantCookie !== $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
-                                } //otherwise proceed with displaying parent
+                                } // otherwise proceed with displaying parent
                             }
                         } else {
                             // Add parent weight
@@ -170,7 +168,7 @@ class PublicController extends CommonFormController
                             }
                             $totalHits += $variants[$id]['hits'];
 
-                            //determine variant to show
+                            // determine variant to show
                             foreach ($variants as &$variant) {
                                 $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
                             }
@@ -193,12 +191,12 @@ class PublicController extends CommonFormController
                                 }
                             );
 
-                            //find the one with the most difference from weight
+                            // find the one with the most difference from weight
 
                             reset($variants);
                             $useId = key($variants);
 
-                            //set the cookie - 14 days
+                            // set the cookie - 14 days
                             $cookieHelper->setCookie(
                                 'mautic_page_'.$entity->getId(),
                                 $useId,
@@ -242,7 +240,7 @@ class PublicController extends CommonFormController
                  * @deprecated  BC support to be removed in 3.0
                  */
                 $template = $entity->getTemplate();
-                //all the checks pass so display the content
+                // all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
@@ -300,8 +298,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $id
-     *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
      * @throws \Exception
@@ -322,7 +318,7 @@ class PublicController extends CommonFormController
         $content   = $entity->getCustomHtml();
         if (empty($content) && !empty($BCcontent)) {
             $template = $entity->getTemplate();
-            //all the checks pass so display the content
+            // all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $entity->getContent();
 
@@ -425,8 +421,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $redirectId
-     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      *
      * @throws \Exception

@@ -42,7 +42,6 @@ trait VariantEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      */
     protected static function addVariantMetadata(ClassMetadataBuilder $builder, $entityClass)
     {
@@ -180,8 +179,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * @param $variantStartDate
-     *
      * @return $this
      */
     public function setVariantStartDate($variantStartDate)
@@ -355,8 +352,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeVariantCount($getter)
@@ -383,10 +378,6 @@ trait VariantEntityTrait
 
     /**
      * Finds and appends IDs for translations of a variant.
-     *
-     * @param $entity
-     * @param $ids
-     * @param $publishedOnly
      */
     protected function appendTranslationEntityIds($entity, &$ids, $publishedOnly)
     {

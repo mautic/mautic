@@ -89,7 +89,7 @@ class TweetType extends AbstractType
 
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
         $builder->add(
-                $builder->create(
+            $builder->create(
                 'asset',
                 AssetListType::class,
                 [
@@ -134,7 +134,7 @@ class TweetType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);

@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class DynamicContentApiController extends CommonController
 {
     /**
-     * @param $objectAlias
-     *
      * @return mixed
      */
     public function processAction(Request $request, $objectAlias)

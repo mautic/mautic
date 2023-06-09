@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Swift_Mailer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -108,7 +107,7 @@ class MailHelperTest extends TestCase
                 )
             );
 
-        $swiftMailer = new Swift_Mailer(new BatchTransport());
+        $swiftMailer = new \Swift_Mailer(new BatchTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -136,7 +135,7 @@ class MailHelperTest extends TestCase
                 )
             );
 
-        $swiftMailer = new Swift_Mailer(new BatchTransport());
+        $swiftMailer = new \Swift_Mailer(new BatchTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -157,7 +156,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory(false);
 
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -199,7 +198,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory(false);
 
         $transport   = new BatchTransport(true);
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -230,7 +229,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -330,7 +329,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BcInterfaceTokenTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -364,7 +363,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
@@ -391,7 +390,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory(true);
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
         $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $email       = new Email();
 
@@ -414,7 +413,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory(true);
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
         $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $email       = new Email();
 
@@ -432,7 +431,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory(true);
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
         $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $email       = new Email();
 
@@ -451,7 +450,7 @@ class MailHelperTest extends TestCase
         ];
         $factoryMock = $this->getMockFactory(true, $parameterMap);
         $transport   = new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
         $mailer      = new MailHelper($factoryMock, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $email       = new Email();
 
@@ -468,7 +467,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory();
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -633,7 +632,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->setBody('{signature}');
@@ -663,7 +662,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
@@ -689,7 +688,7 @@ class MailHelperTest extends TestCase
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
@@ -720,7 +719,7 @@ class MailHelperTest extends TestCase
     {
         $mockFactory = $this->getMockFactory();
         $transport   = ($useSmtp) ? new SmtpTransport() : new BatchTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         return new MailHelper($mockFactory, $swiftMailer);
     }
@@ -814,7 +813,7 @@ class MailHelperTest extends TestCase
                 )
             );
 
-        $swiftMailer = new Swift_Mailer(new SmtpTransport());
+        $swiftMailer = new \Swift_Mailer(new SmtpTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
@@ -831,7 +830,7 @@ class MailHelperTest extends TestCase
 
     public function testThatTokenizationIsEnabledIfTransportSupportsTokenization()
     {
-        $swiftMailer = new Swift_Mailer($this->spoolTransport);
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
         $this->delegatingSpool->expects($this->once())
             ->method('isTokenizationEnabled')
             ->willReturn(true);
@@ -842,7 +841,7 @@ class MailHelperTest extends TestCase
 
     public function testThatTokenizationIsDisabledIfTransportDoesnotSupportTokenization()
     {
-        $swiftMailer = new Swift_Mailer($this->spoolTransport);
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
         $this->delegatingSpool->expects($this->once())
             ->method('isTokenizationEnabled')
             ->willReturn(false);
@@ -871,7 +870,7 @@ class MailHelperTest extends TestCase
             ->willReturn($router);
 
         $transport   = new SmtpTransport();
-        $swiftMailer = new Swift_Mailer($transport);
+        $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);
@@ -930,7 +929,7 @@ class MailHelperTest extends TestCase
                 ['mailer_append_tracking_pixel', false, false],
             ]
         );
-        $swiftMailer = new Swift_Mailer(new SmtpTransport());
+        $swiftMailer = new \Swift_Mailer(new SmtpTransport());
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->addTo($this->contacts[0]['email']);

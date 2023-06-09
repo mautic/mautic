@@ -136,7 +136,7 @@ class CustomFieldColumn
         } catch (DriverException $e) {
             $this->logger->warning($e->getMessage());
 
-            if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
+            if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
                 throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
             }
 
@@ -144,7 +144,7 @@ class CustomFieldColumn
         }
 
         if ($saveLeadField) {
-            //$leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
+            // $leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
             $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 

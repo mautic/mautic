@@ -33,11 +33,6 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param $key
-     * @param $header
-     * @param $icon
-     * @param $content
-     * @param $form
      * @param int $priority
      */
     public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
@@ -76,14 +71,6 @@ class BuilderEvent extends Event
         return $this->slotTypes;
     }
 
-    /**
-     * @param $key
-     * @param $header
-     * @param $icon
-     * @param $content
-     * @param $form
-     * @param $priority
-     */
     public function addSection($key, $header, $icon, $content, $form, $priority = 0)
     {
         $this->sections[$key] = [
@@ -163,13 +150,13 @@ class BuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
         }
 
-        //check for required keys
+        // check for required keys
         $this->verifyCriteria(
             ['group', 'label', 'event'],
             $criteria
         );
 
-        //translate the group
+        // translate the group
         $criteria['group']                = $this->translator->trans($criteria['group']);
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
@@ -197,10 +184,6 @@ class BuilderEvent extends Event
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
@@ -314,7 +297,6 @@ class BuilderEvent extends Event
     /**
      * Add tokens from a BuilderTokenHelper.
      *
-     * @param        $tokens
      * @param string $labelColumn
      * @param string $valueColumn
      * @param bool   $convertToLinks If true, the tokens will be converted to links
@@ -340,17 +322,13 @@ class BuilderEvent extends Event
     /**
      * Get tokens from a BuilderTokenHelper.
      *
-     * @param $tokens
-     * @param $labelColumn
-     * @param $valueColumn
-     *
      * @return array|void
      */
     public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
     {
         return $tokenHelper->getTokens(
             $tokens,
-            ('label' == $this->tokenFilterTarget ? $this->tokenFilterText : ''),
+            'label' == $this->tokenFilterTarget ? $this->tokenFilterText : '',
             $labelColumn,
             $valueColumn
         );
@@ -387,8 +365,6 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param $type
-     *
      * @return bool
      */
     protected function getRequested($type)
