@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
@@ -11,24 +13,35 @@ class SmtpTransportExtension implements TransportExtensionInterface, TestConnect
         return ['smtp'];
     }
 
-    /** {@inheritdoc} */
     public function testConnection(array $settings): bool
     {
+        if (empty($settings['mailer_host'])) {
+            throw new ConnectionErrorException('Host is empty.');
+        }
+
+        if (empty($settings['mailer_port'])) {
+            throw new ConnectionErrorException('Port is empty.');
+        }
+
         try {
-            $connect = fsockopen($settings['mailer_host'], $settings['mailer_port'], $errno, $errstr, 10);
-        } catch (\Throwable $exception) {
-            throw new ConnectionErrorException($exception->getMessage());
-        }
-        $response = fgets($connect, 4096);
-        if (empty($connect)) {
-            throw new ConnectionErrorException($response);
+            $connect = fsockopen($settings['mailer_host'], (int) $settings['mailer_port'], timeout: 10);
+        } catch (\Throwable) {
+            throw new ConnectionErrorException();
         }
 
-        fclose($connect);
+        if (false === $connect) {
+            throw new ConnectionErrorException();
+        }
 
-        /*
-         * TODO: Add more checks for SMTP connection
-         */
+        try {
+            $response = fgets($connect, 4096);
+
+            if (empty($response)) {
+                throw new ConnectionErrorException();
+            }
+        } finally {
+            fclose($connect);
+        }
 
         return true;
     }

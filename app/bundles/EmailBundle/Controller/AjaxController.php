@@ -186,8 +186,9 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0, 'message' => ''];
         $user      = $userHelper->getUser();
+        $settings  = $request->request->all();
 
-        if ($user->isAdmin()) {
+        if (!empty($settings['mailer_transport']) && $user->isAdmin()) {
             $settings = $request->request->all();
 
             try {
@@ -200,10 +201,8 @@ class AjaxController extends CommonAjaxController
 
             try {
                 // Pass all the settings to the extension and it should handle the rest
-                if ($extension->testConnection($settings)) {
-                    $dataArray['success'] = 1;
-                    $dataArray['message'] = $this->translator->trans('mautic.core.success');
-                }
+                $dataArray['success'] = $extension->testConnection($settings);
+                $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (ConnectionErrorException $exception) {
                 $dataArray['message'] = $exception->getMessage();
             }
