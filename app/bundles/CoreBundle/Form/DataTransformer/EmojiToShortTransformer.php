@@ -24,7 +24,7 @@ class EmojiToShortTransformer implements DataTransformerInterface
                 $convert = $this->transform($convert);
             }
         } else {
-            $content = EmojiHelper::toEmoji($content, 'short');
+            $content = EmojiHelper::toEmoji((string) $content, 'short');
         }
 
         return $content;

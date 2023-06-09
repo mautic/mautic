@@ -1085,7 +1085,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // Fix the HTML markup
         if (is_array($result)) {
             foreach ($result as &$field) {
-                $field = html_entity_decode($field);
+                $field = is_string($field) ? html_entity_decode($field) : $field;
             }
         }
 

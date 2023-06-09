@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0']
+        php-versions: ['8.0', '8.1']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -50,7 +50,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.0' && matrix.db-types == 'mariadb'}}
+      if: ${{matrix.php-versions == '8.1' && matrix.db-types == 'mariadb'}}
       uses: actions/cache@v3
       with:
         path: ./var/cache/phpunit
@@ -89,18 +89,27 @@ jobs:
       run: |
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
+        if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        path: |
+          ./junit.xml
+          ./coverage.xml
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -125,7 +134,7 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
-        php-versions: ['8.0']
+        php-versions: ['8.1']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
@@ -172,6 +181,10 @@ jobs:
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
+          export SYMFONY_ENV=dev
+          export APP_ENV=dev
+          export APP_DEBUG=1
+          bin/console cache:warmup --env=dev        
           composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test

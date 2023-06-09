@@ -55,7 +55,7 @@ class ResponseItems implements \Iterator
      *
      * @return ResponseItem
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->items[$this->position];
     }
@@ -65,7 +65,7 @@ class ResponseItems implements \Iterator
      *
      * @see  http://php.net/manual/en/iterator.next.php
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -77,7 +77,7 @@ class ResponseItems implements \Iterator
      *
      * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -86,10 +86,8 @@ class ResponseItems implements \Iterator
      * Checks if current position is valid.
      *
      * @see  http://php.net/manual/en/iterator.valid.php
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->items[$this->position]);
     }
@@ -99,7 +97,7 @@ class ResponseItems implements \Iterator
      *
      * @see  http://php.net/manual/en/iterator.rewind.php
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }

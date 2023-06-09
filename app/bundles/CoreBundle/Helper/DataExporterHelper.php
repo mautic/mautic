@@ -42,9 +42,7 @@ class DataExporterHelper
 
         if (is_callable($resultsCallback)) {
             foreach ($items as $item) {
-                $row = array_map(function ($itemEncode) {
-                    return html_entity_decode($itemEncode, ENT_QUOTES);
-                }, $resultsCallback($item));
+                $row = array_map(fn ($itemEncode) => html_entity_decode((string) $itemEncode, ENT_QUOTES), $resultsCallback($item));
 
                 $toExport[] = $this->secureAgainstCsvInjection($row);
             }

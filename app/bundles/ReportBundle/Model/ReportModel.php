@@ -664,7 +664,7 @@ class ReportModel extends FormModel
 
         foreach ($data as $keys => $lead) {
             foreach ($lead as $key => $field) {
-                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+                $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
             }
         }
 
