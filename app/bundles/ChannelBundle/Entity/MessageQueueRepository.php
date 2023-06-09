@@ -90,7 +90,7 @@ class MessageQueueRepository extends CommonRepository
                     'status'  => MessageQueue::STATUS_SENT,
                 ]
             )
-            ->executeStatement()
+            ->executeQuery()
             ->fetchOne();
     }
 
