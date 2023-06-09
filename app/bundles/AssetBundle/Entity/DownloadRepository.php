@@ -71,8 +71,8 @@ class DownloadRepository extends CommonRepository
      * Get list of assets ordered by it's download count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param int                               $limit
+     * @param int                               $offset
      *
      * @return array
      *
@@ -94,8 +94,8 @@ class DownloadRepository extends CommonRepository
      * Get list of asset referrals ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param int                               $limit
+     * @param int                               $offset
      *
      * @return array
      *
@@ -142,8 +142,6 @@ class DownloadRepository extends CommonRepository
 
     /**
      * @param \DateTime $fromDate
-     *
-     * @return mixed
      */
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
     {
@@ -184,8 +182,6 @@ class DownloadRepository extends CommonRepository
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
      * @param \DateTime $fromDate
-     *
-     * @return mixed
      */
     public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
     {
