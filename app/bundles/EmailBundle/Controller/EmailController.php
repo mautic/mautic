@@ -313,7 +313,7 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        //get A/B test information
+        // get A/B test information
         [$parent, $children] = $email->getVariants();
 
         $abTestResults = [];
@@ -408,7 +408,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, AbTestSettingsService $abTestSettingsService, $entity = null)
     {
         $model = $this->getModel('email');
         \assert($model instanceof EmailModel);
@@ -440,7 +440,7 @@ class EmailController extends FormController
 
         $entity->clearVariantSettings();
 
-        //create the form
+        // create the form
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
@@ -481,7 +481,7 @@ class EmailController extends FormController
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $abTestSettingsService, $entity->getId(), true);
                     }
                 }
             } else {
@@ -812,7 +812,7 @@ class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, AbTestSettingsService $abTestSettingsService, $objectId)
     {
         $model = $this->getModel('email');
         /** @var Email $entity */
@@ -836,7 +836,7 @@ class EmailController extends FormController
             $session->set($contentName, $entity->getCustomHtml());
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $abTestSettingsService, $entity);
     }
 
     /**
@@ -977,7 +977,7 @@ class EmailController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, AbTestSettingsService $abTestSettingsService, $objectId)
     {
         $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
@@ -1017,7 +1017,7 @@ class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $abTestSettingsService, $clone);
     }
 
     /**
@@ -1096,8 +1096,6 @@ class EmailController extends FormController
     /**
      * Manually sends emails.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function absendAction(Request $request, $objectId)
@@ -1107,7 +1105,7 @@ class EmailController extends FormController
         $entity  = $model->getEntity($objectId);
         $session = $this->container->get('session');
         $page    = $session->get('mautic.email.page', 1);
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
 
         $postActionVars = [
@@ -1120,7 +1118,7 @@ class EmailController extends FormController
             ],
         ];
 
-        //not found
+        // not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
