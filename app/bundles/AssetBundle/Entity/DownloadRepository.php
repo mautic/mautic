@@ -70,7 +70,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of assets ordered by it's download count.
      *
-     * @param QueryBuilder $query
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int          $limit
      * @param int          $offset
      *
@@ -93,7 +93,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of asset referrals ordered by it's count.
      *
-     * @param QueryBuilder $query
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int          $limit
      * @param int          $offset
      *
@@ -116,7 +116,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Get pie graph data for http statuses.
      *
-     * @param QueryBuilder $query
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @return array
      *

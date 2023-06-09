@@ -556,7 +556,7 @@ class ChartQuery extends AbstractChart
     /**
      * Count how many rows is between a range of date diff in seconds.
      *
-     * @param string $query
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @return int
      */
