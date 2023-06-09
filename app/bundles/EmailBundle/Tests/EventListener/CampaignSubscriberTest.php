@@ -78,6 +78,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
+        $event->setType(Event::TYPE_ACTION);
+
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog
             ->method('getLead')

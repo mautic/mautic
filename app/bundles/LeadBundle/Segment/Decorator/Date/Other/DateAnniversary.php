@@ -65,8 +65,8 @@ class DateAnniversary implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $date           = $this->dateOptionParameters->getDefaultDate();
-        $filter         =  $contactSegmentFilterCrate->getFilter();
-        $relativeFilter =  trim(str_replace(['anniversary', 'birthday'], '', $filter));
+        $filter         = $contactSegmentFilterCrate->getFilter();
+        $relativeFilter = is_string($filter) ? trim(str_replace(['anniversary', 'birthday'], '', $filter)) : $filter;
 
         if ($relativeFilter) {
             $date->modify($relativeFilter);

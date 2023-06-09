@@ -84,6 +84,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email');
         $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
         $email->setIsPublished(true);
