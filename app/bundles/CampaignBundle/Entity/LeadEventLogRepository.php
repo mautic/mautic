@@ -574,7 +574,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('rotation', (int) $rotation)
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         return !empty($results);
     }
