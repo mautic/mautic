@@ -5,10 +5,8 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
-use Mautic\EmailBundle\Mailer\EmailSender;
 use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
 use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
 use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
@@ -18,7 +16,7 @@ use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mime\Address;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
@@ -211,26 +209,26 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function sendTestEmailAction(MailHelper $mailer, UserHelper $userHelper, EmailSender $emailSender)
+    public function sendTestEmailAction(MailHelper $mailer, UserHelper $userHelper): Response
     {
-        /** @var Translator $translator */
-        $translator = $this->translator;
-
-        $mailer->setSubject($translator->trans('mautic.email.config.mailer.transport.test_send.subject'));
-        $mailer->setBody($translator->trans('mautic.email.config.mailer.transport.test_send.body'));
+        $mailer->setSubject($this->translator->trans('mautic.email.config.mailer.transport.test_send.subject'));
+        $mailer->setBody($this->translator->trans('mautic.email.config.mailer.transport.test_send.body'));
 
         $user         = $userHelper->getUser();
         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
         if (empty($userFullName)) {
             $userFullName = '';
         }
+        $mailer->setTo([$user->getEmail() => $userFullName]);
+
         $success = 1;
-        $message = $translator->trans('mautic.core.success');
-        try {
-            $emailSender->sendTestEmail(new Address($user->getEmail(), $userFullName));
-        } catch (\Exception $exception) {
-            $success = 0;
-            $message = $exception->getMessage();
+        $message = $this->translator->trans('mautic.core.success');
+
+        if (!$mailer->send(true)) {
+            $success   = 0;
+            $errors    = $mailer->getErrors();
+            unset($errors['failures']);
+            $message = implode('; ', $errors);
         }
 
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
