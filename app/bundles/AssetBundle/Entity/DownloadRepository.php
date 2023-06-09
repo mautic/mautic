@@ -141,7 +141,7 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<int, mixed>
      *
      * @throws \Doctrine\DBAL\Exception
      */
@@ -185,7 +185,7 @@ class DownloadRepository extends CommonRepository
      *
      * @param \DateTime $fromDate
      *
-     * @return array
+     * @return array<int, mixed>
      *
      * @throws \Doctrine\DBAL\Exception
      */
