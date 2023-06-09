@@ -348,8 +348,8 @@ class ReportType extends AbstractType
                 'label'      => 'mautic.report.schedule.scheduleTimezone',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                          'class'                       => 'form-control',
-                          'data-report-schedule-format' => 'scheduleTimezone',
+                          'class'                => 'form-control',
+                          'data-report-schedule' => 'scheduleTimezone',
                 ],
                 'required' => false,
                 ]

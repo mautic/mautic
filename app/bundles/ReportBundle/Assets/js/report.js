@@ -37,27 +37,35 @@ Mautic.reportOnLoad = function (container) {
     var $unitTypeId = mQuery('[data-report-schedule="scheduleUnit"]');
     var $scheduleDay = mQuery('[data-report-schedule="scheduleDay"]');
     var $scheduleMonthFrequency = mQuery('[data-report-schedule="scheduleMonthFrequency"]');
+    var $scheduleTime = mQuery('[data-report-schedule="scheduleTime"]');
+    var $scheduleTimeZone = mQuery('[data-report-schedule="scheduleTimezone"]');
 
     mQuery($isScheduled).change(function () {
-        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
     });
     mQuery($unitTypeId).change(function () {
-        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
     });
     mQuery($scheduleDay).change(function () {
-        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
     });
     mQuery($scheduleMonthFrequency).change(function () {
-        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
     });
-    Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    mQuery($scheduleTime).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
+    });
+    mQuery($scheduleTimeZone).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
+    });
+    Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
 
     jQuery(document).ajaxComplete(function(){
         Mautic.ajaxifyForm('daterange');
     });
 };
 
-Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime) {
     Mautic.checkIsScheduled($isScheduled);
 
     var unitVal = mQuery($unitTypeId).val();
@@ -77,11 +85,11 @@ Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
         mQuery('#scheduleTimePart').show();
     }
     if($isScheduled.length) {
-        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
     }
 };
 
-Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime) {
     var previewUrl = mQuery('#schedule_preview_url').data('url');
     var $schedulePreviewData = mQuery('#schedule_preview_data');
 
@@ -98,9 +106,11 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     var unitVal = mQuery($unitTypeId).val();
     var scheduleDayVal = mQuery($scheduleDay).val();
     var scheduleMonthFrequencyVal = mQuery($scheduleMonthFrequency).val();
+    var $scheduleTimeZoneVal = mQuery($scheduleTimeZone).val();
+    var $scheduleTimeVal = mQuery($scheduleTime).val();
 
     mQuery.get(
-        previewUrl + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal,
+        previewUrl + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal + '/' + $scheduleTimeVal + '/' + $scheduleTimeZoneVal,
         function( data ) {
             if (!data.html) {
                 return;
