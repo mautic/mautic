@@ -373,6 +373,8 @@ class UpdateHelperTest extends TestCase
 
     public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
+        $this->response->method('getStatusCode')->willReturn(200);
+
         $cache = [
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
@@ -569,6 +571,8 @@ class UpdateHelperTest extends TestCase
 
     public function testErrorIfGuzzleException(): void
     {
+        $this->response->method('getStatusCode')->willReturn(200);
+
         $cache = [
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',

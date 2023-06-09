@@ -191,31 +191,22 @@ class InputHelper
 
     /**
      * Strips tags.
-     *
-     * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function string($value, $urldecode = false)
+    public static function string(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
-        return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        return self::filter_string_polyfill($value);
     }
 
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param string       $value
-     * @param bool|false   $urldecode
-     * @param string|false $convertSpacesTo
-     * @param array        $allowedCharacters
-     *
-     * @return string
+     * @param string[] $allowedCharacters
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
+    public static function alphanum(string $value, bool $urldecode = false, ?string $convertSpacesTo = null, array $allowedCharacters = []): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -237,7 +228,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', $value));
+        return trim(preg_replace($regex, '', (string) $value));
     }
 
     /**
@@ -394,6 +385,8 @@ class InputHelper
     /**
      * Returns clean HTML.
      *
+     * @param string[]|string $value
+     *
      * @return mixed|string
      */
     public static function html($value)
@@ -404,9 +397,9 @@ class InputHelper
             }
         } else {
             // Special handling for doctype
-            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
+            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', (string) $value, $doctype);
             // Special handling for CDATA tags
-            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
+            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], (string) $value, $cdataCount);
             // Special handling for conditional blocks
             preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
             if (!empty($matches[0])) {
@@ -616,5 +609,15 @@ class InputHelper
         $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', $css);
 
         return $css;
+    }
+
+    /**
+     * Needed to support PHP 8.1 without changing behavior.
+     *
+     * @see https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
+     */
+    private static function filter_string_polyfill(string $string): string
+    {
+        return preg_replace('/\x00|<[^>]*>?/', '', $string);
     }
 }

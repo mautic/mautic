@@ -84,6 +84,12 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($columns);
         $report->setGroupBy(['l.company']);
+        $report->setTableOrder([
+            [
+                'column'    => 'l.company',
+                'direction' => 'ASC',
+            ],
+        ]);
         $report->setAggregators([
             [
                 'column'    => 'l.points',

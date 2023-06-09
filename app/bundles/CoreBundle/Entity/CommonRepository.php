@@ -1776,7 +1776,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function sanitize($sqlAttr, $allowedCharacters = [])
     {
-        return InputHelper::alphanum($sqlAttr, false, false, $allowedCharacters);
+        return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }
 
     private function convertOrmPropertiesToColumns(array &$filters, array $properties)

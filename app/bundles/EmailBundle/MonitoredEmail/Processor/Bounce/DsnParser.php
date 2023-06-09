@@ -46,7 +46,7 @@ class DsnParser
      *
      * @return array
      */
-    public function parse($dsnMessage, $dsnReport)
+    public function parse(string $dsnMessage, string $dsnReport)
     {
         // initialize the result array
         $result = [
