@@ -87,7 +87,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->executeQuery()->fetchAllAssociative();
+        return $query->fetchAllAssociative();
     }
 
     /**
@@ -110,7 +110,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->executeQuery()->fetchAllAssociative();
+        return $query->fetchAllAssociative();
     }
 
     /**
@@ -129,7 +129,7 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->executeQuery()->fetchAllAssociative();
+        $results = $query->fetchAllAssociative();
 
         $chart   = new PieChart();
 
