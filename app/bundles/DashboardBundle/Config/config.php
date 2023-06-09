@@ -40,15 +40,6 @@ return [
         ],
     ],
     'services' => [
-        'forms' => [
-            'mautic.dashboard.form.type.widget' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.security',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.dashboard.model.dashboard' => [
                 'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',

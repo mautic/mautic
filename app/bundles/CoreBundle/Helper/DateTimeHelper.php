@@ -2,9 +2,13 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
+
 class DateTimeHelper
 {
     public const FORMAT_DB = 'Y-m-d H:i:s';
+
+    private static ?string $defaultLocalTimezone = null;
 
     /**
      * @var string
@@ -43,6 +47,7 @@ class DateTimeHelper
      */
     public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
     {
+        $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
@@ -53,9 +58,8 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
     {
-        $localTimezone = date_default_timezone_get();
         if ('local' == $timezone) {
-            $timezone = $localTimezone;
+            $timezone = self::$defaultLocalTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -64,7 +68,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone($localTimezone);
+        $this->local = new \DateTimeZone(self::$defaultLocalTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
@@ -86,7 +90,7 @@ class DateTimeHelper
             );
 
             if (false === $this->datetime) {
-                //the format does not match the string so let's attempt to fix that
+                // the format does not match the string so let's attempt to fix that
                 $this->string   = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
                     $this->format,
@@ -231,8 +235,7 @@ class DateTimeHelper
     /**
      * Add to datetime.
      *
-     * @param            $intervalString
-     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -253,8 +256,7 @@ class DateTimeHelper
     /**
      * Subtract from datetime.
      *
-     * @param            $intervalString
-     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -309,8 +311,7 @@ class DateTimeHelper
     /**
      * Modify datetime.
      *
-     * @param            $string
-     * @param bool|false $clone  If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -328,8 +329,6 @@ class DateTimeHelper
 
     /**
      * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
-     *
-     * @param $interval
      *
      * @return bool|string
      */
@@ -393,6 +392,19 @@ class DateTimeHelper
         if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
             throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+        }
+    }
+
+    public function getLocalTimezoneOffset(): string
+    {
+        return $this->getLocalDateTime()->format('P');
+    }
+
+    protected function setDefaultTimezone(): void
+    {
+        if (null === self::$defaultLocalTimezone) {
+            $parameterLoader            = new ParameterLoader();
+            self::$defaultLocalTimezone = $parameterLoader->getParameterBag()->get('default_timezone') ?? date_default_timezone_get();
         }
     }
 }

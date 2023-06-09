@@ -12,12 +12,13 @@ use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class StageModel.
+ * @extends CommonFormModel<Stage>
  */
 class StageModel extends CommonFormModel
 {
@@ -50,7 +51,7 @@ class StageModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticStageBundle:Stage');
+        return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
     }
 
     /**
@@ -66,7 +67,7 @@ class StageModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -144,7 +145,7 @@ class StageModel extends CommonFormModel
         static $actions;
 
         if (empty($actions)) {
-            //build them
+            // build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);

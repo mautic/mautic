@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ImportRepository.
+ * @extends CommonRepository<Import>
  */
 class ImportRepository extends CommonRepository
 {
@@ -90,8 +90,6 @@ class ImportRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {

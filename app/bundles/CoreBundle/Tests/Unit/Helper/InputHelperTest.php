@@ -25,6 +25,12 @@ class InputHelperTest extends TestCase
         $html5DoctypeWithContent = '<!DOCTYPE html>
         <html>
         </html>';
+        $html5DoctypeWithUnicodeContent = '<!DOCTYPE html>
+        <html>
+        <body>
+            <a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>
+        </body>
+        </html>';
         $xhtml1Doctype = '<!DOCTYPE html PUBLIC
   "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
@@ -33,14 +39,15 @@ class InputHelperTest extends TestCase
         $unicode = '<a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>';
 
         $samples = [
-            $outlookXML                => $outlookXML,
-            $html5Doctype              => $html5Doctype,
-            $html5DoctypeWithContent   => $html5DoctypeWithContent,
-            $xhtml1Doctype             => $xhtml1Doctype,
-            $cdata                     => $cdata,
-            $script                    => $script,
-            $unicode                   => $unicode,
-            '<applet>content</applet>' => 'content',
+            $outlookXML                     => $outlookXML,
+            $html5Doctype                   => $html5Doctype,
+            $html5DoctypeWithContent        => $html5DoctypeWithContent,
+            $html5DoctypeWithUnicodeContent => $html5DoctypeWithUnicodeContent,
+            $xhtml1Doctype                  => $xhtml1Doctype,
+            $cdata                          => $cdata,
+            $script                         => $script,
+            $unicode                        => $unicode,
+            '<applet>content</applet>'      => 'content',
         ];
 
         foreach ($samples as $sample => $expected) {
@@ -210,5 +217,85 @@ class InputHelperTest extends TestCase
 
         // fragment is not included
         yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
+    }
+
+    /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
+     * @dataProvider minifyHTMLProvider
+     */
+    public function testMinifyHTML(string $html, string $expected): void
+    {
+        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public function minifyHTMLProvider(): array
+    {
+        return [
+            // Test with a simple HTML string with no whitespace
+            ['<p>Hello World</p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple spaces between tags
+            ['<p>    Hello World    </p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple newlines between tags
+            ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'],
+            // Test with an HTML string with inline CSS
+            ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
+            // Test with an empty HTML string
+            ['', ''],
+            // Test with an HTML string with multiple attributes
+            ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
+            // Test with an HTML string with multiple same tag
+            ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
+            // Test with an HTML string with multiple same tag but with different attributes
+            ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
+            [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
+        ];
     }
 }

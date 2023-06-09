@@ -2,14 +2,12 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -30,9 +28,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
- * Class ReportModel.
+ * @extends FormModel<Report>
  */
 class ReportModel extends FormModel
 {
@@ -49,9 +48,9 @@ class ReportModel extends FormModel
     protected $defaultPageLimit;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var ChannelListHelper
@@ -85,7 +84,7 @@ class ReportModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         ChannelListHelper $channelListHelper,
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
@@ -93,7 +92,7 @@ class ReportModel extends FormModel
         ExcelExporter $excelExporter
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
-        $this->templatingHelper  = $templatingHelper;
+        $this->twig              = $twig;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
         $this->reportHelper      = $reportHelper;
@@ -129,7 +128,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -140,7 +139,7 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'table_list' => $this->getTableData(),
+            'table_list' => $this->getTableData('all', $entity->getSource()),
             'attr'       => [
                 'readonly' => false,
             ],
@@ -212,11 +211,9 @@ class ReportModel extends FormModel
     /**
      * Build the table and graph data.
      *
-     * @param $context
-     *
      * @return mixed
      */
-    public function buildAvailableReports($context)
+    public function buildAvailableReports($context, ?string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -224,10 +221,10 @@ class ReportModel extends FormModel
                 $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
-                //build them
+                // build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
-                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
                 $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD);
 
                 $tables = $event->getTables();
@@ -262,9 +259,9 @@ class ReportModel extends FormModel
      *
      * @return array
      */
-    public function getTableData($context = 'all')
+    public function getTableData($context = 'all', ?string $reportSource = null)
     {
-        $data = $this->buildAvailableReports($context);
+        $data = $this->buildAvailableReports($context, $reportSource);
 
         $data = (!isset($data['tables'])) ? [] : $data['tables'];
 
@@ -418,16 +415,13 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, array $reportData, $handle = null, $page = null)
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                //build the data rows
-                $reportDataResult = new ReportDataResult($reportData);
-
                 if (!is_null($handle)) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
@@ -448,19 +442,14 @@ class ReportModel extends FormModel
                 return $response;
 
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                $content = $this->twig->render(
+                    '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData' => $reportData,
-                        'data'       => $reportData['data'],
-                        'columns'    => $reportData['columns'],
-                        'pageTitle'  => $name,
-                        'graphs'     => $reportData['graphs'],
-                        'report'     => $report,
-                        'dateFrom'   => $reportData['dateFrom'],
-                        'dateTo'     => $reportData['dateTo'],
+                        'pageTitle'        => $name,
+                        'report'           => $report,
+                        'reportDataResult' => $reportDataResult,
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
 
@@ -470,8 +459,8 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 
@@ -561,7 +550,7 @@ class ReportModel extends FormModel
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
@@ -638,7 +627,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -747,7 +736,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**
@@ -786,7 +775,7 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $this->em->getConnection()->connect('slave');
         }
 

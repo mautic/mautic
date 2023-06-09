@@ -7,8 +7,6 @@ trait RegexTrait
     /**
      * Ensure that special characters are escaped correctly.
      *
-     * @param $regex
-     *
      * @return mixed
      */
     protected function prepareRegex($regex)

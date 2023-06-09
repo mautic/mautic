@@ -9,9 +9,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 class EscapeTransformer implements DataTransformerInterface
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $allowedParameters;
+    private array $allowedParameters;
 
     public function __construct(array $allowedParameters)
     {

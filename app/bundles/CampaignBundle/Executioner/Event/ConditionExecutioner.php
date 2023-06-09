@@ -36,6 +36,7 @@ class ConditionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        \assert($config instanceof ConditionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
 
         /** @var LeadEventLog $log */

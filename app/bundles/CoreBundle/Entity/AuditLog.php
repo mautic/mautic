@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class AuditLog
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -36,7 +36,7 @@ class AuditLog
     protected $object;
 
     /**
-     * @var int
+     * @var string
      */
     protected $objectId;
 
@@ -51,7 +51,7 @@ class AuditLog
     protected $details = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 
@@ -113,7 +113,7 @@ class AuditLog
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -173,7 +173,7 @@ class AuditLog
      */
     public function setObjectId($objectId)
     {
-        $this->objectId = $objectId;
+        $this->objectId = (string) $objectId;
 
         return $this;
     }
@@ -185,7 +185,7 @@ class AuditLog
      */
     public function getObjectId()
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
     /**
@@ -251,7 +251,7 @@ class AuditLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

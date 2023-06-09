@@ -37,7 +37,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
-        //in the installer
+        // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
         } elseif (empty($this->tablePrefix)) {
@@ -53,7 +53,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
 
         if (false !== strpos($classMetadata->namespace, 'Mautic')) {
-            //if in the installer, use the prefix set by it rather than what is cached
+            // if in the installer, use the prefix set by it rather than what is cached
 
             // Prefix indexes
             $uniqueConstraints = [];

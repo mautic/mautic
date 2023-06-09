@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Monolog;
 
-use DateTime;
 use Mautic\CoreBundle\Monolog\LogProcessor;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +19,7 @@ class LogProcessorTest extends TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'channel'    => 'mautic',
-            'datetime'   => new DateTime(),
+            'datetime'   => new \DateTime(),
             'extra'      => [],
         ];
         $outputRecord = $logProcessor($record);

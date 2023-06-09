@@ -3,11 +3,10 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Segment\Query\QueryException;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -19,15 +18,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
     public const NAME = 'mautic:segments:update';
     private TranslatorInterface $translator;
     private ListModel $listModel;
-    private LoggerInterface $logger;
 
-    public function __construct(ListModel $listModel, TranslatorInterface $translator, PathsHelper $pathsHelper, LoggerInterface $logger)
+    public function __construct(ListModel $listModel, TranslatorInterface $translator, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->listModel  = $listModel;
         $this->translator = $translator;
-        $this->logger     = $logger;
     }
 
     protected function configure()
@@ -35,7 +32,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $this
             ->setName('mautic:segments:update')
             ->setAliases(['mautic:segments:rebuild'])
-            ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption(
                 '--batch-limit',
                 '-b',
@@ -77,7 +73,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -87,28 +83,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
         if ($id) {
             $list = $this->listModel->getEntity($id);
 
-            if (null !== $list) {
-                if ($list->isPublished()) {
-                    $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
-                    $processed = 0;
-                    try {
-                        $processed = $this->listModel->rebuildListLeads($list, $batch, $max, $output);
-                        if (0 >= (int) $max) {
-                            // Only full segment rebuilds count
-                            $list->setLastBuiltDateToCurrentDatetime();
-                            $this->listModel->saveEntity($list);
-                        }
-                    } catch (QueryException $e) {
-                        $this->logger->error('Query Builder Exception: '.$e->getMessage());
-                    }
-
-                    $output->writeln(
-                        '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
-                    );
-                }
-            } else {
+            if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
+
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
+
+            $this->rebuildSegment($list, $batch, $max, $output);
         } else {
             $leadLists = $this->listModel->getEntities(
                 [
@@ -119,30 +100,15 @@ class UpdateLeadListsCommand extends ModeratedCommand
             while (false !== ($leadList = $leadLists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 /** @var LeadList $leadList */
-                $leadList = reset($leadList);
-
-                if ($leadList->isPublished()) {
-                    $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $leadList->getId()]).'</info>');
-
-                    $startTimeForSingleSegment = time();
-                    $processed                 = $this->listModel->rebuildListLeads($leadList, $batch, $max, $output);
-                    if (0 >= (int) $max) {
-                        // Only full segment rebuilds count
-                        $leadList->setLastBuiltDateToCurrentDatetime();
-                        $this->listModel->saveEntity($leadList);
-                    }
-                    $output->writeln(
-                        '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
-                    );
-                    if ($enableTimeMeasurement) {
-                        $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
-                        $output->writeln('<fg=cyan>'.$this->translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
-                    }
+                $leadList                  = reset($leadList);
+                $startTimeForSingleSegment = time();
+                $this->rebuildSegment($leadList, $batch, $max, $output);
+                if ($enableTimeMeasurement) {
+                    $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
+                    $output->writeln('<fg=cyan>'.$this->translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
                 }
-
                 unset($leadList);
             }
-
             unset($leadLists);
         }
 
@@ -153,6 +119,27 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    private function rebuildSegment(LeadList $segment, int $batch, int $max, OutputInterface $output): void
+    {
+        if ($segment->isPublished()) {
+            $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $segment->getId()]).'</info>');
+            $startTime   = microtime(true);
+            $processed   = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
+            $rebuildTime = round(microtime(true) - $startTime, 2);
+            if (0 >= (int) $max) {
+                // Only full segment rebuilds count
+                $segment->setLastBuiltDateToCurrentDatetime();
+                $segment->setLastBuiltTime($rebuildTime);
+                $this->listModel->saveEntity($segment);
+            }
+
+            $output->writeln(
+                '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
+            );
+        }
+    }
+    protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

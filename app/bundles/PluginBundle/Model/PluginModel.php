@@ -7,9 +7,10 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\Plugin;
 
 /**
- * Class PluginModel.
+ * @extends FormModel<Plugin>
  */
 class PluginModel extends FormModel
 {
@@ -42,12 +43,12 @@ class PluginModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:Plugin');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
     }
 
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
     /**

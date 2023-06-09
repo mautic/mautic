@@ -14,12 +14,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MailchimpType.
- */
 class MailchimpType extends AbstractType
 {
     /**
@@ -31,7 +28,7 @@ class MailchimpType extends AbstractType
     private $pluginModel;
 
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
@@ -40,7 +37,7 @@ class MailchimpType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
         $this->integrationHelper    = $integrationHelper;
         $this->pluginModel          = $pluginModel;

@@ -105,19 +105,13 @@ final class AuthenticationListener
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $response = $this->authenticationHandler->onAuthenticationFailure($request, $failed);
-
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
-        }
-
-        return $response;
+        return $this->authenticationHandler->onAuthenticationFailure($request, $failed);
     }
 
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null): Response
     {
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
+            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUserIdentifier()));
         }
 
         $session = $request->getSession();
@@ -130,10 +124,6 @@ final class AuthenticationListener
 
         if (null === $response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
-
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Authentication Success Handler did not return a Response.');
-            }
         }
 
         return $response;
@@ -145,6 +135,7 @@ final class AuthenticationListener
     private function setActivePermissionsOnAuthToken(): void
     {
         $token = $this->tokenStorage->getToken();
+        /** @var User|null $user */
         $user  = $token->getUser();
 
         // If no user associated with a token, it's a client credentials grant type. Handle accordingly.

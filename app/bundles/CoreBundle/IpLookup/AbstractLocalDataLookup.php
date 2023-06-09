@@ -3,9 +3,6 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
-use PharData;
-use PharFileInfo;
-use RecursiveIteratorIterator;
 
 /**
  * Class AbstractLocalDataLookup.
@@ -97,9 +94,9 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                         mkdir($tempTargetFolder);
                     }
                     file_put_contents($temporaryPhar, $data->getBody());
-                    $pharData = new PharData($temporaryPhar);
-                    foreach (new RecursiveIteratorIterator($pharData) as $file) {
-                        /** @var PharFileInfo $file */
+                    $pharData = new \PharData($temporaryPhar);
+                    foreach (new \RecursiveIteratorIterator($pharData) as $file) {
+                        /** @var \PharFileInfo $file */
                         if ($file->getBasename() === basename($localTarget)) {
                             $success = copy($file->getPathname(), $localTarget);
                         }
@@ -111,7 +108,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                 case 'gz' == $tempExt:
                     $memLimit = $this->sizeInByte(ini_get('memory_limit'));
                     $freeMem  = $memLimit - memory_get_peak_usage();
-                    //check whether there is enough memory to handle large iplookp DB
+                    // check whether there is enough memory to handle large iplookp DB
                     // or will throw iplookup exception
                     if (function_exists('gzdecode') && strlen($data->getBody()) < ($freeMem / 3)) {
                         $success = (bool) file_put_contents($localTarget, gzdecode($data->getBody()));

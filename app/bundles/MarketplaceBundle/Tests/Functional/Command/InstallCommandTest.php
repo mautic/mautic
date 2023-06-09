@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
-use Exception;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
+use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
-use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 
 final class InstallCommandTest extends AbstractMauticTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ComposerHelper
+     * @var MockObject&ComposerHelper
      */
     private $composerHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&PackageModel
+     * @var MockObject&PackageModel
      */
     private $packageModel;
 
@@ -45,7 +44,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $this->composerHelper->method('install')
             ->with($this->packageName)
-            ->willReturn(new ConsoleOutputModel(0, 'OK'));
+            ->willReturn(new ConsoleOutput(0, 'OK'));
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
@@ -66,7 +65,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $this->composerHelper->method('install')
             ->with($this->packageName)
-            ->willReturn(new ConsoleOutputModel(0, 'OK'));
+            ->willReturn(new ConsoleOutput(0, 'OK'));
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
@@ -90,7 +89,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -109,7 +108,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -130,7 +129,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -145,7 +144,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $this->composerHelper->method('install')
             ->with($packageName)
-            ->willReturn(new ConsoleOutputModel(1, 'Something went wrong during the installation'));
+            ->willReturn(new ConsoleOutput(1, 'Something went wrong during the installation'));
 
         $this->packageModel->method('getPackageDetail')
             ->with($packageName)

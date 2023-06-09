@@ -581,6 +581,26 @@ final class LeadEvents
     public const COMPANY_POST_DELETE = 'mautic.company_post_delete';
 
     /**
+     * The mautic.company_pre_merge event is dispatched before two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_PRE_MERGE = 'mautic.company_pre_merge';
+
+    /**
+     * The mautic.company_post_merge event is dispatched after two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a
@@ -725,4 +745,32 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
+
+    /**
+     * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const POST_CONTACT_EXPORT_SCHEDULED = 'mautic.post_contact_export_scheduled';
+
+    /**
+     * The mautic.contact_export_prepare_file event is dispatched when a contact export is being processed.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const CONTACT_EXPORT_PREPARE_FILE = 'mautic.contact_export_prepare_file';
+
+    /**
+     * The mautic.contact_export_prepare_file event is dispatched when a contact export email is to be sent.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const CONTACT_EXPORT_SEND_EMAIL = 'mautic.contact_export_send_email';
+
+    /**
+     * The mautic.post_contact_export_send_email event is dispatched when a contact export email is sent.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const POST_CONTACT_EXPORT_SEND_EMAIL = 'mautic.post_contact_export_send_email';
 }

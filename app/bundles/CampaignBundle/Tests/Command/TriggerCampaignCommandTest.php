@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
@@ -27,9 +25,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
     }
 
-    public function tearDown(): void
+    public function beforeTearDown(): void
     {
-        parent::tearDown();
+        parent::beforeTearDown();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
 
@@ -37,7 +35,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -84,11 +82,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        sleep(6);
+        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -109,7 +107,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(25, $stats);
 
         // Now let's simulate email opens
@@ -130,8 +129,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[3]);
         $this->assertCount(25, $byEvent[10]);
 
-        // Wait 6 seconds to go beyond the inaction timeframe
-        sleep(6);
+        // Wait another 6 seconds to go beyond the inaction timeframe
+        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -203,7 +202,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -249,11 +248,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        sleep(6);
+        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -274,7 +274,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(1, $stats);
 
         // Now let's simulate email opens
@@ -296,7 +297,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        sleep(6);
+        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -408,11 +409,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        sleep(6);
+        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -433,7 +435,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
         // Now let's simulate email opens
@@ -455,7 +457,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        sleep(6);
+        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -560,13 +562,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignInfiniteLoop(): void
     {
         $campaignMemberRepo = $this->em->getRepository(Lead::class);
-        \assert($campaignMemberRepo instanceof LeadRepository);
 
         $segmentMemberRepo = $this->em->getRepository(ListLead::class);
-        \assert($segmentMemberRepo instanceof ListLeadRepository);
 
         $campaignRepo = $this->em->getRepository(Campaign::class);
-        \assert($campaignRepo instanceof CampaignRepository);
 
         // Clear the campaign and segment members as those are manually_added.
         $campaignMemberRepo->deleteEntities($campaignMemberRepo->findAll());
@@ -586,7 +585,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $john);
         $this->createCampaignLead($campaign, $jane, true); // Manually removed.
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaign);
+        $this->em->detach($campaignRepo);
 
         $tStart = microtime(true);
 
@@ -598,7 +598,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSegmentCacheCount(): void
     {
@@ -620,7 +620,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $tagCounts = [];
         foreach ($tags as $tag) {

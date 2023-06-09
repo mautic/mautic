@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
@@ -20,16 +20,16 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     /**
-     * @var UserPasswordEncoder
+     * @var UserPasswordHasher
      */
-    private $encoder;
+    private $hasher;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(UserPasswordEncoder $encoder)
+    public function __construct(UserPasswordHasher $hasher)
     {
-        $this->encoder = $encoder;
+        $this->hasher = $hasher;
     }
 
     public function load(ObjectManager $manager)
@@ -39,8 +39,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $user->setLastName('User');
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
-        $encoder = $this->encoder;
-        $user->setPassword($encoder->encodePassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'mautic'));
         $user->setRole($this->getReference('admin-role'));
         $manager->persist($user);
         $manager->flush();
@@ -52,8 +51,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $user->setLastName('User');
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
-        $encoder = $this->encoder;
-        $user->setPassword($encoder->encodePassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'mautic'));
         $user->setRole($this->getReference('sales-role'));
         $manager->persist($user);
         $manager->flush();

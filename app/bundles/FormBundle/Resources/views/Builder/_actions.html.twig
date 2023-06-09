@@ -1,0 +1,19 @@
+{#
+  Variables
+    - route (optional)
+    - id
+    - formId
+    - disallowDelete (optional)
+#}
+{% set route = route|default('mautic_formfield_action') %}
+
+<div class="form-buttons btn-group" role="group" aria-label="Field options">
+    <button type="button" data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}" class="btn btn-default btn-edit">
+        <i class="fa fa-pencil-square-o text-primary"></i>
+    </button>
+    {% if disallowDelete is not defined or (disallowDelete is defined and false == disallowDelete) %}
+      <a type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': id, 'formId': formId}) }}" class="btn btn-default">
+          <i class="fa fa-trash-o text-danger"></i>
+      </a>
+    {% endif %}
+</div>

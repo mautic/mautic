@@ -6,17 +6,21 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Class MailHelper.
@@ -38,9 +42,9 @@ class MailHelper
     protected $transport;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var null
@@ -118,6 +122,8 @@ class MailHelper
      * @var Email|null
      */
     protected $email;
+
+    protected ?string $emailType = null;
 
     /**
      * @var array
@@ -749,7 +755,7 @@ class MailHelper
                     $key                = is_string($key) ? str_ireplace($search, $replace, $key, $count1) : $key;
                     $value              = is_string($value) ? str_ireplace($search, $replace, $value, $count2) : $value;
                     $bodyReplaced[$key] = $value;
-                    if (($count1 + $count2)) {
+                    if ($count1 + $count2) {
                         $updated = true;
                     }
                 }
@@ -881,11 +887,11 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->templating) {
-            $this->templating = $this->factory->getTemplating();
+        if (null == $this->twig) {
+            $this->twig = $this->factory->getTwig();
         }
 
-        $content = $this->templating->renderResponse($template, $vars)->getContent();
+        $content = $this->twig->render($template, $vars);
 
         unset($vars);
 
@@ -899,8 +905,6 @@ class MailHelper
 
     /**
      * Set subject.
-     *
-     * @param $subject
      */
     public function setSubject($subject)
     {
@@ -917,8 +921,6 @@ class MailHelper
 
     /**
      * Set a plain text part.
-     *
-     * @param $content
      */
     public function setPlainText($content)
     {
@@ -966,7 +968,6 @@ class MailHelper
     }
 
     /**
-     * @param        $content
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
@@ -1042,9 +1043,6 @@ class MailHelper
     /**
      * Set to address(es).
      *
-     * @param $addresses
-     * @param $name
-     *
      * @return bool
      */
     public function setTo($addresses, $name = null)
@@ -1079,8 +1077,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string $address
-     * @param null   $name
+     * @param string      $address
+     * @param string|null $name
      *
      * @return bool
      */
@@ -1221,9 +1219,6 @@ class MailHelper
 
     /**
      * Set reply to address(es).
-     *
-     * @param $addresses
-     * @param $name
      */
     public function setReplyTo($addresses, $name = null)
     {
@@ -1237,8 +1232,6 @@ class MailHelper
 
     /**
      * Set a custom return path.
-     *
-     * @param $address
      */
     public function setReturnPath($address)
     {
@@ -1343,6 +1336,16 @@ class MailHelper
         $this->source = $source;
     }
 
+    public function getEmailType(): ?string
+    {
+        return $this->emailType;
+    }
+
+    public function setEmailType(?string $emailType): void
+    {
+        $this->emailType = $emailType;
+    }
+
     /**
      * @return Email|null
      */
@@ -1361,6 +1364,10 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
+        if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
+            $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
+        }
+
         $this->email = $email;
 
         $subject = $email->getSubject();
@@ -1431,7 +1438,7 @@ class MailHelper
 
             $this->processSlots($slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -1489,10 +1496,6 @@ class MailHelper
         $this->headers = $headers;
     }
 
-    /**
-     * @param $name
-     * @param $value
-     */
     public function addCustomHeader($name, $value)
     {
         $this->headers[$name] = $value;
@@ -1504,6 +1507,12 @@ class MailHelper
     public function getCustomHeaders()
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
+
+        // Personal and transactional emails do not contain unsubscribe header
+        $email = $this->getEmail();
+        if (empty($email) || 'transactional' === $this->getEmailType()) {
+            return $headers;
+        }
 
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
@@ -1643,7 +1652,6 @@ class MailHelper
     /**
      * Log exception.
      *
-     * @param      $error
      * @param null $context
      */
     protected function logError($error, $context = null)
@@ -1804,8 +1812,6 @@ class MailHelper
     }
 
     /**
-     * @param $url
-     *
      * @return \Mautic\PageBundle\Entity\Redirect|object|null
      */
     public function getTrackableLink($url)
@@ -1841,7 +1847,7 @@ class MailHelper
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
     {
-        //create a stat
+        // create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($this->email);
@@ -1849,7 +1855,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+                $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1871,7 +1877,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+                $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1912,7 +1918,7 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1927,9 +1933,6 @@ class MailHelper
 
     /**
      * Check to see if a monitored email box is enabled and configured.
-     *
-     * @param $bundleKey
-     * @param $folderKey
      *
      * @return bool|array
      */
@@ -2019,12 +2022,11 @@ class MailHelper
     }
 
     /**
-     * @param $slots
      * @param Email $entity
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();
@@ -2042,8 +2044,6 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @param $name
      *
      * @return string|null
      */
@@ -2064,8 +2064,6 @@ class MailHelper
     }
 
     /**
-     * @param $contact
-     *
      * @return bool|array
      */
     protected function getContactOwner(&$contact)
@@ -2079,6 +2077,7 @@ class MailHelper
                     $contact['owner_id'] = 0;
                 } elseif (isset($contact['owner_id'])) {
                     $leadModel = $this->factory->getModel('lead');
+                    \assert($leadModel instanceof LeadModel);
                     if (isset(self::$leadOwners[$contact['owner_id']])) {
                         $owner = self::$leadOwners[$contact['owner_id']];
                     } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {
@@ -2092,8 +2091,6 @@ class MailHelper
     }
 
     /**
-     * @param $owner
-     *
      * @return mixed
      */
     protected function getContactOwnerSignature($owner)
@@ -2152,8 +2149,6 @@ class MailHelper
     }
 
     /**
-     * @param $name
-     *
      * @return array
      */
     private function buildMetadata($name, array $tokens)
@@ -2176,8 +2171,6 @@ class MailHelper
      *
      * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
      *
-     * @param $address
-     *
      * @throws \Swift_RfcComplianceException
      */
     public static function validateEmail($address)
@@ -2193,9 +2186,6 @@ class MailHelper
         }
     }
 
-    /**
-     * @param $overrideFrom
-     */
     private function setDefaultFrom($overrideFrom, array $systemFrom)
     {
         if (is_array($overrideFrom)) {
@@ -2210,10 +2200,6 @@ class MailHelper
         $this->from       = $this->systemFrom;
     }
 
-    /**
-     * @param $systemReplyToEmail
-     * @param $systemFromEmail
-     */
     private function setDefaultReplyTo($systemReplyToEmail =null, $systemFromEmail = null)
     {
         $fromEmail = null;

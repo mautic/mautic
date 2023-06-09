@@ -28,11 +28,11 @@ class SendGridApiResponse
         $statusCode = $response->statusCode();
 
         if ($statusCode >= 200 && $statusCode <= 299) {
-            //Request was successful
+            // Request was successful
             return;
         }
 
-        $this->logger->addError(
+        $this->logger->error(
             'SendGrid response: '.$statusCode,
             ['response' => $response]
         );

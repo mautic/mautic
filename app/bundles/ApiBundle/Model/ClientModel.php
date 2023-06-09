@@ -8,11 +8,15 @@ use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Client>
+ */
 class ClientModel extends FormModel
 {
     /**
@@ -39,9 +43,6 @@ class ClientModel extends FormModel
         }
     }
 
-    /**
-     * @param $apiMode
-     */
     public function setApiMode($apiMode)
     {
         $this->apiMode = $apiMode;
@@ -73,7 +74,7 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -140,8 +141,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * @param $entity
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
@@ -150,7 +149,7 @@ class ClientModel extends FormModel
             throw new MethodNotAllowedHttpException(['Client']);
         }
 
-        //remove the user from the client
+        // remove the user from the client
         if ('oauth2' == $this->apiMode) {
             $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);

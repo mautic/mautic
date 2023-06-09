@@ -4,11 +4,12 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Focus>
+ */
 class FocusRepository extends CommonRepository
 {
     /**
-     * @param $formId
-     *
      * @return array
      */
     public function findByForm($formId)
@@ -27,7 +28,7 @@ class FocusRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($alias)
-            ->from('MauticFocusBundle:Focus', $alias, $alias.'.id');
+            ->from(\MauticPlugin\MauticFocusBundle\Entity\Focus::class, $alias, $alias.'.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin($alias.'.category', 'c');
@@ -40,7 +41,6 @@ class FocusRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -51,7 +51,6 @@ class FocusRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -69,7 +68,7 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {
@@ -80,8 +79,6 @@ class FocusRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {

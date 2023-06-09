@@ -4,16 +4,17 @@ namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CategoryModel
- * {@inheritdoc}
+ * @extends FormModel<Category>
  */
 class CategoryModel extends FormModel
 {
@@ -30,9 +31,11 @@ class CategoryModel extends FormModel
         $this->requestStack = $requestStack;
     }
 
-    public function getRepository()
+    public function getRepository(): CategoryRepository
     {
-        return $this->em->getRepository('MauticCategoryBundle:Category');
+        $result = $this->em->getRepository(Category::class);
+
+        return $result;
     }
 
     public function getNameGetter()
@@ -56,9 +59,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $entity
-     * @param $unlock
-     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
@@ -69,7 +69,7 @@ class CategoryModel extends FormModel
         }
         $alias = $this->cleanAlias($alias, '', false, '-');
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
@@ -92,16 +92,14 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -116,9 +114,7 @@ class CategoryModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
-     * @return Category
+     * @return Category|null
      */
     public function getEntity($id = null)
     {
@@ -131,11 +127,6 @@ class CategoryModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -178,10 +169,6 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $bundle
-     * @param $filter
-     * @param $limit
      *
      * @return array
      */

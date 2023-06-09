@@ -32,108 +32,12 @@ return [
         ],
     ],
     'services' => [
-        'commands' => [
-            'mautic.integrations.command.sync' => [
-                'class'     => \Mautic\IntegrationsBundle\Command\SyncCommand::class,
-                'arguments' => [
-                    'mautic.integrations.sync.service',
-                    'mautic.helper.core_parameters',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'events' => [
-            'mautic.integrations.subscriber.lead' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.integrations.repository.field_change',
-                    'mautic.integrations.repository.object_mapping',
-                    'mautic.integrations.helper.variable_expresser',
-                    'mautic.integrations.helper.sync_integrations',
-                ],
-            ],
-            'mautic.integrations.subscriber.contact_object' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber::class,
-                'arguments' => [
-                    'mautic.integrations.helper.contact_object',
-                    'router',
-                ],
-            ],
-            'mautic.integrations.subscriber.company_object' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\CompanyObjectSubscriber::class,
-                'arguments' => [
-                    'mautic.integrations.helper.company_object',
-                    'router',
-                ],
-            ],
             'mautic.integrations.subscriber.controller' => [
                 'class'     => \Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                     'controller_resolver',
-                ],
-            ],
-            'mautic.integrations.subscriber.ui_contact_integrations_tab' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\UIContactIntegrationsTabSubscriber::class,
-                'arguments' => [
-                    'mautic.integrations.repository.object_mapping',
-                ],
-            ],
-            'mautic.integrations.subscriber.contact_timeline_events' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\TimelineSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead_event_log',
-                    'translator',
-                ],
-            ],
-            'mautic.integrations.subscriber.email_subscriber' => [
-                'class'     => \Mautic\IntegrationsBundle\EventListener\EmailSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.integrations.token.parser',
-                    'mautic.integrations.repository.object_mapping',
-                    'mautic.helper.integration',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.integrations.form.config.integration' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
-                'arguments' => [
-                    'mautic.integrations.helper.config_integrations',
-                ],
-            ],
-            'mautic.integrations.form.config.feature_settings' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings_field_mappings' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'translator',
-                ],
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field_directions' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
-                ],
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
-            ],
-            'mautic.integrations.form.config.feature_settings.activity_list' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\ActivityListType::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
                 ],
             ],
         ],

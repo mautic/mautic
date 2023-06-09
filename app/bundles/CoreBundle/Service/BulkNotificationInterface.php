@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Service;
 
-use DateTime;
 use Mautic\UserBundle\Entity\User;
 
 interface BulkNotificationInterface
@@ -15,9 +14,9 @@ interface BulkNotificationInterface
         string $type = null,
         string $header = null,
         string $iconClass = null,
-        DateTime $datetime = null,
+        \DateTime $datetime = null,
         User $user = null
     ): void;
 
-    public function flush(DateTime $deduplicateDateTimeFrom = null): void;
+    public function flush(\DateTime $deduplicateDateTimeFrom = null): void;
 }

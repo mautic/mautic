@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * MAUTIC_INSTALLER which breaks other tests.
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 final class Oauth2Test extends MauticMysqlTestCase
@@ -23,7 +24,6 @@ final class Oauth2Test extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;
-        $this->useMockServices    = false;
 
         parent::setUp();
     }
@@ -79,7 +79,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWorkflow(): void
     {
-        $this->client->enableReboot();
+        $this->client->disableReboot();
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');

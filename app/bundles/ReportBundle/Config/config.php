@@ -77,84 +77,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.report.configbundle.subscriber' => [
-                'class' => \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.report.search.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.report.model.report',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.report.report.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.report.dashboard.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.report',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.report.scheduler.report_scheduler_subscriber' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.scheduler_planner',
-                ],
-            ],
-            'mautic.report.report.schedule_subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\SchedulerSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.send_schedule',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.reportconfig' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,
-            ],
-            'mautic.form.type.report' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
-                'arguments' => [
-                    'mautic.report.model.report',
-                ],
-            ],
-            'mautic.form.type.filter_selector' => [
-                'class' => \Mautic\ReportBundle\Form\Type\FilterSelectorType::class,
-            ],
-            'mautic.form.type.table_order' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\TableOrderType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.report_filters' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
-                'arguments' => 'mautic.factory',
-            ],
-            'mautic.form.type.report_dynamic_filters' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-            ],
-            'mautic.form.type.report_widget' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
-                'arguments' => 'mautic.report.model.report',
-            ],
-            'mautic.form.type.aggregator' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\AggregatorType::class,
-                'arguments' => 'translator',
-            ],
-            'mautic.form.type.report.settings' => [
-                'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
-            ],
-        ],
         'helpers' => [
             'mautic.report.helper.report' => [
                 'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,
@@ -166,7 +88,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\ReportModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.channel.helper.channel_list',
                     'mautic.lead.model.field',
                     'mautic.report.helper.report',
@@ -177,14 +99,16 @@ return [
             'mautic.report.model.csv_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
             'mautic.report.model.excel_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
+                    'translator',
                 ],
             ],
             'mautic.report.model.scheduler_builder' => [
@@ -286,16 +210,6 @@ return [
                     'mautic.report.model.scheduler_builder',
                 ],
                 'tag' => 'validator.constraint_validator',
-            ],
-        ],
-        'command' => [
-            'mautic.report.command.export_scheduler' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand::class,
-                'arguments' => [
-                    'mautic.report.model.report_exporter',
-                    'translator',
-                ],
-                'tag' => 'console.command',
             ],
         ],
     ],

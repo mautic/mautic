@@ -6,6 +6,7 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor';
 
 // for local dev
@@ -33,9 +34,6 @@ export default class BuilderService {
     }
     if (!assets.conf.deletePath) {
       throw Error('No deletePath found');
-    }
-    if (!assets.files || !assets.files[0]) {
-      console.warn('no assets');
     }
 
     this.assets = assets.files;
@@ -116,6 +114,11 @@ export default class BuilderService {
     codeModeButton.addCommand();
     codeModeButton.addButton();
 
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
+
+    this.overrideCustomRteDisable();
     this.setListeners();
   }
 
@@ -288,6 +291,26 @@ export default class BuilderService {
 
   getEditor() {
     return this.editor;
+  }
+
+  overrideCustomRteDisable() {
+    const richTextEditor = this.editor.RichTextEditor;
+
+    if (!richTextEditor) {
+      console.error('No RichTextEditor found');
+      return;
+    }
+
+    if (richTextEditor.customRte) {
+      richTextEditor.customRte.disable = (el, rte) => {
+        el.contentEditable = false;
+        if(rte && rte.focusManager) {
+          rte.focusManager.blur(true);
+        }
+
+        rte.destroy(true);
+      }
+    }
   }
   /**
    * Generate assets list from GrapesJs

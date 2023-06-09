@@ -3,7 +3,6 @@
 namespace Mautic\ConfigBundle;
 
 /**
- * Class ConfigEvents
  * Events available for ConfigBundle.
  */
 final class ConfigEvents

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -10,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\LeadEvents;
@@ -71,15 +71,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->contactRepository  = $this->em->getRepository(Lead::class);
     }
 
-    /**
-     * Clean up after the tests.
-     *
-     * @throws DBALException
-     */
-    protected function tearDown(): void
+    protected function beforeBeginTransaction(): void
     {
-        parent::tearDown();
-
         $this->truncateTables('leads', 'stages', 'campaigns', 'campaign_events');
     }
 
@@ -600,5 +593,30 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    public function testManipulatorSetOnCampaignTriggerAction(): void
+    {
+        $lead = new Lead();
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'campaign'   => ['id' => 1],
+                'properties' => ['integration' => 'vTiger', 'config' => ['campaigns' => 1]],
+                'type'       => 'test',
+            ],
+            'eventDetails'    => null,
+            'systemTriggered' => false,
+            'eventSettings'   => [],
+        ];
+
+        $event           = new CampaignExecutionEvent($args, false);
+        $eventDispatcher = self::$container->get('event_dispatcher');
+        $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
+
+        $leadManipulator = $lead->getManipulator();
+        Assert::assertInstanceOf(LeadManipulator::class, $leadManipulator);
+        Assert::assertSame('campaign', $leadManipulator->getBundleName());
+        Assert::assertSame('trigger-action', $leadManipulator->getObjectName());
     }
 }

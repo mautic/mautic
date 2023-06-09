@@ -106,7 +106,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'form'       => $form,
                             'page'       => $this->pageModel->getEntity($row['page_id']),
                         ],
-                        'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => '@MauticForm/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => 'fa-pencil-square-o',
                         'contactId'       => $row['lead_id'],
                     ]

@@ -2,34 +2,66 @@
 
 namespace Mautic\WebhookBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @extends CommonApiController<Webhook>
+ */
 class WebhookApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var WebhookModel|null
      */
-    public function initialize(ControllerEvent $event)
-    {
-        $this->model            = $this->getModel('webhook');
+    protected $model = null;
+
+    private RequestStack $requestStack;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
+        $this->requestStack = $requestStack;
+
+        $webhookModel = $modelFactory->getModel('webhook');
+        \assert($webhookModel instanceof WebhookModel);
+
+        $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
         $this->entityNameMulti  = 'hooks';
         $this->serializerGroups = ['hookDetails', 'categoryList', 'publishDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
-     *
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         // We have to use this hack to have a simple array instead of the one the serializer gives us
         $entity->buildTriggers();
@@ -46,7 +78,7 @@ class WebhookApiController extends CommonApiController
         }
 
         // Remove events missing in the PUT request
-        if ('PUT' === $this->request->getMethod()) {
+        if ('PUT' === $this->requestStack->getCurrentRequest()->getMethod()) {
             foreach ($entity->getEvents() as $event) {
                 if (!in_array($event->getEventType(), $eventsToKeep)) {
                     $entity->removeEvent($event);
