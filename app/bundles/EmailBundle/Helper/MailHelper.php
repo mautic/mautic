@@ -928,13 +928,10 @@ class MailHelper
      */
     public function setTo($addresses, $name = null)
     {
-        // TODO: clean this code, it is a bit messy
+        $name = $this->cleanName($name);
 
-        $name        = $this->cleanName($name);
-        $toAddresses = [];
         if (!is_array($addresses)) {
-            $toAddresses[] = new Address($addresses, $name ?? '');
-            $addresses     = [$addresses => $name];
+            $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
             $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
@@ -942,14 +939,12 @@ class MailHelper
 
                 return $address;
             }, []);
-
-            // Convert to array of Address objects
-            foreach ($addresses as $address => $name) {
-                $toAddresses[] = new Address($address, $name ?? '');
-            }
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
+
+        // Convert to array of Address objects
+        $toAddresses = array_map(fn (string $address, ?string $name): Address => new Address($address, $name ?? ''), array_keys($addresses), $addresses);
 
         try {
             $this->message->to(...$toAddresses);
