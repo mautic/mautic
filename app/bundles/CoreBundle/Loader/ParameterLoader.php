@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Loader;
 
-use Mautic\MessengerBundle\Loader\EnvVars\MessengerEnvLoader;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -77,7 +76,6 @@ class ParameterLoader
         EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        MessengerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
         $dotenv = new Dotenv(MAUTIC_ENV);
