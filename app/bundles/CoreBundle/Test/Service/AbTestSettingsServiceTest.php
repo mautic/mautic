@@ -1,32 +1,32 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Test\Service;
 
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\EmailBundle\Entity\Email;
+use PHPUnit\Framework\TestCase;
 
-class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
+class AbTestSettingsServiceTest extends TestCase
 {
     /**
      * Tests that service is returning proper AB test settings for a parent variant.
      */
-    public function testGetAbTestSettings()
+    public function testGetAbTestSettings(): void
     {
         $abTestSettingsService = new AbTestSettingsService();
 
         $winnerCriteria  = 'email.openrate';
         $sendWinnerDelay = 2;
-        $totalWeight     = 50;
-        $weightA         = 15;
-        $weightB         = 25;
+        $totalWeight     = 10;
+        $weightA         = 33;
+        $weightB         = 33;
 
         $idParent = 1;
         $idA      = 2;
         $idB      = 3;
 
         $parent = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $parent->method('getId')
             ->willReturn($idParent);
@@ -37,7 +37,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantA->method('getId')
             ->willReturn($idA);
@@ -47,7 +47,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setIsPublished(true);
 
         $variantB = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantB->method('getId')
             ->willReturn($idB);
@@ -62,9 +62,13 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($winnerCriteria, $abTestSettings['winnerCriteria']);
         $this->assertEquals($sendWinnerDelay, $abTestSettings['sendWinnerDelay']);
 
-        $this->assertEquals($totalWeight - $weightA - $weightB, $abTestSettings['variants'][$idParent]['weight']);
-        $this->assertEquals($weightA, $abTestSettings['variants'][$idA]['weight']);
-        $this->assertEquals($weightB, $abTestSettings['variants'][$idB]['weight']);
+        $onePercentOfTotalWeight = $totalWeight / 100;
+        $weightACalculated       = round($onePercentOfTotalWeight * $weightA);
+        $weightBCalculated       = round($onePercentOfTotalWeight * $weightB);
+        $parentWeight            = $totalWeight - $weightACalculated - $weightBCalculated;
+        $this->assertEquals($parentWeight, $abTestSettings['variants'][$idParent]['weight']);
+        $this->assertEquals($weightACalculated, $abTestSettings['variants'][$idA]['weight']);
+        $this->assertEquals($weightBCalculated, $abTestSettings['variants'][$idB]['weight']);
 
         $this->assertFalse($abTestSettings['configurationError']);
     }
@@ -72,14 +76,14 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests that in case of wrong configuration the service is returning configuration error.
      */
-    public function testGetAbTestSettingsWrongConfiguration()
+    public function testGetAbTestSettingsWrongConfiguration(): void
     {
         $abTestSettingsService = new AbTestSettingsService();
 
         $winnerCriteria  = 'email.openrate';
         $sendWinnerDelay = 2;
-        $totalWeight     = 50; // wrong configuration, smaller than variant weights
-        $weightA         = 15;
+        $totalWeight     = 10; // wrong configuration, smaller than variant weights
+        $weightA         = 65;
         $weightB         = 40;
 
         $idParent = 1;
@@ -87,7 +91,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $idB      = 3;
 
         $parent = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $parent->method('getId')
             ->willReturn($idParent);
@@ -98,7 +102,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantA->method('getId')
             ->willReturn($idA);
@@ -108,7 +112,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setIsPublished(true);
 
         $variantB = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantB->method('getId')
             ->willReturn($idB);
@@ -125,12 +129,12 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests settings for winner criteria if winnerCriteria is set in a children variant.
      */
-    public function testGetAbTestChildrenSettings()
+    public function testGetAbTestChildrenSettings(): void
     {
         $abTestSettingsService = new AbTestSettingsService();
 
         $winnerCriteria  = 'email.openrate';
-        $totalWeight     = 100;
+        $totalWeight     = 10;
         $weightA         = 15;
         $weightB         = 25;
 
@@ -139,14 +143,14 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $idB      = 3;
 
         $parent = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $parent->method('getId')
             ->willReturn($idParent);
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantA->method('getId')
             ->willReturn($idA);
@@ -156,7 +160,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setIsPublished(true);
 
         $variantB = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variantB->method('getId')
             ->willReturn($idB);
@@ -167,12 +171,17 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
 
         $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
 
+        $onePercentOfTotalWeight = $totalWeight / 100;
+        $weightACalculated       = round($onePercentOfTotalWeight * $weightA);
+        $weightBCalculated       = round($onePercentOfTotalWeight * $weightB);
+        $parentWeight            = $totalWeight - $weightACalculated - $weightBCalculated;
+
         $this->assertEquals($totalWeight, $abTestSettings['totalWeight']);
         $this->assertEquals($winnerCriteria, $abTestSettings['winnerCriteria']);
 
-        $this->assertEquals($totalWeight - $weightA - $weightB, $abTestSettings['variants'][$idParent]['weight']);
-        $this->assertEquals($weightA, $abTestSettings['variants'][$idA]['weight']);
-        $this->assertEquals($weightB, $abTestSettings['variants'][$idB]['weight']);
+        $this->assertEquals($parentWeight, $abTestSettings['variants'][$idParent]['weight']);
+        $this->assertEquals($weightACalculated, $abTestSettings['variants'][$idA]['weight']);
+        $this->assertEquals($weightBCalculated, $abTestSettings['variants'][$idB]['weight']);
 
         $this->assertFalse($abTestSettings['configurationError']);
     }

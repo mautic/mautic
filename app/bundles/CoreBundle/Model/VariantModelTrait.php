@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
@@ -105,9 +106,7 @@ trait VariantModelTrait
 
             // Reset the variant
             if (!empty($changes) && empty($this->inConversion)) {
-                if (method_exists($entity, 'setVariantStartDate')) {
-                    $entity->setVariantStartDate($variantStartDate);
-                }
+                $entity->setVariantStartDate($variantStartDate);
 
                 // Reset counters
                 foreach ($resetVariantCounterMethods as $method) {
@@ -143,9 +142,9 @@ trait VariantModelTrait
     }
 
     /**
-     * @param VariantEntityInterface|Email $entity
+     * @param VariantEntityInterface|FormEntity $entity
      */
-    public function cloneFromParentToVariant($entity)
+    public function cloneFromParentToVariant($entity): void
     {
         if ($this->inConversion) {
             return;

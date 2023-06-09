@@ -28,6 +28,7 @@ parameters:
 		- phpstan-bootstrap.php
 	ignoreErrors:
 		- '/Variable \$\w+ might not be defined\./'
+		- '#Parameter \$factory of method Mautic\\CoreBundle\\Model\\AbTest\\AbTestResultService::\_construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Factory\\MauticFactory#'
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

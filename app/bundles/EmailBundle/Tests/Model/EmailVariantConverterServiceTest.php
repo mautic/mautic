@@ -1,18 +1,18 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests;
 
 use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
+use PHPUnit\Framework\TestCase;
 
-class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
+class EmailVariantConverterServiceTest extends TestCase
 {
     /**
      * Tests if variant is converted properly into a parent one.
      */
-    public function testConvertWinnerVariant()
+    public function testConvertWinnerVariant(): void
     {
         $converter      = new VariantConverterService();
         $emailConverter = new EmailVariantConverterService($converter);
@@ -21,7 +21,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $sendWinnerDelay = 2;
 
         $parent = $this->getMockBuilder(Email::class)
-        ->setMethods(['getId'])
+        ->onlyMethods(['getId'])
         ->getMock();
         $parent->expects($this->any())
             ->method('getId')
@@ -33,7 +33,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $parent->setIsPublished(true);
 
         $winner = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $winner->expects($this->any())
             ->method('getId')
@@ -44,7 +44,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $winner->setVariantParent($parent);
 
         $variant = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variant->expects($this->any())
             ->method('getId')
@@ -73,7 +73,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests if variants are converted properly if the winner variant is already the parent one.
      */
-    public function testConvertAlreadyParentVariant()
+    public function testConvertAlreadyParentVariant(): void
     {
         $converter      = new VariantConverterService();
         $emailConverter = new EmailVariantConverterService($converter);
@@ -82,7 +82,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $sendWinnerDelay = 2;
 
         $winner = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $winner->expects($this->any())
             ->method('getId')
@@ -94,7 +94,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $winner->setIsPublished(true);
 
         $variant = $this->getMockBuilder(Email::class)
-            ->setMethods(['getId'])
+            ->onlyMethods(['getId'])
             ->getMock();
         $variant->expects($this->any())
             ->method('getId')

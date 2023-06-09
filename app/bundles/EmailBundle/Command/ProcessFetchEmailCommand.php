@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

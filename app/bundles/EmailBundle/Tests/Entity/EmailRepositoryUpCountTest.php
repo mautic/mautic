@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -54,7 +55,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
             ->with('id = 45');
 
         $this->queryBuilderMock->expects($this->once())
-            ->method('execute');
+            ->method('executeQuery');
 
         $this->repo->upCount(45);
     }
@@ -76,7 +77,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
             ->with('id = 45');
 
         $this->queryBuilderMock->expects($this->once())
-            ->method('execute');
+            ->method('executeQuery');
 
         $this->repo->upCount(45, 'read', 2, true);
     }
@@ -84,10 +85,11 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
     public function testUpCountWithTwoErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new DBALException()),
-                $this->throwException(new DBALException())
+                $this->throwException(new DBALException()),
+                $this->createMock(Result::class)
             );
 
         $this->repo->upCount(45);
@@ -96,7 +98,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
     public function testUpCountWithFourErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
-            ->method('execute')
+            ->method('executeQuery')
             ->will($this->throwException(new DBALException()));
 
         $this->expectException(DBALException::class);

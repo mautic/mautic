@@ -1213,15 +1213,16 @@ class PageModel extends FormModel
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertWinnerVariant(VariantEntityInterface $entity)
+    public function convertWinnerVariant(VariantEntityInterface $entity): void
     {
-        //let saveEntities() know it does not need to set variant start dates
+        // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
         $this->variantConverterService->convertWinnerVariant($entity);
+        /** @var iterable<Page> $save */
         $save = $this->variantConverterService->getUpdatedVariants();
 
-        //save the entities
+        // save the entities
         $this->saveEntities($save, false);
     }
 

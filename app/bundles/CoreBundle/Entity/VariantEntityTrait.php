@@ -16,22 +16,22 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface
+     * @var VariantEntityInterface|FormEntity
      **/
     private $variantParent;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $variantSettingsKeys = ['weight', 'winnerCriteria'];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
 
     /**
-     * @var array
+     * @var array<int|bool|string>
      */
     private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
@@ -143,7 +143,7 @@ trait VariantEntityTrait
      *
      * @return $this
      */
-    public function setVariantSettings($variantSettings)
+    public function setVariantSettings($variantSettings): self
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantSettings', $variantSettings);
@@ -178,10 +178,7 @@ trait VariantEntityTrait
         return $this->variantStartDate;
     }
 
-    /**
-     * @return $this
-     */
-    public function setVariantStartDate($variantStartDate)
+    public function setVariantStartDate($variantStartDate): self
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantStartDate', $variantStartDate);
@@ -311,7 +308,7 @@ trait VariantEntityTrait
         }
     }
 
-    public function clearVariantSettings()
+    public function clearVariantSettings(): void
     {
         if (!$this->getVariantParent()) {
             $this->variantSettings = [
@@ -346,7 +343,7 @@ trait VariantEntityTrait
 
         $variants           = $this->getVariantChildren();
         $variantCount       = count($variants) + 1;
-        $singleVariantCount = ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
+        $singleVariantCount = (int) ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
 
         return $singleVariantCount * $variantCount;
     }

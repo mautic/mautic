@@ -2,7 +2,8 @@
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
-use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 /**
@@ -16,7 +17,7 @@ class VariantConverterService
     public const DEFAULT_WEIGHT = 100;
 
     /**
-     * @var array
+     * @var array<VariantEntityInterface>
      */
     private $updatedVariants = [];
 
@@ -28,13 +29,13 @@ class VariantConverterService
     /**
      * Converts variants for a new winner.
      */
-    public function convertWinnerVariant(VariantEntityInterface $winner)
+    public function convertWinnerVariant(VariantEntityInterface $winner): void
     {
         $this->setDefaultValues($winner);
 
         $this->switchParent = $winner->isVariant(true);
 
-        //set this email as the parent for the original parent and children
+        // set this email as the parent for the original parent and children
         if (true === $this->switchParent) {
             $oldParent = $winner->getVariantParent();
 
@@ -48,14 +49,14 @@ class VariantConverterService
     }
 
     /**
-     * @return array
+     * @return array<VariantEntityInterface>
      */
     public function getUpdatedVariants()
     {
         return $this->updatedVariants;
     }
 
-    private function switchParent(VariantEntityInterface $winner, VariantEntityInterface $oldParent)
+    private function switchParent(VariantEntityInterface $winner, VariantEntityInterface $oldParent): void
     {
         if ($winner->getId() === $oldParent->getId()) {
             return;
@@ -72,9 +73,9 @@ class VariantConverterService
     }
 
     /**
-     * @param Collection $variantChildren
+     * @param ArrayCollection<int, VariantEntityInterface|FormEntity> $variantChildren
      */
-    private function updateOldChildren($variantChildren, VariantEntityInterface $winner)
+    private function updateOldChildren($variantChildren, VariantEntityInterface $winner): void
     {
         foreach ($variantChildren as $child) {
             if ($child->getId() !== $winner->getId()) {
@@ -90,7 +91,7 @@ class VariantConverterService
         }
     }
 
-    private function updateWinnerSettings(VariantEntityInterface $winner)
+    private function updateWinnerSettings(VariantEntityInterface $winner): void
     {
         $variantSettings = $winner->getVariantSettings();
 
@@ -103,7 +104,7 @@ class VariantConverterService
     /**
      * Sets oldParent settings.
      */
-    public function updateOldParentSettings(VariantEntityInterface $oldParent)
+    public function updateOldParentSettings(VariantEntityInterface $oldParent): void
     {
         if (method_exists($oldParent, 'setIsPublished')) {
             $oldParent->setIsPublished(false);
@@ -112,7 +113,7 @@ class VariantConverterService
         $this->setDefaultValues($oldParent);
     }
 
-    private function transferChildToWinner(VariantEntityInterface $child, VariantEntityInterface $winner)
+    private function transferChildToWinner(VariantEntityInterface $child, VariantEntityInterface $winner): void
     {
         if (false === $this->switchParent) {
             return;
@@ -126,7 +127,7 @@ class VariantConverterService
         $child->setVariantParent($winner);
     }
 
-    private function addToUpdatedVariants(VariantEntityInterface $variant)
+    private function addToUpdatedVariants(VariantEntityInterface $variant): void
     {
         if (in_array($variant, $this->updatedVariants)) {
             return;
@@ -135,7 +136,7 @@ class VariantConverterService
         $this->updatedVariants[] = $variant;
     }
 
-    private function switchVariantSettings(VariantEntityInterface $winner, VariantEntityInterface $oldParent)
+    private function switchVariantSettings(VariantEntityInterface $winner, VariantEntityInterface $oldParent): void
     {
         $winnerSettings    = $winner->getVariantSettings();
         $oldParentSettings = $oldParent->getVariantSettings();
@@ -155,7 +156,7 @@ class VariantConverterService
         $oldParent->setVariantSettings($parentSettings);
     }
 
-    private function setDefaultValues(VariantEntityInterface $variant)
+    private function setDefaultValues(VariantEntityInterface $variant): void
     {
         $variant->setVariantStartDate(null);
     }

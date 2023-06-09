@@ -117,7 +117,7 @@ trait TimelineTrait
                 ->setMaxResults(null)
                 ->select('count(*)');
 
-            $total = $query->execute()->fetchOne();
+            $total = $query->executeQuery()->fetchOne();
 
             return [
                 'total'   => $total,

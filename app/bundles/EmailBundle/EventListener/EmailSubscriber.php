@@ -69,7 +69,7 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function cloneParentEmailData(Events\EmailEvent $event)
+    public function cloneParentEmailData(Events\EmailEvent $event): void
     {
         if ($event->getEmail()->isVariant()) {
             $this->emailModel->cloneFromParentToVariant($event->getEmail());

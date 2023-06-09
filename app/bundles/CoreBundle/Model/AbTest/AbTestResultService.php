@@ -29,7 +29,7 @@ class AbTestResultService
     }
 
     /**
-     * @param $criteria
+     * @param array<mixed>|null $criteria
      *
      * @return array|mixed
      *
@@ -37,7 +37,7 @@ class AbTestResultService
      */
     public function getAbTestResult(VariantEntityInterface $parentVariant, $criteria)
     {
-        //get A/B test information
+        // get A/B test information
         [$parent, $children] = $parentVariant->getVariants();
 
         $abTestResults = [];
@@ -56,7 +56,7 @@ class AbTestResultService
                 $abTestResults = $determineWinnerEvent->getAbTestResults();
             }
 
-            //execute the callback
+            // execute the callback
             if (isset($testSettings['callback']) && is_callable($testSettings['callback'])) {
                 if (is_array($testSettings['callback'])) {
                     $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
@@ -64,7 +64,7 @@ class AbTestResultService
                     $parts      = explode('::', $testSettings['callback']);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
-                    $reflection = new \ReflectionMethod(null, $testSettings['callback']);
+                    $reflection = new \ReflectionMethod('', $testSettings['callback']);
                 }
 
                 $pass = [];

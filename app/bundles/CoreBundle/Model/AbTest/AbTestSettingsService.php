@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
 
@@ -17,7 +18,7 @@ class AbTestSettingsService
      */
     public const DEFAULT_TOTAL_WEIGHT = 100;
 
-    const DEFAULT_AB_WEIGHT = 10;
+    public const DEFAULT_AB_WEIGHT = 10;
 
     /**
      * @var int
@@ -25,12 +26,12 @@ class AbTestSettingsService
     private $allPublishedVariantsWeight;
 
     /**
-     * @var array
+     * @var array<int,array<string|int>>
      */
     private $variantsSettings;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $winnerCriteria;
 
@@ -55,7 +56,7 @@ class AbTestSettingsService
     private $setCriteriaFromVariants;
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getAbTestSettings(VariantEntityInterface $variant)
     {
@@ -96,7 +97,7 @@ class AbTestSettingsService
     /**
      * Sets default values.
      */
-    private function init()
+    private function init(): void
     {
         $this->variantsSettings           = [];
         $this->winnerCriteria             = null;
@@ -106,7 +107,7 @@ class AbTestSettingsService
         $this->setCriteriaFromVariants    = false;
     }
 
-    private function setGeneralSettings(VariantEntityInterface $parentVariant)
+    private function setGeneralSettings(VariantEntityInterface $parentVariant): void
     {
         $parentSettings = $parentVariant->getVariantSettings();
         if (isset($parentSettings['totalWeight'])) {
@@ -126,7 +127,7 @@ class AbTestSettingsService
         }
     }
 
-    private function setVariantsSettings(VariantEntityInterface $parentVariant)
+    private function setVariantsSettings(VariantEntityInterface $parentVariant): void
     {
         $variants = $parentVariant->getVariantChildren();
 
@@ -136,7 +137,7 @@ class AbTestSettingsService
         $this->setParentSettingsWeight($parentVariant);
     }
 
-    private function setVariantSettings(VariantEntityInterface $variant)
+    private function setVariantSettings(VariantEntityInterface $variant): void
     {
         $variantsSettings = $variant->getVariantSettings();
         $weight           = isset($variantsSettings['weight']) ? $variantsSettings['weight'] : 0;
@@ -148,9 +149,10 @@ class AbTestSettingsService
     }
 
     /**
-     * @param int $weight
+     * @param VariantEntityInterface|FormEntity $variant
+     * @param int                               $weight
      */
-    private function setVariantSettingsWeight(VariantEntityInterface $variant, $weight)
+    private function setVariantSettingsWeight($variant, $weight): void
     {
         if ($variant->getIsPublished()) {
             $variantWeight                                       = round(($weight / 100) * $this->totalWeight);
@@ -161,7 +163,7 @@ class AbTestSettingsService
         }
     }
 
-    private function setParentSettingsWeight(VariantEntityInterface $parentVariant)
+    private function setParentSettingsWeight(VariantEntityInterface $parentVariant): void
     {
         if ($this->totalWeight < $this->allPublishedVariantsWeight) {
             // published variants weight exceeds total weight
@@ -173,9 +175,9 @@ class AbTestSettingsService
     /**
      * Adds variant weight for further calculation.
      *
-     * @param int $weight
+     * @param int|float $weight
      */
-    private function addPublishedVariantWeight($weight)
+    private function addPublishedVariantWeight($weight): void
     {
         $this->allPublishedVariantsWeight += $weight;
     }
@@ -185,7 +187,7 @@ class AbTestSettingsService
      *
      * @param string $variantCriteria
      */
-    private function setWinnerCriteriaFromVariant($variantCriteria)
+    private function setWinnerCriteriaFromVariant($variantCriteria): void
     {
         if (!empty($this->winnerCriteria) && $variantCriteria != $this->winnerCriteria) {
             // there are variants with different winner criteria

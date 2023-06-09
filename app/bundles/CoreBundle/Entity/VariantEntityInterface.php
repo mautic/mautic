@@ -101,18 +101,19 @@ interface VariantEntityInterface
     /**
      * Sets settings array for the variant.
      *
-     * @param array $variantSettings
+     * @param array<int|string> $variantSettings
      */
-    public function setVariantSettings($variantSettings);
+    public function setVariantSettings($variantSettings): self;
 
     /**
-     * @param $variantStartDate
-     *
-     * @return $this
+     * @param \DateTimeInterface|null $variantStartDate
      */
-    public function setVariantStartDate($variantStartDate);
+    public function setVariantStartDate($variantStartDate): self;
 
     public function isParent(): bool;
 
+    /**
+     * @return array<int>
+     */
     public function getOnlyChildrenRelatedEntityIds(): array;
 }

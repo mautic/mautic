@@ -166,7 +166,8 @@ class PageTestAbstract extends TestCase
             $deviceTrackerMock,
             $contactTracker,
             $coreParametersHelper,
-            $contactRequestHelper
+            $contactRequestHelper,
+            $variantConverterServiceMock
         );
 
         $pageModel->setDispatcher($dispatcher);

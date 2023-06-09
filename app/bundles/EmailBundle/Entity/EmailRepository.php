@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -38,7 +38,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -549,7 +549,7 @@ class EmailRepository extends CommonRepository
         $connection->createQueryBuilder()
             ->delete($tableName)
             ->where('email_id IN (:ids)')
-            ->setParameter('ids', $childrenIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('ids', $childrenIds, ArrayParameterType::INTEGER)
             ->execute();
 
         // Add new cross-reference records for child emails.
@@ -609,7 +609,7 @@ class EmailRepository extends CommonRepository
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
-                $q->execute();
+                $q->executeQuery();
 
                 return;
             } catch (\Doctrine\DBAL\Exception $e) {
@@ -705,7 +705,7 @@ class EmailRepository extends CommonRepository
     /**
      * Gets emails with published variants.
      *
-     * @return array
+     * @return array<Email>
      */
     public function getPublishedEmailsWithVariant()
     {

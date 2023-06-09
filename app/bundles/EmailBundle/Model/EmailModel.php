@@ -1048,7 +1048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param array           $lists
      * @param int             $limit
-     * @param bool            $batch        True to process and batch all pending leads
+     * @param bool|int|null   $batch        True to process and batch all pending leads
      * @param OutputInterface $output
      * @param int             $minContactId
      * @param int             $maxContactId
@@ -1270,7 +1270,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                         }
                     }
 
-                    //set parent weight
+                    // set parent weight
                     $emailSettings[$email->getId()]['weight'] = $abTestSettings['variants'][$email->getId()]['weight'] / 100;
                 } else {
                     $emailSettings[$email->getId()]['weight'] = 1;
@@ -2357,22 +2357,22 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertWinnerVariant(Email $entity)
+    public function convertWinnerVariant(Email $entity): void
     {
-        //let saveEntities() know it does not need to set variant start dates
+        // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
         $this->variantConverterService->convertWinnerVariant($entity);
+        /** @var iterable<Email> $save */
         $save = $this->variantConverterService->getUpdatedVariants();
 
-        //save the entities
         $this->saveEntities($save, false);
     }
 
     /**
      * Gets emails with published variants for automatic determination of a winner variant.
      *
-     * @return array
+     * @return array<Email>
      */
     public function getEmailsToSendWinnerVariant()
     {

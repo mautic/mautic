@@ -35,9 +35,11 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -272,7 +274,6 @@ class EmailController extends FormController
         $model    = $this->getModel('email');
         $security = $this->security;
 
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.email.page', 1);
@@ -1096,14 +1097,15 @@ class EmailController extends FormController
     /**
      * Manually sends emails.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function absendAction(Request $request, $objectId)
+    public function absendAction(Request $request, SessionInterface $session, FormFactory $formFactory, $objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
         $entity  = $model->getEntity($objectId);
-        $session = $this->container->get('session');
         $page    = $session->get('mautic.email.page', 1);
         // set the return URL
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -1168,30 +1170,28 @@ class EmailController extends FormController
 
         // Check that the parent is getting sent
         if ($variantParent = $entity->getVariantParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $variantParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $variantParent->getId(),
+            ]);
         }
 
         if ($translationParent = $entity->getTranslationParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $translationParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $translationParent->getId(),
+            ]);
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'absend', 'objectId' => $objectId]);
         $pending  = $model->getPendingLeads($entity, null, true);
-        $form     = $this->get('form.factory')->create(AbTestSendType::class, [], ['action' => $action]);
+        $form     = $formFactory->create(AbTestSendType::class, [], ['action' => $action]);
 
         if ('POST' == $request->getMethod()) {
             $entity->setPublishUp(new \DateTime());
-            $this->getModel('email.email')->saveEntity($entity);
+            /** @var EmailModel $emailModel */
+            $emailModel = $this->getModel('email.email');
+            $emailModel->saveEntity($entity);
             $viewParameters = [
                 'objectAction' => 'view',
                 'objectId'     => $entity->getId(),
@@ -1325,12 +1325,10 @@ class EmailController extends FormController
         }
 
         if ($entity->isEnableAbTest()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'absend',
-                    'objectId'     => $entity->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'absend',
+                'objectId'     => $entity->getId(),
+            ]);
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);

@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model\AbTest;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\EmailBundle\Entity\Email;
 
@@ -23,7 +24,7 @@ class EmailVariantConverterService
         $this->variantConverterService = $variantConverterService;
     }
 
-    public function convertWinnerVariant(Email $email)
+    public function convertWinnerVariant(Email $email): void
     {
         $this->variantConverterService->convertWinnerVariant($email);
 
@@ -31,7 +32,7 @@ class EmailVariantConverterService
     }
 
     /**
-     * @return array
+     * @return array<VariantEntityInterface>
      */
     public function getUpdatedVariants()
     {
@@ -41,8 +42,9 @@ class EmailVariantConverterService
     /**
      * Sets default values for AB test variants.
      */
-    private function setDefaultValues()
+    private function setDefaultValues(): void
     {
+        /** @var Email $variant */
         foreach ($this->getUpdatedVariants() as $variant) {
             $variant->setVariantSentCount(0);
         }

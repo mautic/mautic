@@ -17,8 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SendWinnerEmailCommand extends ModeratedCommand
 {
-    public const COMMAND_NAME = 'mautic:email:sendwinner';
+    protected static $defaultDescription = 'Send winner email variant to remaining contacts';
+    public const COMMAND_NAME            = 'mautic:email:sendwinner';
 
+    /**
+     * @var SendWinnerService
+     */
     private $sendWinnerService;
 
     public function __construct(SendWinnerService $sendWinnerService, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
@@ -28,11 +32,10 @@ class SendWinnerEmailCommand extends ModeratedCommand
         $this->sendWinnerService = $sendWinnerService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Send winner email variant to remaining contacts')
             ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of timeá
@@ -45,13 +48,11 @@ EOT
     }
 
     /**
-     * @return int
-     *
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $emailId       = $input->getOption('id');
+        $emailId       = (int) $input->getOption('id');
         $moderationKey = sprintf('%s-%s', self::COMMAND_NAME, $emailId);
 
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {

@@ -30,7 +30,7 @@ class SendWinnerService
     private $abTestSettingsService;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $outputMessages;
 
@@ -55,7 +55,7 @@ class SendWinnerService
      * @throws \ReflectionException
      * @throws \Exception
      */
-    public function processWinnerEmails($emailId = null)
+    public function processWinnerEmails($emailId = null): void
     {
         if (null === $emailId) {
             $emails = $this->emailModel->getEmailsToSendWinnerVariant();
@@ -90,7 +90,7 @@ class SendWinnerService
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function getOutputMessages()
     {
@@ -109,7 +109,7 @@ class SendWinnerService
      * @throws NotReadyToSendWinnerException
      * @throws \ReflectionException
      */
-    private function processWinnerEmail(Email $email)
+    private function processWinnerEmail(Email $email): void
     {
         $this->addOutputMessage(sprintf("\n\nProcessing email id #%d", $email->getId()));
 
@@ -126,7 +126,7 @@ class SendWinnerService
     }
 
     /**
-     * @param array $abTestSettings
+     * @param array<int|string> $abTestSettings
      *
      * @return bool
      *
@@ -134,7 +134,7 @@ class SendWinnerService
      */
     private function isAllowedToSendWinner(Email $email, $abTestSettings)
     {
-        //g et A/B test information
+        // g et A/B test information
         [$parent, $children] = $email->getVariants();
 
         if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
@@ -189,7 +189,7 @@ class SendWinnerService
     /**
      * @param string $message
      */
-    private function addOutputMessage($message)
+    private function addOutputMessage($message): void
     {
         $this->outputMessages[] = $message;
     }
