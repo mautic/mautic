@@ -8,6 +8,7 @@ use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -33,7 +34,6 @@ class CategoryModel extends FormModel
     public function getRepository(): CategoryRepository
     {
         $result = $this->em->getRepository(Category::class);
-        \assert($result instanceof CategoryRepository);
 
         return $result;
     }
@@ -59,9 +59,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $entity
-     * @param $unlock
-     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
@@ -72,7 +69,7 @@ class CategoryModel extends FormModel
         }
         $alias = $this->cleanAlias($alias, '', false, '-');
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
@@ -95,8 +92,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
-     * @param             $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -104,7 +99,7 @@ class CategoryModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -119,8 +114,6 @@ class CategoryModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Category|null
      */
     public function getEntity($id = null)
@@ -134,11 +127,6 @@ class CategoryModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -181,10 +169,6 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $bundle
-     * @param $filter
-     * @param $limit
      *
      * @return array
      */

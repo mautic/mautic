@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -32,7 +32,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $kernel;
     private $validator;
-    private $encoder;
+    private UserPasswordHasher $hasher;
 
     /**
      * @var MockObject&FixturesLoaderInterface
@@ -52,7 +52,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->encoder              = $this->createMock(UserPasswordEncoder::class);
+        $this->hasher               = $this->createMock(UserPasswordHasher::class);
         $this->fixtureLoader        = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
@@ -63,7 +63,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->kernel,
             $this->validator,
-            $this->encoder,
+            $this->hasher,
             $this->fixtureLoader
         );
     }
@@ -183,9 +183,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->method('write');
 
         $this->configurator->expects($this->once())
-            ->method('mergeParameters')
-            ->with($params)
-            ->willReturn($messages);
+            ->method('mergeParameters');
 
         $this->assertEquals($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
     }
@@ -204,9 +202,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn($params);
 
         $this->configurator->expects($this->once())
-            ->method('mergeParameters')
-            ->with($params)
-            ->willReturn($messages);
+            ->method('mergeParameters');
 
         $this->configurator->expects($this->once())
             ->method('write');

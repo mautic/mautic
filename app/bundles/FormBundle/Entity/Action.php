@@ -24,7 +24,7 @@ class Action
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -90,8 +90,6 @@ class Action
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -117,10 +115,6 @@ class Action
         ]));
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {

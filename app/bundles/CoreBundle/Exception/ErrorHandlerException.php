@@ -2,8 +2,6 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-use Exception;
-
 class ErrorHandlerException extends \Exception
 {
     /**
@@ -18,7 +16,7 @@ class ErrorHandlerException extends \Exception
      * @param bool   $showMessage
      * @param int    $code
      */
-    public function __construct($message = '', $showMessage = false, $code = 0, Exception $previous = null)
+    public function __construct($message = '', $showMessage = false, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
 

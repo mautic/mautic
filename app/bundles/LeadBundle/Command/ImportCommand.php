@@ -32,7 +32,6 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Imports data to Mautic')
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
@@ -58,14 +57,14 @@ EOT
             if (!$import) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.core.error.notfound', [], 'flashes').'</error>');
 
-                return 1;
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
         } else {
             $import = $this->importModel->getImportToProcess();
 
             // No import waiting in the queue. Finish silently.
             if (null === $import) {
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -87,7 +86,7 @@ EOT
                 ]
             ).'</error>');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         } catch (ImportDelayedException $e) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
@@ -96,7 +95,7 @@ EOT
                 ]
             ).'</info>');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         // Success
@@ -111,6 +110,7 @@ EOT
             ]
         ).'</info>');
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Imports data to Mautic';
 }

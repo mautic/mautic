@@ -67,8 +67,6 @@ abstract class AbstractLookup
     }
 
     /**
-     * @param $ip
-     *
      * @return $this
      */
     public function setIpAddress($ip)

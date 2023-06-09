@@ -255,7 +255,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
             ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
-            ->willReturn(true);
+            ->willReturn(new \stdClass());
 
         $contactTracker->setTrackedContact($lead);
         $contactTracker->setTrackedContact($lead2);

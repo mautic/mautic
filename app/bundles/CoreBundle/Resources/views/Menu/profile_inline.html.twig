@@ -1,0 +1,55 @@
+{% if item.hasChildren() and (options.depth is not same as 0) and item.getDisplayChildren()  %}
+
+    {% for child in item.getChildren() %}
+
+        {% if child.isDisplayed() %}
+
+            {% set showChildren = (child.hasChildren() and child.getDisplayChildren() ? true : false) %}
+            {% set liAttributes = child.getAttributes() %}
+            {% set isAncestor = matcher.isAncestor(child, options['matchingDepth']) %}
+            {% set extras = child.getExtras() %}
+
+            {% if (extras.divider is defined and extras.divider is not empty) %}
+                <li role="separator" class="divider"></li>
+            {% elseif (extras.header is defined and extras.header is not empty) %}
+                <li class="dropdown-header">{{ extras.header|trans|purify }}</li>
+            {% else %}
+
+                {# save default classes for the item #}
+                {% set liClasses = (liAttributes.class is defined) ? liAttributes.class ~ ' nav-group' : 'nav-group' %}
+                
+                {# fetch classes from options and merge with the default classes #}
+                {% set liAttributes = liAttributes|merge(buildMenuClasses(child, matcher, options, liClasses)) %}
+
+                {# Menu item start #}
+                <li{{ parseMenuAttributes(liAttributes) }}>
+
+                    {% set url = child.getUri() %}
+                    {% set linkAttributes = child.getLinkAttributes() %}
+                    {% set url = (url is empty) ? 'javascript:void(0);' : url %}
+                    {% if (linkAttributes.target is not defined or linkAttributes.target is empty) %}
+                        {% set linkAttributes = linkAttributes|merge({'data-toggle': 'ajax'}) %}
+                    {% endif %}
+                    <a href="{{url}}"{{ parseMenuAttributes(linkAttributes) }}>
+                        {% if (extras.iconClass is defined and extras.iconClass is not empty) %}
+                        <span style="margin-top: 4px;" class="fs-14 fa {{ extras.iconClass }}"></span>
+                        {% endif %}
+
+                        {% set labelAttributes = child.getLabelAttributes() %}
+                        
+                        {% set labelClasses = (labelAttributes.class is not defined) ? 'text' : labelAttributes.class ~ ' text' %}
+                        {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}
+
+                        <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
+
+                    </a>
+
+                </li>
+
+            {% endif %}
+
+        {% endif %}
+
+    {% endfor %}
+
+{% endif %}

@@ -25,8 +25,6 @@ class UntrackableUrlsEvent extends Event
 
     /**
      * TrackableEvent constructor.
-     *
-     * @param $content
      */
     public function __construct($content)
     {
@@ -35,8 +33,6 @@ class UntrackableUrlsEvent extends Event
 
     /**
      * set a URL or token to not convert to trackables.
-     *
-     * @param $url
      */
     public function addNonTrackable($url)
     {

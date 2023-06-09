@@ -22,4 +22,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php');
     $services->alias('mautic.asset.helper.token', \Mautic\AssetBundle\Helper\TokenHelper::class);
     $services->alias('mautic.asset.model.asset', \Mautic\AssetBundle\Model\AssetModel::class);
+    $services->alias(\Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
 };

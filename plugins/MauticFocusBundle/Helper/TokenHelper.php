@@ -34,8 +34,6 @@ class TokenHelper
     }
 
     /**
-     * @param $content
-     *
      * @return array
      */
     public function findFocusTokens($content)
@@ -62,10 +60,10 @@ class TokenHelper
                 ) {
                     $script = '<script src="'.
                         $this->router->generate(
-                        'mautic_focus_generate',
-                        ['id' => $id],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ).
+                            'mautic_focus_generate',
+                            ['id' => $id],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ).
                     '" type="text/javascript" charset="utf-8" async="async"></script>';
                     $tokens[$token] = $script;
                 } else {

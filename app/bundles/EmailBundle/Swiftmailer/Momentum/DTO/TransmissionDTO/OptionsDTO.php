@@ -1,31 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
-/**
- * Class OptionsDTO.
- */
 final class OptionsDTO implements \JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $startTime;
+    private ?string $startTime = null;
 
-    /**
-     * @var bool|null
-     */
-    private $openTracking;
+    private ?bool $openTracking = null;
 
-    /**
-     * @var bool|null
-     */
-    private $clickTracking;
+    private ?bool $clickTracking = null;
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    /** @return array<string, string|bool> */
+    public function jsonSerialize(): array
     {
         $json = [];
         if (null !== $this->startTime) {
@@ -41,36 +29,21 @@ final class OptionsDTO implements \JsonSerializable
         return $json;
     }
 
-    /**
-     * @param string|null $startTime
-     *
-     * @return OptionsDTO
-     */
-    public function setStartTime($startTime = null)
+    public function setStartTime(?string $startTime): self
     {
         $this->startTime = $startTime;
 
         return $this;
     }
 
-    /**
-     * @param bool|null $openTracking
-     *
-     * @return OptionsDTO
-     */
-    public function setOpenTracking($openTracking = null)
+    public function setOpenTracking(?bool $openTracking): self
     {
         $this->openTracking = $openTracking;
 
         return $this;
     }
 
-    /**
-     * @param bool|null $clickTracking
-     *
-     * @return OptionsDTO
-     */
-    public function setClickTracking($clickTracking = null)
+    public function setClickTracking(?bool $clickTracking): self
     {
         $this->clickTracking = $clickTracking;
 

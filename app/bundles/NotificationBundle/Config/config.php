@@ -20,7 +20,7 @@ return [
                 'alias'     => 'notification_helper',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'templating.helper.assets',
+                    'twig.helper.assets',
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                     'router',
@@ -184,9 +184,9 @@ return [
             ],
         ],
     ],
-    //'categories' => [
+    // 'categories' => [
     //    'notification' => null
-    //],
+    // ],
     'parameters' => [
         'notification_enabled'                        => false,
         'notification_landing_page_enabled'           => true,

@@ -14,27 +14,27 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class StatDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var array
+     * @var \Mautic\EmailBundle\Entity\Stat|null
      */
     private $stat;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadDevice
+     * @var \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     private $device;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateOpened;
 
@@ -65,8 +65,6 @@ class StatDevice
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -83,11 +81,11 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

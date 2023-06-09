@@ -1,0 +1,52 @@
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-md-6">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+{% block _config_messengerconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+
+{# we want to show these keys no matter what is the transport selected #}
+{% set retryKeys = [
+    'messenger_retry_strategy_max_retries',
+    'messenger_retry_strategy_delay',
+    'messenger_retry_strategy_multiplier',
+    'messenger_retry_strategy_max_delay'
+] %}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+    <div class='row'>
+    {% for key in fieldKeys|filter(v => v not in retryKeys) %}
+        {{ _self.row_if_exists(fields, key) }}
+    {% endfor %}
+    </div>
+        {% if fields.messenger_type is defined %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_retries') }}
+                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_delay') }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_multiplier') }}
+                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_delay') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

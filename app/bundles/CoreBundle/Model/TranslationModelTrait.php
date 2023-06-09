@@ -67,10 +67,10 @@ trait TranslationModelTrait
                     $browserLanguages = explode(',', $browserLanguages);
                     foreach ($browserLanguages as $language) {
                         if (($pos = strpos($language, ';q=')) !== false) {
-                            //remove weights
-                            $language = substr($language, 0, ($pos + 1));
+                            // remove weights
+                            $language = substr($language, 0, $pos + 1);
                         }
-                        //change - to _
+                        // change - to _
                         $language = str_replace('-', '_', $language);
 
                         if (!isset($languageList[$language])) {
@@ -130,8 +130,6 @@ trait TranslationModelTrait
     }
 
     /**
-     * @param $locale
-     *
      * @return string
      */
     protected function getTranslationLocaleCore($locale)

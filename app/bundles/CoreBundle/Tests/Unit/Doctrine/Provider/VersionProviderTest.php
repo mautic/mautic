@@ -5,13 +5,25 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class VersionProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var Connection|MockObject
+     */
     private $connection;
-    private $statement;
+
+    /**
+     * @var MockObject&Result
+     */
+    private $result;
+
+    /**
+     * @var VersionProvider
+     */
     private $provider;
 
     protected function setUp(): void
@@ -19,7 +31,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->connection           = $this->createMock(Connection::class);
-        $this->statement            = $this->createMock(Statement::class);
+        $this->result               = $this->createMock(Result::class);
         $this->provider             = new VersionProvider($this->connection);
     }
 
@@ -28,10 +40,10 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
+        $this->result->expects($this->once())
+            ->method('fetchOne')
             ->willReturn('5.7.23-23-log');
 
         $version = $this->provider->getVersion();
@@ -46,10 +58,10 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with('SELECT VERSION()')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
+        $this->result->expects($this->once())
+            ->method('fetchOne')
             ->willReturn('10.3.9-MariaDB');
 
         $version = $this->provider->getVersion();

@@ -94,9 +94,6 @@ class SubmissionEvent extends CommonEvent
 
     /**
      * SubmissionEvent constructor.
-     *
-     * @param $post
-     * @param $server
      */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
@@ -228,10 +225,6 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @param $key
-     * @param $feedback
-     */
     public function setActionFeedback($key, $feedback)
     {
         $this->feedback[$key] = $feedback;

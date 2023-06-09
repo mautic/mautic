@@ -240,7 +240,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/20030306?v=4",
       "profile": "https://hartmut.io",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -949,7 +950,99 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/758957?v=4",
       "profile": "http://rembo.me",
       "contributions": [
+        "userTesting",
+        "code",
+        "review"
+      ]
+    },
+    {
+      "login": "TechBill",
+      "name": "TechBill",
+      "avatar_url": "https://avatars.githubusercontent.com/u/945103?v=4",
+      "profile": "https://github.com/TechBill",
+      "contributions": [
         "userTesting"
+      ]
+    },
+    {
+      "login": "irfanhanfi",
+      "name": "Irfan Hanfi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4272642?v=4",
+      "profile": "https://stackoverflow.com/users/902161/irfan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "annamunk",
+      "name": "Anna Munk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/102536220?v=4",
+      "profile": "https://github.com/annamunk",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "sdoering",
+      "name": "Sven Döring",
+      "avatar_url": "https://avatars.githubusercontent.com/u/765204?v=4",
+      "profile": "https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "pedrodejesus",
+      "name": "Pedro de Jesus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42081152?v=4",
+      "profile": "https://www.linkedin.com/in/pedro-de-jesus-a60527167",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "JeanMarcAivie",
+      "name": "Jean-Marc ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/127292186?v=4",
+      "profile": "https://github.com/JeanMarcAivie",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "paulsanduleac",
+      "name": "Paul Sanduleac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67867?v=4",
+      "profile": "http://paulsanduleac.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lenonleite",
+      "name": "Lenon Leite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218436?v=4",
+      "profile": "http://lenonleite.com.br",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Syrgak-Alan",
+      "name": "Alan Syrgak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96595532?v=4",
+      "profile": "https://github.com/Syrgak-Alan",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "MohHeader",
+      "name": "Mohammed Header",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3213925?v=4",
+      "profile": "https://github.com/MohHeader",
+      "contributions": [
+        "code"
       ]
     }
   ],
@@ -959,5 +1052,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }

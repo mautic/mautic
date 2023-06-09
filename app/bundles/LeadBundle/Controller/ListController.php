@@ -3,16 +3,19 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Exception;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
+use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -38,16 +41,16 @@ class ListController extends FormController
      *
      * @return JsonResponse|Response
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
         /** @var ListModel $model */
         $model   = $this->getModel('lead.list');
-        $session = $this->get('session');
+        $session = $request->getSession();
 
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted([
+        // set some permissions
+        $permissions = $this->security->isGranted([
             'lead:leads:viewown',
             'lead:leads:viewother',
             'lead:lists:viewother',
@@ -55,24 +58,24 @@ class ListController extends FormController
             'lead:lists:deleteother',
         ], 'RETURN_ARRAY');
 
-        //Lists can be managed by anyone who has access to leads
+        // Lists can be managed by anyone who has access to leads
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
         }
 
         $this->setListFilters();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $session->get('mautic.segment.filter', ''));
+        $search = $request->get('search', $session->get('mautic.segment.filter', ''));
         $session->set('mautic.segment.filter', $search);
 
-        //do some default filtering
+        // do some default filtering
         $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
         $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
 
@@ -80,10 +83,10 @@ class ListController extends FormController
             'string' => $search,
         ];
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         if (!$permissions['lead:lists:viewother']) {
-            $translator      = $this->get('translator');
+            $translator      = $this->translator;
             $mine            = $translator->trans('mautic.core.searchcommand.ismine');
             $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
             $filter['force'] = "($mine or $global)";
@@ -92,7 +95,7 @@ class ListController extends FormController
         [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -115,7 +118,7 @@ class ListController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
@@ -127,7 +130,7 @@ class ListController extends FormController
             'page'                           => $page,
             'limit'                          => $limit,
             'permissions'                    => $permissions,
-            'security'                       => $this->get('mautic.security'),
+            'security'                       => $this->security,
             'tmpl'                           => $tmpl,
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
@@ -138,14 +141,14 @@ class ListController extends FormController
         return $this->delegateView(
             $this->getViewArguments([
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticLeadBundle:List:list.html.twig',
+                'contentTemplate' => '@MauticLead/List/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
                     'mauticContent' => 'leadlist',
                 ],
             ],
-            'index'
+                'index'
             )
         );
     }
@@ -155,35 +158,35 @@ class ListController extends FormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare)
     {
-        if (!$this->get('mautic.security')->isGranted('lead:leads:viewown')) {
+        if (!$this->security->isGranted('lead:leads:viewown')) {
             return $this->accessDenied();
         }
 
-        //retrieve the entity
+        // retrieve the entity
         $list = new LeadList();
         /** @var ListModel $model */
         $model = $this->getModel('lead.list');
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.segment.page', 1);
-        //set the return URL for post actions
+        // set the page we came from
+        $page = $request->getSession()->get('mautic.segment.page', 1);
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
         $action    = $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']);
 
-        //get the user form factory
-        $form = $model->createForm($list, $this->get('form.factory'), $action);
+        // get the user form factory
+        $form = $model->createForm($list, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        // /Check for a submitted form and process it
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $list->setDateModified(new \DateTime());
                     $model->saveEntity($list);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $list->getName().' ('.$list->getAlias().')',
                         '%menu_link%' => 'mautic_segment_index',
                         '%url%'       => $this->generateUrl('mautic_segment_action', [
@@ -205,16 +208,15 @@ class ListController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($list->getId(), true);
+                return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $list->getId(), true);
             }
         }
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
+            'contentTemplate' => '@MauticLead/List/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']),
@@ -231,15 +233,18 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function cloneAction($objectId, $ignorePost = false)
+    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false)
     {
-        $postActionVars = $this->getPostActionVars();
+        $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
             $segment = $this->getSegment($objectId);
 
             return $this->createSegmentModifyResponse(
+                $request,
                 clone $segment,
+                $segmentDependencies,
+                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
@@ -269,9 +274,9 @@ class ListController extends FormController
      *
      * @return Response
      */
-    public function editAction($objectId, $ignorePost = false, bool $isNew = false)
+    public function editAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false, bool $isNew = false)
     {
-        $postActionVars = $this->getPostActionVars($objectId);
+        $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
             $segment = $this->getSegment($objectId);
@@ -281,7 +286,10 @@ class ListController extends FormController
             }
 
             return $this->createSegmentModifyResponse(
+                $request,
                 $segment,
+                $segmentDependencies,
+                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -311,7 +319,7 @@ class ListController extends FormController
      *
      * @return Response
      */
-    private function createSegmentModifyResponse(LeadList $segment, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, array $postActionVars, $action, $ignorePost)
     {
         /** @var ListModel $segmentModel */
         $segmentModel = $this->getModel('lead.list');
@@ -321,16 +329,16 @@ class ListController extends FormController
         }
 
         /** @var FormInterface $form */
-        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
+        $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
+        // /Check for a submitted form and process it
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $segmentModel->saveEntity($segment, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
                         '%menu_link%' => 'mautic_segment_index',
                         '%url%'       => $this->generateUrl('mautic_segment_action', [
@@ -340,7 +348,7 @@ class ListController extends FormController
                     ]);
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.twig';
+                        $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
@@ -348,20 +356,21 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
+                        $form = $segmentModel->createForm($segment, $this->formFactory, $postActionVars['returnUrl']);
+
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
-                            //'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
                             'form'         => $form->createView(),
                         ];
 
                         return $this->postActionRedirect($postActionVars);
                     } else {
-                        return $this->viewAction($segment->getId());
+                        return $this->viewAction($request, $segmentDependencies, $segmentCampaignShare, $segment->getId());
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $segmentModel->unlockEntity($segment);
             }
 
@@ -369,17 +378,16 @@ class ListController extends FormController
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $segmentModel->lockEntity($segment);
         }
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
+            'contentTemplate' => '@MauticLead/List/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $action,
@@ -408,7 +416,7 @@ class ListController extends FormController
             throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
+        if (!$this->security->hasEntityAccess(
             true, 'lead:lists:editother', $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
@@ -420,20 +428,20 @@ class ListController extends FormController
     /**
      * Get variables for POST action.
      *
-     * @param null $objectId
+     * @param int|null $objectId
      *
      * @return array
      */
-    private function getPostActionVars($objectId = null)
+    private function getPostActionVars(Request $request, $objectId = null)
     {
-        //set the return URL
+        // set the return URL
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
             $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::viewAction';
         } else {
-            //set the page we came from
-            $page            = $this->get('session')->get('mautic.segment.page', 1);
+            // set the page we came from
+            $page            = $request->getSession()->get('mautic.segment.page', 1);
             $returnUrl       = $this->generateUrl('mautic_segment_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
             $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::indexAction';
@@ -453,15 +461,13 @@ class ListController extends FormController
     /**
      * Delete a list.
      *
-     * @param $objectId
-     *
-     * @return JsonResponse|RedirectResponse
+     * @return Response
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
         /** @var ListModel $model */
         $model     = $this->getModel('lead.list');
-        $page      = $this->get('session')->get('mautic.segment.page', 1);
+        $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
         $flashes   = [];
 
@@ -491,7 +497,7 @@ class ListController extends FormController
             );
         }
 
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
             $model = $this->getModel('lead.list');
             $list  = $model->getEntity($objectId);
@@ -502,7 +508,7 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.list.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            } elseif (!$this->security->hasEntityAccess(
                 true, 'lead:lists:deleteother', $list->getCreatedBy()
             )
             ) {
@@ -521,7 +527,7 @@ class ListController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -533,11 +539,11 @@ class ListController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse|RedirectResponse
+     * @return Response
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        $page      = $this->get('session')->get('mautic.segment.page', 1);
+        $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
         $flashes   = [];
 
@@ -551,10 +557,10 @@ class ListController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
             $model           = $this->getModel('lead.list');
-            $ids             = json_decode($this->request->query->get('ids', '{}'));
+            $ids             = json_decode($request->query->get('ids', '{}'));
             $canNotBeDeleted = $model->canNotBeDeleted($ids);
 
             if (!empty($canNotBeDeleted)) {
@@ -578,7 +584,7 @@ class ListController extends FormController
                         'msg'     => 'mautic.lead.list.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->hasEntityAccess(
+                } elseif (!$this->security->hasEntityAccess(
                     true, 'lead:lists:deleteother', $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->accessDenied(true);
@@ -601,7 +607,7 @@ class ListController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -611,34 +617,27 @@ class ListController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
-     * @return JsonResponse|RedirectResponse
+     * @return Response
      */
-    public function removeLeadAction($objectId)
+    public function removeLeadAction(Request $request, $objectId)
     {
-        return $this->changeList($objectId, 'remove');
+        return $this->changeList($request, $objectId, 'remove');
     }
 
     /**
-     * @param $objectId
-     *
-     * @return JsonResponse|RedirectResponse
+     * @return Response
      */
-    public function addLeadAction($objectId)
+    public function addLeadAction(Request $request, $objectId)
     {
-        return $this->changeList($objectId, 'add');
+        return $this->changeList($request, $objectId, 'add');
     }
 
     /**
-     * @param $listId
-     * @param $action
-     *
-     * @return array|JsonResponse|RedirectResponse
+     * @return Response
      */
-    protected function changeList($listId, $action)
+    protected function changeList(Request $request, $listId, $action)
     {
-        $page      = $this->get('session')->get('mautic.lead.page', 1);
+        $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
         $flashes   = [];
 
@@ -652,8 +651,8 @@ class ListController extends FormController
             ],
         ];
 
-        $leadId = $this->request->get('leadId');
-        if (!empty($leadId) && 'POST' == $this->request->getMethod()) {
+        $leadId = $request->get('leadId');
+        if (!empty($leadId) && 'POST' === $request->getMethod()) {
             /** @var ListModel $model */
             $model = $this->getModel('lead.list');
             /** @var LeadList $list */
@@ -668,7 +667,7 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.lead.error.notfound',
                     'msgVars' => ['%id%' => $listId],
                 ];
-            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            } elseif (!$this->security->hasEntityAccess(
                 'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
@@ -678,9 +677,9 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.list.error.notfound',
                     'msgVars' => ['%id%' => $list->getId()],
                 ];
-            } elseif (!$list->isGlobal() && !$this->get('mautic.security')->hasEntityAccess(
-                    true, 'lead:lists:viewother', $list->getCreatedBy()
-                )) {
+            } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
+                true, 'lead:lists:viewother', $list->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
@@ -688,7 +687,7 @@ class ListController extends FormController
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
                 $model->$function($lead, $list, true);
 
-                $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+                $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
                     'type' => 'notice',
                     'msg'  => ('remove' == $action) ? 'mautic.lead.lead.notice.removedfromlists' :
@@ -704,7 +703,7 @@ class ListController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -716,32 +715,30 @@ class ListController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId)
     {
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model    = $this->getModel('lead.list');
-        $security = $this->get('mautic.security');
+        $security = $this->security;
 
         /** @var LeadList $list */
         $list = $model->getEntity($objectId);
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.segment.page', 1);
+        // set the page we came from
+        $page = $request->getSession()->get('mautic.segment.page', 1);
 
-        if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {
+        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
             $filters = [
-                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+                'includeEvents' => InputHelper::clean($request->get('includeEvents', [])),
             ];
-            $this->get('session')->set('mautic.segment.filters', $filters);
+            $request->getSession()->set('mautic.segment.filters', $filters);
         } else {
             $filters = [];
         }
 
         if (null === $list) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
             return $this->postActionRedirect([
@@ -760,7 +757,7 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->security->hasEntityAccess(
             'lead:leads:viewown',
             'lead:lists:viewother',
             $list->getCreatedBy()
@@ -769,12 +766,12 @@ class ListController extends FormController
             return $this->accessDenied();
         }
         /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
+        $translator = $this->translator;
         /** @var ListModel $listModel */
         $listModel                    = $this->getModel('lead.list');
-        $dateRangeValues              = $this->request->get('daterange', []);
+        $dateRangeValues              = $request->get('daterange', []);
         $action                       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $dateRangeForm                = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $segmentContactsLineChartData = $listModel->getSegmentContactsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -792,8 +789,8 @@ class ListController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'usageStats'     => $this->get('mautic.lead.segment.stat.dependencies')->getChannelsIds($list->getId()),
-                'campaignStats'  => $this->get('mautic.lead.segment.stat.campaign.share')->getCampaignList($list->getId()),
+                'usageStats'     => $segmentDependencies->getChannelsIds($list->getId()),
+                'campaignStats'  => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'          => $segmentContactsLineChartData,
                 'list'           => $list,
                 'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
@@ -814,7 +811,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
+            'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',
@@ -849,23 +846,18 @@ class ListController extends FormController
         return 'lead.list';
     }
 
-    /**
-     * @param $start
-     * @param $limit
-     * @param $filter
-     * @param $orderBy
-     * @param $orderByDir
-     */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $session        = $this->get('session');
+        $request = $this->getCurrentRequest();
+        \assert(null !== $request);
+        $session        = $request->getSession();
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
-        $updatedFilters = $this->request->get('filters', false);
+        $updatedFilters = $request->get('filters', false);
 
         $sourceLists = $this->getListModel()->getSourceLists();
         $listFilters = [
             'filters' => [
-                'placeholder' => $this->get('translator')->trans('mautic.lead.list.filter.placeholder'),
+                'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
                 'multiple'    => true,
                 'groups'      => [
                     'mautic.lead.list.source.segment.category' => [
@@ -919,6 +911,9 @@ class ListController extends FormController
         // Store for customizeViewArguments
         $this->listFilters = $listFilters;
 
+        $request = $this->getCurrentRequest();
+        \assert(null !== $request);
+
         return parent::getIndexItems(
             $start,
             $limit,
@@ -931,9 +926,6 @@ class ListController extends FormController
         );
     }
 
-    /**
-     * @param $action
-     */
     public function getViewArguments(array $args, $action): array
     {
         switch ($action) {
@@ -951,19 +943,19 @@ class ListController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsAction($objectId, $page = 1)
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
     {
-        $session = $this->get('session');
+        $session = $request->getSession();
         \assert($session instanceof SessionInterface);
         $session->set('mautic.segment.contact.page', $page);
 
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
-        if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {
+        if ('POST' === $request->getMethod() && $request->request->has('includeEvents')) {
             $filters = [
-                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+                'includeEvents' => InputHelper::clean($request->get('includeEvents', [])),
             ];
-            $this->get('session')->set('mautic.segment.filters', $filters);
+            $request->getSession()->set('mautic.segment.filters', $filters);
         } else {
             $filters = [];
         }
@@ -981,6 +973,8 @@ class ListController extends FormController
         }
 
         return $this->generateContactsGrid(
+            $request,
+            $pageHelperFactory,
             $objectId,
             $page,
             ['lead:leads:viewother', 'lead:leads:viewown'],

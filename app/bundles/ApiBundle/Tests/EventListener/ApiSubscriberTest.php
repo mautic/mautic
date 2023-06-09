@@ -57,7 +57,7 @@ class ApiSubscriberTest extends CommonMocks
     public function testOnKernelRequestWhenNotMasterRequest(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->never())
@@ -69,7 +69,7 @@ class ApiSubscriberTest extends CommonMocks
     public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->event->expects($this->once())
@@ -100,7 +100,7 @@ class ApiSubscriberTest extends CommonMocks
     public function testOnKernelRequestOnApiRequestWhenApiEnabled(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->event->expects($this->once())

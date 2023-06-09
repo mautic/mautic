@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
 /**
@@ -23,7 +22,7 @@ trait SlaveConnectionTrait
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             if (
                 !$limiter
                 || !($limiter->getContactId() || $limiter->getContactIdList())

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -192,21 +191,21 @@ class ContactObjectHelper implements ObjectHelperInterface
      * @param int $start
      * @param int $limit
      */
-    public function findObjectsBetweenDates(DateTimeInterface $from, DateTimeInterface $to, $start, $limit): array
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->isNotNull('l.date_identified'),
-                    $qb->expr()->orX(
-                        $qb->expr()->andX(
+                    $qb->expr()->or(
+                        $qb->expr()->and(
                             $qb->expr()->isNotNull('l.date_modified'),
                             $qb->expr()->gte('l.date_modified', ':dateFrom'),
                             $qb->expr()->lt('l.date_modified', ':dateTo')
                         ),
-                        $qb->expr()->andX(
+                        $qb->expr()->and(
                             $qb->expr()->isNull('l.date_modified'),
                             $qb->expr()->gte('l.date_added', ':dateFrom'),
                             $qb->expr()->lt('l.date_added', ':dateTo')
@@ -219,7 +218,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByIds(array $ids): array
@@ -235,7 +234,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByFieldValues(array $fields): array
@@ -250,7 +249,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     public function getDoNotContactStatus(int $contactId, string $channel): int
@@ -260,7 +259,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $q->select('dnc.reason')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('dnc.lead_id', ':contactId'),
                     $q->expr()->eq('dnc.channel', ':channel')
                 )
@@ -269,7 +268,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setParameter('channel', $channel)
             ->setMaxResults(1);
 
-        $status = $q->execute()->fetchColumn();
+        $status = $q->execute()->fetchOne();
 
         if (false === $status) {
             return DoNotContact::IS_CONTACTABLE;
@@ -291,7 +290,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->andWhere('c.id IN (:objectIds)');
         $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     private function getAvailableFields(): array
@@ -342,8 +341,6 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param $value
-     *
      * @return int
      */
     private function getDoNotContactReason($value)

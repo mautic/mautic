@@ -47,7 +47,6 @@ class MaxMindDoNotSellPurgeCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:max-mind:purge')
-            ->setDescription('Purge data connected to MaxMind Do Not Sell list.')
             ->addOption(
                 'dry-run',
                 'd',
@@ -88,7 +87,7 @@ EOT
             if (0 == count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
 
             $output->writeln('Found '.count($doNotSellContacts)." contacts with an IP from the Do Not Sell list.\n");
@@ -96,7 +95,7 @@ EOT
             if ($dryRun) {
                 $output->writeln('<info>Dry run; skipping purge.</info>');
 
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
 
             $output->writeln('<info>Step 2: Purging data...</info>');
@@ -110,11 +109,11 @@ EOT
             $purgeProgress->finish();
             $output->writeln("\n<info>Purge complete.</info>\n");
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         } catch (\Exception $e) {
             $output->writeln("\n<error>".$e->getMessage().'</error>');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
     }
 
@@ -127,11 +126,11 @@ EOT
              'JOIN '.MAUTIC_TABLE_PREFIX.'ip_addresses ip ON x.ip_id = ip.id '.
              'WHERE ip.ip_address IN ('.$in.')';
 
-        $conn = $this->em->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        $conn   = $this->em->getConnection();
+        $stmt   = $conn->prepare($sql);
+        $result = $stmt->executeQuery();
 
-        return $stmt->fetchAll();
+        return $result->fetchAllAssociative();
     }
 
     private function purgeData(string $contactId, string $ip): bool
@@ -164,4 +163,5 @@ EOT
 
         return false;
     }
+    protected static $defaultDescription = 'Purge data connected to MaxMind Do Not Sell list.';
 }

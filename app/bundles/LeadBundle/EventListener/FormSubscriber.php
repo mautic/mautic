@@ -95,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => FormSubmitActionPointsChangeType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
+            'formTheme'   => '@MauticLead/FormTheme/FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
@@ -113,6 +113,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'       => 'mautic.lead.lead.events.changetags_descr',
             'formType'          => ModifyLeadTagsType::class,
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
@@ -120,7 +121,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.addutmtags',
             'description'       => 'mautic.lead.lead.events.addutmtags_descr',
             'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
+            'formTheme'         => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -130,7 +131,6 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.removedonotcontact',
             'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
             'formType'          => ActionRemoveDoNotContact::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -267,7 +267,7 @@ class FormSubscriber implements EventSubscriberInterface
         $utmValues->setQuery($event->getRequest()->query->all());
         $utmValues->setReferer($refererURL);
         $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
-        $utmValues->setDateAdded(new \Datetime());
+        $utmValues->setDateAdded(new \DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
         $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);

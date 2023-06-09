@@ -1,0 +1,114 @@
+{#
+  Variables
+    - searchValue
+    - items (\Mautic\DynamicContentBundle\Entity\DynamicContent[])
+    - categories
+    - page
+    - limit
+    - permissions
+    - model
+    - tmpl
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive page-list">
+        <table class="table table-hover table-striped table-bordered dwctable-list" id="dwcTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#dwcTable',
+                        'routeBase': 'dynamicContent',
+                        'templateButtons': {
+                            'delete': permissions['dynamiccontent:dynamiccontents:deleteown'] or permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        },
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'dynamicContent',
+                        'orderBy': 'e.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-dwc-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'dynamicContent',
+                        'orderBy': 'e.slotName',
+                        'text': 'mautic.dynamicContent.label.slot_name',
+                        'class': 'col-dwc-slotname visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'dynamicContent',
+                        'orderBy': 'c.title',
+                        'text': 'mautic.core.category',
+                        'class': 'col-dwc-category visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'dynamicContent',
+                        'orderBy': 'e.id',
+                        'text': 'mautic.core.id',
+                        'class': 'col-dwc-id visible-md visible-lg',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], item.createdBy),
+                                    'clone': permissions['dynamiccontent:dynamiccontents:create'],
+                                    'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'dynamicContent',
+                                'nameGetter': 'getName',
+                        }) }}
+                    </td>
+                    <td>
+                        {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'dynamicContent'}) }}
+                        <a href="{{ url('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                            {{ item.name }}
+                            {% if item.isVariant or item.isTranslation %}
+                                <span>
+                                  {% if item.isVariant %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw fa-sitemap"></i></span>
+                                  {% endif %}
+                                  {% if item.isTranslation %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw fa-language"></i></span>
+                                  {% endif %}
+                                 </span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.slotName }}</td>
+                    <td class="visible-md visible-lg">
+                        {% set catName = item.category is not empty ? item.category.title : 'mautic.core.form.uncategorized'|trans %}
+                        {% set color = item.category is not empty ? '#' ~ item.category.color : 'inherit' %}
+                        <span style="white-space: nowrap;">
+                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                          <span>{{ catName }}</span>
+                        </span>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'menuLinkId': 'mautic_dynamicContent_index',
+                    'baseUrl': url('mautic_dynamicContent_index'),
+                    'sessionVar': 'dynamicContent',
+            }) }}
+        </div>
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

@@ -67,7 +67,7 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.bundle',
                     'mautic.helper.core_parameters',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.plugin.model.plugin',
                 ],
             ],

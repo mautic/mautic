@@ -54,7 +54,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                             $submission->$setter($entity);
                             unset($rows[$col]);
                         } else {
-                            //the rest are custom field values
+                            // the rest are custom field values
                             break;
                         }
                     }

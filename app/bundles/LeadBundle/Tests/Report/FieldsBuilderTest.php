@@ -27,7 +27,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 
         $leadModel = $this->createMock(LeadModel::class);
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
             ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
@@ -56,7 +56,6 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',
@@ -194,7 +193,6 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',
@@ -284,7 +282,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());

@@ -43,6 +43,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Ensure a restrictions are recursively applied
+     *
      * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions()
      * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::applyRestrictions()
      */
