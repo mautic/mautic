@@ -141,7 +141,9 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
     {
@@ -182,6 +184,10 @@ class DownloadRepository extends CommonRepository
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
      * @param \DateTime $fromDate
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
     {
