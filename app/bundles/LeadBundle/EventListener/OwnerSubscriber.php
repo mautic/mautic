@@ -17,16 +17,6 @@ class OwnerSubscriber implements EventSubscriberInterface
     private $ownerFieldSprintf = '{ownerfield=%s}';
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var array
      */
     private $owners;
@@ -36,10 +26,8 @@ class OwnerSubscriber implements EventSubscriberInterface
     /**
      * OwnerSubscriber constructor.
      */
-    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
+    public function __construct(private LeadModel $leadModel, private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -101,7 +89,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $combinedContent = $event->getCombinedContent();
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
-            if (false !== strpos($combinedContent, $token)) {
+            if (str_contains($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }
@@ -170,10 +158,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @return array|null
-     */
-    private function getOwner($ownerId)
+    private function getOwner($ownerId): ?array
     {
         if (!isset($this->owners[$ownerId])) {
             $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);

@@ -24,10 +24,8 @@ class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -182,10 +180,7 @@ class ConfigController extends FormController
         );
     }
 
-    /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
+    public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -221,10 +216,7 @@ class ConfigController extends FormController
         return $this->notFound();
     }
 
-    /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
+    public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -246,7 +238,7 @@ class ConfigController extends FormController
 
                 $cacheHelper->refreshConfig();
                 $success = 1;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
 

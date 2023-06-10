@@ -17,26 +17,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository)
     {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
     }
 
     /**

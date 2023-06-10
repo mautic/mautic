@@ -13,11 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 class ReportDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
      * @var array
      */
     private $objects = [];
@@ -32,9 +27,11 @@ class ReportDAO
      */
     private $relationsDAO;
 
-    public function __construct($integration)
+    /**
+     * @param string $integration
+     */
+    public function __construct(private $integration)
     {
-        $this->integration     = $integration;
         $this->relationsDAO    = new RelationsDAO();
     }
 
@@ -61,12 +58,10 @@ class ReportDAO
     }
 
     /**
-     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
+    public function remapObject($oldObjectName, mixed $oldObjectId, $newObjectName, mixed $newObjectId = null): void
     {
         if (null === $newObjectId) {
             $newObjectId = $oldObjectId;

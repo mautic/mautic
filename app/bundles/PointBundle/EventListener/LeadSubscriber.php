@@ -16,43 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TriggerModel
-     */
-    private $triggerModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var PointsChangeLogRepository
-     */
-    private $pointsChangeLogRepository;
-
-    /**
-     * @var LeadPointLogRepository
-     */
-    private $leadPointLogRepository;
-
-    /**
-     * @var LeadTriggerLogRepository
-     */
-    private $leadTriggerLogRepository;
-
-    public function __construct(
-        TriggerModel $triggerModel,
-        TranslatorInterface $translator,
-        PointsChangeLogRepository $pointsChangeLogRepository,
-        LeadPointLogRepository $leadPointLogRepository,
-        LeadTriggerLogRepository $leadTriggerLogRepository
-    ) {
-        $this->triggerModel              = $triggerModel;
-        $this->translator                = $translator;
-        $this->pointsChangeLogRepository = $pointsChangeLogRepository;
-        $this->leadPointLogRepository    = $leadPointLogRepository;
-        $this->leadTriggerLogRepository  = $leadTriggerLogRepository;
+    public function __construct(private TriggerModel $triggerModel, private TranslatorInterface $translator, private PointsChangeLogRepository $pointsChangeLogRepository, private LeadPointLogRepository $leadPointLogRepository, private LeadTriggerLogRepository $leadTriggerLogRepository)
+    {
     }
 
     /**

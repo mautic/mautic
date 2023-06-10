@@ -8,24 +8,11 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 final class FieldCrate
 {
-    private string $key;
-    private string $name;
-    private string $type;
-
-    /**
-     * @var mixed[]
-     */
-    private array $properties;
-
     /**
      * @param mixed[] $properties
      */
-    public function __construct(string $key, string $name, string $type, array $properties)
+    public function __construct(private string $key, private string $name, private string $type, private array $properties)
     {
-        $this->key        = $key;
-        $this->name       = $name;
-        $this->type       = $type;
-        $this->properties = $properties;
     }
 
     public function getKey(): string

@@ -17,38 +17,10 @@ class PageSubscriber implements EventSubscriberInterface
     private $formRegex = '{form=(.*?)}';
 
     /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
      * PageSubscriber constructor.
      */
-    public function __construct(
-        FormModel $formModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
-        CorePermissions $security
-    ) {
-        $this->formModel                 = $formModel;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
-        $this->translator                = $translator;
-        $this->security                  = $security;
+    public function __construct(private FormModel $formModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private CorePermissions $security)
+    {
     }
 
     /**

@@ -10,11 +10,6 @@ use Symfony\Component\Routing\RouterInterface;
 class FieldValueTransformer
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @var array
      */
     private $contactFieldsToUpdate = [];
@@ -29,9 +24,8 @@ class FieldValueTransformer
      */
     private $isTransformed = false;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)

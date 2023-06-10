@@ -15,10 +15,8 @@ class PointController extends AbstractFormController
 {
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): JsonResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -100,10 +98,8 @@ class PointController extends AbstractFormController
      * Generates new form and processes post data.
      *
      * @param \Mautic\PointBundle\Entity\Point $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null)
+    public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('point');
         \assert($model instanceof PointModel);
@@ -205,10 +201,8 @@ class PointController extends AbstractFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('point');
         \assert($model instanceof PointModel);
@@ -338,10 +332,8 @@ class PointController extends AbstractFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('point');
         $entity = $model->getEntity($objectId);

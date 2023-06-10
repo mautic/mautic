@@ -20,10 +20,8 @@ class CompanyController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): JsonResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -123,10 +121,8 @@ class CompanyController extends FormController
      *
      * @param int $objectId company id
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsListAction(Request $request, $objectId, $page = 1)
+    public function contactsListAction(Request $request, $objectId, $page = 1): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         if (empty($objectId)) {
             return $this->accessDenied();
@@ -183,10 +179,8 @@ class CompanyController extends FormController
      * Generates new form and processes post data.
      *
      * @param \Mautic\LeadBundle\Entity\Company $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('lead.company');
         \assert($model instanceof CompanyModel);
@@ -327,10 +321,8 @@ class CompanyController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('lead.company');
         \assert($model instanceof CompanyModel);
@@ -512,10 +504,8 @@ class CompanyController extends FormController
 
     /**
      * Loads a specific company into the detailed panel.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
@@ -662,10 +652,8 @@ class CompanyController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction($objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('lead.company');
         $entity = $model->getEntity($objectId);
@@ -814,10 +802,8 @@ class CompanyController extends FormController
 
     /**
      * Company Merge function.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function mergeAction(Request $request, $objectId)
+    public function mergeAction(Request $request, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -964,10 +950,8 @@ class CompanyController extends FormController
 
     /**
      * Export company's data.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId)
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

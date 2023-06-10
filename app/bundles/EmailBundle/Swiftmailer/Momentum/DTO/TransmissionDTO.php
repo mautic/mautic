@@ -10,8 +10,6 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 
 final class TransmissionDTO implements \JsonSerializable
 {
-    private ?OptionsDTO $options;
-
     /**
      * @var RecipientDTO[]
      */
@@ -19,15 +17,8 @@ final class TransmissionDTO implements \JsonSerializable
 
     private ?string $campaignId = null;
 
-    private string $returnPath;
-
-    private ContentDTO $content;
-
-    public function __construct(ContentDTO $content, string $returnPath, ?OptionsDTO $options = null)
+    public function __construct(private ContentDTO $content, private string $returnPath, private ?OptionsDTO $options = null)
     {
-        $this->content    = $content;
-        $this->returnPath = $returnPath;
-        $this->options    = $options;
     }
 
     public function addRecipient(RecipientDTO $recipientDTO): self

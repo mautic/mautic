@@ -25,81 +25,26 @@ use Psr\Log\LoggerInterface;
 class EventExecutioner
 {
     /**
-     * @var ActionExecutioner
-     */
-    private $actionExecutioner;
-
-    /**
-     * @var ConditionExecutioner
-     */
-    private $conditionExecutioner;
-
-    /**
-     * @var DecisionExecutioner
-     */
-    private $decisionExecutioner;
-
-    /**
-     * @var EventCollector
-     */
-    private $collector;
-
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
      * @var Responses
      */
     private $responses;
-
-    /**
-     * @var RemovedContactTracker
-     */
-    private $removedContactTracker;
 
     /**
      * @var \DateTimeInterface
      */
     private $executionDate;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
     public function __construct(
-        EventCollector $eventCollector,
-        EventLogger $eventLogger,
-        ActionExecutioner $actionExecutioner,
-        ConditionExecutioner $conditionExecutioner,
-        DecisionExecutioner $decisionExecutioner,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        RemovedContactTracker $removedContactTracker,
-        LeadRepository $leadRepository
+        private EventCollector $collector,
+        private EventLogger $eventLogger,
+        private ActionExecutioner $actionExecutioner,
+        private ConditionExecutioner $conditionExecutioner,
+        private DecisionExecutioner $decisionExecutioner,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private RemovedContactTracker $removedContactTracker,
+        private LeadRepository $leadRepository
     ) {
-        $this->actionExecutioner     = $actionExecutioner;
-        $this->conditionExecutioner  = $conditionExecutioner;
-        $this->decisionExecutioner   = $decisionExecutioner;
-        $this->collector             = $eventCollector;
-        $this->eventLogger           = $eventLogger;
-        $this->logger                = $logger;
-        $this->scheduler             = $scheduler;
-        $this->removedContactTracker = $removedContactTracker;
-        $this->leadRepository        = $leadRepository;
-
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
     }
@@ -299,7 +244,7 @@ class EventExecutioner
      * @param ArrayCollection|LeadEventLog[] $logs
      * @param string                         $error
      */
-    public function recordLogsWithError(ArrayCollection $logs, $error)
+    public function recordLogsWithError(ArrayCollection|array $logs, $error)
     {
         foreach ($logs as $log) {
             $log->appendToMetadata(

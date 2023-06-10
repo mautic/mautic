@@ -220,7 +220,7 @@ class AjaxController extends CommonAjaxController
                         }
                         $mailer->setApiKey($settings['api_key']);
                     }
-                } catch (\Exception $exception) {
+                } catch (\Exception) {
                     // Transport had magic method defined and threw an exception
                 }
 
@@ -232,7 +232,7 @@ class AjaxController extends CommonAjaxController
                         $mailer->setUsername($settings['user']);
                         $mailer->setPassword($settings['password']);
                     }
-                } catch (\Exception $exception) {
+                } catch (\Exception) {
                     // Transport had magic method defined and threw an exception
                 }
 

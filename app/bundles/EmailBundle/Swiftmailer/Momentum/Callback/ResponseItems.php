@@ -43,7 +43,7 @@ class ResponseItems implements \Iterator
 
             try {
                 $this->items[] = new ResponseItem($event);
-            } catch (ResponseItemException $e) {
+            } catch (ResponseItemException) {
             }
         }
     }

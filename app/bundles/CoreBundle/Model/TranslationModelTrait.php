@@ -16,11 +16,9 @@ trait TranslationModelTrait
     /**
      * Get the entity based on requested translation.
      *
-     * @param Lead|array|null $lead
-     *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
-    public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null)
+    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead|array|null $lead = null, Request $request = null)
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
@@ -134,7 +132,7 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (false !== strpos($locale, '_')) {
+        if (str_contains($locale, '_')) {
             $locale = substr($locale, 0, 2);
         }
 

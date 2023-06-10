@@ -504,11 +504,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $description
-     *
      * @return Email
      */
-    public function setDescription($description)
+    public function setDescription(mixed $description)
     {
         $this->description = $description;
 
@@ -687,11 +685,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $fromAddress
-     *
      * @return Email
      */
-    public function setFromAddress($fromAddress)
+    public function setFromAddress(mixed $fromAddress)
     {
         $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
@@ -708,11 +704,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $fromName
-     *
      * @return Email
      */
-    public function setFromName($fromName)
+    public function setFromName(mixed $fromName)
     {
         $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
@@ -729,11 +723,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $replyToAddress
-     *
      * @return Email
      */
-    public function setReplyToAddress($replyToAddress)
+    public function setReplyToAddress(mixed $replyToAddress)
     {
         $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
@@ -750,11 +742,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $bccAddress
-     *
      * @return Email
      */
-    public function setBccAddress($bccAddress)
+    public function setBccAddress(mixed $bccAddress)
     {
         $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
@@ -966,8 +956,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Form $unsubscribeForm
-     *
      * @return $this
      */
     public function setUnsubscribeForm(Form $unsubscribeForm = null)
@@ -986,8 +974,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Page $preferenceCenter
-     *
      * @return $this
      */
     public function setPreferenceCenter(Page $preferenceCenter = null)
@@ -1006,11 +992,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $emailType
-     *
      * @return Email
      */
-    public function setEmailType($emailType)
+    public function setEmailType(mixed $emailType)
     {
         $this->emailType = $emailType;
 

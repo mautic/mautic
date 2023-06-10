@@ -8,33 +8,21 @@ use Symfony\Component\HttpFoundation\Request;
 class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
-     * Button location requested.
-     */
-    protected $location;
-
-    /**
      * @var array
      */
     protected $buttons = [];
-
-    /**
-     * Entity for list/view actions.
-     *
-     * @var mixed
-     */
-    protected $item;
 
     /**
      * CustomButtonEvent constructor.
      *
      * @param null $item
      */
-    public function __construct($location, Request $request, array $buttons = [], $item = null)
+    public function __construct(/**
+     * Button location requested.
+     */
+    protected $location, Request $request, array $buttons = [], protected $item = null)
     {
         parent::__construct($request);
-
-        $this->location = $location;
-        $this->item     = $item;
 
         foreach ($buttons as $button) {
             $this->buttons[$this->generateButtonKey($button)] = $button;
@@ -85,12 +73,9 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param string|null $location
-     * @param string|null $route
-     *
      * @return $this
      */
-    public function addButton(array $button, $location = null, $route = null)
+    public function addButton(array $button, ?string $location = null, ?string $route = null)
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;

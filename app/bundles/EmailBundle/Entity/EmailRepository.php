@@ -139,31 +139,25 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int            $emailId
-     * @param int[]|null     $variantIds
-     * @param int[]|null     $listIds
-     * @param bool           $countOnly
-     * @param int|null       $limit
-     * @param int|null       $minContactId
-     * @param int|null       $maxContactId
-     * @param bool           $countWithMaxMin
-     * @param \DateTime|null $maxDate
-     *
-     * @return QueryBuilder|int|array
+     * @param int        $emailId
+     * @param int[]|null $variantIds
+     * @param int[]|null $listIds
+     * @param bool       $countOnly
+     * @param bool       $countWithMaxMin
      */
     public function getEmailPendingQuery(
         $emailId,
-        $variantIds = null,
-        $listIds = null,
+        ?array $variantIds = null,
+        ?array $listIds = null,
         $countOnly = false,
-        $limit = null,
-        $minContactId = null,
-        $maxContactId = null,
+        ?int $limit = null,
+        ?int $minContactId = null,
+        ?int $maxContactId = null,
         $countWithMaxMin = false,
-        $maxDate = null,
+        ?\DateTime $maxDate = null,
         int $maxThreads = null,
         int $threadId = null
-    ) {
+    ): QueryBuilder|int|array {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
@@ -288,25 +282,20 @@ class EmailRepository extends CommonRepository
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
      * @param bool       $countOnly
-     * @param int|null   $limit
-     * @param int|null   $minContactId
-     * @param int|null   $maxContactId
      * @param bool       $countWithMaxMin
-     *
-     * @return array|int
      */
     public function getEmailPendingLeads(
         $emailId,
-        $variantIds = null,
-        $listIds = null,
+        ?array $variantIds = null,
+        ?array $listIds = null,
         $countOnly = false,
-        $limit = null,
-        $minContactId = null,
-        $maxContactId = null,
+        ?int $limit = null,
+        ?int $minContactId = null,
+        ?int $maxContactId = null,
         $countWithMaxMin = false,
         int $maxThreads = null,
         int $threadId = null
-    ) {
+    ): array|int {
         $q = $this->getEmailPendingQuery(
             $emailId,
             $variantIds,
@@ -348,12 +337,10 @@ class EmailRepository extends CommonRepository
      * @param int                      $start
      * @param bool                     $viewOther
      * @param bool                     $topLevel
-     * @param string|null              $emailType
-     * @param int|null                 $variantParentId
      *
      * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
+    public function getEmailList(string|array $search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, ?string $emailType = null, array $ignoreIds = [], ?int $variantParentId = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
@@ -514,7 +501,7 @@ class EmailRepository extends CommonRepository
      * @param string[]|string|int $relatedIds
      * @param string              $date
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants(array|string|int $relatedIds, $date)
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];
@@ -536,12 +523,11 @@ class EmailRepository extends CommonRepository
     /**
      * Up the read/sent counts.
      *
-     * @param int        $id
-     * @param string     $type
-     * @param int        $increaseBy
-     * @param bool|false $variant
+     * @param int    $id
+     * @param string $type
+     * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
+    public function upCount($id, $type = 'sent', $increaseBy = 1, bool $variant = false)
     {
         if (!$increaseBy) {
             return;
@@ -575,11 +561,9 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int|null $id
-     *
      * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts(?int $id = null)
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);

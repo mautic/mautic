@@ -11,31 +11,10 @@ use Mautic\SmsBundle\Exception\NumberNotFoundException;
 class ContactHelper
 {
     /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var PhoneNumberHelper
-     */
-    private $phoneNumberHelper;
-
-    /**
      * ContactHelper constructor.
      */
-    public function __construct(
-        LeadRepository $leadRepository,
-        Connection $connection,
-        PhoneNumberHelper $phoneNumberHelper
-    ) {
-        $this->leadRepository    = $leadRepository;
-        $this->connection        = $connection;
-        $this->phoneNumberHelper = $phoneNumberHelper;
+    public function __construct(private LeadRepository $leadRepository, private Connection $connection, private PhoneNumberHelper $phoneNumberHelper)
+    {
     }
 
     /**

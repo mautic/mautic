@@ -10,14 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(EmailModel $emailModel)
+    public function __construct(private EmailModel $emailModel)
     {
-        $this->emailModel = $emailModel;
     }
 
     /**

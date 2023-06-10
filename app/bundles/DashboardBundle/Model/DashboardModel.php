@@ -80,10 +80,8 @@ class DashboardModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null === $id) {
             return new Widget();

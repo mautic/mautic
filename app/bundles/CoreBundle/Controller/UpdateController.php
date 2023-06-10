@@ -17,10 +17,8 @@ class UpdateController extends CommonController
 {
     /**
      * Generates the update view.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(UpdateHelper $updateHelper)
+    public function indexAction(UpdateHelper $updateHelper): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
@@ -43,10 +41,7 @@ class UpdateController extends CommonController
         ]);
     }
 
-    /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function schemaAction(Request $request, LoggerInterface $mauticLogger, KernelInterface $kernel)
+    public function schemaAction(Request $request, LoggerInterface $mauticLogger, KernelInterface $kernel): array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
@@ -80,7 +75,7 @@ class UpdateController extends CommonController
             $outputBuffer = $output->fetch();
 
             // Check if migrations executed
-            $noMigrations = (0 === $result && false !== strpos($outputBuffer, 'No migrations'));
+            $noMigrations = (0 === $result && str_contains($outputBuffer, 'No migrations'));
         }
 
         if (0 !== $result) {

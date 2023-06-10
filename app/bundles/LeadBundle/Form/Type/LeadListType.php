@@ -11,14 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadListType extends AbstractType
 {
-    /**
-     * @var ListModel
-     */
-    private $segmentModel;
-
-    public function __construct(ListModel $segmentModel)
+    public function __construct(private ListModel $segmentModel)
     {
-        $this->segmentModel = $segmentModel;
     }
 
     public function configureOptions(OptionsResolver $resolver)

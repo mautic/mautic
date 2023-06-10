@@ -34,10 +34,8 @@ class TriggerEventModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return TriggerEvent|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?TriggerEvent
     {
         if (null === $id) {
             return new TriggerEvent();

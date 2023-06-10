@@ -32,24 +32,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $password;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var SesV2Client
      */
     private $amazonClient;
-
-    /**
-     * @var AmazonCallback
-     */
-    private $amazonCallback;
 
     /**
      * @var int
@@ -75,10 +60,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->region = ('other' === $region) ? $otherRegion : $region;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getRegion()
+    public function getRegion(): ?string
     {
         return $this->region;
     }
@@ -88,10 +70,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->username = $username;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -101,10 +80,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->password = $password;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -114,10 +90,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->handler = $handler;
     }
 
-    /**
-     * @return object|null
-     */
-    public function getHandler()
+    public function getHandler(): ?object
     {
         return $this->handler;
     }
@@ -127,22 +100,13 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->debug = $debug;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getDebug()
+    public function getDebug(): ?bool
     {
         return $this->debug;
     }
 
-    public function __construct(
-        TranslatorInterface $translator,
-        AmazonCallback $amazonCallback,
-        LoggerInterface $logger
-    ) {
-        $this->amazonCallback    = $amazonCallback;
-        $this->translator        = $translator;
-        $this->logger            = $logger;
+    public function __construct(private TranslatorInterface $translator, private AmazonCallback $amazonCallback, private LoggerInterface $logger)
+    {
     }
 
     public function start()

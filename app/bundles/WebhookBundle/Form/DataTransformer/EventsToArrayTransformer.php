@@ -12,11 +12,8 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class EventsToArrayTransformer implements DataTransformerInterface
 {
-    private $webhook;
-
-    public function __construct(Webhook $webhook)
+    public function __construct(private Webhook $webhook)
     {
-        $this->webhook = $webhook;
     }
 
     /**

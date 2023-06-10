@@ -35,30 +35,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
-
-    /**
-     * @var MappedObjectCollector
-     */
-    private $mappedObjectCollector;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, private MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
-        $this->mappedObjectCollector       = $mappedObjectCollector;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -156,10 +141,8 @@ class FormController extends CommonFormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model      = $this->getModel('form');
@@ -289,11 +272,9 @@ class FormController extends CommonFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     *
      * @throws \Exception
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model   = $this->getModel('form');
@@ -491,13 +472,10 @@ class FormController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      *
-     * @param int|Form $objectId
-     * @param bool     $ignorePost
-     * @param bool     $forceTypeSelection
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @param bool $ignorePost
+     * @param bool $forceTypeSelection
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, int|Form $objectId, $ignorePost = false, $forceTypeSelection = false): \Symfony\Component\HttpFoundation\JsonResponse|Response
     {
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model            = $this->getModel('form');
@@ -880,10 +858,8 @@ class FormController extends CommonFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('form.form');
 

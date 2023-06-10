@@ -9,14 +9,8 @@ use SendGrid\Mail;
 
 class SendGridMailBase
 {
-    /**
-     * @var PlainTextMessageHelper
-     */
-    private $plainTextMessageHelper;
-
-    public function __construct(PlainTextMessageHelper $plainTextMessageHelper)
+    public function __construct(private PlainTextMessageHelper $plainTextMessageHelper)
     {
-        $this->plainTextMessageHelper = $plainTextMessageHelper;
     }
 
     /**

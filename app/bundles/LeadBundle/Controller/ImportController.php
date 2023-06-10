@@ -50,11 +50,6 @@ class ImportController extends FormController
     public const STEP_IMPORT_FROM_CSV = 4;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var SessionInterface
      */
     private $session;
@@ -64,9 +59,8 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->logger = $mauticLogger;
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
 
@@ -78,10 +72,8 @@ class ImportController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|RedirectResponse
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
@@ -131,20 +123,16 @@ class ImportController extends FormController
 
     /**
      * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): array|JsonResponse|RedirectResponse|Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
      * Cancel and unpublish the import during manual import.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function cancelAction(Request $request)
+    public function cancelAction(Request $request): array|JsonResponse|RedirectResponse|Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -166,10 +154,8 @@ class ImportController extends FormController
 
     /**
      * Schedules manual import to background queue.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function queueAction(Request $request)
+    public function queueAction(Request $request): array|JsonResponse|RedirectResponse|Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -190,10 +176,8 @@ class ImportController extends FormController
     /**
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
+    public function newAction(Request $request, $objectId = 0, $ignorePost = false): JsonResponse|Response
     {
         $dispatcher = $this->dispatcher;
 
@@ -379,7 +363,7 @@ class ImportController extends FormController
                                     }
                                 }
                             } catch (FileException $e) {
-                                if (false !== strpos($e->getMessage(), 'upload_max_filesize')) {
+                                if (str_contains($e->getMessage(), 'upload_max_filesize')) {
                                     $errorMessage    = 'mautic.lead.import.filetoolarge';
                                     $errorParameters = [
                                         '%upload_max_filesize%' => ini_get('upload_max_filesize'),
@@ -387,7 +371,7 @@ class ImportController extends FormController
                                 } else {
                                     $errorMessage = 'mautic.lead.import.filenotreadable';
                                 }
-                            } catch (\Exception $e) {
+                            } catch (\Exception) {
                                 $errorMessage = 'mautic.lead.import.filenotreadable';
                             } finally {
                                 if (!is_null($errorMessage)) {

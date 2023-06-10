@@ -23,43 +23,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    public function __construct(
-        RequestStack $requestStack,
-        TranslatorInterface $translator,
-        ValidatorInterface $validator,
-        SessionInterface $session,
-        RouterInterface $router
-    ) {
-        $this->translator   = $translator;
-        $this->validator    = $validator;
-        $this->requestStack = $requestStack;
-        $this->session      = $session;
-        $this->router       = $router;
+    public function __construct(private RequestStack $requestStack, private TranslatorInterface $translator, private ValidatorInterface $validator, private SessionInterface $session, private RouterInterface $router)
+    {
     }
 
     /**

@@ -19,43 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutioner
 {
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
-     * @var ReferenceResolverInterface
-     */
-    private $referenceResolver;
-
-    /**
-     * @var FieldValidatorInterface
-     */
-    private $fieldValidator;
-
-    public function __construct(
-        MappingHelper $mappingHelper,
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider,
-        ReferenceResolverInterface $referenceResolver,
-        FieldValidatorInterface $fieldValidator
-    ) {
-        $this->mappingHelper     = $mappingHelper;
-        $this->dispatcher        = $dispatcher;
-        $this->objectProvider    = $objectProvider;
-        $this->referenceResolver = $referenceResolver;
-        $this->fieldValidator    = $fieldValidator;
+    public function __construct(private MappingHelper $mappingHelper, private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider, private ReferenceResolverInterface $referenceResolver, private FieldValidatorInterface $fieldValidator)
+    {
     }
 
     public function execute(OrderDAO $syncOrderDAO): ObjectMappingsDAO
@@ -106,7 +71,7 @@ class OrderExecutioner
                 $syncOrderDAO->getIdentifiedObjectIds($objectName),
                 $updateObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
@@ -157,7 +122,7 @@ class OrderExecutioner
                 $this->objectProvider->getObjectByName($objectName),
                 $createObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,

@@ -9,14 +9,8 @@ use Mautic\CoreBundle\Helper\AppVersion;
  */
 final class VersionHelper
 {
-    /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
-    public function __construct(AppVersion $appVersion)
+    public function __construct(private AppVersion $appVersion)
     {
-        $this->appVersion = $appVersion;
     }
 
     /**

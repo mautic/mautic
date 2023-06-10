@@ -80,10 +80,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];

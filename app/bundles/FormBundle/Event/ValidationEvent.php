@@ -9,16 +9,6 @@ use Mautic\FormBundle\Entity\Form;
 class ValidationEvent extends CommonEvent
 {
     /**
-     * @var Field
-     */
-    private $field;
-
-    /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
      * @var bool
      */
     private $valid = true;
@@ -32,10 +22,8 @@ class ValidationEvent extends CommonEvent
      * @param Form $form
      * @param bool $isNew
      */
-    public function __construct(Field $field, $value)
+    public function __construct(private Field $field, private mixed $value)
     {
-        $this->field = $field;
-        $this->value = $value;
     }
 
     /**

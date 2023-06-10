@@ -24,7 +24,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
  */
-class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
+class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder implements \Stringable
 {
     /*
      * The query types.
@@ -234,23 +234,12 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             return $this->sql;
         }
 
-        switch ($this->type) {
-            case self::INSERT:
-                $sql = $this->getSQLForInsert();
-                break;
-            case self::DELETE:
-                $sql = $this->getSQLForDelete();
-                break;
-
-            case self::UPDATE:
-                $sql = $this->getSQLForUpdate();
-                break;
-
-            case self::SELECT:
-            default:
-                $sql = $this->getSQLForSelect();
-                break;
-        }
+        $sql = match ($this->type) {
+            self::INSERT => $this->getSQLForInsert(),
+            self::DELETE => $this->getSQLForDelete(),
+            self::UPDATE => $this->getSQLForUpdate(),
+            default      => $this->getSQLForSelect(),
+        };
 
         $this->state = self::STATE_CLEAN;
         $this->sql   = $sql;
@@ -277,7 +266,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function setParameter($key, $value, $type = null)
     {
-        if (':' === substr($key, 0, 1)) {
+        if (str_starts_with($key, ':')) {
             // For consistency sake, remove the :
             $key = substr($key, 1);
         }
@@ -1241,11 +1230,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @return string
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getSQL();
     }
@@ -1454,10 +1441,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @param string $table
      * @param null   $joinType allowed values: inner, left, right
-     *
-     * @return array|bool|string
      */
-    public function getTableAlias($table, $joinType = null)
+    public function getTableAlias($table, $joinType = null): array|bool|string
     {
         if (is_null($joinType)) {
             $tables = $this->getTableAliases();

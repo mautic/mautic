@@ -206,10 +206,8 @@ class Action
 
     /**
      * Get form.
-     *
-     * @return Form|null
      */
-    public function getForm()
+    public function getForm(): ?Form
     {
         return $this->form;
     }

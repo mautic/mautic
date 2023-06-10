@@ -63,10 +63,7 @@ class AuditlogController extends CommonController
         );
     }
 
-    /**
-     * @return array|Response
-     */
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): array|Response
     {
         if (empty($leadId)) {
             return $this->accessDenied();

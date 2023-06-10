@@ -8,29 +8,14 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper;
 class Category
 {
     /**
-     * @var string
-     */
-    private $category;
-
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var bool
-     */
-    private $isPermanent;
-
-    /**
      * Category constructor.
+     *
+     * @param string $category
+     * @param string $type
+     * @param bool   $isPermanent
      */
-    public function __construct($category, $type, $isPermanent)
+    public function __construct(private $category, private $type, private $isPermanent)
     {
-        $this->category    = $category;
-        $this->type        = $type;
-        $this->isPermanent = $isPermanent;
-
         return $this;
     }
 

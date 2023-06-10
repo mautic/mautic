@@ -20,31 +20,6 @@ class MembershipManager
     public const ACTION_REMOVED = 'removed';
 
     /**
-     * @var Adder
-     */
-    private $adder;
-
-    /**
-     * @var Remover
-     */
-    private $remover;
-
-    /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var ProgressBar
      */
     private $progressBar;
@@ -52,18 +27,8 @@ class MembershipManager
     /**
      * MembershipManager constructor.
      */
-    public function __construct(
-        Adder $adder,
-        Remover $remover,
-        EventDispatcher $eventDispatcher,
-        LeadRepository $leadRepository,
-        LoggerInterface $logger
-    ) {
-        $this->adder           = $adder;
-        $this->remover         = $remover;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->leadRepository  = $leadRepository;
-        $this->logger          = $logger;
+    public function __construct(private Adder $adder, private Remover $remover, private EventDispatcher $eventDispatcher, private LeadRepository $leadRepository, private LoggerInterface $logger)
+    {
     }
 
     /**

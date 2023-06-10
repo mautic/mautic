@@ -15,14 +15,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 final class ReferenceResolver implements ReferenceResolverInterface
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -46,7 +40,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
 
                 try {
                     $resolvedReference = $this->resolveReference($normalizedValue);
-                } catch (ReferenceNotFoundException $e) {
+                } catch (ReferenceNotFoundException) {
                     $resolvedReference = null;
                 }
 

@@ -229,11 +229,9 @@ class DynamicContentController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param bool|false $ignorePost
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, bool $ignorePost = false)
     {
         /** @var DynamicContentModel $model */
         $model  = $this->getModel('dynamicContent');
@@ -339,10 +337,8 @@ class DynamicContentController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         $model = $this->getModel('dynamicContent');
         \assert($model instanceof DynamicContentModel);
@@ -435,10 +431,8 @@ class DynamicContentController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction($objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('dynamicContent');
         $entity = $model->getEntity($objectId);

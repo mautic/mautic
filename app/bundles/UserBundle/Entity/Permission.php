@@ -122,8 +122,6 @@ class Permission
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return Permission
      */
     public function setRole(Role $role = null)

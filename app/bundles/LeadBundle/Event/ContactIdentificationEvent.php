@@ -8,11 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ContactIdentificationEvent extends Event
 {
     /**
-     * @var array
-     */
-    private $clickthrough;
-
-    /**
      * @var Lead
      */
     private $identifiedContact;
@@ -25,9 +20,8 @@ class ContactIdentificationEvent extends Event
     /**
      * ContactIdentificationEvent constructor.
      */
-    public function __construct(array $clickthrough)
+    public function __construct(private array $clickthrough)
     {
-        $this->clickthrough = $clickthrough;
     }
 
     /**

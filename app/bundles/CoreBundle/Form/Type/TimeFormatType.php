@@ -10,16 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TimeFormatType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * TimeFormat constructor.
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**

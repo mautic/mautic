@@ -11,14 +11,8 @@ use SendGrid\Response;
  */
 class SendGridWrapper
 {
-    /**
-     * @var \SendGrid
-     */
-    private $sendGrid;
-
-    public function __construct(\SendGrid $sendGrid)
+    public function __construct(private \SendGrid $sendGrid)
     {
-        $this->sendGrid = $sendGrid;
     }
 
     /**

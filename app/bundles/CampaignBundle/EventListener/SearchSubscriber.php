@@ -11,29 +11,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    public function __construct(
-        CampaignModel $campaignModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->campaignModel = $campaignModel;
-        $this->security      = $security;
-        $this->twig          = $twig;
+    public function __construct(private CampaignModel $campaignModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**

@@ -7,22 +7,8 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 
 final class DefaultAvatarHelper
 {
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    public function __construct(
-        PathsHelper $pathsHelper,
-        AssetsHelper $assetsHelper
-    ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->assetsHelper = $assetsHelper;
+    public function __construct(private PathsHelper $pathsHelper, private AssetsHelper $assetsHelper)
+    {
     }
 
     public function getDefaultAvatar(bool $absolute = false): string

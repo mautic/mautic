@@ -57,11 +57,9 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's page event log.
      *
-     * @param int|null $leadId
-     *
      * @return array
      */
-    public function getLeadLogs($leadId = null, array $options = [])
+    public function getLeadLogs(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()
                       ->getConnection()
@@ -131,8 +129,6 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Get a lead's upcoming events.
-     *
-     * @param array $options
      *
      * @return array
      */

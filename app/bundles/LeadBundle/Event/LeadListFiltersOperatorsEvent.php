@@ -8,13 +8,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadListFiltersOperatorsEvent extends CommonEvent
 {
     /**
-     * Please refer to OperatorListTrait.php, inside getFilterExpressionFunctions method, for examples of operators.
-     *
-     * @var array
-     */
-    protected $operators;
-
-    /**
      * @deprecated to be removed in Mautic 3
      *
      * @var TranslatorInterface
@@ -27,9 +20,8 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
      * @param array               $operators  @deprecated to be removed in Mautic 3. Subscribe operators instead.
      * @param TranslatorInterface $translator @deprecated to be removed in Mautic 3
      */
-    public function __construct($operators, TranslatorInterface $translator)
+    public function __construct(protected $operators, TranslatorInterface $translator)
     {
-        $this->operators  = $operators;
         $this->translator = $translator;
     }
 

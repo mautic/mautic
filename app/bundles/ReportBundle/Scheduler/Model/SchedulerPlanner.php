@@ -12,24 +12,12 @@ use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 class SchedulerPlanner
 {
     /**
-     * @var DateBuilder
-     */
-    private $dateBuilder;
-
-    /**
      * @var SchedulerRepository
      */
     private $schedulerRepository;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(DateBuilder $dateBuilder, EntityManager $entityManager)
+    public function __construct(private DateBuilder $dateBuilder, private EntityManager $entityManager)
     {
-        $this->dateBuilder         = $dateBuilder;
-        $this->entityManager       = $entityManager;
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
@@ -43,7 +31,7 @@ class SchedulerPlanner
     {
         try {
             $date = $this->dateBuilder->getNextEvent($report);
-        } catch (NoScheduleException $e) {
+        } catch (NoScheduleException) {
             return;
         }
 

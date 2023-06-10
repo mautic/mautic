@@ -29,10 +29,7 @@ class BaseDecorator implements FilterDecoratorInterface
         $this->contactSegmentFilterOperator = $contactSegmentFilterOperator;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate): ?string
     {
         return $contactSegmentFilterCrate->getField();
     }
@@ -56,14 +53,10 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $operator = $this->contactSegmentFilterOperator->fixOperator($contactSegmentFilterCrate->getOperator());
 
-        switch ($operator) {
-            case 'startsWith':
-            case 'endsWith':
-            case 'contains':
-                return 'like';
-        }
-
-        return $operator;
+        return match ($operator) {
+            'startsWith', 'endsWith', 'contains' => 'like',
+            default => $operator,
+        };
     }
 
     /**
@@ -76,10 +69,8 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): array|string
     {
         if (is_array($argument)) {
             $result = [];
@@ -93,10 +84,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return ':'.$argument;
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array|bool|float|string|null
     {
         $filter = $contactSegmentFilterCrate->getFilter();
 
@@ -110,7 +98,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
@@ -142,10 +130,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return false;
     }
 
-    /**
-     * @return CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): CompositeExpression|string|null
     {
         return null;
     }

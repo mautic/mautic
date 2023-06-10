@@ -25,17 +25,8 @@ class ConfigSubscriber implements EventSubscriberInterface
         'messenger_password',
     ];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    private MessengerTransportType $transportType;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, MessengerTransportType $transportType)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private MessengerTransportType $transportType)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->transportType        = $transportType;
     }
 
     /**

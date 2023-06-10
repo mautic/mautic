@@ -11,24 +11,12 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportGraphEvent extends AbstractReportEvent
 {
     /**
-     * @var array
-     */
-    private $requestedGraphs = [];
-
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
-
-    /**
      * Constructor.
      */
-    public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
+    public function __construct(Report $report, private array $requestedGraphs, private QueryBuilder $queryBuilder)
     {
         $this->report          = $report;
         $this->context         = $report->getSource();
-        $this->requestedGraphs = $graphs;
-        $this->queryBuilder    = $queryBuilder;
     }
 
     /**

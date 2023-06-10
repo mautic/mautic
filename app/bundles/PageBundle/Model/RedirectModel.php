@@ -34,10 +34,7 @@ class RedirectModel extends FormModel
         return $result;
     }
 
-    /**
-     * @return Redirect|null
-     */
-    public function getRedirectById($identifier)
+    public function getRedirectById($identifier): ?Redirect
     {
         return $this->getRepository()->findOneBy(['redirectId' => $identifier]);
     }
@@ -99,10 +96,8 @@ class RedirectModel extends FormModel
      * Get a Redirect entity by URL.
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
-     *
-     * @return Redirect|null
      */
-    public function getRedirectByUrl($url)
+    public function getRedirectByUrl($url): ?Redirect
     {
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);

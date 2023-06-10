@@ -12,14 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignHelper
-     */
-    private $campaignHelper;
-
-    public function __construct(CampaignHelper $campaignHelper)
+    public function __construct(private CampaignHelper $campaignHelper)
     {
-        $this->campaignHelper = $campaignHelper;
     }
 
     /**

@@ -19,8 +19,6 @@ class ConfigBuilderEvent extends Event
         '@MauticConfig/FormTheme/_config_file_row.html.twig',
     ];
 
-    private BundleHelper $bundleHelper;
-
     /**
      * @var string[]
      */
@@ -31,9 +29,8 @@ class ConfigBuilderEvent extends Event
      */
     protected array $temporaryFields = [];
 
-    public function __construct(BundleHelper $bundleHelper)
+    public function __construct(private BundleHelper $bundleHelper)
     {
-        $this->bundleHelper = $bundleHelper;
     }
 
     /**

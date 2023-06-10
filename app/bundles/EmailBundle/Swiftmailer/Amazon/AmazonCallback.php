@@ -25,17 +25,8 @@ class AmazonCallback
      */
     public const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
-    private TranslatorInterface $translator;
-    private LoggerInterface $logger;
-    private Client $httpClient;
-    private TransportCallback $transportCallback;
-
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Client $httpClient, TransportCallback $transportCallback)
+    public function __construct(private TranslatorInterface $translator, private LoggerInterface $logger, private Client $httpClient, private TransportCallback $transportCallback)
     {
-        $this->translator        = $translator;
-        $this->logger            = $logger;
-        $this->transportCallback = $transportCallback;
-        $this->httpClient        = $httpClient;
     }
 
     /**

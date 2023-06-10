@@ -21,41 +21,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactRequestHelper
 {
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @var Lead|null
      */
     private $trackedContact;
@@ -70,32 +35,11 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    private ContactMerger $contactMerger;
-
-    public function __construct(
-        LeadModel $leadModel,
-        ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper,
-        IpLookupHelper $ipLookupHelper,
-        RequestStack $requestStack,
-        Logger $logger,
-        EventDispatcherInterface $eventDispatcher,
-        ContactMerger $contactMerger
-    ) {
-        $this->leadModel            = $leadModel;
-        $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->requestStack         = $requestStack;
-        $this->logger               = $logger;
-        $this->eventDispatcher      = $eventDispatcher;
-        $this->contactMerger        = $contactMerger;
+    public function __construct(private LeadModel $leadModel, private ContactTracker $contactTracker, private CoreParametersHelper $coreParametersHelper, private IpLookupHelper $ipLookupHelper, private RequestStack $requestStack, private Logger $logger, private EventDispatcherInterface $eventDispatcher, private ContactMerger $contactMerger)
+    {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getContactFromQuery(array $queryFields = [])
+    public function getContactFromQuery(array $queryFields = []): ?Lead
     {
         unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
@@ -104,7 +48,7 @@ class ContactRequestHelper
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         if (!$this->trackedContact) {
@@ -140,7 +84,7 @@ class ContactRequestHelper
 
         try {
             return $this->getContactFromClickthrough($clickthrough);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
@@ -156,7 +100,7 @@ class ContactRequestHelper
             if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
                 try {
                     $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 
@@ -254,7 +198,7 @@ class ContactRequestHelper
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {
                 return $this->contactMerger->merge($this->trackedContact, $foundContact);
-            } catch (SameContactException $exception) {
+            } catch (SameContactException) {
             }
         }
 

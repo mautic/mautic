@@ -145,7 +145,7 @@ class ObjectMapping
     /**
      * @return int|null ?int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -162,10 +162,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateCreated()
+    public function getDateCreated(): ?\DateTimeInterface
     {
         return $this->dateCreated;
     }
@@ -279,13 +276,11 @@ class ObjectMapping
     }
 
     /**
-     * @param \DateTimeInterface|null $lastSyncDate
-     *
      * @return ObjectMapping
      *
      * @throws \Exception
      */
-    public function setLastSyncDate($lastSyncDate)
+    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate)
     {
         if (null === $lastSyncDate) {
             $lastSyncDate = new \DateTime();
@@ -346,20 +341,15 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIntegrationReferenceId()
+    public function getIntegrationReferenceId(): ?string
     {
         return $this->integrationReferenceId;
     }
 
     /**
-     * @param string|null $integrationReferenceId
-     *
      * @return ObjectMapping
      */
-    public function setIntegrationReferenceId($integrationReferenceId)
+    public function setIntegrationReferenceId(?string $integrationReferenceId)
     {
         $this->integrationReferenceId = $integrationReferenceId;
 

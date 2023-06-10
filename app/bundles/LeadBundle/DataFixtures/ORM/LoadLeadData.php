@@ -16,16 +16,10 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function load(ObjectManager $manager)

@@ -14,16 +14,6 @@ class ConfigEvent extends CommonEvent
     private $preserve = [];
 
     /**
-     * @param array
-     */
-    private $config;
-
-    /**
-     * @param ParameterBag
-     */
-    private $post;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -47,10 +37,16 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    public function __construct(array $config, ParameterBag $post)
-    {
-        $this->config = $config;
-        $this->post   = $post;
+    public function __construct(
+        /**
+         * @param array
+         */
+        private array $config,
+        /**
+         * @param ParameterBag
+         */
+        private ParameterBag $post
+    ) {
     }
 
     /**
@@ -91,10 +87,8 @@ class ConfigEvent extends CommonEvent
     /**
      * Set fields such as passwords that will not overwrite existing values
      * if the current is empty.
-     *
-     * @param array|string $fields
      */
-    public function unsetIfEmpty($fields)
+    public function unsetIfEmpty(array|string $fields)
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -117,14 +111,12 @@ class ConfigEvent extends CommonEvent
     /**
      * Set error message.
      *
-     * @param string      $message     (untranslated)
-     * @param array       $messageVars for translation
-     * @param string|null $key
-     * @param string|null $field
+     * @param string $message     (untranslated)
+     * @param array  $messageVars for translation
      *
      * @return ConfigEvent
      */
-    public function setError($message, $messageVars = [], $key = null, $field = null)
+    public function setError($message, $messageVars = [], ?string $key = null, ?string $field = null)
     {
         if (!empty($key) && !empty($field)) {
             if (!isset($this->errors[$key])) {

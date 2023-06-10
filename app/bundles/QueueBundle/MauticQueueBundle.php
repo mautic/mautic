@@ -12,14 +12,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticQueueBundle extends Bundle
 {
-    /**
-     * @var string
-     */
-    private $queueProtocol;
-
-    public function __construct(string $queueProtocol)
+    public function __construct(private string $queueProtocol)
     {
-        $this->queueProtocol = $queueProtocol;
     }
 
     public function build(ContainerBuilder $container): void

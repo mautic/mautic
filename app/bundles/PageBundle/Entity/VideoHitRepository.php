@@ -16,11 +16,9 @@ class VideoHitRepository extends CommonRepository
     /**
      * Get video hit info for lead timeline.
      *
-     * @param int|null $leadId
-     *
      * @return array
      */
-    public function getTimelineStats($leadId = null, array $options = [])
+    public function getTimelineStats(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

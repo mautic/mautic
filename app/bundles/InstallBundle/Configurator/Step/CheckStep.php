@@ -26,11 +26,6 @@ class CheckStep implements StepInterface
     private $kernelRoot;
 
     /**
-     * @var OpenSSLCipher
-     */
-    private $openSSLCipher;
-
-    /**
      * Absolute path to cache directory.
      * Required in step.
      *
@@ -69,7 +64,7 @@ class CheckStep implements StepInterface
         Configurator $configurator,
         string $projectDir,
         RequestStack $requestStack,
-        OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
@@ -78,7 +73,6 @@ class CheckStep implements StepInterface
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
-        $this->openSSLCipher    = $openSSLCipher;
     }
 
     /**
@@ -219,7 +213,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if (!$this->site_url || 'https' !== substr($this->site_url, 0, 5)) {
+        if (!$this->site_url || !str_starts_with($this->site_url, 'https')) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
@@ -244,7 +238,7 @@ class CheckStep implements StepInterface
                 if (is_null(new \Collator('fr_FR'))) {
                     $messages[] = 'mautic.install.intl.config';
                 }
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
         }

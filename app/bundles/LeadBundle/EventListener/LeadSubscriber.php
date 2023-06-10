@@ -30,69 +30,29 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var LeadChangeEventDispatcher
-     */
-    private $leadEventDispatcher;
-
-    /**
-     * @var DncReasonHelper
-     */
-    private $dncReasonHelper;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var RouterInterface
      */
     private $router;
 
     /**
-     * Whether or not we're running in a test environment.
-     *
-     * @var bool
-     */
-    private $isTest;
-
-    /**
      * @param ModelFactory<object> $modelFactory
+     * @param bool                 $isTest
      */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        LeadChangeEventDispatcher $eventDispatcher,
-        DncReasonHelper $dncReasonHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private LeadChangeEventDispatcher $leadEventDispatcher,
+        private DncReasonHelper $dncReasonHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory,
-        $isTest = false
+        /**
+         * Whether or not we're running in a test environment.
+         */
+        private $isTest = false
     ) {
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->auditLogModel       = $auditLogModel;
-        $this->leadEventDispatcher = $eventDispatcher;
-        $this->dncReasonHelper     = $dncReasonHelper;
-        $this->entityManager       = $entityManager;
-        $this->translator          = $translator;
         $this->router              = $router;
-        $this->isTest              = $isTest;
 
         $this->setModelFactory($modelFactory);
     }

@@ -12,21 +12,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var \DateTimeInterface
-     */
-    private $syncDateTime;
-
-    /**
-     * @var bool
-     */
-    private $isFirstTimeSync;
-
-    /**
-     * @var string
-     */
-    private $integration;
-
-    /**
      * @var ObjectChangeDAO[][]
      */
     private $identifiedObjects = [];
@@ -78,18 +63,12 @@ class OrderDAO
      */
     private $notifications = [];
 
-    private array $options;
-
     /**
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
+    public function __construct(private \DateTimeInterface $syncDateTime, private $isFirstTimeSync, private $integration, private array $options = [])
     {
-        $this->syncDateTime    = $syncDateTime;
-        $this->isFirstTimeSync = $isFirstTimeSync;
-        $this->integration     = $integration;
-        $this->options         = $options;
     }
 
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
@@ -146,13 +125,12 @@ class OrderDAO
     /**
      * Create a new mapping between the Mautic and Integration objects.
      *
-     * @param string     $integrationObjectName
-     * @param string|int $integrationObjectId
+     * @param string $integrationObjectName
      */
     public function addObjectMapping(
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
-        $integrationObjectId,
+        string|int $integrationObjectId,
         ?\DateTimeInterface $objectModifiedDate = null
     ): void {
         if (null === $objectModifiedDate) {
@@ -173,12 +151,10 @@ class OrderDAO
     /**
      * Update an existing mapping in the case of conversions (i.e. Lead converted to Contact).
      *
-     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
+    public function remapObject($oldObjectName, mixed $oldObjectId, $newObjectName, mixed $newObjectId = null): void
     {
         if (null === $newObjectId) {
             $newObjectId = $oldObjectId;

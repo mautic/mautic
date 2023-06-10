@@ -11,16 +11,6 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportQueryEvent extends AbstractReportEvent
 {
     /**
-     * @var QueryBuilder
-     */
-    private $query;
-
-    /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * @var int
      */
     private $totalResults = 0;
@@ -28,12 +18,10 @@ class ReportQueryEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      */
-    public function __construct(Report $report, QueryBuilder $query, $totalResults, array $options)
+    public function __construct(Report $report, private QueryBuilder $query, $totalResults, private array $options)
     {
         $this->context      = $report->getSource();
         $this->report       = $report;
-        $this->query        = $query;
-        $this->options      = $options;
         $this->totalResults = (int) $totalResults;
     }
 

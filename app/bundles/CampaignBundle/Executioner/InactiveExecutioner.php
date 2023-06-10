@@ -37,29 +37,9 @@ class InactiveExecutioner implements ExecutionerInterface
     private $output;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var ProgressBar
      */
     private $progressBar;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
 
     /**
      * @var Counter
@@ -67,39 +47,17 @@ class InactiveExecutioner implements ExecutionerInterface
     private $counter;
 
     /**
-     * @var InactiveContactFinder
-     */
-    private $inactiveContactFinder;
-
-    /**
      * @var ArrayCollection
      */
     private $decisions;
-
-    /**
-     * @var InactiveHelper
-     */
-    private $helper;
 
     protected ?\DateTime $now = null;
 
     /**
      * InactiveExecutioner constructor.
      */
-    public function __construct(
-        InactiveContactFinder $inactiveContactFinder,
-        LoggerInterface $logger,
-        TranslatorInterface $translator,
-        EventScheduler $scheduler,
-        InactiveHelper $helper,
-        EventExecutioner $executioner
-    ) {
-        $this->inactiveContactFinder = $inactiveContactFinder;
-        $this->logger                = $logger;
-        $this->translator            = $translator;
-        $this->scheduler             = $scheduler;
-        $this->helper                = $helper;
-        $this->executioner           = $executioner;
+    public function __construct(private InactiveContactFinder $inactiveContactFinder, private LoggerInterface $logger, private TranslatorInterface $translator, private EventScheduler $scheduler, private InactiveHelper $helper, private EventExecutioner $executioner)
+    {
     }
 
     /**
@@ -122,9 +80,9 @@ class InactiveExecutioner implements ExecutionerInterface
 
             $this->prepareForExecution();
             $this->executeEvents();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -157,9 +115,9 @@ class InactiveExecutioner implements ExecutionerInterface
             $this->checkCampaignIsPublished();
             $this->prepareForExecution();
             $this->executeEvents();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -284,7 +242,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     // Get the next batch, starting with the max contact ID
                     $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
                 }
-            } catch (NoContactsFoundException $exception) {
+            } catch (NoContactsFoundException) {
                 // On to the next decision
                 $this->logger->debug('CAMPAIGN: No more contacts to process for decision ID #'.$decisionEvent->getId());
             }

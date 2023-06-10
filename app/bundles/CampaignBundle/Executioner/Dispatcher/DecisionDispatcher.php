@@ -14,32 +14,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class DecisionDispatcher
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
      * DecisionDispatcher constructor.
      */
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LegacyEventDispatcher $legacyDispatcher
-    ) {
-        $this->dispatcher       = $dispatcher;
-        $this->legacyDispatcher = $legacyDispatcher;
+    public function __construct(private EventDispatcherInterface $dispatcher, private LegacyEventDispatcher $legacyDispatcher)
+    {
     }
 
     /**
-     * @param mixed $passthrough
-     *
      * @return DecisionEvent
      */
-    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
+    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, mixed $passthrough)
     {
         $event = new DecisionEvent($config, $log, $passthrough);
         $this->dispatcher->dispatch($event, $config->getEventName());

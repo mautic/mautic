@@ -106,16 +106,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $signature;
 
     /**
-     * @var bool
+     * @param bool $guest
      */
-    private $guest = false;
-
-    /**
-     * @param bool $isGuest
-     */
-    public function __construct($isGuest = false)
+    public function __construct(private $guest = false)
     {
-        $this->guest = $isGuest;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -572,8 +566,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -713,10 +705,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->lastLogin;
     }
 
-    /**
-     * @param mixed $lastLogin
-     */
-    public function setLastLogin($lastLogin = null)
+    public function setLastLogin(mixed $lastLogin = null)
     {
         if (empty($lastLogin)) {
             $lastLogin = new \DateTime();
@@ -732,10 +721,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->lastActive;
     }
 
-    /**
-     * @param mixed $lastActive
-     */
-    public function setLastActive($lastActive = null)
+    public function setLastActive(mixed $lastActive = null)
     {
         if (empty($lastActive)) {
             $lastActive = new \DateTime();

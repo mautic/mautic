@@ -11,17 +11,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SwiftMessageValidator implements SwiftMessageValidatorInterface
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * MomentumSwiftMessageValidator constructor.
      */
-    public function __construct(
-        TranslatorInterface $translator
-    ) {
-        $this->translator = $translator;
+    public function __construct(private TranslatorInterface $translator)
+    {
     }
 
     /**

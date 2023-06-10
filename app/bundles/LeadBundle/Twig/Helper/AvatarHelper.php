@@ -15,36 +15,9 @@ final class AvatarHelper
      * @var array<string>
      */
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var GravatarHelper
-     */
-    private $gravatarHelper;
-
-    /**
-     * @var DefaultAvatarHelper
-     */
-    private $defaultAvatarHelper;
-
-    public function __construct(
-        AssetsHelper $assetsHelper,
-        PathsHelper $pathsHelper,
-        GravatarHelper $gravatarHelper,
-        DefaultAvatarHelper $defaultAvatarHelper
-    ) {
-        $this->assetsHelper        = $assetsHelper;
-        $this->pathsHelper         = $pathsHelper;
-        $this->gravatarHelper      = $gravatarHelper;
-        $this->defaultAvatarHelper = $defaultAvatarHelper;
+    public function __construct(private AssetsHelper $assetsHelper, private PathsHelper $pathsHelper, private GravatarHelper $gravatarHelper, private DefaultAvatarHelper $defaultAvatarHelper)
+    {
     }
 
     /**
@@ -126,8 +99,6 @@ final class AvatarHelper
 
     /**
      * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
-     *
-     * @param bool|false $absolute
      */
     public function getDefaultAvatar(bool $absolute = false): string
     {

@@ -119,17 +119,15 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = false !== strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
+        $type = str_contains($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
 
         return $formFactory->create($type, $entity, $options);
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Notification|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Notification
     {
         if (null === $id) {
             $entity = new Notification();

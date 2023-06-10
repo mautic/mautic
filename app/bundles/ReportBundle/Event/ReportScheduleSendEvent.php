@@ -11,22 +11,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ReportScheduleSendEvent extends Event
 {
     /**
-     * @var Scheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var string
-     */
-    private $file;
-
-    /**
      * @param string $file
      */
-    public function __construct(Scheduler $scheduler, $file)
+    public function __construct(private Scheduler $scheduler, private $file)
     {
-        $this->scheduler = $scheduler;
-        $this->file      = $file;
     }
 
     /**

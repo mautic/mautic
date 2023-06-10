@@ -8,20 +8,11 @@ use Doctrine\DBAL\Connection;
 
 class CompanyHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
-    /**
-     * @return string|bool
-     */
-    public function getCompanyName(int $id)
+    public function getCompanyName(int $id): string|bool
     {
         return $this->connection->createQueryBuilder()
             ->select('c.companyname')

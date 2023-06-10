@@ -11,14 +11,8 @@ class FieldsWithUniqueIdentifier
      */
     private $uniqueIdentifierFields = [];
 
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
-
-    public function __construct(FieldList $fieldList)
+    public function __construct(private FieldList $fieldList)
     {
-        $this->fieldList = $fieldList;
     }
 
     /**

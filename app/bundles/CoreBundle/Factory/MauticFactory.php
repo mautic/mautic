@@ -24,46 +24,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class MauticFactory
 {
-    private ContainerInterface $container;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private ModelFactory $modelFactory;
-
-    private CorePermissions $security;
-
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private UserHelper $userHelper;
-
-    private RequestStack $requestStack;
-
-    private ManagerRegistry $doctrine;
-
-    private Translator $translator;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        ContainerInterface $container,
-        ModelFactory $modelFactory,
-        CorePermissions $security,
-        AuthorizationCheckerInterface $authorizationChecker,
-        UserHelper $userHelper,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        Translator $translator
-    ) {
-        $this->container            = $container;
-        $this->modelFactory         = $modelFactory;
-        $this->security             = $security;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->userHelper           = $userHelper;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
-        $this->translator           = $translator;
+    public function __construct(private ContainerInterface $container, private ModelFactory $modelFactory, private CorePermissions $security, private AuthorizationCheckerInterface $authorizationChecker, private UserHelper $userHelper, private RequestStack $requestStack, private ManagerRegistry $doctrine, private Translator $translator)
+    {
     }
 
     /**
@@ -100,10 +65,8 @@ class MauticFactory
      * Retrieves user currently logged in.
      *
      * @param bool $nullIfGuest
-     *
-     * @return User|null
      */
-    public function getUser($nullIfGuest = false)
+    public function getUser($nullIfGuest = false): ?User
     {
         return $this->userHelper->getUser($nullIfGuest);
     }
@@ -173,10 +136,8 @@ class MauticFactory
 
     /**
      * Retrieves request.
-     *
-     * @return \Symfony\Component\HttpFoundation\Request|null
      */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         $request = $this->requestStack->getCurrentRequest();
         if (empty($request)) {
@@ -192,11 +153,9 @@ class MauticFactory
     /**
      * Retrieves a Mautic parameter.
      *
-     * @param mixed $default
-     *
      * @return bool|mixed
      */
-    public function getParameter($id, $default = false)
+    public function getParameter($id, mixed $default = false)
     {
         return $this->container->get('mautic.helper.core_parameters')->get($id, $default);
     }
@@ -352,11 +311,9 @@ class MauticFactory
     /**
      * Get Symfony's logger.
      *
-     * @param bool|false $system
-     *
      * @return \Monolog\Logger
      */
-    public function getLogger($system = false)
+    public function getLogger(bool $system = false)
     {
         if ($system) {
             return $this->container->get('logger');
@@ -372,20 +329,14 @@ class MauticFactory
      */
     public function getHelper($helper)
     {
-        switch ($helper) {
-            case 'template.assets':
-                return $this->container->get('twig.helper.assets');
-            case 'template.slots':
-                return $this->container->get('twig.helper.slots');
-            case 'template.form':
-                return $this->container->get('twig.helper.form');
-            case 'template.translator':
-                return $this->container->get('twig.helper.translator');
-            case 'template.router':
-                return $this->container->get('twig.helper.router');
-            default:
-                return $this->container->get('mautic.helper.'.$helper);
-        }
+        return match ($helper) {
+            'template.assets'     => $this->container->get('twig.helper.assets'),
+            'template.slots'      => $this->container->get('twig.helper.slots'),
+            'template.form'       => $this->container->get('twig.helper.form'),
+            'template.translator' => $this->container->get('twig.helper.translator'),
+            'template.router'     => $this->container->get('twig.helper.router'),
+            default               => $this->container->get('mautic.helper.'.$helper),
+        };
     }
 
     /**
@@ -401,11 +352,9 @@ class MauticFactory
     /**
      * Get's an array of details for Mautic core bundles.
      *
-     * @param bool|false $includePlugins
-     *
      * @return array|mixed
      */
-    public function getMauticBundles($includePlugins = false)
+    public function getMauticBundles(bool $includePlugins = false)
     {
         return $this->container->get('mautic.helper.bundle')->getMauticBundles($includePlugins);
     }

@@ -10,10 +10,7 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
  */
 class SchedulerRepository extends CommonRepository
 {
-    /**
-     * @return Scheduler|null
-     */
-    public function getSchedulerByReport(Report $report)
+    public function getSchedulerByReport(Report $report): ?Scheduler
     {
         return $this->findOneBy(['report' => $report]);
     }

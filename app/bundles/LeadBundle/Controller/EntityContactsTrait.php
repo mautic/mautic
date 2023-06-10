@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 trait EntityContactsTrait
 {
     /**
-     * @param string|int              $entityId
      * @param int                     $page
      * @param string[]|string         $permission
      * @param string                  $sessionVar
@@ -32,21 +31,21 @@ trait EntityContactsTrait
     protected function generateContactsGrid(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
-        $entityId,
+        string|int $entityId,
         $page,
-        $permission,
+        array|string $permission,
         $sessionVar,
         $entityJoinTable,
-        $dncChannel = null,
-        $entityIdColumnName = 'id',
+        ?string $dncChannel = null,
+        ?string $entityIdColumnName = 'id',
         array $contactFilter = null,
         array $additionalJoins = null,
-        $contactColumnName = null,
+        ?string $contactColumnName = null,
         array $routeParameters = [],
-        $paginationTarget = null,
-        $orderBy = null,
-        $orderByDir = null,
-        $count = null,
+        ?string $paginationTarget = null,
+        ?string $orderBy = null,
+        ?string $orderByDir = null,
+        ?int $count = null,
         \DateTimeInterface $dateFrom = null,
         \DateTimeInterface $dateTo = null
     ) {

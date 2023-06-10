@@ -6,17 +6,8 @@ namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO
 
 final class AttachmentDTO implements \JsonSerializable
 {
-    private string $type;
-
-    private string $name;
-
-    private string $content;
-
-    public function __construct(string $type, string $name, string $content)
+    public function __construct(private string $type, private string $name, private string $content)
     {
-        $this->type    = $type;
-        $this->name    = $name;
-        $this->content = $content;
     }
 
     /** @return array<string, string> */

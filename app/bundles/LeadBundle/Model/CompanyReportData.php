@@ -9,22 +9,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CompanyReportData
 {
     /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * CompanyReportData constructor.
      */
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
+    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
     {
-        $this->fieldModel = $fieldModel;
-        $this->translator = $translator;
     }
 
     /**
@@ -96,32 +84,16 @@ class CompanyReportData
     {
         $columns = [];
         foreach ($fields as $f) {
-            switch ($f->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($f->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$f->getAlias()] = [
                 'label' => $this->translator->trans('mautic.report.field.company.label', ['%field%' => $f->getLabel()]),
                 'type'  => $type,

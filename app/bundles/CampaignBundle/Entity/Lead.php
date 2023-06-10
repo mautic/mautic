@@ -224,10 +224,7 @@ class Lead
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateLastExited()
+    public function getDateLastExited(): ?\DateTimeInterface
     {
         return $this->dateLastExited;
     }

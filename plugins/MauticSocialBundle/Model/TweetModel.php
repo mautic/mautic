@@ -152,10 +152,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return Tweet|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Tweet
     {
         if (null === $id) {
             $entity = new Tweet();

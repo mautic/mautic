@@ -10,32 +10,8 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
+    public function __construct(private FieldModel $fieldModel, private ListModel $listModel, private UserModel $userModel, private LeadModel $leadModel)
     {
-        $this->fieldModel = $fieldModel;
-        $this->listModel  = $listModel;
-        $this->userModel  = $userModel;
-        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -221,32 +197,16 @@ class FieldsBuilder
 
         $columns = [];
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($field->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$field->getAlias()] = [
                 'label' => $field->getLabel(),
                 'type'  => $type,
@@ -263,7 +223,7 @@ class FieldsBuilder
      */
     private function sanitizePrefix($prefix)
     {
-        if (false === strpos($prefix, '.')) {
+        if (!str_contains($prefix, '.')) {
             $prefix .= '.';
         }
 

@@ -20,12 +20,9 @@ class ExcelExporter
      */
     protected $formatterHelper;
 
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
+    public function __construct(FormatterHelper $formatterHelper, private TranslatorInterface $translator)
     {
         $this->formatterHelper      = $formatterHelper;
-        $this->translator           = $translator;
     }
 
     /**

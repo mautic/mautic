@@ -9,22 +9,10 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 class FieldDAO
 {
     /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $value;
-
-    /**
      * @param string $name
      */
-    public function __construct($name, NormalizedValueDAO $value)
+    public function __construct(private $name, private NormalizedValueDAO $value)
     {
-        $this->name  = $name;
-        $this->value = $value;
     }
 
     /**

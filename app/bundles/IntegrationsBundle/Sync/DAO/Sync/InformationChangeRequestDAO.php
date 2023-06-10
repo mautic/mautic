@@ -9,31 +9,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 class InformationChangeRequestDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var string
-     */
-    private $objectName;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
-
-    /**
-     * @var string
-     */
-    private $field;
-
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $newValue;
-
-    /**
      * @var \DateTimeInterface|null
      */
     private $possibleChangeDateTime;
@@ -46,16 +21,10 @@ class InformationChangeRequestDAO
     /**
      * @param string $integration
      * @param string $objectName
-     * @param mixed  $objectId
      * @param string $field
      */
-    public function __construct($integration, $objectName, $objectId, $field, NormalizedValueDAO $normalizedValueDAO)
+    public function __construct(private $integration, private $objectName, private mixed $objectId, private $field, private NormalizedValueDAO $newValue)
     {
-        $this->integration = $integration;
-        $this->objectName  = $objectName;
-        $this->objectId    = $objectId;
-        $this->field       = $field;
-        $this->newValue    = $normalizedValueDAO;
     }
 
     public function getIntegration(): string

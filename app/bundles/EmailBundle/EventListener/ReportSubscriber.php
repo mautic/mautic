@@ -140,43 +140,8 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    public function __construct(
-        Connection $db,
-        CompanyReportData $companyReportData,
-        StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        FieldsBuilder $fieldsBuilder
-    ) {
-        $this->db                       = $db;
-        $this->companyReportData        = $companyReportData;
-        $this->statRepository           = $statRepository;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->fieldsBuilder            = $fieldsBuilder;
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private FieldsBuilder $fieldsBuilder)
+    {
     }
 
     /**

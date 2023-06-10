@@ -138,7 +138,7 @@ class LookupHelper
     {
         // prefix#entityId#hour#userId#nonce
         list($w, $id, $hour, $uid, $nonce) = explode('#', $oid, 5);
-        $notify                            = (false !== strpos($w, '_notify') && $uid) ? $uid : false;
+        $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
 
         switch ($type) {
             case 'person':
@@ -168,10 +168,8 @@ class LookupHelper
 
     /**
      * @param bool $person
-     *
-     * @return bool|Clearbit_Company|Clearbit_Person
      */
-    protected function getClearbit($person = true)
+    protected function getClearbit($person = true): bool|Clearbit_Company|Clearbit_Person
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;

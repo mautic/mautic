@@ -40,10 +40,7 @@ class CallbackEnum
         return in_array($event, self::getSupportedEvents(), true);
     }
 
-    /**
-     * @return string|null
-     */
-    public static function convertEventToDncReason($event)
+    public static function convertEventToDncReason($event): ?string
     {
         if (!self::shouldBeEventProcessed($event)) {
             return null;
@@ -56,10 +53,8 @@ class CallbackEnum
 
     /**
      * @param string $event
-     *
-     * @return string|null
      */
-    public static function getDncComments($event, array $item)
+    public static function getDncComments($event, array $item): ?string
     {
         if (!self::shouldBeEventProcessed($event)) {
             return null;

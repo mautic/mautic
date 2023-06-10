@@ -15,23 +15,11 @@ class TransportChain
     private $transports;
 
     /**
-     * @var string
-     */
-    private $primaryTransport;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
      * @param string $primaryTransport
      */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
+    public function __construct(private $primaryTransport, private IntegrationHelper $integrationHelper)
     {
-        $this->primaryTransport  = $primaryTransport;
         $this->transports        = [];
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**

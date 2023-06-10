@@ -117,10 +117,7 @@ class TrackingHelper
         return false;
     }
 
-    /**
-     * @return array|Lead|null
-     */
-    public function getLead()
+    public function getLead(): array|Lead|null
     {
         return $this->contactTracker->getContact();
     }
@@ -136,7 +133,7 @@ class TrackingHelper
     protected function isLandingPage()
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 

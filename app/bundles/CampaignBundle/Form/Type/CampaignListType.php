@@ -16,11 +16,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignListType extends AbstractType
 {
     /**
-     * @var CampaignModel
-     */
-    private $model;
-
-    /**
      * @var TranslatorInterface
      */
     protected $translator;
@@ -30,9 +25,8 @@ class CampaignListType extends AbstractType
      */
     private $canViewOther = false;
 
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(private CampaignModel $model, TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model        = $campaignModel;
         $this->translator   = $translator;
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }

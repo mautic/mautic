@@ -23,8 +23,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
      */
     protected $dispatcher;
 
-    protected $providerKey;
-
     /**
      * @var UserProviderInterface
      */
@@ -45,10 +43,9 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         EventDispatcherInterface $dispatcher,
         RequestStack $requestStack,
         UserProviderInterface $userProvider,
-        $providerKey
+        protected $providerKey
     ) {
         $this->dispatcher        = $dispatcher;
-        $this->providerKey       = $providerKey;
         $this->userProvider      = $userProvider;
         $this->integrationHelper = $integrationHelper;
         $this->requestStack      = $requestStack;

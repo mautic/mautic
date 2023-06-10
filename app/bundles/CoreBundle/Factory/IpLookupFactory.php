@@ -8,25 +8,14 @@ use Psr\Log\LoggerInterface;
 
 class IpLookupFactory
 {
-    protected ?LoggerInterface $logger;
-    protected ?string $cacheDir;
-    protected array $lookupServices;
-    protected ?Client $client;
-
-    public function __construct(array $lookupServices, ?LoggerInterface $logger = null, ?Client $client = null, ?string $cacheDir = null)
+    public function __construct(protected array $lookupServices, protected ?LoggerInterface $logger = null, protected ?Client $client = null, protected ?string $cacheDir = null)
     {
-        $this->lookupServices = $lookupServices;
-        $this->logger         = $logger;
-        $this->cacheDir       = $cacheDir;
-        $this->client         = $client;
     }
 
     /**
      * @param null $auth
-     *
-     * @return AbstractLookup|null
      */
-    public function getService($service, $auth = null, array $ipLookupConfig = [])
+    public function getService($service, $auth = null, array $ipLookupConfig = []): ?AbstractLookup
     {
         static $services = [];
 
@@ -40,7 +29,7 @@ class IpLookupFactory
             }
 
             $className = $this->lookupServices[$service]['class'];
-            if ('\\' !== substr($className, 0, 1)) {
+            if (!str_starts_with($className, '\\')) {
                 $className = '\\'.$className;
             }
 

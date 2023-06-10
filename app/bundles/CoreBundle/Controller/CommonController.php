@@ -40,11 +40,6 @@ class CommonController extends AbstractController implements MauticController
     protected $factory;
 
     /**
-     * @var ModelFactory<object>
-     */
-    protected ModelFactory $modelFactory;
-
-    /**
      * @var User
      */
     protected $user;
@@ -59,34 +54,15 @@ class CommonController extends AbstractController implements MauticController
      */
     protected $dispatcher;
 
-    protected Translator $translator;
-
-    private ?RequestStack $requestStack = null;
-
-    protected ?CorePermissions $security = null;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    protected ManagerRegistry $doctrine;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(protected ManagerRegistry $doctrine, MauticFactory $factory, protected ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, protected Translator $translator, private FlashBag $flashBag, private ?RequestStack $requestStack, protected ?CorePermissions $security)
     {
-        $this->doctrine             = $doctrine;
         $this->factory              = $factory;
-        $this->modelFactory         = $modelFactory;
         $this->user                 = $userHelper->getUser();
         $this->coreParametersHelper = $coreParametersHelper;
         $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->flashBag             = $flashBag;
-        $this->requestStack         = $requestStack;
-        $this->security             = $security;
     }
 
     protected function getCurrentRequest(): Request
@@ -329,7 +305,7 @@ class CommonController extends AbstractController implements MauticController
                         '_route_params' => $routeParams,
                     ]
                 );
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // do nothing
             }
 
@@ -600,8 +576,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @param Request $request
      *
      * @return array
      */

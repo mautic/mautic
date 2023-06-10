@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
  */
-class ContactSegmentFilter
+class ContactSegmentFilter implements \Stringable
 {
     /**
      * @var ContactSegmentFilterCrate
@@ -21,40 +21,16 @@ class ContactSegmentFilter
     public $contactSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface
-     */
-    private $filterDecorator;
-
-    /**
-     * @var FilterQueryBuilderInterface
-     */
-    private $filterQueryBuilder;
-
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private $batchLimiters = [];
-
-    /**
      * @param array<string, mixed> $batchLimiters
      */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
-        FilterDecoratorInterface $filterDecorator,
-        TableSchemaColumnsCache $cache,
-        FilterQueryBuilderInterface $filterQueryBuilder,
-        array $batchLimiters = []
+        private FilterDecoratorInterface $filterDecorator,
+        private TableSchemaColumnsCache $schemaCache,
+        private FilterQueryBuilderInterface $filterQueryBuilder,
+        private array $batchLimiters = []
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
-        $this->filterDecorator           = $filterDecorator;
-        $this->schemaCache               = $cache;
-        $this->filterQueryBuilder        = $filterQueryBuilder;
-        $this->batchLimiters             = $batchLimiters;
     }
 
     /**
@@ -85,10 +61,7 @@ class ContactSegmentFilter
         return $this->filterDecorator->getQueryType($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getOperator()
+    public function getOperator(): ?string
     {
         return $this->filterDecorator->getOperator($this->contactSegmentFilterCrate);
     }
@@ -133,18 +106,12 @@ class ContactSegmentFilter
         return $this->filterDecorator->getParameterValue($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getWhere()
+    public function getWhere(): ?string
     {
         return $this->filterDecorator->getWhere($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getGlue()
+    public function getGlue(): ?string
     {
         return $this->contactSegmentFilterCrate->getGlue();
     }
@@ -212,7 +179,7 @@ class ContactSegmentFilter
         return new IntegrationCampaignParts($this->getParameterValue());
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',
@@ -224,18 +191,12 @@ class ContactSegmentFilter
         );
     }
 
-    /**
-     * @return string|null
-     */
-    public function getRelationJoinTable()
+    public function getRelationJoinTable(): ?string
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getRelationJoinTableField()
+    public function getRelationJoinTableField(): ?string
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
             $this->filterDecorator->getRelationJoinTableField() : null;

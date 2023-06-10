@@ -10,14 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LookupHelper
-     */
-    private $lookupHelper;
-
-    public function __construct(LookupHelper $lookupHelper)
+    public function __construct(private LookupHelper $lookupHelper)
     {
-        $this->lookupHelper = $lookupHelper;
     }
 
     /**

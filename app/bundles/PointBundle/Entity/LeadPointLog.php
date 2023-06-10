@@ -57,10 +57,7 @@ class LeadPointLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
-    public function setDateFired($dateFired)
+    public function setDateFired(mixed $dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -73,10 +70,7 @@ class LeadPointLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ipAddress
-     */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress(mixed $ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -89,10 +83,7 @@ class LeadPointLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(mixed $lead)
     {
         $this->lead = $lead;
     }
@@ -105,10 +96,7 @@ class LeadPointLog
         return $this->point;
     }
 
-    /**
-     * @param mixed $point
-     */
-    public function setPoint($point)
+    public function setPoint(mixed $point)
     {
         $this->point = $point;
     }

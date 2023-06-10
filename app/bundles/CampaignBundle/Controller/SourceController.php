@@ -228,10 +228,8 @@ class SourceController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $session         = $request->getSession();
         $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);

@@ -11,36 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper,
-        Router $router
-    ) {
-        $this->translator           = $translator;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
+    public function __construct(private TranslatorInterface $translator, private FileProperties $fileProperties, private CoreParametersHelper $coreParametersHelper, private Router $router)
+    {
     }
 
     /**

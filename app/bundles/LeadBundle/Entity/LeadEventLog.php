@@ -148,10 +148,8 @@ class LeadEventLog
 
     /**
      * Get lead.
-     *
-     * @return Lead|null
      */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

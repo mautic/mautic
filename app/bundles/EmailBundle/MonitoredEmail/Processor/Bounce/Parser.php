@@ -8,22 +8,13 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 class Parser
 {
     /**
-     * @var Message
-     */
-    private $message;
-
-    /**
      * Parser constructor.
      */
-    public function __construct(Message $message)
+    public function __construct(private Message $message)
     {
-        $this->message = $message;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getFailedRecipients()
+    public function getFailedRecipients(): ?string
     {
         return (isset($this->message->xHeaders['x-failed-recipients'])) ? $this->message->xHeaders['x-failed-recipients'] : null;
     }
@@ -39,7 +30,7 @@ class Parser
         foreach ($this->message->to as $to => $name) {
             // Some ISPs strip the + email so will still process the content for a bounce
             // even if a +bounce address was not found
-            if (false !== strpos($to, '+bounce')) {
+            if (str_contains($to, '+bounce')) {
                 $bouncerAddress = $to;
 
                 break;
@@ -50,7 +41,7 @@ class Parser
         $dsnParser = new DsnParser();
         try {
             $bounce = $dsnParser->getBounce($this->message);
-        } catch (BounceNotFound $exception) {
+        } catch (BounceNotFound) {
             // DSN report wasn't found so try parsing the body itself
             $bodyParser = new BodyParser();
             $bounce     = $bodyParser->getBounce($this->message, $this->getFailedRecipients());

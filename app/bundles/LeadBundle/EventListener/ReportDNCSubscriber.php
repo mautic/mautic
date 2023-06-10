@@ -17,43 +17,8 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        ChannelListHelper $channelListHelper
-    ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
-        $this->translator        = $translator;
-        $this->router            = $router;
-        $this->channelListHelper = $channelListHelper;
+    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData, private TranslatorInterface $translator, private RouterInterface $router, private ChannelListHelper $channelListHelper)
+    {
     }
 
     /**

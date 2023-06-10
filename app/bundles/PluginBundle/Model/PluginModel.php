@@ -24,16 +24,10 @@ class PluginModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper)
+    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, private BundleHelper $bundleHelper)
     {
         $this->leadFieldModel       = $leadFieldModel;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundleHelper         = $bundleHelper;
     }
 
     /**
@@ -118,7 +112,7 @@ class PluginModel extends FormModel
         foreach ($allMetadata as $meta) {
             $namespace = $meta->namespace;
 
-            if (false !== strpos($namespace, 'MauticPlugin')) {
+            if (str_contains($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginsMetadata[$bundleName])) {
                     $pluginsMetadata[$bundleName] = [];

@@ -15,14 +15,8 @@ class AuthIntegrationsHelper
      */
     private $integrations = [];
 
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
+    public function __construct(private IntegrationsHelper $integrationsHelper)
     {
-        $this->integrationsHelper = $integrationsHelper;
     }
 
     public function addIntegration(AuthenticationInterface $integration): void

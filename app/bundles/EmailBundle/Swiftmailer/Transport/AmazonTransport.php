@@ -12,22 +12,16 @@ use Symfony\Component\HttpFoundation\Request;
 class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     /**
-     * @var AmazonCallback
-     */
-    private $amazonCallback;
-
-    /**
      * AmazonTransport constructor.
      *
      * @param string $host
      * @param string $otherHost
      * @param int    $port
      */
-    public function __construct($region, $otherRegion, $port, AmazonCallback $amazonCallback)
+    public function __construct($region, $otherRegion, $port, private AmazonCallback $amazonCallback)
     {
         $port                 = $port ?: 2587;
         $host                 = $this->buildHost($region, $otherRegion);
-        $this->amazonCallback = $amazonCallback;
 
         parent::__construct($host, $port, 'tls');
 
@@ -46,14 +40,10 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     {
         $sesRegion = ('other' === $region) ? $otherRegion : $region;
 
-        switch ($sesRegion) {
-            case 'email-smtp.eu-west-1.amazonaws.com':
-            case 'email-smtp.us-east-1.amazonaws.com':
-            case 'email-smtp.us-west-2.amazonaws.com':
-                return $sesRegion;
-            default:
-                return 'email-smtp.'.$sesRegion.'.amazonaws.com';
-        }
+        return match ($sesRegion) {
+            'email-smtp.eu-west-1.amazonaws.com', 'email-smtp.us-east-1.amazonaws.com', 'email-smtp.us-west-2.amazonaws.com' => $sesRegion,
+            default => 'email-smtp.'.$sesRegion.'.amazonaws.com',
+        };
     }
 
     /**

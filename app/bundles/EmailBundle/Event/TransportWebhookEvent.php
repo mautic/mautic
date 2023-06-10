@@ -11,20 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class TransportWebhookEvent extends Event
 {
-    /**
-     * @var CallbackTransportInterface
-     */
-    private $transport;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(CallbackTransportInterface $transport, Request $request)
+    public function __construct(private CallbackTransportInterface $transport, private Request $request)
     {
-        $this->transport = $transport;
-        $this->request   = $request;
     }
 
     /**

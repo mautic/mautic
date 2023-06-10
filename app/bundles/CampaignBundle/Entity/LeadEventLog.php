@@ -208,18 +208,12 @@ class LeadEventLog implements ChannelInterface
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return (int) $this->id;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateTriggered()
+    public function getDateTriggered(): ?\DateTimeInterface
     {
         return $this->dateTriggered;
     }
@@ -237,10 +231,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -255,10 +246,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return LeadEntity|null
-     */
-    public function getLead()
+    public function getLead(): ?LeadEntity
     {
         return $this->lead;
     }
@@ -273,10 +261,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
@@ -323,18 +308,13 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * If isScheduled was changed, this will have the previous state.
-     *
-     * @return bool|null
      */
-    public function getPreviousScheduledState()
+    public function getPreviousScheduledState(): ?bool
     {
         return $this->previousScheduledState;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -350,10 +330,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return Campaign|null
-     */
-    public function getCampaign()
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }
@@ -411,7 +388,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return mixed[]|null
      */
-    public function getMetadata()
+    public function getMetadata(): ?array
     {
         return $this->metadata;
     }
@@ -446,10 +423,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getChannel()
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
@@ -466,10 +440,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getChannelId()
+    public function getChannelId(): ?int
     {
         return $this->channelId;
     }
@@ -486,10 +457,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getRotation()
+    public function getRotation(): ?int
     {
         return $this->rotation;
     }
@@ -506,10 +474,7 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return FailedLeadEventLog|null
-     */
-    public function getFailedLog()
+    public function getFailedLog(): ?FailedLeadEventLog
     {
         return $this->failedLog;
     }

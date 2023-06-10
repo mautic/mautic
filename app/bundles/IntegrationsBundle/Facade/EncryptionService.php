@@ -9,24 +9,13 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 class EncryptionService
 {
     /**
-     * @var EncryptionHelper
-     */
-    private $encryptionHelper;
-
-    /**
      * EncryptionService constructor.
      */
-    public function __construct(EncryptionHelper $encryptionHelper)
+    public function __construct(private EncryptionHelper $encryptionHelper)
     {
-        $this->encryptionHelper = $encryptionHelper;
     }
 
-    /**
-     * @param mixed $keys
-     *
-     * @return array|string
-     */
-    public function encrypt($keys)
+    public function encrypt(mixed $keys): array|string
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->encrypt($keys);
@@ -41,10 +30,8 @@ class EncryptionService
 
     /**
      * @param bool $onlyPrimaryCipher
-     *
-     * @return array|string
      */
-    public function decrypt($keys, $onlyPrimaryCipher = false)
+    public function decrypt($keys, $onlyPrimaryCipher = false): array|string
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->decrypt($keys, $onlyPrimaryCipher);

@@ -23,36 +23,8 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ObjectCollectorInterface
-     */
-    private $objectCollector;
-
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
-
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        ObjectCollectorInterface $objectCollector,
-        FieldCollectorInterface $fieldCollector,
-        AlreadyMappedFieldCollectorInterface $mappedFieldCollector
-    ) {
-        $this->translator           = $translator;
-        $this->objectCollector      = $objectCollector;
-        $this->fieldCollector       = $fieldCollector;
-        $this->mappedFieldCollector = $mappedFieldCollector;
+    public function __construct(private TranslatorInterface $translator, private ObjectCollectorInterface $objectCollector, private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector)
+    {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -210,7 +182,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );
@@ -445,7 +417,7 @@ class FieldType extends AbstractType
                             if ($field->isListType()) {
                                 return ['data-list-type' => 1];
                             }
-                        } catch (FieldNotFoundException $e) {
+                        } catch (FieldNotFoundException) {
                         }
 
                         return [];
@@ -633,20 +605,12 @@ class FieldType extends AbstractType
 
     private function getDefaultMappedField(string $type): string
     {
-        switch ($type) {
-            case 'email':
-                $default = 'email';
-                break;
-            case 'country':
-                $default = 'country';
-                break;
-            case 'tel':
-                $default = 'phone';
-                break;
-            default:
-                $default = '';
-                break;
-        }
+        $default = match ($type) {
+            'email'   => 'email',
+            'country' => 'country',
+            'tel'     => 'phone',
+            default   => '',
+        };
 
         return $default;
     }

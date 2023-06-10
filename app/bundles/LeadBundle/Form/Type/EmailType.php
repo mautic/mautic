@@ -16,14 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailType extends AbstractType
 {
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    public function __construct(UserHelper $userHelper)
+    public function __construct(private UserHelper $userHelper)
     {
-        $this->userHelper = $userHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

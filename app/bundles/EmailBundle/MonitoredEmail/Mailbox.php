@@ -196,7 +196,7 @@ class Mailbox
         if (null !== $bundleKey) {
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
-            } catch (MailboxException $e) {
+            } catch (MailboxException) {
                 return false;
             }
         }
@@ -321,9 +321,8 @@ class Mailbox
     /**
      * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
      *
-     * @param int   $options
-     * @param int   $retriesNum
-     * @param array $params
+     * @param int $options
+     * @param int $retriesNum
      */
     public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null)
     {
@@ -886,11 +885,9 @@ class Mailbox
     }
 
     /**
-     * @param bool|true  $markAsSeen
-     * @param bool|false $isDsn
-     * @param bool|false $isFbl
+     * @param bool|true $markAsSeen
      */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
+    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, bool $isDsn = false, bool $isFbl = false)
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -966,14 +963,11 @@ class Mailbox
                     : '';
                 switch ($partStructure->type) {
                     case TYPETEXT:
-                        switch ($subtype) {
-                            case 'plain':
-                                $mail->textPlain .= $data;
-                                break;
-                            case 'html':
-                            default:
-                                $mail->textHtml .= $data;
-                        }
+                        match ($subtype) {
+                            'plain' => $mail->textPlain .= $data,
+                            // no break
+                            default => $mail->textHtml .= $data,
+                        };
                         break;
                     case TYPEMULTIPART:
                         if (

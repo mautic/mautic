@@ -17,26 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SendEmailToContact
 {
     /**
-     * @var MailHelper
-     */
-    private $mailer;
-
-    /**
-     * @var StatHelper
-     */
-    private $statHelper;
-
-    /**
-     * @var DoNotContact
-     */
-    private $dncModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var string|null
      */
     private $singleEmailMode;
@@ -89,12 +69,8 @@ class SendEmailToContact
     /**
      * SendEmailToContact constructor.
      */
-    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
+    public function __construct(private MailHelper $mailer, private StatHelper $statHelper, private DoNotContact $dncModel, private TranslatorInterface $translator)
     {
-        $this->mailer     = $mailer;
-        $this->statHelper = $statHelper;
-        $this->dncModel   = $dncModel;
-        $this->translator = $translator;
     }
 
     /**
@@ -167,11 +143,9 @@ class SendEmailToContact
     }
 
     /**
-     * @param int|null $id
-     *
      * @return $this
      */
-    public function setListId($id)
+    public function setListId(?int $id)
     {
         $this->listId = empty($id) ? null : (int) $id;
 
@@ -200,7 +174,7 @@ class SendEmailToContact
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
                 $this->failContact();
             }
-        } catch (BatchQueueMaxException $e) {
+        } catch (BatchQueueMaxException) {
             // Queue full so flush then try again
             $this->flush(false);
 
@@ -295,7 +269,7 @@ class SendEmailToContact
             $stat = $this->statHelper->getStat($this->contact['email']);
             $this->downEmailSentCount($stat->getEmailId());
             $this->statHelper->markForDeletion($stat);
-        } catch (StatNotFoundException $exception) {
+        } catch (StatNotFoundException) {
         }
 
         if ($hasBadEmail) {
@@ -316,7 +290,7 @@ class SendEmailToContact
             try {
                 /** @var Reference $stat */
                 $stat = $this->statHelper->getStat($failedEmail);
-            } catch (StatNotFoundException $exception) {
+            } catch (StatNotFoundException) {
                 continue;
             }
 

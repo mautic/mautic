@@ -50,23 +50,17 @@ class PointModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
         Session $session,
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         MauticFactory $mauticFactory,
-        ContactTracker $contactTracker
+        private ContactTracker $contactTracker
     ) {
         $this->session            = $session;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
-        $this->contactTracker     = $contactTracker;
     }
 
     /**
@@ -111,10 +105,8 @@ class PointModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return Point|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Point
     {
         if (null === $id) {
             return new Point();
@@ -192,12 +184,11 @@ class PointModel extends CommonFormModel
      *
      * @param mixed $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
      * @param bool  $allowUserRequest
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
+    public function triggerAction($type, mixed $eventDetails = null, mixed $typeId = null, Lead $lead = null, $allowUserRequest = false)
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -266,7 +257,7 @@ class PointModel extends CommonFormModel
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (false !== strpos($callback, '::')) {
+                } elseif (str_contains($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {

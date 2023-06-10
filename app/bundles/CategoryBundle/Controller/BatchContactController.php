@@ -21,21 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ContactActionModel
-     */
-    private $actionModel;
-
-    /**
-     * @var CategoryModel
-     */
-    private $categoryModel;
-
-    public function __construct(ContactActionModel $actionModel, CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private ContactActionModel $actionModel, private CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->actionModel   = $actionModel;
-        $this->categoryModel = $categoryModel;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -72,10 +59,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View the modal form for adding contacts into categories in batches.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_category_batch_contact_set');
         $rows  = $this->categoryModel->getLookupResults('global', '', 300);

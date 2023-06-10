@@ -106,38 +106,6 @@ class SubmissionModel extends CommonFormModel
      */
     protected $fieldHelper;
 
-    /**
-     * @var UploadFieldValidator
-     */
-    private $uploadFieldValidator;
-
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var FieldValueTransformer
-     */
-    private $fieldValueTransformer;
-
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    private ContactMerger $contactMerger;
-
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         Environment $twig,
@@ -149,13 +117,13 @@ class SubmissionModel extends CommonFormModel
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
-        UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        FieldValueTransformer $fieldValueTransformer,
-        DateHelper $dateHelper,
-        ContactTracker $contactTracker,
-        ContactMerger $contactMerger
+        private UploadFieldValidator $uploadFieldValidator,
+        private FormUploader $formUploader,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private FieldValueTransformer $fieldValueTransformer,
+        private DateHelper $dateHelper,
+        private ContactTracker $contactTracker,
+        private ContactMerger $contactMerger
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->twig                   = $twig;
@@ -167,13 +135,6 @@ class SubmissionModel extends CommonFormModel
         $this->leadFieldModel         = $leadFieldModel;
         $this->companyModel           = $companyModel;
         $this->fieldHelper            = $fieldHelper;
-        $this->uploadFieldValidator   = $uploadFieldValidator;
-        $this->formUploader           = $formUploader;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->fieldValueTransformer  = $fieldValueTransformer;
-        $this->dateHelper             = $dateHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->contactMerger          = $contactMerger;
     }
 
     public function getRepository(): SubmissionRepository
@@ -186,11 +147,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false): bool|array
     {
         $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
 
@@ -500,11 +459,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, $form, $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -611,11 +568,9 @@ class SubmissionModel extends CommonFormModel
      * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -723,8 +678,6 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param resource     $handle
      * @param array<mixed> $row
-     *
-     * @return false|int
      */
     private function putCsvExportRow($handle, array $row): bool|int
     {
@@ -1081,7 +1034,7 @@ class SubmissionModel extends CommonFormModel
                 // Merge the found lead with currently tracked lead
                 try {
                     $lead = $this->contactMerger->merge($lead, $foundLead);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 
@@ -1183,7 +1136,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
-    protected function validateFieldValue(Field $field, $value)
+    protected function validateFieldValue(Field $field, $value): bool|string
     {
         $standardValidation = $this->fieldHelper->validateFieldValue($field->getType(), $value, $field);
         if (!empty($standardValidation)) {

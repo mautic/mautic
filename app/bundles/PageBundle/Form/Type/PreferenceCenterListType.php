@@ -15,18 +15,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PreferenceCenterListType extends AbstractType
 {
     /**
-     * @var PageModel
-     */
-    private $model;
-
-    /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
+    public function __construct(private PageModel $model, CorePermissions $corePermissions)
     {
-        $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 

@@ -17,33 +17,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @var ContactSegmentQueryBuilder
-     */
-    private $leadSegmentQueryBuilder;
-
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $leadSegmentFilterFactory;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
-        ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
-        EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory,
+        private ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
+        private EntityManager $entityManager,
+        private ContactSegmentFilterFactory $leadSegmentFilterFactory,
         EventDispatcherInterface $dispatcher
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-
-        $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
-        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
-        $this->entityManager            = $entityManager;
     }
 
     /**

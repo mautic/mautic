@@ -5,25 +5,13 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 class RepliedEmail
 {
     /**
-     * @var string
-     */
-    private $fromAddress;
-
-    /**
-     * @var string|null
-     */
-    private $statHash;
-
-    /**
      * RepliedEmail constructor.
      *
      * @param string $fromAddress
      * @param null   $statHash
      */
-    public function __construct($fromAddress, $statHash = null)
+    public function __construct(private $fromAddress, private ?string $statHash = null)
     {
-        $this->fromAddress = $fromAddress;
-        $this->statHash    = $statHash;
     }
 
     /**
@@ -34,10 +22,7 @@ class RepliedEmail
         return $this->fromAddress;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getStatHash()
+    public function getStatHash(): ?string
     {
         return $this->statHash;
     }

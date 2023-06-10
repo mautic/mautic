@@ -9,22 +9,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class FrequencyActionModel
 {
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
-     * @var FrequencyRuleRepository
-     */
-    private $frequencyRuleRepository;
-
-    public function __construct(
-        LeadModel $contactModel,
-        FrequencyRuleRepository $frequencyRuleRepository
-    ) {
-        $this->contactModel            = $contactModel;
-        $this->frequencyRuleRepository = $frequencyRuleRepository;
+    public function __construct(private LeadModel $contactModel, private FrequencyRuleRepository $frequencyRuleRepository)
+    {
     }
 
     /**

@@ -17,24 +17,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, SessionInterface $session, EventDispatcherInterface $dispatcher)
+    public function __construct(private DynamicContentModel $dynamicContentModel, private SessionInterface $session, private EventDispatcherInterface $dispatcher)
     {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->session             = $session;
-        $this->dispatcher          = $dispatcher;
     }
 
     /**
@@ -92,10 +76,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @return bool|CampaignExecutionEvent
-     */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): bool|CampaignExecutionEvent
     {
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();

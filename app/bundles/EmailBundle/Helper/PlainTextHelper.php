@@ -336,7 +336,7 @@ class PlainTextHelper
             $url = $link;
         } else {
             $url = $this->options['base_url'];
-            if ('/' != substr($link, 0, 1)) {
+            if (!str_starts_with($link, '/')) {
                 $url .= '/';
             }
             $url .= $link;
@@ -531,12 +531,11 @@ class PlainTextHelper
     }
 
     /**
-     * @param string     $breakline
-     * @param bool|false $cut
+     * @param string $breakline
      *
      * @return string
      */
-    private function linewrap($text, $width, $breakline = "\n", $cut = false)
+    private function linewrap($text, $width, $breakline = "\n", bool $cut = false)
     {
         $lines = explode("\n", $text);
         $text  = '';

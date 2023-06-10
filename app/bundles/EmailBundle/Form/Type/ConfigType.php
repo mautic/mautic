@@ -22,20 +22,8 @@ class ConfigType extends AbstractType
 {
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var TransportType
-     */
-    private $transportType;
-
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
+    public function __construct(private TranslatorInterface $translator, private TransportType $transportType)
     {
-        $this->translator    = $translator;
-        $this->transportType = $transportType;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

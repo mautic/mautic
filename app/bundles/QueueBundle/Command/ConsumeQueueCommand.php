@@ -13,13 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsumeQueueCommand extends Command
 {
-    private QueueService $queueService;
-
-    public function __construct(QueueService $queueService)
+    public function __construct(private QueueService $queueService)
     {
         parent::__construct();
-
-        $this->queueService = $queueService;
     }
 
     protected function configure()

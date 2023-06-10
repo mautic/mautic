@@ -17,31 +17,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 class EventLogger
 {
     /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    /**
-     * @var SummaryModel
-     */
-    private $summaryModel;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
      * @var ArrayCollection
      */
     private $persistQueue;
@@ -65,18 +40,12 @@ class EventLogger
      * EventLogger constructor.
      */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker,
-        LeadEventLogRepository $leadEventLogRepository,
-        LeadRepository $leadRepository,
-        SummaryModel $summaryModel
+        private IpLookupHelper $ipLookupHelper,
+        private ContactTracker $contactTracker,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private SummaryModel $summaryModel
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->leadEventLogRepository = $leadEventLogRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->summaryModel           = $summaryModel;
-
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
     }

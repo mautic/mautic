@@ -206,10 +206,7 @@ class Stat
         return $this->dateClicked;
     }
 
-    /**
-     * @param mixed $dateClicked
-     */
-    public function setDateClicked($dateClicked)
+    public function setDateClicked(mixed $dateClicked)
     {
         $this->dateClicked = $dateClicked;
     }
@@ -222,10 +219,7 @@ class Stat
         return $this->dateSent;
     }
 
-    /**
-     * @param mixed $dateSent
-     */
-    public function setDateSent($dateSent)
+    public function setDateSent(mixed $dateSent)
     {
         $this->dateSent = $dateSent;
     }
@@ -238,9 +232,6 @@ class Stat
         return $this->notification;
     }
 
-    /**
-     * @param Notification $notification
-     */
     public function setNotification(Notification $notification = null)
     {
         $this->notification = $notification;
@@ -278,10 +269,7 @@ class Stat
         return $this->isClicked;
     }
 
-    /**
-     * @param mixed $isClicked
-     */
-    public function setIsClicked($isClicked)
+    public function setIsClicked(mixed $isClicked)
     {
         $this->isClicked = $isClicked;
     }
@@ -310,10 +298,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param mixed $trackingHash
-     */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash(mixed $trackingHash)
     {
         $this->trackingHash = $trackingHash;
     }
@@ -326,10 +311,7 @@ class Stat
         return $this->list;
     }
 
-    /**
-     * @param mixed $list
-     */
-    public function setList($list)
+    public function setList(mixed $list)
     {
         $this->list = $list;
     }
@@ -342,10 +324,7 @@ class Stat
         return $this->retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
-    public function setRetryCount($retryCount)
+    public function setRetryCount(mixed $retryCount)
     {
         $this->retryCount = $retryCount;
     }
@@ -363,10 +342,7 @@ class Stat
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source)
+    public function setSource(mixed $source)
     {
         $this->source = $source;
     }
@@ -379,10 +355,7 @@ class Stat
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
-    public function setSourceId($sourceId)
+    public function setSourceId(mixed $sourceId)
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -395,10 +368,7 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @param mixed $tokens
-     */
-    public function setTokens($tokens)
+    public function setTokens(mixed $tokens)
     {
         $this->tokens = $tokens;
     }
@@ -412,11 +382,9 @@ class Stat
     }
 
     /**
-     * @param mixed $clickCount
-     *
      * @return Stat
      */
-    public function setClickCount($clickCount)
+    public function setClickCount(mixed $clickCount)
     {
         $this->clickCount = $clickCount;
 
@@ -470,11 +438,9 @@ class Stat
     }
 
     /**
-     * @param mixed $clickDetails
-     *
      * @return Stat
      */
-    public function setClickDetails($clickDetails)
+    public function setClickDetails(mixed $clickDetails)
     {
         $this->clickDetails = $clickDetails;
 

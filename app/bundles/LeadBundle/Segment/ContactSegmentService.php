@@ -11,29 +11,8 @@ class ContactSegmentService
 {
     use LeadBatchLimiterTrait;
 
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $contactSegmentFilterFactory;
-
-    /**
-     * @var ContactSegmentQueryBuilder
-     */
-    private $contactSegmentQueryBuilder;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(
-        ContactSegmentFilterFactory $contactSegmentFilterFactory,
-        ContactSegmentQueryBuilder $queryBuilder,
-        \Psr\Log\LoggerInterface $logger
-    ) {
-        $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
-        $this->contactSegmentQueryBuilder  = $queryBuilder;
-        $this->logger                      = $logger;
+    public function __construct(private ContactSegmentFilterFactory $contactSegmentFilterFactory, private ContactSegmentQueryBuilder $contactSegmentQueryBuilder, private \Psr\Log\LoggerInterface $logger)
+    {
     }
 
     /**
@@ -194,14 +173,12 @@ class ContactSegmentService
     }
 
     /**
-     * @param int|null $limit
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], ?int $limit = null)
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 
@@ -249,14 +226,12 @@ class ContactSegmentService
     }
 
     /**
-     * @param int|null $limit
-     *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], ?int $limit = null)
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 

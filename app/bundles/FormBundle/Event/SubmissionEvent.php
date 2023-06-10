@@ -11,18 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 class SubmissionEvent extends CommonEvent
 {
     /**
-     * Raw POST results.
-     *
-     * @var array
-     */
-    private $post = [];
-
-    /**
-     * @var array
-     */
-    private $server = [];
-
-    /**
      * Cleaned post results.
      *
      * @var array
@@ -78,11 +66,6 @@ class SubmissionEvent extends CommonEvent
     private $context;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var array|Response|null
      */
     private $postSubmitResponse;
@@ -94,13 +77,16 @@ class SubmissionEvent extends CommonEvent
 
     /**
      * SubmissionEvent constructor.
+     *
+     * @param mixed[] $post
+     * @param mixed[] $server
      */
-    public function __construct(Submission $submission, $post, $server, Request $request)
+    public function __construct(Submission $submission, /**
+     * Raw POST results.
+     */
+    private $post, private $server, private Request $request)
     {
         $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
     }
 
     /**
@@ -315,11 +301,9 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param mixed $callbackResponse
-     *
      * @return SubmissionEvent
      */
-    public function setPostSubmitCallbackResponse($key, $callbackResponse)
+    public function setPostSubmitCallbackResponse($key, mixed $callbackResponse)
     {
         $this->callbackResponses[$key] = $callbackResponse;
 

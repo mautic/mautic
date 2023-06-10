@@ -193,11 +193,9 @@ class StageRepository extends CommonRepository
     }
 
     /**
-     * @param string|int $value
-     *
      * @return array
      */
-    public function findByIdOrName($value)
+    public function findByIdOrName(string|int $value)
     {
         $qb = $this->_em->createQueryBuilder()
             ->select('s')

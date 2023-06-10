@@ -9,11 +9,6 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 class StatHelper
 {
     /**
-     * @var StatRepository
-     */
-    private $repo;
-
-    /**
      * Just store email ID and lead ID to avoid doctrine RAM issues with entities.
      *
      * @var Reference[]
@@ -28,9 +23,8 @@ class StatHelper
     /**
      * StatHelper constructor.
      */
-    public function __construct(StatRepository $statRepository)
+    public function __construct(private StatRepository $repo)
     {
-        $this->repo = $statRepository;
     }
 
     public function storeStat(Stat $stat, $emailAddress)

@@ -12,16 +12,10 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(CompanyModel $companyModel)
+    public function __construct(private CompanyModel $companyModel)
     {
-        $this->companyModel = $companyModel;
     }
 
     public function load(ObjectManager $manager)

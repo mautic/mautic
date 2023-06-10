@@ -26,7 +26,7 @@ class IntegrationEntityRepository extends CommonRepository
         $integration,
         $integrationEntity,
         $internalEntity,
-        $internalEntityIds = null,
+        array|int|null $internalEntityIds = null,
         $startDate = null,
         $endDate = null,
         $push = false,
@@ -161,11 +161,10 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param int          $limit
-     * @param null         $fromDate
-     * @param null         $toDate
-     * @param array|string $integrationEntity
-     * @param array        $excludeIntegrationIds
+     * @param int   $limit
+     * @param null  $fromDate
+     * @param null  $toDate
+     * @param array $excludeIntegrationIds
      */
     public function findLeadsToUpdate(
         $integration,
@@ -174,7 +173,7 @@ class IntegrationEntityRepository extends CommonRepository
         $limit = 25,
         $fromDate = null,
         $toDate = null,
-        $integrationEntity = ['Contact', 'Lead'],
+        array|string $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
     ) {
         if ('company' == $internalEntity) {
@@ -317,10 +316,8 @@ class IntegrationEntityRepository extends CommonRepository
      * @param int  $limit
      * @param null $fromDate
      * @param null $toDate
-     *
-     * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead')
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead'): array|int
     {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
@@ -426,12 +423,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
     }
 
-    /**
-     * @param int|bool $limit
-     *
-     * @return array|int
-     */
-    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100)
+    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, int|bool $limit = 100): array|int
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');

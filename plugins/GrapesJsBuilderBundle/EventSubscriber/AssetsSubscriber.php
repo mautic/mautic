@@ -12,20 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var InstallService
-     */
-    private $installer;
-
-    public function __construct(Config $config, InstallService $installer)
+    public function __construct(private Config $config, private InstallService $installer)
     {
-        $this->config    = $config;
-        $this->installer = $installer;
     }
 
     public static function getSubscribedEvents()

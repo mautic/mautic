@@ -113,10 +113,8 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * @param string $trackingId
-     *
-     * @return LeadDevice|null
      */
-    public function getByTrackingId($trackingId)
+    public function getByTrackingId($trackingId): ?LeadDevice
     {
         /** @var LeadDevice $leadDevice */
         $leadDevice = $this->findOneBy([

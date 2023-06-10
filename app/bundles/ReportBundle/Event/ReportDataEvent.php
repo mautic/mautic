@@ -10,16 +10,6 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportDataEvent extends AbstractReportEvent
 {
     /**
-     * @var array
-     */
-    private $data = [];
-
-    /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * @var int
      */
     private $totalResults = 0;
@@ -27,12 +17,10 @@ class ReportDataEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      */
-    public function __construct(Report $report, array $data, $totalResults, array $options)
+    public function __construct(Report $report, private array $data, $totalResults, private array $options)
     {
         $this->context      = $report->getSource();
         $this->report       = $report;
-        $this->data         = $data;
-        $this->options      = $options;
         $this->totalResults = (int) $totalResults;
     }
 

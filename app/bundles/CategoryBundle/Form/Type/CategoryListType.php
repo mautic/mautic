@@ -15,32 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryListType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var CategoryModel
-     */
-    private $model;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
+    public function __construct(private EntityManager $em, private TranslatorInterface $translator, private CategoryModel $model, private RouterInterface $router)
     {
-        $this->em         = $em;
-        $this->translator = $translator;
-        $this->model      = $model;
-        $this->router     = $router;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

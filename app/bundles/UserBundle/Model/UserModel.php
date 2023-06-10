@@ -30,17 +30,11 @@ class UserModel extends FormModel
      */
     protected $mailHelper;
 
-    /**
-     * @var UserTokenServiceInterface
-     */
-    private $userTokenService;
-
     public function __construct(
         MailHelper $mailHelper,
-        UserTokenServiceInterface $userTokenService
+        private UserTokenServiceInterface $userTokenService
     ) {
         $this->mailHelper       = $mailHelper;
-        $this->userTokenService = $userTokenService;
     }
 
     public function getRepository(): UserRepository
@@ -90,12 +84,11 @@ class UserModel extends FormModel
     /**
      * Checks for a new password and rehashes if necessary.
      *
-     * @param string     $submittedPassword
-     * @param bool|false $validate
+     * @param string $submittedPassword
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, bool $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -149,10 +142,7 @@ class UserModel extends FormModel
         return $entity;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getSystemAdministrator()
+    public function getSystemAdministrator(): ?User
     {
         $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
 
@@ -217,17 +207,12 @@ class UserModel extends FormModel
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'role':
-                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
-                break;
-            case 'user':
-                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
-                break;
-            case 'position':
-                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
-                break;
-        }
+        $results = match ($type) {
+            'role'     => $this->em->getRepository(Role::class)->getRoleList($filter, $limit),
+            'user'     => $this->em->getRepository(User::class)->getUserList($filter, $limit),
+            'position' => $this->em->getRepository(User::class)->getPositionList($filter, $limit),
+            default    => $results,
+        };
 
         return $results;
     }
@@ -340,7 +325,6 @@ class UserModel extends FormModel
      * Set user preference.
      *
      * @param null $value
-     * @param User $user
      */
     public function setPreference($key, $value = null, User $user = null)
     {
@@ -360,7 +344,6 @@ class UserModel extends FormModel
      * Get user preference.
      *
      * @param null $default
-     * @param User $user
      */
     public function getPreference($key, $default = null, User $user = null)
     {

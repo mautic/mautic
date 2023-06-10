@@ -20,7 +20,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $controller = $event->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
 
-        if (false === strpos($controller, self::class)) {
+        if (!str_contains($controller, self::class)) {
             return;
         }
 
@@ -38,10 +38,8 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * Generates login form and processes login.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper)
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php

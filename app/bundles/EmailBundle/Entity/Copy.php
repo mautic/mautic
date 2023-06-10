@@ -124,11 +124,9 @@ class Copy
     }
 
     /**
-     * @param mixed $subject
-     *
      * @return Copy
      */
-    public function setSubject($subject)
+    public function setSubject(mixed $subject)
     {
         // Ensure it's clean of emoji
         $subject = EmojiHelper::toShort($subject);

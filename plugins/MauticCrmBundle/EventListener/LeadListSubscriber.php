@@ -14,26 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(IntegrationHelper $helper, ListModel $listModel, TranslatorInterface $translator)
+    public function __construct(private IntegrationHelper $helper, private ListModel $listModel, private TranslatorInterface $translator)
     {
-        $this->helper     = $helper;
-        $this->listModel  = $listModel;
-        $this->translator = $translator;
     }
 
     /**
@@ -108,7 +90,7 @@ class LeadListSubscriber implements EventSubscriberInterface
 
         foreach ($filters as $filter) {
             if ('integration_campaigns' == $filter['field']) {
-                if (false !== strpos($filter['filter'], '::')) {
+                if (str_contains($filter['filter'], '::')) {
                     list($integrationName, $campaignId) = explode('::', $filter['filter']);
                 } else {
                     // Assuming this is a Salesforce integration for BC with pre 2.11.0

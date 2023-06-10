@@ -16,14 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CampaignEventFormFieldValueType extends AbstractType
 {
-    /**
-     * @var FormModel
-     */
-    private $model;
-
-    public function __construct(FormModel $model)
+    public function __construct(private FormModel $model)
     {
-        $this->model = $model;
     }
 
     /**

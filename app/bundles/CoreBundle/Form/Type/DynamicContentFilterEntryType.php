@@ -23,14 +23,7 @@ class DynamicContentFilterEntryType extends AbstractType
     private $timezoneChoices = [];
     private $localeChoices   = [];
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(ListModel $listModel, StageModel $stageModel, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -40,8 +33,6 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->regionChoices             = FormFieldHelper::getRegionChoices();
         $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices             = FormFieldHelper::getLocaleChoices();
-        $this->stageModel                = $stageModel;
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -51,7 +42,7 @@ class DynamicContentFilterEntryType extends AbstractType
         try {
             $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
             $mauticBuilder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $extraClasses = ' legacy-builder';
         }

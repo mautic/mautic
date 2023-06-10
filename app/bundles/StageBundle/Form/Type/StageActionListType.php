@@ -13,11 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class StageActionListType extends AbstractType
 {
-    private $model;
-
-    public function __construct(StageModel $model)
+    public function __construct(private StageModel $model)
     {
-        $this->model = $model;
     }
 
     public function configureOptions(OptionsResolver $resolver)

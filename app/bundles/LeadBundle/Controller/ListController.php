@@ -39,11 +39,9 @@ class ListController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse|Response
-     *
      * @throws \Exception
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|Response
     {
         /** @var ListModel $model */
         $model   = $this->getModel('lead.list');
@@ -155,10 +153,8 @@ class ListController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare)
+    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare): JsonResponse|RedirectResponse|Response
     {
         if (!$this->security->isGranted('lead:leads:viewown')) {
             return $this->accessDenied();
@@ -249,9 +245,9 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -294,9 +290,9 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -428,11 +424,9 @@ class ListController extends FormController
     /**
      * Get variables for POST action.
      *
-     * @param int|null $objectId
-     *
      * @return array
      */
-    private function getPostActionVars(Request $request, $objectId = null)
+    private function getPostActionVars(Request $request, ?int $objectId = null)
     {
         // set the return URL
         if ($objectId) {
@@ -714,10 +708,8 @@ class ListController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId)
+    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model    = $this->getModel('lead.list');
@@ -940,10 +932,8 @@ class ListController extends FormController
     /**
      * @param int $objectId
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): JsonResponse|RedirectResponse|Response
     {
         $session = $request->getSession();
         \assert($session instanceof SessionInterface);

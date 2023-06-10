@@ -15,21 +15,10 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteLoader extends Loader
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParameters;
-
-    /**
      * RouteLoader constructor.
      */
-    public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private CoreParametersHelper $coreParameters)
     {
-        $this->dispatcher     = $dispatcher;
-        $this->coreParameters = $parametersHelper;
     }
 
     /**

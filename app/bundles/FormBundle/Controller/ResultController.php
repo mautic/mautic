@@ -45,10 +45,7 @@ class ResultController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var FormModel $formModel */
         $formModel      = $this->getModel('form.form');
@@ -298,10 +295,8 @@ class ResultController extends CommonFormController
 
     /**
      * Delete a form result.
-     *
-     * @return array|Response
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): array|Response
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
@@ -356,10 +351,7 @@ class ResultController extends CommonFormController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->batchDeleteStandard($request);
     }

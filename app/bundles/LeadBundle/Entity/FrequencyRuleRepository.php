@@ -10,21 +10,19 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FrequencyRuleRepository extends CommonRepository
 {
     /**
-     * @param string      $channel
-     * @param array       $leadIds
-     * @param string|null $defaultFrequencyNumber
-     * @param string|null $defaultFrequencyTime
-     * @param string      $statTable
-     * @param string      $statSentColumn
-     * @param string      $statContactColumn
+     * @param string $channel
+     * @param array  $leadIds
+     * @param string $statTable
+     * @param string $statSentColumn
+     * @param string $statContactColumn
      *
      * @return array
      */
     public function getAppliedFrequencyRules(
         $channel,
         $leadIds,
-        $defaultFrequencyNumber,
-        $defaultFrequencyTime,
+        ?string $defaultFrequencyNumber,
+        ?string $defaultFrequencyTime,
         $statTable = 'email_stats',
         $statContactColumn = 'lead_id',
         $statSentColumn = 'date_sent'

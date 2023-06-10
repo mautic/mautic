@@ -21,21 +21,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 class IntegrationSyncProcess
 {
     /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var ObjectChangeGenerator
-     */
-    private $objectChangeGenerator;
-
-    /**
      * @var InputOptionsDAO
      */
     private $inputOptionsDAO;
@@ -50,11 +35,8 @@ class IntegrationSyncProcess
      */
     private $syncDataExchange;
 
-    public function __construct(SyncDateHelper $syncDateHelper, MappingHelper $mappingHelper, ObjectChangeGenerator $objectChangeGenerator)
+    public function __construct(private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private ObjectChangeGenerator $objectChangeGenerator)
     {
-        $this->syncDateHelper        = $syncDateHelper;
-        $this->mappingHelper         = $mappingHelper;
-        $this->objectChangeGenerator = $objectChangeGenerator;
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void
@@ -174,7 +156,7 @@ class IntegrationSyncProcess
                         if ($objectChange->shouldSync()) {
                             $syncOrder->addObjectChange($objectChange);
                         }
-                    } catch (ObjectDeletedException $exception) {
+                    } catch (ObjectDeletedException) {
                         DebugLogger::log(
                             $this->mappingManualDAO->getIntegration(),
                             sprintf(

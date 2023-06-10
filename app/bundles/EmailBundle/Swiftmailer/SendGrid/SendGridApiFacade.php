@@ -8,29 +8,8 @@ use Mautic\EmailBundle\Swiftmailer\SwiftmailerFacadeInterface;
 
 class SendGridApiFacade implements SwiftmailerFacadeInterface
 {
-    /**
-     * @var SendGridWrapper
-     */
-    private $sendGridWrapper;
-
-    /**
-     * @var SendGridApiMessage
-     */
-    private $sendGridApiMessage;
-
-    /**
-     * @var SendGridApiResponse
-     */
-    private $sendGridApiResponse;
-
-    public function __construct(
-        SendGridWrapper $sendGridWrapper,
-        SendGridApiMessage $sendGridApiMessage,
-        SendGridApiResponse $sendGridApiResponse
-    ) {
-        $this->sendGridWrapper     = $sendGridWrapper;
-        $this->sendGridApiMessage  = $sendGridApiMessage;
-        $this->sendGridApiResponse = $sendGridApiResponse;
+    public function __construct(private SendGridWrapper $sendGridWrapper, private SendGridApiMessage $sendGridApiMessage, private SendGridApiResponse $sendGridApiResponse)
+    {
     }
 
     /**

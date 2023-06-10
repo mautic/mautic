@@ -12,14 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AggregatorType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**

@@ -22,45 +22,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ActionDispatcher
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
      * EventDispatcher constructor.
      */
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        NotificationHelper $notificationHelper,
-        LegacyEventDispatcher $legacyDispatcher
-    ) {
-        $this->dispatcher         = $dispatcher;
-        $this->logger             = $logger;
-        $this->scheduler          = $scheduler;
-        $this->notificationHelper = $notificationHelper;
-        $this->legacyDispatcher   = $legacyDispatcher;
+    public function __construct(private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private EventScheduler $scheduler, private NotificationHelper $notificationHelper, private LegacyEventDispatcher $legacyDispatcher)
+    {
     }
 
     /**

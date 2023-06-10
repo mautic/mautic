@@ -41,40 +41,8 @@ class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        EntityManager $entityManager,
-        StageModel $stageModel,
-        CoreParametersHelper $coreParametersHelper,
-        ThemeHelperInterface $themeHelper
-    ) {
-        $this->translator           = $translator;
-        $this->em                   = $entityManager;
-        $this->stageModel           = $stageModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->themeHelper          = $themeHelper;
+    public function __construct(private TranslatorInterface $translator, private EntityManager $em, private StageModel $stageModel, private CoreParametersHelper $coreParametersHelper, private ThemeHelperInterface $themeHelper)
+    {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

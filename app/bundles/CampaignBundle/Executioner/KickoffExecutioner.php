@@ -37,31 +37,6 @@ class KickoffExecutioner implements ExecutionerInterface
     private $output;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var KickoffContactFinder
-     */
-    private $kickoffContactFinder;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
      * @var ProgressBar
      */
     private $progressBar;
@@ -76,18 +51,8 @@ class KickoffExecutioner implements ExecutionerInterface
      */
     private $counter;
 
-    public function __construct(
-        LoggerInterface $logger,
-        KickoffContactFinder $kickoffContactFinder,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler
-    ) {
-        $this->logger               = $logger;
-        $this->kickoffContactFinder = $kickoffContactFinder;
-        $this->translator           = $translator;
-        $this->executioner          = $executioner;
-        $this->scheduler            = $scheduler;
+    public function __construct(private LoggerInterface $logger, private KickoffContactFinder $kickoffContactFinder, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler)
+    {
     }
 
     /**
@@ -108,9 +73,9 @@ class KickoffExecutioner implements ExecutionerInterface
         try {
             $this->prepareForExecution();
             $this->executeOrScheduleEvent();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -199,7 +164,7 @@ class KickoffExecutioner implements ExecutionerInterface
                     $rootEvents->remove($key);
 
                     continue;
-                } catch (NotSchedulableException $exception) {
+                } catch (NotSchedulableException) {
                     // Execute the event
                 }
             }

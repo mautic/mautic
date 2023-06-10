@@ -10,31 +10,13 @@ use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 class Engine
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
      * @var string
      */
     private $migrationsPath;
 
-    /**
-     * @var string
-     */
-    private $bundleName;
-
-    public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath, string $bundleName)
+    public function __construct(private EntityManager $entityManager, private string $tablePrefix, string $pluginPath, private string $bundleName)
     {
-        $this->entityManager  = $entityManager;
-        $this->tablePrefix    = $tablePrefix;
         $this->migrationsPath = $pluginPath.'/Migrations/';
-        $this->bundleName     = $bundleName;
     }
 
     /**

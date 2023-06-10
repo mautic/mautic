@@ -52,7 +52,7 @@ class GrapesJsController extends CommonController
         }
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains($objectId, 'new')) {
             $isNew = true;
 
             if (!$this->security->isGranted($aclToCheck.'create')) {
@@ -128,7 +128,7 @@ class GrapesJsController extends CommonController
             ]
         );
 
-        if (false !== strpos($renderedTemplate, '<mjml>')) {
+        if (str_contains($renderedTemplate, '<mjml>')) {
             $type = 'mjml';
         }
 

@@ -20,10 +20,8 @@ class TagController extends FormController
      * Generate's default list view.
      *
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
@@ -141,10 +139,8 @@ class TagController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|RedirectResponse|Response
     {
         if (!$this->security->isGranted('tagManager:tagManager:create')) {
             return $this->accessDenied();
@@ -246,9 +242,9 @@ class TagController extends FormController
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -390,11 +386,9 @@ class TagController extends FormController
     /**
      * Get variables for POST action.
      *
-     * @param int|null $objectId
-     *
      * @return array
      */
-    private function getPostActionVars(Request $request, $objectId = null)
+    private function getPostActionVars(Request $request, ?int $objectId = null)
     {
         // set the return URL
         if ($objectId) {
@@ -422,10 +416,8 @@ class TagController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\TagModel $model */
         $model    = $this->getModel('lead.tag');
@@ -593,7 +585,7 @@ class TagController extends FormController
             if (!empty($deleteIds)) {
                 try {
                     $entities = $model->deleteEntities($deleteIds);
-                } catch (ForeignKeyConstraintViolationException $exception) {
+                } catch (ForeignKeyConstraintViolationException) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',

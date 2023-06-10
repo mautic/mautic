@@ -13,22 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var GrapesJsBuilderModel
-     */
-    private $grapesJsBuilderModel;
-
-    /**
      * EmailSubscriber constructor.
      */
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel)
+    public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel)
     {
-        $this->config               = $config;
-        $this->grapesJsBuilderModel = $grapesJsBuilderModel;
     }
 
     /**

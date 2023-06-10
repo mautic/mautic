@@ -123,13 +123,12 @@ class MessageQueueModel extends FormModel
     /**
      * Adds messages to the queue.
      *
-     * @param array    $leads
-     * @param string   $channel
-     * @param int      $channelId
-     * @param int      $maxAttempts
-     * @param int      $priority
-     * @param int|null $campaignEventId
-     * @param array    $options
+     * @param array  $leads
+     * @param string $channel
+     * @param int    $channelId
+     * @param int    $maxAttempts
+     * @param int    $priority
+     * @param array  $options
      *
      * @return bool
      */
@@ -140,7 +139,7 @@ class MessageQueueModel extends FormModel
         \DateInterval $scheduledInterval,
         $maxAttempts = 1,
         $priority = 1,
-        $campaignEventId = null,
+        ?int $campaignEventId = null,
         $options = []
     ) {
         $messageQueues = [];

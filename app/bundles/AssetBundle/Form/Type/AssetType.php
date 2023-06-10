@@ -24,20 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AssetType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    public function __construct(TranslatorInterface $translator, AssetModel $assetModel)
+    public function __construct(private TranslatorInterface $translator, private AssetModel $assetModel)
     {
-        $this->translator = $translator;
-        $this->assetModel = $assetModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

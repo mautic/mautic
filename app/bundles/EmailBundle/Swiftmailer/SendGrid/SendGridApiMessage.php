@@ -10,36 +10,8 @@ use SendGrid\Mail;
 
 class SendGridApiMessage
 {
-    /**
-     * @var SendGridMailBase
-     */
-    private $sendGridMailBase;
-
-    /**
-     * @var SendGridMailPersonalization
-     */
-    private $sendGridMailPersonalization;
-
-    /**
-     * @var SendGridMailMetadata
-     */
-    private $sendGridMailMetadata;
-
-    /**
-     * @var SendGridMailAttachment
-     */
-    private $sendGridMailAttachment;
-
-    public function __construct(
-        SendGridMailBase $sendGridMailBase,
-        SendGridMailPersonalization $sendGridMailPersonalization,
-        SendGridMailMetadata $sendGridMailMetadata,
-        SendGridMailAttachment $sendGridMailAttachment
-    ) {
-        $this->sendGridMailBase            = $sendGridMailBase;
-        $this->sendGridMailPersonalization = $sendGridMailPersonalization;
-        $this->sendGridMailMetadata        = $sendGridMailMetadata;
-        $this->sendGridMailAttachment      = $sendGridMailAttachment;
+    public function __construct(private SendGridMailBase $sendGridMailBase, private SendGridMailPersonalization $sendGridMailPersonalization, private SendGridMailMetadata $sendGridMailMetadata, private SendGridMailAttachment $sendGridMailAttachment)
+    {
     }
 
     /**

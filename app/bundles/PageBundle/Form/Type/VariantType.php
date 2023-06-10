@@ -16,14 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class VariantType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    public function __construct(PageModel $pageModel)
+    public function __construct(private PageModel $pageModel)
     {
-        $this->pageModel = $pageModel;
     }
 
     /**

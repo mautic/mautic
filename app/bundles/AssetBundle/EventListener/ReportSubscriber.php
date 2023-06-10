@@ -16,20 +16,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_ASSET          = 'assets';
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var DownloadRepository
-     */
-    private $downloadRepository;
-
-    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository)
+    public function __construct(private CompanyReportData $companyReportData, private DownloadRepository $downloadRepository)
     {
-        $this->companyReportData  = $companyReportData;
-        $this->downloadRepository = $downloadRepository;
     }
 
     /**

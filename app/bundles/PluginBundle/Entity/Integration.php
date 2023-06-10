@@ -92,20 +92,15 @@ class Integration extends CommonEntity
         return $this->id;
     }
 
-    /**
-     * @return Plugin|null
-     */
-    public function getPlugin()
+    public function getPlugin(): ?Plugin
     {
         return $this->plugin;
     }
 
     /**
-     * @param mixed $plugin
-     *
      * @return Integration
      */
-    public function setPlugin($plugin)
+    public function setPlugin(mixed $plugin)
     {
         $this->plugin = $plugin;
 
@@ -121,11 +116,9 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @param mixed $name
-     *
      * @return Integration
      */
-    public function setName($name)
+    public function setName(mixed $name)
     {
         $this->isChanged('name', $name);
 
@@ -143,11 +136,9 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @param mixed $isPublished
-     *
      * @return Integration
      */
-    public function setIsPublished($isPublished)
+    public function setIsPublished(mixed $isPublished)
     {
         $this->isChanged('isPublished', $isPublished);
 
@@ -170,11 +161,9 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @param mixed $supportedFeatures
-     *
      * @return Integration
      */
-    public function setSupportedFeatures($supportedFeatures)
+    public function setSupportedFeatures(mixed $supportedFeatures)
     {
         $this->isChanged('supportedFeatures', $supportedFeatures);
 
@@ -192,11 +181,9 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @param mixed $apiKeys
-     *
      * @return Integration
      */
-    public function setApiKeys($apiKeys)
+    public function setApiKeys(mixed $apiKeys)
     {
         $this->apiKeys = $apiKeys;
 
@@ -212,11 +199,9 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @param mixed $featureSettings
-     *
      * @return Integration
      */
-    public function setFeatureSettings($featureSettings)
+    public function setFeatureSettings(mixed $featureSettings)
     {
         $this->isChanged('featureSettings', $featureSettings);
 

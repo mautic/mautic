@@ -122,10 +122,8 @@ class SubmissionApiController extends CommonApiController
      * Returns Form on success
      *
      * @param int $formId
-     *
-     * @return Response|Form
      */
-    protected function getFormOrResponseWithError($formId)
+    protected function getFormOrResponseWithError($formId): Response|Form
     {
         $formModel = $this->getModel('form');
         $form      = $formModel->getEntity($formId);

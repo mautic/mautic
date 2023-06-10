@@ -17,14 +17,8 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private static $contactFieldRegex = '{contactfield=(.*?)}';
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
-
-    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
+    public function __construct(private BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**

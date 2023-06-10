@@ -55,50 +55,20 @@ class AssetModel extends FormModel
      */
     protected $maxAssetSize;
 
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
         LeadModel $leadModel,
         CategoryModel $categoryModel,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
         CoreParametersHelper $coreParametersHelper,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactTracker $contactTracker
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private ContactTracker $contactTracker
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
-        $this->requestStack           = $requestStack;
         $this->ipLookupHelper         = $ipLookupHelper;
-        $this->deviceCreatorService   = $deviceCreatorService;
-        $this->deviceDetectorFactory  = $deviceDetectorFactory;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->contactTracker         = $contactTracker;
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
     }
 
@@ -321,10 +291,9 @@ class AssetModel extends FormModel
     /**
      * Increase the download count.
      *
-     * @param int        $increaseBy
-     * @param bool|false $unique
+     * @param int $increaseBy
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($asset, $increaseBy = 1, bool $unique = false)
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
@@ -383,10 +352,8 @@ class AssetModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Asset|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
             $entity = new Asset();
@@ -497,7 +464,7 @@ class AssetModel extends FormModel
      *
      * @return float
      */
-    public function getMaxUploadSize($unit = 'M', $humanReadable = false)
+    public function getMaxUploadSize($unit = 'M', bool $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
         $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
@@ -515,10 +482,7 @@ class AssetModel extends FormModel
         return $number;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getTotalFilesize($assets)
+    public function getTotalFilesize($assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
@@ -557,7 +521,7 @@ class AssetModel extends FormModel
      *
      * @return array
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDownloadsLineChartData(?string $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -649,11 +613,9 @@ class AssetModel extends FormModel
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */

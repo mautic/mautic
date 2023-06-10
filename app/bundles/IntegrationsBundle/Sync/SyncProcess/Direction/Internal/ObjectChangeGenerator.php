@@ -26,24 +26,9 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 class ObjectChangeGenerator
 {
     /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudge;
-
-    /**
      * @var ReportDAO
      */
     private $syncReport;
-
-    /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
 
     /**
      * @var MappingManualDAO
@@ -77,11 +62,8 @@ class ObjectChangeGenerator
     /**
      * ObjectChangeGenerator constructor.
      */
-    public function __construct(SyncJudgeInterface $syncJudge, ValueHelper $valueHelper, FieldHelper $fieldHelper)
+    public function __construct(private SyncJudgeInterface $syncJudge, private ValueHelper $valueHelper, private FieldHelper $fieldHelper)
     {
-        $this->syncJudge   = $syncJudge;
-        $this->valueHelper = $valueHelper;
-        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -163,7 +145,7 @@ class ObjectChangeGenerator
                 $this->integrationObject->getObjectId(),
                 $fieldMappingDAO->getIntegrationField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -180,7 +162,7 @@ class ObjectChangeGenerator
                 $internalFieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
@@ -230,7 +212,7 @@ class ObjectChangeGenerator
     ): void {
         try {
             $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
-        } catch (FieldNotFoundException $exception) {
+        } catch (FieldNotFoundException) {
             $internalField = null;
         }
 
@@ -293,7 +275,7 @@ class ObjectChangeGenerator
                 );
 
                 break;
-            } catch (ConflictUnresolvedException $exception) {
+            } catch (ConflictUnresolvedException) {
                 DebugLogger::log(
                     $this->mappingManual->getIntegration(),
                     sprintf(

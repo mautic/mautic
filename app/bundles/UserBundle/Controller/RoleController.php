@@ -101,10 +101,8 @@ class RoleController extends FormController
 
     /**
      * Generate's new role form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         if (!$this->security->isGranted('user:roles:create')) {
             return $this->accessDenied();
@@ -185,10 +183,8 @@ class RoleController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = true)
+    public function editAction(Request $request, $objectId, $ignorePost = true): \Symfony\Component\HttpFoundation\JsonResponse|Response
     {
         if (!$this->security->isGranted('user:roles:edit')) {
             return $this->accessDenied();

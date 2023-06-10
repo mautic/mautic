@@ -13,14 +13,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VariantType extends AbstractType
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(EmailModel $emailModel)
+    public function __construct(private EmailModel $emailModel)
     {
-        $this->emailModel = $emailModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

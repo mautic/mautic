@@ -10,22 +10,10 @@ use Twig\Environment;
 final class ContentHelper
 {
     /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * UIHelper constructor.
      */
-    public function __construct(Environment $twig, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -36,7 +24,7 @@ final class ContentHelper
      * @param string|null          $viewName The main identifier for the content requested. Will be etracted from $vars if get_
      *defined
      */
-    public function getCustomContent($context = null, array $vars = [], $viewName = null): string
+    public function getCustomContent(?string $context = null, array $vars = [], ?string $viewName = null): string
     {
         if (null === $viewName) {
             if (empty($vars['mauticTemplate'])) {

@@ -12,36 +12,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    public function __construct(
-        UserHelper $userHelper,
-        EmailModel $emailModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->userHelper = $userHelper;
-        $this->emailModel = $emailModel;
-        $this->security   = $security;
-        $this->twig       = $twig;
+    public function __construct(private UserHelper $userHelper, private EmailModel $emailModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**

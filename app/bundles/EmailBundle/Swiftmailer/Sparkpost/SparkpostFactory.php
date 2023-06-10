@@ -7,14 +7,8 @@ use SparkPost\SparkPost;
 
 final class SparkpostFactory implements SparkpostFactoryInterface
 {
-    /**
-     * @var GuzzleAdapter
-     */
-    private $client;
-
-    public function __construct(GuzzleAdapter $client)
+    public function __construct(private GuzzleAdapter $client)
     {
-        $this->client = $client;
     }
 
     /**
@@ -26,7 +20,7 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      */
     public function create($host, $apiKey, $port = null)
     {
-        if (false === strpos($host, '://') && '/' != substr($host, 0, 1)) {
+        if (!str_contains($host, '://') && !str_starts_with($host, '/')) {
             $host = 'https://'.$host;
         }
 

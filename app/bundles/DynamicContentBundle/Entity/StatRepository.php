@@ -39,11 +39,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int|array $dynamicContentIds
-     *
      * @return int
      */
-    public function getSentCount($dynamicContentIds = null)
+    public function getSentCount(int|array $dynamicContentIds = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -67,8 +65,7 @@ class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by dynamic content Id.
      *
-     * @param array     $dynamicContentIds
-     * @param \DateTime $fromDate
+     * @param array $dynamicContentIds
      *
      * @return array
      */
@@ -105,14 +102,12 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's dynamic content stat.
      *
-     * @param int|null $leadId
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId = null, array $options = [])
+    public function getLeadStats(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

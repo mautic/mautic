@@ -183,10 +183,7 @@ class LeadDevice
         return $this->clientInfo;
     }
 
-    /**
-     * @param mixed $clientInfo
-     */
-    public function setClientInfo($clientInfo)
+    public function setClientInfo(mixed $clientInfo)
     {
         $this->clientInfo = $clientInfo;
     }
@@ -199,10 +196,7 @@ class LeadDevice
         return $this->device;
     }
 
-    /**
-     * @param mixed $device
-     */
-    public function setDevice($device)
+    public function setDevice(mixed $device)
     {
         $this->device = $device;
     }
@@ -228,10 +222,7 @@ class LeadDevice
         return $this->deviceModel;
     }
 
-    /**
-     * @param mixed $deviceModel
-     */
-    public function setDeviceModel($deviceModel)
+    public function setDeviceModel(mixed $deviceModel)
     {
         $this->deviceModel = $deviceModel;
     }
@@ -343,10 +334,7 @@ class LeadDevice
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTrackingId()
+    public function getTrackingId(): ?string
     {
         return $this->trackingId;
     }
@@ -389,10 +377,7 @@ class LeadDevice
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(mixed $dateAdded)
     {
         $this->dateAdded = $dateAdded;
     }

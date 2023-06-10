@@ -25,24 +25,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class ContactExportSchedulerModel extends AbstractCommonModel
 {
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
-    private SessionInterface $session;
-    private RequestStack $requestStack;
-    private LeadModel $leadModel;
-    private ExportHelper $exportHelper;
-    private MailHelper $mailHelper;
 
-    public function __construct(
-        SessionInterface $session,
-        RequestStack $requestStack,
-        LeadModel $leadModel,
-        ExportHelper $exportHelper,
-        MailHelper $mailHelper
-    ) {
-        $this->session      = $session;
-        $this->requestStack = $requestStack;
-        $this->leadModel    = $leadModel;
-        $this->exportHelper = $exportHelper;
-        $this->mailHelper   = $mailHelper;
+    public function __construct(private SessionInterface $session, private RequestStack $requestStack, private LeadModel $leadModel, private ExportHelper $exportHelper, private MailHelper $mailHelper)
+    {
     }
 
     public function getRepository(): ContactExportSchedulerRepository
@@ -84,7 +69,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
                 ],
             ];
         } else {
-            if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
+            if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
                 $filter['force'] = [
                     [

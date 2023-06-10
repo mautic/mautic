@@ -48,10 +48,8 @@ class EmailController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|Response
     {
         $model = $this->getModel('email');
 
@@ -261,10 +259,8 @@ class EmailController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
@@ -447,10 +443,8 @@ class EmailController extends FormController
      * Generates new form and processes post data.
      *
      * @param \Mautic\EmailBundle\Entity\Email $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('email');
         \assert($model instanceof EmailModel);
@@ -612,8 +606,6 @@ class EmailController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
             Request $request,
@@ -624,7 +616,7 @@ class EmailController extends FormController
             $objectId,
             $ignorePost = false,
             $forceTypeSelection = false
-    ) {
+    ): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model  = $this->getModel('email');
         $method = $request->getMethod();
@@ -837,10 +829,8 @@ class EmailController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('email');
         /** @var Email $entity */
@@ -935,18 +925,16 @@ class EmailController extends FormController
     /**
      * Activate the builder.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
+    public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
                 return $this->accessDenied();
@@ -1002,10 +990,8 @@ class EmailController extends FormController
 
     /**
      * Create an AB test.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
@@ -1038,10 +1024,8 @@ class EmailController extends FormController
 
     /**
      * Make the variant the main.
-     *
-     * @return array|Response
      */
-    public function winnerAction(Request $request, $objectId)
+    public function winnerAction(Request $request, $objectId): array|Response
     {
         // todo - add confirmation to button click
         $page      = $request->getSession()->get('mautic.email', 1);
@@ -1466,15 +1450,13 @@ class EmailController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1
-    ) {
+    ): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

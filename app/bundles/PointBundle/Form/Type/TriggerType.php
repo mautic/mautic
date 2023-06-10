@@ -21,14 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TriggerType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(CorePermissions $security)
+    public function __construct(private CorePermissions $security)
     {
-        $this->security = $security;
     }
 
     /**

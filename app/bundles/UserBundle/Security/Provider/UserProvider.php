@@ -99,7 +99,7 @@ class UserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        $class = get_class($user);
+        $class = $user::class;
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
@@ -191,11 +191,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UserNotFoundException $exception) {
+        } catch (UserNotFoundException) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UserNotFoundException $exception) {
+            } catch (UserNotFoundException) {
             }
         }
 

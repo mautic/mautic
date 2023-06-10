@@ -49,16 +49,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $formModel;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
+    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, private RouterInterface $router)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-        $this->router              = $router;
     }
 
     /**

@@ -237,11 +237,9 @@ class PageRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param int        $increaseBy
-     * @param bool|false $unique
-     * @param bool|false $variant
+     * @param int $increaseBy
      */
-    public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false)
+    public function upHitCount($id, $increaseBy = 1, bool $unique = false, bool $variant = false)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

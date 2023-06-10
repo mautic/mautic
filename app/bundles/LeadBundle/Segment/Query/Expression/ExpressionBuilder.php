@@ -26,20 +26,12 @@ class ExpressionBuilder
     public const BETWEEN = 'BETWEEN';
 
     /**
-     * The DBAL Connection.
-     *
-     * @var \Doctrine\DBAL\Connection
-     */
-    private $connection;
-
-    /**
      * Initializes a new <tt>ExpressionBuilder</tt>.
      *
      * @param \Doctrine\DBAL\Connection $connection the DBAL Connection
      */
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -56,7 +48,7 @@ class ExpressionBuilder
      *
      * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression
      */
-    public function andX($x = null)
+    public function andX(mixed $x = null)
     {
         if (is_array($x)) {
             return new CompositeExpression(CompositeExpression::TYPE_AND, $x);
@@ -79,7 +71,7 @@ class ExpressionBuilder
      *
      * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression
      */
-    public function orX($x = null)
+    public function orX(mixed $x = null)
     {
         if (is_array($x)) {
             return new CompositeExpression(CompositeExpression::TYPE_OR, $x);
@@ -97,7 +89,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function comparison($x, $operator, $y)
+    public function comparison(mixed $x, $operator, mixed $y)
     {
         return $x.' '.$operator.' '.$y;
     }
@@ -152,7 +144,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function regexp($x, $y)
+    public function regexp(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::REGEXP, $y);
     }
@@ -172,7 +164,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function notRegexp($x, $y)
+    public function notRegexp(mixed $x, mixed $y)
     {
         return 'NOT '.$this->comparison($x, self::REGEXP, $y);
     }
@@ -192,7 +184,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function eq($x, $y)
+    public function eq(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::EQ, $y);
     }
@@ -211,7 +203,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function neq($x, $y)
+    public function neq(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::NEQ, $y);
     }
@@ -230,7 +222,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function lt($x, $y)
+    public function lt(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::LT, $y);
     }
@@ -249,7 +241,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function lte($x, $y)
+    public function lte(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::LTE, $y);
     }
@@ -268,7 +260,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function gt($x, $y)
+    public function gt(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::GT, $y);
     }
@@ -287,7 +279,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function gte($x, $y)
+    public function gte(mixed $x, mixed $y)
     {
         return $this->comparison($x, self::GTE, $y);
     }
@@ -324,7 +316,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function like($x, $y)
+    public function like($x, mixed $y)
     {
         return $this->comparison($x, 'LIKE', $y);
     }
@@ -337,7 +329,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function notLike($x, $y)
+    public function notLike($x, mixed $y)
     {
         return $this->comparison($x, 'NOT LIKE', $y);
     }
@@ -350,7 +342,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function in($x, $y)
+    public function in($x, string|array $y)
     {
         return $this->comparison($x, 'IN', '('.implode(', ', (array) $y).')');
     }
@@ -363,7 +355,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function notIn($x, $y)
+    public function notIn($x, string|array $y)
     {
         return $this->comparison($x, 'NOT IN', '('.implode(', ', (array) $y).')');
     }
@@ -376,7 +368,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function literal($input, $type = null)
+    public function literal(mixed $input, ?string $type = null)
     {
         return $this->connection->quote($input, $type);
     }
@@ -410,7 +402,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function func($func, $x, $y = null)
+    public function func($func, mixed $x, string|array $y = null)
     {
         $functionArguments = func_get_args();
         $additionArguments = array_splice($functionArguments, 2);

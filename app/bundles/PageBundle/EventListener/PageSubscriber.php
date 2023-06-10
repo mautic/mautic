@@ -20,71 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
-
-    /**
-     * @var PageRepository
-     */
-    private $pageRepository;
-
-    /**
-     * @var RedirectRepository
-     */
-    private $redirectRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $contactRepository;
-
-    public function __construct(
-        AssetsHelper $assetsHelper,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        PageModel $pageModel,
-        LoggerInterface $logger,
-        HitRepository $hitRepository,
-        PageRepository $pageRepository,
-        RedirectRepository $redirectRepository,
-        LeadRepository $contactRepository
-    ) {
-        $this->assetsHelper       = $assetsHelper;
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->auditLogModel      = $auditLogModel;
-        $this->pageModel          = $pageModel;
-        $this->logger             = $logger;
-        $this->hitRepository      = $hitRepository;
-        $this->pageRepository     = $pageRepository;
-        $this->redirectRepository = $redirectRepository;
-        $this->contactRepository  = $contactRepository;
+    public function __construct(private AssetsHelper $assetsHelper, private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private PageModel $pageModel, private LoggerInterface $logger, private HitRepository $hitRepository, private PageRepository $pageRepository, private RedirectRepository $redirectRepository, private LeadRepository $contactRepository)
+    {
     }
 
     /**

@@ -59,60 +59,45 @@ class EmailStatOptions extends FetchOptions
         return $this->ids;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getCompanyId()
+    public function getCompanyId(): ?int
     {
         return $this->companyId;
     }
 
     /**
-     * @param int|null $companyId
-     *
      * @return $this;
      */
-    public function setCompanyId($companyId)
+    public function setCompanyId(?int $companyId)
     {
         $this->companyId = $companyId;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getCampaignId()
+    public function getCampaignId(): ?int
     {
         return $this->campaignId;
     }
 
     /**
-     * @param int|null $campaignId
-     *
      * @return $this;
      */
-    public function setCampaignId($campaignId)
+    public function setCampaignId(?int $campaignId)
     {
         $this->campaignId = $campaignId;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSegmentId()
+    public function getSegmentId(): ?int
     {
         return $this->segmentId;
     }
 
     /**
-     * @param int|null $segmentId
-     *
      * @return $this;
      */
-    public function setSegmentId($segmentId)
+    public function setSegmentId(?int $segmentId)
     {
         $this->segmentId = $segmentId;
 

@@ -19,15 +19,8 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     protected $protocolUiTranslation = 'mautic.queue.config.protocol.rabbitmq';
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        // The container is needed due to non-required binding of the producer & consumer
-        $this->container = $container;
     }
 
     public function publishMessage(Events\QueueEvent $event)

@@ -21,14 +21,11 @@ class DwcEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
-    private $translator;
-
     /**
      * DwcEntryFiltersType constructor.
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

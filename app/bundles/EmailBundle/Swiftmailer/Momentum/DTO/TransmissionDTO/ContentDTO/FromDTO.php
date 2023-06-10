@@ -6,13 +6,10 @@ namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO
 
 final class FromDTO implements \JsonSerializable
 {
-    private string $email;
-
     private ?string $name = null;
 
-    public function __construct(string $email)
+    public function __construct(private string $email)
     {
-        $this->email = $email;
     }
 
     public function setName(?string $name = null): self

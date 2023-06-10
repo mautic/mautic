@@ -26,7 +26,7 @@ class ResponseItems implements \Iterator
             }
             try {
                 $this->items[] = new ResponseItem($item);
-            } catch (ResponseItemException $e) {
+            } catch (ResponseItemException) {
             }
         }
     }

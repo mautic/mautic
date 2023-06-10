@@ -82,11 +82,9 @@ class Stat
     }
 
     /**
-     * @param mixed $focus
-     *
      * @return Stat
      */
-    public function setFocus($focus)
+    public function setFocus(mixed $focus)
     {
         $this->focus = $focus;
 
@@ -102,11 +100,9 @@ class Stat
     }
 
     /**
-     * @param mixed $type
-     *
      * @return Stat
      */
-    public function setType($type)
+    public function setType(mixed $type)
     {
         $this->type = $type;
 
@@ -122,11 +118,9 @@ class Stat
     }
 
     /**
-     * @param mixed $typeId
-     *
      * @return Stat
      */
-    public function setTypeId($typeId)
+    public function setTypeId(mixed $typeId)
     {
         $this->typeId = $typeId;
 
@@ -142,11 +136,9 @@ class Stat
     }
 
     /**
-     * @param mixed $dateAdded
-     *
      * @return Stat
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(mixed $dateAdded)
     {
         $this->dateAdded = $dateAdded;
 

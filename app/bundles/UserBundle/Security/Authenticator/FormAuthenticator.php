@@ -34,18 +34,6 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public const LOGIN_ROUTE = 'login';
 
-    private UserPasswordHasher $hasher;
-
-    private EventDispatcherInterface $dispatcher;
-
-    private IntegrationHelper $integrationHelper;
-
-    private ?RequestStack $requestStack;
-
-    private CsrfTokenManagerInterface $csrfTokenManager;
-
-    private UrlGeneratorInterface $urlGenerator;
-
     /**
      * @var string|null After upgrade to Symfony 5.2 we should use Passport system to store the authenticatingService
      */
@@ -53,20 +41,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     private ?Response $authEventResponse;
 
-    public function __construct(
-        IntegrationHelper $integrationHelper,
-        UserPasswordHasher $hasher,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        UrlGeneratorInterface $urlGenerator
-    ) {
-        $this->hasher            = $hasher;
-        $this->dispatcher        = $dispatcher;
-        $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack;
-        $this->csrfTokenManager  = $csrfTokenManager;
-        $this->urlGenerator      = $urlGenerator;
+    public function __construct(private IntegrationHelper $integrationHelper, private UserPasswordHasher $hasher, private EventDispatcherInterface $dispatcher, private ?RequestStack $requestStack, private CsrfTokenManagerInterface $csrfTokenManager, private UrlGeneratorInterface $urlGenerator)
+    {
     }
 
     public function supports(Request $request): bool
@@ -102,7 +78,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         try {
             /** @var User $user */
             $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UserNotFoundException $e) {
+        } catch (UserNotFoundException) {
             /** @var string $user */
             $user = $credentials['username'];
         }

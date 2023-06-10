@@ -9,14 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolver
 {
-    private $filesystem;
-
-    private $inputHelper;
-
-    public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
+    public function __construct(private Filesystem $filesystem, private InputHelper $inputHelper)
     {
-        $this->filesystem  = $filesystem;
-        $this->inputHelper = $inputHelper;
     }
 
     /**
@@ -62,7 +56,7 @@ class FilePathResolver
         }
         try {
             $this->filesystem->mkdir($directory);
-        } catch (IOException $e) {
+        } catch (IOException) {
             throw new FilePathException('Could not create directory');
         }
     }
@@ -77,7 +71,7 @@ class FilePathResolver
         }
         try {
             $this->filesystem->remove($path);
-        } catch (IOException $e) {
+        } catch (IOException) {
         }
     }
 

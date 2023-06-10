@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-class ReferenceValueDAO
+class ReferenceValueDAO implements \Stringable
 {
     /**
      * @var int

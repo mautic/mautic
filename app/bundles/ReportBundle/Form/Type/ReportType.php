@@ -23,14 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportType extends AbstractType
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    public function __construct(ReportModel $reportModel)
+    public function __construct(private ReportModel $reportModel)
     {
-        $this->reportModel = $reportModel;
     }
 
     /**

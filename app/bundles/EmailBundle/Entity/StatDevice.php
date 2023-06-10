@@ -128,10 +128,7 @@ class StatDevice
         return $this->dateOpened;
     }
 
-    /**
-     * @param mixed $dateOpened
-     */
-    public function setDateOpened($dateOpened)
+    public function setDateOpened(mixed $dateOpened)
     {
         $this->dateOpened = $dateOpened;
     }

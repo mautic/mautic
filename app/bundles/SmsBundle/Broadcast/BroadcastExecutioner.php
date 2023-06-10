@@ -12,21 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BroadcastExecutioner
 {
     /**
-     * @var SmsModel
-     */
-    private $smsModel;
-
-    private LeadRepository $leadRepository;
-
-    /**
      * @var ContactLimiter
      */
     private $contactLimiter;
-
-    /**
-     * @var BroadcastQuery
-     */
-    private $broadcastQuery;
 
     /**
      * @var BroadcastResult
@@ -34,19 +22,10 @@ class BroadcastExecutioner
     private $result;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * BroadcastExecutioner constructor.
      */
-    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
+    public function __construct(private SmsModel $smsModel, private BroadcastQuery $broadcastQuery, private TranslatorInterface $translator, private LeadRepository $leadRepository)
     {
-        $this->smsModel       = $smsModel;
-        $this->broadcastQuery = $broadcastQuery;
-        $this->translator     = $translator;
-        $this->leadRepository = $leadRepository;
     }
 
     public function execute(ChannelBroadcastEvent $event)
@@ -59,7 +38,7 @@ class BroadcastExecutioner
             $this->result         = new BroadcastResult();
             try {
                 $this->send($sms);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
             $event->setResults(
                 sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),

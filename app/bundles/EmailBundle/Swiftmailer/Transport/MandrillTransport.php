@@ -14,22 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTransportInterface
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    /**
      * MandrillTransport constructor.
      */
-    public function __construct(TranslatorInterface $translator, TransportCallback $transportCallback)
+    public function __construct(private TranslatorInterface $translator, private TransportCallback $transportCallback)
     {
-        $this->translator        = $translator;
-        $this->transportCallback = $transportCallback;
     }
 
     /**
@@ -177,7 +165,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (false !== strpos($var['content'], 'http') && ($ctPos = strpos($var['content'], 'ct=')) !== false) {
+                                if (str_contains($var['content'], 'http') && ($ctPos = strpos($var['content'], 'ct=')) !== false) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
                                 }

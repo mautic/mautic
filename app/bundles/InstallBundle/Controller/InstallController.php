@@ -25,15 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
 {
-    private Configurator $configurator;
-
-    private InstallService $installer;
-
-    public function __construct(Configurator $configurator, InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private Configurator $configurator, private InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->configurator = $configurator;
-        $this->installer    = $installer;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -42,11 +35,9 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return JsonResponse|Response
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
+    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): JsonResponse|Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
@@ -228,11 +219,9 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return JsonResponse|Response
-     *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper)
+    public function finalAction(Request $request, PathsHelper $pathsHelper): JsonResponse|Response
     {
         $session = $request->getSession();
 
@@ -284,17 +273,10 @@ class InstallController extends CommonController
     private function handleInstallerErrors(Form $form, array $messages)
     {
         foreach ($messages as $type => $message) {
-            switch ($type) {
-                case 'warning':
-                case 'error':
-                case 'notice':
-                    $this->addFlashMessage($message, [], $type);
-                    break;
-                default:
-                    // If type not a flash type, assume form field error
-                    $form[$type]->addError(new FormError($message));
-                    break;
-            }
+            match ($type) {
+                'warning', 'error', 'notice' => $this->addFlashMessage($message, [], $type),
+                default => $form[$type]->addError(new FormError($message)),
+            };
         }
     }
 }

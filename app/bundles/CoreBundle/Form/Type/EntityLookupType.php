@@ -20,26 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EntityLookupType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private $modelFactory;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * @var EntityLookupChoiceLoader[]
      */
     private $choiceLoaders;
@@ -47,12 +27,8 @@ class EntityLookupType extends AbstractType
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, RouterInterface $router)
+    public function __construct(private ModelFactory $modelFactory, private TranslatorInterface $translator, private Connection $connection, private RouterInterface $router)
     {
-        $this->translator   = $translator;
-        $this->router       = $router;
-        $this->connection   = $connection;
-        $this->modelFactory = $modelFactory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

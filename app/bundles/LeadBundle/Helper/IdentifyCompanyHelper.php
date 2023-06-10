@@ -13,11 +13,10 @@ class IdentifyCompanyHelper
 {
     /**
      * @param array $data
-     * @param mixed $lead
      *
      * @return array
      */
-    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel)
+    public static function identifyLeadsCompany($data, mixed $lead, CompanyModel $companyModel)
     {
         $addContactToCompany = true;
 
@@ -29,7 +28,7 @@ class IdentifyCompanyHelper
 
         try {
             $companies = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [null, false, null];
         }
 
@@ -70,7 +69,7 @@ class IdentifyCompanyHelper
 
         try {
             $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [[], []];
         }
 
@@ -123,10 +122,8 @@ class IdentifyCompanyHelper
      * Checks if email address' domain has a DNS MX record. Returns the domain if found.
      *
      * @param string $email
-     *
-     * @return string|false
      */
-    protected static function domainExists($email)
+    protected static function domainExists($email): string|false
     {
         if (!strstr($email, '@')) { // not a valid email adress
             return false;

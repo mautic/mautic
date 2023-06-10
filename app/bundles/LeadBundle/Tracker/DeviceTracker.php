@@ -12,26 +12,6 @@ use Monolog\Logger;
 class DeviceTracker
 {
     /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @var bool
      */
     private $deviceWasChanged = false;
@@ -44,22 +24,11 @@ class DeviceTracker
     /**
      * DeviceTracker constructor.
      */
-    public function __construct(
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        Logger $logger
-    ) {
-        $this->deviceCreatorService  = $deviceCreatorService;
-        $this->deviceDetectorFactory = $deviceDetectorFactory;
-        $this->deviceTrackingService = $deviceTrackingService;
-        $this->logger                = $logger;
+    public function __construct(private DeviceCreatorServiceInterface $deviceCreatorService, private DeviceDetectorFactoryInterface $deviceDetectorFactory, private DeviceTrackingServiceInterface $deviceTrackingService, private Logger $logger)
+    {
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
-     */
-    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
+    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent): ?LeadDevice
     {
         $signature = $trackedContact->getId().$userAgent;
         if (isset($this->trackedDevice[$signature])) {
@@ -92,10 +61,7 @@ class DeviceTracker
         return $this->trackedDevice[$signature];
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
-     */
-    public function getTrackedDevice()
+    public function getTrackedDevice(): ?LeadDevice
     {
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 

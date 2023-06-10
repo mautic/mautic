@@ -16,57 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
-
-    /**
-     * @var SchemaDefinition
-     */
-    private $schemaDefinition;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
-
-    /**
-     * @var CustomFieldIndex
-     */
-    private $customFieldIndex;
-
-    /**
-     * @var FieldColumnDispatcher
-     */
-    private $fieldColumnDispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(
-        ColumnSchemaHelper $columnSchemaHelper,
-        SchemaDefinition $schemaDefinition,
-        Logger $logger,
-        LeadFieldSaver $leadFieldSaver,
-        CustomFieldIndex $customFieldIndex,
-        FieldColumnDispatcher $fieldColumnDispatcher,
-        TranslatorInterface $translator
-    ) {
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->schemaDefinition      = $schemaDefinition;
-        $this->logger                = $logger;
-        $this->leadFieldSaver        = $leadFieldSaver;
-        $this->customFieldIndex      = $customFieldIndex;
-        $this->fieldColumnDispatcher = $fieldColumnDispatcher;
-        $this->translator            = $translator;
+    public function __construct(private ColumnSchemaHelper $columnSchemaHelper, private SchemaDefinition $schemaDefinition, private Logger $logger, private LeadFieldSaver $leadFieldSaver, private CustomFieldIndex $customFieldIndex, private FieldColumnDispatcher $fieldColumnDispatcher, private TranslatorInterface $translator)
+    {
     }
 
     /**

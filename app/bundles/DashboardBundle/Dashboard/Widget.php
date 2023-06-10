@@ -14,34 +14,14 @@ class Widget
     public const FORMAT_HUMAN = 'M j, Y';
     public const FORMAT_MYSQL = 'Y-m-d';
 
-    /**
-     * @var DashboardModel
-     */
-    private $dashboardModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-    public function __construct(DashboardModel $dashboardModel, UserHelper $userHelper, Session $session)
+    public function __construct(private DashboardModel $dashboardModel, private UserHelper $userHelper, private Session $session)
     {
-        $this->dashboardModel = $dashboardModel;
-        $this->userHelper     = $userHelper;
-        $this->session        = $session;
     }
 
     /**
      * Get ready widget to populate in template.
-     *
-     * @return bool|\Mautic\DashboardBundle\Entity\Widget
      */
-    public function get(int $widgetId)
+    public function get(int $widgetId): bool|\Mautic\DashboardBundle\Entity\Widget
     {
         /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);

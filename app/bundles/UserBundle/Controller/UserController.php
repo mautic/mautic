@@ -21,10 +21,8 @@ class UserController extends FormController
      * Generate's default user list.
      *
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): \Symfony\Component\HttpFoundation\JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();
@@ -101,10 +99,8 @@ class UserController extends FormController
 
     /**
      * Generate's form and processes new post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
+    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher): \Symfony\Component\HttpFoundation\JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
@@ -207,10 +203,8 @@ class UserController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false): \Symfony\Component\HttpFoundation\JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();

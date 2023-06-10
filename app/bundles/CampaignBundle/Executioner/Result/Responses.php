@@ -40,10 +40,7 @@ class Responses
         }
     }
 
-    /**
-     * @param mixed $response
-     */
-    public function setResponse(Event $event, $response)
+    public function setResponse(Event $event, mixed $response)
     {
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
@@ -62,11 +59,9 @@ class Responses
     }
 
     /**
-     * @param string|null $type
-     *
      * @return array
      */
-    public function getActionResponses($type = null)
+    public function getActionResponses(?string $type = null)
     {
         if ($type) {
             return (isset($this->actionResponses[$type])) ? $this->actionResponses[$type] : [];
@@ -76,11 +71,9 @@ class Responses
     }
 
     /**
-     * @param string|null $type
-     *
      * @return array
      */
-    public function getConditionResponses($type = null)
+    public function getConditionResponses(?string $type = null)
     {
         if ($type) {
             return (isset($this->conditionResponses[$type])) ? $this->conditionResponses[$type] : [];

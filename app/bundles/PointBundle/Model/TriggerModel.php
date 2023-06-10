@@ -48,23 +48,17 @@ class TriggerModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         TriggerEventModel $pointTriggerEventModel,
         MauticFactory $mauticFactory,
-        ContactTracker $contactTracker
+        private ContactTracker $contactTracker
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
         $this->mauticFactory          = $mauticFactory;
-        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -184,10 +178,8 @@ class TriggerModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return Trigger|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Trigger
     {
         if (null === $id) {
             return new Trigger();
@@ -374,7 +366,7 @@ class TriggerModel extends CommonFormModel
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (false !== strpos($settings['callback'], '::')) {
+        } elseif (str_contains($settings['callback'], '::')) {
             $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {

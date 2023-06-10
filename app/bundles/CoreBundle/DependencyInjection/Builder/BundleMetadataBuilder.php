@@ -11,16 +11,6 @@ class BundleMetadataBuilder
     /**
      * @var array
      */
-    private $paths;
-
-    /**
-     * @var array
-     */
-    private $symfonyBundles;
-
-    /**
-     * @var array
-     */
     private $ipLookupServices = [];
 
     /**
@@ -43,11 +33,8 @@ class BundleMetadataBuilder
      */
     private $coreMetadata = [];
 
-    public function __construct(array $symfonyBundles, array $paths)
+    public function __construct(private array $symfonyBundles, private array $paths)
     {
-        $this->paths          = $paths;
-        $this->symfonyBundles = $symfonyBundles;
-
         $this->buildMetadata();
     }
 
@@ -80,14 +67,14 @@ class BundleMetadataBuilder
     {
         foreach ($this->symfonyBundles as $symfonyBundle => $namespace) {
             // Plugin
-            if (false !== strpos($namespace, 'MauticPlugin\\')) {
+            if (str_contains($namespace, 'MauticPlugin\\')) {
                 $this->pluginMetadata[$symfonyBundle] = $this->buildPluginMetadata($namespace, $symfonyBundle);
 
                 continue;
             }
 
             // Core bundle
-            if (false !== strpos($namespace, 'Mautic\\')) {
+            if (str_contains($namespace, 'Mautic\\')) {
                 $this->coreMetadata[$symfonyBundle] = $this->buildCoreMetadata($namespace, $symfonyBundle);
 
                 continue;

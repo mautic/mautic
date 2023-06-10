@@ -13,11 +13,6 @@ class IntegrationObjectToken
     /**
      * @var string
      */
-    private $token;
-
-    /**
-     * @var string
-     */
     private $objectName;
 
     /**
@@ -43,9 +38,8 @@ class IntegrationObjectToken
     /**
      * IntegrationObjectToken constructor.
      */
-    public function __construct(string $token)
+    public function __construct(private string $token)
     {
-        $this->token = $token;
     }
 
     /**

@@ -44,36 +44,6 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
      * @var array
      */
     private $channels;
@@ -83,34 +53,8 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $channelActions;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    public function __construct(
-        LeadModel $leadModel,
-        StageModel $stageModel,
-        CampaignModel $campaignModel,
-        EventCollector $eventCollector,
-        CompanyModel $companyModel,
-        CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder,
-        Translator $translator
-    ) {
-        $this->leadModel         = $leadModel;
-        $this->stageModel        = $stageModel;
-        $this->campaignModel     = $campaignModel;
-        $this->eventCollector    = $eventCollector;
-        $this->companyModel      = $companyModel;
-        $this->companyReportData = $companyReportData;
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->translator        = $translator;
+    public function __construct(private LeadModel $leadModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
+    {
     }
 
     /**
@@ -484,17 +428,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     $data  = $outerQb->execute()->fetchAllAssociative();
 
                     foreach ($data as $row) {
-                        switch ($groupBy) {
-                            case 'actions':
-                                $label = $this->channelActions[$row['slice']];
-                                break;
-                            case 'channels':
-                                $label = $this->channels[$row['slice']];
-                                break;
-
-                            default:
-                                $label = (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'];
-                        }
+                        $label = match ($groupBy) {
+                            'actions'  => $this->channelActions[$row['slice']],
+                            'channels' => $this->channels[$row['slice']],
+                            default    => (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'],
+                        };
                         $chart->setDataset($label, $row['total_attribution']);
                     }
 

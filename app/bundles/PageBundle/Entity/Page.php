@@ -631,8 +631,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set category.
      *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
-     *
      * @return Page
      */
     public function setCategory(Category $category = null)
@@ -654,11 +652,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * @param bool|null $isPreferenceCenter
-     *
      * @return Page
      */
-    public function setIsPreferenceCenter($isPreferenceCenter)
+    public function setIsPreferenceCenter(?bool $isPreferenceCenter)
     {
         $sanitizedValue = null === $isPreferenceCenter ? null : (bool) $isPreferenceCenter;
         $this->isChanged('isPreferenceCenter', $sanitizedValue);
@@ -667,28 +663,19 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getIsPreferenceCenter()
+    public function getIsPreferenceCenter(): ?bool
     {
         return $this->isPreferenceCenter;
     }
 
-    /**
-     * @param bool|null $noIndex
-     */
-    public function setNoIndex($noIndex)
+    public function setNoIndex(?bool $noIndex)
     {
         $sanitizedValue = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedValue);
         $this->noIndex = $sanitizedValue;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNoIndex()
+    public function getNoIndex(): ?bool
     {
         return $this->noIndex;
     }
@@ -792,10 +779,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
-    /**
-     * @param mixed $variantHits
-     */
-    public function setVariantHits($variantHits)
+    public function setVariantHits(mixed $variantHits)
     {
         $this->variantHits = $variantHits;
     }
@@ -808,10 +792,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->customHtml;
     }
 
-    /**
-     * @param mixed $customHtml
-     */
-    public function setCustomHtml($customHtml)
+    public function setCustomHtml(mixed $customHtml)
     {
         $this->customHtml = $customHtml;
     }

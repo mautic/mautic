@@ -14,23 +14,11 @@ class EncodedValueDAO
     public const BOOLEAN_TYPE  = 'boolean';
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $value;
-
-    /**
      * @param string $type
      * @param string $value
      */
-    public function __construct($type, $value)
+    public function __construct(private $type, private $value)
     {
-        $this->type  = $type;
-        $this->value = $value;
     }
 
     /**

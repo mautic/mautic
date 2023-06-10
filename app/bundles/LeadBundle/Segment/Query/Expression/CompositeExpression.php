@@ -12,7 +12,7 @@ namespace Mautic\LeadBundle\Segment\Query\Expression;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
  */
-class CompositeExpression implements \Countable
+class CompositeExpression implements \Countable, \Stringable
 {
     /**
      * Constant that represents an AND composite expression.
@@ -23,13 +23,6 @@ class CompositeExpression implements \Countable
      * Constant that represents an OR composite expression.
      */
     public const TYPE_OR  = 'OR';
-
-    /**
-     * The instance type of composite expression.
-     *
-     * @var string
-     */
-    private $type;
 
     /**
      * Each expression part of the composite expression.
@@ -44,10 +37,8 @@ class CompositeExpression implements \Countable
      * @param string $type  instance type of composite expression
      * @param array  $parts composition of expressions to be joined on composite expression
      */
-    public function __construct($type, array $parts = [])
+    public function __construct(private $type, array $parts = [])
     {
-        $this->type = $type;
-
         $this->addMultiple($parts);
     }
 
@@ -68,11 +59,9 @@ class CompositeExpression implements \Countable
     /**
      * Adds an expression to composite expression.
      *
-     * @param mixed $part
-     *
      * @return self
      */
-    public function add($part)
+    public function add(mixed $part)
     {
         if (!empty($part) || ($part instanceof self && $part->count() > 0)) {
             $this->parts[] = $part;
@@ -91,10 +80,8 @@ class CompositeExpression implements \Countable
 
     /**
      * Retrieves the string representation of this composite expression.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (1 === count($this->parts)) {
             return (string) $this->parts[0];

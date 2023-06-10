@@ -191,10 +191,7 @@ class DynamicContentRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return bool|object|null
-     */
-    public function getDynamicContentForSlotFromCampaign($slot)
+    public function getDynamicContentForSlotFromCampaign($slot): bool|object|null
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

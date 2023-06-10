@@ -48,10 +48,7 @@ class SmsApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId)
+    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId): JsonResponse|Response
     {
         if (!$transportChain->getEnabledTransports()) {
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));

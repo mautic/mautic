@@ -16,10 +16,8 @@ class NoteController extends FormController
 
     /**
      * Generate's default list view.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $leadId = 0, $page = 1)
+    public function indexAction(Request $request, $leadId = 0, $page = 1): JsonResponse|Response
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -126,10 +124,8 @@ class NoteController extends FormController
 
     /**
      * Generate's new note and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, $leadId)
+    public function newAction(Request $request, $leadId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -210,10 +206,8 @@ class NoteController extends FormController
 
     /**
      * Generate's edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $leadId, $objectId)
+    public function editAction(Request $request, $leadId, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {

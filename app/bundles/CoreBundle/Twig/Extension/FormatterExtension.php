@@ -11,11 +11,8 @@ use Twig\TwigFunction;
 
 class FormatterExtension extends AbstractExtension
 {
-    protected FormatterHelper $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
+    public function __construct(protected FormatterHelper $formatterHelper)
     {
-        $this->formatterHelper = $formatterHelper;
     }
 
     /**
@@ -42,10 +39,8 @@ class FormatterExtension extends AbstractExtension
 
     /**
      * Format a string.
-     *
-     * @param mixed $val
      */
-    public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
+    public function _(mixed $val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {
         return (string) $this->formatterHelper->_($val, $type, $textOnly, $round);
     }

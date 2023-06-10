@@ -17,18 +17,9 @@ class CsvExporter
      */
     protected $formatterHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
+    public function __construct(FormatterHelper $formatterHelper, private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
     {
         $this->formatterHelper      = $formatterHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
     /**

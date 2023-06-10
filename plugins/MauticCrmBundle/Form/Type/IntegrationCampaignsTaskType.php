@@ -12,11 +12,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    private $connectwiseIntegration;
-
-    public function __construct(ConnectwiseIntegration $connectwiseIntegration)
+    public function __construct(private ConnectwiseIntegration $connectwiseIntegration)
     {
-        $this->connectwiseIntegration = $connectwiseIntegration;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

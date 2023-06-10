@@ -84,17 +84,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
-    private RequestStack $requestStack;
-
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -103,13 +97,9 @@ class CampaignController extends AbstractStandardFormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->requestStack   = $requestStack;
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -139,40 +129,32 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse
     {
         return $this->batchDeleteStandard($request);
     }
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): JsonResponse|RedirectResponse|Response
     {
         return $this->cloneStandard($request, $objectId);
     }
 
     /**
-     * @param string|int $objectId
-     * @param int        $page
-     * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
+     * @param int $page
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
-        $objectId,
+        string|int $objectId,
         $page = 1,
-        $count = null,
+        ?int $count = null,
         \DateTimeInterface $dateFrom = null,
         \DateTimeInterface $dateTo = null
-    ) {
+    ): JsonResponse|RedirectResponse|Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
@@ -201,30 +183,24 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse|RedirectResponse
     {
         return $this->deleteStandard($request, $objectId);
     }
 
     /**
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|RedirectResponse|Response
     {
         return $this->editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $page = null)
+    public function indexAction(Request $request, $page = null): JsonResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -342,10 +318,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): RedirectResponse|Response
     {
         /** @var CampaignModel $model */
         $model    = $this->getModel('campaign');
@@ -464,10 +438,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * View a specific campaign.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         return $this->viewStandard($request, $objectId, $this->getModelName(), null, null, 'campaign');
     }
@@ -698,10 +670,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param null $objectId
-     *
-     * @return int|string|null
      */
-    protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
+    protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null): int|string|null
     {
         if (isset($this->sessionId)) {
             return $this->sessionId;

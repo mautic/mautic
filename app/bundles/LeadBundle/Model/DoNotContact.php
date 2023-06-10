@@ -36,11 +36,10 @@ class DoNotContact implements MauticModelInterface
      * @param int       $contactId
      * @param string    $channel
      * @param bool|true $persist
-     * @param int|null  $reason
      *
      * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
+    public function removeDncForContact($contactId, $channel, $persist = true, ?int $reason = null)
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -68,26 +67,25 @@ class DoNotContact implements MauticModelInterface
     /**
      * Create a DNC entry for a lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead|int|null $contactId
-     * @param string|array                            $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string                                  $comments
-     * @param int                                     $reason                   Must be a class constant from the DoNotContact class
-     * @param bool                                    $persist
-     * @param bool                                    $checkCurrentStatus
-     * @param bool                                    $allowUnsubscribeOverride
+     * @param string|array $channel                  If an array with an ID, use the structure ['email' => 123]
+     * @param string       $comments
+     * @param int          $reason                   Must be a class constant from the DoNotContact class
+     * @param bool         $persist
+     * @param bool         $checkCurrentStatus
+     * @param bool         $allowUnsubscribeOverride
      *
      * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
      */
     public function addDncForContact(
-        $contactId,
-        $channel,
+        Lead|int|null $contactId,
+        string|array $channel,
         $reason = DNC::BOUNCED,
         $comments = '',
         $persist = true,
         $checkCurrentStatus = true,
         $allowUnsubscribeOverride = false
-    ) {
+    ): bool|DNC {
         $dnc     = null;
         $contact = $this->leadModel->getEntity($contactId);
 

@@ -11,22 +11,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    /**
-     * @var RandomParameterName
-     */
-    private $parameterNameGenerator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(
-        RandomParameterName $randomParameterNameService,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->parameterNameGenerator = $randomParameterNameService;
-        $this->dispatcher             = $dispatcher;
+    public function __construct(private RandomParameterName $parameterNameGenerator, private EventDispatcherInterface $dispatcher)
+    {
     }
 
     public static function getServiceId()

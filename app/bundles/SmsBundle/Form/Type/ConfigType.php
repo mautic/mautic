@@ -14,22 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigType extends AbstractType
 {
     /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * ConfigType constructor.
      */
-    public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
+    public function __construct(private TransportChain $transportChain, private TranslatorInterface $translator)
     {
-        $this->transportChain = $transportChain;
-        $this->translator     = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

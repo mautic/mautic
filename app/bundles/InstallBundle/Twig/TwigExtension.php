@@ -22,10 +22,7 @@ class TwigExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @return false|string
-     */
-    public function phpversion(string $value = '')
+    public function phpversion(string $value = ''): false|string
     {
         return phpversion($value);
     }

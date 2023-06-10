@@ -13,30 +13,12 @@ class FieldDAO
     public const FIELD_UNCHANGED = 'unchanged';
 
     /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $value;
-
-    /**
      * @var \DateTimeInterface|null
      */
     private $changeDateTime;
 
-    /**
-     * @var string
-     */
-    private $state;
-
-    public function __construct(string $name, NormalizedValueDAO $value, string $state = self::FIELD_CHANGED)
+    public function __construct(private string $name, private NormalizedValueDAO $value, private string $state = self::FIELD_CHANGED)
     {
-        $this->name  = $name;
-        $this->value = $value;
-        $this->state = $state;
     }
 
     /**

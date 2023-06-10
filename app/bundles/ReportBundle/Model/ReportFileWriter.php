@@ -9,20 +9,8 @@ use Mautic\ReportBundle\Exception\FileIOException;
 
 class ReportFileWriter
 {
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
-
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
-
-    public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
+    public function __construct(private CsvExporter $csvExporter, private ExportHandler $exportHandler)
     {
-        $this->csvExporter   = $csvExporter;
-        $this->exportHandler = $exportHandler;
     }
 
     /**

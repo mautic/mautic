@@ -21,10 +21,8 @@ class MobileNotificationController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
@@ -141,10 +139,8 @@ class MobileNotificationController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model    = $this->getModel('notification');
@@ -247,10 +243,8 @@ class MobileNotificationController extends FormController
      * Generates new form and processes post data.
      *
      * @param Notification $entity
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null)
+    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
@@ -384,10 +378,8 @@ class MobileNotificationController extends FormController
     /**
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model   = $this->getModel('notification');
@@ -549,10 +541,8 @@ class MobileNotificationController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
+    public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);
@@ -719,10 +709,7 @@ class MobileNotificationController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function previewAction($objectId)
+    public function previewAction($objectId): JsonResponse|Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model        = $this->getModel('notification');
@@ -740,15 +727,13 @@ class MobileNotificationController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $page = 1
-    ) {
+    ): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

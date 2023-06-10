@@ -28,11 +28,6 @@ class MetadataProcessor
     private $mauticTokens = [];
 
     /**
-     * @var \Swift_Message
-     */
-    private $message;
-
-    /**
      * @var string
      */
     private $campaignId;
@@ -40,10 +35,8 @@ class MetadataProcessor
     /**
      * MetadataProcessor constructor.
      */
-    public function __construct(\Swift_Message $message)
+    public function __construct(private \Swift_Message $message)
     {
-        $this->message = $message;
-
         $metadata       = ($message instanceof MauticMessage) ? $message->getMetadata() : [];
         $this->metadata = $metadata;
 
@@ -90,10 +83,7 @@ class MetadataProcessor
         return $substitutionData;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCampaignId()
+    public function getCampaignId(): ?string
     {
         // Sparkpost/Momentum only supports 64 bytes
         return $this->campaignId ? mb_strcut($this->campaignId, 0, 64) : null;

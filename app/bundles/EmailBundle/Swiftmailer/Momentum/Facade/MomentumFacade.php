@@ -15,45 +15,10 @@ use Monolog\Logger;
 final class MomentumFacade implements MomentumFacadeInterface
 {
     /**
-     * @var AdapterInterface
-     */
-    private $adapter;
-
-    /**
-     * @var SwiftMessageServiceInterface
-     */
-    private $swiftMessageService;
-
-    /**
-     * @var SwiftMessageValidatorInterface
-     */
-    private $swiftMessageValidator;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var MomentumCallbackInterface
-     */
-    private $momentumCallback;
-
-    /**
      * MomentumFacade constructor.
      */
-    public function __construct(
-        AdapterInterface $adapter,
-        SwiftMessageServiceInterface $swiftMessageService,
-        SwiftMessageValidatorInterface $swiftMessageValidator,
-        MomentumCallbackInterface $momentumCallback,
-        Logger $logger
-    ) {
-        $this->adapter               = $adapter;
-        $this->swiftMessageService   = $swiftMessageService;
-        $this->swiftMessageValidator = $swiftMessageValidator;
-        $this->momentumCallback      = $momentumCallback;
-        $this->logger                = $logger;
+    public function __construct(private AdapterInterface $adapter, private SwiftMessageServiceInterface $swiftMessageService, private SwiftMessageValidatorInterface $swiftMessageValidator, private MomentumCallbackInterface $momentumCallback, private Logger $logger)
+    {
     }
 
     /**

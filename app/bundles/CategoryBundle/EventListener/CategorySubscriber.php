@@ -12,26 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CategorySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private BundleHelper $bundleHelper, private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->bundleHelper   = $bundleHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
     /**

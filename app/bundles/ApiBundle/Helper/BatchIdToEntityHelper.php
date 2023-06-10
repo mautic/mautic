@@ -15,11 +15,6 @@ class BatchIdToEntityHelper
     private $originalKeys = [];
 
     /**
-     * @var string
-     */
-    private $idKey;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -34,10 +29,8 @@ class BatchIdToEntityHelper
      *
      * @param string $idKey
      */
-    public function __construct(array $parameters, $idKey = 'id')
+    public function __construct(array $parameters, private $idKey = 'id')
     {
-        $this->idKey = $idKey;
-
         $this->extractIds($parameters);
     }
 
@@ -121,10 +114,7 @@ class BatchIdToEntityHelper
         $this->extractIdsFromParams($parameters);
     }
 
-    /**
-     * @param mixed $ids
-     */
-    private function extractIdsFromIdKey($ids)
+    private function extractIdsFromIdKey(mixed $ids)
     {
         // ['ids' => [1,2,3]]
         if (is_array($ids)) {
@@ -136,7 +126,7 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
-        if (false !== strpos($ids, ',') || is_numeric($ids)) {
+        if (str_contains($ids, ',') || is_numeric($ids)) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;

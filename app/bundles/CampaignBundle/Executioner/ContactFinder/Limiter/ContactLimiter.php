@@ -35,11 +35,6 @@ class ContactLimiter
     private $maxContactId;
 
     /**
-     * @var array
-     */
-    private $contactIdList;
-
-    /**
      * @var int|null
      */
     private $threadId;
@@ -75,7 +70,7 @@ class ContactLimiter
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
-        array $contactIdList = [],
+        private array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
         $campaignLimit = null
@@ -84,7 +79,6 @@ class ContactLimiter
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
-        $this->contactIdList = $contactIdList;
 
         if ($threadId && $maxThreads) {
             $this->threadId     = (int) $threadId;
@@ -109,26 +103,17 @@ class ContactLimiter
         return $this->batchLimit;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getContactId()
+    public function getContactId(): ?int
     {
         return $this->contactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMinContactId()
+    public function getMinContactId(): ?int
     {
         return ($this->batchMinContactId) ? $this->batchMinContactId : $this->minContactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxContactId()
+    public function getMaxContactId(): ?int
     {
         return $this->maxContactId;
     }
@@ -180,26 +165,17 @@ class ContactLimiter
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxThreads()
+    public function getMaxThreads(): ?int
     {
         return $this->maxThreads;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getThreadId()
+    public function getThreadId(): ?int
     {
         return $this->threadId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getCampaignLimit()
+    public function getCampaignLimit(): ?int
     {
         return $this->campaignLimit;
     }

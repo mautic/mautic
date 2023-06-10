@@ -17,36 +17,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MomentumSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MomentumCallbackInterface
-     */
-    private $momentumCallback;
-
-    /**
-     * @var QueueService
-     */
-    private $queueService;
-
-    /**
-     * @var RequestStorageHelper
-     */
-    private $requestStorageHelper;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(
-        MomentumCallbackInterface $momentumCallback,
-        QueueService $queueService,
-        RequestStorageHelper $requestStorageHelper,
-        LoggerInterface $logger
-    ) {
-        $this->momentumCallback     = $momentumCallback;
-        $this->queueService         = $queueService;
-        $this->requestStorageHelper = $requestStorageHelper;
-        $this->logger               = $logger;
+    public function __construct(private MomentumCallbackInterface $momentumCallback, private QueueService $queueService, private RequestStorageHelper $requestStorageHelper, private LoggerInterface $logger)
+    {
     }
 
     /**

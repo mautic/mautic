@@ -18,16 +18,10 @@ class DisplayCounter
     private $alreadyAlwaysDisplayed = 0;
 
     /**
-     * @var Form
-     */
-    private $form;
-
-    /**
      * DisplayCounter constructor.
      */
-    public function __construct(Form $form)
+    public function __construct(private Form $form)
     {
-        $this->form = $form;
     }
 
     public function increaseDisplayedFields()

@@ -24,10 +24,7 @@ class PublicController extends CommonFormController
      */
     private $tokens = [];
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function submitAction(Request $request, DateHelper $dateTemplateHelper)
+    public function submitAction(Request $request, DateHelper $dateTemplateHelper): RedirectResponse|Response
     {
         if ('POST' !== $request->getMethod()) {
             return $this->accessDenied();
@@ -47,7 +44,7 @@ class PublicController extends CommonFormController
         if (!empty($return)) {
             // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (false === strpos($return, '?')) ? '?' : '&';
+            $query  = (!str_contains($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;

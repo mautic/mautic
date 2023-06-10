@@ -11,29 +11,8 @@ use Monolog\Logger;
 
 class CustomFieldIndex
 {
-    /**
-     * @var IndexSchemaHelper
-     */
-    private $indexSchemaHelper;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
-
-    public function __construct(
-        IndexSchemaHelper $indexSchemaHelper,
-        Logger $logger,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
-    ) {
-        $this->indexSchemaHelper          = $indexSchemaHelper;
-        $this->logger                     = $logger;
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
+    public function __construct(private IndexSchemaHelper $indexSchemaHelper, private Logger $logger, private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
+    {
     }
 
     /**

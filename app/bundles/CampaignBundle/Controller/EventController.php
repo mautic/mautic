@@ -30,15 +30,11 @@ class EventController extends CommonFormController
         Event::TYPE_CONDITION,
     ];
 
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -50,18 +46,13 @@ class EventController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -245,10 +236,8 @@ class EventController extends CommonFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $session       = $request->getSession();
         $valid         = $cancelled = false;
@@ -443,10 +432,8 @@ class EventController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
@@ -475,7 +462,7 @@ class EventController extends CommonFormController
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
-                if (false === strpos($objectId, 'new')) {
+                if (!str_contains($objectId, 'new')) {
                     $deletedEvents[] = $objectId;
                     $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
                 }
@@ -504,10 +491,8 @@ class EventController extends CommonFormController
 
     /**
      * Undeletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function undeleteAction(Request $request, $objectId)
+    public function undeleteAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();

@@ -22,22 +22,15 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
     private $sandboxMail;
 
     /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(TransportCallback $transportCallback, $sandboxMode = false, $sandboxMail = '')
+    public function __construct(private TransportCallback $transportCallback, $sandboxMode = false, $sandboxMail = '')
     {
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
 
         $this->setSandboxMode($sandboxMode);
         $this->setSandboxMail($sandboxMail);
-
-        $this->transportCallback = $transportCallback;
     }
 
     /**
@@ -116,7 +109,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
-            if (isset($event['CustomID']) && '' !== $event['CustomID'] && false !== strpos($event['CustomID'], '-', 0)) {
+            if (isset($event['CustomID']) && '' !== $event['CustomID'] && str_contains($event['CustomID'], '-')) {
                 $fistDashPos = strpos($event['CustomID'], '-', 0);
                 $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
                 $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));

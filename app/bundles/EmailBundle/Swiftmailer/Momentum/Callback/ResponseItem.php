@@ -48,10 +48,7 @@ class ResponseItem
         return $this->email;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getReason()
+    public function getReason(): ?string
     {
         return $this->reason;
     }
@@ -64,10 +61,7 @@ class ResponseItem
         return $this->dncReason;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getStatHash()
+    public function getStatHash(): ?string
     {
         return $this->statHash;
     }

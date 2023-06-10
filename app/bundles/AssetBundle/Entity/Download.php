@@ -235,8 +235,6 @@ class Download
     /**
      * Set asset.
      *
-     * @param Asset $asset
-     *
      * @return Download
      */
     public function setAsset(Asset $asset = null)
@@ -310,10 +308,7 @@ class Download
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(mixed $lead)
     {
         $this->lead = $lead;
     }
@@ -326,10 +321,7 @@ class Download
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source)
+    public function setSource(mixed $source)
     {
         $this->source = $source;
     }
@@ -342,10 +334,7 @@ class Download
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
-    public function setSourceId($sourceId)
+    public function setSourceId(mixed $sourceId)
     {
         $this->sourceId = (int) $sourceId;
     }

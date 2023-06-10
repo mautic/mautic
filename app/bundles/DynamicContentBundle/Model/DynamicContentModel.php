@@ -80,10 +80,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * Here just so PHPStorm calms down about type hinting.
      *
      * @param null $id
-     *
-     * @return DynamicContent|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?DynamicContent
     {
         if (null === $id) {
             return new DynamicContent();
@@ -131,12 +129,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
+     * @param string $slot
      *
      * @return array<string, mixed>|false
      */
-    public function getSlotContentForLead($slot, $lead)
+    public function getSlotContentForLead($slot, Lead|array $lead): array|false
     {
         if (!$lead) {
             return [];
@@ -161,10 +158,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Lead|array $lead
-     * @param string     $source
+     * @param string $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, Lead|array $lead, $source = null)
     {
         if (empty($lead)) {
             return;

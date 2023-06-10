@@ -20,48 +20,18 @@ use Twig\Environment;
 class SearchSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var LeadRepository
      */
     private $leadRepo;
 
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
     public function __construct(
-        LeadModel $leadModel,
-        EmailRepository $emailRepository,
-        TranslatorInterface $translator,
-        CorePermissions $security,
-        Environment $twig
+        private LeadModel $leadModel,
+        private EmailRepository $emailRepository,
+        private TranslatorInterface $translator,
+        private CorePermissions $security,
+        private Environment $twig
     ) {
-        $this->leadModel       = $leadModel;
         $this->leadRepo        = $leadModel->getRepository();
-        $this->emailRepository = $emailRepository;
-        $this->translator      = $translator;
-        $this->security        = $security;
-        $this->twig            = $twig;
     }
 
     /**
@@ -88,7 +58,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $filter    = ['string' => $str, 'force' => ''];
 
         // only show results that are not anonymous so as to not clutter up things
-        if (false === strpos($str, "$anonymous")) {
+        if (!str_contains($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
 

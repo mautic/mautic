@@ -14,29 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PepipostTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    /**
      * PepipostTransport constructor.
      */
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
+    public function __construct(private TranslatorInterface $translator, private LoggerInterface $logger, private TransportCallback $transportCallback)
     {
-        $this->translator        = $translator;
-        $this->logger            = $logger;
-        $this->transportCallback = $transportCallback;
-
         parent::__construct('smtp.pepipost.com', 587, 'tls');
 
         $this->setAuthMode('login');

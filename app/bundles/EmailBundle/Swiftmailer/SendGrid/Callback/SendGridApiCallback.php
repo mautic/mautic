@@ -7,14 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SendGridApiCallback
 {
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    public function __construct(TransportCallback $transportCallback)
+    public function __construct(private TransportCallback $transportCallback)
     {
-        $this->transportCallback = $transportCallback;
     }
 
     public function processCallbackRequest(Request $request)

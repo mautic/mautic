@@ -15,20 +15,8 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private PrimaryCompanyHelper $primaryCompanyHelper)
     {
-        $this->dispatcher           = $dispatcher;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
     }
 
     /**

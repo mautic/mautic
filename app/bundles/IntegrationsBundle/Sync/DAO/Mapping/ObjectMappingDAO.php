@@ -11,16 +11,6 @@ class ObjectMappingDAO
     public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
     /**
-     * @var string
-     */
-    private $internalObjectName;
-
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
-
-    /**
      * @var array
      */
     private $internalIdMapping = [];
@@ -35,10 +25,8 @@ class ObjectMappingDAO
      */
     private $fieldMappings = [];
 
-    public function __construct(string $internalObjectName, string $integrationObjectName)
+    public function __construct(private string $internalObjectName, private string $integrationObjectName)
     {
-        $this->internalObjectName    = $internalObjectName;
-        $this->integrationObjectName = $integrationObjectName;
     }
 
     /**
@@ -79,11 +67,9 @@ class ObjectMappingDAO
     }
 
     /**
-     * @param mixed $integrationObjectId
-     *
      * @return mixed|null
      */
-    public function getMappedInternalObjectId($integrationObjectId)
+    public function getMappedInternalObjectId(mixed $integrationObjectId)
     {
         if (array_key_exists($integrationObjectId, $this->integrationIdMapping)) {
             return $this->integrationIdMapping[$integrationObjectId];

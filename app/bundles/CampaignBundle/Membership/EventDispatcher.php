@@ -11,16 +11,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class EventDispatcher
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * EventDispatcher constructor.
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

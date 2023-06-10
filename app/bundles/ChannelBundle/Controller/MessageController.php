@@ -30,19 +30,12 @@ class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
-    private RequestStack $requestStack;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, private RequestStack $requestStack, CorePermissions $security)
     {
-        $this->requestStack = $requestStack;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->batchDeleteStandard($request);
     }
@@ -50,7 +43,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): \Symfony\Component\HttpFoundation\Response
     {
         return $this->cloneStandard($request, $objectId);
     }
@@ -70,7 +63,7 @@ class MessageController extends AbstractStandardFormController
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         return $this->indexStandard($request, $page);
     }
@@ -83,10 +76,7 @@ class MessageController extends AbstractStandardFormController
         return $this->newStandard($request);
     }
 
-    /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         return $this->viewStandard($request, $objectId, 'message', 'channel');
     }
@@ -193,10 +183,7 @@ class MessageController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    protected function deleteAction(Request $request, $objectId)
+    protected function deleteAction(Request $request, $objectId): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         return $this->deleteStandard($request, $objectId);
     }

@@ -13,19 +13,8 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @var \Symfony\Contracts\Translation\TranslatorInterface
-     */
-    private $translator;
-
-    private MessengerTransportType $transportType;
-
-    public function __construct(
-        \Symfony\Contracts\Translation\TranslatorInterface $translator,
-        MessengerTransportType $transportType
-    ) {
-        $this->translator    = $translator;
-        $this->transportType = $transportType;
+    public function __construct(private \Symfony\Contracts\Translation\TranslatorInterface $translator, private MessengerTransportType $transportType)
+    {
     }
 
     /***

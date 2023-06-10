@@ -113,10 +113,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Category|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Category
     {
         if (null === $id) {
             return new Category();

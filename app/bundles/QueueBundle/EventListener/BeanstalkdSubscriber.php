@@ -25,21 +25,8 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
      */
     protected $protocolUiTranslation = 'mautic.queue.config.protocol.beanstalkd';
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var QueueService
-     */
-    private $queueService;
-
-    public function __construct(ContainerInterface $container, QueueService $queueService)
+    public function __construct(private ContainerInterface $container, private QueueService $queueService)
     {
-        // The container is needed due to non-required binding of pheanstalk
-        $this->container    = $container;
-        $this->queueService = $queueService;
     }
 
     public function publishMessage(Events\QueueEvent $event): void
@@ -79,8 +66,8 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 try {
                     $pheanstalk->delete($job);
                 } catch (ServerException $e) {
-                    if (false === strpos($e->getMessage(), 'Cannot delete job')
-                        && false === strpos($e->getMessage(), 'NOT_FOUND')
+                    if (!str_contains($e->getMessage(), 'Cannot delete job')
+                        && !str_contains($e->getMessage(), 'NOT_FOUND')
                     ) {
                         throw $e;
                     }

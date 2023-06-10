@@ -63,10 +63,7 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getQueuedChannelCount($channel, array $ids = null)
+    public function getQueuedChannelCount($channel, array $ids = null): bool|string
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -97,11 +94,9 @@ class MessageQueueRepository extends CommonRepository
     /**
      * Get a lead's point log.
      *
-     * @param int|null $leadId
-     *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    public function getLeadTimelineEvents(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')

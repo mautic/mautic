@@ -298,12 +298,10 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction($id)
+    public function previewAction($id): Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
     {
         $model  = $this->getModel('page');
         $entity = $model->getEntity($id);
@@ -395,7 +393,7 @@ class PublicController extends CommonFormController
 
         try {
             $model->hitPage(null, $request);
-        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+        } catch (InvalidDecodedStringException) {
             // do not track invalid ct
             return $notSuccessResponse;
         }
@@ -496,7 +494,7 @@ class PublicController extends CommonFormController
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
-            if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
                 if (strpos($url, '&')) {
                     $url .= '&ct='.$ct;
                 } else {
@@ -608,7 +606,7 @@ class PublicController extends CommonFormController
 
             try {
                 $model->hitVideo($request);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return new JsonResponse(['success' => false]);
             }
 

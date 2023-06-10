@@ -59,18 +59,12 @@ class ContactSegmentFilterCrate
         $this->setOperator($filter);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getGlue()
+    public function getGlue(): ?string
     {
         return $this->glue;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getField()
+    public function getField(): ?string
     {
         return $this->field;
     }
@@ -96,25 +90,16 @@ class ContactSegmentFilterCrate
         return self::BEHAVIORS_OBJECT === $this->object;
     }
 
-    /**
-     * @return string|array|bool|float|null
-     */
-    public function getFilter()
+    public function getFilter(): string|array|bool|float|null
     {
-        switch ($this->getType()) {
-            case 'number':
-                return (float) $this->filter;
-            case 'boolean':
-                return (bool) $this->filter;
-        }
-
-        return $this->filter;
+        return match ($this->getType()) {
+            'number'  => (float) $this->filter,
+            'boolean' => (bool) $this->filter,
+            default   => $this->filter,
+        };
     }
 
-    /**
-     * @return string|null
-     */
-    public function getOperator()
+    public function getOperator(): ?string
     {
         return $this->operator;
     }
@@ -161,10 +146,7 @@ class ContactSegmentFilterCrate
         return $this->isNumberType() || $this->isBooleanType();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -182,7 +164,7 @@ class ContactSegmentFilterCrate
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = false === strpos($operator, '!') ? '' : '!';
+            $neg            = !str_contains($operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;

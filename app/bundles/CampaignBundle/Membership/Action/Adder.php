@@ -14,22 +14,10 @@ class Adder
     public const NAME = 'added';
 
     /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    /**
      * Adder constructor.
      */
-    public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
+    public function __construct(private LeadRepository $leadRepository, private LeadEventLogRepository $leadEventLogRepository)
     {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
     /**

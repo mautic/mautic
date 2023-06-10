@@ -20,8 +20,6 @@ class EmailGraphStatsController extends AbstractController
      * @param string $dateFrom
      * @param string $dateTo
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Exception
      */
     public function viewAction(
@@ -33,7 +31,7 @@ class EmailGraphStatsController extends AbstractController
         $isVariant,
         $dateFrom = null,
         $dateTo = null
-    ) {
+    ): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
 

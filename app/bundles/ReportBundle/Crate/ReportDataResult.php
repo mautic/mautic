@@ -27,11 +27,6 @@ class ReportDataResult
     private $types = [];
 
     /**
-     * @var array<mixed>
-     */
-    private array $totals = [];
-
-    /**
      * @var array<string>
      */
     private array $columnKeys = [];
@@ -49,15 +44,11 @@ class ReportDataResult
 
     private int $page;
 
-    private int $preBatchSize;
-
-    private bool $isLastBatch;
-
     /**
      * @param array<mixed> $data
-     * @param array<mixed> $preTotals
+     * @param array<mixed> $totals
      */
-    public function __construct(array $data, array $preTotals = [], int $preBatchSize = 0, bool $isLastBatch = true)
+    public function __construct(array $data, private array $totals = [], private int $preBatchSize = 0, private bool $isLastBatch = true)
     {
         if (
             !array_key_exists('data', $data) ||
@@ -74,12 +65,7 @@ class ReportDataResult
         $this->dateTo       = $data['dateTo'] ?? null;
         $this->limit        = isset($data['limit']) ? (int) $data['limit'] : null;
         $this->page         = isset($data['page']) ? (int) $data['page'] : 1;
-        $this->isLastBatch  = $isLastBatch;
         $this->columnKeys   = isset($this->data[0]) ? array_keys($this->data[0]) : [];
-
-        // Use the calculated totals for previous batch to continue
-        $this->preBatchSize = $preBatchSize;
-        $this->totals       = $preTotals;
 
         $this->buildHeader($data);
         $this->buildTypes($data);
@@ -223,7 +209,7 @@ class ReportDataResult
 
         foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
-                $this->types[$k] = ('AVG' === substr($k, 0, 3)) ? 'float' : 'int';
+                $this->types[$k] = (str_starts_with($k, 'AVG')) ? 'float' : 'int';
             } else {
                 $dataColumn      = $data['dataColumns'][$k];
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];

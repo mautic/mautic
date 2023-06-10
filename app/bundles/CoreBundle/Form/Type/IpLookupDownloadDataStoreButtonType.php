@@ -15,22 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
     /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * IpLookupDownloadDataStoreButtonType constructor.
      */
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
     {
-        $this->dateHelper = $dateHelper;
-        $this->translator = $translator;
     }
 
     /**

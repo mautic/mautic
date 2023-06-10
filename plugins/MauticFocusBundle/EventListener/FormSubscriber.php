@@ -9,14 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
-
-    public function __construct(FocusModel $model)
+    public function __construct(private FocusModel $model)
     {
-        $this->model = $model;
     }
 
     /**

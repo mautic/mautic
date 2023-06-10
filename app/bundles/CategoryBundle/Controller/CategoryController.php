@@ -23,12 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractFormController
 {
-    private FormFactoryInterface $formFactory;
-
-    public function __construct(FormFactoryInterface $formFactory, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private FormFactoryInterface $formFactory, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->formFactory = $formFactory;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -55,10 +51,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $bundle, $page = 1)
+    public function indexAction(Request $request, $bundle, $page = 1): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 
@@ -198,10 +192,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, $bundle)
+    public function newAction(Request $request, $bundle): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model = $this->getModel('category');
         \assert($model instanceof CategoryModel);
@@ -296,10 +288,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
         $model   = $this->getModel('category');

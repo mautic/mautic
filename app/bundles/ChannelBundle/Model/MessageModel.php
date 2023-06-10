@@ -124,19 +124,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                     throw new \InvalidArgumentException('lookupFormType and/or propertiesFormType are required for channel '.$channel);
                 }
 
-                switch (true) {
-                    case $this->translator->hasId('mautic.channel.'.$channel):
-                        $label = $this->translator->trans('mautic.channel.'.$channel);
-                        break;
-                    case $this->translator->hasId('mautic.'.$channel):
-                        $label = $this->translator->trans('mautic.'.$channel);
-                        break;
-                    case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                        $label = $this->translator->trans('mautic.'.$channel.'.'.$channel);
-                        break;
-                    default:
-                        $label = ucfirst($channel);
-                }
+                $label = match (true) {
+                    $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+                    $this->translator->hasId('mautic.'.$channel)              => $this->translator->trans('mautic.'.$channel),
+                    $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+                    default                                                   => ucfirst($channel),
+                };
                 $config['label'] = $label;
 
                 $channels[$channel] = $config;
@@ -238,10 +231,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $id
      * @param string $entityName
      * @param string $nameColumn
-     *
-     * @return string|null
      */
-    public function getChannelName($id, $entityName, $nameColumn = 'name')
+    public function getChannelName($id, $entityName, $nameColumn = 'name'): ?string
     {
         if (!$id || !$entityName || !$nameColumn) {
             return null;

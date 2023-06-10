@@ -59,15 +59,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $emailModel;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(EmailModel $emailModel, RouterInterface $router)
+    public function __construct(EmailModel $emailModel, private RouterInterface $router)
     {
         $this->emailModel = $emailModel;
-        $this->router     = $router;
     }
 
     /**

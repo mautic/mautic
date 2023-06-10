@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
@@ -78,36 +77,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var Report
-     */
-    private $entity;
-
-    /**
      * @var string
      */
     private $contentTemplate;
 
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper)
     {
-        $this->entity            = $entity;
-        $this->dispatcher        = $dispatcher;
-        $this->db                = $db;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -317,7 +292,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Replace {{count}} with the count query
         array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
-            if (false !== strpos($columnValue, '{{count}}')) {
+            if (str_contains($columnValue, '{{count}}')) {
                 $columnValue = str_replace('{{count}}', $countSql, $columnValue);
             }
         });

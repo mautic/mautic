@@ -31,39 +31,18 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
-    private LeadModel $leadModel;
-
-    private ListModel $listModel;
-
-    private CampaignModel $campaignModel;
-
-    private EmailModel $emailModel;
-
-    private StageModel $stageModel;
-
-    private CategoryModel $categoryModel;
-
-    private AssetModel $assetModel;
-
     private TranslatorInterface $translator;
 
     public function __construct(
-        LeadModel $leadModel,
-        ListModel $listModel,
-        CampaignModel $campaignModel,
-        EmailModel $emailModel,
-        StageModel $stageModel,
-        CategoryModel $categoryModel,
-        AssetModel $assetModel,
+        private LeadModel $leadModel,
+        private ListModel $listModel,
+        private CampaignModel $campaignModel,
+        private EmailModel $emailModel,
+        private StageModel $stageModel,
+        private CategoryModel $categoryModel,
+        private AssetModel $assetModel,
         TranslatorInterface $translator
     ) {
-        $this->leadModel     = $leadModel;
-        $this->listModel     = $listModel;
-        $this->campaignModel = $campaignModel;
-        $this->emailModel    = $emailModel;
-        $this->stageModel    = $stageModel;
-        $this->categoryModel = $categoryModel;
-        $this->assetModel    = $assetModel;
         $this->translator    = $translator;
     }
 

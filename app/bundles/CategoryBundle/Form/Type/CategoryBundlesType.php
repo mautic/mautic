@@ -15,14 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CategoryBundlesType extends AbstractType
 {
-    private $dispatcher;
-
     /**
      * CategoryBundlesType constructor.
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

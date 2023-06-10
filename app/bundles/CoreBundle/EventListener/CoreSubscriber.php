@@ -29,78 +29,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var MenuHelper
-     */
-    private $menuHelper;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $securityContext;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
-
-    public function __construct(
-        BundleHelper $bundleHelper,
-        MenuHelper $menuHelper,
-        UserHelper $userHelper,
-        AssetsHelper $assetsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        AuthorizationCheckerInterface $securityContext,
-        UserModel $userModel,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        FormRepository $formRepository,
-    ) {
-        $this->bundleHelper         = $bundleHelper;
-        $this->menuHelper           = $menuHelper;
-        $this->userHelper           = $userHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->securityContext      = $securityContext;
-        $this->userModel            = $userModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->requestStack         = $requestStack;
-        $this->formRepository       = $formRepository;
+    public function __construct(private BundleHelper $bundleHelper, private MenuHelper $menuHelper, private UserHelper $userHelper, private AssetsHelper $assetsHelper, private CoreParametersHelper $coreParametersHelper, private AuthorizationCheckerInterface $securityContext, private UserModel $userModel, private EventDispatcherInterface $dispatcher, private RequestStack $requestStack, private FormRepository $formRepository)
+    {
     }
 
     /**
@@ -314,7 +244,7 @@ class CoreSubscriber implements EventSubscriberInterface
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if ('s' == substr($id[1], -1)) {
+                                if (str_ends_with($id[1], 's')) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);
@@ -354,7 +284,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (false !== strpos($details['path'], '{page}')) {
+        if (str_contains($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -362,7 +292,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (false !== strpos($details['path'], '{objectId}')) {
+        if (str_contains($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -373,7 +303,7 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (false !== strpos($details['path'], '{id}')) {
+            if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

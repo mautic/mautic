@@ -137,8 +137,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $permissionBase;
 
-    private RequestStack $requestStack;
-
     /**
      * @var CorePermissions
      */
@@ -156,22 +154,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     protected ContainerBagInterface $parametersContainer;
 
-    protected EntityResultHelper $entityResultHelper;
-
-    private AppVersion $appVersion;
-
-    protected ManagerRegistry $doctrine;
-
     /**
      * @param ModelFactory<E> $modelFactory
      */
     public function __construct(
         CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
-        AppVersion $appVersion,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
+        protected EntityResultHelper $entityResultHelper,
+        private AppVersion $appVersion,
+        private RequestStack $requestStack,
+        protected ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
@@ -179,10 +171,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     ) {
         $this->security             = $security;
         $this->translator           = $translator;
-        $this->entityResultHelper   = $entityResultHelper;
-        $this->appVersion           = $appVersion;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
         $this->modelFactory         = $modelFactory;
         $this->dispatcher           = $dispatcher;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -438,12 +426,11 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
      *
      * @return bool|Response
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess(mixed $entity, $action = 'view')
     {
         if ('create' !== $action && is_object($entity) && method_exists($entity, 'getCreatedBy')) {
             $ownPerm   = "{$this->permissionBase}:{$action}own";
@@ -538,7 +525,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getEntityDefaultProperties(object $entity): array
     {
-        $class         = get_class($entity);
+        $class         = $entity::class;
         $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 

@@ -10,18 +10,12 @@ class HourStat
     private $count = 0;
 
     /**
-     * @var string
-     */
-    private $hour;
-
-    /**
      * HourStat constructor.
      *
      * @param string $hour "2018-12-07 12" format
      */
-    public function __construct($hour)
+    public function __construct(private $hour)
     {
-        $this->hour = $hour;
     }
 
     /**

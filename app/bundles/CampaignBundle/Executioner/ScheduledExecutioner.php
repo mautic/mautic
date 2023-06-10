@@ -25,36 +25,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
     /**
-     * @var LeadEventLogRepository
-     */
-    private $repo;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var ScheduledContactFinder
-     */
-    private $scheduledContactFinder;
-
-    /**
      * @var Campaign
      */
     private $campaign;
@@ -89,20 +59,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * ScheduledExecutioner constructor.
      */
-    public function __construct(
-        LeadEventLogRepository $repository,
-        LoggerInterface $logger,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler,
-        ScheduledContactFinder $scheduledContactFinder
-    ) {
-        $this->repo                   = $repository;
-        $this->logger                 = $logger;
-        $this->translator             = $translator;
-        $this->executioner            = $executioner;
-        $this->scheduler              = $scheduler;
-        $this->scheduledContactFinder = $scheduledContactFinder;
+    public function __construct(private LeadEventLogRepository $repo, private LoggerInterface $logger, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler, private ScheduledContactFinder $scheduledContactFinder)
+    {
     }
 
     /**
@@ -126,7 +84,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         try {
             $this->prepareForExecution();
             $this->executeOrRescheduleEvent();
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -197,7 +155,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                     $this->scheduledContactFinder->hydrateContacts($organizedLogs);
 
                     $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
-                } catch (NoContactsFoundException $e) {
+                } catch (NoContactsFoundException) {
                     // All of the events were rescheduled
                 }
             } else {
@@ -284,7 +242,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         while ($logs->count()) {
             try {
                 $fetchedContacts = $this->scheduledContactFinder->hydrateContacts($logs);
-            } catch (NoContactsFoundException $e) {
+            } catch (NoContactsFoundException) {
                 break;
             }
 

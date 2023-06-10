@@ -25,11 +25,6 @@ class AuthenticationEvent extends Event
     protected $response;
 
     /**
-     * @var mixed
-     */
-    protected $user;
-
-    /**
      * @var TokenInterface
      */
     protected $token;
@@ -55,18 +50,6 @@ class AuthenticationEvent extends Event
     protected $isFormLogin;
 
     /**
-     * @var bool
-     */
-    protected $isLoginCheck;
-
-    /**
-     * @var string Service that authenticated the user
-     */
-    protected $authenticatingService;
-
-    protected $integrations;
-
-    /**
      * @var Request
      */
     protected $request;
@@ -80,27 +63,23 @@ class AuthenticationEvent extends Event
 
     /**
      * @param string|User|null                $user
-     * @param bool                            $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
+     * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
      * @param string                          $authenticatingService Service Service requesting authentication
      * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
-        $user,
+        protected $user,
         TokenInterface $token,
         UserProviderInterface $userProvider,
         Request $request,
-        $loginCheck = false,
-        $authenticatingService = null,
-        $integrations = null
+        protected $isLoginCheck = false,
+        protected $authenticatingService = null,
+        protected $integrations = null
     ) {
         $this->token = $token;
-        $this->user  = $user;
 
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
-        $this->integrations          = $integrations;
         $this->request               = $request;
-        $this->isLoginCheck          = $loginCheck;
-        $this->authenticatingService = $authenticatingService;
 
         if ($userProvider instanceof ChainUserProvider) {
             // Chain of user providers so let's find Mautic's
@@ -119,10 +98,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get user returned by username search.
-     *
-     * @return string|User|null
      */
-    public function getUser()
+    public function getUser(): string|User|null
     {
         return $this->user;
     }
@@ -273,10 +250,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the response if set by the listener.
-     *
-     * @return Response|null
      */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }
@@ -311,10 +286,7 @@ class AuthenticationEvent extends Event
         return $this->isLoginCheck;
     }
 
-    /**
-     * @return AbstractIntegration|bool
-     */
-    public function getIntegration($integrationName)
+    public function getIntegration($integrationName): AbstractIntegration|bool
     {
         return (isset($this->integrations[$integrationName])) ? $this->integrations[$integrationName] : false;
     }

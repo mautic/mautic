@@ -11,18 +11,15 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 class QueueConsumerEvent extends CommonEvent
 {
     /**
-     * @var array
-     */
-    private $payload;
-
-    /**
      * @var string
      */
     private $result;
 
-    public function __construct($payload = [])
+    /**
+     * @param mixed[] $payload
+     */
+    public function __construct(private $payload = [])
     {
-        $this->payload = $payload;
         $this->result  = QueueConsumerResults::DO_NOT_ACKNOWLEDGE;
     }
 

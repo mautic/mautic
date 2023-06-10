@@ -11,16 +11,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class TrackingSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
      * TrackingSubscriber constructor.
      */
-    public function __construct(StatRepository $statRepository)
+    public function __construct(private StatRepository $statRepository)
     {
-        $this->statRepository = $statRepository;
     }
 
     /**

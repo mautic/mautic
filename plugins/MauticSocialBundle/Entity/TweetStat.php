@@ -174,10 +174,7 @@ class TweetStat
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTwitterTweetId()
+    public function getTwitterTweetId(): ?string
     {
         return $this->twitterTweetId;
     }
@@ -202,10 +199,7 @@ class TweetStat
         return $this->dateSent;
     }
 
-    /**
-     * @param mixed $dateSent
-     */
-    public function setDateSent($dateSent)
+    public function setDateSent(mixed $dateSent)
     {
         $this->dateSent = $dateSent;
     }
@@ -250,10 +244,7 @@ class TweetStat
         return $this->retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
-    public function setRetryCount($retryCount)
+    public function setRetryCount(mixed $retryCount)
     {
         $this->retryCount = $retryCount;
     }
@@ -311,10 +302,7 @@ class TweetStat
         return $this->isFailed;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
-    public function setIsFailed($isFailed)
+    public function setIsFailed(mixed $isFailed)
     {
         $this->isFailed = $isFailed;
     }
@@ -327,18 +315,12 @@ class TweetStat
         return $this->getIsFailed();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHandle()
+    public function getHandle(): ?string
     {
         return $this->handle;
     }
 
-    /**
-     * @param mixed $handle
-     */
-    public function setHandle($handle)
+    public function setHandle(mixed $handle)
     {
         $this->handle = $handle;
     }
@@ -351,10 +333,7 @@ class TweetStat
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
-    public function setSource($source)
+    public function setSource(mixed $source)
     {
         $this->source = $source;
     }
@@ -367,10 +346,7 @@ class TweetStat
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
-    public function setSourceId($sourceId)
+    public function setSourceId(mixed $sourceId)
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -384,11 +360,9 @@ class TweetStat
     }
 
     /**
-     * @param mixed $responseDetails
-     *
      * @return Stat
      */
-    public function setResponseDetails($responseDetails)
+    public function setResponseDetails(mixed $responseDetails)
     {
         $this->responseDetails = $responseDetails;
 

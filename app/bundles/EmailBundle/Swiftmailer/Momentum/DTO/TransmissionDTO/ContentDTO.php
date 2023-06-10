@@ -9,10 +9,6 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\FromD
 
 final class ContentDTO implements \JsonSerializable
 {
-    private string $subject;
-
-    private FromDTO $from;
-
     private ?string $html = null;
 
     private ?string $inlineCss = null;
@@ -25,10 +21,8 @@ final class ContentDTO implements \JsonSerializable
     /** @var AttachmentDTO[] */
     private array $attachments = [];
 
-    public function __construct(string $subject, FromDTO $from)
+    public function __construct(private string $subject, private FromDTO $from)
     {
-        $this->subject = $subject;
-        $this->from    = $from;
     }
 
     public function setHtml(?string $html): self

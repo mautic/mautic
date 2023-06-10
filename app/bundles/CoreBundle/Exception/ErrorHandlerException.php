@@ -5,22 +5,15 @@ namespace Mautic\CoreBundle\Exception;
 class ErrorHandlerException extends \Exception
 {
     /**
-     * @var bool
-     */
-    protected $showMessage = false;
-
-    /**
      * ErrorHandlerException constructor.
      *
      * @param string $message
      * @param bool   $showMessage
      * @param int    $code
      */
-    public function __construct($message = '', $showMessage = false, $code = 0, \Exception $previous = null)
+    public function __construct($message = '', protected $showMessage = false, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
-
-        $this->showMessage = $showMessage;
     }
 
     /**

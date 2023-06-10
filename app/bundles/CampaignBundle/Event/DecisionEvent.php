@@ -10,23 +10,6 @@ class DecisionEvent extends CampaignExecutionEvent
     use ContextTrait;
 
     /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
-
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
-
-    /**
-     * Anything that the dispatching listener wants to pass through to other listeners.
-     *
-     * @var mixed
-     */
-    private $passthrough;
-
-    /**
      * @var bool
      */
     private $applicable = false;
@@ -36,24 +19,20 @@ class DecisionEvent extends CampaignExecutionEvent
      *
      * @param mixed $passthrough
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $passthrough = null)
+    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog, private $passthrough = null)
     {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
-        $this->passthrough = $passthrough;
-
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => $passthrough,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
                 'systemTriggered' => defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'),
-                'dateScheduled'   => $log->getTriggerDate(),
+                'dateScheduled'   => $eventLog->getTriggerDate(),
             ],
             null,
-            $log
+            $eventLog
         );
     }
 

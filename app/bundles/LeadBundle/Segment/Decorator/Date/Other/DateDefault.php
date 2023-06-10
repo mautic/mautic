@@ -9,28 +9,13 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 class DateDefault implements FilterDecoratorInterface
 {
     /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
-
-    /**
-     * @var string
-     */
-    private $originalValue;
-
-    /**
      * @param string $originalValue
      */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
+    public function __construct(private DateDecorator $dateDecorator, private $originalValue)
     {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate): ?string
     {
         return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
@@ -53,34 +38,23 @@ class DateDefault implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): array|string
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array|bool|float|string|null
     {
         $filter = $this->originalValue;
 
-        switch ($contactSegmentFilterCrate->getOperator()) {
-            case 'like':
-            case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
-            case 'contains':
-                return '%'.$filter.'%';
-            case 'startsWith':
-                return $filter.'%';
-            case 'endsWith':
-                return '%'.$filter;
-        }
-
-        return $this->originalValue;
+        return match ($contactSegmentFilterCrate->getOperator()) {
+            'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,
+            'contains'   => '%'.$filter.'%',
+            'startsWith' => $filter.'%',
+            'endsWith'   => '%'.$filter,
+            default      => $this->originalValue,
+        };
     }
 
     /**
@@ -91,18 +65,12 @@ class DateDefault implements FilterDecoratorInterface
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }

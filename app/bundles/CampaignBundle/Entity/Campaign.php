@@ -300,8 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -455,10 +453,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category)
+    public function setCategory(mixed $category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -495,7 +490,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      *
      * @return Lead[]|\Doctrine\Common\Collections\Collection
      */
-    public function getLeads()
+    public function getLeads(): array|\Doctrine\Common\Collections\Collection
     {
         return $this->leads;
     }

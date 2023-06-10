@@ -52,7 +52,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @return LeadEventLog[]|ArrayCollection
      */
-    public function getPending()
+    public function getPending(): array|ArrayCollection
     {
         return $this->logs;
     }
@@ -116,7 +116,7 @@ class PendingEvent extends AbstractLogCollectionEvent
      * @param LeadEventLog[]|ArrayCollection $logs
      * @param string                         $reason
      */
-    public function failLogs(ArrayCollection $logs, $reason)
+    public function failLogs(array|ArrayCollection $logs, $reason)
     {
         foreach ($logs as $log) {
             $this->fail($log, $reason);
@@ -187,7 +187,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param LeadEventLog[]|ArrayCollection $logs
      */
-    public function passLogs(ArrayCollection $logs)
+    public function passLogs(array|ArrayCollection $logs)
     {
         foreach ($logs as $log) {
             $this->pass($log);
@@ -209,7 +209,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @return LeadEventLog[]|ArrayCollection
      */
-    public function getFailures()
+    public function getFailures(): array|ArrayCollection
     {
         return $this->failures;
     }
@@ -217,16 +217,15 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @return LeadEventLog[]|ArrayCollection
      */
-    public function getSuccessful()
+    public function getSuccessful(): array|ArrayCollection
     {
         return $this->successful;
     }
 
     /**
-     * @param string   $channel
-     * @param int|null $channelId
+     * @param string $channel
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, ?int $channelId = null)
     {
         $this->channel   = $channel;
         $this->channelId = $channelId;

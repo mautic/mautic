@@ -10,16 +10,10 @@ use PhpAmqpLib\Message\AMQPMessage;
 class RabbitMqConsumer implements ConsumerInterface
 {
     /**
-     * @var QueueService
-     */
-    private $queueService;
-
-    /**
      * RabbitMqConsumer constructor.
      */
-    public function __construct(QueueService $queueService)
+    public function __construct(private QueueService $queueService)
     {
-        $this->queueService = $queueService;
     }
 
     /**

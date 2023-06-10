@@ -16,38 +16,10 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 final class SecurityHelper
 {
     /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
-
-    /**
      * SecurityHelper constructor.
      */
-    public function __construct(
-        CorePermissions $security,
-        RequestStack $requestStack,
-        EventDispatcherInterface $dispatcher,
-        CsrfTokenManagerInterface $tokenManager
-    ) {
-        $this->security     = $security;
-        $this->requestStack = $requestStack;
-        $this->dispatcher   = $dispatcher;
-        $this->tokenManager = $tokenManager;
+    public function __construct(private CorePermissions $security, private RequestStack $requestStack, private EventDispatcherInterface $dispatcher, private CsrfTokenManagerInterface $tokenManager)
+    {
     }
 
     /**
@@ -60,12 +32,8 @@ final class SecurityHelper
 
     /**
      * Helper function to check if the logged in user has access to an entity.
-     *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int $ownerId): bool
     {
         return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
@@ -75,7 +43,7 @@ final class SecurityHelper
      *
      * @return mixed
      */
-    public function isGranted($permission)
+    public function isGranted(array|string $permission)
     {
         return $this->security->isGranted($permission);
     }

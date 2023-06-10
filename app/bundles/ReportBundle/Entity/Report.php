@@ -384,10 +384,7 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
+    public function setDescription(mixed $description)
     {
         $this->description = $description;
     }
@@ -521,72 +518,48 @@ class Report extends FormEntity implements SchedulerInterface
         $this->isScheduled = $isScheduled;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getToAddress()
+    public function getToAddress(): ?string
     {
         return $this->toAddress;
     }
 
-    /**
-     * @param string|null $toAddress
-     */
-    public function setToAddress($toAddress)
+    public function setToAddress(?string $toAddress)
     {
         $this->isChanged('toAddress', $toAddress);
 
         $this->toAddress = $toAddress;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleUnit()
+    public function getScheduleUnit(): ?string
     {
         return $this->scheduleUnit;
     }
 
-    /**
-     * @param string|null $scheduleUnit
-     */
-    public function setScheduleUnit($scheduleUnit)
+    public function setScheduleUnit(?string $scheduleUnit)
     {
         $this->isChanged('scheduleUnit', $scheduleUnit);
 
         $this->scheduleUnit = $scheduleUnit;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleDay()
+    public function getScheduleDay(): ?string
     {
         return $this->scheduleDay;
     }
 
-    /**
-     * @param string|null $scheduleDay
-     */
-    public function setScheduleDay($scheduleDay)
+    public function setScheduleDay(?string $scheduleDay)
     {
         $this->isChanged('scheduleDay', $scheduleDay);
 
         $this->scheduleDay = $scheduleDay;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getScheduleMonthFrequency()
+    public function getScheduleMonthFrequency(): ?string
     {
         return $this->scheduleMonthFrequency;
     }
 
-    /**
-     * @param string|null $scheduleMonthFrequency
-     */
-    public function setScheduleMonthFrequency($scheduleMonthFrequency)
+    public function setScheduleMonthFrequency(?string $scheduleMonthFrequency)
     {
         $this->scheduleMonthFrequency = $scheduleMonthFrequency;
     }

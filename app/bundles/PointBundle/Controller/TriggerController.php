@@ -16,10 +16,8 @@ class TriggerController extends FormController
 {
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -97,10 +95,8 @@ class TriggerController extends FormController
      * View a specific trigger.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $entity = $this->getModel('point.trigger')->getEntity($objectId);
 
@@ -161,10 +157,8 @@ class TriggerController extends FormController
      * Generates new form and processes post data.
      *
      * @param \Mautic\PointBundle\Entity\Trigger $entity
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel $model */
         $model = $this->getModel('point.trigger');
@@ -281,10 +275,8 @@ class TriggerController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|Response
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel $model */
         $model      = $this->getModel('point.trigger');
@@ -446,10 +438,8 @@ class TriggerController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction($objectId): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $model  = $this->getModel('point.trigger');
         $entity = $model->getEntity($objectId);

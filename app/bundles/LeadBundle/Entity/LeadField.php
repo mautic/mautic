@@ -358,7 +358,7 @@ class LeadField extends FormEntity
      *
      * @return LeadField
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue(string|array $defaultValue)
     {
         $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
@@ -612,11 +612,9 @@ class LeadField extends FormEntity
     /**
      * Set the unique identifer state of the field.
      *
-     * @param mixed $isUniqueIdentifer
-     *
      * @return LeadField
      */
-    public function setIsUniqueIdentifer($isUniqueIdentifer)
+    public function setIsUniqueIdentifer(mixed $isUniqueIdentifer)
     {
         $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
@@ -636,11 +634,9 @@ class LeadField extends FormEntity
     /**
      * Wrapper for incorrectly spelled setIsUniqueIdentifer.
      *
-     * @param mixed $isUniqueIdentifier
-     *
      * @return LeadField
      */
-    public function setIsUniqueIdentifier($isUniqueIdentifier)
+    public function setIsUniqueIdentifier(mixed $isUniqueIdentifier)
     {
         return $this->setIsUniqueIdentifer($isUniqueIdentifier);
     }
@@ -713,10 +709,7 @@ class LeadField extends FormEntity
         return $this->group;
     }
 
-    /**
-     * @param mixed $group
-     */
-    public function setGroup($group)
+    public function setGroup(mixed $group)
     {
         $this->group = $group;
     }
@@ -729,10 +722,7 @@ class LeadField extends FormEntity
         return $this->isPubliclyUpdatable;
     }
 
-    /**
-     * @param mixed $isPubliclyUpdatable
-     */
-    public function setIsPubliclyUpdatable($isPubliclyUpdatable)
+    public function setIsPubliclyUpdatable(mixed $isPubliclyUpdatable)
     {
         $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;
     }

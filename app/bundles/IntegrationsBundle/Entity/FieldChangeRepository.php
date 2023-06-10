@@ -61,12 +61,11 @@ class FieldChangeRepository extends CommonRepository
     }
 
     /**
-     * @param int|null $afterObjectId
-     * @param int      $objectCount
+     * @param int $objectCount
      *
      * @return array
      */
-    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100)
+    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, ?int $afterObjectId = null, $objectCount = 100)
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

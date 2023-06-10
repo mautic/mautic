@@ -63,10 +63,7 @@ class CampaignEventHelper
         $this->tweetModel        = $tweetModel;
     }
 
-    /**
-     * @return array|false
-     */
-    public function sendTweetAction(Lead $lead, array $event)
+    public function sendTweetAction(Lead $lead, array $event): array|false
     {
         $tweetSent   = false;
         $tweetEntity = $this->tweetModel->getEntity($event['channelId']);
@@ -128,7 +125,7 @@ class CampaignEventHelper
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (false !== strpos($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(

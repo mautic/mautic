@@ -9,21 +9,6 @@ use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 class UpdatedObjectMappingDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
-
-    /**
-     * @var mixed
-     */
-    private $integrationObjectId;
-
-    /**
      * @var \DateTimeInterface
      */
     private $objectModifiedDate;
@@ -36,17 +21,13 @@ class UpdatedObjectMappingDAO
     /**
      * @param string $integration
      * @param string $integrationObjectName
-     * @param mixed  $integrationObjectId
      */
     public function __construct(
-        $integration,
-        $integrationObjectName,
-        $integrationObjectId,
+        private $integration,
+        private $integrationObjectName,
+        private mixed $integrationObjectId,
         \DateTimeInterface $objectModifiedDate
     ) {
-        $this->integration           = $integration;
-        $this->integrationObjectName = $integrationObjectName;
-        $this->integrationObjectId   = $integrationObjectId;
         $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()

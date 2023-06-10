@@ -9,24 +9,16 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 class Parser
 {
     /**
-     * @var Message
-     */
-    private $message;
-
-    /**
      * Parser constructor.
      */
-    public function __construct(Message $message)
+    public function __construct(private Message $message)
     {
-        $this->message = $message;
     }
 
     /**
-     * @return string|null
-     *
      * @throws FeedbackLoopNotFound
      */
-    public function parse()
+    public function parse(): ?string
     {
         if (null === $this->message->fblReport) {
             throw new FeedbackLoopNotFound();
@@ -46,10 +38,8 @@ class Parser
     /**
      * @param string $content
      * @param string $pattern
-     *
-     * @return string|null
      */
-    protected function searchMessage($pattern, $content)
+    protected function searchMessage($pattern, $content): ?string
     {
         if (preg_match('/'.$pattern.'/i', $content, $match)) {
             if ($parsedAddressList = Address::parseList($match[1])) {

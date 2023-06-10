@@ -17,51 +17,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
     /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var MergeRecordRepository
-     */
-    private $mergeRecordRepository;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
      * ContactTrackingService constructor.
      */
-    public function __construct(
-        CookieHelper $cookieHelper,
-        LeadDeviceRepository $leadDeviceRepository,
-        LeadRepository $leadRepository,
-        MergeRecordRepository $mergeRecordRepository,
-        RequestStack $requestStack
-    ) {
-        $this->cookieHelper          = $cookieHelper;
-        $this->leadDeviceRepository  = $leadDeviceRepository;
-        $this->leadRepository        = $leadRepository;
-        $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->requestStack          = $requestStack;
+    public function __construct(private CookieHelper $cookieHelper, private LeadDeviceRepository $leadDeviceRepository, private LeadRepository $leadRepository, private MergeRecordRepository $mergeRecordRepository, private RequestStack $requestStack)
+    {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getTrackedLead()
+    public function getTrackedLead(): ?Lead
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -101,10 +63,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         return $anotherDeviceAlreadyTracked ? null : $lead;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTrackedIdentifier()
+    public function getTrackedIdentifier(): ?string
     {
         return $this->cookieHelper->getCookie('mautic_session_id', null);
     }

@@ -17,26 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(LeadModel $leadModel, StageModel $stageModel, TranslatorInterface $translator)
+    public function __construct(private LeadModel $leadModel, private StageModel $stageModel, private TranslatorInterface $translator)
     {
-        $this->leadModel  = $leadModel;
-        $this->stageModel = $stageModel;
-        $this->translator = $translator;
     }
 
     /**

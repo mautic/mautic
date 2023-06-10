@@ -5,37 +5,21 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
-use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectUpdateEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
-     * @var array
-     */
-    private $identifiedObjectIds;
-
-    /**
-     * @var ObjectChangeDAO[]
-     */
-    private $updateObjects;
-
-    /**
      * @var UpdatedObjectMappingDAO[]
      */
     private $updatedObjectMappings = [];
 
-    public function __construct(ObjectInterface $object, array $identifiedObjectIds, array $updateObjects)
+    /**
+     * @param \Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO[] $updateObjects
+     */
+    public function __construct(private ObjectInterface $object, private array $identifiedObjectIds, private array $updateObjects)
     {
-        $this->object              = $object;
-        $this->identifiedObjectIds = $identifiedObjectIds;
-        $this->updateObjects       = $updateObjects;
     }
 
     public function getObject(): ObjectInterface

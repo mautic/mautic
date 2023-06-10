@@ -7,16 +7,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CustomContentEvent extends Event
 {
     /**
-     * @var string
-     */
-    protected $viewName;
-
-    /**
-     * @var string|null
-     */
-    protected $context;
-
-    /**
      * @var array
      */
     protected $vars;
@@ -32,25 +22,21 @@ class CustomContentEvent extends Event
     protected $templates = [];
 
     /**
-     * @param string      $viewName
-     * @param string|null $context
+     * @param string $viewName
      */
-    public function __construct($viewName, $context = null, array $vars = [])
+    public function __construct(protected $viewName, protected ?string $context = null, array $vars = [])
     {
-        $this->viewName = $viewName;
-        $this->context  = $context;
         $this->vars     = $vars;
     }
 
     /**
      * Check if the context is applicable.
      *
-     * @param string      $viewName
-     * @param string|null $context
+     * @param string $viewName
      *
      * @return bool
      */
-    public function checkContext($viewName, $context)
+    public function checkContext($viewName, ?string $context)
     {
         return $viewName === $this->viewName && $context === $this->context;
     }
@@ -82,10 +68,7 @@ class CustomContentEvent extends Event
         return $this->viewName;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }

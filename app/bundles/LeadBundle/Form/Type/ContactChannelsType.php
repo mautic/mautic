@@ -15,14 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactChannelsType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

@@ -179,19 +179,13 @@ class Plugin extends CommonEntity
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
+    public function setDescription(mixed $description)
     {
         $this->description = $description;
         $this->splitDescriptions();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPrimaryDescription()
+    public function getPrimaryDescription(): ?string
     {
         return $this->primaryDescription ?: $this->description;
     }
@@ -204,10 +198,7 @@ class Plugin extends CommonEntity
         return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSecondaryDescription()
+    public function getSecondaryDescription(): ?string
     {
         return $this->secondaryDescription;
     }
@@ -220,10 +211,7 @@ class Plugin extends CommonEntity
         return $this->version;
     }
 
-    /**
-     * @param mixed $version
-     */
-    public function setVersion($version)
+    public function setVersion(mixed $version)
     {
         $this->version = $version;
     }
@@ -236,10 +224,7 @@ class Plugin extends CommonEntity
         return $this->isMissing;
     }
 
-    /**
-     * @param mixed $isMissing
-     */
-    public function setIsMissing($isMissing)
+    public function setIsMissing(mixed $isMissing)
     {
         $this->isMissing = $isMissing;
     }
@@ -252,10 +237,7 @@ class Plugin extends CommonEntity
         return $this->author;
     }
 
-    /**
-     * @param mixed $author
-     */
-    public function setAuthor($author)
+    public function setAuthor(mixed $author)
     {
         $this->author = $author;
     }

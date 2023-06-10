@@ -10,10 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
  */
 class EmailBuilderEvent extends BuilderEvent
 {
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->entity;
     }

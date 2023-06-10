@@ -12,14 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SchedulerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
-
-    public function __construct(SendSchedule $sendSchedule)
+    public function __construct(private SendSchedule $sendSchedule)
     {
-        $this->sendSchedule = $sendSchedule;
     }
 
     /**

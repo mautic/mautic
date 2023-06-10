@@ -218,10 +218,8 @@ class Monitoring extends FormEntity
 
     /**
      * Set the category id.
-     *
-     * @param \Mautic\CategoryBundle\Entity\Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

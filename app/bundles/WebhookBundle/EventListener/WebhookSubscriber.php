@@ -11,29 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var WebhookKillNotificator
-     */
-    private $webhookKillNotificator;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        WebhookKillNotificator $webhookKillNotificator
-    ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->auditLogModel          = $auditLogModel;
-        $this->webhookKillNotificator = $webhookKillNotificator;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private WebhookKillNotificator $webhookKillNotificator)
+    {
     }
 
     /**

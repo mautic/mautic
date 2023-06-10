@@ -4,23 +4,6 @@ namespace Mautic\CoreBundle\Helper\Dsn;
 
 class Dsn
 {
-    private string $scheme;
-
-    private string $host;
-
-    private ?string $user;
-
-    private ?string $password;
-
-    private ?int $port;
-
-    /**
-     * Query string array to be added to DSN.
-     *
-     * @var array<string,string>
-     */
-    private array $options;
-
     private const ALLOWED_DSN_ARRAY = [
         'sync://' => ['sync', ''],
     ];
@@ -35,14 +18,17 @@ class Dsn
      * @param int                   $port     The DSN port (e.g. 3306)
      * @param array<string, string> $options  The DSN options (e.g. ['charset' => 'utf8'])
      */
-    public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
-    {
-        $this->scheme   = $scheme;
-        $this->host     = $host;
-        $this->user     = $user;
-        $this->password = $password;
-        $this->port     = $port;
-        $this->options  = $options;
+    public function __construct(
+        private string $scheme,
+        private string $host,
+        private ?string $user = null,
+        private ?string $password = null,
+        private ?int $port = null,
+        /**
+         * Query string array to be added to DSN.
+         */
+        private array $options = []
+    ) {
     }
 
     /**
@@ -112,11 +98,9 @@ class Dsn
     }
 
     /**
-     * @param mixed $default
-     *
      * @return mixed|null
      */
-    public function getOption(string $key, $default = null)
+    public function getOption(string $key, mixed $default = null)
     {
         return $this->options[$key] ?? $default;
     }

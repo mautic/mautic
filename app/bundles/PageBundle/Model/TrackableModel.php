@@ -50,11 +50,6 @@ class TrackableModel extends AbstractCommonModel
     protected $redirectModel;
 
     /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    /**
      * @var array|null
      */
     private $contactFieldUrlTokens;
@@ -62,10 +57,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * TrackableModel constructor.
      */
-    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
+    public function __construct(RedirectModel $redirectModel, private LeadFieldRepository $leadFieldRepository)
     {
         $this->redirectModel       = $redirectModel;
-        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     /**
@@ -93,7 +87,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
+    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], bool $shortenUrl = false, $utmTags = [])
     {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
@@ -106,10 +100,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Return a channel Trackable entity by URL.
-     *
-     * @return Trackable|null
      */
-    public function getTrackableByUrl($url, $channel, $channelId)
+    public function getTrackableByUrl($url, $channel, $channelId): ?Trackable
     {
         if (empty($url)) {
             return null;
@@ -221,7 +213,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Extract URLs from content and return as trackables.
      *
-     * @param mixed      $content
      * @param null       $channel
      * @param null       $channelId
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
@@ -229,7 +220,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{0: mixed, 1: array<int|string, Redirect|Trackable>}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true)
+    public function parseContentForTrackables(mixed $content, array $contentTokens = [], $channel = null, $channelId = null, bool $usingClickthrough = true)
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -561,10 +552,8 @@ class TrackableModel extends AbstractCommonModel
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
      * @param $urlParts Array from parse_url
-     *
-     * @return array|false
      */
-    protected function extractTokensFromQuery(&$urlParts)
+    protected function extractTokensFromQuery(&$urlParts): array|false
     {
         $tokenizedParams = false;
 
@@ -722,7 +711,7 @@ class TrackableModel extends AbstractCommonModel
                             unset($sBasePath);
                         }
 
-                        if (false !== strpos($url['path'], './')) {
+                        if (str_contains($url['path'], './')) {
                             // Remove any '../' and their directories
                             while (preg_match('/\w+\/\.\.\//', $url['path'])) {
                                 $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
@@ -804,7 +793,7 @@ class TrackableModel extends AbstractCommonModel
      */
     private function isContactFieldToken($token)
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
     }
 
     /**

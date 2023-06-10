@@ -2,7 +2,6 @@
 
 namespace Mautic\UserBundle\Security\SAML\User;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
@@ -16,26 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
-
     /**
      * @var int
      */
@@ -52,16 +31,12 @@ class UserCreator implements UserCreatorInterface
     ];
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserMapper $userMapper,
-        UserModel $userModel,
-        UserPasswordHasher $hasher,
+        private EntityManagerInterface $entityManager,
+        private UserMapper $userMapper,
+        private UserModel $userModel,
+        private UserPasswordHasher $hasher,
         $defaultRole
     ) {
-        $this->entityManager = $entityManager;
-        $this->userMapper    = $userMapper;
-        $this->userModel     = $userModel;
-        $this->hasher        = $hasher;
         $this->defaultRole   = (int) $defaultRole;
     }
 

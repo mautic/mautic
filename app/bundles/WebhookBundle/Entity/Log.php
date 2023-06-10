@@ -96,11 +96,9 @@ class Log
     }
 
     /**
-     * @param mixed $statusCode
-     *
      * @return Log
      */
-    public function setStatusCode($statusCode)
+    public function setStatusCode(mixed $statusCode)
     {
         $this->statusCode = $statusCode;
 

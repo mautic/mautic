@@ -40,33 +40,15 @@ class CampaignModel extends CommonFormModel
      */
     protected $formModel;
 
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
         ListModel $leadListModel,
         FormModel $formModel,
-        EventCollector $eventCollector,
-        MembershipBuilder $membershipBuilder,
-        ContactTracker $contactTracker
+        private EventCollector $eventCollector,
+        private MembershipBuilder $membershipBuilder,
+        private ContactTracker $contactTracker
     ) {
         $this->leadListModel     = $leadListModel;
         $this->formModel         = $formModel;
-        $this->eventCollector    = $eventCollector;
-        $this->membershipBuilder = $membershipBuilder;
-        $this->contactTracker    = $contactTracker;
     }
 
     /**
@@ -142,10 +124,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Campaign|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Campaign
     {
         if (null === $id) {
             return new Campaign();
@@ -224,7 +204,7 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ('id' == $f && 0 === strpos($v, 'new')) {
+                if ('id' == $f && str_starts_with($v, 'new')) {
                     // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -376,7 +356,7 @@ class CampaignModel extends CommonFormModel
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (false !== strpos($node['id'], 'new')) {
+            if (str_contains($node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -388,13 +368,13 @@ class CampaignModel extends CommonFormModel
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (false !== strpos($connection['sourceId'], 'new')) {
+            if (str_contains($connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
             }
 
             // Check target
-            if (false !== strpos($connection['targetId'], 'new')) {
+            if (str_contains($connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
             }
@@ -524,11 +504,9 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param mixed $form
-     *
      * @return array
      */
-    public function getCampaignsByForm($form)
+    public function getCampaignsByForm(mixed $form)
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
@@ -538,7 +516,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param Lead $lead
      * @param bool $forList
      *
      * @return mixed
@@ -686,7 +663,7 @@ class CampaignModel extends CommonFormModel
      *
      * @return array
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getCampaignMetricsLineChartData(?string $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -770,9 +747,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      */

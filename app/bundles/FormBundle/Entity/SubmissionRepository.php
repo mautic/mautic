@@ -174,10 +174,8 @@ class SubmissionRepository extends CommonRepository
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Submission
     {
         $entity = parent::getEntity($id);
 
@@ -382,8 +380,6 @@ class SubmissionRepository extends CommonRepository
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
      *
-     * @param \DateTime $fromDate
-     *
      * @return mixed
      */
     public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
@@ -454,17 +450,16 @@ class SubmissionRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int         $lead         ID
-     * @param int         $form         ID
-     * @param string      $formAlias
-     * @param int         $field        alias
-     * @param string      $value        to compare with
-     * @param string      $operatorExpr for WHERE clause
-     * @param string|null $type
+     * @param int    $lead         ID
+     * @param int    $form         ID
+     * @param string $formAlias
+     * @param int    $field        alias
+     * @param string $value        to compare with
+     * @param string $operatorExpr for WHERE clause
      *
      * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, ?string $type = null)
     {
         // Modify operator
         switch ($operatorExpr) {
@@ -496,16 +491,11 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form);
 
-        switch ($type) {
-            case 'boolean':
-            case 'number':
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
-                break;
-            default:
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
-                    ->setParameter('value', $value);
-                break;
-        }
+        match ($type) {
+            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+                ->setParameter('value', $value),
+        };
 
         $result = $q->execute()->fetchAssociative();
 

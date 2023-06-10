@@ -18,8 +18,6 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class MappingManualDAO
 {
-    private $integration;
-
     /**
      * @var array
      */
@@ -35,9 +33,8 @@ class MappingManualDAO
      */
     private $integrationObjectsMapping = [];
 
-    public function __construct(string $integration)
+    public function __construct(private string $integration)
     {
-        $this->integration = $integration;
     }
 
     public function getIntegration(): string

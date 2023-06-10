@@ -24,11 +24,6 @@ class SubmitActionEmailType extends AbstractType
     use ToBcBccFieldsTrait;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -36,9 +31,8 @@ class SubmitActionEmailType extends AbstractType
     /**
      * SubmitActionEmailType constructor.
      */
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 

@@ -8,16 +8,6 @@ use Mautic\FormBundle\Entity\Form;
 class DisplayManager
 {
     /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * @var array
-     */
-    private $viewOnlyFields;
-
-    /**
      * @var DisplayCounter
      */
     private $displayCounter;
@@ -25,10 +15,8 @@ class DisplayManager
     /**
      * DisplayManager constructor.
      */
-    public function __construct(Form $form, array $viewOnlyFields = [])
+    public function __construct(private Form $form, private array $viewOnlyFields = [])
     {
-        $this->form           = $form;
-        $this->viewOnlyFields = $viewOnlyFields;
         $this->displayCounter = new DisplayCounter($form);
     }
 

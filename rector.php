@@ -40,6 +40,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
+        \Rector\Set\ValueObject\SetList::PHP_80,
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,

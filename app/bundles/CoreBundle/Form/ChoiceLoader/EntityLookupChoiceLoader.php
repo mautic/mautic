@@ -26,11 +26,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $choices = [];
 
     /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
      * @var ModelFactory<object>
      */
     protected $modelFactory;
@@ -49,18 +44,14 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      * @param ModelFactory<object> $modelFactory
      * @param array                $options
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
+    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, protected $options = [])
     {
         $this->modelFactory = $modelFactory;
         $this->translator   = $translator;
         $this->connection   = $connection;
-        $this->options      = $options;
     }
 
-    /**
-     * @param Options|array $options
-     */
-    public function setOptions($options)
+    public function setOptions(Options|array $options)
     {
         $this->options = $options;
     }
@@ -110,12 +101,11 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param array|null $data
-     * @param bool       $includeNew
+     * @param bool $includeNew
      *
      * @return array
      */
-    protected function getChoices($data = null, $includeNew = false)
+    protected function getChoices(?array $data = null, $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
@@ -233,7 +223,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
-            throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
+            throw new \InvalidArgumentException($model::class.' must implement '.AjaxLookupModelInterface::class);
         }
 
         $args = (isset($this->options['lookup_arguments'])) ? $this->options['lookup_arguments'] : [];

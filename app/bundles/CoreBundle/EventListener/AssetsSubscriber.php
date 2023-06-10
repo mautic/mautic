@@ -12,20 +12,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(AssetsHelper $assetsHelper, EventDispatcherInterface $dispatcher)
+    public function __construct(private AssetsHelper $assetsHelper, private EventDispatcherInterface $dispatcher)
     {
-        $this->assetsHelper = $assetsHelper;
-        $this->dispatcher   = $dispatcher;
     }
 
     /**

@@ -41,11 +41,9 @@ class EscapeTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param mixed $value
-     *
      * @return mixed
      */
-    private function unescape($value)
+    private function unescape(mixed $value)
     {
         if (!is_string($value)) {
             return $value;
@@ -55,11 +53,9 @@ class EscapeTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param mixed $value
-     *
      * @return mixed
      */
-    private function escape($value)
+    private function escape(mixed $value)
     {
         if (!is_string($value)) {
             return $value;

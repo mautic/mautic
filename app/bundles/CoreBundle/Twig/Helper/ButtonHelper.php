@@ -59,21 +59,6 @@ final class ButtonHelper
     private $location;
 
     /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var string|null
      */
     private $wrapOpeningTag;
@@ -123,11 +108,8 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -157,12 +139,9 @@ final class ButtonHelper
     }
 
     /**
-     * @param string|null $wrapOpeningTag
-     * @param string|null $wrapClosingTag
-     *
      * @return $this
      */
-    public function setWrappingTags($wrapOpeningTag, $wrapClosingTag)
+    public function setWrappingTags(?string $wrapOpeningTag, ?string $wrapClosingTag)
     {
         $this->wrapOpeningTag = $wrapOpeningTag;
         $this->wrapClosingTag = $wrapClosingTag;
@@ -183,11 +162,9 @@ final class ButtonHelper
     }
 
     /**
-     * @param string|null $menuLink
-     *
      * @return $this
      */
-    public function setMenuLink($menuLink)
+    public function setMenuLink(?string $menuLink)
     {
         $this->menuLink = $menuLink;
 
@@ -247,11 +224,9 @@ final class ButtonHelper
     }
 
     /**
-     * @param mixed $location
-     *
      * @return ButtonHelper
      */
-    public function setLocation($location)
+    public function setLocation(mixed $location)
     {
         $this->location = $location;
 

@@ -10,22 +10,10 @@ final class RecipientDTO implements \JsonSerializable
 {
     private ?string $returnPath = null;
 
-    private AddressDTO $address;
-
     /**
      * @var array<string, string>
      */
     private array $tags = [];
-
-    /**
-     * @var array<string, mixed>
-     */
-    private array $metadata;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private array $substitutionData;
 
     /**
      * RecipientDTO constructor.
@@ -33,11 +21,8 @@ final class RecipientDTO implements \JsonSerializable
      * @param array<string, mixed> $metadata
      * @param array<string, mixed> $substitutionData
      */
-    public function __construct(AddressDTO $addressDTO, array $metadata = [], array $substitutionData = [])
+    public function __construct(private AddressDTO $address, private array $metadata = [], private array $substitutionData = [])
     {
-        $this->address          = $addressDTO;
-        $this->metadata         = $metadata;
-        $this->substitutionData = $substitutionData;
     }
 
     public function setReturnPath(?string $returnPath): self

@@ -26,10 +26,8 @@ class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): JsonResponse|Response
     {
         $model   = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -91,10 +89,7 @@ class DashboardController extends AbstractFormController
         ]);
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId)
+    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId): JsonResponse|Response
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
@@ -123,10 +118,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Generate new dashboard widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory)
+    public function newAction(Request $request, FormFactoryInterface $formFactory): JsonResponse|RedirectResponse|Response
     {
         // retrieve the entity
         $widget = new Widget();
@@ -187,10 +180,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * edit widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId): JsonResponse|RedirectResponse|Response
     {
         $model  = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -365,10 +356,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Exports the widgets of current user into a json file.
-     *
-     * @return JsonResponse|Response
      */
-    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper)
+    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper): JsonResponse|Response
     {
         $file = $request->get('file');
 
@@ -388,12 +377,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Applies dashboard layout.
-     *
-     * @param string|null $file
-     *
-     * @return JsonResponse|Response
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null)
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, ?string $file = null): JsonResponse|Response
     {
         if (!$file) {
             $file = $request->get('file');
@@ -441,10 +426,7 @@ class DashboardController extends AbstractFormController
         return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): JsonResponse|Response
     {
         $preview = $request->get('preview');
 

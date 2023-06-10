@@ -113,10 +113,7 @@ class ContactExportScheduler
         return $this->changes;
     }
 
-    /**
-     * @param mixed $value
-     */
-    private function addChange(string $property, $value): void
+    private function addChange(string $property, mixed $value): void
     {
         $this->changes[$property] = $value;
     }

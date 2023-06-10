@@ -11,26 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
+    public function __construct(private EmailModel $emailModel, private RealTimeExecutioner $realTimeExecutioner, private RequestStack $requestStack)
     {
-        $this->emailModel          = $emailModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->requestStack        = $requestStack;
     }
 
     /**

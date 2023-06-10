@@ -18,29 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    public function __construct(
-        LeadModel $leadModel,
-        TrackingHelper $trackingHelper,
-        RealTimeExecutioner $realTimeExecutioner
-    ) {
-        $this->leadModel           = $leadModel;
-        $this->trackingHelper      = $trackingHelper;
-        $this->realTimeExecutioner = $realTimeExecutioner;
+    public function __construct(private LeadModel $leadModel, private TrackingHelper $trackingHelper, private RealTimeExecutioner $realTimeExecutioner)
+    {
     }
 
     /**

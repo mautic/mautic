@@ -335,10 +335,7 @@ class Point extends FormEntity
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category)
+    public function setCategory(mixed $category)
     {
         $this->category = $category;
     }
@@ -351,10 +348,7 @@ class Point extends FormEntity
         return $this->delta;
     }
 
-    /**
-     * @param mixed $delta
-     */
-    public function setDelta($delta)
+    public function setDelta(mixed $delta)
     {
         $this->delta = (int) $delta;
     }

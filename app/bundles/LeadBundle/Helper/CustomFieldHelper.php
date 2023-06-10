@@ -17,28 +17,22 @@ class CustomFieldHelper
      * Fixes value type for specific field types.
      *
      * @param string $type
-     * @param mixed  $value
      *
      * @return mixed
      */
-    public static function fixValueType($type, $value)
+    public static function fixValueType($type, mixed $value)
     {
         if (null === $value) {
             // do not transform null values
             return null;
         }
 
-        switch ($type) {
-            case self::TYPE_NUMBER:
-                $value = (float) $value;
-                break;
-            case self::TYPE_BOOLEAN:
-                $value = (bool) $value;
-                break;
-            case self::TYPE_SELECT:
-                $value = (string) $value;
-                break;
-        }
+        $value = match ($type) {
+            self::TYPE_NUMBER  => (float) $value,
+            self::TYPE_BOOLEAN => (bool) $value,
+            self::TYPE_SELECT  => (string) $value,
+            default            => $value,
+        };
 
         return $value;
     }
@@ -48,7 +42,7 @@ class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value)
+    public static function fieldValueTransfomer(array $field, mixed $value)
     {
         if (null === $value) {
             // do not transform null values

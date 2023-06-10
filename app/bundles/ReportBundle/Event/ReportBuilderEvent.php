@@ -33,16 +33,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     ];
 
     /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * Container with registered graphs.
      *
      * @var array
@@ -50,29 +40,17 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $graphArray = [];
 
     /**
-     * List of published array of lead fields.
-     *
-     * @var array
-     */
-    private $leadFields = [];
-
-    private $reportHelper;
-
-    private ?string $reportSource;
-
-    /**
      * ReportBuilderEvent constructor.
      *
-     * @param string $context
+     * @param string  $context
+     * @param mixed[] $leadFields
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper, ?string $reportSource = null)
+    public function __construct(private TranslatorInterface $translator, private ChannelListHelper $channelListHelper, $context, /**
+     * List of published array of lead fields.
+     */
+    private $leadFields, private ReportHelper $reportHelper, private ?string $reportSource = null)
     {
         $this->context           = $context;
-        $this->translator        = $translator;
-        $this->channelListHelper = $channelListHelper;
-        $this->leadFields        = $leadFields;
-        $this->reportHelper      = $reportHelper;
-        $this->reportSource      = $reportSource;
     }
 
     /**

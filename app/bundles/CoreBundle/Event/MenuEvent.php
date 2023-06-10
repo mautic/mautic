@@ -13,11 +13,6 @@ class MenuEvent extends Event
     protected $menuItems = ['children' => []];
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    /**
      * @var MenuHelper
      */
     protected $helper;
@@ -25,10 +20,9 @@ class MenuEvent extends Event
     /**
      * @param string $type
      */
-    public function __construct(MenuHelper $menuHelper, $type = 'main')
+    public function __construct(MenuHelper $menuHelper, protected $type = 'main')
     {
         $this->helper = $menuHelper;
-        $this->type   = $type;
     }
 
     public function setMenuItems(array $menuItems)

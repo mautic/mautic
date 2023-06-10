@@ -326,11 +326,10 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param mixed                                         $type
      * @param null                                          $data
      * @param array<int|string|array<int|string>>|Lead|null $lead
      */
-    public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
+    public function addStat(Focus $focus, mixed $type, $data = null, array|Lead|null $lead = null): ?Stat
     {
         if (empty($lead)) {
             return null;

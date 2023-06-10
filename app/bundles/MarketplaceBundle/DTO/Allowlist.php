@@ -9,16 +9,10 @@ use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 final class Allowlist
 {
     /**
-     * @var AllowlistEntry[]
-     */
-    public array $entries;
-
-    /**
      * @param AllowlistEntry[] $entries
      */
-    public function __construct(array $entries)
+    public function __construct(public array $entries)
     {
-        $this->entries = $entries;
     }
 
     /**

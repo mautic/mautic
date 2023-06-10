@@ -11,20 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LeadListQueryBuilderGeneratedEvent extends Event
 {
-    /**
-     * @var LeadList
-     */
-    private $segment;
-
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
-
-    public function __construct(LeadList $segment, QueryBuilder $queryBuilder)
+    public function __construct(private LeadList $segment, private QueryBuilder $queryBuilder)
     {
-        $this->segment      = $segment;
-        $this->queryBuilder = $queryBuilder;
     }
 
     /**

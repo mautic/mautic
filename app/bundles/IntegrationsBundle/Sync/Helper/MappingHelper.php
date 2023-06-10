@@ -24,36 +24,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $dispatcher;
-
-    public function __construct(
-        FieldModel $fieldModel,
-        ObjectMappingRepository $objectMappingRepository,
-        ObjectProvider $objectProvider,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->fieldModel              = $fieldModel;
-        $this->objectMappingRepository = $objectMappingRepository;
-        $this->objectProvider          = $objectProvider;
-        $this->dispatcher              = $dispatcher;
+    public function __construct(private FieldModel $fieldModel, private ObjectMappingRepository $objectMappingRepository, private ObjectProvider $objectProvider, private EventDispatcherInterface $dispatcher)
+    {
     }
 
     /**
@@ -93,7 +65,7 @@ class MappingHelper
                 if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
                     $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
                 }
-            } catch (FieldNotFoundException $e) {
+            } catch (FieldNotFoundException) {
             }
         }
 
@@ -106,7 +78,7 @@ class MappingHelper
             $event = new InternalObjectFindEvent(
                 $this->objectProvider->getObjectByName($internalObjectName)
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
         }
@@ -150,7 +122,7 @@ class MappingHelper
     {
         try {
             return $this->objectProvider->getObjectByName($internalObject)->getEntityName();
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception instead to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
         }
@@ -198,7 +170,7 @@ class MappingHelper
         foreach ($mappings as $mapping) {
             try {
                 $this->updateObjectMapping($mapping);
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 continue;
             }
         }

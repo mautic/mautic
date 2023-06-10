@@ -10,10 +10,7 @@ use Mautic\PageBundle\Entity\Page;
  */
 class PageBuilderEvent extends BuilderEvent
 {
-    /**
-     * @return Page|null
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->entity;
     }

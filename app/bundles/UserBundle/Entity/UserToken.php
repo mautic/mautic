@@ -130,20 +130,15 @@ class UserToken
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getExpiration()
+    public function getExpiration(): ?\DateTimeInterface
     {
         return $this->expiration;
     }
 
     /**
-     * @param \DateTime|null $expiration
-     *
      * @return UserToken
      */
-    public function setExpiration($expiration = null)
+    public function setExpiration(?\DateTime $expiration = null)
     {
         $this->expiration = $expiration;
 

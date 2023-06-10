@@ -61,58 +61,42 @@ class WebhookQueue
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?Webhook
     {
         return $this->webhook;
     }
 
     /**
-     * @param Webhook|null $webhook
-     *
      * @return WebhookQueue
      */
-    public function setWebhook($webhook)
+    public function setWebhook(?Webhook $webhook)
     {
         $this->webhook = $webhook;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
 
     /**
-     * @param \DateTime|null $dateAdded
-     *
      * @return WebhookQueue
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded)
     {
         $this->dateAdded = $dateAdded;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPayload()
+    public function getPayload(): ?string
     {
         if (null !== $this->payload) {
             // BC: plain payload is fetched by ORM
@@ -146,20 +130,15 @@ class WebhookQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
     /**
-     * @param Event|null $event
-     *
      * @return WebhookQueue
      */
-    public function setEvent($event)
+    public function setEvent(?Event $event)
     {
         $this->event = $event;
 

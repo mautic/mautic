@@ -34,7 +34,7 @@ trait FrequencyRuleTrait
      *
      * @return true|Form
      */
-    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false): bool|Form
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');

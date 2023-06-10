@@ -109,28 +109,20 @@ class Message extends FormEntity
         $this->channels = new ArrayCollection();
     }
 
-    /**
-     * @return ?int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param ?string $name
-     *
      * @return Message
      */
-    public function setName($name)
+    public function setName(?string $name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -138,20 +130,15 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param ?string $description
-     *
      * @return Message
      */
-    public function setDescription($description)
+    public function setDescription(?string $description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -159,20 +146,15 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
 
     /**
-     * @param ?\DateTime $publishUp
-     *
      * @return Message
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp(?\DateTime $publishUp)
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -180,20 +162,15 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
 
     /**
-     * @param ?\DateTime $publishDown
-     *
      * @return Message
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown(?\DateTime $publishDown)
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -201,20 +178,15 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return ?Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
     /**
-     * @param ?Category $category
-     *
      * @return Message
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

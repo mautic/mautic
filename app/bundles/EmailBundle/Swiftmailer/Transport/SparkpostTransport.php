@@ -23,26 +23,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     private $host;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    /**
-     * @var SparkpostFactoryInterface
-     */
-    private $sparkpostFactory;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     public const SPARK_POST_HOSTS = [
         'us' => 'api.sparkpost.com',
         'eu' => 'api.eu.sparkpost.com',
@@ -53,18 +33,13 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function __construct(
         $apiKey,
-        TranslatorInterface $translator,
-        TransportCallback $transportCallback,
-        SparkpostFactoryInterface $sparkpostFactory,
-        LoggerInterface $logger,
+        private TranslatorInterface $translator,
+        private TransportCallback $transportCallback,
+        private SparkpostFactoryInterface $sparkpostFactory,
+        private LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->setApiKey($apiKey);
-
-        $this->translator           = $translator;
-        $this->transportCallback    = $transportCallback;
-        $this->sparkpostFactory     = $sparkpostFactory;
-        $this->logger               = $logger;
 
         $this->setHost($coreParametersHelper->get('mailer_sparkpost_region'));
     }
@@ -77,10 +52,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->apiKey = $apiKey;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getApiKey()
+    public function getApiKey(): ?string
     {
         return $this->apiKey;
     }
@@ -90,10 +62,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->host = self::SPARK_POST_HOSTS[$region] ?? self::SPARK_POST_HOSTS['us'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHost()
+    public function getHost(): ?string
     {
         return $this->host;
     }

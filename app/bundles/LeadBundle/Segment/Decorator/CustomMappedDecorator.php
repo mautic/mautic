@@ -25,16 +25,13 @@ class CustomMappedDecorator extends BaseDecorator
         $this->dictionary = $contactSegmentFilterDictionary;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate): ?string
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'field');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getField($contactSegmentFilterCrate);
         }
     }
@@ -48,7 +45,7 @@ class CustomMappedDecorator extends BaseDecorator
 
         try {
             return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getTable($contactSegmentFilterCrate);
         }
     }
@@ -62,7 +59,7 @@ class CustomMappedDecorator extends BaseDecorator
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'type');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getQueryType($contactSegmentFilterCrate);
         }
     }
@@ -70,27 +67,24 @@ class CustomMappedDecorator extends BaseDecorator
     /**
      * @return string|bool if no func needed
      */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'func');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return false;
         }
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'where');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getWhere($contactSegmentFilterCrate);
         }
     }

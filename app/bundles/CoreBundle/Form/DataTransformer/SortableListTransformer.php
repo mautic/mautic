@@ -8,23 +8,12 @@ use Symfony\Component\Form\DataTransformerInterface;
 class SortableListTransformer implements DataTransformerInterface
 {
     /**
-     * @var bool
-     */
-    private $withLabels = true;
-
-    /**
-     * @var bool
-     */
-    private $useKeyValuePairs = false;
-
-    /**
      * @param bool $withLabels
      * @param bool $atRootLevel
+     * @param bool $useKeyValuePairs
      */
-    public function __construct($withLabels = true, $useKeyValuePairs = false)
+    public function __construct(private $withLabels = true, private $useKeyValuePairs = false)
     {
-        $this->withLabels       = $withLabels;
-        $this->useKeyValuePairs = $useKeyValuePairs;
     }
 
     /**

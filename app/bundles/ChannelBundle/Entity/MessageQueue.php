@@ -242,11 +242,9 @@ class MessageQueue
     }
 
     /**
-     * @param mixed $channelId
-     *
      * @return MessageQueue
      */
-    public function setChannelId($channelId)
+    public function setChannelId(mixed $channelId)
     {
         $this->channelId = $channelId;
 
@@ -372,10 +370,7 @@ class MessageQueue
         return $this->scheduledDate;
     }
 
-    /**
-     * @param mixed $scheduledDate
-     */
-    public function setScheduledDate($scheduledDate)
+    public function setScheduledDate(mixed $scheduledDate)
     {
         $this->scheduledDate = $scheduledDate;
     }

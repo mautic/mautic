@@ -25,11 +25,6 @@ class ColumnSchemaHelper
     /**
      * @var string
      */
-    protected $prefix;
-
-    /**
-     * @var string
-     */
     protected $tableName;
 
     /**
@@ -47,11 +42,10 @@ class ColumnSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
+    public function __construct(Connection $db, protected $prefix)
     {
         $this->db     = $db;
         $this->sm     = $db->getSchemaManager();
-        $this->prefix = $prefix;
     }
 
     /**
@@ -219,13 +213,11 @@ class ColumnSchemaHelper
     /**
      * Determine if a table exists.
      *
-     * @param bool|false $throwException
-     *
      * @return bool
      *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false)
+    public function checkTableExists($table, bool $throwException = false)
     {
         if (!$this->sm->tablesExist($table)) {
             if ($throwException) {

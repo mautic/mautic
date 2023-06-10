@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ObjectMappingRepository extends CommonRepository
 {
-    /**
-     * @return array|null
-     */
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName)
+    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }
@@ -30,10 +27,7 @@ class ObjectMappingRepository extends CommonRepository
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
     }
 
-    /**
-     * @return array|null
-     */
-    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName)
+    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName): ?array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
@@ -59,13 +53,11 @@ class ObjectMappingRepository extends CommonRepository
     /**
      * @param string $integration
      * @param string $oldObjectName
-     * @param mixed  $oldObjectId
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      *
      * @return int
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
+    public function updateIntegrationObject($integration, $oldObjectName, mixed $oldObjectId, $newObjectName, mixed $newObjectId)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -139,7 +131,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return \Doctrine\DBAL\Driver\Statement|int
      */
-    public function markAsDeleted(string $integration, string $objectName, $objectIds): int
+    public function markAsDeleted(string $integration, string $objectName, array|string $objectIds): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

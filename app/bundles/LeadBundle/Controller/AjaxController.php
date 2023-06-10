@@ -549,10 +549,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function getNewLeadsAction(Request $request)
+    public function getNewLeadsAction(Request $request): array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');

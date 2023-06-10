@@ -15,24 +15,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessFetchEmailCommand extends Command
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $parametersHelper;
-
-    /**
-     * @var Fetcher
-     */
-    private $fetcher;
-
-    /**
      * ProcessFetchEmailCommand constructor.
      */
-    public function __construct(CoreParametersHelper $parametersHelper, Fetcher $fetcher)
+    public function __construct(private CoreParametersHelper $parametersHelper, private Fetcher $fetcher)
     {
         parent::__construct();
-
-        $this->parametersHelper = $parametersHelper;
-        $this->fetcher          = $fetcher;
     }
 
     /**

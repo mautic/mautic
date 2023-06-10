@@ -249,9 +249,8 @@ class Field
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
-    private function isChanged($prop, $val)
+    private function isChanged($prop, mixed $val)
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];
@@ -523,10 +522,8 @@ class Field
 
     /**
      * Get form.
-     *
-     * @return Form|null
      */
-    public function getForm()
+    public function getForm(): ?Form
     {
         return $this->form;
     }
@@ -709,10 +706,7 @@ class Field
         return $this->sessionId;
     }
 
-    /**
-     * @param mixed $sessionId
-     */
-    public function setSessionId($sessionId)
+    public function setSessionId(mixed $sessionId)
     {
         $this->sessionId = $sessionId;
     }
@@ -729,10 +723,8 @@ class Field
 
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
-     *
-     * @param mixed $leadField
      */
-    public function setLeadField($leadField)
+    public function setLeadField(mixed $leadField)
     {
         $this->leadField = $leadField;
     }
@@ -745,10 +737,7 @@ class Field
         return $this->saveResult;
     }
 
-    /**
-     * @param mixed $saveResult
-     */
-    public function setSaveResult($saveResult)
+    public function setSaveResult(mixed $saveResult)
     {
         $this->saveResult = $saveResult;
     }
@@ -761,10 +750,7 @@ class Field
         return $this->isAutoFill;
     }
 
-    /**
-     * @param mixed $isAutoFill
-     */
-    public function setIsAutoFill($isAutoFill)
+    public function setIsAutoFill(mixed $isAutoFill)
     {
         $this->isAutoFill = $isAutoFill;
     }
@@ -804,13 +790,9 @@ class Field
     /**
      * Decide if the field should be displayed based on thr progressive profiling conditions.
      *
-     * @param array|null $submissions
-     * @param Lead       $lead
-     * @param Form       $form
-     *
      * @return bool
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
+    public function showForContact(?array $submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {

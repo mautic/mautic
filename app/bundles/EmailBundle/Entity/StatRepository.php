@@ -64,11 +64,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int      $limit
-     * @param int|null $createdByUserId
-     * @param int|null $companyId
-     * @param int|null $campaignId
-     * @param int|null $segmentId
+     * @param int $limit
      *
      * @return array
      */
@@ -76,10 +72,10 @@ class StatRepository extends CommonRepository
         $limit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
-        $createdByUserId = null,
-        $companyId = null,
-        $campaignId = null,
-        $segmentId = null
+        ?int $createdByUserId = null,
+        ?int $companyId = null,
+        ?int $campaignId = null,
+        ?int $segmentId = null
     ) {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
@@ -170,7 +166,7 @@ class StatRepository extends CommonRepository
      *
      * @return array
      */
-    public function getSentStats($emailIds, $listId = null)
+    public function getSentStats(array|int|null $emailIds, array|int|bool|null $listId = null)
     {
         if (!is_array($emailIds)) {
             $emailIds = [(int) $emailIds];
@@ -205,10 +201,8 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
      * @param bool                                $combined
-     *
-     * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getSentCount(array|int|null $emailIds = null, array|int|bool|null $listId = null, ChartQuery $chartQuery = null, $combined = false): array|int
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -217,10 +211,8 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
      * @param bool                           $combined
-     *
-     * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getReadCount(array|int|null $emailIds = null, array|int|null $listId = null, ChartQuery $chartQuery = null, $combined = false): array|int
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -229,10 +221,8 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
      * @param bool                                $combined
-     *
-     * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getFailedCount(array|int|null $emailIds = null, array|int|bool|null $listId = null, ChartQuery $chartQuery = null, $combined = false): array|int
     {
         return $this->getStatusCount('is_failed', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -242,10 +232,8 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
      * @param bool                                $combined
-     *
-     * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getStatusCount($column, array|int|null $emailIds = null, array|int|bool|null $listId = null, ChartQuery $chartQuery = null, $combined = false): array|int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -325,7 +313,7 @@ class StatRepository extends CommonRepository
      *
      * @return array
      */
-    public function getOpenedRates($emailIds, \DateTime $fromDate = null)
+    public function getOpenedRates(array|int $emailIds, \DateTime $fromDate = null)
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
@@ -386,7 +374,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getOpenedStatIds($emailIds = null, $listId = null)
+    public function getOpenedStatIds(array|int $emailIds = null, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

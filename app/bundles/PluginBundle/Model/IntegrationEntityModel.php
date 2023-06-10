@@ -89,10 +89,8 @@ class IntegrationEntityModel extends FormModel
 
     /**
      * @param int $id
-     *
-     * @return IntegrationEntity|null
      */
-    public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime)
+    public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime): ?IntegrationEntity
     {
         $entity = $this->getIntegrationEntityRepository()->find($id);
         if ($entity) {

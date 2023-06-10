@@ -13,16 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var BroadcastExecutioner
-     */
-    private $broadcastExecutioner;
-
-    /**
      * BroadcastSubscriber constructor.
      */
-    public function __construct(BroadcastExecutioner $broadcastExecutioner)
+    public function __construct(private BroadcastExecutioner $broadcastExecutioner)
     {
-        $this->broadcastExecutioner = $broadcastExecutioner;
     }
 
     /**

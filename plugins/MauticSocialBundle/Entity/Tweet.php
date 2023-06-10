@@ -192,10 +192,7 @@ class Tweet extends FormEntity
         ));
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -242,11 +239,9 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param string|null $description
-     *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(?string $description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -254,10 +249,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMediaId()
+    public function getMediaId(): ?string
     {
         return $this->mediaId;
     }
@@ -275,10 +267,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMediaPath()
+    public function getMediaPath(): ?string
     {
         return $this->mediaPath;
     }
@@ -317,10 +306,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSentCount()
+    public function getSentCount(): ?int
     {
         return $this->sentCount;
     }
@@ -411,10 +397,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Asset|null
-     */
-    public function getAsset()
+    public function getAsset(): ?Asset
     {
         return $this->asset;
     }
@@ -429,10 +412,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }
@@ -447,10 +427,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }

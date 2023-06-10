@@ -47,11 +47,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed               $log
          * @param string|array<mixed> $context
          * @param bool                $backtrace
          */
-        public static function logDebugEntry($log, $context = 'null', $backtrace = false)
+        public static function logDebugEntry(mixed $log, string|array $context = 'null', $backtrace = false)
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -209,7 +208,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $handlingFatal = true;
                         $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
-                        if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
+                        if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
                             $exception = new OutOfMemoryError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,
@@ -262,7 +261,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $logMessage = $exception->getMessage();
 
                     if ('dev' === self::$environment) {
-                        $message = '<strong>'.get_class($exception).':</strong> '.$exception->getMessage();
+                        $message = '<strong>'.$exception::class.':</strong> '.$exception->getMessage();
                     }
                 }
             } elseif ($exception instanceof DatabaseConnectionException) {
@@ -330,11 +329,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $displayErrors
-         *
          * @return ErrorHandler
          */
-        public function setDisplayErrors($displayErrors)
+        public function setDisplayErrors(mixed $displayErrors)
         {
             $this->displayErrors = $displayErrors;
 
@@ -366,11 +363,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $mainLogger
-         *
          * @return ErrorHandler
          */
-        public function setMainLogger($mainLogger)
+        public function setMainLogger(mixed $mainLogger)
         {
             $this->mainLogger = $mainLogger;
 
@@ -495,7 +490,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
-                    if ('/' == substr($assetPrefix, -1)) {
+                    if (str_ends_with($assetPrefix, '/')) {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
@@ -534,28 +529,13 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private function getErrorName($bit)
         {
-            switch ($bit) {
-                case E_PARSE:
-                    return 'Parse Error';
-
-                case E_ERROR:
-                case E_USER_ERROR:
-                case E_CORE_ERROR:
-                case E_RECOVERABLE_ERROR:
-                    return 'Error';
-
-                case E_WARNING:
-                case E_USER_WARNING:
-                case E_CORE_WARNING:
-                    return 'Warning';
-
-                case E_DEPRECATED:
-                case E_USER_DEPRECATED:
-                    return 'Deprecation';
-
-                default:
-                    return 'Notice';
-            }
+            return match ($bit) {
+                E_PARSE => 'Parse Error',
+                E_ERROR, E_USER_ERROR, E_CORE_ERROR, E_RECOVERABLE_ERROR => 'Error',
+                E_WARNING, E_USER_WARNING, E_CORE_WARNING => 'Warning',
+                E_DEPRECATED, E_USER_DEPRECATED => 'Deprecation',
+                default => 'Notice',
+            };
         }
     }
 }

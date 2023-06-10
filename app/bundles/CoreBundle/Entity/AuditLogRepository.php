@@ -14,8 +14,6 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param array $filters
-     *
      * @return int
      */
     public function getAuditLogsCount(Lead $lead, array $filters = null)
@@ -45,9 +43,8 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     * @param int   $page
-     * @param int   $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -89,7 +86,7 @@ class AuditLogRepository extends CommonRepository
             if (isset($orderBy[1])) {
                 $orderdir = $orderBy[1];
             }
-            if (0 !== strpos($order, 'al.')) {
+            if (!str_starts_with($order, 'al.')) {
                 $order = 'al.'.$order;
             }
 
@@ -100,8 +97,6 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     *
      * @return array
      */
     public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
@@ -140,7 +135,7 @@ class AuditLogRepository extends CommonRepository
             if (isset($orderBy[1])) {
                 $orderdir = $orderBy[1];
             }
-            if (0 !== strpos($order, 'al.')) {
+            if (!str_starts_with($order, 'al.')) {
                 $order = 'al.'.$order;
             }
 
@@ -153,15 +148,13 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param string|null $object
-     * @param string|null $id
-     * @param int         $limit
-     * @param null        $afterDate
-     * @param null        $bundle
+     * @param int  $limit
+     * @param null $afterDate
+     * @param null $bundle
      *
      * @return array
      */
-    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null, $bundle = null)
+    public function getLogForObject(?string $object = null, ?string $id = null, $limit = 10, $afterDate = null, $bundle = null)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')

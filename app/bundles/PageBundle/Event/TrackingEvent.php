@@ -21,24 +21,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class TrackingEvent extends Event
 {
     /**
-     * @var Lead
-     */
-    private $contact;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var ParameterBag
      */
     private $response;
 
-    public function __construct(Lead $contact, Request $request, array $mtcSessionResponses)
+    public function __construct(private Lead $contact, private Request $request, array $mtcSessionResponses)
     {
-        $this->contact  = $contact;
-        $this->request  = $request;
         $this->response = new ParameterBag($mtcSessionResponses);
     }
 

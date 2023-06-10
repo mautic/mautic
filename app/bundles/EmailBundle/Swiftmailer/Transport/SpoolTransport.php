@@ -7,24 +7,11 @@ use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
 class SpoolTransport extends \Swift_Transport_SpoolTransport
 {
     /**
-     * @var \Swift_Events_EventDispatcher
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var DelegatingSpool
-     */
-    private $spool;
-
-    /**
      * SpoolTransport constructor.
      */
-    public function __construct(\Swift_Events_EventDispatcher $eventDispatcher, DelegatingSpool $delegatingSpool)
+    public function __construct(private \Swift_Events_EventDispatcher $eventDispatcher, private DelegatingSpool $spool)
     {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->spool           = $delegatingSpool;
-
-        parent::__construct($eventDispatcher, $delegatingSpool);
+        parent::__construct($eventDispatcher, $spool);
     }
 
     /**

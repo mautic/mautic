@@ -10,12 +10,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class FieldCollectEvent extends Event
 {
-    private string $object;
     private FieldCollection $fields;
 
-    public function __construct(string $object)
+    public function __construct(private string $object)
     {
-        $this->object = $object;
         $this->fields = new FieldCollection();
     }
 

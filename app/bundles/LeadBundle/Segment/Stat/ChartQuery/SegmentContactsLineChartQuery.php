@@ -14,11 +14,6 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 class SegmentContactsLineChartQuery extends ChartQuery
 {
     /**
-     * @var array
-     */
-    private $filters;
-
-    /**
      * @var int
      */
     private $segmentId;
@@ -53,13 +48,12 @@ class SegmentContactsLineChartQuery extends ChartQuery
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
     {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
-        $this->filters    = $filters;
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
@@ -149,10 +143,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         return $this->loadAndBuildTimeData($q);
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getFirstDateAddedSegmentEventLog()
+    private function getFirstDateAddedSegmentEventLog(): bool|string
     {
         $subQuery = $this->connection->createQueryBuilder();
         $subQuery->select('el.date_added - INTERVAL 10 SECOND')
@@ -244,7 +235,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $compositeExpressionReflectionParts->setAccessible(true);
         $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
         $newParts = array_filter($parts, function ($val) use ($joinAlias) {
-            return 0 !== strpos($val, "$joinAlias.");
+            return !str_starts_with($val, "$joinAlias.");
         });
         $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
         $compositeExpressionReflectionParts->setAccessible(false);

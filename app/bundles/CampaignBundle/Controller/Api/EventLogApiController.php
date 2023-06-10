@@ -196,10 +196,7 @@ class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @return array|Response
-     */
-    public function editEventsAction(Request $request)
+    public function editEventsAction(Request $request): array|Response
     {
         $parameters = $request->request->all();
 

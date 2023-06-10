@@ -32,20 +32,16 @@ class FocusController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): JsonResponse|RedirectResponse|Response
     {
         return parent::indexStandard($request, $page);
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|Response
     {
         return parent::newStandard($request);
     }
@@ -55,20 +51,16 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Displays details on a Focus.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): array|JsonResponse|RedirectResponse|Response
     {
         return parent::viewStandard($request, $objectId, 'focus', 'plugin.focus');
     }
@@ -77,10 +69,8 @@ class FocusController extends AbstractStandardFormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): JsonResponse|RedirectResponse|Response
     {
         return parent::cloneStandard($request, $objectId);
     }
@@ -89,20 +79,16 @@ class FocusController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse|RedirectResponse
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse
     {
         return parent::batchDeleteStandard($request);
     }

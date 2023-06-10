@@ -14,16 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventCollector
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var array
      */
     private $eventsArray = [];
@@ -36,10 +26,8 @@ class EventCollector
     /**
      * EventCollector constructor.
      */
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
     {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -71,11 +59,9 @@ class EventCollector
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param string|null $type
-     *
      * @return array|mixed
      */
-    public function getEventsArray($type = null)
+    public function getEventsArray(?string $type = null)
     {
         if (empty($this->eventsArray)) {
             $this->buildEventList();

@@ -114,10 +114,8 @@ class LogRepository extends CommonRepository
      *
      * @param int $webhookId
      * @param int $limit
-     *
-     * @return float|null
      */
-    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit)
+    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit): ?float
     {
         // Generate query to select last X = $limit rows
         $selectqb = $this->_em->getConnection()->createQueryBuilder();

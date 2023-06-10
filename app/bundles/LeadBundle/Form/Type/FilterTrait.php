@@ -327,7 +327,7 @@ trait FilterTrait
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->execute()->fetchAllAssociative();
-                            } catch (\Exception $exception) {
+                            } catch (\Exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }
                         }
@@ -352,7 +352,7 @@ trait FilterTrait
         } else {
             if (!empty($customOptions['constraints'])) {
                 foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if ('NotBlank' === get_class($constraint)) {
+                    if ('NotBlank' === $constraint::class) {
                         array_splice($customOptions['constraints'], $i, 1);
                     }
                 }

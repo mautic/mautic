@@ -79,11 +79,9 @@ class Result
     }
 
     /**
-     * @param mixed $email
-     *
      * @return Result
      */
-    public function setEmail($email)
+    public function setEmail(mixed $email)
     {
         $this->email = $email;
 

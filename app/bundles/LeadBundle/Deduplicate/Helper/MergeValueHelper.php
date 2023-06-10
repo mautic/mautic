@@ -7,17 +7,13 @@ use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 class MergeValueHelper
 {
     /**
-     * @param mixed $newerValue
-     * @param mixed $olderValue
-     * @param mixed $currentValue
-     * @param mixed $defaultValue
-     * @param bool  $newIsAnonymous
+     * @param bool $newIsAnonymous
      *
      * @return mixed
      *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue($newerValue, $olderValue, $currentValue = null, $defaultValue = null, $newIsAnonymous = false)
+    public static function getMergeValue(mixed $newerValue, mixed $olderValue, mixed $currentValue = null, mixed $defaultValue = null, $newIsAnonymous = false)
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);

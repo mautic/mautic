@@ -66,12 +66,11 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int|array $notificationIds
-     * @param int       $listId
+     * @param int $listId
      *
      * @return int
      */
-    public function getSentCount($notificationIds = null, $listId = null)
+    public function getSentCount(int|array $notificationIds = null, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -100,12 +99,11 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array|int $notificationIds
-     * @param int       $listId
+     * @param int $listId
      *
      * @return int
      */
-    public function getReadCount($notificationIds = null, $listId = null)
+    public function getReadCount(array|int $notificationIds = null, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -164,15 +162,10 @@ class StatRepository extends CommonRepository
         if (isset($options['order'])) {
             list($orderBy, $orderByDir) = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 'e.dateRead, e.dateSent';
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => 'e.title',
+                default      => 'e.dateRead, e.dateSent',
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }

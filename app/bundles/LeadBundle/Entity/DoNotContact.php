@@ -228,11 +228,9 @@ class DoNotContact
     }
 
     /**
-     * @param mixed $channelId
-     *
      * @return DoNotContact
      */
-    public function setChannelId($channelId)
+    public function setChannelId(mixed $channelId)
     {
         $this->channelId = $channelId;
 

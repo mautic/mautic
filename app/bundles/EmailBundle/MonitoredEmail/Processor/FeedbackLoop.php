@@ -14,43 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FeedbackLoop implements ProcessorInterface
 {
     /**
-     * @var ContactFinder
-     */
-    private $contactFinder;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var Message
      */
     private $message;
 
     /**
-     * @var DoNotContactModel
-     */
-    private $doNotContact;
-
-    /**
      * FeedbackLoop constructor.
      */
-    public function __construct(
-        ContactFinder $contactFinder,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        DoNotContactModel $doNotContact
-    ) {
-        $this->contactFinder = $contactFinder;
-        $this->translator    = $translator;
-        $this->logger        = $logger;
-        $this->doNotContact  = $doNotContact;
+    public function __construct(private ContactFinder $contactFinder, private TranslatorInterface $translator, private LoggerInterface $logger, private DoNotContactModel $doNotContact)
+    {
     }
 
     /**
@@ -71,7 +43,7 @@ class FeedbackLoop implements ProcessorInterface
                 // A contact email was not found in the FBL report
                 return false;
             }
-        } catch (FeedbackLoopNotFound $exception) {
+        } catch (FeedbackLoopNotFound) {
             return false;
         }
 

@@ -21,22 +21,10 @@ class CampaignReplySubscriber implements EventSubscriberInterface
     public const TYPE = 'sms.reply';
 
     /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
      * CampaignReplySubscriber constructor.
      */
-    public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
+    public function __construct(private TransportChain $transportChain, private RealTimeExecutioner $realTimeExecutioner)
     {
-        $this->transportChain      = $transportChain;
-        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**

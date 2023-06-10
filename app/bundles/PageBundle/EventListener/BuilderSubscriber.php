@@ -36,45 +36,6 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TokenHelper
-     */
-    private $tokenHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
     private $pageTokenRegex      = '{pagelink=(.*?)}';
     private $dwcTokenRegex       = '{dwc=(.*?)}';
     private $langBarRegex        = '{langbar}';
@@ -93,24 +54,8 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * BuilderSubscriber constructor.
      */
-    public function __construct(
-        CorePermissions $security,
-        TokenHelper $tokenHelper,
-        IntegrationHelper $integrationHelper,
-        PageModel $pageModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
-        Connection $connection,
-        Environment $twig
-    ) {
-        $this->security                  = $security;
-        $this->tokenHelper               = $tokenHelper;
-        $this->integrationHelper         = $integrationHelper;
-        $this->pageModel                 = $pageModel;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
-        $this->translator                = $translator;
-        $this->connection                = $connection;
-        $this->twig                      = $twig;
+    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig)
+    {
     }
 
     /**
@@ -361,21 +306,21 @@ class BuilderSubscriber implements EventSubscriberInterface
         $page    = $event->getPage();
         $params  = $event->getParams();
 
-        if (false !== strpos($content, $this->langBarRegex)) {
+        if (str_contains($content, $this->langBarRegex)) {
             $langbar = $this->renderLanguageBar($page);
             $content = str_ireplace($this->langBarRegex, $langbar, $content);
         }
 
-        if (false !== strpos($content, $this->shareButtonsRegex)) {
+        if (str_contains($content, $this->shareButtonsRegex)) {
             $buttons = $this->renderSocialShareButtons();
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        if (false !== strpos($content, $this->titleRegex)) {
+        if (str_contains($content, $this->titleRegex)) {
             $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
         }
 
-        if (false !== strpos($content, $this->descriptionRegex)) {
+        if (str_contains($content, $this->descriptionRegex)) {
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
@@ -435,32 +380,32 @@ class BuilderSubscriber implements EventSubscriberInterface
                 unset($slot, $xpath, $dom);
             }
             // replace tokens
-            if (false !== strpos($content, self::segmentListRegex)) {
+            if (str_contains($content, self::segmentListRegex)) {
                 $segmentList = $this->renderSegmentList($params);
                 $content     = str_ireplace(self::segmentListRegex, $segmentList, $content);
             }
 
-            if (false !== strpos($content, self::categoryListRegex)) {
+            if (str_contains($content, self::categoryListRegex)) {
                 $categoryList = $this->renderCategoryList($params);
                 $content      = str_ireplace(self::categoryListRegex, $categoryList, $content);
             }
 
-            if (false !== strpos($content, self::preferredchannel)) {
+            if (str_contains($content, self::preferredchannel)) {
                 $preferredChannel = $this->renderPreferredChannel($params);
                 $content          = str_ireplace(self::preferredchannel, $preferredChannel, $content);
             }
 
-            if (false !== strpos($content, self::channelfrequency)) {
+            if (str_contains($content, self::channelfrequency)) {
                 $channelfrequency = $this->renderChannelFrequency($params);
                 $content          = str_ireplace(self::channelfrequency, $channelfrequency, $content);
             }
 
-            if (false !== strpos($content, self::saveprefsRegex)) {
+            if (str_contains($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
             // add form before first block of prefs center
-            if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
+            if (isset($params['startform']) && str_contains($content, 'data-prefs-center')) {
                 $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
                 $xpath      = new \DOMXPath($dom);
@@ -480,7 +425,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 }
             }
 
-            if (false !== strpos($content, self::successmessage)) {
+            if (str_contains($content, self::successmessage)) {
                 $successMessage = $this->renderSuccessMessage($params);
                 $content        = str_ireplace(self::successmessage, $successMessage, $content);
             }

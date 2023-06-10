@@ -22,25 +22,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ChannelActionModel
-     */
-    private $channelActionModel;
-
-    /**
-     * @var FrequencyActionModel
-     */
-    private $frequencyActionModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
     public function __construct(
-        ChannelActionModel $channelActionModel,
-        FrequencyActionModel $frequencyActionModel,
-        LeadModel $leadModel,
+        private ChannelActionModel $channelActionModel,
+        private FrequencyActionModel $frequencyActionModel,
+        private LeadModel $contactModel,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -52,9 +37,6 @@ class BatchContactController extends AbstractFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->channelActionModel   = $channelActionModel;
-        $this->frequencyActionModel = $frequencyActionModel;
-        $this->contactModel         = $leadModel;
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -90,10 +72,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View for batch action.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

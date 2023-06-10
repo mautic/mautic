@@ -32,20 +32,15 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
         $this->vars     = $vars;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
 
     /**
-     * @param string|null $template
-     *
      * @return CustomTemplateEvent
      */
-    public function setTemplate($template)
+    public function setTemplate(?string $template)
     {
         $this->template = $template;
 

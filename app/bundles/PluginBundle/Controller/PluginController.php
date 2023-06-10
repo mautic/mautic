@@ -24,10 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PluginController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -133,10 +130,8 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -362,10 +357,7 @@ class PluginController extends FormController
         );
     }
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function infoAction($name)
+    public function infoAction($name): array|JsonResponse|RedirectResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();

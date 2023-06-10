@@ -15,18 +15,12 @@ class BuilderEvent extends Event
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
-    protected $translator;
-    protected $entity;
-    protected $requested;
     protected $tokenFilterText;
     protected $tokenFilterTarget;
 
-    public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
+    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
     {
-        $this->translator        = $translator;
-        $this->entity            = $entity;
-        $this->requested         = $requested;
-        $this->tokenFilterTarget = (0 === strpos($tokenFilter, '{@')) ? 'label' : 'token';
+        $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -198,7 +192,7 @@ class BuilderEvent extends Event
         if (false === $withBC) {
             $tokens = [];
             foreach ($this->tokens as $key => $value) {
-                if ('{leadfield' !== substr($key, 0, 10)) {
+                if (!str_starts_with($key, '{leadfield')) {
                     $tokens[$key] = $value;
                 }
             }
@@ -213,11 +207,9 @@ class BuilderEvent extends Event
      * Check if tokens have been requested.
      * Pass in string or array of tokens to filter against if filterType == token.
      *
-     * @param string|array|null $tokenKeys
-     *
      * @return bool
      */
-    public function tokensRequested($tokenKeys = null)
+    public function tokensRequested(string|array|null $tokenKeys = null)
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' == $this->tokenFilterTarget) {

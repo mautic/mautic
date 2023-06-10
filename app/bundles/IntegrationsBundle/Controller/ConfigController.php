@@ -46,9 +46,6 @@ class ConfigController extends AbstractFormController
      */
     private $integrationConfiguration;
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
     public function editAction(
         Request $request,
         ConfigIntegrationsHelper $integrationsHelper,
@@ -57,7 +54,7 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         string $integration
-    ) {
+    ): array|JsonResponse|RedirectResponse|Response {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
@@ -66,7 +63,7 @@ class ConfigController extends AbstractFormController
         try {
             $this->integrationObject        = $integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 
@@ -90,8 +87,6 @@ class ConfigController extends AbstractFormController
 
     /**
      * @param FormInterface<FormInterface> $form
-     *
-     * @return JsonResponse|Response
      */
     private function submitForm(
         Request $request,
@@ -101,7 +96,7 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         FormInterface $form
-    ) {
+    ): JsonResponse|Response {
         if ($this->isFormCancelled($form)) {
             return $this->closeForm($request);
         }
@@ -178,10 +173,8 @@ class ConfigController extends AbstractFormController
 
     /**
      * @param FormInterface<FormInterface> $form
-     *
-     * @return JsonResponse|Response
      */
-    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension)
+    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): JsonResponse|Response
     {
         $integrationObject = $this->integrationObject;
         $formView          = $form->createView();

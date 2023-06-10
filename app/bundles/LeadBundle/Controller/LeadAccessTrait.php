@@ -16,10 +16,8 @@ trait LeadAccessTrait
      * @param $lead
      * @param bool   $isPlugin
      * @param string $intgegration
-     *
-     * @return Response|Lead
      */
-    protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
+    protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = ''): Response|Lead
     {
         if (!$leadId instanceof Lead) {
             // make sure the user has view access to this lead
@@ -71,10 +69,8 @@ trait LeadAccessTrait
 
     /**
      * Returns leads the user has access to.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function checkAllAccess($action, $limit)
+    protected function checkAllAccess($action, $limit): array|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');

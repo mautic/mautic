@@ -105,16 +105,6 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * @var Client
-     */
-    private $httpClient;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * Timestamp when the webhook processing starts.
      *
      * @var float
@@ -124,13 +114,11 @@ class WebhookModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
-        Client $httpClient,
-        EventDispatcherInterface $eventDispatcher
+        private Client $httpClient,
+        private EventDispatcherInterface $eventDispatcher
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
-        $this->httpClient        = $httpClient;
-        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -169,10 +157,7 @@ class WebhookModel extends FormModel
         return $formFactory->create(WebhookType::class, $entity, $options);
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Webhook
     {
         if (null === $id) {
             return new Webhook();
@@ -277,10 +262,8 @@ class WebhookModel extends FormModel
 
     /**
      * Execute a list of webhooks to their specified endpoints.
-     *
-     * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
-    public function processWebhooks($webhooks)
+    public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks)
     {
         $this->startTime = microtime(true);
 
@@ -290,8 +273,6 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param WebhookQueue $queue
-     *
      * @return bool
      */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
@@ -465,8 +446,6 @@ class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @param WebhookQueue $queue
      *
      * @return array
      */

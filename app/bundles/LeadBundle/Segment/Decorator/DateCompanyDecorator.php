@@ -10,20 +10,11 @@ use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilde
  */
 class DateCompanyDecorator implements FilterDecoratorInterface
 {
-    /**
-     * @var FilterDecoratorInterface
-     */
-    private $dateDecorator;
-
-    public function __construct(FilterDecoratorInterface $dateDecorator)
+    public function __construct(private FilterDecoratorInterface $dateDecorator)
     {
-        $this->dateDecorator = $dateDecorator;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate): ?string
     {
         return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
@@ -46,18 +37,13 @@ class DateCompanyDecorator implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): array|string
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array|bool|float|string|null
     {
         return $this->dateDecorator->getParameterValue($contactSegmentFilterCrate);
     }
@@ -70,18 +56,12 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate): \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }

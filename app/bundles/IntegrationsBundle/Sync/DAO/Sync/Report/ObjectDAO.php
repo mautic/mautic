@@ -9,34 +9,15 @@ use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 class ObjectDAO
 {
     /**
-     * @var int
-     */
-    private $object;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
-
-    /**
      * @var FieldDAO[]
      */
     private $fields = [];
 
     /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
-
-    /**
      * @param string $object
-     * @param mixed  $objectId
      */
-    public function __construct($object, $objectId, ?\DateTimeInterface $changeDateTime = null)
+    public function __construct(private $object, private mixed $objectId, private ?\DateTimeInterface $changeDateTime = null)
     {
-        $this->object         = $object;
-        $this->objectId       = $objectId;
-        $this->changeDateTime = $changeDateTime;
     }
 
     public function getChangeDateTime(): ?\DateTimeInterface
@@ -80,11 +61,9 @@ class ObjectDAO
     /**
      * @param string $name
      *
-     * @return FieldDAO|null
-     *
      * @throws FieldNotFoundException
      */
-    public function getField($name)
+    public function getField($name): ?FieldDAO
     {
         if (!isset($this->fields[$name])) {
             throw new FieldNotFoundException($name, $this->object);

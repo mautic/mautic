@@ -9,14 +9,8 @@ use SendGrid\Response;
 
 class SendGridApiResponse
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    public function __construct(Logger $logger)
+    public function __construct(private Logger $logger)
     {
-        $this->logger = $logger;
     }
 
     /**

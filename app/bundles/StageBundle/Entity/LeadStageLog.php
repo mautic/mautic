@@ -60,10 +60,7 @@ class LeadStageLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
-    public function setDateFired($dateFired)
+    public function setDateFired(mixed $dateFired)
     {
         $this->dateFired = $dateFired;
     }
@@ -76,10 +73,7 @@ class LeadStageLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ipAddress
-     */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress(mixed $ipAddress)
     {
         $this->ipAddress = $ipAddress;
     }
@@ -92,10 +86,7 @@ class LeadStageLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(mixed $lead)
     {
         $this->lead = $lead;
     }
@@ -108,10 +99,7 @@ class LeadStageLog
         return $this->stage;
     }
 
-    /**
-     * @param mixed $stage
-     */
-    public function setStage($stage)
+    public function setStage(mixed $stage)
     {
         $this->stage = $stage;
     }

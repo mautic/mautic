@@ -18,17 +18,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class DeviceModel extends FormModel
 {
     /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
      * DeviceModel constructor.
      */
-    public function __construct(
-        LeadDeviceRepository $leadDeviceRepository
-    ) {
-        $this->leadDeviceRepository = $leadDeviceRepository;
+    public function __construct(private LeadDeviceRepository $leadDeviceRepository)
+    {
     }
 
     /**
@@ -53,10 +46,8 @@ class DeviceModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null === $id) {
             return new LeadDevice();

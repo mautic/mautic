@@ -26,21 +26,17 @@ class FetchOptions
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getItemId()
+    public function getItemId(): ?int
     {
         return $this->itemId;
     }
 
     /**
      * @param string $key
-     * @param mixed  $value
      *
      * @return $this
      */
-    public function setOption($key, $value)
+    public function setOption($key, mixed $value)
     {
         $this->options[$key] = $value;
 

@@ -27,43 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $pageTrackableModel;
-
-    /**
-     * @var RedirectModel
-     */
-    private $pageRedirectModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        EmailModel $emailModel,
-        TrackableModel $trackableModel,
-        RedirectModel $redirectModel,
-        TranslatorInterface $translator
-    ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel           = $emailModel;
-        $this->pageTrackableModel   = $trackableModel;
-        $this->pageRedirectModel    = $redirectModel;
-        $this->translator           = $translator;
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private EmailModel $emailModel, private TrackableModel $pageTrackableModel, private RedirectModel $pageRedirectModel, private TranslatorInterface $translator)
+    {
     }
 
     /**
@@ -349,13 +314,11 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Parses content for URLs and tokens.
      *
-     * @param int|null $emailId
-     *
      * @return array<mixed>
      *
      * @throws MappingException
      */
-    private function parseContentForUrls(EmailSendEvent $event, $emailId): array
+    private function parseContentForUrls(EmailSendEvent $event, ?int $emailId): array
     {
         static $convertedContent = [];
 

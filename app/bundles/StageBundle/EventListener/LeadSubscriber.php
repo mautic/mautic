@@ -13,36 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StagesChangeLogRepository
-     */
-    private $stagesChangeLogRepository;
-
-    /**
-     * @var LeadStageLogRepository
-     */
-    private $leadStageLogRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(
-        StagesChangeLogRepository $stagesChangeLogRepository,
-        LeadStageLogRepository $leadStageLogRepository,
-        TranslatorInterface $translator,
-        RouterInterface $router
-    ) {
-        $this->stagesChangeLogRepository = $stagesChangeLogRepository;
-        $this->leadStageLogRepository    = $leadStageLogRepository;
-        $this->translator                = $translator;
-        $this->router                    = $router;
+    public function __construct(private StagesChangeLogRepository $stagesChangeLogRepository, private LeadStageLogRepository $leadStageLogRepository, private TranslatorInterface $translator, private RouterInterface $router)
+    {
     }
 
     /**

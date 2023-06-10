@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChannelListHelper
 {
-    private Translator $translator;
-
     /**
      * @var array<string,string>
      */
@@ -21,12 +19,8 @@ class ChannelListHelper
      */
     private array $featureChannels = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Translator $translator)
     {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -98,14 +92,11 @@ class ChannelListHelper
      */
     public function getChannelLabel($channel)
     {
-        switch (true) {
-            case $this->translator->hasId('mautic.channel.'.$channel):
-                return $this->translator->trans('mautic.channel.'.$channel);
-            case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                return $this->translator->trans('mautic.'.$channel.'.'.$channel);
-            default:
-                return ucfirst($channel);
-        }
+        return match (true) {
+            $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+            $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+            default                                                   => ucfirst($channel),
+        };
     }
 
     /**

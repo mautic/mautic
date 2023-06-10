@@ -31,11 +31,9 @@ class ApiErrorException extends \Exception
     }
 
     /**
-     * @param mixed $contactId
-     *
      * @return ApiErrorException
      */
-    public function setContactId($contactId)
+    public function setContactId(mixed $contactId)
     {
         $this->contactId = $contactId;
 

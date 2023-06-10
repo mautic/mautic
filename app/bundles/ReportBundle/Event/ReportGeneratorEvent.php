@@ -22,13 +22,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $selectColumns = [];
 
     /**
-     * QueryBuilder object.
-     *
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
-
-    /**
      * contentTemplate.
      *
      * @var string
@@ -36,32 +29,22 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $contentTemplate;
 
     /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * @var ExpressionBuilder|null
      */
     private $filterExpression;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
 
     /**
      * @var array|null
      */
     private $sortedFilters;
 
-    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
+    public function __construct(Report $report, private array $options, /**
+     * QueryBuilder object.
+     */
+    private QueryBuilder $queryBuilder, private ChannelListHelper $channelListHelper)
     {
         $this->report            = $report;
         $this->context           = $report->getSource();
-        $this->options           = $options;
-        $this->queryBuilder      = $qb;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -157,10 +140,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return ExpressionBuilder|null
-     */
-    public function getFilterExpression()
+    public function getFilterExpression(): ?ExpressionBuilder
     {
         return $this->filterExpression;
     }
@@ -369,10 +349,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Returns true if the report uses the column anywhere in the query.
-     *
-     * @param string|array $column
      */
-    public function usesColumn($column): bool
+    public function usesColumn(string|array $column): bool
     {
         return $this->hasColumn($column) || $this->hasFilter($column);
     }
@@ -396,11 +374,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Check if the report has a specific column.
      *
-     * @param array|string $column
-     *
      * @return bool
      */
-    public function hasColumn($column)
+    public function hasColumn(array|string $column)
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
@@ -420,11 +396,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Check if the report has a specific filter.
      *
-     * @param array|string $column
-     *
      * @return bool
      */
-    public function hasFilter($column)
+    public function hasFilter(array|string $column)
     {
         $this->buildSortedFilters();
 

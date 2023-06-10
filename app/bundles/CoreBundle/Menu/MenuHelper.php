@@ -30,11 +30,6 @@ class MenuHelper
     private $orphans = [];
 
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * @var IntegrationHelper
      */
     protected $integrationHelper;
@@ -42,10 +37,9 @@ class MenuHelper
     /**
      * MenuHelper constructor.
      */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
         $this->security              = $security;
-        $this->coreParametersHelper  = $coreParametersHelper;
         $this->requestStack          = $requestStack;
         $this->integrationHelper     = $integrationHelper;
     }
@@ -274,22 +268,20 @@ class MenuHelper
 
     /**
      * @param string $name
-     * @param mixed  $value
      *
      * @return bool
      */
-    protected function handleParametersChecks($name, $value)
+    protected function handleParametersChecks($name, mixed $value)
     {
         return $this->getParameter($name) == $value;
     }
 
     /**
      * @param string $name
-     * @param mixed  $value
      *
      * @return bool
      */
-    protected function handleRequestChecks($name, $value)
+    protected function handleRequestChecks($name, mixed $value)
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
@@ -299,12 +291,10 @@ class MenuHelper
      */
     protected function handleAccessCheck($accessLevel)
     {
-        switch ($accessLevel) {
-            case 'admin':
-                return $this->security->isAdmin();
-            default:
-                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
-        }
+        return match ($accessLevel) {
+            'admin' => $this->security->isAdmin(),
+            default => $this->security->isGranted($accessLevel, 'MATCH_ONE'),
+        };
     }
 
     /**

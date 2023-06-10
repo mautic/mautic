@@ -17,11 +17,6 @@ class DelegatingSpool extends \Swift_FileSpool
     private $fileSpoolEnabled = false;
 
     /**
-     * @var \Swift_Transport
-     */
-    private $realTransport;
-
-    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
@@ -36,10 +31,9 @@ class DelegatingSpool extends \Swift_FileSpool
      *
      * @throws \Swift_IoException
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, \Swift_Transport $realTransport)
+    public function __construct(CoreParametersHelper $coreParametersHelper, private \Swift_Transport $realTransport)
     {
         $this->fileSpoolEnabled     = 'file' === $coreParametersHelper->get('mailer_spool_type');
-        $this->realTransport        = $realTransport;
         $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct($this->getSpoolDir());
@@ -50,7 +44,7 @@ class DelegatingSpool extends \Swift_FileSpool
      *
      * @throws \Swift_IoException
      */
-    public function delegateMessage(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
+    public function delegateMessage(\Swift_Mime_SimpleMessage $message, ?array &$failedRecipients = null): int
     {
         $this->messageSpooled = false;
 

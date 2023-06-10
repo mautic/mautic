@@ -16,20 +16,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(RequestStack $requestStack, EmailModel $emailModel)
+    public function __construct(private RequestStack $requestStack, private EmailModel $emailModel)
     {
-        $this->requestStack = $requestStack;
-        $this->emailModel   = $emailModel;
     }
 
     /**

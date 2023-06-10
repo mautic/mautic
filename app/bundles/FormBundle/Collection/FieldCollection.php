@@ -27,10 +27,7 @@ final class FieldCollection extends \ArrayIterator
         return $choices;
     }
 
-    /**
-     * @return FieldCrate|null
-     */
-    public function getFieldByKey(string $key, bool $throwExceptionIfNotFound = true)
+    public function getFieldByKey(string $key, bool $throwExceptionIfNotFound = true): ?FieldCrate
     {
         /** @var FieldCrate $field */
         foreach ($this as $field) {

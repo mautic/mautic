@@ -9,16 +9,6 @@ class ParseEmailEvent extends Event
     /**
      * @var array
      */
-    private $messages;
-
-    /**
-     * @var array
-     */
-    private $keys;
-
-    /**
-     * @var array
-     */
     private $criteriaRequests = [];
 
     /**
@@ -26,10 +16,8 @@ class ParseEmailEvent extends Event
      */
     private $markAsSeen = [];
 
-    public function __construct(array $messages = [], array $applicableKeys = [])
+    public function __construct(private array $messages = [], private array $keys = [])
     {
-        $this->messages = $messages;
-        $this->keys     = $applicableKeys;
     }
 
     /**

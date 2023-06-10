@@ -14,16 +14,10 @@ use Monolog\Logger;
 class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 {
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * DoctrineSubscriber constructor.
      */
-    public function __construct(Logger $logger)
+    public function __construct(private Logger $logger)
     {
-        $this->logger = $logger;
     }
 
     /**

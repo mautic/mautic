@@ -16,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ThemeController extends FormController
 {
-    /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper): JsonResponse|Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -108,10 +105,8 @@ class ThemeController extends FormController
      * Download a theme.
      *
      * @param string $themeName
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, $themeName)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, $themeName): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $flashes = [];
         $error   = false;

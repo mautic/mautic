@@ -14,11 +14,9 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get a lead's stage log.
      *
-     * @param int|null $leadId
-     *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    public function getLeadTimelineEvents(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')

@@ -96,11 +96,9 @@ trait OperatorListTrait
     /**
      * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
      *
-     * @param string|null $operator
-     *
      * @return array<string,array<string,string>>|array<string,string>
      */
-    public function getFilterExpressionFunctions($operator = null)
+    public function getFilterExpressionFunctions(?string $operator = null)
     {
         $operatorOption = OperatorOptions::getFilterExpressionFunctions();
 
@@ -113,7 +111,7 @@ trait OperatorListTrait
      *
      * @return mixed[]
      */
-    public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
+    public function getOperatorsForFieldType(string|array|null $type = null, $overrideHiddenTypes = [])
     {
         static $processedTypes = [];
 
@@ -182,11 +180,9 @@ trait OperatorListTrait
      *
      * Normalize type operator.
      *
-     * @param string|null $type
-     *
      * @return void
      */
-    protected function normalizeType(&$type)
+    protected function normalizeType(?string &$type)
     {
         if (null === $type) {
             return;

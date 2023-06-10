@@ -110,10 +110,7 @@ class Event
         return $this->eventType;
     }
 
-    /**
-     * @param mixed $eventType
-     */
-    public function setEventType($eventType)
+    public function setEventType(mixed $eventType)
     {
         $this->eventType = $eventType;
 

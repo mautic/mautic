@@ -9,11 +9,8 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 class ConsoleErrorListener
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
     public function onConsoleError(ConsoleErrorEvent $event): void
@@ -24,7 +21,7 @@ class ConsoleErrorListener
         // Log error with trace
         $message = sprintf(
             '%s: %s (uncaught exception) at %s line %s while running console command `%s`%s',
-            get_class($exception),
+            $exception::class,
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),

@@ -7,41 +7,17 @@ use Psr\Http\Message\ResponseInterface;
 
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private $url;
-
-    /**
-     * @var array
-     */
-    private $parameters;
-
-    private $headers;
-
-    /**
-     * @var string
-     */
-    private $method;
-
-    /**
-     * @var array
-     */
-    private $settings;
-
-    /**
-     * @var string
-     */
-    private $authType;
-
     private $response;
 
-    public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)
+    /**
+     * @param mixed[] $parameters
+     * @param string  $method
+     * @param mixed[] $settings
+     * @param string  $authType
+     */
+    public function __construct(UnifiedIntegrationInterface $integration, private $url, private $parameters, private $headers, private $method, private $settings, private $authType)
     {
         $this->integration = $integration;
-        $this->url         = $url;
-        $this->parameters  = $parameters;
-        $this->headers     = $headers;
-        $this->method      = $method;
-        $this->settings    = $settings;
-        $this->authType    = $authType;
     }
 
     /**

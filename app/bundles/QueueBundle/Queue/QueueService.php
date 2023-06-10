@@ -17,28 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 class QueueService
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * QueueService constructor.
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private EventDispatcherInterface $eventDispatcher, private LoggerInterface $logger)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->eventDispatcher      = $eventDispatcher;
-        $this->logger               = $logger;
     }
 
     /**
@@ -61,11 +43,9 @@ class QueueService
     }
 
     /**
-     * @param string   $queueName
-     * @param int|null $messages
-     * @param int|null $timeout
+     * @param string $queueName
      */
-    public function consumeFromQueue($queueName, $messages = null, $timeout = null)
+    public function consumeFromQueue($queueName, ?int $messages = null, ?int $timeout = null)
     {
         $protocol = $this->coreParametersHelper->get('queue_protocol');
         $event    = new QueueEvent($protocol, $queueName, [], $messages, $timeout);

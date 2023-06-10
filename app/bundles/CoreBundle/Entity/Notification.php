@@ -100,18 +100,12 @@ class Notification
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getUser()
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -121,98 +115,62 @@ class Notification
         $this->user = $user;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @param string|null $type
-     */
-    public function setType($type)
+    public function setType(?string $type)
     {
         $this->type = $type;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMessage()
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
-    /**
-     * @param string|null $message
-     */
-    public function setMessage($message)
+    public function setMessage(?string $message)
     {
         $this->message = $message;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime|null $dateAdded
-     */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded)
     {
         $this->dateAdded = $dateAdded;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIconClass()
+    public function getIconClass(): ?string
     {
         return $this->iconClass;
     }
 
-    /**
-     * @param string|null $iconClass
-     */
-    public function setIconClass($iconClass)
+    public function setIconClass(?string $iconClass)
     {
         $this->iconClass = $iconClass;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getIsRead()
+    public function getIsRead(): ?bool
     {
         return $this->isRead;
     }
 
-    /**
-     * @param bool|null $isRead
-     */
-    public function setIsRead($isRead)
+    public function setIsRead(?bool $isRead)
     {
         $this->isRead = (bool) $isRead;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHeader()
+    public function getHeader(): ?string
     {
         return $this->header;
     }
 
-    /**
-     * @param string|null $header
-     */
-    public function setHeader($header)
+    public function setHeader(?string $header)
     {
         $this->header = $header;
     }

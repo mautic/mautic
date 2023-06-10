@@ -38,10 +38,8 @@ class ChannelExtractor
 
     /**
      * @param string $channelIdField
-     *
-     * @return int|null
      */
-    private static function getChannelId(array $properties, $channelIdField)
+    private static function getChannelId(array $properties, $channelIdField): ?int
     {
         if (empty($properties[$channelIdField])) {
             return null;

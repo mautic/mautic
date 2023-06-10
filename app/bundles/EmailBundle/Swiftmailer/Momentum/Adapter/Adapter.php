@@ -12,16 +12,10 @@ use SparkPost\SparkPostPromise;
 final class Adapter implements AdapterInterface
 {
     /**
-     * @var SparkPost
-     */
-    private $momentumSparkpost;
-
-    /**
      * Adapter constructor.
      */
-    public function __construct(SparkPost $momentumSparkpost)
+    public function __construct(private SparkPost $momentumSparkpost)
     {
-        $this->momentumSparkpost   = $momentumSparkpost;
     }
 
     /**

@@ -14,14 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class IframeAvailabilityChecker
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     public function check(string $url, string $currentScheme): JsonResponse
@@ -83,7 +77,7 @@ class IframeAvailabilityChecker
         // Mixed Content: The page at 'https://example.com' was loaded over HTTPS,
         // but requested an insecure frame 'http://target-example.com/'. This request has been blocked; the content
         // must be served over HTTPS.
-        return 'https' === $currentScheme && 0 === strpos($url, 'http://');
+        return 'https' === $currentScheme && str_starts_with($url, 'http://');
     }
 
     /**
@@ -117,7 +111,7 @@ class IframeAvailabilityChecker
 
         if (array_key_exists($name, $headers)) {
             if (null !== $content) {
-                if (0 === strpos($headers[$name][0], $content)) {
+                if (str_starts_with($headers[$name][0], $content)) {
                     return true;
                 } else {
                     return false;

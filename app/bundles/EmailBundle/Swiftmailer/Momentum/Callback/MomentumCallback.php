@@ -10,16 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 final class MomentumCallback implements MomentumCallbackInterface
 {
     /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    /**
      * MomentumCallback constructor.
      */
-    public function __construct(TransportCallback $transportCallback)
+    public function __construct(private TransportCallback $transportCallback)
     {
-        $this->transportCallback = $transportCallback;
     }
 
     public function processCallbackRequest(Request $request)

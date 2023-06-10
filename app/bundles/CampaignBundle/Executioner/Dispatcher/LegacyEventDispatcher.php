@@ -31,52 +31,10 @@ class LegacyEventDispatcher
     use EventArrayTrait;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
      * LegacyEventDispatcher constructor.
      */
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        EventScheduler $scheduler,
-        LoggerInterface $logger,
-        NotificationHelper $notificationHelper,
-        MauticFactory $factory,
-        ContactTracker $contactTracker
-    ) {
-        $this->dispatcher         = $dispatcher;
-        $this->scheduler          = $scheduler;
-        $this->logger             = $logger;
-        $this->notificationHelper = $notificationHelper;
-        $this->factory            = $factory;
-        $this->contactTracker     = $contactTracker;
+    public function __construct(private EventDispatcherInterface $dispatcher, private EventScheduler $scheduler, private LoggerInterface $logger, private NotificationHelper $notificationHelper, private MauticFactory $factory, private ContactTracker $contactTracker)
+    {
     }
 
     public function dispatchCustomEvent(
@@ -239,7 +197,7 @@ class LegacyEventDispatcher
         try {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (false !== strpos($settings['callback'], '::')) {
+            } elseif (str_contains($settings['callback'], '::')) {
                 $parts      = explode('::', $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
@@ -256,7 +214,7 @@ class LegacyEventDispatcher
             }
 
             return $reflection->invokeArgs($this, $pass);
-        } catch (\ReflectionException $exception) {
+        } catch (\ReflectionException) {
             return false;
         }
     }

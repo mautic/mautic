@@ -11,11 +11,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class LeadChangeEventDispatcher
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var Lead
      */
     private $lead;
@@ -28,9 +23,8 @@ class LeadChangeEventDispatcher
     /**
      * LeadChangeEventDispatcher constructor.
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     public function dispatchEvents(Events\LeadEvent $event, array $changes)

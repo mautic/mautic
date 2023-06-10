@@ -21,7 +21,6 @@ use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\Notification\Notifier;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
@@ -31,96 +30,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SyncProcess
 {
     /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
-
-    /**
-     * @var MauticSyncDataExchange
-     */
-    private $internalSyncDataExchange;
-
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $integrationSyncDataExchange;
-
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
-
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
-
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var Notifier
-     */
-    private $notifier;
-
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
-
-    /**
      * @var int
      */
     private $syncIteration;
 
-    /**
-     * @var SyncServiceInterface
-     */
-    private $syncService;
-
-    public function __construct(
-        SyncDateHelper $syncDateHelper,
-        MappingHelper $mappingHelper,
-        RelationsHelper $relationsHelper,
-        IntegrationSyncProcess $integrationSyncProcess,
-        MauticSyncProcess $mauticSyncProcess,
-        EventDispatcherInterface $eventDispatcher,
-        Notifier $notifier,
-        MappingManualDAO $mappingManualDAO,
-        SyncDataExchangeInterface $internalSyncDataExchange,
-        SyncDataExchangeInterface $integrationSyncDataExchange,
-        InputOptionsDAO $inputOptionsDAO,
-        SyncServiceInterface $syncService
-    ) {
-        $this->syncDateHelper              = $syncDateHelper;
-        $this->mappingHelper               = $mappingHelper;
-        $this->relationsHelper             = $relationsHelper;
-        $this->integrationSyncProcess      = $integrationSyncProcess;
-        $this->mauticSyncProcess           = $mauticSyncProcess;
-        $this->eventDispatcher             = $eventDispatcher;
-        $this->notifier                    = $notifier;
-        $this->mappingManualDAO            = $mappingManualDAO;
-        $this->internalSyncDataExchange    = $internalSyncDataExchange;
-        $this->integrationSyncDataExchange = $integrationSyncDataExchange;
-        $this->inputOptionsDAO             = $inputOptionsDAO;
-        $this->syncService                 = $syncService;
+    public function __construct(private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private RelationsHelper $relationsHelper, private IntegrationSyncProcess $integrationSyncProcess, private MauticSyncProcess $mauticSyncProcess, private EventDispatcherInterface $eventDispatcher, private Notifier $notifier, private MappingManualDAO $mappingManualDAO, private SyncDataExchangeInterface $internalSyncDataExchange, private SyncDataExchangeInterface $integrationSyncDataExchange, private InputOptionsDAO $inputOptionsDAO, private SyncServiceInterface $syncService)
+    {
     }
 
     /**

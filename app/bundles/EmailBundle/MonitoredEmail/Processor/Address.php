@@ -33,10 +33,7 @@ class Address
         return $results;
     }
 
-    /**
-     * @return string|null
-     */
-    public static function parseAddressForStatHash($address)
+    public static function parseAddressForStatHash($address): ?string
     {
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $address, $parts)) {
             if (strstr($parts[2], '_')) {

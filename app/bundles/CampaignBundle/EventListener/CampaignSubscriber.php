@@ -13,36 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CampaignService
-     */
-    private $campaignService;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        CampaignService $campaignService,
-        FlashBag $flashBag
-    ) {
-        $this->ipLookupHelper   = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->campaignService  = $campaignService;
-        $this->flashBag         = $flashBag;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private CampaignService $campaignService, private FlashBag $flashBag)
+    {
     }
 
     /**

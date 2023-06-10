@@ -28,8 +28,6 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param Email $email
-     *
      * @return array
      */
     public function findByIds(array $ids, Email $email = null)
@@ -60,10 +58,9 @@ class RedirectRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param int        $increaseBy
-     * @param bool|false $unique
+     * @param int $increaseBy
      */
-    public function upHitCount($id, $increaseBy = 1, $unique = false)
+    public function upHitCount($id, $increaseBy = 1, bool $unique = false)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -79,11 +76,7 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param int      $limit
-     * @param int|null $createdByUserId
-     * @param int|null $companyId
-     * @param int|null $campaignId
-     * @param int|null $segmentId
+     * @param int $limit
      *
      * @return array
      */
@@ -91,10 +84,10 @@ class RedirectRepository extends CommonRepository
         $limit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
-        $createdByUserId = null,
-        $companyId = null,
-        $campaignId = null,
-        $segmentId = null
+        ?int $createdByUserId = null,
+        ?int $companyId = null,
+        ?int $campaignId = null,
+        ?int $segmentId = null
     ) {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')

@@ -20,21 +20,6 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var VideoModel
-     */
-    private $pageVideoModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var RouterInterface
      */
     private $router;
@@ -43,15 +28,12 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        PageModel $pageModel,
-        VideoModel $pageVideoModel,
-        TranslatorInterface $translator,
+        private PageModel $pageModel,
+        private VideoModel $pageVideoModel,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory
     ) {
-        $this->pageModel      = $pageModel;
-        $this->pageVideoModel = $pageVideoModel;
-        $this->translator     = $translator;
         $this->router         = $router;
 
         $this->setModelFactory($modelFactory);
