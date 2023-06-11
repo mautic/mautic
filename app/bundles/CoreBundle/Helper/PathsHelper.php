@@ -62,10 +62,10 @@ class PathsHelper
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $this->user                   = $userHelper->getUser();
         $this->theme                  = $coreParametersHelper->get('theme');
-        $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->get('image_path'));
-        $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_dir'));
-        $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->get('tmp_path'));
-        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_user_dir'));
+        $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
+        $this->dashboardImportDir     = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_dir'));
+        $this->temporaryDir           = $this->removeTrailingSlash((string) $coreParametersHelper->get('tmp_path'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
         $this->kernelRootDir          = $this->removeTrailingSlash($root);
@@ -219,7 +219,7 @@ class PathsHelper
         return $path;
     }
 
-    private function removeTrailingSlash(?string $dir): ?string
+    private function removeTrailingSlash(string $dir): string
     {
         if ('/' === substr($dir, -1)) {
             $dir = substr($dir, 0, -1);

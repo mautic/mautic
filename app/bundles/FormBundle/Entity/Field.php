@@ -592,9 +592,9 @@ class Field
     }
 
     /**
-     * @return array
+     * @return array<string,mixed>
      */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

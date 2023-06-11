@@ -175,7 +175,7 @@ class FocusModel extends FormModel
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
     {
         // If cached is not an array, rebuild to support the new format
-        $cached = json_decode($focus->getCache(), true);
+        $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
         if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
             $focusArray = $focus->toArray();
 
