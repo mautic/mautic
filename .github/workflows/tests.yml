@@ -103,7 +103,7 @@ jobs:
         fail_ci_if_error: true
 
     - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: actions/upload-artifact@v3
       with:
         name: test-results-${{ matrix.php-versions }}-${{ matrix.db-types }}
