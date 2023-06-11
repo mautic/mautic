@@ -106,7 +106,7 @@ jobs:
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: actions/upload-artifact@v3
       with:
-        name: test-results-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        name: test-results
         path: |
           ./junit.xml
           ./coverage.xml
