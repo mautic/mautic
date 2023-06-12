@@ -18,13 +18,13 @@ class PageHitNotification
      * @param array|Request $request
      */
     public function __construct(
-        private int $hitId,
-        private ?int $pageId,
-        $request,
-        private ?int $leadId,
-        private bool $isNew,
-        private bool $isRedirect,
-        ?DateTime $eventTime = null
+        private int   $hitId,
+        private ?int  $pageId,
+        array|Request $request,
+        private ?int  $leadId,
+        private bool  $isNew,
+        private bool  $isRedirect,
+        ?DateTime     $eventTime = null
     ) {
         $this->setRequest($request);
         $this->setEventTime($eventTime);

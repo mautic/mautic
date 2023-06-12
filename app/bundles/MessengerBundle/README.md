@@ -1,6 +1,6 @@
 # Messenger Bundle
 
-The bundle makes use of Symfony's messenger component to dispatch and handle messages. 
+The bundle makes use of [Symfony's messenger component](https://symfony.com/doc/5.4/messenger.html) to dispatch and handle messages. 
 
 ## Transports
 
@@ -15,6 +15,10 @@ https://symfony.com/doc/current/messenger.html#routing-messages-to-a-transport
 
 By default, the transport is set to **synchronous**, meaning no AMQP/Doctrine or whatsoever is used and the request is handled directly.
 
+[Currently defined routes](MauticMessengerRoutes.php) are SYNC, PAGE_HIT, EMAIL_HIT although in default configuration only the SYNC is used.
+
+> https://symfony.com/doc/5.4/messenger.html#routing-messages-to-a-transport
+
 Here [a sample configuration](#sample-configuration)
 
 ## Notifications
@@ -23,6 +27,7 @@ Currently, 2 messages are defined.
  * [EmailHitNotification](app/bundles/MessengerBundle/Message/EmailHitNotification.php)
  * [PageHitNotification](app/bundles/MessengerBundle/Message/PageHitNotification.php)
 
+configuring transports:
 
 
 ### Sample configuration
