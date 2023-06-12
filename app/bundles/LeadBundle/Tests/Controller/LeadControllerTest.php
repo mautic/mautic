@@ -30,6 +30,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email'] = 'admin@mautic-community.test';
+        $this->configParams['messenger_type']    = 'testEmailSendToContactSync' === $this->getName() ? 'sync' : 'async';
 
         parent::setUp();
     }
@@ -479,7 +480,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(2, $leadsTableRows->count(), $crawler->html());
     }
 
-    public function testEmailSendToContact(): void
+    public function testEmailSendToContactSync(): void
     {
         $contact = $this->createContact('contact@an.email');
 
@@ -497,12 +498,10 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertQueuedEmailCount(1);
-        $email = $this->getMailerMessage();
 
+        $email      = $this->getMailerMessage();
         $userHelper = static::getContainer()->get(UserHelper::class);
-        \assert($userHelper instanceof UserHelper);
-
-        $user = $userHelper->getUser();
+        $user       = $userHelper->getUser();
 
         Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
         Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
@@ -516,6 +515,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount(1, $email->getReplyTo());
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+    }
+
+    public function testEmailSendToContactAsync(): void
+    {
+        // This test should behave the same as sending it via Sync. Just with different settings. See setUp().
+        $this->testEmailSendToContactSync();
     }
 
     private function createContact(string $email): Lead
