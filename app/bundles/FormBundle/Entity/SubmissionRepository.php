@@ -102,9 +102,7 @@ class SubmissionRepository extends CommonRepository
 
         $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
-        $fieldAliases = array_map(function ($alias) use ($databasePlatform) {
-            return $databasePlatform->quoteIdentifier($alias);
-        }, $fieldAliases);
+        $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
 
         $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
