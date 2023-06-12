@@ -17,6 +17,7 @@ class PublicController extends CommonFormController
      */
     public function downloadAction(Request $request, CoreParametersHelper $parametersHelper, $slug)
     {
+        return '';        
         echo 'something';
         // find the asset
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
