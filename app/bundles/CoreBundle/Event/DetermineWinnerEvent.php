@@ -31,7 +31,7 @@ class DetermineWinnerEvent extends Event
      *   parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email|mixed,
      *   children?: array<mixed>,
      *   page?: \Mautic\PageBundle\Entity\Page,
-     *   email?: \Mautic\EmailBundle\Entity\Email|\Mautic\CoreBundle\Entity\VariantEntityInterface
+     *   email?: \Mautic\EmailBundle\Entity\Email
      * } $parameters
      */
     public function __construct(array $parameters)

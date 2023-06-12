@@ -299,6 +299,9 @@ trait VariantEntityTrait
         return array_unique($ids);
     }
 
+    /**
+     * @return string[]
+     */
     private function getSettingsKeys()
     {
         if ($this->getVariantParent()) {
