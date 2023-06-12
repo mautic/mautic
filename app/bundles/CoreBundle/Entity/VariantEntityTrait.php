@@ -16,7 +16,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|FormEntity|null
+     * @var VariantEntityInterface|FormEntity|object|null
      **/
     private $variantParent;
 
