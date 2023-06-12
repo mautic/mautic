@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -51,7 +52,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     public static function getMailerMessages(string $transport = null): array
     {
-        return parent::getMailerMessages($transport);
+        $messages = parent::getMailerMessages($transport);
+
+        return array_map(function (RawMessage $message): MauticMessage {
+            \assert($message instanceof MauticMessage);
+
+            return $message;
+        }, $messages);
     }
 
     /**
