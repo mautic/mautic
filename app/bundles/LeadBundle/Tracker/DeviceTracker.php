@@ -59,10 +59,10 @@ class DeviceTracker
     /**
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
-    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent, bool $allowMultiSessionCalls = false)
+    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
         $signature = $trackedContact->getId().$userAgent;
-        if (isset($this->trackedDevice[$signature]) && !$allowMultiSessionCalls) { // This allows batch processing
+        if (isset($this->trackedDevice[$signature])) { // This allows batch processing
             // Prevent subsequent calls within the same session from creating multiple entries
             return $this->trackedDevice[$signature];
         }

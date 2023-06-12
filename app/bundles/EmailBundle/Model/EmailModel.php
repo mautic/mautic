@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\UnitOfWork;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -571,10 +572,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if ($lead) {
             $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent(
                 $lead,
-                $request->server->get('HTTP_USER_AGENT'),
-                true
+                $request->server->get('HTTP_USER_AGENT')
             );
-            $this->em->persist($trackedDevice);
+
+            // As the entity might be cached, present in EM, but not attached, we need to reload it
+            if ($this->em->getUnitOfWork()->getEntityState($trackedDevice) === UnitOfWork::STATE_DETACHED) {
+                $trackedDevice = $this->em->merge($trackedDevice);
+            }
 
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
