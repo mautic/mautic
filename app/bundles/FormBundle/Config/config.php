@@ -88,6 +88,10 @@ return [
                 'path'       => '/forms/results/file/{submissionId}/{field}',
                 'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileAction',
             ],
+            'mautic_form_file_download_by_name' => [
+                'path'       => '/forms/results/file/{fieldId}/filename/{fileName}',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileByFileNameAction',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'Mautic\FormBundle\Controller\PublicController::submitAction',

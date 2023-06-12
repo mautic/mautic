@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
@@ -219,6 +220,35 @@ class ResultController extends CommonFormController
         $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
 
         $fs = new Filesystem();
+        if (!$fs->exists($file)) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($file);
+        $response::trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileName
+        );
+
+        return $response;
+    }
+
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    {
+        $fieldEntity = $fieldModel->getEntity($fieldId);
+
+        if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
+                'form:forms:viewown',
+                'form:forms:viewother',
+                $fieldEntity->getForm()->getCreatedBy())
+        ) {
+            return $this->accessDenied();
+        }
+
+        $file = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
+
+        $fs   = new Filesystem();
         if (!$fs->exists($file)) {
             throw $this->createNotFoundException();
         }
