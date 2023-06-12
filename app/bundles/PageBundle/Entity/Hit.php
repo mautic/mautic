@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class Hit
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -30,22 +30,22 @@ class Hit
     private $dateLeft;
 
     /**
-     * @var Page
+     * @var Page|null
      */
     private $page;
 
     /**
-     * @var Redirect
+     * @var Redirect|null
      */
     private $redirect;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email
+     * @var \Mautic\EmailBundle\Entity\Email|null
      */
     private $email;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -55,27 +55,27 @@ class Hit
     private $ipAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $country;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $region;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $city;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $isp;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $organization;
 
@@ -89,22 +89,22 @@ class Hit
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $urlTitle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $pageLanguage;
 
@@ -119,12 +119,12 @@ class Hit
     private $trackingId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -132,8 +132,9 @@ class Hit
      * @var array
      */
     private $query = [];
+
     /**
-     * @var LeadDevice
+     * @var LeadDevice|null
      */
     private $device;
 
@@ -254,8 +255,6 @@ class Hit
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -299,7 +298,7 @@ class Hit
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

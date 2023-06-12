@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
@@ -34,7 +34,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public const LOGIN_ROUTE = 'login';
 
-    private UserPasswordEncoder $encoder;
+    private UserPasswordHasher $hasher;
 
     private EventDispatcherInterface $dispatcher;
 
@@ -55,13 +55,13 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserPasswordEncoder $encoder,
+        UserPasswordHasher $hasher,
         EventDispatcherInterface $dispatcher,
         RequestStack $requestStack,
         CsrfTokenManagerInterface $csrfTokenManager,
         UrlGeneratorInterface $urlGenerator
     ) {
-        $this->encoder           = $encoder;
+        $this->hasher            = $hasher;
         $this->dispatcher        = $dispatcher;
         $this->integrationHelper = $integrationHelper;
         $this->requestStack      = $requestStack;
@@ -149,7 +149,12 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public function checkCredentials($credentials, UserInterface $user): bool
     {
-        return $this->encoder->isPasswordValid($user, $credentials['password']);
+        // Temp solution to remap a UserInterface object to a PasswordAuthenticatedUserInterface object
+        $newUser = new User();
+        $newUser->setUsername($user->getUserName());
+        $newUser->setPassword($user->getPassword());
+
+        return $this->hasher->isPasswordValid($newUser, $credentials['password']);
     }
 
     public function getPassword($credentials): ?string

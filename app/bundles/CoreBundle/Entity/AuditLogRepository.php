@@ -101,7 +101,6 @@ class AuditLogRepository extends CommonRepository
 
     /**
      * @param array $filters
-     * @param $listOfContacts
      *
      * @return array
      */

@@ -41,7 +41,7 @@ class SearchSubscriberTest extends TestCase
                     $primaryTable = $tables[0];
                     unset($tables[0]);
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
-                    $joins = $q->getQueryPart('join');
+                    $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
                         $q->$joinType(
                             $primaryTable['from_alias'],

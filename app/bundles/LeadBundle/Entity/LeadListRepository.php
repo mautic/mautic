@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -60,7 +59,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $entity = null;
         }
 
@@ -195,8 +194,6 @@ class LeadListRepository extends CommonRepository
     /**
      * Check Lead segments by ids.
      *
-     * @param $ids
-     *
      * @return bool
      */
     public function checkLeadSegmentsByIds(Lead $lead, $ids)
@@ -233,7 +230,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
             ->orderBy('l.name');
 
@@ -252,7 +249,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, publicName, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 
@@ -266,11 +263,11 @@ class LeadListRepository extends CommonRepository
      *
      * @return array|int
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function getLeadCount($listIds)
     {
-        if (!(is_array($listIds))) {
+        if (!is_array($listIds)) {
             $listIds = [$listIds];
         }
 
@@ -323,8 +320,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param $filters
-     *
      * @return array
      */
     public function arrangeFilters($filters)
@@ -354,10 +349,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param      $table
-     * @param      $alias
-     * @param      $column
-     * @param      $value
      * @param null $leadId
      *
      * @return QueryBuilder
@@ -406,7 +397,6 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -424,7 +414,6 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -437,7 +426,7 @@ class LeadListRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
@@ -530,7 +519,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

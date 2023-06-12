@@ -30,8 +30,6 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 
     /**
      * Set new keys array.
-     *
-     * @param $keys
      */
     public function setKeys(array $keys)
     {

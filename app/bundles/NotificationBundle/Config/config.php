@@ -184,9 +184,9 @@ return [
             ],
         ],
     ],
-    //'categories' => [
+    // 'categories' => [
     //    'notification' => null
-    //],
+    // ],
     'parameters' => [
         'notification_enabled'                        => false,
         'notification_landing_page_enabled'           => true,

@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Spool;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
-use Swift_Mime_SimpleMessage;
 
 /**
  * Class DelegatingSpool
@@ -51,7 +50,7 @@ class DelegatingSpool extends \Swift_FileSpool
      *
      * @throws \Swift_IoException
      */
-    public function delegateMessage(Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
+    public function delegateMessage(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
     {
         $this->messageSpooled = false;
 

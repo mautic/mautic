@@ -113,9 +113,6 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
-     * @param $name
-     * @param $arguments
-     *
      * @return mixed
      */
     public static function __callStatic($name, $arguments)
@@ -173,7 +170,6 @@ class InputHelper
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed|string
@@ -195,32 +191,22 @@ class InputHelper
 
     /**
      * Strips tags.
-     *
-     * @param            $value
-     * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function string($value, $urldecode = false)
+    public static function string(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
-        return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        return self::filter_string_polyfill($value);
     }
 
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param            $value
-     * @param bool|false $urldecode
-     * @param bool|false $convertSpacesTo
-     * @param array      $allowedCharacters
-     *
-     * @return string
+     * @param string[] $allowedCharacters
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
+    public static function alphanum(string $value, bool $urldecode = false, ?string $convertSpacesTo = null, array $allowedCharacters = []): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -242,7 +228,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', $value));
+        return trim(preg_replace($regex, '', (string) $value));
     }
 
     /**
@@ -271,7 +257,6 @@ class InputHelper
     /**
      * Returns raw value.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return string
@@ -288,7 +273,6 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs.
      *
-     * @param                    $value
      * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
      * @param mixed              $defaultProtocol
@@ -358,7 +342,6 @@ class InputHelper
     /**
      * Removes all characters except those allowed in emails.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed
@@ -378,7 +361,6 @@ class InputHelper
     /**
      * Returns a clean array.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return array|mixed|string
@@ -403,7 +385,7 @@ class InputHelper
     /**
      * Returns clean HTML.
      *
-     * @param $value
+     * @param string[]|string $value
      *
      * @return mixed|string
      */
@@ -415,9 +397,9 @@ class InputHelper
             }
         } else {
             // Special handling for doctype
-            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
+            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', (string) $value, $doctype);
             // Special handling for CDATA tags
-            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
+            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], (string) $value, $cdataCount);
             // Special handling for conditional blocks
             preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
             if (!empty($matches[0])) {
@@ -525,8 +507,6 @@ class InputHelper
     /**
      * Converts UTF8 into Latin.
      *
-     * @param $value
-     *
      * @return mixed
      */
     public static function transliterate($value)
@@ -540,6 +520,17 @@ class InputHelper
         return \URLify::transliterate((string) $value);
     }
 
+    public static function transliterateFilename(string $filename): string
+    {
+        $pathInfo = pathinfo($filename);
+        $filename = self::alphanum(self::transliterate($pathInfo['filename']), false, '-');
+        if (isset($pathInfo['extension'])) {
+            $filename .= '.'.$pathInfo['extension'];
+        }
+
+        return $filename;
+    }
+
     public static function minifyHTML(string $html): string
     {
         if ('' === trim($html)) {
@@ -548,10 +539,10 @@ class InputHelper
         // Remove extra white-space(s) between HTML attribute(s)
         $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function ($matches) {
             return '<'.$matches[1].preg_replace(
-                    '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
-                    ' $1$2',
-                    $matches[2]
-                ).$matches[3].'>';
+                '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
+                ' $1$2',
+                $matches[2]
+            ).$matches[3].'>';
         }, str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
         if (false !== strpos($html, ' style=')) {
@@ -618,5 +609,15 @@ class InputHelper
         $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', $css);
 
         return $css;
+    }
+
+    /**
+     * Needed to support PHP 8.1 without changing behavior.
+     *
+     * @see https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
+     */
+    private static function filter_string_polyfill(string $string): string
+    {
+        return preg_replace('/\x00|<[^>]*>?/', '', $string);
     }
 }

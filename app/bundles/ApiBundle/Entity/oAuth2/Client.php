@@ -25,7 +25,7 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     protected $users;
 
@@ -55,7 +55,7 @@ class Client extends BaseClient
     protected $allowedGrantTypes;
 
     /**
-     * @var Role
+     * @var Role|null
      */
     protected $role;
 
@@ -125,10 +125,6 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);

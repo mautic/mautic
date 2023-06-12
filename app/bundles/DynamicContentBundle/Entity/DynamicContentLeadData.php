@@ -20,7 +20,7 @@ class DynamicContentLeadData extends CommonEntity
     private $dateAdded;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 

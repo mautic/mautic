@@ -97,7 +97,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                             'form.submit',
                         ],
                         'lookupFormType'             => 'sms_list',
-                        'repository'                 => 'MauticSmsBundle:Sms',
+                        'repository'                 => \Mautic\SmsBundle\Entity\Sms::class,
                     ],
                 ]
             );

@@ -29,9 +29,6 @@ class MauticMessage extends \Swift_Message
         return new self($subject, $body, $contentType, $charset);
     }
 
-    /**
-     * @param $email
-     */
     public function addMetadata($email, array $metadata)
     {
         $this->metadata[$email] = $metadata;
@@ -56,7 +53,6 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
-     * @param            $filePath
      * @param null       $fileName
      * @param null       $contentType
      * @param bool|false $inline

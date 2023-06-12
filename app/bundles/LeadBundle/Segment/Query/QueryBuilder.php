@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -201,16 +201,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * Executes this query using the bound parameters and their types.
      *
-     * @return Result<mixed>|int|string
+     * @return Result|int|string
      *
      * @throws \Exception
      */
     public function execute()
     {
         if (self::SELECT === $this->type) {
-            return Result::ensure(
-                $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes)
-            );
+            return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
         }
 
         return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
@@ -1101,9 +1099,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $queryPartName
-     * @param $value
-     *
      * @return $this
      */
     public function setQueryPart($queryPartName, $value)
@@ -1327,8 +1322,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $fromAlias
-     *
      * @return string
      *
      * @throws QueryException
@@ -1344,7 +1337,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 }
                 $sql .= ' '.strtoupper($join['joinType'])
                     .' JOIN '.$join['joinTable'].' '.$join['joinAlias']
-                    .' ON '.($join['joinCondition']);
+                    .' ON '.$join['joinCondition'];
                 $knownAliases[$join['joinAlias']] = true;
             }
 
@@ -1381,8 +1374,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $alias
-     *
      * @return bool
      */
     public function getJoinCondition($alias)
@@ -1399,9 +1390,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
     /**
      * Add AND condition to existing table alias.
-     *
-     * @param $alias
-     * @param $expr
      *
      * @return $this
      *
@@ -1430,9 +1418,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $alias
-     * @param $expr
-     *
      * @return $this
      */
     public function replaceJoinCondition($alias, $expr)
@@ -1450,9 +1435,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $parameters
-     * @param $filterParameters
-     *
      * @return QueryBuilder
      */
     public function setParametersPairs($parameters, $filterParameters)
@@ -1564,8 +1546,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $table
-     *
      * @return bool
      */
     public function isJoinTable($table)
@@ -1635,8 +1615,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $expression
-     *
      * @return $this
      */
     private function addLogicStack($expression)
@@ -1649,9 +1627,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
-     *
-     * @param $expression
-     * @param $glue
      */
     public function addLogic($expression, $glue)
     {

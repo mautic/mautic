@@ -18,27 +18,27 @@ class Summary
     private $id;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTimeImmutable|null
      **/
     private $dateTriggered;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $scheduledCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $triggeredCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $nonActionPathTakenCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $failedCount = 0;
 
@@ -154,7 +154,7 @@ class Summary
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTimeInterface $dateTriggered = null): void
+    public function setDateTriggered(\DateTimeImmutable $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

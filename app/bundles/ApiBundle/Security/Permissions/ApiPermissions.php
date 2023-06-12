@@ -61,7 +61,7 @@ class ApiPermissions extends AbstractPermissions
      */
     public function getValue($name, $perm)
     {
-        //ensure api is enabled system wide
+        // ensure api is enabled system wide
         if (empty($this->params['api_enabled'])) {
             return 0;
         }

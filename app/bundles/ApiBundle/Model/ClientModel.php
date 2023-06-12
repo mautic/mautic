@@ -43,9 +43,6 @@ class ClientModel extends FormModel
         }
     }
 
-    /**
-     * @param $apiMode
-     */
     public function setApiMode($apiMode)
     {
         $this->apiMode = $apiMode;
@@ -144,8 +141,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * @param $entity
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
@@ -154,7 +149,7 @@ class ClientModel extends FormModel
             throw new MethodNotAllowedHttpException(['Client']);
         }
 
-        //remove the user from the client
+        // remove the user from the client
         if ('oauth2' == $this->apiMode) {
             $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
