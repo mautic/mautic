@@ -13,10 +13,6 @@ $root = $container->getParameter('kernel.project_dir').'/app';
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
 
-$container->loadFromExtension('sentry', [
-    'dsn' => getenv('SENTRY_DSN', false),
-]);
-
 // Load extra annotations
 $container->loadFromExtension('sensio_framework_extra', [
     'router'  => ['annotations' => false],
