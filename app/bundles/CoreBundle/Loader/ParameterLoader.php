@@ -166,7 +166,7 @@ class ParameterLoader
             /** @var array<string, mixed> $parameters */
             include $localParametersFile;
 
-            //override default with forced
+            // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 

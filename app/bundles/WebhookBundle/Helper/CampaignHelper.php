@@ -109,7 +109,7 @@ class CampaignHelper
                 } else {
                     $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
                 }
-            $response = $this->client->request($method, $url, $options);
+                $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
                 $response = $this->client->delete($url, [

@@ -30,7 +30,6 @@ class UpdateIpDataStoreCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:iplookup:download')
-            ->setDescription('Fetch remote datastores for IP lookup services that leverage local lookups')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.
@@ -65,6 +64,7 @@ EOT
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch remote datastores for IP lookup services that leverage local lookups';
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -9,53 +11,45 @@ use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelperMock;
+    private AssetsHelper $assetsHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|PathsHelper
+     * @var MockObject&PathsHelper
      */
     private $pathsHelperMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|GravatarHelper
-     */
-    private $gravatarHelperMock;
+    private GravatarHelper $gravatarHelperMock;
+
+    private DefaultAvatarHelper $defaultAvatarHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DefaultAvatarHelper
-     */
-    private $defaultAvatarHelperMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Lead
+     * @var MockObject&Lead
      */
     private $leadMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AvatarHelper
-     */
-    private $avatarHelper;
+    private AvatarHelper $avatarHelper;
 
     protected function setUp(): void
     {
-        $packagesMock = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->assetsHelperMock        = new AssetsHelper($packagesMock);
-        $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
+
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        $this->assetsHelperMock = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $this->pathsHelperMock  = $this->createMock(PathsHelper::class);
         $this->pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->pathsHelperMock, $this->assetsHelperMock);
-        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $this->createMock(CoreParametersHelper::class), $this->createMock(RequestStack::class));
+        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
     }
@@ -63,7 +57,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test to get gravatar.
      */
-    public function testGetAvatarWhenGravatar()
+    public function testGetAvatarWhenGravatar(): void
     {
         $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
         $_SERVER['SERVER_PORT']     = '80';
@@ -88,7 +82,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test to get default image.
      */
-    public function testGetAvatarWhenDefault()
+    public function testGetAvatarWhenDefault(): void
     {
         $this->leadMock->method('getPreferredProfileImage')
             ->willReturn('gravatar');

@@ -70,7 +70,7 @@ class NotificationHelper
     public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
 
         $lead = $repo->getLeadByEmail($notification);
 

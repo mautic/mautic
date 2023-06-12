@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 interface AjaxLookupModelInterface
 {
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start

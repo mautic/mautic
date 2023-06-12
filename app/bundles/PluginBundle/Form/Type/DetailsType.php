@@ -42,52 +42,52 @@ class DetailsType extends AbstractType
         }
 
         $builder->add(
-                'apiKeys',
-                KeysType::class,
-                [
-                    'label'              => false,
-                    'integration_keys'   => $keys,
-                    'data'               => $decryptedKeys,
-                    'integration_object' => $integrationObject,
-                ]
-            );
+            'apiKeys',
+            KeysType::class,
+            [
+                'label'              => false,
+                'integration_keys'   => $keys,
+                'data'               => $decryptedKeys,
+                'integration_object' => $integrationObject,
+            ]
+        );
 
         $builder->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
-                    $data = $event->getData();
-                    $form = $event->getForm();
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
+                $data = $event->getData();
+                $form = $event->getForm();
 
-                    $form->add(
-                        'apiKeys',
-                        KeysType::class,
-                        [
-                            'label'              => false,
-                            'integration_keys'   => $keys,
-                            'data'               => $decryptedKeys,
-                            'integration_object' => $options['integration_object'],
-                            'is_published'       => (int) $data['isPublished'],
-                        ]
-                    );
-                }
-            );
+                $form->add(
+                    'apiKeys',
+                    KeysType::class,
+                    [
+                        'label'              => false,
+                        'integration_keys'   => $keys,
+                        'data'               => $decryptedKeys,
+                        'integration_object' => $options['integration_object'],
+                        'is_published'       => (int) $data['isPublished'],
+                    ]
+                );
+            }
+        );
 
         if (!empty($formSettings['requires_authorization'])) {
             $label = ($integrationObject->isAuthorized()) ? 'reauthorize' : 'authorize';
 
             $builder->add(
-                    'authButton',
-                    StandAloneButtonType::class,
-                    [
-                        'attr'     => [
-                            'class'   => 'btn btn-success btn-lg',
-                            'onclick' => 'Mautic.initiateIntegrationAuthorization()',
-                            'icon'    => 'fa fa-key',
-                        ],
-                        'label'    => 'mautic.integration.form.'.$label,
-                        'disabled' => false,
-                    ]
-                );
+                'authButton',
+                StandAloneButtonType::class,
+                [
+                    'attr'     => [
+                        'class'   => 'btn btn-success btn-lg',
+                        'onclick' => 'Mautic.initiateIntegrationAuthorization()',
+                        'icon'    => 'fa fa-key',
+                    ],
+                    'label'    => 'mautic.integration.form.'.$label,
+                    'disabled' => false,
+                ]
+            );
         }
 
         $features = $integrationObject->getSupportedFeatures();

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -41,7 +40,7 @@ class ContactSegmentService
      * @return array<int,mixed[]>
      *
      * @throws Exception\SegmentQueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters): array
     {
@@ -117,7 +116,7 @@ class ContactSegmentService
      *
      * @return array<int,mixed[]>
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws Exception\SegmentQueryException
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
@@ -180,7 +179,7 @@ class ContactSegmentService
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = [])
     {
@@ -200,7 +199,7 @@ class ContactSegmentService
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
@@ -255,7 +254,7 @@ class ContactSegmentService
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
@@ -275,7 +274,7 @@ class ContactSegmentService
         $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
         $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
         $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
-        $qbO->setParameter(':orpsegid', $segment->getId());
+        $qbO->setParameter('orpsegid', $segment->getId());
         $this->addLeadAndMinMaxLimiters($qbO, $batchLimiters, 'lead_lists_leads');
 
         if ($limit) {
@@ -295,8 +294,6 @@ class ContactSegmentService
 
     /**
      * Formatting helper.
-     *
-     * @param $inputSeconds
      *
      * @return string
      */

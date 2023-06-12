@@ -173,11 +173,11 @@ abstract class AbstractChart
     {
         switch ($this->unit) {
             case 's':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%s'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%s');
                 ++$amount;
                 break;
             case 'i':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%i'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%i');
                 ++$amount;
                 break;
             case 'd':

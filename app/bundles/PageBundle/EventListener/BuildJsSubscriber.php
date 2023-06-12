@@ -214,23 +214,8 @@ JS;
         );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
-            null,
-            null,
-            true
-        );
-        $froogaloop2       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/froogaloop2.min.js',
-            null,
-            null,
-            true
-        );
-
-        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
-        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
-        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
-        $froogaloop2     = str_replace('/index_dev.php', '', $froogaloop2);
+        $jQueryUrl       = $this->assetsHelper->getUrl('media/js/jquery.min.js', null, null, true);
+        $froogaloop2     = $this->assetsHelper->getUrl('media/js/froogaloop.min.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!

@@ -14,8 +14,6 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param $trackingHash
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -38,7 +36,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $smsId
      * @param null $listId
      *
      * @return array
@@ -58,7 +55,7 @@ class StatRepository extends CommonRepository
 
         $result = $q->execute()->fetchAllAssociative();
 
-        //index by lead
+        // index by lead
         $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
@@ -148,7 +145,7 @@ class StatRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->orX(
+                $query->expr()->or(
                     $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
                 )
             );
@@ -171,9 +168,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -186,8 +180,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
     public function deleteStat($id)
     {
@@ -195,7 +187,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

@@ -113,7 +113,7 @@ trait TimelineTrait
         if (!empty($options['paginated'])) {
             // Get a total count along with results
             $query->resetQueryParts(['select', 'orderBy'])
-                ->setFirstResult(null)
+                ->setFirstResult(0)
                 ->setMaxResults(null)
                 ->select('count(*)');
 

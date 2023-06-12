@@ -97,7 +97,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param $order
      * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
@@ -106,7 +105,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from('MauticLeadBundle:Company', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
@@ -123,8 +122,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get companies by lead.
-     *
-     * @param $leadId
      *
      * @return array
      */
@@ -265,8 +262,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a count of leads that belong to the company.
      *
-     * @param $companyIds
-     *
      * @return array
      */
     public function getLeadCount($companyIds)
@@ -276,7 +271,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $q->select('count(cl.lead_id) as thecount, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
 
-        $returnArray = (is_array($companyIds));
+        $returnArray = is_array($companyIds);
 
         if (!$returnArray) {
             $companyIds = [$companyIds];
@@ -307,9 +302,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a list of lists.
      *
-     * @param      $companyName
-     * @param      $city
-     * @param      $country
      * @param null $state
      *
      * @return array
@@ -362,7 +354,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
@@ -408,7 +400,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param     $query
      * @param int $limit
      * @param int $offset
      *

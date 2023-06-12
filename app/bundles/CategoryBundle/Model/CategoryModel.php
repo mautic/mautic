@@ -34,7 +34,6 @@ class CategoryModel extends FormModel
     public function getRepository(): CategoryRepository
     {
         $result = $this->em->getRepository(Category::class);
-        \assert($result instanceof CategoryRepository);
 
         return $result;
     }
@@ -60,9 +59,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $entity
-     * @param $unlock
-     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
@@ -71,9 +67,9 @@ class CategoryModel extends FormModel
         if (empty($alias)) {
             $alias = $entity->getTitle();
         }
-        $alias = $this->cleanAlias($alias, '', false, '-');
+        $alias = $this->cleanAlias($alias, '', 0, '-');
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
@@ -96,7 +92,6 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -119,8 +114,6 @@ class CategoryModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Category|null
      */
     public function getEntity($id = null)
@@ -134,11 +127,6 @@ class CategoryModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -181,10 +169,6 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $bundle
-     * @param $filter
-     * @param $limit
      *
      * @return array
      */

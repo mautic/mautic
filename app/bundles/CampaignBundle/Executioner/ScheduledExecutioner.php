@@ -225,7 +225,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private function prepareForExecution()
     {
-        $this->now = $this->now ?? new \Datetime();
+        $this->now = $this->now ?? new \DateTime();
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
@@ -272,8 +272,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException

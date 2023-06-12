@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -39,8 +38,6 @@ class PublicController extends CommonFormController
     private LoggerInterface $logger;
 
     /**
-     * @param $idHash
-     *
      * @return Response
      */
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash)
@@ -96,8 +93,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $idHash
-     *
      * @return Response
      */
     public function trackingImageAction(
@@ -117,8 +112,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $idHash
-     *
      * @return Response
      *
      * @throws \Exception
@@ -227,7 +220,7 @@ class PublicController extends CommonFormController
 
                 $formView = $form->createView();
                 /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
@@ -326,8 +319,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $idHash
-     *
      * @return Response
      *
      * @throws \Exception
@@ -335,7 +326,7 @@ class PublicController extends CommonFormController
      */
     public function resubscribeAction(ContactTracker $contactTracker, $idHash)
     {
-        //find the email
+        // find the email
         $model = $this->getModel('email');
         \assert($model instanceof EmailModel);
         $stat = $model->getEmailStatus($idHash);
@@ -349,7 +340,7 @@ class PublicController extends CommonFormController
                 $contactTracker->setTrackedContact($lead);
 
                 if (!$this->translator instanceof LocaleAwareInterface) {
-                    throw new LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+                    throw new \LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
                 }
 
                 // Set lead lang
@@ -423,8 +414,6 @@ class PublicController extends CommonFormController
     /**
      * Handles mailer transport webhook post.
      *
-     * @param $transport
-     *
      * @return Response
      */
     public function mailerCallbackAction(Request $request, $transport)
@@ -445,8 +434,6 @@ class PublicController extends CommonFormController
 
     /**
      * Preview email.
-     *
-     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -472,7 +459,7 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
 
-        //bogus ID
+        // bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
         $BCcontent = $emailEntity->getContent();
@@ -501,7 +488,7 @@ class PublicController extends CommonFormController
                 ]
             );
 
-            //replace tokens
+            // replace tokens
             $content = $response->getContent();
         }
 
@@ -547,7 +534,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $slots
      * @param Email $entity
      */
     public function processSlots($slots, $entity)
@@ -569,8 +555,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $integration
-     *
      * @throws \Exception
      */
     private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration)
@@ -678,8 +662,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $integration
-     *
      * @return Response
      */
     public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration)
@@ -689,12 +671,6 @@ class PublicController extends CommonFormController
         return TrackingPixelHelper::getResponse($request); // send gif
     }
 
-    /**
-     * @param $lead
-     * @param $email
-     * @param $query
-     * @param $idHash
-     */
     private function addStat(MailHelper $mailer, $lead, $email, $query, $idHash)
     {
         if (null !== $lead) {
@@ -724,9 +700,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $email
-     * @param $repo
-     *
      * @return mixed
      */
     private function createLead($email, $repo)
@@ -745,11 +718,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $idHash
-     * @param $model
-     * @param $stat
-     * @param $translator
-     *
      * @return mixed
      */
     public function getUnsubscribeMessage($idHash, $model, $stat, $translator)

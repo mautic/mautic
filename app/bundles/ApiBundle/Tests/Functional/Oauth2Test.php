@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * MAUTIC_INSTALLER which breaks other tests.
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 final class Oauth2Test extends MauticMysqlTestCase

@@ -83,8 +83,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Called by parent::getBuilderTokensAction().
      *
-     * @param $query
-     *
      * @return array
      */
     protected function getBuilderTokens($query)

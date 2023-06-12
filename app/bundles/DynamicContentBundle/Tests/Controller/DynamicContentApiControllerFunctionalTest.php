@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase

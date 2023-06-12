@@ -109,7 +109,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetUrlsFromPlaintextSkipDefaultTokenValues()
     {
         $this->assertEquals(
-        // 1 is skipped because it's set as the token default
+            // 1 is skipped because it's set as the token default
             [0 => 'https://find.this', 2 => '{contactfield=website|http://skip.this}'],
             UrlHelper::getUrlsFromPlaintext(
                 'Find this url: https://find.this, but allow this token because we know its a url: {contactfield=website|http://skip.this}! '

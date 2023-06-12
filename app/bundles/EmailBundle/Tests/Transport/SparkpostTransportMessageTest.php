@@ -66,7 +66,7 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(10, $sparkpostMessage['recipients']);
 
-        //CC and BCC fields has to be included as normal recipient with same data as TO fields has
+        // CC and BCC fields has to be included as normal recipient with same data as TO fields has
         $recipients = [
             [
                 'address' => [

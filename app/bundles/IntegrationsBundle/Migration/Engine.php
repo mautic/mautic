@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Migration;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
@@ -66,7 +65,7 @@ class Engine
             }
 
             $this->entityManager->commit();
-        } catch (DBALException $e) {
+        } catch (\Doctrine\DBAL\Exception $e) {
             $this->entityManager->rollback();
 
             throw $e;
@@ -86,7 +85,7 @@ class Engine
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath.$fileName;
             $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className          = 'MauticPlugin\\'.$this->bundleName."\Migrations\\${className}";
+            $className          = 'MauticPlugin\\'.$this->bundleName."\Migrations\\{$className}";
             $migrationClasses[] = $className;
         }
 

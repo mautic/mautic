@@ -33,7 +33,6 @@ class SendChannelBroadcastCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:broadcasts:send')
-            ->setDescription('Process contacts pending to receive a channel broadcast.')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
@@ -100,12 +99,12 @@ EOT
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
 
-                return 1;
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
         }
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
@@ -137,6 +136,7 @@ EOT
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

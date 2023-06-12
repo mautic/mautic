@@ -74,6 +74,8 @@ class ThemeHelperTest extends TestCase
 
         $this->builderIntegrationsHelper = $this->createMock(BuilderIntegrationsHelper::class);
 
+        $this->translator->method('trans')->willReturn('some translation');
+
         $this->themeHelper = new ThemeHelper(
             $this->pathsHelper,
             $this->twig,

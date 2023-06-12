@@ -23,12 +23,12 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $emailModel                                             =  self::$container->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
-        $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
         $this->assertEquals($sentCount, 7);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
+        $this->assertEquals($sentCount, 8);
     }
 
     /**
@@ -84,6 +84,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email');
         $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
         $email->setIsPublished(true);
@@ -120,7 +121,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $childrenEmail->setTranslationParent($parentEmail);
         $this->em->persist($parentEmail);
 
-        $this->em->clear();
+        $this->em->detach($segment);
+        $this->em->detach($parentEmail);
+        $this->em->detach($childrenEmail);
 
         /** @var EmailModel $emailModel */
         $emailModel = self::$container->get('mautic.email.model.email');

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -21,17 +21,13 @@ class Tag
     private $tag;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
-    /**
-     * @param string $tag
-     * @param bool   $clean
-     */
-    public function __construct($tag = null, $clean = true)
+    public function __construct(string $tag = null, bool $clean = true)
     {
-        $this->tag = $clean ? $this->validateTag($tag) : $tag;
+        $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
     }
 
     public static function loadMetadata(ClassMetadata $metadata)
@@ -42,8 +38,8 @@ class Tag
             ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
-        $builder->addField('tag', Type::STRING);
-        $builder->addNamedField('description', Type::TEXT, 'description', true);
+        $builder->addField('tag', Types::STRING);
+        $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
@@ -76,11 +72,9 @@ class Tag
     }
 
     /**
-     * @param string $tag
-     *
      * @return Tag
      */
-    public function setTag($tag)
+    public function setTag(string $tag)
     {
         $this->tag = $this->validateTag($tag);
 
@@ -107,13 +101,8 @@ class Tag
         return $this;
     }
 
-    /**
-     * @param string $tag
-     *
-     * @return Tag
-     */
-    protected function validateTag($tag)
+    private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim($tag));
+        return InputHelper::string(trim((string) $tag));
     }
 }

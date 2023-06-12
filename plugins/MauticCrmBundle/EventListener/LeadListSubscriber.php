@@ -101,7 +101,7 @@ class LeadListSubscriber implements EventSubscriberInterface
      */
     public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
-        //get Integration Campaign members
+        // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];

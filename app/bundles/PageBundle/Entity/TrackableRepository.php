@@ -13,9 +13,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Find redirects that are trackable.
      *
-     * @param $channel
-     * @param $channelId
-     *
      * @return mixed
      */
     public function findByChannel($channel, $channelId)
@@ -26,7 +23,7 @@ class TrackableRepository extends CommonRepository
         return $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
                     $q->expr()->eq('t.channel_id', (int) $channelId)
@@ -40,10 +37,6 @@ class TrackableRepository extends CommonRepository
 
     /**
      * Get a Trackable by Redirect URL.
-     *
-     * @param $url
-     * @param $channel
-     * @param $channelId
      *
      * @return array
      */
@@ -71,9 +64,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Get an array of Trackable entities by Redirect URLs.
      *
-     * @param $channel
-     * @param $channelId
-     *
      * @return array
      */
     public function findByUrls(array $urls, $channel, $channelId)
@@ -98,9 +88,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param      $redirectId
-     * @param      $channel
-     * @param      $channelId
      * @param int  $increaseBy
      * @param bool $unique
      */
@@ -111,7 +98,7 @@ class TrackableRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'channel_url_trackables')
             ->set('hits', 'hits + '.(int) $increaseBy)
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('redirect_id', (int) $redirectId),
                     $q->expr()->eq('channel', ':channel'),
                     $q->expr()->eq('channel_id', (int) $channelId)
@@ -129,9 +116,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Get hit count.
      *
-     * @param $channel
-     * @param $channelIds
-     * @param $listId
      * @param bool   $combined
      * @param string $countColumn
      *
@@ -207,7 +191,7 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

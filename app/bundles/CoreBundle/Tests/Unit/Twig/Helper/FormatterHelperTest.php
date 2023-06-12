@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
-use DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
@@ -49,9 +48,9 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testStrictHtmlFormatIsRemovingScriptTags(): void
     {
-        $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
+        $sample = '<a href="/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
-        $expected = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.console.log(\'script is running\');console.log(\'CAPITAL script is running\');';
+        $expected = '<a href="/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.console.log(\'script is running\');console.log(\'CAPITAL script is running\');';
 
         $result = $this->formatterHelper->_($sample, 'html');
 
@@ -70,6 +69,22 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->formatterHelper->_(0, 'bool');
         $this->assertEquals('no', $result);
+    }
+
+    public function testFloatFormat(): void
+    {
+        $result = $this->formatterHelper->_(1.55, 'float');
+
+        $this->assertEquals('1.5500', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
+    public function testIntFormat(): void
+    {
+        $result = $this->formatterHelper->_(10, 'int');
+
+        $this->assertSame('10', $result);
+        $this->assertEquals('string', gettype($result));
     }
 
     /**
@@ -106,8 +121,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
         // date object
         yield [
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
     }
 }
