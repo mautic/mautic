@@ -17,8 +17,11 @@ class PublicController extends CommonFormController
      */
     public function downloadAction(Request $request, CoreParametersHelper $parametersHelper, $slug)
     {
-        return '';        
-        echo 'something';
+        
+        if(preg_match("/^([a-z0–9\+_\-]+)(\.[a-z0–9\+_\-]+)*@([a-z0–   9\-]+\.)+[a-z]{2,6}$/ix", $email) {
+            echo "test";
+         }
+         
         // find the asset
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
