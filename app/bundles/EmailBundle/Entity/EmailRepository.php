@@ -545,6 +545,11 @@ class EmailRepository extends CommonRepository
         $connection    = $this->getEntityManager()->getConnection();
         $tableName     = MAUTIC_TABLE_PREFIX.'email_list_xref';
         $childrenIds   = array_map('intval', (array) $parent->getOnlyChildrenRelatedEntityIds());
+
+        if (empty($childrenIds)) {
+            return;
+        }
+
         // Delete existing cross-reference records for child emails.
         $connection->createQueryBuilder()
             ->delete($tableName)

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
@@ -142,7 +141,7 @@ trait VariantModelTrait
     }
 
     /**
-     * @param VariantEntityInterface|FormEntity $entity
+     * @param VariantEntityInterface $entity
      */
     public function cloneFromParentToVariant($entity): void
     {
@@ -154,17 +153,8 @@ trait VariantModelTrait
 
         $repo = $this->getRepository();
 
-        $isParent = $entity->getId() === $parent->getId();
-
-        if ($isParent && method_exists($repo, 'cloneFromParentToVariant')) {
+        if (method_exists($repo, 'cloneFromParentToVariant')) {
             $repo->cloneFromParentToVariant($parent);
-        }
-
-        if (!$isParent) {
-            $entity->setIsPublished($parent->getIsPublished());
-            $entity->setPublishUp($parent->getPublishUp());
-            $entity->setPublishDown($parent->getPublishDown());
-            $entity->setLists($parent->getLists()->toArray());
         }
     }
 
