@@ -23,7 +23,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->createFile($fileName);
 
         $form  = new Form();
-        $form->setAlias('apiform2');
+        $form->setAlias('apiform');
         $form->setName('API form');
         $form->setDescription('Test Form');
         $form->setFormType('standalone');
@@ -32,10 +32,10 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $field = new Field();
         $field->setType('file');
         $field->setLabel('File');
-        $field->setAlias('file_field_2');
+        $field->setAlias('file_field');
         $field->setProperties([
             'allowed_file_size'       => 1,
-            'allowed_file_extensions' => ['txt', 'jpg', 'gif', 'png',],
+            'allowed_file_extensions' => ['txt', 'jpg', 'gif', 'png'],
             'public'                  => true,
         ]);
         $field->setForm($form);
@@ -51,7 +51,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $form        = $formCrawler->form();
         $file        = new UploadedFile($fileName, $fileName, 'image/png');
         $form->setValues([
-            'mauticform[file_field_2]' => $file,
+            'mauticform[file_field]' => $file,
         ]);
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
