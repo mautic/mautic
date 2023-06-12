@@ -153,8 +153,8 @@ class FileApiController extends CommonApiController
     {
         try {
             $possibleDirs = ['assets', 'images'];
-            $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, false, ['/']));
+            $dir          = InputHelper::alphanum($dir, true, null, ['_', '.']);
+            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, null, ['/']));
 
             // Dots in the dir name are slashes
             if (false !== strpos($dir, '.') && !$subdir) {

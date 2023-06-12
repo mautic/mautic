@@ -29,6 +29,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
+        $email->setSubject('Test subject');
         $email->setCustomHtml(
             <<<'CONTENT'
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -110,6 +111,7 @@ CONTENT
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
         $mailHelper->message->html($email->getCustomHtml());
+        $mailHelper->message->setSubject($email->getSubject());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
         $parsedBody = $mailHelper->message->getHtmlBody();

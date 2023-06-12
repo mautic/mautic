@@ -42,7 +42,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->data[$this->position];
     }
@@ -71,7 +71,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -86,7 +86,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->position <= $this->totalResult && !is_null($this->data)) {
             return true;

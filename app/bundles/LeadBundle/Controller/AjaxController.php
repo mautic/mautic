@@ -101,7 +101,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray  = ['success' => 1];
         $filter     = InputHelper::clean($request->query->get('filter'));
-        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, null, ['_']);
 
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getModel('lead.field');

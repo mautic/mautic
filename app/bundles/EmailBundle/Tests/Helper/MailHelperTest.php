@@ -69,11 +69,11 @@ class MailHelperTest extends TestCase
 
         $email = new Email();
         $email->setUseOwnerAsMailer(true);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
 
         $mailer->setEmail($email);
         $mailer->enableQueue();
-
-        $mailer->setSubject('Hello');
 
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
@@ -127,6 +127,8 @@ class MailHelperTest extends TestCase
         $email->setUseOwnerAsMailer(false);
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
         $mailer->setEmail($email);
 
         foreach ($this->contacts as $key => $contact) {
@@ -147,6 +149,9 @@ class MailHelperTest extends TestCase
         $mailer        = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
         $email         = new Email();
 
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
         $mailer->setEmail($email);
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         $this->assertEquals('nobody@nowhere.com', $replyTo);
@@ -164,6 +169,9 @@ class MailHelperTest extends TestCase
         $symfonyMailer = new Mailer($transport);
         $mailer        = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
         $email         = new Email();
+
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
 
         // From address is set
         $email->setFromAddress('from@nowhere.com');
@@ -186,6 +194,8 @@ class MailHelperTest extends TestCase
 
         // From address is set
         $email->setFromAddress('from@nowhere.com');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
         $mailer->setEmail($email);
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         // Expect from address in reply to
@@ -202,8 +212,10 @@ class MailHelperTest extends TestCase
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
 
         $email = new Email();
-        $mailer->setEmail($email);
         $email->setUseOwnerAsMailer(true);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $mailer->setEmail($email);
 
         $mailer->setBody('{signature}');
 
@@ -536,6 +548,7 @@ class MailHelperTest extends TestCase
 
         $email = new Email();
         $email->setCustomHtml($html);
+        $email->setSubject('Subject');
         $mailer->setEmail($email);
         $this->assertSame($expectedHtml, $mailer->getBody(), $mailer->getBody());
     }
