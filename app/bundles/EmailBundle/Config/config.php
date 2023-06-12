@@ -267,16 +267,8 @@ return [
                 'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
             ],
             'smtp' => [
-                'class'        => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
-                'tagArguments' => [
-                    \Mautic\EmailBundle\Model\TransportType::TRANSPORT_ALIAS   => 'mautic.email.config.mailer_transport.smtp',
-                    \Mautic\EmailBundle\Model\TransportType::FIELD_HOST        => true,
-                    \Mautic\EmailBundle\Model\TransportType::FIELD_PORT        => true,
-                    \Mautic\EmailBundle\Model\TransportType::FIELD_USER        => true,
-                    \Mautic\EmailBundle\Model\TransportType::FIELD_PASSWORD    => true,
-                    \Mautic\EmailBundle\Model\TransportType::DSN_CONVERTOR     => Mautic\EmailBundle\Helper\MailerDsnConvertor::class,
-                ],
-                'tag'      => 'mautic.email.transport_extension',
+                'class' => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
+                'tag'   => 'mautic.email.transport_extension',
             ],
         ],
         'models' => [
@@ -328,10 +320,6 @@ return [
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
                 ],
-            ],
-            'mautic.email.transport_type' => [
-                'class'     => \Mautic\EmailBundle\Model\TransportType::class,
-                'arguments' => [],
             ],
         ],
         'validator' => [

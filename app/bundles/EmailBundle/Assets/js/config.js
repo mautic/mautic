@@ -63,25 +63,6 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
     });
 };
 
-Mautic.testEmailServerConnection = function() {
-    var data = {}
-    mQuery('.used-in-test').each(function(){
-        const id = mQuery(this).attr('id')
-        const key = id.substring(id.indexOf('mailer'));
-        data[key] = mQuery(this).val()
-    })    
-    
-    mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');
-
-    Mautic.ajaxActionRequest('email:testEmailServerConnection', data, function(response) {
-        var theClass = (response.success) ? 'has-success' : 'has-error';
-        var theMessage = response.message;
-        mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);
-        mQuery('#mailerTestButtonContainer .help-block .status-msg').html(theMessage);
-        mQuery('#mailerTestButtonContainer .fa-spinner').addClass('hide');
-    });
-};
-
 Mautic.sendTestEmail = function() {
     mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');
 

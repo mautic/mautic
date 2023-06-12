@@ -43,19 +43,4 @@ class TransportWrapper
 
         return $transportExtension;
     }
-
-    /**
-     * @throws TransportNotFoundException
-     * @throws UnsupportedTransportException
-     */
-    public function getTestConnectionExtension(string $transportName): TestConnectionInterface
-    {
-        $transportExtension = $this->getTransportExtension($transportName);
-
-        if (!$transportExtension instanceof TestConnectionInterface) {
-            throw UnsupportedTransportException::fromName($transportName, 'Connection test');
-        }
-
-        return $transportExtension;
-    }
 }

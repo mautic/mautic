@@ -15,7 +15,7 @@
     '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
 ] %}
 
-{% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type'])|length > 0 %}
+{% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_dsn', 'mailer_spool_type'])|length > 0 %}
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title">{{ 'mautic.email.config.header.mail'|trans }}</h3>
@@ -37,14 +37,13 @@
                 <hr class="text-muted" />
             {% endif %}
 
-            {% if fields.mailer_transport is defined %}
+            {% if fields.mailer_dsn is defined %}
                 <div class="row">
                     <div class="col-sm-6">
-                        {{ form_row(fields.mailer_transport) }}
+                        {{ form_row(fields.mailer_dsn) }}
                     </div>
-                    <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_emailconfig_mailer_transport":["sendmail","mail"]}'>
+                    <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_emailconfig_mailer_dsn":["sendmail","mail"]}'>
                         <div class="button_container">
-                            {{ form_widget(fields.mailer_test_connection_button) }}
                             {{ form_widget(fields.mailer_test_send_button) }}
                             <span class="fa fa-spinner fa-spin hide"></span>
                         </div>
@@ -57,38 +56,6 @@
             {% endif %}
 
             <div class="row">
-                {{ _self.row_if_exists(fields, 'mailer_amazon_region') }}
-                {{ _self.row_if_exists(fields, 'mailer_amazon_other_region') }}
-            </div>
-
-            <div class="row">
-                {{ _self.row_if_exists(fields, 'mailer_sparkpost_region') }}
-            </div>
-
-            <div class="row">
-                {{ _self.row_if_exists(fields, 'mailer_host') }}
-                {{ _self.row_if_exists(fields, 'mailer_port') }}
-            </div>
-
-            <div class="row">
-                {{ _self.row_if_exists(fields, 'mailer_encryption') }}
-                {{ _self.row_if_exists(fields, 'mailer_auth_mode') }}
-            </div>
-
-            <div class="row">
-                {{ _self.row_if_exists(fields, 'mailer_user') }}
-                {{ _self.row_if_exists(fields, 'mailer_password') }}
-                {{ _self.row_if_exists(fields, 'mailer_api_key') }}
-            </div>
-
-            {% if fields.mailer_transport is defined %}
-                <div class="row">
-                    {{ _self.row_if_exists(fields, 'mailer_mailjet_sandbox') }}
-                    {{ _self.row_if_exists(fields, 'mailer_mailjet_sandbox_default_mail') }}
-                </div>
-            {% endif %}
-
-            <div class="row">
                 {% if form.mailer_custom_headers is defined %}
                   <div class="col-md-6">
                     {{ form_row(form.mailer_custom_headers) }}
@@ -96,7 +63,7 @@
                 {% endif %}
             </div>
 
-            {% if fields.mailer_transport is defined %}
+            {% if fields.mailer_dsn is defined %}
                 <hr class="text-muted" />
             {% endif %}
 

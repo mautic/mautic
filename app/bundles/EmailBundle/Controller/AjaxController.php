@@ -7,10 +7,6 @@ use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
-use Mautic\EmailBundle\Mailer\Exception\ConnectionErrorException;
-use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
-use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
-use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -169,40 +165,6 @@ class AjaxController extends CommonAjaxController
                 $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (\Exception $e) {
                 $dataArray['message'] = $this->translator->trans($e->getMessage());
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * Tests mail transport settings.
-     *
-     * @return JsonResponse
-     */
-    public function testEmailServerConnectionAction(Request $request, UserHelper $userHelper, TransportWrapper $transportWrapper)
-    {
-        $dataArray = ['success' => 0, 'message' => ''];
-        $user      = $userHelper->getUser();
-        $settings  = $request->request->all();
-
-        if (!empty($settings['mailer_transport']) && $user->isAdmin()) {
-            $settings = $request->request->all();
-
-            try {
-                $extension = $transportWrapper->getTestConnectionExtension($settings['mailer_transport']);
-            } catch (TransportNotFoundException|UnsupportedTransportException $exception) {
-                $dataArray['message'] = $exception->getMessage();
-
-                return $this->sendJsonResponse($dataArray);
-            }
-
-            try {
-                // Pass all the settings to the extension and it should handle the rest
-                $dataArray['success'] = $extension->testConnection($settings);
-                $dataArray['message'] = $this->translator->trans('mautic.core.success');
-            } catch (ConnectionErrorException $exception) {
-                $dataArray['message'] = $exception->getMessage();
             }
         }
 
