@@ -77,7 +77,6 @@
     "twilio/sdk": "^5.25",
     "stack/builder": "^1.0",
     "php-http/guzzle7-adapter": "^1.0",
-    "sparkpost/sparkpost": "^2.3",
     "lightsaml/sp-bundle": "dev-symfony5",
     "php-amqplib/rabbitmq-bundle": "^2.5.1",
     "simshaun/recurr": "^5.0",
