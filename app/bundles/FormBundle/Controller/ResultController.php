@@ -239,9 +239,9 @@ class ResultController extends CommonFormController
         $fieldEntity = $fieldModel->getEntity($fieldId);
 
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
-                'form:forms:viewown',
-                'form:forms:viewother',
-                $fieldEntity->getForm()->getCreatedBy())
+            'form:forms:viewown',
+            'form:forms:viewother',
+            $fieldEntity->getForm()->getCreatedBy())
         ) {
             return $this->accessDenied();
         }
