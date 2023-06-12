@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -42,6 +43,24 @@ abstract class AbstractMauticTestCase extends WebTestCase
     ];
 
     protected AbstractDatabaseTool $databaseTool;
+
+    /**
+     * Overloading the method from MailerAssertionsTrait to get better typehint.
+     *
+     * @return MauticMessage[]
+     */
+    public static function getMailerMessages(string $transport = null): array
+    {
+        return parent::getMailerMessages($transport);
+    }
+
+    /**
+     * Overloading the method from MailerAssertionsTrait to get better typehint.
+     */
+    public static function getMailerMessage(int $index = 0, string $transport = null): ?MauticMessage
+    {
+        return self::getMailerMessages($transport)[$index] ?? null;
+    }
 
     protected function setUp(): void
     {
