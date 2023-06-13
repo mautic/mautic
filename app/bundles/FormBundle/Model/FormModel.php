@@ -69,31 +69,6 @@ class FormModel extends CommonFormModel
      */
     protected $leadFieldModel;
 
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
-
-    /**
-     * @var TableSchemaHelper
-     */
-    private $tableSchemaHelper;
-
-    /**
-     * @var MappedObjectCollectorInterface
-     */
-    private $mappedObjectCollector;
-
     public function __construct(
         RequestStack $requestStack,
         Environment $twig,
@@ -102,11 +77,11 @@ class FormModel extends CommonFormModel
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader,
-        ContactTracker $contactTracker,
-        ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper,
-        MappedObjectCollectorInterface $mappedObjectCollector
+        private FormUploader $formUploader,
+        private ContactTracker $contactTracker,
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private TableSchemaHelper $tableSchemaHelper,
+        private MappedObjectCollectorInterface $mappedObjectCollector
     ) {
         $this->requestStack          = $requestStack;
         $this->twig                  = $twig;
@@ -115,11 +90,6 @@ class FormModel extends CommonFormModel
         $this->formFieldModel        = $formFieldModel;
         $this->fieldHelper           = $fieldHelper;
         $this->leadFieldModel        = $leadFieldModel;
-        $this->formUploader          = $formUploader;
-        $this->contactTracker        = $contactTracker;
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->tableSchemaHelper     = $tableSchemaHelper;
-        $this->mappedObjectCollector = $mappedObjectCollector;
     }
 
     /**
@@ -166,10 +136,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param string|int|null $id
-     *
-     * @return Form|object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): Form|object|null
     {
         if (null === $id) {
             return new Form();
@@ -342,7 +310,7 @@ class FormModel extends CommonFormModel
                 if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (false !== strpos($pv, 'new')) {
+                            if (str_contains($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -933,11 +901,9 @@ class FormModel extends CommonFormModel
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -1137,10 +1103,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param string $fieldAlias
-     *
-     * @return Field|null
      */
-    public function findFormFieldByAlias(Form $form, $fieldAlias)
+    public function findFormFieldByAlias(Form $form, $fieldAlias): ?Field
     {
         foreach ($form->getFields() as $field) {
             if ($field->getAlias() === $fieldAlias) {
@@ -1160,7 +1124,7 @@ class FormModel extends CommonFormModel
             } elseif ($field->getLeadField() && !$field->getMappedField()) {
                 $field->setMappedField($field->getLeadField());
                 $field->setMappedObject(
-                    'company' === substr($field->getLeadField(), 0, 7) && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                    str_starts_with($field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
                 );
             }
         }

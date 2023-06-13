@@ -72,32 +72,20 @@ class ReportModel extends FormModel
      */
     protected $reportHelper;
 
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
-
-    /**
-     * @var ExcelExporter
-     */
-    private $excelExporter;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         Environment $twig,
         ChannelListHelper $channelListHelper,
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
-        CsvExporter $csvExporter,
-        ExcelExporter $excelExporter
+        private CsvExporter $csvExporter,
+        private ExcelExporter $excelExporter
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->twig              = $twig;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
         $this->reportHelper      = $reportHelper;
-        $this->csvExporter       = $csvExporter;
-        $this->excelExporter     = $excelExporter;
     }
 
     public function setSession(Session $session)
@@ -154,10 +142,8 @@ class ReportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return Report|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Report
     {
         if (null === $id) {
             return new Report();
@@ -411,11 +397,9 @@ class ReportModel extends FormModel
      * @param null   $handle
      * @param int    $page
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null): StreamedResponse|Response
     {
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
@@ -476,8 +460,6 @@ class ReportModel extends FormModel
 
     /**
      * Get report data for view rendering.
-     *
-     * @param FormFactoryInterface $formFactory
      *
      * @return array
      */

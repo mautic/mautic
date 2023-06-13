@@ -35,11 +35,6 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool|mixed[]|string|null
-     */
-    protected $result;
-
-    /**
      * @var array
      */
     protected $eventSettings;
@@ -67,14 +62,13 @@ class CampaignExecutionEvent extends Event
     /**
      * @param bool|mixed[]|string|null $result
      */
-    public function __construct(array $args, $result, LeadEventLog $log = null)
+    public function __construct(array $args, protected bool|string|array|null $result, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->eventSettings   = $args['eventSettings'];
-        $this->result          = $result;
         $this->log             = $log;
     }
 
@@ -142,7 +136,7 @@ class CampaignExecutionEvent extends Event
     /**
      * @return bool|mixed[]|string|null
      */
-    public function getResult()
+    public function getResult(): bool|array|string|null
     {
         return $this->result;
     }
@@ -152,7 +146,7 @@ class CampaignExecutionEvent extends Event
      *
      * @return $this
      */
-    public function setResult($result)
+    public function setResult(bool|array|string|null $result)
     {
         $this->result = $result;
 
@@ -162,11 +156,9 @@ class CampaignExecutionEvent extends Event
     /**
      * Set the result to failed.
      *
-     * @param string|null $reason
-     *
      * @return $this
      */
-    public function setFailed($reason = null)
+    public function setFailed(?string $reason = null)
     {
         $this->result = [
             'failed' => 1,
@@ -216,12 +208,11 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param string          $channel
-     * @param string|int|null $channelId
+     * @param string $channel
      *
      * @return $this
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, string|int|null $channelId = null)
     {
         if (null !== $this->log) {
             // Set the channel since we have the resource

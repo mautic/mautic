@@ -443,7 +443,7 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

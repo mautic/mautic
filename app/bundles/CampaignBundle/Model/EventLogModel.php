@@ -16,24 +16,8 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class EventLogModel extends AbstractCommonModel
 {
-    protected EventModel $eventModel;
-
-    protected CampaignModel $campaignModel;
-
-    protected IpLookupHelper $ipLookupHelper;
-
-    protected EventScheduler $eventScheduler;
-
-    public function __construct(
-        EventModel $eventModel,
-        CampaignModel $campaignModel,
-        IpLookupHelper $ipLookupHelper,
-        EventScheduler $eventScheduler
-    ) {
-        $this->eventModel     = $eventModel;
-        $this->campaignModel  = $campaignModel;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->eventScheduler = $eventScheduler;
+    public function __construct(protected EventModel $eventModel, protected CampaignModel $campaignModel, protected IpLookupHelper $ipLookupHelper, protected EventScheduler $eventScheduler)
+    {
     }
 
     public function getRepository(): LeadEventLogRepository
@@ -80,10 +64,7 @@ class EventLogModel extends AbstractCommonModel
         return $logs;
     }
 
-    /**
-     * @return string|LeadEventLog
-     */
-    public function updateContactEvent(Event $event, Lead $contact, array $parameters)
+    public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|LeadEventLog
     {
         $campaign = $event->getCampaign();
 

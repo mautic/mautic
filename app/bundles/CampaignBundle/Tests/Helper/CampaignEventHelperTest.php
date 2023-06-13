@@ -21,7 +21,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
                 'id' => null,
             ],
         ];
-        $result = CampaignEventHelper::validateLeadChangeTrigger($eventDetails, $event);
+        $result = CampaignEventHelper::validateLeadChangeTrigger($event, $eventDetails);
         $this->assertFalse($result);
     }
 
@@ -37,7 +37,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
                 'id' => 4,
             ],
         ];
-        $result = CampaignEventHelper::validateLeadChangeTrigger($eventDetails, $event);
+        $result = CampaignEventHelper::validateLeadChangeTrigger($event, $eventDetails);
         $this->assertFalse($result);
     }
 
@@ -53,7 +53,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
                 'id' => 3,
             ],
         ];
-        $result = CampaignEventHelper::validateLeadChangeTrigger($eventDetails, $event);
+        $result = CampaignEventHelper::validateLeadChangeTrigger($event, $eventDetails);
         $this->assertFalse($result);
     }
 
@@ -77,7 +77,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
                     'id' => $campaignId,
                 ],
             ];
-            $result = CampaignEventHelper::validateLeadChangeTrigger($eventDetails, $event);
+            $result = CampaignEventHelper::validateLeadChangeTrigger($event, $eventDetails);
             $this->assertSame($expectedResult, $result);
         }
     }

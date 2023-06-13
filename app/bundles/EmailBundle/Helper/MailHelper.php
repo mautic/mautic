@@ -504,10 +504,8 @@ class MailHelper
      *                                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
      *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
      *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
-     *
-     * @return bool|array
      */
-    public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
+    public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO): bool|array
     {
         if ($this->tokenizationEnabled) {
             // Dispatch event to get custom tokens from listeners
@@ -801,10 +799,8 @@ class MailHelper
 
     /**
      * Get a MauticMessage/Swift_Message instance.
-     *
-     * @return bool|MauticMessage
      */
-    public function getMessageInstance()
+    public function getMessageInstance(): bool|MauticMessage
     {
         try {
             return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
@@ -854,10 +850,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @param int|Asset $asset
-     */
-    public function attachAsset($asset)
+    public function attachAsset(int|Asset $asset)
     {
         $model = $this->factory->getModel('asset');
 
@@ -977,7 +970,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (false !== strpos($content, '</body>')) {
+            if (str_contains($content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -1003,7 +996,7 @@ class MailHelper
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
                 // skip items that already embedded, or have token {tracking_pixel}
-                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                if (str_contains($match, 'cid:') || str_contains($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
                     continue;
                 }
 
@@ -1077,12 +1070,11 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string      $address
-     * @param string|null $name
+     * @param string $address
      *
      * @return bool
      */
-    public function addTo($address, $name = null)
+    public function addTo($address, ?string $name = null)
     {
         $this->checkBatchMaxRecipients();
 
@@ -1102,12 +1094,11 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * @return bool
      */
-    public function setCc($addresses, $name = null)
+    public function setCc(mixed $addresses, $name = null)
     {
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
@@ -1126,12 +1117,11 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param mixed $address
-     * @param null  $name
+     * @param null $name
      *
      * @return bool
      */
-    public function addCc($address, $name = null)
+    public function addCc(mixed $address, $name = null)
     {
         $this->checkBatchMaxRecipients(1, 'cc');
 
@@ -1150,12 +1140,11 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * @return bool
      */
-    public function setBcc($addresses, $name = null)
+    public function setBcc(mixed $addresses, $name = null)
     {
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
@@ -1245,10 +1234,9 @@ class MailHelper
     /**
      * Set from email address and name (defaults to determining automatically unless isGlobal is true).
      *
-     * @param string|array $fromEmail
-     * @param string       $fromName
+     * @param string $fromName
      */
-    public function setFrom($fromEmail, $fromName = null)
+    public function setFrom(string|array $fromEmail, $fromName = null)
     {
         $fromName = $this->cleanName($fromName);
 
@@ -1265,10 +1253,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIdHash()
+    public function getIdHash(): ?string
     {
         return $this->idHash;
     }
@@ -1293,18 +1278,12 @@ class MailHelper
         $this->message->leadIdHash = $idHash;
     }
 
-    /**
-     * @return array|Lead
-     */
-    public function getLead()
+    public function getLead(): array|Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param array|Lead $lead
-     */
-    public function setLead($lead, $interalSend = false)
+    public function setLead(array|Lead $lead, $interalSend = false)
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;
@@ -1346,10 +1325,7 @@ class MailHelper
         $this->emailType = $emailType;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
@@ -1517,7 +1493,7 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                if (false === strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                if (!str_contains($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
                     $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
                 }
@@ -1529,10 +1505,7 @@ class MailHelper
         return $headers;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): bool|string
     {
         if ($this->idHash) {
             $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -1671,7 +1644,7 @@ class MailHelper
         }
 
         $logDump = $this->logger->dump();
-        if (!empty($logDump) && false === strpos($error, $logDump)) {
+        if (!empty($logDump) && !str_contains($error, $logDump)) {
             $error .= " Log data: $logDump";
         }
 
@@ -1811,13 +1784,10 @@ class MailHelper
         return $this->tokenizationEnabled;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\Redirect|object|null
-     */
-    public function getTrackableLink($url)
+    public function getTrackableLink($url): \Mautic\PageBundle\Entity\Redirect|object|null
     {
         // Ensure a valid URL and that it has not already been found
-        if ('http' !== substr($url, 0, 4) && 'ftp' !== substr($url, 0, 3)) {
+        if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {
             return null;
         }
 
@@ -1839,13 +1809,12 @@ class MailHelper
     /**
      * Create an email stat.
      *
-     * @param bool|true   $persist
-     * @param string|null $emailAddress
-     * @param null        $listId
+     * @param bool|true $persist
+     * @param null      $listId
      *
      * @return Stat
      */
-    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    public function createEmailStat($persist = true, ?string $emailAddress = null, $listId = null)
     {
         // create a stat
         $stat = new Stat();
@@ -1856,7 +1825,7 @@ class MailHelper
         if (null !== $this->lead) {
             try {
                 $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
             $emailAddress = $this->lead['email'];
@@ -1878,7 +1847,7 @@ class MailHelper
         if (null !== $listId) {
             try {
                 $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }
@@ -1919,7 +1888,7 @@ class MailHelper
         if (isset($this->copies[$id])) {
             try {
                 $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }
@@ -1933,10 +1902,8 @@ class MailHelper
 
     /**
      * Check to see if a monitored email box is enabled and configured.
-     *
-     * @return bool|array
      */
-    public function isMontoringEnabled($bundleKey, $folderKey)
+    public function isMontoringEnabled($bundleKey, $folderKey): bool|array
     {
         /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper */
         $mailboxHelper = $this->factory->getHelper('mailbox');
@@ -1952,10 +1919,8 @@ class MailHelper
      * Generate bounce email for the lead.
      *
      * @param null $idHash
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): bool|string
     {
         $monitoredEmail = false;
 
@@ -1976,10 +1941,8 @@ class MailHelper
      * Generate an unsubscribe email for the lead.
      *
      * @param null $idHash
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): bool|string
     {
         $monitoredEmail = false;
 
@@ -2044,10 +2007,8 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName($name): ?string
     {
         if (null === $name) {
             return $name;
@@ -2063,10 +2024,7 @@ class MailHelper
         return $name;
     }
 
-    /**
-     * @return bool|array
-     */
-    protected function getContactOwner(&$contact)
+    protected function getContactOwner(&$contact): bool|array
     {
         $owner = false;
         $email = $this->getEmail();

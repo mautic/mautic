@@ -11,20 +11,14 @@ class RestrictionHelper
     public const MODE_REMOVE = 'remove';
     public const MODE_MASK   = 'mask';
 
-    private TranslatorInterface $translator;
-
     /**
      * @var string[]
      */
     private array $restrictedFields;
 
-    private string $displayMode;
-
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, string $mode)
+    public function __construct(private TranslatorInterface $translator, array $restrictedFields, private string $displayMode)
     {
-        $this->translator       = $translator;
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
-        $this->displayMode      = $mode;
     }
 
     public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
@@ -54,7 +48,7 @@ class RestrictionHelper
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    $childType->getConfig()->getType()->getInnerType()::class,
                     array_merge(
                         $childType->getConfig()->getOptions(),
                         [

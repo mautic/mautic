@@ -13,29 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CorePermissions
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var UserHelper
      */
     protected $userHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var array
-     */
-    private $bundles;
-
-    /**
-     * @var array
-     */
-    private $pluginBundles;
 
     /**
      * @var array
@@ -69,23 +49,19 @@ class CorePermissions
 
     public function __construct(
         UserHelper $userHelper,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        array $bundles,
-        array $pluginBundles
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private array $bundles,
+        private array $pluginBundles
     ) {
         $this->userHelper           = $userHelper;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundles              = $bundles;
-        $this->pluginBundles        = $pluginBundles;
 
         $this->registerPermissionClasses();
     }
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
     {
-        $this->permissionObjectsByClass[get_class($permissionObject)] = $permissionObject;
+        $this->permissionObjectsByClass[$permissionObject::class]     = $permissionObject;
         $this->permissionObjectsByName[$permissionObject->getName()]  = $permissionObject;
     }
 
@@ -103,7 +79,7 @@ class CorePermissions
         foreach ($this->getPermissionClasses() as $class) {
             try {
                 $this->getPermissionObject($class);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
             }
         }
 
@@ -240,7 +216,7 @@ class CorePermissions
      *
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+    public function isGranted(array|string $requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
     {
         // Initialize all permission classes if
         $this->getPermissionObjects();
@@ -311,11 +287,9 @@ class CorePermissions
     /**
      * Check if a permission or array of permissions exist.
      *
-     * @param array|string $permission
-     *
      * @return bool
      */
-    public function checkPermissionExists($permission)
+    public function checkPermissionExists(array|string $permission)
     {
         // Generate all permission objects in case they haven't been already.
         $this->getPermissionObjects();
@@ -345,13 +319,9 @@ class CorePermissions
     /**
      * Checks if the user has access to the requested entity.
      *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
-     *
      * @return bool
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0)
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int $ownerId = 0)
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

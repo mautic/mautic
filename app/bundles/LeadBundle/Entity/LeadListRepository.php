@@ -59,7 +59,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
@@ -116,7 +116,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
+    public function getLeadLists(int|array $lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
@@ -261,11 +261,9 @@ class LeadListRepository extends CommonRepository
      *
      * @param int|int[] $listIds
      *
-     * @return array|int
-     *
      * @throws \Exception
      */
-    public function getLeadCount($listIds)
+    public function getLeadCount(int|array $listIds): array|int
     {
         if (!is_array($listIds)) {
             $listIds = [$listIds];

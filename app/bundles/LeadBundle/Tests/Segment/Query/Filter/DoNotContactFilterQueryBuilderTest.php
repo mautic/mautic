@@ -67,27 +67,10 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
-            /**
-             * @var string
-             */
-            private $operator;
-
-            /**
-             * @var string
-             */
-            private $parameterValue;
-
-            /**
-             * @var array<string, mixed>
-             */
-            private $batchLimiters;
-
-            /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct(string $operator, string $parameterValue, array $batchLimiters)
+            /** @noinspection PhpMissingParentConstructorInspection
+             * @param array<string, mixed> $batchLimiters */
+            public function __construct(private string $operator, private string $parameterValue, private array $batchLimiters)
             {
-                $this->operator       = $operator;
-                $this->parameterValue = $parameterValue;
-                $this->batchLimiters  = $batchLimiters;
             }
 
             public function getDoNotContactParts()
