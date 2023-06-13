@@ -599,7 +599,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Returns the user to be used for permissions.
      */
-    public function getPermissionUser(): User|int
+    public function getPermissionUser(): User|int|null
     {
         return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
     }

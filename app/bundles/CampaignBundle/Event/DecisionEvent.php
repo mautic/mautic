@@ -91,7 +91,7 @@ class DecisionEvent extends CampaignExecutionEvent
      *
      * @return bool
      */
-    public function getResult()
+    public function getResult(): array|string|bool|null
     {
         return $this->applicable;
     }

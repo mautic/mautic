@@ -16,18 +16,11 @@ class ConfigMetadataTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->metadata = $this->getMockBuilder(BundleMetadata::class)
-            ->setMethodsExcept(['setConfig', 'toArray'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadata = new BundleMetadata(['directory' => '/foo/bar', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
     }
 
     public function testMissingConfigIsIgnored()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn('/foo/bar');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -36,10 +29,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testBadConfigIsIgnored()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/BadConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -48,10 +37,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testIpLookupServicesAreLoaded()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -68,10 +53,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testConfigIsLoaded()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -82,10 +63,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testOptionalMissingServicesAreIgnored()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -95,10 +72,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testParameterArgumentsAreEncoded()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -110,10 +83,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testParametersAreEncoded()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
@@ -125,10 +94,6 @@ class ConfigMetadataTest extends TestCase
 
     public function testParameterTypesArePreserved()
     {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 

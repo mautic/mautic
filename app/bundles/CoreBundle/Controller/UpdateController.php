@@ -41,7 +41,7 @@ class UpdateController extends CommonController
         ]);
     }
 
-    public function schemaAction(Request $request, LoggerInterface $mauticLogger, KernelInterface $kernel): array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function schemaAction(Request $request, LoggerInterface $mauticLogger, KernelInterface $kernel): array|\Symfony\Component\HttpFoundation\Response
     {
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();

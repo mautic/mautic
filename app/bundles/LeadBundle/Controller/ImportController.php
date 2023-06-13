@@ -73,7 +73,7 @@ class ImportController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): JsonResponse|RedirectResponse
+    public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);

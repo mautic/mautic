@@ -604,7 +604,7 @@ class Form extends FormEntity
     /**
      * @return Form
      */
-    public function addAction(int|string $key, Action $action)
+    public function addAction(int|string|null $key, Action $action)
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', [$key, $changes]);
@@ -705,7 +705,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function setNoIndex(?bool $noIndex)
+    public function setNoIndex(bool|null|string $noIndex)
     {
         $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedNoIndex);

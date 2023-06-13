@@ -37,7 +37,7 @@ class ConfigType extends AbstractType
         private LanguageHelper $langHelper,
         private IpLookupFactory $ipLookupFactory,
         private array $ipLookupServices,
-        private AbstractLookup $ipLookup = null
+        private ?AbstractLookup $ipLookup = null
     ) {
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
     }

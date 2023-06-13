@@ -77,7 +77,7 @@ class Mapper
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($mauticContactId, ?int $zohoId = null)
+    public function map($mauticContactId, string|null|int $zohoId = null)
     {
         $mapped             = 0;
         $objectMappedValues = [];

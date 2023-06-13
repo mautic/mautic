@@ -107,6 +107,11 @@ class PageTestAbstract extends TestCase
             ->getMock();
 
         $hitRepository = $this->createMock(HitRepository::class);
+
+        $hitRepository->expects($this->any())
+            ->method('isUniquePageHit')
+            ->willReturn(true);
+
         $userHelper    = $this->createMock(UserHelper::class);
 
         $queueService = $this
@@ -118,13 +123,12 @@ class PageTestAbstract extends TestCase
 
         /** @var ContactRequestHelper&MockObject $contactRequestHelper */
         $contactRequestHelper = $this->createMock(ContactRequestHelper::class);
-
+        $lead                 = new \Mautic\LeadBundle\Entity\Lead();
+        $lead->setId(self::$mockId);
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
-            );
+            ->willReturn($lead);
 
         $queueService->expects($this
             ->any())

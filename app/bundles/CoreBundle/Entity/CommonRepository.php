@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Connection;
@@ -773,7 +772,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Persist an array of entities.
      */
-    public function saveEntities(array|ArrayCollection $entities)
+    public function saveEntities(array|\Doctrine\Common\Collections\Collection $entities)
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;

@@ -800,7 +800,7 @@ class MailHelper
     /**
      * Get a MauticMessage/Swift_Message instance.
      */
-    public function getMessageInstance(): bool|MauticMessage
+    public function getMessageInstance(): bool|MauticMessage|\Swift_Message
     {
         try {
             return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
@@ -1278,7 +1278,7 @@ class MailHelper
         $this->message->leadIdHash = $idHash;
     }
 
-    public function getLead(): array|Lead
+    public function getLead(): array|Lead|null
     {
         return $this->lead;
     }
@@ -1784,7 +1784,7 @@ class MailHelper
         return $this->tokenizationEnabled;
     }
 
-    public function getTrackableLink($url): \Mautic\PageBundle\Entity\Redirect|object|null
+    public function getTrackableLink($url): \Mautic\PageBundle\Entity\Redirect|null
     {
         // Ensure a valid URL and that it has not already been found
         if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {
@@ -2024,7 +2024,7 @@ class MailHelper
         return $name;
     }
 
-    protected function getContactOwner(&$contact): bool|array
+    protected function getContactOwner(&$contact): bool|array|null
     {
         $owner = false;
         $email = $this->getEmail();

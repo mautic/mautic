@@ -136,7 +136,7 @@ class CampaignExecutionEvent extends Event
     /**
      * @return bool|mixed[]|string|null
      */
-    public function getResult(): bool|array|string|null
+    public function getResult(): array|string|bool|null
     {
         return $this->result;
     }

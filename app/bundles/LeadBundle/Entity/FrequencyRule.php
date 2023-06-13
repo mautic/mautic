@@ -184,7 +184,7 @@ class FrequencyRule extends CommonEntity
     /**
      * @return FrequencyRule
      */
-    public function setFrequencyNumber(?int $frequencyNumber)
+    public function setFrequencyNumber(string|int|null $frequencyNumber)
     {
         $this->isChanged('frequencyNumber', $frequencyNumber);
 

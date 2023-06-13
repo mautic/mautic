@@ -33,7 +33,7 @@ final class SecurityHelper
     /**
      * Helper function to check if the logged in user has access to an entity.
      */
-    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int $ownerId): bool
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int|null $ownerId): bool
     {
         return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }

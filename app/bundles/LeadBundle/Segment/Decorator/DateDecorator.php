@@ -9,7 +9,7 @@ class DateDecorator extends CustomMappedDecorator
     /**
      * @throws \Exception
      */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array|string|float|bool|null
     {
         throw new \Exception('Instance of Date option needs to implement this function');
     }

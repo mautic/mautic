@@ -41,7 +41,7 @@ class ScheduledEvent extends CampaignScheduledEvent
     /**
      * @return LeadEventLog
      */
-    public function getLog()
+    public function getLog(): ?LeadEventLog
     {
         return $this->eventLog;
     }

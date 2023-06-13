@@ -22,7 +22,7 @@ class HitRepository extends CommonRepository
      *
      * @return bool
      */
-    public function isUniquePageHit(Page|Redirect $page, $trackingId, Lead $lead = null)
+    public function isUniquePageHit(Page|Redirect|null $page, $trackingId, Lead $lead = null)
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();

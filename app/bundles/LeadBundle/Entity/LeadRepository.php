@@ -365,7 +365,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?object
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
