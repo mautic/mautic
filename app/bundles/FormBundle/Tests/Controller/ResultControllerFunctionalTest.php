@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -16,35 +15,40 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testDownloadFileByFileNameAction(): void
     {
-        $formModel    = self::$container->get('mautic.form.model.form');
+        $fieldModel   = self::$container->get('mautic.form.model.field');
         $formUploader = self::$container->get('mautic.form.helper.form_uploader');
         $fileName     = 'image.png';
 
         $this->createFile($fileName);
 
-        $form  = new Form();
-        $form->setAlias('apiform');
-        $form->setName('API form');
-        $form->setDescription('Test Form');
-        $form->setFormType('standalone');
-        $form->setIsPublished(true);
+        $formPayload  = [
+            'name'        => 'API form',
+            'formType'    => 'standalone',
+            'alias'       => 'apiform',
+            'description' => 'Test API Form',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'      => 'File',
+                    'alias'      => 'file_field',
+                    'type'       => 'file',
+                    'properties' => [
+                        'allowed_file_size'       => 1,
+                        'allowed_file_extensions' => ['txt', 'jpg', 'gif', 'png'],
+                        'public'                  => true,
+                    ],
+                ],
+            ],
+        ];
 
-        $field = new Field();
-        $field->setType('file');
-        $field->setLabel('File');
-        $field->setAlias('file_field');
-        $field->setProperties([
-            'allowed_file_size'       => 1,
-            'allowed_file_extensions' => ['txt', 'jpg', 'gif', 'png'],
-            'public'                  => true,
-        ]);
-        $field->setForm($form);
-        $form->addField('file', $field);
+        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
 
-        $formModel->saveEntity($form);
-
-        $formId   = $form->getId();
-        $fieldId  = $field->getId();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response = json_decode($clientResponse->getContent(), true);
+        $form     = $response['form'];
+        $formId   = $form['id'];
+        $fieldId  = $form['fields'][0]['id'];
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_apiform]');
@@ -59,8 +63,11 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/forms/results/file/{$fieldId}/filename/{$fileName}");
         $this->assertTrue($this->client->getResponse()->isOk());
 
+        $field = $fieldModel->getEntity($fieldId);
         unlink($fileName);
         unlink($formUploader->getCompleteFilePath($field, $fileName));
+        rmdir(str_replace(DIRECTORY_SEPARATOR.$fileName, '', $formUploader->getCompleteFilePath($field, $fileName)));
+        rmdir(str_replace(DIRECTORY_SEPARATOR.$formId.DIRECTORY_SEPARATOR.$fileName, '', $formUploader->getCompleteFilePath($field, $fileName)));
     }
 
     private function createFile(string $filename): void
