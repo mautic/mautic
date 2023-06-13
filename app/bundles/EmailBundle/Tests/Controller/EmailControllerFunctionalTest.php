@@ -213,7 +213,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email   = $this->createEmail();
         $email->addList($segment);
         $email->setSubject('Subject A');
-        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i>');
+        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
 
         foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
             $contact = new Lead();
@@ -246,7 +246,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
@@ -257,7 +257,74 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $email->getReplyTo());
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
-        Assert::arrayHasKey('value123', $email->getHeaders()->get('x-global-custom-header'));
+        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
+    public function testSegmentEmailSendWithAdvancedOptions(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+        $email->setSubject('Subject A');
+        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $email->setPlainText('Dear {contactfield=email}');
+        $email->setFromAddress('custom@from.address');
+        $email->setFromName('Custom From Name');
+        $email->setReplyToAddress('custom@replyto.address');
+        $email->setBccAddress('custom@bcc.address');
+        $email->setHeaders(['x-global-custom-header' => 'value123 overridden']);
+        $email->setUtmTags(
+            [
+                'utmSource'   => 'utmSourceA',
+                'utmMedium'   => 'utmMediumA',
+                'utmCampaign' => 'utmCampaignA',
+                'utmContent'  => 'utmContentA',
+            ]
+        );
+
+        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
+            $contact = new Lead();
+            $contact->setEmail($emailAddress);
+
+            $member = new ListLead();
+            $member->setLead($contact);
+            $member->setList($segment);
+            $member->setDateAdded(new \DateTime());
+
+            $this->em->persist($member);
+            $this->em->persist($contact);
+        }
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
+            'id'         => $email->getId(),
+            'pending'    => 2,
+            'batchLimit' => 10,
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(2);
+
+        $email = $this->getMailerMessage();
+
+        // The order of the recipients is not guaranteed, so we need to check both possibilities.
+        Assert::assertSame('Subject A', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
+        Assert::assertCount(1, $email->getFrom());
+        Assert::assertSame('Custom From Name', $email->getFrom()[0]->getName());
+        Assert::assertSame('custom@from.address', $email->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $email->getTo());
+        Assert::assertSame('', $email->getTo()[0]->getName());
+        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
+        Assert::assertCount(1, $email->getReplyTo());
+        Assert::assertSame('', $email->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
     private function createSegment(string $suffix = 'A'): LeadList
