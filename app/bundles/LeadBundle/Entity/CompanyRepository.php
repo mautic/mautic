@@ -43,8 +43,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
     public function getEntity($id = 0): ?object
     {

@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
@@ -118,9 +118,11 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
+     * @param Collection<int, Lead> $contacts
+     *
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
+    public function groupContactsByDate(Event $event, Collection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();

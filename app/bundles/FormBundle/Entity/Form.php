@@ -594,7 +594,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return \Doctrine\Common\Collections\Collection<int, Submission>|array<int, Submission>
      */
     public function getSubmissions(): Collection|array
     {

@@ -776,7 +776,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * Persist an array of entities.
+     * @param array<int, T>|\Doctrine\Common\Collections\Collection<int, T> $entities
+     *                                                                                Persist an array of entities
      */
     public function saveEntities(array|\Doctrine\Common\Collections\Collection $entities)
     {

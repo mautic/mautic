@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -656,17 +657,17 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getChildren(): \Doctrine\Common\Collections\Collection|array
+    public function getChildren(): Collection|array
     {
         return $this->children;
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getPositiveChildren(): ArrayCollection|array
+    public function getPositiveChildren(): Collection|array
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
 
@@ -674,9 +675,9 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getNegativeChildren(): ArrayCollection|array
+    public function getNegativeChildren(): Collection|array
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_INACTION));
 
@@ -684,7 +685,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
     public function getChildrenByType($type)
     {
@@ -694,7 +695,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
     public function getChildrenByEventType($type)
     {
@@ -902,9 +903,9 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     * @return array<int, LeadEventLog>|\Doctrine\Common\Collections\Collection|static
      */
-    public function getContactLog(Contact $contact = null): array|\Doctrine\Common\Collections\Collection|static
+    public function getContactLog(Contact $contact = null): array|Collection|static
     {
         if ($this->contactLog) {
             return $this->contactLog;

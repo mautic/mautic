@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -192,11 +193,12 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
+     * @param bool                  $isInactiveEntry
+     * @param Collection<int, Lead> $contacts
      *
      * @return ArrayCollection
      */
-    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry = false)
     {
         $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
@@ -204,11 +206,12 @@ class EventLogger
     }
 
     /**
-     * @param bool $isInactiveEntry
+     * @param bool                  $isInactiveEntry
+     * @param Collection<int, Lead> $contacts
      *
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
 

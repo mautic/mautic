@@ -358,8 +358,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
     public function getEntity($id = 0): ?object
     {

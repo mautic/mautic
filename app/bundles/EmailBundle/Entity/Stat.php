@@ -336,7 +336,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    public function setTrackingHash(array|string|null $trackingHash)
+    public function setTrackingHash(?string $trackingHash)
     {
         $this->trackingHash = $trackingHash;
     }
@@ -552,7 +552,7 @@ class Stat
     }
 
     /**
-     * @return ArrayCollection|EmailReply[]
+     * @return \Doctrine\Common\Collections\Collection<int, EmailReply>|array<int, EmailReply>
      */
     public function getReplies(): \Doctrine\Common\Collections\Collection|array
     {

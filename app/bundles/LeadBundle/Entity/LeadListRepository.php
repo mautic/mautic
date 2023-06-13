@@ -47,8 +47,6 @@ class LeadListRepository extends CommonRepository
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
     public function getEntity($id = 0): ?object
     {
