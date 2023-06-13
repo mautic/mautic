@@ -43,8 +43,8 @@ return [
                     'scheduleTimeZone'       => 'UTC',
                 ],
                 'requirements' => [
-                    'scheduleTimeZone' => '.+'
-                ]
+                    'scheduleTimeZone' => '.+',
+                ],
             ],
             'mautic_report_schedule' => [
                 'path'       => '/reports/schedule/{reportId}/now',
