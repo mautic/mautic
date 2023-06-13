@@ -29,6 +29,16 @@ class SubmissionRepository extends CommonRepository
         $results['form_id']       = $form->getId();
 
         if (!empty($results)) {
+            // Check that alias is SQL safe since it will be used for the column name
+            $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+            $reservedWords    = $databasePlatform->getReservedKeywordsList();
+            foreach ($results as $alias => $value) {
+                if ($reservedWords->isKeyword($alias)) {
+                    $results[$databasePlatform->quoteIdentifier($alias)] = $value;
+                    unset($results[$alias]);
+                }
+            }
+
             $this->_em->getConnection()->insert($this->getResultsTableName($form->getId(), $form->getAlias()), $results);
         }
     }
@@ -89,11 +99,12 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $fieldAliasSql = ',';
-        foreach ($fieldAliases as $fieldAlias) {
-            $fieldAliasSql .= 'r.`'.$fieldAlias.'`,';
-        }
-        $fieldAliasSql = substr($fieldAliasSql, 0, -1);
+
+        $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+        // Quote reserved keywords in field aliases
+        $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
+
+        $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->execute()->fetchAllAssociative();
 

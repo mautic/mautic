@@ -5886,7 +5886,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "e355f4c754c87d33488235caab0242ccc58f75c1"
+                "reference": "9126dbd91c8a6cb752037bb5d8066e764f34be03"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5981,6 +5981,9 @@
                 "twilio/sdk": "^5.25",
                 "wikimedia/less.php": "^4.1"
             },
+            "conflict": {
+                "psr/simple-cache": ">=3.0.0"
+            },
             "type": "mautic-core",
             "extra": {
                 "mautic-scaffold": {
@@ -5991,6 +5994,7 @@
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/app/config/bootstrap.php": "assets/scaffold/files/bootstrap.php",
+                        "[project-root]/app/console-application.php": "assets/scaffold/files/console-application.php",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
