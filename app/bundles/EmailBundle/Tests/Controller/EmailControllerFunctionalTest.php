@@ -23,9 +23,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function setUp(): void
     {
-        $this->configParams['mailer_from_name']  = 'Mautic Admin';
-        $this->configParams['mailer_from_email'] = 'admin@emai.com';
-        $this->clientOptions                     = ['debug' => true];
+        $this->configParams['mailer_from_name']      = 'Mautic Admin';
+        $this->configParams['mailer_from_email']     = 'admin@emai.com';
+        $this->configParams['mailer_custom_headers'] = ['x-global-custom-header' => 'value123'];
+        $this->clientOptions                         = ['debug' => true];
 
         parent::setUp();
     }
@@ -246,16 +247,17 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
         Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody());
+        Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email->getTo());
         Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertSame($contact->getEmail(), $email->getTo()[0]->getAddress());
+        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
         Assert::assertCount(1, $email->getReplyTo());
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
         Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+        Assert::arrayHasKey('value123', $email->getHeaders()->get('x-global-custom-header'));
     }
 
     private function createSegment(string $suffix = 'A'): LeadList
