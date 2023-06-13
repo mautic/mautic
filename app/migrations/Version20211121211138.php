@@ -30,6 +30,9 @@ final class Version20211121211138 extends AbstractMauticMigration
         if (!$table->hasColumn('send_empty')) {
             $this->addSql("ALTER TABLE {$this->prefix}reports ADD send_empty TINYINT(1) DEFAULT '0' NOT NULL");
         }
+        if (!$table->hasColumn('schedule_format')) {
+            $this->addSql("ALTER TABLE {$this->prefix}reports ADD schedule_format VARCHAR(191) DEFAULT NULL");
+        }
     }
 
     public function down(Schema $schema): void
@@ -43,6 +46,9 @@ final class Version20211121211138 extends AbstractMauticMigration
         }
         if ($table->hasColumn('send_empty')) {
             $this->addSql("ALTER TABLE {$this->prefix}reports DROP COLUMN send_empty ");
+        }
+        if ($table->hasColumn('schedule_format')) {
+            $this->addSql("ALTER TABLE {$this->prefix}reports DROP COLUMN schedule_format ");
         }
     }
 }
