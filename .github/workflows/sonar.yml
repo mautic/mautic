@@ -37,6 +37,9 @@ jobs:
       - name: 'Unzip code coverage'
         run: |
           unzip test-results.zip -d coverage
+      - name: Fix code coverage paths
+        run: sed -i
+          's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage/coverage.xml
           
       - name: "Get PR information"
         uses: potiuk/get-workflow-origin@v1_3
