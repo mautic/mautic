@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Form\DataTransformer\DsnTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -22,7 +23,7 @@ class ConfigType extends AbstractType
 {
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator, private DsnTransformer $dsnTransformer)
     {
     }
 
@@ -273,6 +274,9 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->get('mailer_dsn')
+            ->addModelTransformer($this->dsnTransformer);
 
         $builder->add(
             'mailer_convert_embed_images',
