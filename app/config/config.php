@@ -74,14 +74,9 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        // 'message_bus' => 'email.bus', //TODO: start using buseses when we upgrade to Symfony 5.1.
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'default_bus' => 'email.bus',
-        'buses'       => [
-            'email.bus' => null,
-        ],
         'failure_transport' => 'failed_default',
         'transports'        => [
             'email_transport' => [
@@ -104,7 +99,7 @@ $container->loadFromExtension('framework', [
             ],
         ],
         'routing' => [
-            'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email_transport',
         ],
     ],
 
