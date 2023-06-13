@@ -4,40 +4,32 @@ namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConfigMetadataTest extends TestCase
 {
-    /**
-     * @var BundleMetadata|MockObject
-     */
-    private $metadata;
-
-    protected function setUp(): void
-    {
-        $this->metadata = new BundleMetadata(['directory' => '/foo/bar', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
-    }
-
     public function testMissingConfigIsIgnored()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => 'foo/bar', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $this->assertEquals([], $this->metadata->toArray()['config']);
+        $this->assertEquals([], $metadata->toArray()['config']);
     }
 
     public function testBadConfigIsIgnored()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/BadConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $this->assertEquals([], $this->metadata->toArray()['config']);
+        $this->assertEquals([], $metadata->toArray()['config']);
     }
 
     public function testIpLookupServicesAreLoaded()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
         $this->assertEquals(
@@ -53,29 +45,32 @@ class ConfigMetadataTest extends TestCase
 
     public function testConfigIsLoaded()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $metadata->toArray()['config'];
         $this->assertTrue(isset($config['services']['helpers']['mautic.helper.bundle']));
         $this->assertTrue(isset($config['parameters']['log_path']));
     }
 
     public function testOptionalMissingServicesAreIgnored()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $metadata->toArray()['config'];
         $this->assertFalse(isset($config['services']['fixtures']['mautic.test.fixture']));
     }
 
     public function testParameterArgumentsAreEncoded()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $metadata->toArray()['config'];
         $this->assertTrue(isset($config['services']['helpers']['mautic.helper.bundle']));
 
         $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
@@ -83,10 +78,11 @@ class ConfigMetadataTest extends TestCase
 
     public function testParametersAreEncoded()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
@@ -94,10 +90,11 @@ class ConfigMetadataTest extends TestCase
 
     public function testParameterTypesArePreserved()
     {
-        $configMetadata = new ConfigMetadata($this->metadata);
+        $metadata       = new BundleMetadata(['directory' => __DIR__.'/resource/GoodConfig', 'namespace' => 'test', 'bundle' => 'test', 'symfonyBundleName' => 'test']);
+        $configMetadata = new ConfigMetadata($metadata);
         $configMetadata->build();
 
-        $config = $this->metadata->toArray()['config'];
+        $config = $metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
