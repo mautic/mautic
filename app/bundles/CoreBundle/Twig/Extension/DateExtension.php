@@ -43,7 +43,7 @@ class DateExtension extends AbstractExtension
     /**
      * Returns full date. eg. October 8, 2014 21:19.
      */
-    public function toFull(\DateTime|string $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toFull(\DateTime|string|null $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toFull($datetime, $timezone, $fromFormat);
     }
@@ -56,7 +56,7 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
-    public function toFullConcat(\DateTime|string $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat(\DateTime|string|\DateTimeImmutable $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }
@@ -66,7 +66,7 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
-    public function toDate(\DateTime|string $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
+    public function toDate(\DateTime|string|\DateTimeImmutable $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }

@@ -148,7 +148,7 @@ class EmailRepository extends CommonRepository
     public function getEmailPendingQuery(
         $emailId,
         ?array $variantIds = null,
-        ?array $listIds = null,
+        int|null|array $listIds = null,
         $countOnly = false,
         ?int $limit = null,
         ?int $minContactId = null,
@@ -287,7 +287,7 @@ class EmailRepository extends CommonRepository
     public function getEmailPendingLeads(
         $emailId,
         ?array $variantIds = null,
-        ?array $listIds = null,
+        int|array|null $listIds = null,
         $countOnly = false,
         ?int $limit = null,
         ?int $minContactId = null,

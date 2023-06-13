@@ -46,7 +46,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return in_array($this->filter->getOperator(), $operators, true);
     }
 
-    public function addExpression(CompositeExpression|string $expression): void
+    public function addExpression(CompositeExpression|string|null $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 

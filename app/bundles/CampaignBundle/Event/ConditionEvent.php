@@ -88,7 +88,7 @@ class ConditionEvent extends CampaignExecutionEvent
      *
      * @return bool
      */
-    public function getResult()
+    public function getResult(): array|string|bool|null
     {
         return $this->passed;
     }

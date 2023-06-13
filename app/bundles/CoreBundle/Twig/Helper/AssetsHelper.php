@@ -158,7 +158,7 @@ final class AssetsHelper
      *
      * @return $this
      */
-    public function addScript(string|array $script, $location = 'head', $async = false, $name = null)
+    public function addScript(string|array|null $script, $location = 'head', $async = false, $name = null)
     {
         $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {

@@ -137,7 +137,7 @@ class FormModel extends CommonFormModel
     /**
      * @param string|int|null $id
      */
-    public function getEntity($id = null): Form|object|null
+    public function getEntity($id = null): Form|null
     {
         if (null === $id) {
             return new Form();

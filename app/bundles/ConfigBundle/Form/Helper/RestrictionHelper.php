@@ -16,7 +16,7 @@ class RestrictionHelper
      */
     private array $restrictedFields;
 
-    public function __construct(private TranslatorInterface $translator, array $restrictedFields, private string $displayMode)
+    public function __construct(private TranslatorInterface $translator, array $restrictedFields, private string $mode)
     {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }
@@ -44,7 +44,7 @@ class RestrictionHelper
 
     private function restrictField(FormInterface $childType, FormInterface $parentType)
     {
-        switch ($this->displayMode) {
+        switch ($this->mode) {
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),

@@ -21,7 +21,7 @@ class FrequencyRuleRepository extends CommonRepository
     public function getAppliedFrequencyRules(
         $channel,
         $leadIds,
-        ?string $defaultFrequencyNumber,
+        int|string|null $defaultFrequencyNumber,
         ?string $defaultFrequencyTime,
         $statTable = 'email_stats',
         $statContactColumn = 'lead_id',

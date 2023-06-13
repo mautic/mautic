@@ -321,7 +321,7 @@ class CorePermissions
      *
      * @return bool
      */
-    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int $ownerId = 0)
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int|null $ownerId = 0)
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {

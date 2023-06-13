@@ -261,7 +261,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $widgetService->expects(self::once())
             ->method('get')
             ->with((int) $widgetId)
-            ->willReturn(null);
+            ->willReturn(false);
 
         $this->containerMock->expects(self::never())
             ->method('get');

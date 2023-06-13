@@ -259,7 +259,7 @@ class InputHelper
      *
      * @return mixed|string
      */
-    public static function url($value, bool $urldecode = false, ?array $allowedProtocols = null, mixed $defaultProtocol = null, $removeQuery = [], bool $ignoreFragment = false)
+    public static function url($value, ?bool $urldecode = false, ?array $allowedProtocols = null, mixed $defaultProtocol = null, $removeQuery = [], bool $ignoreFragment = false)
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -363,7 +363,7 @@ class InputHelper
      *
      * @return mixed|string
      */
-    public static function html(array|string $value)
+    public static function html(array|string|null $value)
     {
         if (is_array($value)) {
             foreach ($value as &$val) {

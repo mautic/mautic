@@ -44,7 +44,7 @@ interface CustomFieldEntityInterface
      *
      * @return mixed
      */
-    public function getFieldValue($field, $group = null);
+    public function getFieldValue($field, ?string $group = null);
 
     /**
      * Get field details.

@@ -28,7 +28,7 @@ class ReportGenerator
     /**
      * ReportGenerator constructor.
      */
-    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper, private FormFactoryInterface $formFactory = null)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper, private ?FormFactoryInterface $formFactory = null)
     {
     }
 

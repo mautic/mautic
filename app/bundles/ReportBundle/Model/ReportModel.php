@@ -409,7 +409,7 @@ class ReportModel extends FormModel
                 if (!is_null($handle)) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
-                    return;
+                    break;
                 }
 
                 $response = new StreamedResponse(

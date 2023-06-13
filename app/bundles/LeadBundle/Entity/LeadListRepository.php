@@ -50,7 +50,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?object
     {
         try {
             $entity = $this

@@ -49,7 +49,7 @@ final class DateHelper
      *
      * @return string
      */
-    private function format($type, \DateTime|string $datetime, $timezone, $fromFormat)
+    private function format($type, \DateTime|string|\DateTimeImmutable|null $datetime, $timezone, $fromFormat)
     {
         if (empty($datetime)) {
             return '';
@@ -70,7 +70,7 @@ final class DateHelper
      *
      * @return string
      */
-    public function toFull(\DateTime|string $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFull(\DateTime|string|null $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('datetime', $datetime, $timezone, $fromFormat);
     }
@@ -83,7 +83,7 @@ final class DateHelper
      *
      * @return string
      */
-    public function toFullConcat(\DateTime|string $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat(\DateTime|string|\DateTimeImmutable $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
@@ -113,7 +113,7 @@ final class DateHelper
      *
      * @return string
      */
-    public function toDate(\DateTime|string $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toDate(\DateTime|string|\DateTimeImmutable $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->format('date', $datetime, $timezone, $fromFormat);
     }
@@ -139,7 +139,7 @@ final class DateHelper
      * @param string                                    $fromFormat
      * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
-    public function toText(string|int|\DateTime $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
+    public function toText(string|int|\DateTime|null|\DateTimeImmutable $datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';

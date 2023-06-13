@@ -656,9 +656,9 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection|Event[]
      */
-    public function getChildren(): ArrayCollection|array
+    public function getChildren(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->children;
     }
@@ -957,7 +957,7 @@ class Event implements ChannelInterface
      *
      * @return self
      */
-    public function setTriggerRestrictedStartHour(?\DateTime $triggerRestrictedStartHour)
+    public function setTriggerRestrictedStartHour(string|\DateTime|null $triggerRestrictedStartHour)
     {
         if (empty($triggerRestrictedStartHour)) {
             $triggerRestrictedStartHour = null;
@@ -985,7 +985,7 @@ class Event implements ChannelInterface
      *
      * @return self
      */
-    public function setTriggerRestrictedStopHour(?\DateTime $triggerRestrictedStopHour)
+    public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour)
     {
         if (empty($triggerRestrictedStopHour)) {
             $triggerRestrictedStopHour = null;

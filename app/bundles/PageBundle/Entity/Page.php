@@ -654,7 +654,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @return Page
      */
-    public function setIsPreferenceCenter(?bool $isPreferenceCenter)
+    public function setIsPreferenceCenter(string|bool|null $isPreferenceCenter)
     {
         $sanitizedValue = null === $isPreferenceCenter ? null : (bool) $isPreferenceCenter;
         $this->isChanged('isPreferenceCenter', $sanitizedValue);
@@ -668,7 +668,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->isPreferenceCenter;
     }
 
-    public function setNoIndex(?bool $noIndex)
+    public function setNoIndex(string|bool|null $noIndex)
     {
         $sanitizedValue = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedValue);

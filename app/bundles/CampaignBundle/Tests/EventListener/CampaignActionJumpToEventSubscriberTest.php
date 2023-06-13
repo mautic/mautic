@@ -27,7 +27,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $event    = new Event();
         $campaign = new Campaign();
         $leadLog  = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): ?int
             {
                 return 456;
             }
@@ -45,7 +45,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function getEntities(array $args = [])
+            public function getEntities(array $args = []): \Doctrine\ORM\Tools\Pagination\Paginator|array
             {
                 Assert::assertSame(
                     [
@@ -133,7 +133,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
         $leadLog = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): ?int
             {
                 return 456;
             }
@@ -151,7 +151,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function getEntities(array $args = [])
+            public function getEntities(array $args = []): \Doctrine\ORM\Tools\Pagination\Paginator|array
             {
                 Assert::assertSame(
                     [

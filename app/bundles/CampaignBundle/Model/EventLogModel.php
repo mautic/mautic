@@ -64,7 +64,7 @@ class EventLogModel extends AbstractCommonModel
         return $logs;
     }
 
-    public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|LeadEventLog
+    public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|LeadEventLog|array
     {
         $campaign = $event->getCampaign();
 

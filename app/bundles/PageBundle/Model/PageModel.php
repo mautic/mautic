@@ -422,7 +422,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Page|Redirect $page, Request $request, string|int $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Page|Redirect|null $page, Request $request, string|int $code = '200', Lead $lead = null, $query = [])
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -524,7 +524,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function processPageHit(Hit $hit, Page|Redirect $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
+    public function processPageHit(Hit $hit, Page|Redirect|null $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
     {
         // Store Page/Redirect association
         if ($page) {
