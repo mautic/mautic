@@ -298,4 +298,34 @@ class InputHelperTest extends TestCase
             [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
         ];
     }
+
+    /**
+     * @dataProvider _Provider
+     */
+    public function test(mixed $provided, mixed $expected): void
+    {
+        $this->assertEquals($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function _Provider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, ''],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], ['']],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], ['', 'hello']],
+            [[null, 3], ['', '3']],
+            [[[null]], [['']]],
+        ];
+    }
 }
