@@ -153,9 +153,9 @@ class InputHelper
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
                 } elseif ('filter' == $useMask) {
-                    $v = self::getFilter()->clean($v, $useMask);
+                    $v = self::getFilter()->clean($v ?? '', $useMask);
                 } else {
-                    $v = self::$useMask($v, $urldecode);
+                    $v = self::$useMask($v ?? '', $urldecode);
                 }
             }
 
@@ -163,7 +163,7 @@ class InputHelper
         } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
             return self::$mask($value, $urldecode);
         } else {
-            return self::getFilter()->clean($value, $mask);
+            return self::getFilter()->clean($value ?? '', $mask);
         }
     }
 
