@@ -68,9 +68,8 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
             ],
             'mautic_mailer_transport_callback' => [
-                'path'       => '/mailer/{transport}/callback',
+                'path'       => '/mailer/callback',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::mailerCallbackAction',
-                'method'     => ['GET', 'POST'],
             ],
             'mautic_email_preview' => [
                 'path'       => '/email/preview/{objectId}',

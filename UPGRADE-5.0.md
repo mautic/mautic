@@ -19,6 +19,12 @@
 * Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
+* Mailer
+    * The Swiftmailer library was replaced with SymfonyMailer. Details in https://github.com/mautic/mautic/pull/11613
+    * There is only one callback route for all transports now. Changed from `/mailer/{transport}/callback` to `/mailer/callback`.
+    * `Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
+    * `Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
+    * `Mautic\EmailBundle\Event\TransportWebhookEvent` does not have the transport in it. Each transport must validate the callback payload and decide if they are able to process it or not. If so, set the `Response` to the event to indicate success.
 * Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:

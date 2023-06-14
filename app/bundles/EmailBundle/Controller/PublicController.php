@@ -11,9 +11,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
-use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
-use Mautic\EmailBundle\Mailer\Transport\TransportWrapper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
@@ -413,23 +410,13 @@ class PublicController extends CommonFormController
 
     /**
      * Handles mailer transport webhook post.
-     *
-     * @return Response
      */
-    public function mailerCallbackAction(Request $request, TransportWrapper $transportWrapper, $transport)
+    public function mailerCallbackAction(Request $request): Response
     {
-        ignore_user_abort(true);
-
-        try {
-            $callbackTransport = $transportWrapper->getCallbackSupportExtension($transport);
-        } catch (TransportNotFoundException|UnsupportedTransportException) {
-            return $this->notFound();
-        }
-
-        $event = new TransportWebhookEvent($callbackTransport, $request);
+        $event = new TransportWebhookEvent($request);
         $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
-        return new Response('success');
+        return $event->getResponse() ?? new Response('No email transport that could process this callback was found', Response::HTTP_NOT_FOUND);
     }
 
     /**

@@ -28,19 +28,4 @@ class TransportWrapper
 
         return $this->transportExtensions[$transportName];
     }
-
-    /**
-     * @throws TransportNotFoundException
-     * @throws UnsupportedTransportException
-     */
-    public function getCallbackSupportExtension(string $transportName): CallbackTransportInterface
-    {
-        $transportExtension = $this->getTransportExtension($transportName);
-
-        if (!$transportExtension instanceof CallbackTransportInterface) {
-            throw UnsupportedTransportException::fromName($transportName, 'Request callback');
-        }
-
-        return $transportExtension;
-    }
 }
