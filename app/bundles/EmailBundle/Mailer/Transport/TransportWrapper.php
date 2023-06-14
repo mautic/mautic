@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\EmailBundle\Mailer\Exception\TransportNotFoundException;
-use Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException;
 
 class TransportWrapper
 {
