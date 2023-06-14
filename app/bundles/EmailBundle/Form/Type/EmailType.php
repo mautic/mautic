@@ -262,7 +262,7 @@ class EmailType extends AbstractType
                         'rows'                 => '15',
                     ],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
