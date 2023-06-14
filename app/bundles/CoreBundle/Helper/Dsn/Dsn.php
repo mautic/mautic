@@ -57,13 +57,14 @@ final class Dsn
             throw new \InvalidArgumentException(sprintf('The "%s" DSN must contain a host (use "default" by default).', $dsn));
         }
 
+        $host     = urldecode($parsedDsn['host']);
         $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
         $port     = isset($parsedDsn['port']) ? (int) $parsedDsn['port'] : null;
-        $path     = isset($parsedDsn['path']) ? ltrim($parsedDsn['path'], '/') : null;
+        $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $path, $query);
+        return new self($parsedDsn['scheme'], $host, $user, $password, $port, $path, $query);
     }
 
     public function __toString(): string
@@ -71,25 +72,25 @@ final class Dsn
         $dsn = $this->scheme.'://';
 
         if ($this->user) {
-            $dsn .= $this->user;
+            $dsn .= urlencode($this->user);
         }
 
         if ($this->password) {
-            $dsn .= ':'.$this->password;
+            $dsn .= ':'.urlencode($this->password);
         }
 
         if ($this->user || $this->password) {
             $dsn .= '@';
         }
 
-        $dsn .= $this->host;
+        $dsn .= urlencode($this->host);
 
         if ($this->port) {
             $dsn .= ':'.$this->port;
         }
 
         if ($this->path) {
-            $dsn .= '/'.$this->path;
+            $dsn .= '/'.urlencode($this->path);
         }
 
         $query = http_build_query($this->options);

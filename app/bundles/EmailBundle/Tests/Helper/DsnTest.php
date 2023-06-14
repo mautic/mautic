@@ -131,4 +131,17 @@ class DsnTest extends TestCase
             new Dsn('smtp', 'host', 'user', 'password', 25, 'test-path', ['encryption' => 'tls', 'auth_mode'=>'login']), 'smtp://user:password@host:25/test-path?encryption=tls&auth_mode=login',
         ];
     }
+
+    public function testToStringUrlEncodesProperly(): void
+    {
+        $dsn = new Dsn('scheme', 'local+@$#/:*!host', 'us+@$#/:*!er', 'pass+@$#/:*!word', 3300, 'pa+@$#/:*!th', ['type' => 'ty+@$#/:*!pe']);
+        Assert::assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
+
+        $dsnFromString = Dsn::fromString((string) $dsn);
+        Assert::assertSame('local+@$#/:*!host', $dsnFromString->getHost());
+        Assert::assertSame('us+@$#/:*!er', $dsnFromString->getUser());
+        Assert::assertSame('pass+@$#/:*!word', $dsnFromString->getPassword());
+        Assert::assertSame('pa+@$#/:*!th', $dsnFromString->getPath());
+        Assert::assertSame('ty+@$#/:*!pe', $dsnFromString->getOption('type'));
+    }
 }
