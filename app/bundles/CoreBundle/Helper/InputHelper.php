@@ -162,10 +162,10 @@ class InputHelper
             }
 
             return $value;
-        } elseif (is_string($mask) && method_exists(__CLASS__, $mask)) {
-            return self::$mask($value, $urldecode);
         } elseif (null === $value) {
             return $value;
+        } elseif (is_string($mask) && method_exists(__CLASS__, $mask)) {
+            return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);
         }

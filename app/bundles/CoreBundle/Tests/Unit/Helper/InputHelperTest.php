@@ -314,7 +314,7 @@ class InputHelperTest extends TestCase
     {
         return [
             ['hello', 'hello'],
-            [null, ''],
+            [null, null],
             [false, ''],
             [true, '1'],
             [0, '0'],
