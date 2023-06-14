@@ -300,17 +300,17 @@ class InputHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider _Provider
+     * @dataProvider underscoreProvider
      */
-    public function test(mixed $provided, mixed $expected): void
+    public function testUndersore(mixed $provided, mixed $expected): void
     {
-        $this->assertEquals($expected, InputHelper::_($provided));
+        $this->assertSame($expected, InputHelper::_($provided));
     }
 
     /**
      * @return mixed[]
      */
-    public function _Provider(): array
+    public function underscoreProvider(): array
     {
         return [
             ['hello', 'hello'],
@@ -319,13 +319,13 @@ class InputHelperTest extends TestCase
             [true, '1'],
             [0, '0'],
             [10, '10'],
-            [[null], ['']],
+            [[null], [null]],
             [[0], ['0']],
             [[false], ['']],
             [[true], ['1']],
-            [[null, 'hello'], ['', 'hello']],
-            [[null, 3], ['', '3']],
-            [[[null]], [['']]],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
         ];
     }
 }
