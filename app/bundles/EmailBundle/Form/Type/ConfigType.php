@@ -263,15 +263,9 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_dsn',
-            TextType::class,
+            DsnType::class,
             [
-                'label'             => 'mautic.email.config.mailer.transport',
-                'required'          => false,
-                'attr'              => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
-                ],
+                'label' => false,
             ]
         );
 
