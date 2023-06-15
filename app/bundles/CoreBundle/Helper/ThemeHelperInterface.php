@@ -122,7 +122,7 @@ interface ThemeHelperInterface
     /**
      * Get the error message from the zip archive.
      *
-     * @param int \ZipArchive::code $archive
+     * @param int $archive \ZipArchive::code
      */
     public function getExtractError(int $archive): string;
 
