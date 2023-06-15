@@ -14286,31 +14286,6 @@ parameters:
 			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToHtmlTransformer.php
 
 		-
-			message: "#^Class Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\EmojiToShortTransformer implements generic interface Symfony\\\\Component\\\\Form\\\\DataTransformerInterface but does not specify its types\\: T, R$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToShortTransformer.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\EmojiToShortTransformer\\:\\:reverseTransform\\(\\) has parameter \\$content with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToShortTransformer.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\EmojiToShortTransformer\\:\\:reverseTransform\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToShortTransformer.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\EmojiToShortTransformer\\:\\:transform\\(\\) has parameter \\$content with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToShortTransformer.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\DataTransformer\\\\EmojiToShortTransformer\\:\\:transform\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/EmojiToShortTransformer.php
-
-		-
 			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityRepository\\<object\\>\\:\\:getEntities\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
