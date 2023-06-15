@@ -34,14 +34,13 @@ jobs:
             });
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/test-results.zip`, Buffer.from(download.data));
-            console.log(context.payload.workflow_run.pull_requests);
       - name: 'Unzip code coverage'
         run: |
           unzip test-results.zip -d coverage
-          pwd
-          ls -al
-          ls -al coverage
-
+      - name: Fix code coverage paths
+        run: sed -i
+          's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage/coverage.xml
+          
       - name: "Get PR information"
         uses: potiuk/get-workflow-origin@v1_3
         id: source-run-info
@@ -69,11 +68,12 @@ jobs:
             -Dsonar.exclusions=app/migrations/**/*,app/bundles/*Bundle/Config/**/*,app/bundles/*Bundle/DataFixtures/**/*,app/bundles/*Bundle/Tests/**/*,app/bundles/*Bundle/Translations/**/*,app/bundles/*Bundle/Views/**/*,app/middlewares/Test/**/*,app/bundles/CoreBundle/Test/**/*,plugins/*Bundle/Config/**/*,plugins/*Bundle/Tests/**/*,plugins/*Bundle/Translations/**/*,plugins/*Bundle/Views/**/*
             -Dsonar.cpd.exclusions=**/*
             -Dsonar.tests=tests
-            -Dsonar.php.coverage.reportPaths=/home/runner/work/mautic/mautic/coverage/coverage.xml
-            -Dsonar.php.tests.reportPath=/home/runner/work/mautic/mautic/coverage/junit.xml
+            -Dsonar.php.coverage.reportPaths=coverage/coverage.xml
+            -Dsonar.php.tests.reportPath=coverage/junit.xml
             -Dsonar.scm.disabled=true
             -Dsonar.verbose=true
             -Dsonar.scm.revision=${{ steps.source-run-info.outputs.sourceHeadSha }}
             -Dsonar.pullrequest.key=${{ steps.source-run-info.outputs.pullRequestNumber }}
             -Dsonar.pullrequest.branch=${{ steps.source-run-info.outputs.sourceHeadBranch }}
             -Dsonar.pullrequest.base=${{ steps.source-run-info.outputs.targetBranch }}
+            -Dsonar.newCode.referenceBranch=${{ steps.source-run-info.outputs.targetBranch }}
