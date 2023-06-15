@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,7 +25,8 @@ class DsnType extends AbstractType
             [
                 'label' => 'mautic.email.config.mailer.dsn.scheme',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
             ]
         );
@@ -35,7 +37,8 @@ class DsnType extends AbstractType
             [
                 'label' => 'mautic.email.config.mailer.dsn.host',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
             ]
         );
@@ -44,10 +47,11 @@ class DsnType extends AbstractType
             'port',
             TextType::class,
             [
-                'label'             => 'mautic.email.config.mailer.dsn.port',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.email.config.mailer.dsn.port',
+                'required' => false,
+                'attr'     => [
                     'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
             ]
         );
@@ -56,10 +60,11 @@ class DsnType extends AbstractType
             'user',
             TextType::class,
             [
-                'label'             => 'mautic.email.config.mailer.dsn.user',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.email.config.mailer.dsn.user',
+                'required' => false,
+                'attr'     => [
                     'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
             ]
         );
@@ -68,10 +73,11 @@ class DsnType extends AbstractType
             'password',
             TextType::class,
             [
-                'label'             => 'mautic.email.config.mailer.dsn.password',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.email.config.mailer.dsn.password',
+                'required' => false,
+                'attr'     => [
                     'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
             ]
         );
@@ -80,11 +86,27 @@ class DsnType extends AbstractType
             'path',
             TextType::class,
             [
-                'label'             => 'mautic.email.config.mailer.dsn.path',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.email.config.mailer.dsn.path',
+                'required' => false,
+                'attr'     => [
                     'class'    => 'form-control',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'options',
+            SortableListType::class,
+            [
+                'required'        => false,
+                'label'           => 'mautic.email.config.mailer.dsn.options',
+                'attr'            => [
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'option_required' => false,
+                'with_labels'     => true,
+                'key_value_pairs' => true,
             ]
         );
     }

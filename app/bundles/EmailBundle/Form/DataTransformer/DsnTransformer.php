@@ -37,6 +37,7 @@ class DsnTransformer implements DataTransformerInterface
             'password' => $dsn->getPassword() ? self::PASSWORD_MASK : null,
             'port'     => $dsn->getPort(),
             'path'     => $dsn->getPath(),
+            'options'  => $dsn->getOptions(),
         ];
     }
 
@@ -55,6 +56,7 @@ class DsnTransformer implements DataTransformerInterface
             $value['password'],
             $value['port'] ? (int) $value['port'] : null,
             $value['path'],
+            $value['options'],
         );
 
         if (self::PASSWORD_MASK === $dsn->getPassword()) {
