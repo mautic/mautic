@@ -94,12 +94,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param string $field
      * @param string $value
-     * @param ?int   $ignoreId
      * @param bool   $indexByColumn
      *
      * @return array
      */
-    public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    public function getLeadsByFieldValue($field, $value, ?int $ignoreId = null, $indexByColumn = false)
     {
         $results = $this->getEntities([
             'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
@@ -122,11 +121,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param string $field
      * @param string $value
-     * @param ?int   $ignoreId
      *
      * @return QueryBuilder
      */
-    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
+    protected function buildQueryForGetLeadsByFieldValue($field, $value, ?int $ignoreId = null)
     {
         $col = 'l.'.$field;
 
@@ -299,10 +297,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param string $email
      * @param bool   $all   Set to true to return all matching lead id's
-     *
-     * @return array|null
      */
-    public function getLeadByEmail($email, $all = false)
+    public function getLeadByEmail($email, $all = false): ?array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -315,7 +311,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         if (count($result)) {
             return $all ? $result : $result[0];
         } else {
-            return;
+            return [];
         }
     }
 
@@ -362,10 +358,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?object
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -381,7 +375,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->andWhere($this->getTableAlias().'.id = :id')
                 ->setParameter('id', (int) $contactId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
@@ -412,11 +406,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * The primary company data will be a flat array on the entity
      * with a key of `primaryCompany`
      *
-     * @param mixed $entity
-     *
      * @return mixed|null
      */
-    public function getEntityWithPrimaryCompany($entity)
+    public function getEntityWithPrimaryCompany(mixed $entity)
     {
         if (is_int($entity)) {
             $entity = $this->getEntity($entity);
@@ -645,7 +637,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
-                    if (false === strpos($column, '.')) {
+                    if (!str_contains($column, '.')) {
                         $column = "entity.$column";
                     }
                     if (null === $expr) {
@@ -1065,10 +1057,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Gets names, signature and email of the user(lead owner).
      *
      * @param int $ownerId
-     *
-     * @return array|false
      */
-    public function getLeadOwner($ownerId)
+    public function getLeadOwner($ownerId): array|false
     {
         if (!$ownerId) {
             return false;
@@ -1123,10 +1113,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Check lead owner.
      *
      * @param array $ownerIds
-     *
-     * @return array|false
      */
-    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    public function checkLeadOwner(Lead $lead, $ownerIds = []): array|false
     {
         if (empty($ownerIds)) {
             return false;
@@ -1283,10 +1271,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param array $tables          $tables[0] should be primary table
      * @param bool  $innerJoinTables
-     * @param mixed $whereExpression
-     * @param mixed $having
      */
-    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
+    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, mixed $whereExpression = null, mixed $having = null)
     {
         $primaryTable = $tables[0];
         unset($tables[0]);
@@ -1359,7 +1345,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         } catch (DriverException $exception) {
             $message = $exception->getMessage();
 
-            if (false !== strpos($message, 'Deadlock') && $tries <= 3) {
+            if (str_contains($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;
 
                 $this->updateContactPoints($changes, $id, $tries);

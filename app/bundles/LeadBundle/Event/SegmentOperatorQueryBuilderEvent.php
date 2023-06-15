@@ -11,15 +11,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class SegmentOperatorQueryBuilderEvent extends Event
 {
-    private QueryBuilder $queryBuilder;
-
-    private ContactSegmentFilter $filter;
-
-    /**
-     * @var string|string[]
-     */
-    private $parameterHolder;
-
     private bool $operatorHandled = false;
 
     private string $leadsTableAlias;
@@ -27,11 +18,8 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @param string|string[] $parameterHolder
      */
-    public function __construct(QueryBuilder $queryBuilder, ContactSegmentFilter $filter, $parameterHolder)
+    public function __construct(private QueryBuilder $queryBuilder, private ContactSegmentFilter $filter, private $parameterHolder)
     {
-        $this->queryBuilder    = $queryBuilder;
-        $this->filter          = $filter;
-        $this->parameterHolder = $parameterHolder;
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
@@ -48,7 +36,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @return string|string[]
      */
-    public function getParameterHolder()
+    public function getParameterHolder(): string|array
     {
         return $this->parameterHolder;
     }
@@ -58,10 +46,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return in_array($this->filter->getOperator(), $operators, true);
     }
 
-    /**
-     * @param CompositeExpression|string $expression
-     */
-    public function addExpression($expression): void
+    public function addExpression(CompositeExpression|string|null $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 

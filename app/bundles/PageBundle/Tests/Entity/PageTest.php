@@ -27,7 +27,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield [true, true, ['isPreferenceCenter' => [null, true]]];
         yield [false, false, ['isPreferenceCenter' => [null, false]]];
         yield ['', false, ['isPreferenceCenter' => [null, false]]];
-        yield [0, false, ['isPreferenceCenter' => [null, false]]];
+        yield [false, false, ['isPreferenceCenter' => [null, false]]];
         yield ['string', true, ['isPreferenceCenter' => [null, true]]];
     }
 
@@ -49,7 +49,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield [true, true, ['noIndex' => [null, true]]];
         yield [false, false, ['noIndex' => [null, false]]];
         yield ['', false, ['noIndex' => [null, false]]];
-        yield [0, false, ['noIndex' => [null, false]]];
+        yield [false, false, ['noIndex' => [null, false]]];
         yield ['string', true, ['noIndex' => [null, true]]];
     }
 

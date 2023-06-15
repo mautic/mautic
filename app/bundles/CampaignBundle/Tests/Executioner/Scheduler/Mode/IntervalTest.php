@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -29,7 +29,13 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
         $contact1->method('getTimezone')
             ->willReturn($localTimezone);
-        $contacts = new ArrayCollection([$contact1]);
+
+        $contacts =$this->getMockBuilder(Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $contacts->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayObject([$contact1]));
 
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -266,16 +272,21 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $contact8->method('getTimezone')
             ->willReturn('Bad/Timezone'); // use default of New_York
 
-        $contacts = new ArrayCollection([
-            1 => $contact1,
-            2 => $contact2,
-            3 => $contact3,
-            4 => $contact4,
-            5 => $contact5,
-            6 => $contact6,
-            7 => $contact7,
-            8 => $contact8,
-        ]);
+        $contacts =$this->getMockBuilder(Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $contacts->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayObject([
+                1 => $contact1,
+                2 => $contact2,
+                3 => $contact3,
+                4 => $contact4,
+                5 => $contact5,
+                6 => $contact6,
+                7 => $contact7,
+                8 => $contact8,
+            ]));
 
         $scheduledExecutionDate = new \DateTime('2018-10-18 6:00:00', new \DateTimeZone('America/Los_Angeles'));
         $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);

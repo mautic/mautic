@@ -673,7 +673,7 @@ class ListModel extends FormModel
         }
 
         if (!empty($persistLists)) {
-            $this->getRepository()->saveEntities($persistLists);
+            $this->getListLeadRepository()->saveEntities($persistLists);
         }
 
         // Clear ListLead entities from Doctrine memory
@@ -793,7 +793,7 @@ class ListModel extends FormModel
         }
 
         if (!empty($persistLists)) {
-            $this->getRepository()->saveEntities($persistLists);
+            $this->getListLeadRepository()->saveEntities($persistLists);
         }
 
         if (!empty($deleteLists)) {

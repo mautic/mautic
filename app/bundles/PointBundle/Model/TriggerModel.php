@@ -88,6 +88,16 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
+     * Retrieves an instance of the LeadTriggerLogRepository.
+     *
+     * @return \Mautic\PointBundle\Entity\LeadTriggerLogRepository
+     */
+    public function getLeadTriggerLogRepository()
+    {
+        return $this->em->getRepository(LeadTriggerLog::class);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPermissionBase()
@@ -427,7 +437,7 @@ class TriggerModel extends CommonFormModel
             }
 
             if (!empty($persist)) {
-                $this->getEventRepository()->saveEntities($persist);
+                $this->getLeadTriggerLogRepository()->saveEntities($persist);
                 $this->getEventRepository()->detachEntities($persist);
                 if (isset($triggerEvent)) {
                     $this->getEventRepository()->deleteEntity($triggerEvent);

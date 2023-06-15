@@ -28,7 +28,7 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         yield [true, true, ['noIndex' => [null, true]]];
         yield [false, false, ['noIndex' => [null, false]]];
         yield ['', false, ['noIndex' => [null, false]]];
-        yield [0, false, ['noIndex' => [null, false]]];
+        yield [false, false, ['noIndex' => [null, false]]];
         yield ['string', true, ['noIndex' => [null, true]]];
     }
 

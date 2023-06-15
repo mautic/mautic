@@ -558,22 +558,14 @@ class Import extends FormEntity
      */
     public function getSatusLabelClass()
     {
-        switch ($this->status) {
-            case self::QUEUED:
-                return 'info';
-            case self::IN_PROGRESS:
-            case self::MANUAL:
-                return 'primary';
-            case self::IMPORTED:
-                return 'success';
-            case self::FAILED:
-                return 'danger';
-            case self::STOPPED:
-            case self::DELAYED:
-                return 'warning';
-            default:
-                return 'default';
-        }
+        return match ($this->status) {
+            self::QUEUED => 'info',
+            self::IN_PROGRESS, self::MANUAL => 'primary',
+            self::IMPORTED => 'success',
+            self::FAILED   => 'danger',
+            self::STOPPED, self::DELAYED => 'warning',
+            default => 'default',
+        };
     }
 
     /**
@@ -656,10 +648,8 @@ class Import extends FormEntity
 
     /**
      * Counts how long the import has run so far.
-     *
-     * @return \DateInterval|null
      */
-    public function getRunTime()
+    public function getRunTime(): ?\DateInterval
     {
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();
@@ -810,11 +800,10 @@ class Import extends FormEntity
      * Set a default value to the defaults array.
      *
      * @param string $key
-     * @param mixed  $value
      *
      * @return Import
      */
-    public function setDefault($key, $value)
+    public function setDefault($key, mixed $value)
     {
         return $this->mergeToProperties([
             'defaults' => array_merge($this->getDefaults(), [$key => $value]),
@@ -824,9 +813,9 @@ class Import extends FormEntity
     /**
      * @param string $key
      *
-     * @return string|null
+     * @return array<int, string>|bool|null
      */
-    public function getDefault($key)
+    public function getDefault($key): array|bool|null
     {
         return empty($this->properties['defaults'][$key]) ? null : $this->properties['defaults'][$key];
     }

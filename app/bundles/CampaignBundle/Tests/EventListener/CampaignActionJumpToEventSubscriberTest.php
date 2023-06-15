@@ -27,7 +27,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $event    = new Event();
         $campaign = new Campaign();
         $leadLog  = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): ?int
             {
                 return 456;
             }
@@ -41,14 +41,11 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private Campaign $campaign;
-
-            public function __construct(Campaign $campaign)
+            public function __construct(private Campaign $campaign)
             {
-                $this->campaign = $campaign;
             }
 
-            public function getEntities(array $args = [])
+            public function getEntities(array $args = []): \Doctrine\ORM\Tools\Pagination\Paginator|array
             {
                 Assert::assertSame(
                     [
@@ -88,7 +85,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @param mixed[] $parameters
              */
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
 
@@ -136,7 +133,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             }
         };
         $leadLog = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): ?int
             {
                 return 456;
             }
@@ -150,14 +147,11 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private Campaign $campaign;
-
-            public function __construct(Campaign $campaign)
+            public function __construct(private Campaign $campaign)
             {
-                $this->campaign = $campaign;
             }
 
-            public function getEntities(array $args = [])
+            public function getEntities(array $args = []): \Doctrine\ORM\Tools\Pagination\Paginator|array
             {
                 Assert::assertSame(
                     [

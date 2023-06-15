@@ -14,11 +14,6 @@ class Mapper
     /**
      * @var array
      */
-    private $fields = [];
-
-    /**
-     * @var array
-     */
     private $mappedFields = [];
 
     private $object;
@@ -42,9 +37,8 @@ class Mapper
      */
     private $contactMapper = [];
 
-    public function __construct(array $fields)
+    public function __construct(private array $fields)
     {
-        $this->fields = $fields;
     }
 
     /**
@@ -83,7 +77,7 @@ class Mapper
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($mauticContactId, $zohoId = null)
+    public function map($mauticContactId, string|null|int $zohoId = null)
     {
         $mapped             = 0;
         $objectMappedValues = [];

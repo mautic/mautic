@@ -249,42 +249,27 @@ class Stat
             ->build();
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateRead()
+    public function getDateRead(): ?\DateTimeInterface
     {
         return $this->dateRead;
     }
 
-    /**
-     * @param \DateTime|null $dateRead
-     */
-    public function setDateRead($dateRead)
+    public function setDateRead(?\DateTime $dateRead)
     {
         $this->dateRead = $dateRead;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateSent()
+    public function getDateSent(): ?\DateTimeInterface
     {
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime|null $dateSent
-     */
-    public function setDateSent($dateSent)
+    public function setDateSent(?\DateTime $dateSent)
     {
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
@@ -294,18 +279,12 @@ class Stat
         $this->email = $email;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return (int) $this->id;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -342,10 +321,7 @@ class Stat
         $this->isRead = $isRead;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -355,34 +331,22 @@ class Stat
         $this->lead = $lead;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTrackingHash()
+    public function getTrackingHash(): ?string
     {
         return $this->trackingHash;
     }
 
-    /**
-     * @param string|null $trackingHash
-     */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash(?string $trackingHash)
     {
         $this->trackingHash = $trackingHash;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
 
-    /**
-     * @param LeadList|null $list
-     */
-    public function setList($list)
+    public function setList(?LeadList $list)
     {
         $this->list = $list;
     }
@@ -435,18 +399,12 @@ class Stat
         return $this->getIsFailed();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getEmailAddress()
+    public function getEmailAddress(): ?string
     {
         return $this->emailAddress;
     }
 
-    /**
-     * @param string|null $emailAddress
-     */
-    public function setEmailAddress($emailAddress)
+    public function setEmailAddress(?string $emailAddress)
     {
         $this->emailAddress = $emailAddress;
     }
@@ -467,34 +425,22 @@ class Stat
         $this->viewedInBrowser = $viewedInBrowser;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSource()
+    public function getSource(): ?string
     {
         return $this->source;
     }
 
-    /**
-     * @param string|null $source
-     */
-    public function setSource($source)
+    public function setSource(?string $source)
     {
         $this->source = $source;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->sourceId;
     }
 
-    /**
-     * @param int|null $sourceId
-     */
-    public function setSourceId($sourceId)
+    public function setSourceId(?int $sourceId)
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -557,20 +503,15 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getLastOpened()
+    public function getLastOpened(): ?\DateTimeInterface
     {
         return $this->lastOpened;
     }
 
     /**
-     * @param \DateTime|null $lastOpened
-     *
      * @return Stat
      */
-    public function setLastOpened($lastOpened)
+    public function setLastOpened(?\DateTime $lastOpened)
     {
         $this->lastOpened = $lastOpened;
 
@@ -595,10 +536,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Copy|null
-     */
-    public function getStoredCopy()
+    public function getStoredCopy(): ?Copy
     {
         return $this->storedCopy;
     }
@@ -614,9 +552,9 @@ class Stat
     }
 
     /**
-     * @return ArrayCollection|EmailReply[]
+     * @return \Doctrine\Common\Collections\Collection<int, EmailReply>|array<int, EmailReply>
      */
-    public function getReplies()
+    public function getReplies(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->replies;
     }

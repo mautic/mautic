@@ -397,10 +397,7 @@ class Form extends FormEntity
         return $this->cachedHtml;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getRenderStyle()
+    public function getRenderStyle(): ?bool
     {
         return $this->renderStyle;
     }
@@ -495,11 +492,9 @@ class Form extends FormEntity
     }
 
     /**
-     * @param int|string $key
-     *
      * @return Form
      */
-    public function addField($key, Field $field)
+    public function addField(int|string $key, Field $field)
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -509,10 +504,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @param int|string $key
-     */
-    public function removeField($key, Field $field)
+    public function removeField(int|string $key, Field $field)
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -602,19 +594,17 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return \Doctrine\Common\Collections\Collection<int, Submission>|array<int, Submission>
      */
-    public function getSubmissions()
+    public function getSubmissions(): Collection|array
     {
         return $this->submissions;
     }
 
     /**
-     * @param int|string $key
-     *
      * @return Form
      */
-    public function addAction($key, Action $action)
+    public function addAction(int|string|null $key, Action $action)
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', [$key, $changes]);
@@ -653,10 +643,7 @@ class Form extends FormEntity
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category)
+    public function setCategory(mixed $category)
     {
         $this->category = $category;
     }
@@ -669,10 +656,7 @@ class Form extends FormEntity
         return $this->template;
     }
 
-    /**
-     * @param mixed $template
-     */
-    public function setTemplate($template)
+    public function setTemplate(mixed $template)
     {
         $this->template = $template;
     }
@@ -685,18 +669,12 @@ class Form extends FormEntity
         return $this->inKioskMode;
     }
 
-    /**
-     * @param mixed $inKioskMode
-     */
-    public function setInKioskMode($inKioskMode)
+    public function setInKioskMode(mixed $inKioskMode)
     {
         $this->inKioskMode = $inKioskMode;
     }
 
-    /**
-     * @param mixed $renderStyle
-     */
-    public function setRenderStyle($renderStyle)
+    public function setRenderStyle(mixed $renderStyle)
     {
         $this->renderStyle = $renderStyle;
     }
@@ -718,31 +696,23 @@ class Form extends FormEntity
     }
 
     /**
-     * @param mixed $formType
-     *
      * @return Form
      */
-    public function setFormType($formType)
+    public function setFormType(mixed $formType)
     {
         $this->formType = $formType;
 
         return $this;
     }
 
-    /**
-     * @param bool|null $noIndex
-     */
-    public function setNoIndex($noIndex)
+    public function setNoIndex(bool|null|string $noIndex)
     {
         $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedNoIndex);
         $this->noIndex = $sanitizedNoIndex;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNoIndex()
+    public function getNoIndex(): ?bool
     {
         return $this->noIndex;
     }

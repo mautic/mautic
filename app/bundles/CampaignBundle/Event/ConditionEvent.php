@@ -10,16 +10,6 @@ class ConditionEvent extends CampaignExecutionEvent
     use ContextTrait;
 
     /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
-
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
-
-    /**
      * @var bool
      */
     private $passed = false;
@@ -27,22 +17,19 @@ class ConditionEvent extends CampaignExecutionEvent
     /**
      * DecisionEvent constructor.
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
+    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog)
     {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
-
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
-                'systemTriggered' => $log->getSystemTriggered(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
+                'systemTriggered' => $eventLog->getSystemTriggered(),
             ],
             null,
-            $log
+            $eventLog
         );
     }
 
@@ -98,10 +85,8 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return bool
      */
-    public function getResult()
+    public function getResult(): bool
     {
         return $this->passed;
     }

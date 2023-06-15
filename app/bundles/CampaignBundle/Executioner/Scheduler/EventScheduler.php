@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -86,9 +87,10 @@ class EventScheduler
     }
 
     /**
-     * @param bool $isInactiveEvent
+     * @param Collection<int, Lead> $contacts
+     * @param bool                  $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function schedule(Event $event, \DateTimeInterface $executionDate, Collection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -242,13 +244,13 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|Event[] $events
+     * @param Collection<int, Event> $events
      *
      * @return array
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate)
+    public function getSortedExecutionDates(Collection $events, \DateTimeInterface $lastActiveDate)
     {
         $eventExecutionDates = [];
 
@@ -369,9 +371,10 @@ class EventScheduler
     }
 
     /**
-     * @param bool $isInactiveEvent
+     * @param Collection<int, Lead> $contacts
+     * @param bool                  $isInactiveEvent
      */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, Collection $contacts, $isInactiveEvent = false)
     {
         foreach ($contacts as $contact) {
             // Create the entry

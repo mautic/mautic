@@ -49,6 +49,7 @@ class Channel extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('message_channels')
+                ->setCustomRepositoryClass(ChannelRepository::class)
                 ->addIndex(['channel', 'channel_id'], 'channel_entity_index')
                 ->addIndex(['channel', 'is_enabled'], 'channel_enabled_index')
                 ->addUniqueConstraint(['message_id', 'channel'], 'channel_index');

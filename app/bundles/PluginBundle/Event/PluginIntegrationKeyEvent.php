@@ -9,15 +9,9 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
  */
 class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var array
-     */
-    private $keys;
-
-    public function __construct(UnifiedIntegrationInterface $integration, array $keys = null)
+    public function __construct(UnifiedIntegrationInterface $integration, private array $keys = [])
     {
         $this->integration = $integration;
-        $this->keys        = $keys;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -390,9 +391,8 @@ class Event implements ChannelInterface
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
-    private function isChanged($prop, $val)
+    private function isChanged($prop, mixed $val)
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -619,10 +619,8 @@ class Event implements ChannelInterface
 
     /**
      * Get log for a contact and a rotation.
-     *
-     * @return LeadEventLog|null
      */
-    public function getLogByContactAndRotation(Contact $contact, $rotation)
+    public function getLogByContactAndRotation(Contact $contact, $rotation): ?LeadEventLog
     {
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq('lead', $contact))
@@ -641,8 +639,6 @@ class Event implements ChannelInterface
     /**
      * Add children.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
-     *
      * @return Event
      */
     public function addChild(Event $children)
@@ -654,8 +650,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove children.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
      */
     public function removeChild(Event $children)
     {
@@ -663,17 +657,17 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getChildren()
+    public function getChildren(): Collection|array
     {
         return $this->children;
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getPositiveChildren()
+    public function getPositiveChildren(): Collection|array
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_ACTION));
 
@@ -681,9 +675,9 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection|Event[]
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    public function getNegativeChildren()
+    public function getNegativeChildren(): Collection|array
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', self::PATH_INACTION));
 
@@ -691,7 +685,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
     public function getChildrenByType($type)
     {
@@ -701,7 +695,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\CampaignBundle\Entity\Event>|array<int, \Mautic\CampaignBundle\Entity\Event>
      */
     public function getChildrenByEventType($type)
     {
@@ -712,8 +706,6 @@ class Event implements ChannelInterface
 
     /**
      * Set parent.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $parent
      *
      * @return Event
      */
@@ -752,10 +744,7 @@ class Event implements ChannelInterface
         return $this->triggerDate;
     }
 
-    /**
-     * @param mixed $triggerDate
-     */
-    public function setTriggerDate($triggerDate)
+    public function setTriggerDate(mixed $triggerDate)
     {
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
@@ -778,10 +767,7 @@ class Event implements ChannelInterface
         $this->triggerInterval = $triggerInterval;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerHour()
+    public function getTriggerHour(): ?\DateTimeInterface
     {
         return $this->triggerHour;
     }
@@ -813,10 +799,7 @@ class Event implements ChannelInterface
         return $this->triggerIntervalUnit;
     }
 
-    /**
-     * @param mixed $triggerIntervalUnit
-     */
-    public function setTriggerIntervalUnit($triggerIntervalUnit)
+    public function setTriggerIntervalUnit(mixed $triggerIntervalUnit)
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
@@ -849,10 +832,7 @@ class Event implements ChannelInterface
         return $this->triggerMode;
     }
 
-    /**
-     * @param mixed $triggerMode
-     */
-    public function setTriggerMode($triggerMode)
+    public function setTriggerMode(mixed $triggerMode)
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
@@ -866,10 +846,7 @@ class Event implements ChannelInterface
         return $this->decisionPath;
     }
 
-    /**
-     * @param mixed $decisionPath
-     */
-    public function setDecisionPath($decisionPath)
+    public function setDecisionPath(mixed $decisionPath)
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
@@ -883,10 +860,7 @@ class Event implements ChannelInterface
         return $this->tempId;
     }
 
-    /**
-     * @param mixed $tempId
-     */
-    public function setTempId($tempId)
+    public function setTempId(mixed $tempId)
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
@@ -929,9 +903,9 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
+     * @return array<int, LeadEventLog>|\Doctrine\Common\Collections\Collection|static
      */
-    public function getContactLog(Contact $contact = null)
+    public function getContactLog(Contact $contact = null): array|Collection|static
     {
         if ($this->contactLog) {
             return $this->contactLog;
@@ -973,10 +947,8 @@ class Event implements ChannelInterface
 
     /**
      * Get the value of triggerRestrictedStartHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStartHour()
+    public function getTriggerRestrictedStartHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStartHour;
     }
@@ -984,11 +956,9 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      *
-     * @param \DateTime|null $triggerRestrictedStartHour
-     *
      * @return self
      */
-    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
+    public function setTriggerRestrictedStartHour(string|\DateTime|null $triggerRestrictedStartHour)
     {
         if (empty($triggerRestrictedStartHour)) {
             $triggerRestrictedStartHour = null;
@@ -1005,10 +975,8 @@ class Event implements ChannelInterface
 
     /**
      * Get the value of triggerRestrictedStopHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStopHour()
+    public function getTriggerRestrictedStopHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStopHour;
     }
@@ -1016,11 +984,9 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      *
-     * @param \DateTime|null $triggerRestrictedStopHour
-     *
      * @return self
      */
-    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
+    public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour)
     {
         if (empty($triggerRestrictedStopHour)) {
             $triggerRestrictedStopHour = null;

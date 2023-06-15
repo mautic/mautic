@@ -101,23 +101,6 @@ class PageModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    private ContactRequestHelper $contactRequestHelper;
-
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -126,11 +109,11 @@ class PageModel extends FormModel
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
         QueueService $queueService,
-        CompanyModel $companyModel,
-        DeviceTracker $deviceTracker,
-        ContactTracker $contactTracker,
+        private CompanyModel $companyModel,
+        private DeviceTracker $deviceTracker,
+        private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper
+        private ContactRequestHelper $contactRequestHelper
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -140,11 +123,7 @@ class PageModel extends FormModel
         $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
         $this->queueService         = $queueService;
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->contactRequestHelper = $contactRequestHelper;
     }
 
     public function setCatInUrl($catInUrl)
@@ -278,10 +257,8 @@ class PageModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return Page|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Page
     {
         if (null === $id) {
             $entity = new Page();
@@ -441,13 +418,11 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Page|Redirect $page
-     * @param string|int    $code
-     * @param array         $query
+     * @param array $query
      *
      * @throws \Exception
      */
-    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Page|Redirect|null $page, Request $request, string|int $code = '200', Lead $lead = null, $query = [])
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -544,13 +519,12 @@ class PageModel extends FormModel
     /**
      * Process page hit.
      *
-     * @param Page|Redirect $page
-     * @param bool          $trackingNewlyGenerated
-     * @param bool          $activeRequest
+     * @param bool $trackingNewlyGenerated
+     * @param bool $activeRequest
      *
      * @throws \Exception
      */
-    public function processPageHit(Hit $hit, $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
+    public function processPageHit(Hit $hit, Page|Redirect|null $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
     {
         // Store Page/Redirect association
         if ($page) {
@@ -733,11 +707,9 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Redirect|Page|null $page
-     *
      * @return array
      */
-    public function getHitQuery(Request $request, $page = null)
+    public function getHitQuery(Request $request, Redirect|Page|null $page = null)
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -768,7 +740,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(Page $page = null, array|string $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -778,8 +750,6 @@ class PageModel extends FormModel
 
     /**
      * Get number of page bounces.
-     *
-     * @param \DateTime $fromDate
      *
      * @return int
      */
@@ -918,9 +888,6 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     *
      * @return array
      */
     public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
@@ -960,11 +927,9 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) pages.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -993,11 +958,9 @@ class PageModel extends FormModel
     /**
      * Get a list of pages created in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -1051,7 +1014,7 @@ class PageModel extends FormModel
         $queryHasUtmTags = false;
         $query           = $hit->getQuery();
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
+            if (str_contains($key, 'utm_')) {
                 $queryHasUtmTags = true;
                 break;
             }
@@ -1129,13 +1092,13 @@ class PageModel extends FormModel
 
         // Use the current URL
         $isPageEvent = false;
-        if (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

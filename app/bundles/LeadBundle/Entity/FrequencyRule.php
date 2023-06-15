@@ -154,10 +154,7 @@ class FrequencyRule extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
@@ -185,11 +182,9 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param int|null $frequencyNumber
-     *
      * @return FrequencyRule
      */
-    public function setFrequencyNumber($frequencyNumber)
+    public function setFrequencyNumber(string|int|null $frequencyNumber)
     {
         $this->isChanged('frequencyNumber', $frequencyNumber);
 
@@ -207,11 +202,9 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param string|null $frequencyTime
-     *
      * @return FrequencyRule
      */
-    public function setFrequencyTime($frequencyTime)
+    public function setFrequencyTime(?string $frequencyTime)
     {
         $this->isChanged('frequencyTime', $frequencyTime);
 
@@ -281,8 +274,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseFromDate
-     *
      * @return FrequencyRule
      */
     public function setPauseFromDate(\DateTime $pauseFromDate = null)
@@ -303,8 +294,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseToDate
-     *
      * @return FrequencyRule
      */
     public function setPauseToDate(\DateTime $pauseToDate = null)

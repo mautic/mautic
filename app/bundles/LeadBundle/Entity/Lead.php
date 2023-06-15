@@ -581,8 +581,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set owner.
      *
-     * @param User $owner
-     *
      * @return Lead
      */
     public function setOwner(User $owner = null)
@@ -593,20 +591,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
     /**
      * Returns the user to be used for permissions.
-     *
-     * @return User|int
      */
-    public function getPermissionUser()
+    public function getPermissionUser(): User|int|null
     {
         return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
     }
@@ -1156,10 +1149,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
-    public function setColor($color)
+    public function setColor(mixed $color)
     {
         $this->color = $color;
     }
@@ -1218,10 +1208,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return LeadManipulator|null
-     */
-    public function getManipulator()
+    public function getManipulator(): ?LeadManipulator
     {
         return $this->manipulator;
     }
@@ -1274,10 +1261,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->dateIdentified;
     }
 
-    /**
-     * @param mixed $dateIdentified
-     */
-    public function setDateIdentified($dateIdentified)
+    public function setDateIdentified(mixed $dateIdentified)
     {
         $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
@@ -1291,10 +1275,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->lastActive;
     }
 
-    /**
-     * @param mixed $lastActive
-     */
-    public function setLastActive($lastActive)
+    public function setLastActive(mixed $lastActive)
     {
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
@@ -1381,8 +1362,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set stage.
      *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
-     *
      * @return Stage
      */
     public function setStage(Stage $stage = null)
@@ -1395,10 +1374,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get stage.
-     *
-     * @return \Mautic\StageBundle\Entity\Stage|null
      */
-    public function getStage()
+    public function getStage(): ?Stage
     {
         return $this->stage;
     }
@@ -1500,11 +1477,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $primaryCompany
-     *
      * @return Lead
      */
-    public function setPrimaryCompany($primaryCompany)
+    public function setPrimaryCompany(mixed $primaryCompany)
     {
         $this->primaryCompany = $primaryCompany;
 
@@ -1520,11 +1495,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $title
-     *
      * @return Lead
      */
-    public function setTitle($title)
+    public function setTitle(mixed $title)
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -1541,11 +1514,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $firstname
-     *
      * @return Lead
      */
-    public function setFirstname($firstname)
+    public function setFirstname(mixed $firstname)
     {
         $this->isChanged('firstname', $firstname);
         $this->firstname = $firstname;
@@ -1562,11 +1533,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $lastname
-     *
      * @return Lead
      */
-    public function setLastname($lastname)
+    public function setLastname(mixed $lastname)
     {
         $this->isChanged('lastname', $lastname);
         $this->lastname = $lastname;
@@ -1583,11 +1552,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $position
-     *
      * @return Lead
      */
-    public function setPosition($position)
+    public function setPosition(mixed $position)
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -1604,11 +1571,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $phone
-     *
      * @return Lead
      */
-    public function setPhone($phone)
+    public function setPhone(mixed $phone)
     {
         $this->isChanged('phone', $phone);
         $this->phone = $phone;
@@ -1625,11 +1590,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $mobile
-     *
      * @return Lead
      */
-    public function setMobile($mobile)
+    public function setMobile(mixed $mobile)
     {
         $this->isChanged('mobile', $mobile);
         $this->mobile = $mobile;
@@ -1637,10 +1600,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getLeadPhoneNumber()
+    public function getLeadPhoneNumber(): ?string
     {
         return $this->getMobile() ?: $this->getPhone();
     }
@@ -1654,11 +1614,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $address1
-     *
      * @return Lead
      */
-    public function setAddress1($address1)
+    public function setAddress1(mixed $address1)
     {
         $this->isChanged('address1', $address1);
         $this->address1 = $address1;
@@ -1675,11 +1633,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $address2
-     *
      * @return Lead
      */
-    public function setAddress2($address2)
+    public function setAddress2(mixed $address2)
     {
         $this->isChanged('address2', $address2);
         $this->address2 = $address2;
@@ -1696,11 +1652,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $city
-     *
      * @return Lead
      */
-    public function setCity($city)
+    public function setCity(mixed $city)
     {
         $this->isChanged('city', $city);
         $this->city = $city;
@@ -1717,11 +1671,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $state
-     *
      * @return Lead
      */
-    public function setState($state)
+    public function setState(mixed $state)
     {
         $this->isChanged('state', $state);
         $this->state = $state;
@@ -1738,11 +1690,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $zipcode
-     *
      * @return Lead
      */
-    public function setZipcode($zipcode)
+    public function setZipcode(mixed $zipcode)
     {
         $this->isChanged('zipcode', $zipcode);
         $this->zipcode = $zipcode;
@@ -1780,11 +1730,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $country
-     *
      * @return Lead
      */
-    public function setCountry($country)
+    public function setCountry(mixed $country)
     {
         $this->isChanged('country', $country);
         $this->country = $country;
@@ -1801,11 +1749,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $company
-     *
      * @return Lead
      */
-    public function setCompany($company)
+    public function setCompany(mixed $company)
     {
         $this->isChanged('company', $company);
         $this->company = $company;
@@ -1822,11 +1768,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $email
-     *
      * @return Lead
      */
-    public function setEmail($email)
+    public function setEmail(mixed $email)
     {
         $this->isChanged('email', $email);
         $this->email = $email;
@@ -1925,17 +1869,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
                     } else {
                         $convertToMonth = function ($number, $unit) {
-                            switch ($unit) {
-                                case FrequencyRule::TIME_MONTH:
-                                    $number = (int) $number;
-                                    break;
-                                case FrequencyRule::TIME_WEEK:
-                                    $number = $number * 4;
-                                    break;
-                                case FrequencyRule::TIME_DAY:
-                                    $number = $number * 30;
-                                    break;
-                            }
+                            $number = match ($unit) {
+                                FrequencyRule::TIME_MONTH => (int) $number,
+                                FrequencyRule::TIME_WEEK  => $number * 4,
+                                FrequencyRule::TIME_DAY   => $number * 30,
+                                default                   => $number,
+                            };
 
                             return $number;
                         };

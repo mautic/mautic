@@ -28,48 +28,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $langHelper;
-
-    /**
      * @var array
      */
     private $supportedLanguages;
 
-    /**
-     * @var IpLookupFactory
-     */
-    private $ipLookupFactory;
-
-    /**
-     * @var AbstractLookup
-     */
-    private $ipLookup;
-
-    /**
-     * @var array
-     */
-    private $ipLookupServices;
-
     public function __construct(
-        TranslatorInterface $translator,
-        LanguageHelper $langHelper,
-        IpLookupFactory $ipLookupFactory,
-        array $ipLookupServices,
-        AbstractLookup $ipLookup = null
+        private TranslatorInterface $translator,
+        private LanguageHelper $langHelper,
+        private IpLookupFactory $ipLookupFactory,
+        private array $ipLookupServices,
+        private ?AbstractLookup $ipLookup = null
     ) {
-        $this->translator          = $translator;
-        $this->langHelper          = $langHelper;
-        $this->ipLookupFactory     = $ipLookupFactory;
-        $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->ipLookupServices    = $ipLookupServices;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

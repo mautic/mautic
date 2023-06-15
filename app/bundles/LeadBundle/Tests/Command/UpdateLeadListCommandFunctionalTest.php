@@ -67,7 +67,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
         Assert::assertSame(
-            '1',
+            1,
             $leadListRepository->getLeadCount([$segment->getId()])
         );
     }

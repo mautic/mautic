@@ -11,11 +11,8 @@ use Twig\TwigFunction;
 
 class SecurityExtension extends AbstractExtension
 {
-    private SecurityHelper $securityHelper;
-
-    public function __construct(SecurityHelper $securityHelper)
+    public function __construct(private SecurityHelper $securityHelper)
     {
-        $this->securityHelper = $securityHelper;
     }
 
     public function getFunctions()
@@ -40,12 +37,8 @@ class SecurityExtension extends AbstractExtension
 
     /**
      * Helper function to check if the logged in user has access to an entity.
-     *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, User|int|null $ownerId): bool
     {
         return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
