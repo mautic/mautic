@@ -5,15 +5,23 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Dsn\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * @extends AbstractType<array>
  */
 class DsnType extends AbstractType
 {
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    {
+    }
+
     /**
      * @param array<string, mixed> $options
      */
@@ -109,5 +117,19 @@ class DsnType extends AbstractType
                 'key_value_pairs' => true,
             ]
         );
+    }
+
+    /**
+     * @phpstan-ignore-next-line
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        $dsn = Dsn::fromString($this->coreParametersHelper->get('mailer_dsn'));
+
+        if ($dsn->getPassword()) {
+            $dsn = $dsn->setPassword('SECRET');
+        }
+
+        $view->vars['currentDns'] = $dsn;
     }
 }

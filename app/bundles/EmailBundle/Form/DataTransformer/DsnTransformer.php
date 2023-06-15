@@ -50,8 +50,8 @@ class DsnTransformer implements DataTransformerInterface
         $value = $this->escapeTransformer->transform($value);
 
         $dsn = new Dsn(
-            $value['scheme'],
-            $value['host'],
+            (string) $value['scheme'],
+            (string) $value['host'],
             $value['user'],
             $value['password'],
             $value['port'] ? (int) $value['port'] : null,
