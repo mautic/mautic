@@ -422,7 +422,6 @@ class TwitterCommandHelper
      * Increment the post counter.
      *
      * @param Monitoring $monitor
-     * @param $tweet
      */
     private function incrementPostCount($monitor, $tweet)
     {

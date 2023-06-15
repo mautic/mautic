@@ -810,8 +810,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // Remove DNC from the contact.
         $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");
         $clientResponse    = $this->client->getResponse();
+        self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
 
+        $this->assertArrayHasKey('contact', $dncRemoveResponse, $clientResponse->getContent());
         $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
 
         // Remove the contact.

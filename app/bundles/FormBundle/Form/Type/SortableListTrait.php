@@ -12,9 +12,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait SortableListTrait
 {
-    /**
-     * @param $options
-     */
     public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield')
     {
         $listOptions = [
@@ -52,10 +49,10 @@ trait SortableListTrait
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $formData = $event->getForm()->getParent()->getData();
-            $form = $event->getForm();
+            $form     = $event->getForm();
             if (empty($formData['mappedField'])) {
                 // Disable sync list if a contact field is not mapped
-                $data = $event->getData();
+                $data             = $event->getData();
                 $data['syncList'] = '0';
                 $form->setData($data);
             }

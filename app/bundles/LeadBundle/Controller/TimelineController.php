@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -189,7 +190,7 @@ class TimelineController extends CommonController
     /**
      * @return array|Response
      */
-    public function batchExportAction(Request $request, DateHelper $dateHelper, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -265,6 +266,6 @@ class TimelineController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline');
+        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $exportHelper);
     }
 }

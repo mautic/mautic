@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -66,5 +67,16 @@ class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $responseArray = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertSame('<some>content</some>', $responseArray['content']);
+    }
+
+    public function testCreateDwc(): void
+    {
+        $payload = [
+            'name'    => 'API test',
+            'content' => 'API test',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);
+        Assert::assertSame(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 }

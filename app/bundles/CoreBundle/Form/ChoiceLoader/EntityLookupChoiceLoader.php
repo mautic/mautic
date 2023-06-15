@@ -183,8 +183,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $choices
-     *
      * @return array
      */
     protected function prepareChoices($choices)
@@ -223,9 +221,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $modelName
-     * @param $data
-     *
      * @return array|mixed
      */
     protected function fetchChoices($modelName, $data = [])
@@ -256,7 +251,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         } elseif (isset($this->options['repo_lookup_method'])) {
             $choices = call_user_func_array([$model->getRepository(), $this->options['repo_lookup_method']], $args);
         } else {
-            //rewrite query to use expression builder
+            // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
             $composite = null;

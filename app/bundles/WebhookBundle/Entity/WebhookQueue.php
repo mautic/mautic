@@ -2,8 +2,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
-use DateTime;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -54,7 +53,7 @@ class WebhookQueue
         $builder->createField('payloadCompressed', Types::BLOB)
             ->columnName('payload_compressed')
             ->nullable()
-            ->length(MySqlPlatform::LENGTH_LIMIT_MEDIUMBLOB)
+            ->length(MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB)
             ->build();
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
@@ -99,7 +98,7 @@ class WebhookQueue
     }
 
     /**
-     * @param DateTime|null $dateAdded
+     * @param \DateTime|null $dateAdded
      *
      * @return WebhookQueue
      */

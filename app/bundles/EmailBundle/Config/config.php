@@ -647,12 +647,12 @@ return [
         'mailer_port'                    => null,
         'mailer_user'                    => null,
         'mailer_password'                => null,
-        'mailer_encryption'              => null, //tls or ssl,
-        'mailer_auth_mode'               => null, //plain, login or cram-md5
+        'mailer_encryption'              => null, // tls or ssl,
+        'mailer_auth_mode'               => null, // plain, login or cram-md5
         'mailer_amazon_region'           => 'us-east-1',
         'mailer_amazon_other_region'     => null,
         'mailer_custom_headers'          => [],
-        'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
+        'mailer_spool_type'              => 'memory', // memory = immediate; file = queue
         'mailer_spool_path'              => '%kernel.project_dir%/var/spool',
         'mailer_spool_msg_limit'         => null,
         'mailer_spool_time_limit'        => null,

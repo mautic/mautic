@@ -194,7 +194,7 @@ class SendEmailToContact
 
         $this->mailer->setTokens($tokens);
         $this->mailer->setLead($contact);
-        $this->mailer->setIdHash(); //auto generates
+        $this->mailer->setIdHash(); // auto generates
 
         try {
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
@@ -223,7 +223,7 @@ class SendEmailToContact
             list($success, $errors) = $this->sendStandardEmail();
         }
 
-        //queue or send the message
+        // queue or send the message
         if (!$success) {
             unset($errors['failures']);
             $this->failContact(false, implode('; ', (array) $errors));
@@ -305,9 +305,6 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    /**
-     * @param $sendFailures
-     */
     protected function processSendFailures($sendFailures)
     {
         $failedEmailAddresses = $sendFailures['failures'];
@@ -354,9 +351,6 @@ class SendEmailToContact
         }
     }
 
-    /**
-     * @param $email
-     */
     protected function createContactStatEntry($email)
     {
         ++$this->statBatchCounter;

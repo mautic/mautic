@@ -67,7 +67,7 @@ class UserListType extends AbstractType
             $choices[$user->getName(true)] = $user->getId();
         }
 
-        //sort by user name
+        // sort by user name
         ksort($choices);
 
         return $choices;

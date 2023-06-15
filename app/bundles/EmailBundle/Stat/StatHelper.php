@@ -33,9 +33,6 @@ class StatHelper
         $this->repo = $statRepository;
     }
 
-    /**
-     * @param $emailAddress
-     */
     public function storeStat(Stat $stat, $emailAddress)
     {
         $this->repo->saveEntity($stat);
@@ -60,8 +57,6 @@ class StatHelper
     }
 
     /**
-     * @param $emailAddress
-     *
      * @return Reference
      *
      * @throws StatNotFoundException

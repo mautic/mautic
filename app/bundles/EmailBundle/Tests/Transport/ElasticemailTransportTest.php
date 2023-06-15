@@ -135,7 +135,6 @@ class ElasticemailTransportTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param        $status
      * @param string $category
      *
      * @return Request

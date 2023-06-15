@@ -175,7 +175,7 @@ class FocusModel extends FormModel
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
     {
         // If cached is not an array, rebuild to support the new format
-        $cached = json_decode($focus->getCache(), true);
+        $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
         if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
             $focusArray = $focus->toArray();
 
@@ -309,9 +309,6 @@ class FocusModel extends FormModel
     /**
      * Get whether the color is light or dark.
      *
-     * @param $hex
-     * @param $level
-     *
      * @return bool
      */
     public static function isLightColor($hex, $level = 200)
@@ -423,7 +420,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param      $unit
      * @param null $dateFormat
      * @param bool $canViewOthers
      *

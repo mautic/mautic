@@ -143,8 +143,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Campaign|null
      */
     public function getEntity($id = null)
@@ -169,11 +167,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -218,10 +211,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $sessionEvents
-     * @param $sessionConnections
-     * @param $deletedEvents
-     *
      * @return array
      */
     public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
@@ -236,7 +225,7 @@ class CampaignModel extends CommonFormModel
 
             foreach ($properties as $f => $v) {
                 if ('id' == $f && 0 === strpos($v, 'new')) {
-                    //set the temp ID used to be able to match up connections
+                    // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
 
@@ -336,7 +325,7 @@ class CampaignModel extends CommonFormModel
 
         $entity->addEvents($events);
 
-        //set event order used when querying the events
+        // set event order used when querying the events
         $this->buildOrder($hierarchy, $events, $entity);
 
         uasort(
@@ -361,8 +350,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param      $entity
-     * @param      $settings
      * @param bool $persist
      * @param null $events
      *
@@ -436,8 +423,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get list of sources for a campaign.
      *
-     * @param $campaign
-     *
      * @return array
      */
     public function getLeadSources($campaign)
@@ -457,10 +442,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Add and/or delete lead sources from a campaign.
-     *
-     * @param $entity
-     * @param $addedSources
-     * @param $deletedSources
      */
     public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
     {
@@ -518,7 +499,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
 
-            // no break
+                // no break
             case 'forms':
             case null:
                 $choices['forms'] = [];
@@ -573,7 +554,7 @@ class CampaignModel extends CommonFormModel
         if (!isset($campaigns[$lead->getId()])) {
             $repo   = $this->getRepository();
             $leadId = $lead->getId();
-            //get the campaigns the lead is currently part of
+            // get the campaigns the lead is currently part of
             $campaigns[$leadId] = $repo->getPublishedCampaigns(
                 null,
                 $lead->getId(),
@@ -629,7 +610,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get details of leads in a campaign.
      *
-     * @param      $campaign
      * @param null $leads
      *
      * @return mixed
@@ -662,8 +642,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $id
-     *
      * @return array
      */
     public function getCampaignListIds($id)
@@ -767,7 +745,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param          $hierarchy
      * @param Campaign $entity
      * @param string   $root
      * @param int      $order
@@ -807,8 +784,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $segmentId
-     *
      * @return array
      */
     public function getCampaignIdsWithDependenciesOnSegment($segmentId)

@@ -366,11 +366,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
-                $type = $email->getEmailType();
+                $type              = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
                 if ('list' == $type && null == $translationParent) {
-                    $validator = $context->getValidator();
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
                         [
@@ -393,7 +393,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
                 if ($email->isVariant()) {
                     // Get a summation of weights
-                    $parent = $email->getVariantParent();
+                    $parent   = $email->getVariantParent();
                     $children = $parent ? $parent->getVariantChildren() : $email->getVariantChildren();
 
                     $total = 0;
@@ -414,8 +414,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -463,10 +461,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -492,8 +486,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      */
     public function setName($name)
@@ -542,8 +534,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $category
-     *
      * @return $this
      */
     public function setCategory($category)
@@ -563,14 +553,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $content
-     *
      * @return $this
      */
     public function setContent($content)
     {
         // Ensure safe emoji
-        $content = EmojiHelper::toShort($content);
+        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
 
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -606,8 +594,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $readCount
-     *
      * @return $this
      */
     public function setReadCount($readCount)
@@ -626,8 +612,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $revision
-     *
      * @return $this
      */
     public function setRevision($revision)
@@ -646,8 +630,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $sessionId
-     *
      * @return $this
      */
     public function setSessionId($sessionId)
@@ -666,8 +648,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $subject
-     *
      * @return $this
      */
     public function setSubject($subject)
@@ -791,8 +771,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $template
-     *
      * @return $this
      */
     public function setTemplate($template)
@@ -812,8 +790,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $publishDown
-     *
      * @return $this
      */
     public function setPublishDown($publishDown)
@@ -833,8 +809,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $publishUp
-     *
      * @return $this
      */
     public function setPublishUp($publishUp)
@@ -856,8 +830,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -876,8 +848,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $variantSentCount
-     *
      * @return $this
      */
     public function setVariantSentCount($variantSentCount)
@@ -934,8 +904,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $plainText
-     *
      * @return $this
      */
     public function setPlainText($plainText)
@@ -954,8 +922,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $variantReadCount
-     *
      * @return $this
      */
     public function setVariantReadCount($variantReadCount)
@@ -982,8 +948,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $customHtml
-     *
      * @return $this
      */
     public function setCustomHtml($customHtml)
@@ -1108,16 +1072,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function cleanUrlsInContent()
     {
-        $this->decodeAmpersands($this->plainText);
-        $this->decodeAmpersands($this->customHtml);
+        if (is_string($this->plainText)) {
+            $this->decodeAmpersands($this->plainText);
+        }
+
+        if (is_string($this->customHtml)) {
+            $this->decodeAmpersands($this->customHtml);
+        }
     }
 
     /**
      * Check all links in content and decode ampersands.
-     *
-     * @param $content
      */
-    private function decodeAmpersands(&$content)
+    private function decodeAmpersands(string &$content): void
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
@@ -1134,7 +1101,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getReadPercentage($includevariants = false)
     {
         if ($this->getSentCount($includevariants) > 0) {
-            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+            return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
         } else {
             return 0;
         }

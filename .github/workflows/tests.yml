@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0']
+        php-versions: ['8.0', '8.1']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -50,7 +50,7 @@ jobs:
         fetch-depth: 0
 
     - name: PHPUnit cache
-      if: ${{matrix.php-versions == '8.0' && matrix.db-types == 'mariadb'}}
+      if: ${{matrix.php-versions == '8.1' && matrix.db-types == 'mariadb'}}
       uses: actions/cache@v3
       with:
         path: ./var/cache/phpunit
@@ -89,18 +89,27 @@ jobs:
       run: |
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
+        if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
+
+    - name: Save test results for future steps
+      if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          ./junit.xml
+          ./coverage.xml
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -124,8 +133,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
-        php-versions: ['8.0']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
+        php-versions: ['8.1']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
@@ -172,10 +181,16 @@ jobs:
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
+          export SYMFONY_ENV=dev
+          export APP_ENV=dev
+          export APP_DEBUG=1
+          bin/console cache:warmup --env=dev        
           composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
+          composer rector
+          git reset --hard
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
@@ -232,6 +247,18 @@ jobs:
           test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
 
           php ./bin/console cache:clear
+        elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
+          composer update --lock --no-plugins --no-scripts 2> /dev/null
+          git diff composer.lock > /tmp/diff_command_output.txt
+          if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
+            echo "The composer.lock file doens't correspond with the changes in the composer.json file"
+            echo "Please run following command locally"
+            echo "composer update --lock"
+            echo ""
+            echo "verbose diff:"
+            cat /tmp/diff_command_output.txt
+            exit 1
+          fi
         else
           echo "Invalid command"
           exit 1

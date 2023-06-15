@@ -128,25 +128,25 @@ class DashboardController extends AbstractFormController
      */
     public function newAction(Request $request, FormFactoryInterface $formFactory)
     {
-        //retrieve the entity
+        // retrieve the entity
         $widget = new Widget();
 
         $model  = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
-        //get the user form factory
+        // get the user form factory
         $form       = $model->createForm($widget, $formFactory, $action);
         $closeModal = false;
         $valid      = false;
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($widget);
                 }
             } else {
@@ -155,7 +155,7 @@ class DashboardController extends AbstractFormController
         }
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars = [
                 'closeModal'    => 1,
                 'mauticContent' => 'widget',
@@ -188,8 +188,6 @@ class DashboardController extends AbstractFormController
     /**
      * edit widget and processes post data.
      *
-     * @param $objectId
-     *
      * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId)
@@ -199,17 +197,17 @@ class DashboardController extends AbstractFormController
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
-        //get the user form factory
+        // get the user form factory
         $form       = $model->createForm($widget, $formFactory, $action);
         $closeModal = false;
         $valid      = false;
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($widget);
                 }
             } else {
@@ -218,7 +216,7 @@ class DashboardController extends AbstractFormController
         }
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars = [
                 'closeModal'    => 1,
                 'mauticContent' => 'widget',

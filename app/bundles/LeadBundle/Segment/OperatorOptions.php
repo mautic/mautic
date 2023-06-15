@@ -61,12 +61,12 @@ class OperatorOptions
         ],
         self::EMPTY => [
             'label'       => 'mautic.lead.list.form.operator.isempty',
-            'expr'        => 'empty', //special case
+            'expr'        => 'empty', // special case
             'negate_expr' => 'notEmpty',
         ],
         self::NOT_EMPTY => [
             'label'       => 'mautic.lead.list.form.operator.isnotempty',
-            'expr'        => 'notEmpty', //special case
+            'expr'        => 'notEmpty', // special case
             'negate_expr' => 'empty',
         ],
         self::LIKE => [
@@ -81,13 +81,13 @@ class OperatorOptions
         ],
         self::BETWEEN => [
             'label'       => 'mautic.lead.list.form.operator.between',
-            'expr'        => 'between', //special case
+            'expr'        => 'between', // special case
             'negate_expr' => 'notBetween',
             'hide'        => true,
         ],
         self::NOT_BETWEEN => [
             'label'       => 'mautic.lead.list.form.operator.notbetween',
-            'expr'        => 'notBetween', //special case
+            'expr'        => 'notBetween', // special case
             'negate_expr' => 'between',
             'hide'        => true,
         ],
@@ -103,17 +103,17 @@ class OperatorOptions
         ],
         self::REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.regexp',
-            'expr'        => 'regexp', //special case
+            'expr'        => 'regexp', // special case
             'negate_expr' => 'notRegexp',
         ],
         self::NOT_REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.notregexp',
-            'expr'        => 'notRegexp', //special case
+            'expr'        => 'notRegexp', // special case
             'negate_expr' => 'regexp',
         ],
         self::DATE => [
             'label'       => 'mautic.lead.list.form.operator.date',
-            'expr'        => 'date', //special case
+            'expr'        => 'date', // special case
             'negate_expr' => 'date',
             'hide'        => true,
         ],

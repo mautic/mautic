@@ -98,7 +98,7 @@ class ActionDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
+        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, $customEvent, $pendingEvent);
 
         return $pendingEvent;
     }
@@ -131,7 +131,7 @@ class ActionDispatcher
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
             );
 
             $this->dispatcher->dispatch(

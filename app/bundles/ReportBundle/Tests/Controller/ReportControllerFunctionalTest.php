@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Tests\Controller;
 
-use DOMDocument;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
@@ -85,6 +84,12 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($columns);
         $report->setGroupBy(['l.company']);
+        $report->setTableOrder([
+            [
+                'column'    => 'l.company',
+                'direction' => 'ASC',
+            ],
+        ]);
         $report->setAggregators([
             [
                 'column'    => 'l.points',
@@ -125,7 +130,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Load view content as HTML and convert the report table to result array
         $result  = [];
         $content = $response->getContent();
-        $dom     = new DOMDocument('1.0', 'utf-8');
+        $dom     = new \DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
         $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
         $rows  = $tbody->getElementsByTagName('tr');

@@ -150,6 +150,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName($emailName);
         $email->setSubject($emailName);
         $email->setEmailType('template');
+        $email->setCustomHtml('some content');
         $this->em->persist($email);
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
@@ -174,6 +175,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setPublishUp(new \DateTime('-2 day'));
         $email->setPublishDown(new \DateTime('-1 day'));
         $email->setEmailType('template');
+        $email->setCustomHtml('some content');
         $email->setPublicPreview(true);
         $this->em->persist($email);
 

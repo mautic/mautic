@@ -41,9 +41,9 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         $bundles   = $this->bundleHelper->getMauticBundles(true);
         $catalogue = new MessageCatalogue($locale);
 
-        //Bundle translations
+        // Bundle translations
         foreach ($bundles as $bundle) {
-            //load translations
+            // load translations
             $translations = $bundle['directory'].'/Translations/'.$locale;
             if (file_exists($translations)) {
                 $iniFiles = new Finder();
@@ -55,7 +55,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
             }
         }
 
-        //Theme translations
+        // Theme translations
         $themeDir = $this->pathsHelper->getSystemPath('current_theme', true);
         if (file_exists($themeTranslation = $themeDir.'/translations/'.$locale)) {
             $iniFiles = new Finder();
@@ -65,7 +65,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
             }
         }
 
-        //3rd Party translations
+        // 3rd Party translations
         $translationsDir = $this->pathsHelper->getSystemPath('translations', true).'/'.$locale;
         if (file_exists($translationsDir)) {
             $iniFiles = new Finder();
@@ -76,7 +76,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
             }
         }
 
-        //Overrides
+        // Overrides
         $overridesDir = $this->pathsHelper->getSystemPath('translations', true).'/overrides/'.$locale;
         if (file_exists($overridesDir)) {
             $iniFiles = new Finder();
@@ -92,10 +92,6 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
 
     /**
      * Load the translation into the catalogue.
-     *
-     * @param $catalogue
-     * @param $locale
-     * @param $file
      *
      * @throws \Exception
      */

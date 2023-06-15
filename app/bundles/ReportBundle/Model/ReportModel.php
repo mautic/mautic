@@ -211,8 +211,6 @@ class ReportModel extends FormModel
     /**
      * Build the table and graph data.
      *
-     * @param $context
-     *
      * @return mixed
      */
     public function buildAvailableReports($context, ?string $reportSource = null)
@@ -223,7 +221,7 @@ class ReportModel extends FormModel
                 $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
-                //build them
+                // build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
@@ -552,7 +550,7 @@ class ReportModel extends FormModel
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
@@ -666,7 +664,7 @@ class ReportModel extends FormModel
 
         foreach ($data as $keys => $lead) {
             foreach ($lead as $key => $field) {
-                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+                $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
             }
         }
 
