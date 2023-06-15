@@ -69,6 +69,14 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return self::getMailerMessages($transport)[$index] ?? null;
     }
 
+    /**
+     * @return MauticMessage[]
+     */
+    public static function getMailerMessagesByToAddress(string $toAddress, string $transport = null): array
+    {
+        return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
+    }
+
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
@@ -188,7 +196,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $message;
     }
 
-    protected function loginUser(string $username): void
+    protected function loginUser(string $username): User
     {
         /** @var User|null $user */
         $user = $this->em->getRepository(User::class)
@@ -205,6 +213,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
+
+        return $user;
     }
 
     /**

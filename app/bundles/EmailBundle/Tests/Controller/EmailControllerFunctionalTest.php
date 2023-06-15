@@ -24,7 +24,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         $this->configParams['mailer_from_name']      = 'Mautic Admin';
-        $this->configParams['mailer_from_email']     = 'admin@emai.com';
+        $this->configParams['mailer_from_email']     = 'admin@email.com';
         $this->configParams['mailer_custom_headers'] = ['x-global-custom-header' => 'value123'];
         $this->clientOptions                         = ['debug' => true];
 

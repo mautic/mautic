@@ -279,10 +279,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $contactIds      = $event->getContactIds();
         $credentialArray = [];
 
-        /**
-         * @var int
-         * @var Lead $contact
-         */
         foreach ($contacts as $logId => $contact) {
             $leadCredentials                      = $contact->getProfileFields();
             $leadCredentials['primaryIdentifier'] = $contact->getPrimaryIdentifier();
