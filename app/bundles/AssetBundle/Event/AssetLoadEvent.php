@@ -11,14 +11,11 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class AssetLoadEvent extends CommonEvent
 {
     /**
-     * @var bool
+     * @param bool $isUnique
      */
-    protected $unique;
-
-    public function __construct(Download $download, $isUnique)
+    public function __construct(Download $download, protected $unique)
     {
         $this->entity = $download;
-        $this->unique = $isUnique;
     }
 
     /**

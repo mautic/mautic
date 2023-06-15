@@ -54,24 +54,15 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $entityRequestParameters = [];
 
-    protected RouterInterface $router;
-
-    protected FormFactoryInterface $formFactory;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, protected RouterInterface $router, protected FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->router      = $router;
-        $this->formFactory = $formFactory;
     }
 
     /**
      * Delete a batch of entities.
-     *
-     * @return array|Response
      */
-    public function deleteEntitiesAction(Request $request)
+    public function deleteEntitiesAction(Request $request): array|Response
     {
         $parameters = $request->query->all();
 
@@ -143,10 +134,8 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Edit a batch of entities.
-     *
-     * @return array|Response
      */
-    public function editEntitiesAction(Request $request)
+    public function editEntitiesAction(Request $request): array|Response
     {
         $parameters = $request->request->all();
 
@@ -248,10 +237,8 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Create a batch of new entities.
-     *
-     * @return array|Response
      */
-    public function newEntitiesAction(Request $request)
+    public function newEntitiesAction(Request $request): array|Response
     {
         $entity = $this->model->getEntity();
 
@@ -396,7 +383,7 @@ class CommonApiController extends FetchCommonApiController
                     $entity
                 );
             }
-        } elseif (is_object($formResponse) && get_class($formResponse) === get_class($entity)) {
+        } elseif (is_object($formResponse) && $formResponse::class === $entity::class) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {
@@ -417,7 +404,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
     {
         $categoryId = null;
 

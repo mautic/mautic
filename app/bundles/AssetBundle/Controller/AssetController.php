@@ -15,10 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends FormController
 {
-    /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, int $page = 1)
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, int $page = 1): JsonResponse|Response
     {
         $assetModel = $this->getModel('asset');
         \assert($assetModel instanceof AssetModel);
@@ -127,10 +124,8 @@ class AssetController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): JsonResponse|Response
     {
         $model       = $this->getModel('asset');
         \assert($model instanceof AssetModel);
@@ -219,10 +214,8 @@ class AssetController extends FormController
 
     /**
      * Show a preview of the file.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function previewAction(Request $request, $objectId)
+    public function previewAction(Request $request, $objectId): JsonResponse|Response
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model       = $this->getModel('asset');
@@ -242,7 +235,7 @@ class AssetController extends FormController
                 // set the uploadDir
                 $activeAsset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
                 $contents = $activeAsset->getFileContents();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return $this->notFound();
             }
 
@@ -270,10 +263,8 @@ class AssetController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $entity = null)
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $entity = null): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
@@ -408,10 +399,8 @@ class AssetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, $objectId, $ignorePost = false): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model  = $this->getModel('asset');
@@ -572,10 +561,8 @@ class AssetController extends FormController
      * Clone an entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $objectId)
+    public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model  = $this->getModel('asset');
@@ -738,10 +725,8 @@ class AssetController extends FormController
 
     /**
      * Renders the container for the remote file browser.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function remoteAction(Request $request)
+    public function remoteAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         // Check for integrations to cloud providers
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */

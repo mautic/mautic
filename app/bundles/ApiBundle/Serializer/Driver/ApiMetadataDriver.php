@@ -155,12 +155,9 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Create properties.
      *
-     * @param bool|false $addToListGroup
-     * @param bool|false $useGetter
-     *
      * @return $this
      */
-    public function addProperties(array $properties, $addToListGroup = false, $useGetter = false)
+    public function addProperties(array $properties, bool $addToListGroup = false, bool $useGetter = false)
     {
         foreach ($properties as $prop) {
             if (!empty($prop)) {

@@ -27,12 +27,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class ClientController extends FormController
 {
-    private ClientModel $clientModel;
-
-    public function __construct(ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->clientModel     = $clientModel;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -188,12 +184,7 @@ class ClientController extends FormController
         );
     }
 
-    /**
-     * @param mixed $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, mixed $objectId = 0): array|JsonResponse|RedirectResponse|Response
     {
         if (!$this->security->isGranted('api:clients:create')) {
             return $this->accessDenied();
@@ -292,10 +283,8 @@ class ClientController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): JsonResponse|RedirectResponse|Response
     {
         if (!$this->security->isGranted('api:clients:editother')) {
             return $this->accessDenied();

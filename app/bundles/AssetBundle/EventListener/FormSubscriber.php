@@ -23,56 +23,20 @@ use Twig\Environment;
 class FormSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
      * @var TranslatorInterface
      */
     protected $translator;
 
-    /**
-     * @var AnalyticsHelper
-     */
-    private $analyticsHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        AssetModel $assetModel,
+        private AssetModel $assetModel,
         TranslatorInterface $translator,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelperInterface $themeHelper,
-        Environment $twig,
-        CoreParametersHelper $coreParametersHelper
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->assetModel           = $assetModel;
         $this->translator           = $translator;
-        $this->analyticsHelper      = $analyticsHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->themeHelper          = $themeHelper;
-        $this->twig                 = $twig;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -121,7 +85,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException|NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
         }

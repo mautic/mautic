@@ -274,8 +274,6 @@ class Asset extends FormEntity
 
     /**
      * Sets file.
-     *
-     * @param File $file
      */
     public function setFile(File $file = null)
     {
@@ -341,10 +339,7 @@ class Asset extends FormEntity
         return $this->extension;
     }
 
-    /**
-     * @param mixed $extension
-     */
-    public function setExtension($extension)
+    public function setExtension(mixed $extension)
     {
         $this->extension = $extension;
     }
@@ -357,10 +352,7 @@ class Asset extends FormEntity
         return $this->mime;
     }
 
-    /**
-     * @param mixed $mime
-     */
-    public function setMime($mime)
+    public function setMime(mixed $mime)
     {
         $this->mime = $mime;
     }
@@ -619,8 +611,6 @@ class Asset extends FormEntity
 
     /**
      * Set category.
-     *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
      *
      * @return Asset
      */
@@ -1080,10 +1070,8 @@ class Asset extends FormEntity
 
     /**
      * Load the file object from it's path.
-     *
-     * @return \Symfony\Component\HttpFoundation\File\File|null
      */
-    public function loadFile($temp = false)
+    public function loadFile($temp = false): ?File
     {
         if ($temp) {
             $path = $this->getAbsoluteTempPath();
@@ -1097,7 +1085,7 @@ class Asset extends FormEntity
 
         try {
             $file = new File($path);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             $file = null;
         }
 
@@ -1134,10 +1122,7 @@ class Asset extends FormEntity
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
+    public function setDescription(mixed $description)
     {
         $this->description = $description;
     }
@@ -1243,10 +1228,8 @@ class Asset extends FormEntity
      * @param bool   $humanReadable
      * @param bool   $forceUpdate
      * @param string $inUnit
-     *
-     * @return float|string
      */
-    public function getSize($humanReadable = true, $forceUpdate = false, $inUnit = '')
+    public function getSize($humanReadable = true, $forceUpdate = false, $inUnit = ''): float|string
     {
         if (empty($this->size) || $forceUpdate) {
             // Try to fetch it
@@ -1274,11 +1257,9 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param mixed $size
-     *
      * @return Asset
      */
-    public function setSize($size)
+    public function setSize(mixed $size)
     {
         $this->size = $size;
 
@@ -1321,7 +1302,7 @@ class Asset extends FormEntity
         $number = number_format($number, 2);
 
         // Remove trailing .00
-        $number = false !== strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
+        $number = str_contains($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
 
         return $number.' '.$unit;
     }
@@ -1349,20 +1330,15 @@ class Asset extends FormEntity
         return [$size, 'bytes'];
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDownloadUrl()
+    public function getDownloadUrl(): ?string
     {
         return $this->downloadUrl;
     }
 
     /**
-     * @param string|null $downloadUrl
-     *
      * @return Asset
      */
-    public function setDownloadUrl($downloadUrl)
+    public function setDownloadUrl(?string $downloadUrl)
     {
         $this->downloadUrl = $downloadUrl;
 
@@ -1393,10 +1369,7 @@ class Asset extends FormEntity
         return $this->disallow;
     }
 
-    /**
-     * @param mixed $disallow
-     */
-    public function setDisallow($disallow)
+    public function setDisallow(mixed $disallow)
     {
         $this->disallow = $disallow;
     }

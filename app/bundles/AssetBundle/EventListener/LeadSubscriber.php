@@ -14,36 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var DownloadRepository
-     */
-    private $downloadRepository;
-
-    public function __construct(
-        AssetModel $assetModel,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        DownloadRepository $downloadRepository
-    ) {
-        $this->assetModel         = $assetModel;
-        $this->translator         = $translator;
-        $this->router             = $router;
-        $this->downloadRepository = $downloadRepository;
+    public function __construct(private AssetModel $assetModel, private TranslatorInterface $translator, private RouterInterface $router, private DownloadRepository $downloadRepository)
+    {
     }
 
     /**

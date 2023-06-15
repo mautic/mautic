@@ -45,11 +45,9 @@ class DownloadRepository extends CommonRepository
     /**
      * Get a lead's page downloads.
      *
-     * @param int|null $leadId
-     *
      * @return array
      */
-    public function getLeadDownloads($leadId = null, array $options = [])
+    public function getLeadDownloads(?int $leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('a.id as asset_id, d.date_download as dateDownload, a.title, d.id as download_id, d.lead_id')
@@ -141,8 +139,6 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
-     *
      * @return mixed
      */
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
@@ -182,8 +178,6 @@ class DownloadRepository extends CommonRepository
     /**
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
-     *
-     * @param \DateTime $fromDate
      *
      * @return mixed
      */
