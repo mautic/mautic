@@ -15,6 +15,10 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             {
             }
 
+            /**
+             * @param string $name
+             * @param mixed  $default
+             */
             public function get($name, $default = null)
             {
                 Assert::assertEquals('param_a', $name);

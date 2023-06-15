@@ -16,9 +16,9 @@ trait TranslationModelTrait
     /**
      * Get the entity based on requested translation.
      *
-     * @return array[$parentEntity, TranslationEntityInterface $entity]
+     * @return array<mixed, TranslationEntityInterface $entity>
      */
-    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead|array|null $lead = null, Request $request = null)
+    public function getTranslatedEntity(TranslationEntityInterface $entity, Lead|array|null $lead = null, Request $request = null): array
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 

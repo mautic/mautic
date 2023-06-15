@@ -22,6 +22,10 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetTokens(): void
     {
         $coreParametersHelper = new class($this->createMock(ContainerInterface::class)) extends CoreParametersHelper {
+            /**
+             * @param string $name
+             * @param mixed  $default
+             */
             public function get($name, $default = null)
             {
                 switch ($name) {

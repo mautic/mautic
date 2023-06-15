@@ -88,7 +88,7 @@ class BuilderTokenHelper
             $prefix .= '.';
         }
 
-        $exprBuilder = $this->connection->getExpressionBuilder();
+        $exprBuilder = $this->connection->createExpressionBuilder();
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
