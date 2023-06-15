@@ -63,7 +63,6 @@ jobs:
             -Dsonar.links.issue=https://github.com/mautic/mautic/issues
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.sources=app,plugins
-            -Dsonar.projectBaseDir="."
             -Dsonar.inclusions=app/*.php,app/**/*.php,plugins/*.php,plugins/**/*.php
             -Dsonar.exclusions=app/migrations/**/*,app/bundles/*Bundle/Config/**/*,app/bundles/*Bundle/DataFixtures/**/*,app/bundles/*Bundle/Tests/**/*,app/bundles/*Bundle/Translations/**/*,app/bundles/*Bundle/Views/**/*,app/middlewares/Test/**/*,app/bundles/CoreBundle/Test/**/*,plugins/*Bundle/Config/**/*,plugins/*Bundle/Tests/**/*,plugins/*Bundle/Translations/**/*,plugins/*Bundle/Views/**/*
             -Dsonar.cpd.exclusions=**/*
