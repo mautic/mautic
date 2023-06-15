@@ -52,7 +52,7 @@ class CacheStorageHelper
      * @param int    $defaultExpiration
      * @param string $adaptor
      */
-    public function __construct(protected $adaptor, protected ?string $namespace, Connection $connection = null, $cacheDir = null, protected $defaultExpiration = 0)
+    public function __construct(protected $adaptor, protected int|string|null $namespace, Connection $connection = null, $cacheDir = null, protected $defaultExpiration = 0)
     {
         $this->cacheDir          = $cacheDir.'/data';
         $this->connection        = $connection;

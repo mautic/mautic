@@ -363,7 +363,7 @@ class ThemeHelper implements ThemeHelperInterface
         }
     }
 
-    public function getExtractError($archive)
+    public function getExtractError(int $archive): string
     {
         $error = match ($archive) {
             \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
