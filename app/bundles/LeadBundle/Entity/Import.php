@@ -812,8 +812,10 @@ class Import extends FormEntity
 
     /**
      * @param string $key
+     *
+     * @return array<int, string>|null
      */
-    public function getDefault($key): ?bool
+    public function getDefault($key): ?array
     {
         return empty($this->properties['defaults'][$key]) ? null : $this->properties['defaults'][$key];
     }

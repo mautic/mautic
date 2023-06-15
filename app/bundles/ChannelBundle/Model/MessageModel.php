@@ -60,7 +60,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
             foreach ($channels as $channel) {
                 $channel->setMessage($entity);
             }
-            $this->getRepository()->saveEntities($channels);
+            $this->getChannelRepository()->saveEntities($channels);
         }
     }
 
@@ -78,6 +78,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository()
     {
         return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
+    }
+
+    public function getChannelRepository(): \Mautic\ChannelBundle\Entity\ChannelRepository
+    {
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Channel::class);
     }
 
     /**

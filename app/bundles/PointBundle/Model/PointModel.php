@@ -80,6 +80,14 @@ class PointModel extends CommonFormModel
     }
 
     /**
+     * @return \Mautic\PointBundle\Entity\LeadPointLogRepository
+     */
+    public function getLeadPointLogRepository()
+    {
+        return $this->em->getRepository(\Mautic\PointBundle\Entity\LeadPointLog::class);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPermissionBase()
@@ -311,7 +319,7 @@ class PointModel extends CommonFormModel
         }
 
         if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
+            $this->getLeadPointLogRepository()->saveEntities($persist);
             $this->getRepository()->detachEntities($persist);
         }
 

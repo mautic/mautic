@@ -79,6 +79,14 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
+     * @return \Mautic\PageBundle\Entity\RedirectRepository
+     */
+    public function getRedirectRepository()
+    {
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Redirect::class);
+    }
+
+    /**
      * @return RedirectModel
      */
     protected function getRedirectModel()
@@ -180,7 +188,7 @@ class TrackableModel extends AbstractCommonModel
 
         // Save new entities
         if (count($newRedirects)) {
-            $this->getRepository()->saveEntities($newRedirects);
+            $this->getRedirectRepository()->saveEntities($newRedirects);
         }
         if (count($newTrackables)) {
             $this->getRepository()->saveEntities($newTrackables);
