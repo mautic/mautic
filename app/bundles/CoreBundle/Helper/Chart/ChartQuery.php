@@ -231,7 +231,7 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -572,11 +572,11 @@ class ChartQuery extends AbstractChart
      */
     protected function prepareTable($table)
     {
-        if (MAUTIC_TABLE_PREFIX && 0 === strpos($table, MAUTIC_TABLE_PREFIX)) {
+        if (MAUTIC_TABLE_PREFIX && str_starts_with($table, MAUTIC_TABLE_PREFIX)) {
             return $table;
         }
 
-        if (0 === strpos($table, '(')) {
+        if (str_starts_with($table, '(')) {
             return $table;
         }
 
@@ -596,7 +596,7 @@ class ChartQuery extends AbstractChart
                 $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
 
                 return $tablePrefix.'.'.$generatedColumn->getColumnName();
-            } catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException) {
                 // Alright. Use the original column then.
             }
         }

@@ -15,29 +15,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class MigrationCommandSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var VersionProviderInterface
-     */
-    private $versionProvider;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(
-        VersionProviderInterface $versionProvider,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        Connection $connection
-    ) {
-        $this->versionProvider          = $versionProvider;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->connection               = $connection;
+    public function __construct(private VersionProviderInterface $versionProvider, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private Connection $connection)
+    {
     }
 
     public static function getSubscribedEvents()

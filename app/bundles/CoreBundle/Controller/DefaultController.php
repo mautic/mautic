@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultController extends CommonController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $root = $this->coreParametersHelper->get('webroot');
 
@@ -63,10 +60,7 @@ class DefaultController extends CommonController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function notificationsAction()
+    public function notificationsAction(): \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');

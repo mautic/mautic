@@ -17,32 +17,25 @@ class CoreParametersHelper
     private $parameters;
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * @var array
      */
     private $resolvedParameters;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
         $loader = new ParameterLoader();
 
         $this->parameters = $loader->getParameterBag();
-        $this->container  = $container;
 
         $this->resolveParameters();
     }
 
     /**
      * @param string $name
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function get($name, $default = null)
+    public function get($name, mixed $default = null)
     {
         $name = $this->stripMauticPrefix($name);
 

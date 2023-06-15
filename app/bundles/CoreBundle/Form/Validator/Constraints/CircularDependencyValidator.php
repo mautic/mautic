@@ -14,20 +14,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    /**
-     * @var ListModel
-     */
-    private $model;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(ListModel $model, RequestStack $requestStack)
+    public function __construct(private ListModel $model, private RequestStack $requestStack)
     {
-        $this->model        = $model;
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -44,7 +32,7 @@ class CircularDependencyValidator extends ConstraintValidator
             if (in_array($segmentId, $dependentSegmentIds)) {
                 $this->context->addViolation($constraint->message);
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             // Segment ID is not in the request. May be new segment.
         }
     }

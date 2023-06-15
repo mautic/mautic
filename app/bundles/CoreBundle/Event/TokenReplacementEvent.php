@@ -18,11 +18,6 @@ class TokenReplacementEvent extends CommonEvent
     protected $content;
 
     /**
-     * @var Lead|mixed[]|null
-     */
-    protected $lead;
-
-    /**
      * @var array
      */
     protected $clickthrough = [];
@@ -33,44 +28,25 @@ class TokenReplacementEvent extends CommonEvent
     protected $tokens = [];
 
     /**
-     * Whatever the calling code wants to make available to the consumers.
-     *
-     * @var mixed
-     */
-    protected $passthrough;
-
-    private bool $internalSend;
-
-    /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
-     * @param mixed                    $passthrough
      */
-    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null, bool $internalSend = false)
+    public function __construct($content, protected array|Lead|null $lead = null, array $clickthrough = [], protected mixed $passthrough = null, private bool $internalSend = false)
     {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
         }
 
         $this->content      = $content;
-        $this->lead         = $lead;
         $this->clickthrough = $clickthrough;
-        $this->passthrough  = $passthrough;
-        $this->internalSend = $internalSend;
     }
 
-    /**
-     * @return CommonEntity|string|null
-     */
-    public function getContent()
+    public function getContent(): CommonEntity|string|null
     {
         return $this->content;
     }
 
-    /**
-     * @param CommonEntity|string|null $content
-     */
-    public function setContent($content)
+    public function setContent(CommonEntity|string|null $content)
     {
         $this->content = $content;
     }
@@ -78,7 +54,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return Lead|mixed[]|null
      */
-    public function getLead()
+    public function getLead(): Lead|array|null
     {
         return $this->lead;
     }
@@ -107,10 +83,7 @@ class TokenReplacementEvent extends CommonEvent
         $this->clickthrough = $clickthrough;
     }
 
-    /**
-     * @return CommonEntity|string
-     */
-    public function getEntity()
+    public function getEntity(): CommonEntity|string
     {
         return $this->entity;
     }

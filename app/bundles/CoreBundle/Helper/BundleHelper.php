@@ -7,17 +7,13 @@ namespace Mautic\CoreBundle\Helper;
  */
 class BundleHelper
 {
-    private $coreBundles   = [];
-    private $pluginBundles = [];
     private $allBundles    = [];
 
     /**
      * BundleHelper constructor.
      */
-    public function __construct(array $coreBundles, array $pluginBundles)
+    public function __construct(private array $coreBundles, private array $pluginBundles)
     {
-        $this->coreBundles   = $coreBundles;
-        $this->pluginBundles = $pluginBundles;
         $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }
 

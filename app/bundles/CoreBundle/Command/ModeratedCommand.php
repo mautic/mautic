@@ -33,8 +33,6 @@ abstract class ModeratedCommand extends Command
     protected $lockExpiration;
     protected $lockFile;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     /**
      * @var Lock
      */
@@ -45,13 +43,8 @@ abstract class ModeratedCommand extends Command
      */
     protected $output;
 
-    protected PathsHelper $pathsHelper;
-
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected PathsHelper $pathsHelper, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-
         parent::__construct();
     }
 

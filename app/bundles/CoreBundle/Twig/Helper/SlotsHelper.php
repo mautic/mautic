@@ -80,7 +80,7 @@ final class SlotsHelper
      *
      * @return string The slot content
      */
-    public function get($name, $default = false)
+    public function get($name, bool|string $default = false)
     {
         return $this->slots[$name] ?? $default;
     }
@@ -127,7 +127,7 @@ final class SlotsHelper
      *
      * @param string|array<string, mixed> $names
      */
-    public function hasContent($names): bool
+    public function hasContent(string|array $names): bool
     {
         // If we're in the builder, return true so all slots show.
         if ($this->inBuilder) {

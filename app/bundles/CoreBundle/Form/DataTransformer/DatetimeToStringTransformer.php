@@ -10,16 +10,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
     /**
-     * @var string
-     */
-    private $format;
-
-    /**
      * @param string $format
      */
-    public function __construct($format = 'Y-m-d H:i')
+    public function __construct(private $format = 'Y-m-d H:i')
     {
-        $this->format = $format;
     }
 
     /**

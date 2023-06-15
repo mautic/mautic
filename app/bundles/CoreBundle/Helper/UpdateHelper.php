@@ -20,31 +20,6 @@ use Monolog\Logger;
 class UpdateHelper
 {
     /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var ReleaseParser
-     */
-    private $releaseParser;
-
-    /**
      * @var string
      */
     private $phpVersion;
@@ -54,23 +29,14 @@ class UpdateHelper
      */
     private $mauticVersion;
 
-    private PreUpdateCheckHelper $preUpdateCheckHelper;
-
     public function __construct(
-        PathsHelper $pathsHelper,
-        Logger $logger,
-        CoreParametersHelper $coreParametersHelper,
-        Client $client,
-        ReleaseParser $releaseParser,
-        PreUpdateCheckHelper $preUpdateCheckHelper
+        private PathsHelper $pathsHelper,
+        private Logger $logger,
+        private CoreParametersHelper $coreParametersHelper,
+        private Client $client,
+        private ReleaseParser $releaseParser,
+        private PreUpdateCheckHelper $preUpdateCheckHelper
     ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->client               = $client;
-        $this->releaseParser        = $releaseParser;
-        $this->preUpdateCheckHelper = $preUpdateCheckHelper;
-
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
     }
@@ -229,7 +195,7 @@ class UpdateHelper
                 $checkResults[] = $check->runCheck();
             } catch (\Exception $e) {
                 // Checks are supposed to catch errors themselves and return them in their PreUpdateCheckResult, but we catch here just in case.
-                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.get_class($check).': '.$e->getMessage())]);
+                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.$check::class.': '.$e->getMessage())]);
             }
         }
 

@@ -9,11 +9,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

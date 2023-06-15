@@ -199,7 +199,7 @@ class PathsHelper
             default:
                 if (isset($this->paths[$name])) {
                     $path = $this->paths[$name];
-                } elseif (false !== strpos($name, '_root')) {
+                } elseif (str_contains($name, '_root')) {
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
@@ -212,7 +212,7 @@ class PathsHelper
         }
 
         $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
-        if (false === strpos($path, $rootPath)) {
+        if (!str_contains($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }
 
@@ -221,7 +221,7 @@ class PathsHelper
 
     private function removeTrailingSlash(string $dir): string
     {
-        if ('/' === substr($dir, -1)) {
+        if (str_ends_with($dir, '/')) {
             $dir = substr($dir, 0, -1);
         }
 

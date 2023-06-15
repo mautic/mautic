@@ -11,11 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ModelFactory
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**
@@ -24,7 +21,7 @@ class ModelFactory
     public function getModel(string $modelNameKey): MauticModelInterface
     {
         // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
+        if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
@@ -55,7 +52,7 @@ class ModelFactory
             $this->getModel($modelNameKey);
 
             return true;
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }

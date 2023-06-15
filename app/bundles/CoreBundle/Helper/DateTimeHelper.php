@@ -51,10 +51,7 @@ class DateTimeHelper
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
-    /**
-     * @param \DateTimeInterface|string $datetime
-     */
-    public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local')
+    public function setDateTime(\DateTimeInterface|string $datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local')
     {
         if ('local' == $timezone) {
             $timezone = self::$defaultLocalTimezone;
@@ -154,11 +151,9 @@ class DateTimeHelper
     }
 
     /**
-     * @param string|null $format
-     *
      * @return string
      */
-    public function getString($format = null)
+    public function getString(?string $format = null)
     {
         if (empty($format)) {
             $format = $this->format;
@@ -175,10 +170,7 @@ class DateTimeHelper
         return $this->datetime;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function getLocalTimestamp()
+    public function getLocalTimestamp(): bool|int
     {
         if ($this->datetime) {
             $local = $this->datetime->setTimezone($this->local);
@@ -189,10 +181,7 @@ class DateTimeHelper
         return false;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function getUtcTimestamp()
+    public function getUtcTimestamp(): bool|int
     {
         if ($this->datetime) {
             $utc = $this->datetime->setTimezone($this->utc);
@@ -206,13 +195,10 @@ class DateTimeHelper
     /**
      * Gets a difference.
      *
-     * @param string     $compare
-     * @param null       $format
-     * @param bool|false $resetTime
-     *
-     * @return bool|\DateInterval|string
+     * @param string $compare
+     * @param null   $format
      */
-    public function getDiff($compare = 'now', $format = null, $resetTime = false)
+    public function getDiff($compare = 'now', $format = null, bool $resetTime = false): bool|\DateInterval|string
     {
         if ('now' == $compare) {
             $compare = new \DateTime();
@@ -237,7 +223,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function add($intervalString, $clone = false)
+    public function add($intervalString, bool $clone = false)
     {
         $interval = new \DateInterval($intervalString);
 
@@ -258,7 +244,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function sub($intervalString, $clone = false)
+    public function sub($intervalString, bool $clone = false)
     {
         $interval = new \DateInterval($intervalString);
 
@@ -291,17 +277,11 @@ class DateTimeHelper
             throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');
         }
 
-        switch ($unit) {
-            case 'I':
-                $spec = "PT{$interval}M";
-                break;
-            case 'H':
-            case 'S':
-                $spec = "PT{$interval}{$unit}";
-                break;
-            default:
-                $spec = "P{$interval}{$unit}";
-        }
+        $spec = match ($unit) {
+            'I' => "PT{$interval}M",
+            'H', 'S' => "PT{$interval}{$unit}",
+            default => "P{$interval}{$unit}",
+        };
 
         return new \DateInterval($spec);
     }
@@ -313,7 +293,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function modify($string, $clone = false)
+    public function modify($string, bool $clone = false)
     {
         if ($clone) {
             $dt = clone $this->datetime;
@@ -327,10 +307,8 @@ class DateTimeHelper
 
     /**
      * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
-     *
-     * @return bool|string
      */
-    public function getTextDate($interval = null)
+    public function getTextDate($interval = null): bool|string
     {
         if (null == $interval) {
             $interval = $this->getDiff('now', null, true);
@@ -338,16 +316,12 @@ class DateTimeHelper
 
         $diffDays = (int) $interval->format('%R%a');
 
-        switch ($diffDays) {
-            case 0:
-                return 'today';
-            case -1:
-                return 'yesterday';
-            case +1:
-                return 'tomorrow';
-            default:
-                return false;
-        }
+        return match ($diffDays) {
+            0       => 'today',
+            -1      => 'yesterday',
+            +1      => 'tomorrow',
+            default => false,
+        };
     }
 
     /**

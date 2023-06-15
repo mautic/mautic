@@ -9,14 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    public function __construct(FilePathResolver $filePathResolver)
+    public function __construct(private FilePathResolver $filePathResolver)
     {
-        $this->filePathResolver = $filePathResolver;
     }
 
     /**

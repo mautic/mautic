@@ -26,19 +26,11 @@ class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';
 
-    private TransifexFactory $transifexFactory;
-    private TranslatorInterface $translator;
-    private LanguageHelper $languageHelper;
-
     public function __construct(
-        TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        LanguageHelper $languageHelper
+        private TransifexFactory $transifexFactory,
+        private TranslatorInterface $translator,
+        private LanguageHelper $languageHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
-        $this->languageHelper   = $languageHelper;
-
         parent::__construct();
     }
 
@@ -65,7 +57,7 @@ EOT
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
-        } catch (InvalidConfigurationException $e) {
+        } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans(
                 'mautic.core.command.transifex_no_credentials')
             );

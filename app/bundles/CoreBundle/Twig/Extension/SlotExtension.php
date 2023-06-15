@@ -36,10 +36,7 @@ class SlotExtension extends AbstractExtension
         return 'slot';
     }
 
-    /**
-     * @return string|false
-     */
-    public function getSlot(string $name, string $default = '')
+    public function getSlot(string $name, string $default = ''): string|false
     {
         ob_start();
 
@@ -53,7 +50,7 @@ class SlotExtension extends AbstractExtension
      *
      * @return bool
      */
-    public function slotHasContent($name)
+    public function slotHasContent(string|array $name)
     {
         return $this->helper->hasContent($name);
     }

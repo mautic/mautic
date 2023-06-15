@@ -14,16 +14,6 @@ trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be
 class CustomFormEvent extends Event
 {
     /**
-     * @var string
-     */
-    protected $formName;
-
-    /**
-     * @var string
-     */
-    protected $formType;
-
-    /**
      * @var array
      */
     protected $listeners = [];
@@ -34,19 +24,11 @@ class CustomFormEvent extends Event
     protected $subscribers = [];
 
     /**
-     * @var FormBuilderInterface
-     */
-    private $formBuilder;
-
-    /**
      * @param string $formName
      * @param string $formType
      */
-    public function __construct($formName, $formType, FormBuilderInterface $formBuilder)
+    public function __construct(protected $formName, protected $formType, private FormBuilderInterface $formBuilder)
     {
-        $this->formName    = $formName;
-        $this->formType    = $formType;
-        $this->formBuilder = $formBuilder;
     }
 
     /**

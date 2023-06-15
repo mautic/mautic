@@ -6,11 +6,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeLocalization
 {
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     public function localize(string $format): string

@@ -11,26 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UpdateTranslationsStep implements StepInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $languageHelper;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(TranslatorInterface $translator, LanguageHelper $languageHelper, LoggerInterface $logger)
+    public function __construct(private TranslatorInterface $translator, private LanguageHelper $languageHelper, private LoggerInterface $logger)
     {
-        $this->translator     = $translator;
-        $this->languageHelper = $languageHelper;
-        $this->logger         = $logger;
     }
 
     public function getOrder(): int

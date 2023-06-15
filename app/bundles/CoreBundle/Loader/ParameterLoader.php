@@ -10,11 +10,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ParameterLoader
 {
     /**
-     * @var string
-     */
-    private $rootPath;
-
-    /**
      * @var ParameterBag
      */
     private $parameterBag;
@@ -34,10 +29,8 @@ class ParameterLoader
      */
     private static $defaultParameters = [];
 
-    public function __construct(string $configRootPath = __DIR__.'/../../../')
+    public function __construct(private string $rootPath = __DIR__.'/../../../')
     {
-        $this->rootPath = $configRootPath;
-
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
         $this->createParameterBags();

@@ -467,11 +467,9 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $createdByUser
-     *
      * @return $this
      */
-    public function setCreatedByUser($createdByUser)
+    public function setCreatedByUser(mixed $createdByUser)
     {
         $this->createdByUser = $createdByUser;
 
@@ -479,11 +477,9 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $modifiedByUser
-     *
      * @return $this
      */
-    public function setModifiedByUser($modifiedByUser)
+    public function setModifiedByUser(mixed $modifiedByUser)
     {
         $this->modifiedByUser = $modifiedByUser;
 
@@ -491,11 +487,9 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $checkedOutByUser
-     *
      * @return $this
      */
-    public function setCheckedOutByUser($checkedOutByUser)
+    public function setCheckedOutByUser(mixed $checkedOutByUser)
     {
         $this->checkedOutByUser = $checkedOutByUser;
 

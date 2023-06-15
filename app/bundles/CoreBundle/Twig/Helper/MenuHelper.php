@@ -12,16 +12,10 @@ use Knp\Menu\Twig\Helper as KnpHelper;
 final class MenuHelper
 {
     /**
-     * @var KnpHelper
-     */
-    private $helper;
-
-    /**
      * MenuHelper constructor.
      */
-    public function __construct(KnpHelper $helper)
+    public function __construct(private KnpHelper $helper)
     {
-        $this->helper = $helper;
     }
 
     public function getName(): string
@@ -97,11 +91,10 @@ final class MenuHelper
     /**
      * Retrieves an item following a path in the tree.
      *
-     * @param \Knp\Menu\ItemInterface|string $menu
-     * @param array<int, string>             $path
-     * @param array<string, mixed>           $options
+     * @param array<int, string>   $path
+     * @param array<string, mixed> $options
      */
-    public function get($menu, array $path = [], array $options = []): ItemInterface
+    public function get(ItemInterface|string $menu, array $path = [], array $options = []): ItemInterface
     {
         return $this->helper->get($menu, $path, $options);
     }
@@ -113,7 +106,7 @@ final class MenuHelper
      * @param array<string, mixed>                                       $options
      * @param string                                                     $renderer
      */
-    public function render($menu, array $options = [], $renderer = null): string
+    public function render(ItemInterface|string|array $menu, array $options = [], $renderer = null): string
     {
         if (null === $renderer) {
             $renderer = $menu;

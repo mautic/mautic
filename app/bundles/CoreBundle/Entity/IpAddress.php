@@ -24,11 +24,6 @@ class IpAddress
     private $id;
 
     /**
-     * @var string
-     */
-    private $ipAddress;
-
-    /**
      * @var array<string,string>
      */
     private $ipDetails;
@@ -81,9 +76,8 @@ class IpAddress
      *
      * @param string|null $ipAddress
      */
-    public function __construct($ipAddress = null)
+    public function __construct(private $ipAddress = null)
     {
-        $this->ipAddress = $ipAddress;
     }
 
     /**
@@ -167,7 +161,7 @@ class IpAddress
     {
         if (!empty($this->doNotTrack)) {
             foreach ($this->doNotTrack as $ip) {
-                if (false !== strpos($ip, '/')) {
+                if (str_contains($ip, '/')) {
                     // has a netmask range
                     // https://gist.github.com/tott/7684443
                     list($range, $netmask) = explode('/', $ip, 2);

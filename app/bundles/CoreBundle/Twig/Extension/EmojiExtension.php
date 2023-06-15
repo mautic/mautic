@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class EmojiExtension extends AbstractExtension
 {
-    protected EmojiHelper $emojiHelper;
-
-    public function __construct(EmojiHelper $emojiHelper)
+    public function __construct(protected EmojiHelper $emojiHelper)
     {
-        $this->emojiHelper = $emojiHelper;
     }
 
     /**

@@ -7,10 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 trait PropertiesTrait
 {
-    /**
-     * @param FormBuilderInterface|Form $builder
-     */
-    protected function addPropertiesType($builder, array $options, array &$masks)
+    protected function addPropertiesType(FormBuilderInterface|Form $builder, array $options, array &$masks)
     {
         $properties = null;
         if (!empty($options['data'])) {

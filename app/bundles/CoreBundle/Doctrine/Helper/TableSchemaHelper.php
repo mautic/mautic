@@ -24,11 +24,6 @@ class TableSchemaHelper
     protected $sm;
 
     /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
      * @var ColumnSchemaHelper
      */
     protected $columnHelper;
@@ -48,11 +43,13 @@ class TableSchemaHelper
      */
     protected $addTables;
 
-    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
+    /**
+     * @param string $prefix
+     */
+    public function __construct(Connection $db, protected $prefix, ColumnSchemaHelper $columnHelper)
     {
         $this->db           = $db;
         $this->sm           = $db->getSchemaManager();
-        $this->prefix       = $prefix;
         $this->columnHelper = $columnHelper;
     }
 

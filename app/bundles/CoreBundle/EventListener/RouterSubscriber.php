@@ -10,26 +10,6 @@ use Symfony\Component\Routing\RouterInterface;
 class RouterSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var string|null
-     */
-    private $baseUrl;
-
-    /**
-     * @var string|null
-     */
-    private $scheme;
-
-    /**
-     * @var string|null
-     */
-    private $host;
-
-    /**
      * @var string|null
      */
     private $httpsPort;
@@ -40,20 +20,13 @@ class RouterSubscriber implements EventSubscriberInterface
     private $httpPort;
 
     /**
-     * @param string|null $scheme
-     * @param string|null $host
      * @param string|null $httpsPort
      * @param string|null $httpPort
-     * @param string|null $baseUrl
      */
-    public function __construct(RouterInterface $router, $scheme, $host, $httpsPort, $httpPort, $baseUrl)
+    public function __construct(private RouterInterface $router, private ?string $scheme, private ?string $host, $httpsPort, $httpPort, private ?string $baseUrl)
     {
-        $this->router    = $router;
-        $this->scheme    = $scheme;
-        $this->host      = $host;
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
-        $this->baseUrl   = $baseUrl;
     }
 
     /**
@@ -85,7 +58,7 @@ class RouterSubscriber implements EventSubscriberInterface
 
         // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
         $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
-        if ('/' == substr($originalBaseUrl, -1)) {
+        if (str_ends_with($originalBaseUrl, '/')) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
 

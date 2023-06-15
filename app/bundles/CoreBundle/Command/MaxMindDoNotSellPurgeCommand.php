@@ -19,25 +19,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MaxMindDoNotSellPurgeCommand extends Command
 {
     /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var MaxMindDoNotSellList
-     */
-    private $doNotSellList;
-
-    /**
      * @var LeadRepository
      */
     private $leadRepository;
 
-    public function __construct(EntityManager $em, MaxMindDoNotSellList $doNotSellList)
+    public function __construct(private EntityManager $em, private MaxMindDoNotSellList $doNotSellList)
     {
         parent::__construct();
-        $this->em             = $em;
-        $this->doNotSellList  = $doNotSellList;
         $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 

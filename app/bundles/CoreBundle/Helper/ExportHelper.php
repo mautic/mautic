@@ -22,18 +22,8 @@ class ExportHelper
     public const EXPORT_TYPE_EXCEL = 'xlsx';
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    private TranslatorInterface $translator;
-    private CoreParametersHelper $coreParametersHelper;
-    private FilePathResolver $filePathResolver;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        FilePathResolver $filePathResolver
-    ) {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->filePathResolver     = $filePathResolver;
+    public function __construct(private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private FilePathResolver $filePathResolver)
+    {
     }
 
     /**
@@ -49,10 +39,8 @@ class ExportHelper
 
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
-     *
-     * @param array|\Iterator $data
      */
-    public function exportDataAs($data, string $type, string $filename): StreamedResponse
+    public function exportDataAs(array|\Iterator $data, string $type, string $filename): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);
