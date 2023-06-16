@@ -327,13 +327,6 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
-            'mautic.email.validator.dsn' => [
-                'class'     => \Mautic\EmailBundle\Validator\DsnValidator::class,
-                'arguments' => [
-                    'mailer.transport_factory',
-                ],
-                'tag' => 'validator.constraint_validator',
-            ],
         ],
         'repositories' => [
             'mautic.email.repository.email' => [
