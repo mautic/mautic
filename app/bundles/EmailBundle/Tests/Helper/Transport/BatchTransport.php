@@ -1,41 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Mailer\Transport\AbstractTokenArrayTransport;
+use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Mailer\Transport\TokenTransportTrait;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\Transport\AbstractTransport;
 
-class BatchTransport extends AbstractTokenArrayTransport
+class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
+    use TokenTransportTrait;
+
     /**
      * @var array<string, mixed>
      */
     private $transports = []; // @phpstan-ignore-line
+    private $metadatas  = [];
 
-    private $fromAddresses = [];
-
-    private $fromNames = [];
-
-    private $metadatas = [];
-
-    private $validate = false;
-
-    private $maxRecipients;
-
-    private $numberToFail;
-
-    /**
-     * BatchTransport constructor.
-     *
-     * @param bool $validate
-     */
-    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
+    public function __construct(private bool $validate = false, private int $maxRecipients = 4, private int $numberToFail = 1)
     {
-        $this->validate           = $validate;
-        $this->maxRecipients      = $maxRecipients;
-        $this->numberToFail       = (int) $numberToFail;
         $this->transports['main'] = $this;
     }
 
@@ -46,71 +33,25 @@ class BatchTransport extends AbstractTokenArrayTransport
 
     protected function doSend(SentMessage $message): void
     {
-        // TODO: @escopecz if you have a better approach, please let me know
-        $this->message         = $message->getOriginalMessage(); // @phpstan-ignore-line it will return either Email or MauticMessage
-        $from                  = $this->message->getFrom(); // @phpstan-ignore-line we are sure this function exists
-        $fromEmail             = key($from);
-        $this->fromAddresses[] = $fromEmail;
-        $this->fromNames[]     = $from[$fromEmail];
-        $this->metadatas[]     = $this->getMetadata();
-
-        $messageArray = $this->messageToArray();
+        $message = $message->getOriginalMessage();
+        \assert($message instanceof MauticMessage);
+        $this->metadatas[] = $message->getMetadata();
 
         if ($this->validate && $this->numberToFail) {
             --$this->numberToFail;
 
-            if (empty($messageArray['subject'])) {
-                $this->throwException('Subject empty');
-            }
-
-            if (empty($messageArray['recipients']['to'])) {
-                $this->throwException('To empty');
+            if (!$message->getSubject()) {
+                throw new TransportException('Subject empty');
             }
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxBatchLimit()
+    public function getMaxBatchLimit(): int
     {
         return $this->maxRecipients;
     }
 
-    /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(Email $message, $toBeAdded = 1, $type = 'to')
-    {
-        $to      = $message->getTo();
-        $toCount = count($to);
-
-        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFromAddresses()
-    {
-        return $this->fromAddresses;
-    }
-
-    /**
-     * return array.
-     */
-    public function getFromNames()
-    {
-        return $this->fromNames;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMetadatas()
+    public function getMetadatas(): array
     {
         return $this->metadatas;
     }

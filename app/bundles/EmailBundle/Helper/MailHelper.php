@@ -723,16 +723,6 @@ class MailHelper
     }
 
     /**
-     * Get a MauticMessage instance.
-     *
-     * @return MauticMessage
-     */
-    public function getMessageInstance()
-    {
-        return new MauticMessage();
-    }
-
-    /**
      * Add an attachment to email.
      *
      * @param string $filePath
@@ -2100,5 +2090,10 @@ class MailHelper
 
         $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
         $this->replyTo       = $this->systemReplyTo;
+    }
+
+    private function getMessageInstance(): MauticMessage
+    {
+        return new MauticMessage();
     }
 }

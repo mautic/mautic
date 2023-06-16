@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Mailer\Message;
 
 use Symfony\Component\Mime\Email;
