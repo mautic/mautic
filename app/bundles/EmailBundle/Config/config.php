@@ -262,13 +262,6 @@ return [
                 ],
                 'tag' => 'mautic.email_stat_helper',
             ],
-            'mautic.email.transport_wrapper' => [
-                'class'     => \Mautic\EmailBundle\Mailer\Transport\TransportWrapper::class,
-            ],
-            'smtp' => [
-                'class' => \Mautic\EmailBundle\Mailer\Transport\SmtpTransportExtension::class,
-                'tag'   => 'mautic.email.transport_extension',
-            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
