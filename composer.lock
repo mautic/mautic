@@ -5886,7 +5886,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "33bda669964161d797df7002dadfa6b0f38f24a6"
+                "reference": "9126dbd91c8a6cb752037bb5d8066e764f34be03"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5937,7 +5937,6 @@
                 "simshaun/recurr": "^5.0",
                 "sparkpost/sparkpost": "^2.3",
                 "stack/builder": "^1.0",
-                "symfony/amqp-messenger": "^5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",
@@ -11459,16 +11458,16 @@
         },
         {
             "name": "symfony/messenger",
-            "version": "v5.4.24",
+            "version": "v5.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/messenger.git",
-                "reference": "75e57d48758d43127377d1310970882446ec7d91"
+                "reference": "5763e92e94908089654bf19cb339c451bde71692"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/messenger/zipball/75e57d48758d43127377d1310970882446ec7d91",
-                "reference": "75e57d48758d43127377d1310970882446ec7d91",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/5763e92e94908089654bf19cb339c451bde71692",
+                "reference": "5763e92e94908089654bf19cb339c451bde71692",
                 "shasum": ""
             },
             "require": {
@@ -11529,7 +11528,7 @@
             "description": "Helps applications send and receive messages to/from other applications or via message queues",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/messenger/tree/v5.4.24"
+                "source": "https://github.com/symfony/messenger/tree/v5.4.22"
             },
             "funding": [
                 {
@@ -11545,7 +11544,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-12T08:59:19+00:00"
+            "time": "2023-03-10T10:27:29+00:00"
         },
         {
             "name": "symfony/mime",

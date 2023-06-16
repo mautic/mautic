@@ -34,14 +34,13 @@ jobs:
             });
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/test-results.zip`, Buffer.from(download.data));
-            console.log(context.payload.workflow_run.pull_requests);
       - name: 'Unzip code coverage'
         run: |
           unzip test-results.zip -d coverage
-          pwd
-          ls -al
-          ls -al coverage
-
+      - name: Fix code coverage paths
+        run: sed -i
+          's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage/coverage.xml
+          
       - name: "Get PR information"
         uses: potiuk/get-workflow-origin@v1_3
         id: source-run-info
@@ -50,7 +49,7 @@ jobs:
           sourceRunId: ${{ github.event.workflow_run.id }}
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.8
+        uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -64,16 +63,16 @@ jobs:
             -Dsonar.links.issue=https://github.com/mautic/mautic/issues
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.sources=app,plugins
-            -Dsonar.projectBaseDir=.
             -Dsonar.inclusions=app/*.php,app/**/*.php,plugins/*.php,plugins/**/*.php
             -Dsonar.exclusions=app/migrations/**/*,app/bundles/*Bundle/Config/**/*,app/bundles/*Bundle/DataFixtures/**/*,app/bundles/*Bundle/Tests/**/*,app/bundles/*Bundle/Translations/**/*,app/bundles/*Bundle/Views/**/*,app/middlewares/Test/**/*,app/bundles/CoreBundle/Test/**/*,plugins/*Bundle/Config/**/*,plugins/*Bundle/Tests/**/*,plugins/*Bundle/Translations/**/*,plugins/*Bundle/Views/**/*
             -Dsonar.cpd.exclusions=**/*
             -Dsonar.tests=tests
-            -Dsonar.php.coverage.reportPaths=/home/runner/work/mautic/mautic/coverage/coverage.xml
-            -Dsonar.php.tests.reportPath=/home/runner/work/mautic/mautic/coverage/junit.xml
-            -Dsonar.scm.disabled=true
+            -Dsonar.php.coverage.reportPaths=coverage/coverage.xml
+            -Dsonar.php.tests.reportPath=coverage/junit.xml
+            -Dsonar.scm.disabled=false
             -Dsonar.verbose=true
             -Dsonar.scm.revision=${{ steps.source-run-info.outputs.sourceHeadSha }}
             -Dsonar.pullrequest.key=${{ steps.source-run-info.outputs.pullRequestNumber }}
             -Dsonar.pullrequest.branch=${{ steps.source-run-info.outputs.sourceHeadBranch }}
             -Dsonar.pullrequest.base=${{ steps.source-run-info.outputs.targetBranch }}
+            -Dsonar.newCode.referenceBranch=${{ steps.source-run-info.outputs.targetBranch }}
