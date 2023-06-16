@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
@@ -16,6 +17,7 @@ use Mautic\EmailBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType as EmailConfigType;
+use Mautic\EmailBundle\Form\Type\DsnType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
@@ -277,7 +279,8 @@ class RestrictionHelperTest extends TypeTestCase
                     new NumberType(),
                     new FormButtonsType(),
                     new ButtonGroupType(),
-                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $this->createMock(DsnTransformer::class)),
+                    new EmailConfigType($translator, $this->createMock(DsnTransformer::class)),
+                    new DsnType($this->createMock(CoreParametersHelper::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper, $escapeTransformer),
