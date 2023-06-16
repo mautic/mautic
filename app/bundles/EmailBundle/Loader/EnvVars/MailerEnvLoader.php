@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\EnvVarsInterface;

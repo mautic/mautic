@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
@@ -88,7 +87,7 @@ abstract class AbstractTokenArrayTransport extends AbstractTransport implements 
 
         $message = [
             'html'    => $this->message->getTextBody(),
-            'text'    => PlainTextMessageHelper::getPlainTextFromMessage($this->message),
+            'text'    => $this->message->getTextBody(),
             'subject' => $this->message->getSubject(),
             'from'    => [
                 'name'  => $fromName,

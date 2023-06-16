@@ -163,9 +163,6 @@ return [
                     'mailer',
                 ],
             ],
-            'mautic.helper.plain_text_message' => [
-                'class'     => \Mautic\EmailBundle\Helper\PlainTextMessageHelper::class,
-            ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
