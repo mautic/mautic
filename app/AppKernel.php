@@ -2,7 +2,6 @@
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
-use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -160,17 +159,6 @@ class AppKernel extends Kernel
             new Mautic\WebhookBundle\MauticWebhookBundle(),
             new Mautic\CacheBundle\MauticCacheBundle(),
         ];
-
-        $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
-        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
-        switch ($queueProtocol) {
-            case QueueProtocol::RABBITMQ:
-                $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
-                break;
-            case QueueProtocol::BEANSTALKD:
-                $bundles[] = new Leezy\PheanstalkBundle\LeezyPheanstalkBundle();
-                break;
-        }
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getProjectDir().'/plugins';

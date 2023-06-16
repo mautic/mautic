@@ -127,7 +127,7 @@ class AssetGenerationHelper
                     $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
 
                     if (!$forceRegeneration) {
-                        while (file_exists($inProgressFile)) {
+                        while (false && file_exists($inProgressFile)) {
                             // dummy loop to prevent conflicts if one process is actively regenerating assets
                         }
                     }

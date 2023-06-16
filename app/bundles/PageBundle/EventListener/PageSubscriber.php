@@ -12,9 +12,6 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -96,7 +93,6 @@ class PageSubscriber implements EventSubscriberInterface
             PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
             PageEvents::PAGE_POST_DELETE => ['onPageDelete', 0],
             PageEvents::PAGE_ON_DISPLAY  => ['onPageDisplay', -255], // We want this to run last
-            QueueEvents::PAGE_HIT        => ['onPageHit', 0],
         ];
     }
 
@@ -190,56 +186,5 @@ class PageSubscriber implements EventSubscriberInterface
         }
 
         $event->setContent($content);
-    }
-
-    public function onPageHit(QueueConsumerEvent $event)
-    {
-        $payload                = $event->getPayload();
-        $request                = $payload['request'];
-        $trackingNewlyGenerated = $payload['isNew'];
-        $hitId                  = $payload['hitId'];
-        $pageId                 = $payload['pageId'];
-        $leadId                 = $payload['leadId'];
-        $isRedirect             = !empty($payload['isRedirect']);
-        $hit                    = $hitId ? $this->hitRepository->find((int) $hitId) : null;
-        $lead                   = $leadId ? $this->contactRepository->find((int) $leadId) : null;
-
-        // On the off chance that the queue contains a message which does not
-        // reference a valid Hit or Lead, discard it to avoid clogging the queue.
-        if (null === $hit || null === $lead) {
-            $event->setResult(QueueConsumerResults::REJECT);
-
-            // Log the rejection with event payload as context.
-            if ($this->logger) {
-                $this->logger->notice(
-                    'QUEUE MESSAGE REJECTED: Lead or Hit not found',
-                    $payload
-                );
-            }
-
-            return;
-        }
-
-        if ($isRedirect) {
-            $page = $pageId ? $this->redirectRepository->find((int) $pageId) : null;
-        } else {
-            $page = $pageId ? $this->pageRepository->find((int) $pageId) : null;
-        }
-
-        // Also reject messages when processing causes any other exception.
-        try {
-            $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
-            $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
-        } catch (\Exception $e) {
-            $event->setResult(QueueConsumerResults::REJECT);
-
-            // Log the exception with event payload as context.
-            if ($this->logger) {
-                $this->logger->error(
-                    'QUEUE CONSUMER ERROR ('.QueueEvents::PAGE_HIT.'): '.$e->getMessage(),
-                    $payload
-                );
-            }
-        }
     }
 }
