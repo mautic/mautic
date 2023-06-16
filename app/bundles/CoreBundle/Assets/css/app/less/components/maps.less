@@ -1,0 +1,33 @@
+.map-options {
+  &__cointainer {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__item {
+    label {
+      color: grey;
+    }
+    label::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      background-color: grey;
+      display: inline-block;
+      margin-right:  5px;
+    }
+    input {
+      visibility: hidden;
+      width: 0;
+      height: 0;
+    }
+    & .active {
+      label {
+        color: #47535f !important;
+      }
+      label::before {
+        background-color: #00b49c;
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+<fieldset class="map-options">
+    <legend class="map-options__title">Choose stats:</legend>
+    <div class="map-options__container">
+        <div class="map-options__item active" data-map-data="{{ results.read|json_encode }}" data-map-option="read">
+            <label>
+                <input type="radio" id="reads" name="map-stats" checked>
+                {{ 'mautic.email.stat.read'|trans }}
+            </label>
+        </div>
+        <div class="map-options__item" data-map-data="{{ results.clicked|json_encode }}" data-map-option="clicked">
+            <label>
+                <input type="radio" id="clicks" name="map-stats">
+                {{ 'mautic.email.clicked'|trans }}
+            </label>
+        </div>
+    </div>
+</fieldset>
+
+<div>
+    {{- include('@MauticCore/Helper/map.html.twig', {
+        'data' : results.read.data,
+        'chartHeight' : 300
+    })
+    -}}
+</div>
+
+<div class="map-legend">
+    <span>Total: {{ results.read.total|json_encode }}</span>
+    <span>({{ results.read.totalWithCountry|json_encode }} with country)</span>
+</div>

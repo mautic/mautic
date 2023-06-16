@@ -713,6 +713,11 @@ Mautic.onPageLoad = function (container, response, inModal) {
     if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
         Mautic.stopPageLoadingBar();
     }
+
+    const maps= document.querySelectorAll('[data-load="map"]');
+    if(maps.length) {
+        maps.forEach(map => map.addEventListener('click', Mautic.loadMap, false));
+    }
 };
 
 Mautic.setDynamicContentEditors = function(container) {

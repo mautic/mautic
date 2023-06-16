@@ -11,6 +11,10 @@ return [
                 'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailGraphStatsController::viewAction',
             ],
+            'mautic_email_map_stats' => [
+                'path'       => '/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailMapStatsController::viewAction',
+            ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',

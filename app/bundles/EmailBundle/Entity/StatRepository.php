@@ -217,12 +217,13 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
      * @param bool                           $combined
+     * @param array                          $options
      *
      * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false, $options = [])
     {
-        return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
+        return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined, $options);
     }
 
     /**
@@ -245,7 +246,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
+    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false, array $options = [])
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -301,6 +302,18 @@ class StatRepository extends CommonRepository
                 ->setParameter('true', true, 'boolean');
         }
 
+        if (isset($options['groupBy'])) {
+            $q->add('groupBy', $options['groupBy'], true);
+        }
+
+        if (isset($options['columns'])) {
+            $q->addSelect(...$options['columns']);
+        }
+
+        if (isset($options['columns']) && in_array('l.country', $options['columns'])) {
+            $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 's.lead_id = l.id');
+        }
+
         if ($chartQuery) {
             $chartQuery->applyDateFilters($q, 'date_sent', 's');
         }
@@ -317,7 +330,11 @@ class StatRepository extends CommonRepository
             return $byList;
         }
 
-        return (isset($results[0])) ? $results[0]['count'] : 0;
+        if (count($results) > 1) {
+            return $results;
+        } else {
+            return (isset($results[0])) ? $results[0]['count'] : 0;
+        }
     }
 
     /**

@@ -693,6 +693,49 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
     }
 
+    public function getEmailListCountryStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    {
+        $options = [
+            'groupBy' => 'l.country',
+            'columns' => ['l.country'],
+        ];
+        if (!$email instanceof Email) {
+            $email = $this->getEntity($email);
+        }
+
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+
+        $lists     = $email->getLists();
+        $listCount = count($lists);
+
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
+        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+
+        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        if ($listCount > 1) {
+            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, ['groupBy' => 'l.country']); // $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
+
+            foreach ($lists as $l) {
+                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
+                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
+            }
+        }
+
+        if ($listCount) {
+            $readStats  = $statRepo->getReadCount($emailIds, null, $query, false, $options);
+            $clickStats = $trackableRepo->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id', $options);
+        }
+
+        return [
+            'read'    => $readStats,
+            'clicked' => $clickStats,
+        ];
+    }
+
     /**
      * Get a stats for email by list.
      *

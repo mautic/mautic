@@ -3831,6 +3831,10 @@ lesshat-selector { -lh-property: 0 ;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
+.shd-sm {
+  -webkit-box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.05);
+}
 .csr-move {
   cursor: move !important;
 }
@@ -4792,4 +4796,32 @@ ul.media-list.media-list-feed div.media-object {
   float: right;
   position: relative;
   right: 10px;
+}
+.map-options__container{
+  display: flex;
+  flex-direction: row;
+}
+.map-options__item label::before {
+  content:"";
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border: 1px solid grey;
+  display: inline-block;
+  margin-right:  5px;
+}
+.map-options__item input {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+.map-options__item label {
+  color: grey;
+}
+.map-options__item.active label {
+  color: #00b49c !important;
+}
+.map-options__item.active label::before {
+  background-color: #00b49c;
+  border: 1px solid #00b49c;
 }

@@ -121,7 +121,7 @@ class TrackableRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
+    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id', $options = [])
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')
@@ -175,6 +175,18 @@ class TrackableRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
 
+        if (isset($options['groupBy'])) {
+            $q->add('groupBy', $options['groupBy'], true);
+        }
+
+        if (isset($options['columns'])) {
+            $q->addSelect(...$options['columns']);
+        }
+
+        if (isset($options['columns']) && in_array('l.country', $options['columns'])) {
+            $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'leads', 'l', 'ph.lead_id = l.id');
+        }
+
         $results = $q->execute()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
@@ -187,7 +199,11 @@ class TrackableRepository extends CommonRepository
             return $byList;
         }
 
-        return (isset($results[0])) ? $results[0]['click_count'] : 0;
+        if (count($results) > 1) {
+            return $results;
+        } else {
+            return (isset($results[0])) ? $results[0]['click_count'] : 0;
+        }
     }
 
     /**
