@@ -4,6 +4,15 @@
 - The calendar feature was removed. See https://github.com/mautic/mautic/pull/11270
 - The Froala assets are disabled by default. Enable them if you use the legacy email or page builder. See https://github.com/mautic/mautic/pull/12416
 
+## Mailer
+The underlying library used for sending emails (Swift Mailer) was discontinued and Mautic 5 is using the [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) library instead. There are user facing changes coming with this change.
+1. All the email transports were removed from Mautic's core and must be re-created as separate plugins.
+2. The good news is that Mautic now supports email transports created for Symfony Mailer.
+3. SMTP transport is the only transport supported by Mautic after fresh installation.
+4. The "Email Step" was removed from the installation wizzard because the transports were removed. The email transport must be configurad right after Mautic installation.
+5. The email transport configuration has changed from various fields unique for each transport to unified "DSN". Any transport can be configured using the same form. There is a migration that should handle most of the email transport configuration from Mautic 4 and re-configure it for Mautic 5.
+6. The command `bin/console mautic:email:process` for sending emails via cron jobs was removed and now [Symfony Messenger](https://symfony.com/doc/5.4/messenger.html) is used instead. Use this command if you want to send emails via a cron job: `bin/console messenger:consume email_transport`. The Messenger in the async configuration can work with various queues. It uses MySql by default.
+
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
