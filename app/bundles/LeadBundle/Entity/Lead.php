@@ -470,12 +470,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         ];
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     * @param null   $oldValue
-     */
-    protected function isChanged($prop, $val, $oldValue = null)
+    protected function isChanged(string $prop, float|bool|int|string|null $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = null !== $oldValue ? $oldValue : $this->$getter();

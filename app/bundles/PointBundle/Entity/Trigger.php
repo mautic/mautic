@@ -143,11 +143,7 @@ class Trigger extends FormEntity
             ->build();
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
+    protected function isChanged(string $prop, float|bool|int|string|null $val): void
     {
         if ('events' == $prop) {
             // changes are already computed so just add them

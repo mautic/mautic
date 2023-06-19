@@ -56,11 +56,7 @@ class CommonEntity
         return $string;
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
+    protected function isChanged(string $prop, float|bool|int|string|null $val): void
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();

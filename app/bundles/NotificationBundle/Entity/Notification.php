@@ -283,7 +283,7 @@ class Notification extends FormEntity
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged(string $prop, float|bool|int|string|null $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();

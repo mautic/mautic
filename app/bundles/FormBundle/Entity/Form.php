@@ -311,7 +311,7 @@ class Form extends FormEntity
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged(string $prop, float|bool|int|string|null $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
