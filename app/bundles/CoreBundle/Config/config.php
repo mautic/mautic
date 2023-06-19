@@ -449,6 +449,14 @@ return [
                 'tag' => 'kernel.event_subscriber',
             ],
 
+            // Configurator (used in installer and managing global config]
+            'mautic.configurator' => [
+                'class'     => 'Mautic\CoreBundle\Configurator\Configurator',
+                'arguments' => [
+                    'mautic.helper.paths',
+                ],
+            ],
+
             // System uses
             'mautic.di.env_processor.nullable' => [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
@@ -526,10 +534,9 @@ return [
                 ],
             ],
             'mautic.exception.listener' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ExceptionListener::class,
+                'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
                     'router',
-                    'mautic.configurator',
                     'Mautic\CoreBundle\Controller\ExceptionController::showAction',
                     'monolog.logger.mautic',
                 ],
