@@ -19,7 +19,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
@@ -46,7 +46,7 @@ class MailHelper
      */
     protected $factory;
 
-    protected Mailer $mailer;
+    protected MailerInterface $mailer;
 
     protected $transport;
 
@@ -236,7 +236,7 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, Mailer $mailer, $from = null)
+    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
     {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
