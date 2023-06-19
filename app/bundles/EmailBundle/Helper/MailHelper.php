@@ -1328,13 +1328,11 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $BCcontent  = $email->getContent();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml) && !empty($BCcontent)) {
+        if (empty($customHtml)) {
             $template = $email->getTemplate();
             if (empty($slots)) {
-                $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
 
