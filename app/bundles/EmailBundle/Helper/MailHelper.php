@@ -1415,10 +1415,10 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
+        $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml)) {
-            $template = $email->getTemplate();
+        if (empty($customHtml) && $template) {
             if (empty($slots)) {
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
