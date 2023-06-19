@@ -182,8 +182,6 @@ class AssetGenerationHelper
                         }
                     });
 
-                    $useMinify = class_exists('\Minify');
-
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
                             $assetFile = "$assetsFullPath/$type/$group.$type";
@@ -201,33 +199,22 @@ class AssetGenerationHelper
                                     $out = fopen($assetFile, 'w');
 
                                     foreach ($files as $relPath => $details) {
-                                        $cssRel = '../../'.dirname($relPath).'/';
-                                        if ($useMinify) {
-                                            $content = \Minify::combine([$details['fullPath']], [
-                                                'rewriteCssUris'  => false,
-                                                'minifierOptions' => [
-                                                    'text/css' => [
-                                                        'currentDir'          => '',
-                                                        'prependRelativePath' => $cssRel,
-                                                    ],
+                                        $content = (new \Minify(new \Minify_Cache_Null()))->combine([$details['fullPath']], [
+                                            'rewriteCssUris'  => false,
+                                            'minifierOptions' => [
+                                                'text/css' => [
+                                                    'currentDir'          => '',
+                                                    'prependRelativePath' => '../../'.dirname($relPath).'/',
                                                 ],
-                                            ]);
-                                        } else {
-                                            $content = file_get_contents($details['fullPath']);
-                                            $search  = '#url\((?!\s*([\'"]?(((?:https?:)?//)|(?:data\:?:))))\s*([\'"])?#';
-                                            $replace = "url($4{$cssRel}";
-                                            $content = preg_replace($search, $replace, $content);
-                                        }
+                                            ],
+                                        ]);
 
                                         fwrite($out, $content);
                                     }
 
                                     fclose($out);
                                 } else {
-                                    array_walk($files, function (&$file) {
-                                        $file = $file['fullPath'];
-                                    });
-                                    file_put_contents($assetFile, \Minify::combine($files));
+                                    file_put_contents($assetFile, (new \Minify(new \Minify_Cache_Null()))->combine(array_column($files, 'fullPath')));
                                 }
                             }
                         }

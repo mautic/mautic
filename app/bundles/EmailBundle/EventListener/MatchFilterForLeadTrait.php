@@ -22,7 +22,7 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (0 === strpos((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
             if ($isCompanyField) {

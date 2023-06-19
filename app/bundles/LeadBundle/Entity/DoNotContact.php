@@ -194,7 +194,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = InputHelper::string($comments);
+        $this->comments = InputHelper::string((string) $comments);
 
         return $this;
     }

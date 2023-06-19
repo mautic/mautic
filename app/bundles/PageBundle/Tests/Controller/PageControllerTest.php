@@ -70,6 +70,7 @@ class PageControllerTest extends MauticMysqlTestCase
             'title'        => 'Page:Page:LandingPageTracking',
             'alias'        => 'page-page-landingPageTracking',
             'template'     => 'blank',
+            'custom_html'  => 'some content',
             'hits'         => 0,
             'unique_hits'  => 0,
             'variant_hits' => 0,
@@ -184,6 +185,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $page->setAlias($alias);
         $page->setIsPublished($isPublished);
         $page->setTemplate($template);
+        $page->setCustomHtml('some content');
 
         $this->em->persist($page);
         $this->em->flush();

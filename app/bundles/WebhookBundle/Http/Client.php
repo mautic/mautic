@@ -28,8 +28,7 @@ class Client
     }
 
     /**
-     * @param string      $url
-     * @param string|null $secret
+     * @param string $url
      *
      * @return ResponseInterface
      */
@@ -41,10 +40,10 @@ class Client
      *
      * @throws \Http\Client\Exception
      */
-    public function post($url, array $payload, $secret = null)
+    public function post($url, array $payload, string $secret = null)
     {
         $jsonPayload = json_encode($payload);
-        $signature   = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
+        $signature   = null === $secret ? null : base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
         $headers     = [
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),

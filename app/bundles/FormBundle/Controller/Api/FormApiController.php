@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
@@ -169,8 +170,10 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity();
                 } else {
+                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }
@@ -188,12 +191,11 @@ class FormApiController extends CommonApiController
                     return $this->returnError($msg, Response::HTTP_NOT_FOUND);
                 }
 
-                /** @var array{formId: ?int, alias?: string, label: string} $fieldEntityArray */
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
 
                 if (!empty($fieldParams['alias'])) {
-                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], '', 25);
+                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
                         $fieldEntityArray['alias'] = $fieldParams['alias'];
@@ -201,7 +203,7 @@ class FormApiController extends CommonApiController
                 }
 
                 if (empty($fieldEntityArray['alias'])) {
-                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
                 }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);

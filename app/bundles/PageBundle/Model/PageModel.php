@@ -202,7 +202,7 @@ class PageModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -765,11 +765,10 @@ class PageModel extends FormModel
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param string|null  $tokenFilter
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
+    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -1028,12 +1027,15 @@ class PageModel extends FormModel
     {
         $query             = [];
         $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
-        parse_str($urlQuery, $urlQueryArray);
 
-        foreach ($urlQueryArray as $key => $value) {
-            if (is_string($value)) {
-                $key         = strtolower($key);
-                $query[$key] = urldecode($value);
+        if (is_string($urlQuery)) {
+            parse_str($urlQuery, $urlQueryArray);
+
+            foreach ($urlQueryArray as $key => $value) {
+                if (is_string($value)) {
+                    $key         = strtolower($key);
+                    $query[$key] = urldecode($value);
+                }
             }
         }
 

@@ -46,6 +46,7 @@
     * `Mautic\LeadBundle\Model\LeadModel::checkForDuplicateContact()` method do not take Lead as a second parameter anymore and so it do not merges contacts. Use `\Mautic\LeadBundle\Deduplicate\ContactMerger::merge()` afterwards.
     * Class `Mautic\LeadBundle\Model\LegacyLeadModel` removed. Use `\Mautic\LeadBundle\Deduplicate\ContactMerger` instead.
     * Method `Mautic\ReportBundle\Event\ReportGeneratorEvent::applyTagFilter()` removed. Use `Mautic\ReportBundle\Builder\MauticReportBuilder::getTagCondition()` instead.
+    * Class `Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer` was removed. [Details](https://github.com/mautic/mautic/pull/12483)
     * `Mautic\CoreBundle\Doctrine\AbstractMauticMigration::entityManager` protected property was removed as unused.
     * The User entity no longer implements `Symfony\Component\Security\Core\User\AdvancedUserInterface` as it was removed from Symfony 5. These methods required by the interface were also removed:
         * `Mautic\UserBundle\Entity\User::isAccountNonExpired()`
@@ -60,6 +61,7 @@
     * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
     * Region names in Austria, Germany and Switzerland were updated based on Standard: ISO_3166-2.
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
+    * Deprecated cookie `mtc_sid` removed.
 
 # Dependency injection improvements
 

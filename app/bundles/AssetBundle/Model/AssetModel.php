@@ -112,7 +112,7 @@ class AssetModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();
