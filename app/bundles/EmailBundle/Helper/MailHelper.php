@@ -320,6 +320,7 @@ class MailHelper
                         $this->setReplyTo($owner['email']);
                     } else {
                         $this->setFrom($this->systemFrom, null);
+                        $this->setReplyTo($this->replyTo);
                     }
                 } elseif (!empty($emailToSend->getFromAddress())) {
                     $this->setFrom($emailToSend->getFromAddress(), $emailToSend->getFromName());
