@@ -199,7 +199,7 @@ class TrackableRepository extends CommonRepository
             return $byList;
         }
 
-        if (count($results) > 1) {
+        if (isset($options['columns'])) {
             return $results;
         } else {
             return (isset($results[0])) ? $results[0]['click_count'] : 0;

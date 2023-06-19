@@ -716,16 +716,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if ($listCount > 1) {
-            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, ['groupBy' => 'l.country']); // $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
-
-            foreach ($lists as $l) {
-                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-            }
-        }
-
-        if ($listCount) {
+            $readStats         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true, $options);
+            $clickStats        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT ph.lead_id', $options);
+        } else {
             $readStats  = $statRepo->getReadCount($emailIds, null, $query, false, $options);
             $clickStats = $trackableRepo->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id', $options);
         }

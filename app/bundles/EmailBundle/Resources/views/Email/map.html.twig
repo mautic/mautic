@@ -1,3 +1,7 @@
+<hr>
+{% set initData = results.read.data|default([])  %}
+{{ results|json_encode }}
+<hr>
 <fieldset class="map-options">
     <legend class="map-options__title">Choose stats:</legend>
     <div class="map-options__container">
@@ -18,13 +22,15 @@
 
 <div>
     {{- include('@MauticCore/Helper/map.html.twig', {
-        'data' : results.read.data,
+        'data' : initData,
         'chartHeight' : 300
     })
     -}}
 </div>
 
-<div class="map-legend">
-    <span>Total: {{ results.read.total|json_encode }}</span>
-    <span>({{ results.read.totalWithCountry|json_encode }} with country)</span>
-</div>
+{% if initData %}
+    <div class="map-legend">
+        <span>Total: {{ results.read.total|default('') }}</span>
+        <span>({{ results.read.totalWithCountry }} with country)</span>
+    </div>
+{% endif %}
