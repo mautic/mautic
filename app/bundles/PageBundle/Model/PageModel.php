@@ -520,11 +520,14 @@ class PageModel extends FormModel
             return;
         }
 
-        $this->cookieHelper->setCookie(
-            name: 'mautic_referer_id',
-            value: $hit->getId() ?: null,
-            sameSite: Cookie::SAMESITE_NONE
-        );
+        // save hit to the cookie to use to update the exit time
+        if ($hit) {
+            $this->cookieHelper->setCookie(
+                name: 'mautic_referer_id',
+                value: $hit->getId() ?: null,
+                sameSite: Cookie::SAMESITE_NONE
+            );
+        }
 
         $message = new PageHitNotification(
             $hit->getId(),

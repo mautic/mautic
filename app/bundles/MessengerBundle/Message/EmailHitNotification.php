@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Mautic\MessengerBundle\Message;
 
 use DateTime;
+use Mautic\MessengerBundle\Message\Interfaces\RequestStatusInterface;
 use Mautic\MessengerBundle\Message\Traits\MessageRequestTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailHitNotification
+class EmailHitNotification implements RequestStatusInterface
 {
     use MessageRequestTrait;
 

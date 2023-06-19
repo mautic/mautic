@@ -4,10 +4,19 @@ use Mautic\MessengerBundle\MauticMessengerRoutes;
 /** @var ContainerBuilder $container */
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\MessengerBundle\Message\PageHitNotification;
+use Mautic\MessengerBundle\Middleware\SynchronousExtrasMiddleware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 $container->loadFromExtension('framework', [
     'messenger' => [
+        'buses' => [
+            'messenger.bus.default' => [
+                'default_middleware'    => true,
+                'middleware'    => [
+                    SynchronousExtrasMiddleware::class,
+                ],
+            ],
+        ],
         'failure_transport' => 'failed',
         'routing'           => [
             PageHitNotification::class  => MauticMessengerRoutes::SYNC,

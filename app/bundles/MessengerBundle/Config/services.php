@@ -12,10 +12,10 @@ return function (ContainerConfigurator $configurator): void {
         ->autoconfigure()
         ->public();
 
-    $excludes = [
-        'Message',
-    ];
+    $excludes = ['Message'];
 
     $services->load('Mautic\\MessengerBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\MessengerBundle\\Middleware\\', '../Middleware');
 };

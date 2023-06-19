@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler;
 use Mautic\MessengerBundle\MessageHandler\PageHitNotificationHandler;
+use Mautic\MessengerBundle\Middleware\SynchronousExtrasMiddleware;
 
 return [
     'services'   => [
@@ -28,6 +29,12 @@ return [
                     'logger',
                 ],
             ],
+            SynchronousExtrasMiddleware::class => [
+                'class' => SynchronousExtrasMiddleware::class,
+                'arguments' => [
+                    'messenger.senders_locator',
+                ]
+            ]
         ],
     ],
 ];

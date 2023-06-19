@@ -14,6 +14,7 @@ trait MessageRequestTrait
 {
     private string $eventTime; // The ISO-8601 date
     private array $request; //  Simplified interpretation of symfony request
+    private bool $isSynchronous = false;
 
     /** @return string The ISO-8601 date */
     public function getEventTime(): string
@@ -24,7 +25,7 @@ trait MessageRequestTrait
     /**
      * @return MessageRequestTrait|EmailHitNotification
      */
-    public function setEventTime(string|\DateTimeInterface $eventTime): self
+    public function setEventTime(?DateTimeInterface $eventTime = null): self
     {
         $eventTime ??= (new DateTime())->format('c');
 
@@ -51,5 +52,16 @@ trait MessageRequestTrait
         $this->request = $request instanceof Request ? MessengerRequestFactory::toArray($request) : $request;
 
         return $this;
+    }
+
+    public function setIsSynchronousRequest(bool $isSynchronous = true): self {
+        $this->isSynchronous = $isSynchronous;
+
+        return $this;
+    }
+
+    public function isSynchronousRequest(): bool
+    {
+        return $this->isSynchronous;
     }
 }

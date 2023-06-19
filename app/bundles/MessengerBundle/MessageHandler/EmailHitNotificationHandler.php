@@ -34,7 +34,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
                 $message->getStatId(),
                 MessengerRequestFactory::fromArray($message->getRequest()),
                 false,
-                false,
+                $message->isSynchronousRequest(),
                 $hitDateTime,
                 true
             );
