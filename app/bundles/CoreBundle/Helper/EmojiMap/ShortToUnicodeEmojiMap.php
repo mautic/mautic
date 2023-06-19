@@ -1352,5 +1352,6 @@ class ShortToUnicodeEmojiMap
     public static $exceptions = [
             // Outlook email rendering
             "microsoft-com\xf0\x9f\x8f\xa2office" => 'microsoft-com:office:office',
+            "microsoft-com\xf0\x9f\x8f\xa2word"   => 'microsoft-com:office:word',
       ];
 }
