@@ -26,5 +26,6 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
-    $services->alias(\Symfony\Component\Mailer\Transport::class, 'mailer.transport_factory');
+    $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
+        ->decorate('mailer.transport_factory');
 };
