@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
@@ -39,7 +39,6 @@ class ContactScheduledExportCommand extends Command
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Export contacts which are scheduled in `contact_export_scheduler` table.')
             ->addOption(
                 '--ids',
                 null,
@@ -73,6 +72,7 @@ class ContactScheduledExportCommand extends Command
 
         $output->writeln('Contact export email(s) sent: '.$count);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';
 }

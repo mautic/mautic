@@ -1,0 +1,129 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - totalItems
+    - page
+    - limit
+    - tmpl
+    - permissions
+    - model
+    - security
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered notification-list">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'routeBase': 'mobile_notification',
+                        'templateButtons': {
+                            'delete': permissions['notification:mobile_notifications:deleteown'] or permissions['notification:mobile_notifications:deleteother'],
+                        },
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'mobile_notification',
+                        'orderBy': 'e.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-notification-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'mobile_notification',
+                        'orderBy': 'c.title',
+                        'text': 'mautic.core.category',
+                        'class': 'visible-md visible-lg col-notification-category',
+                }) }}
+
+                <th class="visible-sm visible-md visible-lg col-notification-stats">{{ 'mautic.core.stats'|trans }}</th>
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'mobile_notification',
+                        'orderBy': 'e.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-notification-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {# @var \Mautic\NotificationBundle\Entity\Notification $item #}
+            {% for item in items %}
+                {% set type = item.notificationType %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['notification:mobile_notifications:editown'], permissions['notification:mobile_notifications:editother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['notification:mobile_notifications:deleteown'], permissions['notification:mobile_notifications:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'mobile_notification',
+                                'customButtons': [
+                                    {
+                                        'attr': {
+                                            'data-toggle': 'ajaxmodal',
+                                            'data-target': '#MauticSharedModal',
+                                            'data-header': 'mautic.notification.mobile_notification.preview'|trans,
+                                            'data-footer': 'false',
+                                            'href': path('mautic_mobile_notification_action', {'objectId': item.id, 'objectAction': 'preview'}),
+                                        },
+                                        'btnText': 'mautic.notification.mobile_notification.preview'|trans,
+                                        'iconClass': 'fa fa-share',
+                                    },
+                                ]
+                        }) }}
+                    </td>
+                    <td>
+                        <div>
+                            {% if 'template' == type %}
+                                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
+                            {% else %}
+                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
+                            {% endif %}
+                            <a href="{{ path('mautic_mobile_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
+                                {{ item.name }}
+                                {% if 'list' == type %}
+                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="fa fa-fw fa-list"></i></span>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
+                        {% set color = category ? '#' ~ category.color : 'inherit' %}
+                        <span style="white-space:nowrap;">
+                          <span class="label label-default pa-4" style="border:1px solid #d5d5d5;background:{{ color }};"></span>
+                          <span>{{ catName }}</span>
+                        </span>
+                    </td>
+                    <td class="visible-sm visible-md visible-lg col-stats">
+                        <span class="mt-xs label label-warning has-click-event clickable-stat"
+                              data-toggle="tooltip"
+                              title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+                            <a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.mobile_sent'|trans ~ ':' ~ item.id}) }}">
+                                {{- 'mautic.notification.stat.sentcount'|trans({'%count%': item.getSentCount(true)}) -}}
+                            </a>
+                        </span>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': totalItems,
+                'page': page,
+                'limit': limit,
+                'baseUrl': path('mautic_mobile_notification_index'),
+                'sessionVar': 'mobile_notification',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

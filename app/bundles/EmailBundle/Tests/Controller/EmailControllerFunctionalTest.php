@@ -39,7 +39,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->persist($email);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($email);
 
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
@@ -139,7 +139,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $dncQueries = array_filter(
             $queries['default'],
-            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = :channel) AND (l.id IN ({$contact->getId()}))" === $query['sql']
+            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN ({$contact->getId()}))" === $query['sql']
         );
 
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
@@ -159,12 +159,20 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
         $this->assertStringContainsString('Email is sending in the background', $html, $html);
 
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
+
         $email->setPublishUp(new \DateTime('now +1 hour'));
         $this->em->persist($email);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
         $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
 
         $email->setPublishUp(null);
@@ -238,7 +246,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
 
         // checking if pending count is removed from details page ui
-        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
+        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text(null, false));
         $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
 
         $profile = $this->client->getProfile();

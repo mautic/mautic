@@ -4,9 +4,7 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 class LeadListAccess extends Constraint
 {
     public $message = 'mautic.lead.lists.failed';

@@ -153,20 +153,20 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
                                     [
                                         'name'    => 'HTMLCCEMAILHEADER',
                                         'content' => $this->translator->trans(
-                                                'mautic.core.email.cc.copy',
-                                                [
-                                                    '%email%' => $rcpt['email'],
-                                                ]
-                                            ).'<br /><br />',
+                                            'mautic.core.email.cc.copy',
+                                            [
+                                                '%email%' => $rcpt['email'],
+                                            ]
+                                        ).'<br /><br />',
                                     ],
                                     [
                                         'name'    => 'TEXTCCEMAILHEADER',
                                         'content' => $this->translator->trans(
-                                                'mautic.core.email.cc.copy',
-                                                [
-                                                    '%email%' => $rcpt['email'],
-                                                ]
-                                            )."\n\n",
+                                            'mautic.core.email.cc.copy',
+                                            [
+                                                '%email%' => $rcpt['email'],
+                                            ]
+                                        )."\n\n",
                                     ],
                                     [
                                         'name'    => 'TRACKINGPIXEL',
@@ -296,9 +296,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
     /**
      * {@inheritdoc}
      *
-     * @param $response
-     * @param $info
-     *
      * @return array
      *
      * @throws \Swift_TransportException
@@ -316,7 +313,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
             // Check the response for PONG!
             if ('PONG!' !== $response) {
                 $message = 'Mandrill failed to authenticate';
-                //array ( 'status' => 'error', 'code' => -1, 'name' => 'Invalid_Key', 'message' => 'Invalid API key', )"
+                // array ( 'status' => 'error', 'code' => -1, 'name' => 'Invalid_Key', 'message' => 'Invalid API key', )"
                 if (is_array($response) && isset($response['message'])) {
                     $message .= ': '.$response['message'];
                 }
@@ -357,7 +354,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
             }
         }
 
-        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, (200 == $info['http_code']))) {
+        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, 200 == $info['http_code'])) {
             $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
         }
 

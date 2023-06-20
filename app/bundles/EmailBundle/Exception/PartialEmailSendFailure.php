@@ -2,8 +2,6 @@
 
 namespace Mautic\EmailBundle\Exception;
 
-use Throwable;
-
 class PartialEmailSendFailure extends \Exception
 {
     /**
@@ -18,7 +16,7 @@ class PartialEmailSendFailure extends \Exception
      * @param string $failureReason
      * @param int    $code
      */
-    public function __construct($sentCount, $failureReason, $code = 0, Throwable $previous = null)
+    public function __construct($sentCount, $failureReason, $code = 0, \Throwable $previous = null)
     {
         $this->sentCount = (int) $sentCount;
 

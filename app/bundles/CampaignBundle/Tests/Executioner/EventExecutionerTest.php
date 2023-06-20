@@ -117,16 +117,16 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setType('email.send')
             ->setCampaign($campaign);
         $otherConfig = new ActionAccessor(
-           [
-                'label'                => 'mautic.email.campaign.event.send',
-                'description'          => 'mautic.email.campaign.event.send_descr',
-                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => EmailSendType::class,
-                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
-                'channel'              => 'email',
-                'channelIdField'       => 'email',
-            ]
+            [
+                 'label'                => 'mautic.email.campaign.event.send',
+                 'description'          => 'mautic.email.campaign.event.send_descr',
+                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                 'formType'             => EmailSendType::class,
+                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
+                 'channel'              => 'email',
+                 'channelIdField'       => 'email',
+             ]
         );
 
         $jumpEvent = new Event();
@@ -138,7 +138,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'mautic.campaign.event.jump_to_event',
                 'description'            => 'mautic.campaign.event.jump_to_event_descr',
                 'formType'               => CampaignEventJumpToEventType::class,
-                'template'               => 'MauticCampaignBundle:Event:jump.html.twig',
+                'template'               => '@MauticCampaign/Event/jump.html.twig',
                 'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
                 'connectionRestrictions' => [
                     'target' => [
@@ -260,7 +260,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'mautic.campaign.event.jump_to_event',
                 'description'            => 'mautic.campaign.event.jump_to_event_descr',
                 'formType'               => CampaignEventJumpToEventType::class,
-                'template'               => 'MauticCampaignBundle:Event:jump.html.twig',
+                'template'               => '@MauticCampaign/Event/jump.html.twig',
                 'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
                 'connectionRestrictions' => [
                     'target' => [

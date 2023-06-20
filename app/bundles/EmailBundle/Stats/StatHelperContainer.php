@@ -15,8 +15,6 @@ class StatHelperContainer
     }
 
     /**
-     * @param $name
-     *
      * @return StatHelperInterface
      *
      * @throws InvalidStatHelperException

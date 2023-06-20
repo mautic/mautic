@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
-use Mautic\CoreBundle\Templating\Twig\Extension\AppExtension;
-use Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension;
-use Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension;
-use Mautic\CoreBundle\Templating\Twig\Extension\FormExtension;
-use Mautic\CoreBundle\Tests\Twig\Fakes\AssetsHelperFake;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Twig\Extension\AppExtension;
+use Mautic\CoreBundle\Twig\Extension\AssetExtension;
+use Mautic\CoreBundle\Twig\Extension\ClassExtension;
+use Mautic\CoreBundle\Twig\Extension\FormExtension;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Asset\Packages;
 use Twig\Extension\ExtensionInterface;
 
 /**
@@ -21,9 +25,30 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
      */
     public function getExtensions(): array
     {
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
+
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var PathsHelper&MockObject $pathHelperMock */
+        $pathHelperMock = $this->createMock(PathsHelper::class);
+
+        $packagesMock->method('getUrl')
+            ->will($this->returnCallback(function (string $path) {
+                $packageName = $version = null;
+                $absolute    = $ignorePrefix = false;
+
+                return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
+            }));
+
+        $assetsHelper = new AssetsHelper($packagesMock, $coreParametersHelper);
+        $pathHelperMock->method('getSystemPath')->willReturn('https://example.com/');
+        $assetsHelper->setPathsHelper($pathHelperMock);
+
         return [
             new AppExtension(),
-            new AssetExtension(new AssetsHelperFake()),
+            new AssetExtension($assetsHelper),
             new ClassExtension(),
             new FormExtension(),
         ];

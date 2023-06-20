@@ -96,7 +96,7 @@ class AuthenticationEvent extends Event
         $this->token = $token;
         $this->user  = $user;
 
-        $this->isFormLogin           = ($token instanceof UsernamePasswordToken);
+        $this->isFormLogin           = $token instanceof UsernamePasswordToken;
         $this->integrations          = $integrations;
         $this->request               = $request;
         $this->isLoginCheck          = $loginCheck;
@@ -152,9 +152,6 @@ class AuthenticationEvent extends Event
         return $this->token;
     }
 
-    /**
-     * @param $service
-     */
     public function setToken($service, TokenInterface $token)
     {
         $this->token                 = $token;
@@ -171,7 +168,7 @@ class AuthenticationEvent extends Event
      */
     public function getUsername()
     {
-        return $this->token->getUsername();
+        return $this->token->getUserIdentifier();
     }
 
     /**
@@ -227,8 +224,6 @@ class AuthenticationEvent extends Event
 
     /**
      * Set the message to display to the user for failing auth.
-     *
-     * @param $message
      */
     public function setFailedAuthenticationMessage($message)
     {
@@ -317,8 +312,6 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * @param $integrationName
-     *
      * @return AbstractIntegration|bool
      */
     public function getIntegration($integrationName)

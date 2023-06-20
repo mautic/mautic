@@ -2,8 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-use DateTimeInterface;
-
 trait DateRangeUnitTrait
 {
     /**
@@ -11,7 +9,7 @@ trait DateRangeUnitTrait
      *
      * @return string
      */
-    public function getTimeUnitFromDateRange(DateTimeInterface $dateFrom, DateTimeInterface $dateTo)
+    public function getTimeUnitFromDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
     {
         $dayDiff = $dateTo->diff($dateFrom)->format('%a');
         $unit    = 'd';

@@ -1,0 +1,54 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}asset{% endblock %}
+{% block headerTitle %}{% trans %}mautic.asset.remote.file.browse{% endtrans %}{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            <div class="page-list">
+                {{ block('mainContent') }}        
+            </div>
+        </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
+
+
+
+{% block mainContent %}
+{% if integrations|length %}
+    <!-- start: box layout -->
+    <div class="box-layout">
+                <!-- step container -->
+        <div class="col-md-3 bg-white">
+            <div class="pt-md pr-md pb-md">
+                <ul class="list-group list-group-tabs">
+                    {% for integration in integrations %}
+                        <li class="list-group-item{% if loop.index0 is same as(0) %} active{% endif %}" id="tab{{ integration.getName() }}">
+                            <a href="#" class="steps" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}');">
+                                {{ integration.getDisplayName() }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!--/ step container -->
+
+        <!-- container -->
+        <div class="col-md-9 bg-auto bdr-l">
+            <div id="remoteFileBrowser">
+                <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
+                    <p>{% trans %}mautic.asset.remote.select_service{% endtrans %}</p>
+                </div>
+            </div>
+        </div>
+        <!--/ end: container -->
+    </div>
+    <!--/ end: box layout -->
+{% endif %}
+{% endblock %}

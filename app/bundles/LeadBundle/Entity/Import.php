@@ -2,13 +2,11 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -80,7 +78,7 @@ class Import extends FormEntity
     /**
      * Name of the original uploaded file.
      *
-     * @var string
+     * @var string|null
      */
     private $originalFile;
 
@@ -113,7 +111,7 @@ class Import extends FormEntity
     private $ignoredCount = 0;
 
     /**
-     * @var bool
+     * @var int
      */
     private $priority;
 
@@ -123,12 +121,12 @@ class Import extends FormEntity
     private $status;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateStarted;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateEnded;
 
@@ -138,7 +136,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     private $properties = [];
 
@@ -164,19 +162,19 @@ class Import extends FormEntity
             ->addIndex(['status'], 'import_status')
             ->addIndex(['priority'], 'import_priority')
             ->addId()
-            ->addField('dir', Type::STRING)
-            ->addField('file', Type::STRING)
-            ->addNullableField('originalFile', Type::STRING, 'original_file')
-            ->addNamedField('lineCount', Type::INTEGER, 'line_count')
-            ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
-            ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
-            ->addNamedField('ignoredCount', Type::INTEGER, 'ignored_count')
-            ->addField('priority', Type::INTEGER)
-            ->addField('status', Type::INTEGER)
-            ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
-            ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
-            ->addField('object', Type::STRING)
-            ->addNullableField('properties', Type::JSON_ARRAY);
+            ->addField('dir', Types::STRING)
+            ->addField('file', Types::STRING)
+            ->addNullableField('originalFile', Types::STRING, 'original_file')
+            ->addNamedField('lineCount', Types::INTEGER, 'line_count')
+            ->addNamedField('insertedCount', Types::INTEGER, 'inserted_count')
+            ->addNamedField('updatedCount', Types::INTEGER, 'updated_count')
+            ->addNamedField('ignoredCount', Types::INTEGER, 'ignored_count')
+            ->addField('priority', Types::INTEGER)
+            ->addField('status', Types::INTEGER)
+            ->addNullableField('dateStarted', Types::DATETIME_MUTABLE, 'date_started')
+            ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
+            ->addField('object', Types::STRING)
+            ->addNullableField('properties', Types::JSON);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -192,8 +190,6 @@ class Import extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -325,7 +321,7 @@ class Import extends FormEntity
     public function setFilePath($path)
     {
         $fileName = basename($path);
-        $dir      = substr($path, 0, (-1 * (strlen($fileName) + 1)));
+        $dir      = substr($path, 0, -1 * (strlen($fileName) + 1));
 
         $this->setDir($dir);
         $this->setFile($fileName);
@@ -594,7 +590,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateStarted()
     {
@@ -651,7 +647,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateEnded()
     {
@@ -750,8 +746,6 @@ class Import extends FormEntity
     }
 
     /**
-     * @param $line
-     *
      * @return Import
      */
     public function setLastLineImported($line)
@@ -926,20 +920,5 @@ class Import extends FormEntity
         }
 
         return parent::setIsPublished($isPublished);
-    }
-
-    /**
-     * Get pie graph data for row status counts.
-     *
-     * @return array
-     */
-    public function getRowStatusesPieChart(TranslatorHelper $translator)
-    {
-        $chart = new PieChart();
-        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
-
-        return $chart->render();
     }
 }

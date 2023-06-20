@@ -120,7 +120,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 $fistDashPos = strpos($event['CustomID'], '-', 0);
                 $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
                 $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));
-                if ($event['email'] == $leadEmail) {
+                if (strtolower($event['email']) == strtolower($leadEmail)) {
                     $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
                 }
             } else {

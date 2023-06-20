@@ -20,9 +20,6 @@ class GeobytesLookup extends AbstractRemoteDataLookup
         return "http://getcitydetails.geobytes.com/GetCityDetails?fqcn={$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

@@ -23,17 +23,17 @@ class Trigger extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -53,12 +53,12 @@ class Trigger extends FormEntity
     private $triggerExistingLeads = false;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PointBundle\Entity\TriggerEvent>
      */
     private $events;
 
@@ -118,8 +118,6 @@ class Trigger extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -152,7 +150,7 @@ class Trigger extends FormEntity
     protected function isChanged($prop, $val)
     {
         if ('events' == $prop) {
-            //changes are already computed so just add them
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -222,8 +220,6 @@ class Trigger extends FormEntity
     /**
      * Add events.
      *
-     * @param $key
-     *
      * @return Point
      */
     public function addTriggerEvent($key, TriggerEvent $event)
@@ -272,7 +268,7 @@ class Trigger extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -297,7 +293,7 @@ class Trigger extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

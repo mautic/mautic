@@ -246,7 +246,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
             // Sparkpost requires substitution_data which can be byspassed by using MailHelper::setTo() rather than a Lead via MailHelper::setLead()
             // Without it, Sparkpost returns the error: "field 'substitution_data' is required"
-            // But, it can't be an empty array or Sparkpost will return error: field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
+            // But, it can't be an empty array or Sparkpost will return error: field 'substitution_data' is of type 'json', but needs to be of type 'json_object'
             if (empty($recipient['substitution_data'])) {
                 $recipient['substitution_data'] = new \stdClass();
             }
@@ -474,9 +474,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         return null;
     }
 
-    /**
-     * @param $hashId
-     */
     private function processCallbackByHashId($hashId, array $event)
     {
         switch ($event['type']) {
@@ -497,9 +494,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * @param $email
-     */
     private function processCallbackByEmailAddress($email, array $event)
     {
         switch ($event['type']) {

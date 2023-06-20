@@ -16,6 +16,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
 {
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
@@ -33,7 +34,8 @@ class EmailTriggerTest extends MauticMysqlTestCase
         $triggerEvent->setProperties(['useremail' => ['email' => $email->getId()]]);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($trigger);
+        $this->em->detach($triggerEvent);
 
         [$crawler, $form] = $this->fetchForm($trigger, $triggerEvent);
 
@@ -45,6 +47,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
@@ -53,7 +56,8 @@ class EmailTriggerTest extends MauticMysqlTestCase
         $triggerEvent = $this->createTriggerEvent($trigger);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($trigger);
+        $this->em->detach($triggerEvent);
 
         [$crawler, $form] = $this->fetchForm($trigger, $triggerEvent);
 

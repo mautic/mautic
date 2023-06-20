@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Executioner;
 
-use DateTime;
-use DateTimeImmutable;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
@@ -145,7 +143,7 @@ class OrderExecutionerTest extends TestCase
                                 $updateObject->getIntegration(),
                                 $updateObject->getObject(),
                                 $updateObject->getObjectId(),
-                                new DateTime()
+                                new \DateTime()
                             );
 
                             if (0 !== $key) {
@@ -269,7 +267,7 @@ class OrderExecutionerTest extends TestCase
                                 $updateObject->getIntegration(),
                                 $updateObject->getObject(),
                                 $updateObject->getObjectId(),
-                                new DateTime()
+                                new \DateTime()
                             );
 
                             $objectMapping = new ObjectMapping();
@@ -294,7 +292,7 @@ class OrderExecutionerTest extends TestCase
                                 $updateObject->getIntegration(),
                                 $updateObject->getObject(),
                                 $updateObject->getObjectId(),
-                                new DateTime()
+                                new \DateTime()
                             );
 
                             $objectMapping = new ObjectMapping();
@@ -370,7 +368,7 @@ class OrderExecutionerTest extends TestCase
 
     public function testEmptyObjectsForUpdateDoesNothing(): void
     {
-        $syncOrder = new OrderDAO(new DateTimeImmutable(), false, self::INTEGRATION_NAME);
+        $syncOrder = new OrderDAO(new \DateTimeImmutable(), false, self::INTEGRATION_NAME);
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, 'bar', null, 'bar', 4));
 
         $this->dispatcher->expects($this->once())
@@ -382,7 +380,7 @@ class OrderExecutionerTest extends TestCase
 
     public function testEmptyObjectsForCreateDoesNothing(): void
     {
-        $syncOrder = new OrderDAO(new DateTimeImmutable(), false, self::INTEGRATION_NAME);
+        $syncOrder = new OrderDAO(new \DateTimeImmutable(), false, self::INTEGRATION_NAME);
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, 'bar', 4, 'bar', 4));
 
         $this->dispatcher->expects($this->once())
@@ -423,7 +421,7 @@ class OrderExecutionerTest extends TestCase
      */
     private function getSyncOrder(string $objectName): OrderDAO
     {
-        $syncOrder = new OrderDAO(new DateTimeImmutable(), false, self::INTEGRATION_NAME);
+        $syncOrder = new OrderDAO(new \DateTimeImmutable(), false, self::INTEGRATION_NAME);
 
         // Two updates
         $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, $objectName, 1, $objectName, 1));

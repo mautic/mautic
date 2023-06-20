@@ -6,10 +6,11 @@ namespace Mautic\EmailBundle\Tests\Stats;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\SentHelper;
@@ -21,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class SentHelperTest extends \PHPUnit\Framework\TestCase
 {
     private Collector $collector;
+
+    private DateTimeHelper $dateTimeHelper;
 
     private SentHelper $sentHelper;
 
@@ -45,9 +48,9 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
     private $queryBuilder;
 
     /**
-     * @var MockObject|Statement
+     * @var MockObject|Result
      */
-    private $statement;
+    private $result;
 
     private GeneratedColumns $generatedColumns;
 
@@ -61,7 +64,8 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->userHelperMock           = $this->createMock(UserHelper::class);
         $this->queryBuilder             = $this->createMock(QueryBuilder::class);
-        $this->statement                = $this->createMock(Statement::class);
+        $this->result                   = $this->createMock(Result::class);
+        $this->dateTimeHelper           = new DateTimeHelper();
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
 
@@ -91,25 +95,23 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('execute')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with("DATE_FORMAT(t.generated_sent_date, '%Y-%m-%d') AS date, COUNT(*) AS count")
+            ->with("DATE_FORMAT(CONVERT_TZ(t.generated_sent_date, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d') AS date, COUNT(*) AS count")
             ->willReturnSelf();
 
-        $this->statement->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([
-                [
-                    'date'  => '2022-12-12',
-                    'count' => '60',
-                ],
-                [
-                    'date'  => '2022-12-16',
-                    'count' => '30',
-                ],
-            ]);
+        $this->result->method('fetchAllAssociative')->willReturn([
+            [
+                'date'  => '2022-12-12',
+                'count' => '60',
+            ],
+            [
+                'date'  => '2022-12-16',
+                'count' => '30',
+            ],
+        ]);
 
         $dateFrom = new \DateTime('2022-12-10 00:00:00');
         $dateTo   = new \DateTime('2022-12-20 00:00:00');
@@ -137,15 +139,15 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('execute')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with("DATE_FORMAT(t.date_sent, '%Y-%m-%d %H:00') AS date, COUNT(*) AS count")
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d %H:00') AS date, COUNT(*) AS count")
             ->willReturnSelf();
 
-        $this->statement->expects($this->once())
-            ->method('fetchAll')
+        $this->result->expects($this->once())
+            ->method('fetchAllAssociative')
             ->willReturn([
                 [
                     'date'  => '2022-12-10 13:00',
@@ -167,6 +169,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
         $this->sentHelper->generateStats($dateFrom, $dateTo, $options, $statCollection);
 
         $hours = $statCollection->getStats()->getHours();
+
         $this->assertEquals(12, $hours['2022-12-10 13']->getCount());
         $this->assertEquals(30, $hours['2022-12-10 14']->getCount());
     }

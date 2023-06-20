@@ -5,6 +5,7 @@ namespace Mautic\ChannelBundle\Command;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,18 +22,17 @@ class SendChannelBroadcastCommand extends ModeratedCommand
     private EventDispatcherInterface $dispatcher;
     private TranslatorInterface $translator;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
 
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
     {
         $this->setName('mautic:broadcasts:send')
-            ->setDescription('Process contacts pending to receive a channel broadcast.')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.
@@ -67,6 +67,17 @@ EOT
                         'Limit how many messages to send at once.'
                     ),
                 ]
+            )->addOption(
+                '--thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of this current process if running multiple in parallel.'
+            )
+            ->addOption(
+                '--max-threads',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The maximum number of processes you intend to run in parallel.'
             );
 
         parent::configure();
@@ -74,16 +85,26 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $channel      = $input->getOption('channel');
-        $channelId    = $input->getOption('id');
-        $limit        = $input->getOption('limit');
-        $batch        = $input->getOption('batch');
-        $minContactId = $input->getOption('min-contact-id');
-        $maxContactId = $input->getOption('max-contact-id');
-        $key          = $channel.$channelId;
+        $channel       = $input->getOption('channel');
+        $channelId     = $input->getOption('id');
+        $limit         = $input->getOption('limit');
+        $batch         = $input->getOption('batch');
+        $minContactId  = $input->getOption('min-contact-id');
+        $maxContactId  = $input->getOption('max-contact-id');
+        $threadId      = $input->getOption('thread-id');
+        $maxThreads    = $input->getOption('max-threads');
+        $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
-        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
-            return 0;
+        if ($threadId && $maxThreads) {
+            if ((int) $threadId > (int) $maxThreads) {
+                $output->writeln('--thread-id cannot be larger than --max-thread');
+
+                return \Symfony\Component\Console\Command\Command::FAILURE;
+            }
+        }
+
+        if (!$this->checkRunStatus($input, $output, $key)) {
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
@@ -91,6 +112,8 @@ EOT
         $event->setBatch($batch);
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
+        $event->setThreadId($threadId);
+        $event->setMaxThreads($maxThreads);
 
         $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
@@ -113,6 +136,7 @@ EOT
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }
