@@ -599,7 +599,6 @@ class MailHelper
         }
 
         foreach ($resetEmailTypes as $type) {
-            $type = ucfirst($type);
             $this->message->{$type}();
         }
 
