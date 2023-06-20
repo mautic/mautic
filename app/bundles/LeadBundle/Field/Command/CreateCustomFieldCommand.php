@@ -73,28 +73,22 @@ EOT
             return Command::FAILURE;
         }
 
-        $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
-
-        if (!$this->checkRunStatus($input, $output, $moderationKey)) {
-            return Command::SUCCESS;
-        }
-
         if ($all) {
-            return $this->addAllMissingColumns($output) ? Command::SUCCESS : Command::FAILURE;
+            return $this->addAllMissingColumns($input, $output) ? Command::SUCCESS : Command::FAILURE;
         }
 
         if (!$leadFieldId) {
-            return $this->findAndAddColumn($output) ? Command::SUCCESS : Command::FAILURE;
+            return $this->findAndAddColumn($input, $output) ? Command::SUCCESS : Command::FAILURE;
         }
 
-        return $this->addColumn($leadFieldId, $userId, $output) ? Command::SUCCESS : Command::FAILURE;
+        return $this->addColumn($leadFieldId, $userId, $input, $output) ? Command::SUCCESS : Command::FAILURE;
     }
 
-    private function addAllMissingColumns(OutputInterface $output): bool
+    private function addAllMissingColumns(InputInterface $input, OutputInterface $output): bool
     {
         $hasNoErrors = true;
         while ($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
-            if (!$this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $output)) {
+            if (!$this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output)) {
                 $hasNoErrors = false;
             }
         }
@@ -102,7 +96,7 @@ EOT
         return $hasNoErrors;
     }
 
-    private function findAndAddColumn(OutputInterface $output): bool
+    private function findAndAddColumn(InputInterface $input, OutputInterface $output): bool
     {
         $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
 
@@ -112,12 +106,19 @@ EOT
             return true;
         }
 
-        return $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $output);
+        return $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output);
     }
 
-    private function addColumn(int $leadFieldId, ?int $userId, OutputInterface $output): bool
+    private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): bool
     {
+        $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
+
+        if (!$this->checkRunStatus($input, $output, $moderationKey)) {
+            return true;
+        }
+
         try {
+            echo "adding column";
             $this->backgroundService->addColumn($leadFieldId, $userId);
         } catch (LeadFieldWasNotFoundException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
