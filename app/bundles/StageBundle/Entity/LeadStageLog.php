@@ -21,12 +21,12 @@ class LeadStageLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateFired;
 

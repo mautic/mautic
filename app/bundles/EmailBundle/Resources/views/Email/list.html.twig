@@ -1,0 +1,36 @@
+{% set isIndex = tmpl == 'index' %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'email' %}
+
+{% block headerTitle 'mautic.email.emails'|trans %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons' : {
+            'new' : permissions['email:emails:create']
+        },
+        'routeBase' : 'email',
+    }) -}}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue' : searchValue,
+                'searchHelp'  : 'mautic.email.help.searchcommands',
+                'action'      : currentRoute,
+                'filters'     : filters,
+            }) -}}
+            <div class="page-list">
+              {{ include('@MauticEmail/Email/_list.html.twig') }}
+            </div>
+        </div>
+    {% else %}
+
+    {{ include('@MauticEmail/Email/_list.html.twig') }}
+
+    {% endif %}
+{% endblock %}

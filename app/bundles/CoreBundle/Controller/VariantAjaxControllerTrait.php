@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 trait VariantAjaxControllerTrait
@@ -19,7 +20,7 @@ trait VariantAjaxControllerTrait
      *
      * @return mixed
      */
-    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
+    private function getAbTestForm(Request $request, FormFactoryInterface $formFactory, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
     {
         $dataArray = [
             'success' => 0,
@@ -29,7 +30,7 @@ trait VariantAjaxControllerTrait
         $id   = (int) $request->request->get('id');
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             $model  = $this->getModel($modelName);
             if (!$model instanceof EmailModel && !$model instanceof PageModel) {
                 throw new \InvalidArgumentException('Model should be either email or page model.');
@@ -44,7 +45,7 @@ trait VariantAjaxControllerTrait
                 $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
                 if (!empty($formType)) {
                     $formOptions = (!empty($abTestSettings[$type]['formTypeOptions'])) ? $abTestSettings[$type]['formTypeOptions'] : [];
-                    $form        = $this->get('form.factory')->create(
+                    $form        = $formFactory->create(
                         $abSettingsFormName,
                         [],
                         ['formType' => $formType, 'formTypeOptions' => $formOptions]

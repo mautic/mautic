@@ -2,14 +2,23 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
@@ -23,10 +32,12 @@ class AjaxController extends CommonAjaxController
      */
     private $mappedFieldCollector;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(FieldCollectorInterface $fieldCollector, AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->fieldCollector       = $this->container->get('mautic.form.collector.field');
-        $this->mappedFieldCollector = $this->container->get('mautic.form.collector.already.mapped.field');
+        $this->fieldCollector       = $fieldCollector;
+        $this->mappedFieldCollector = $mappedFieldCollector;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -34,7 +45,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return JsonResponse
      */
-    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
+    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
         if ('form' === $name) {
             $name = 'fields';
@@ -42,7 +53,7 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
-        $session     = $this->get('session');
+        $session     = $request->getSession();
         $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->get($orderName));
         $components  = $session->get($sessionName);
@@ -59,7 +70,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return JsonResponse
      */
-    protected function getFieldsForObjectAction(Request $request)
+    public function getFieldsForObjectAction(Request $request)
     {
         $formId       = $request->get('formId');
         $mappedObject = $request->get('mappedObject');
@@ -87,7 +98,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return JsonResponse
      */
-    protected function reorderActionsAction(Request $request)
+    public function reorderActionsAction(Request $request)
     {
         return $this->reorderFieldsAction($request, 'actions');
     }
@@ -95,7 +106,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return JsonResponse
      */
-    protected function updateFormFieldsAction(Request $request)
+    public function updateFormFieldsAction(Request $request)
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
@@ -110,19 +121,19 @@ class AjaxController extends CommonAjaxController
                 $options    = [];
 
                 if (!empty($properties['list']['list'])) {
-                    //If the field is a SELECT field then the data gets stored in [list][list]
+                    // If the field is a SELECT field then the data gets stored in [list][list]
                     $optionList = $properties['list']['list'];
                 } elseif (!empty($properties['optionlist']['list'])) {
-                    //If the field is a radio or a checkbox then it will be stored in [optionlist][list]
+                    // If the field is a radio or a checkbox then it will be stored in [optionlist][list]
                     $optionList = $properties['optionlist']['list'];
                 }
                 if (!empty($optionList)) {
                     foreach ($optionList as $listItem) {
                         if (is_array($listItem) && isset($listItem['value']) && isset($listItem['label'])) {
-                            //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                            // The select box needs values to be [value] => label format so make sure we have that style then put it in
                             $options[$listItem['value']] = $listItem['label'];
                         } elseif (!is_array($listItem)) {
-                            //Keeping for BC
+                            // Keeping for BC
                             $options[] = $listItem;
                         }
                     }
@@ -152,9 +163,9 @@ class AjaxController extends CommonAjaxController
      *
      * @return JsonResponse
      */
-    public function submitAction()
+    public function submitAction(Request $request)
     {
-        $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $this->request->request->all(), [], ['ajax' => true]);
+        $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);
         $success      = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
             && empty($responseData['validationErrors']));

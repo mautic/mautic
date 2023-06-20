@@ -5,11 +5,8 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="monitoring_leads")
- * @ORM\Entity(repositoryClass="MauticPlugin\MauticSocialBundle\Entity\LeadRepository")
- */
+#[ORM\Table(name: 'monitoring_leads')]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 class Lead
 {
     /**
@@ -23,7 +20,7 @@ class Lead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -53,8 +50,6 @@ class Lead
     }
 
     /**
-     * @param $dateAdded
-     *
      * @return $this
      */
     public function setDateAdded($dateAdded)
@@ -73,8 +68,6 @@ class Lead
     }
 
     /**
-     * @param $lead
-     *
      * @return $this
      */
     public function setLead($lead)
@@ -93,8 +86,6 @@ class Lead
     }
 
     /**
-     * @param $monitor
-     *
      * @return $this
      */
     public function setMonitor($monitor)

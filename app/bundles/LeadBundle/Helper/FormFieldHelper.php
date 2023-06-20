@@ -119,15 +119,12 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param $type
-     * @param $properties
-     *
-     * @return bool
+     * @return array{0: bool, 1:string}
      */
     public static function validateProperties($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
-            //ensure the field type is supported
+            // ensure the field type is supported
             return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
@@ -138,7 +135,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             }
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
-                //ensure requirements are met
+                // ensure requirements are met
                 return [false, $fieldType['properties'][$key]['error_msg']];
             }
         }

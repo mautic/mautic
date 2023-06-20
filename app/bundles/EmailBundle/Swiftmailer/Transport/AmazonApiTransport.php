@@ -83,9 +83,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->region;
     }
 
-    /**
-     * @param $username
-     */
     public function setUsername($username)
     {
         $this->username = $username;
@@ -99,9 +96,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->username;
     }
 
-    /**
-     * @param $password
-     */
     public function setPassword($password)
     {
         $this->password = $password;
@@ -115,9 +109,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->password;
     }
 
-    /**
-     * @param $handler
-     */
     public function setHandler($handler)
     {
         $this->handler = $handler;
@@ -131,9 +122,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         return $this->handler;
     }
 
-    /**
-     * @param $debug
-     */
     public function setDebug($debug)
     {
         $this->debug = $debug;

@@ -11,7 +11,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
@@ -59,7 +58,20 @@ class PageModelTest extends PageTestAbstract
         $page = new Page();
         $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
-        $url       = $pageModel->generateUrl($page);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback(
+                function (string $route, array $routeParams, int $referenceType) {
+                    $this->assertSame('mautic_page_public', $route);
+                    $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
+                    $this->assertSame(0, $referenceType);
+
+                    return '/'.$routeParams['slug'];
+                }
+            );
+
+        $url = $pageModel->generateUrl($page);
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
@@ -86,7 +98,7 @@ class PageModelTest extends PageTestAbstract
     public function testCleanQueryWhenCalledReturnsSafeAndValidData()
     {
         $pageModel           = $this->getPageModel();
-        $pageModelReflection = new ReflectionClass(get_class($pageModel));
+        $pageModelReflection = new \ReflectionClass(get_class($pageModel));
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
         $res = $cleanQueryMethod->invokeArgs($pageModel, [

@@ -43,12 +43,9 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     /**
      * Analyze the output of the API response and return any addresses that FAILED to send.
      *
-     * @param $response
-     * @param $curlInfo
+     * @return array
      *
      * @throws \Swift_TransportException
-     *
-     * @return array
      */
     abstract protected function handlePostResponse($response, $curlInfo);
 

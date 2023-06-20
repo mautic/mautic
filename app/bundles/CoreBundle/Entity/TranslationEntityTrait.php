@@ -16,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var mixed
      **/
     private $translationParent;
 
@@ -32,7 +32,6 @@ trait TranslationEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      * @param string        $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
@@ -104,7 +103,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getTranslationParent()
     {
@@ -222,8 +221,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)

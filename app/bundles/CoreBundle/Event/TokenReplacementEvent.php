@@ -39,12 +39,14 @@ class TokenReplacementEvent extends CommonEvent
      */
     protected $passthrough;
 
+    private bool $internalSend;
+
     /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough
      */
-    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)
+    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null, bool $internalSend = false)
     {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
@@ -54,6 +56,7 @@ class TokenReplacementEvent extends CommonEvent
         $this->lead         = $lead;
         $this->clickthrough = $clickthrough;
         $this->passthrough  = $passthrough;
+        $this->internalSend = $internalSend;
     }
 
     /**
@@ -112,10 +115,6 @@ class TokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param $token
-     * @param $value
-     */
     public function addToken($token, $value)
     {
         $this->tokens[$token] = $value;
@@ -135,5 +134,10 @@ class TokenReplacementEvent extends CommonEvent
     public function getPassthrough()
     {
         return $this->passthrough;
+    }
+
+    public function isInternalSend(): bool
+    {
+        return $this->internalSend;
     }
 }

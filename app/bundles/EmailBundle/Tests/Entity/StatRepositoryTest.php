@@ -31,12 +31,12 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('executeQuery')
             ->with(
                 $expectedQuery,
-                [':contacts' => [6, 8]],
-                [':contacts' => 101]
+                ['contacts' => [6, 8]],
+                ['contacts' => 101]
             )
-            ->willReturn($this->resultStatement);
+            ->willReturn($this->result);
 
-        $this->resultStatement->method('fetchAll')
+        $this->result->method('fetchAllAssociative')
             ->willReturn([
                 [
                     'lead_id'               => '6',

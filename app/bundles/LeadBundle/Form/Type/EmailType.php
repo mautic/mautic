@@ -47,12 +47,12 @@ class EmailType extends AbstractType
         $builder->add(
             'fromname',
             TextType::class,
-             [
-                'label'      => 'mautic.lead.email.from_name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-                'data'       => $default,
+            [
+               'label'      => 'mautic.lead.email.from_name',
+               'label_attr' => ['class' => 'control-label'],
+               'attr'       => ['class' => 'form-control'],
+               'required'   => false,
+               'data'       => $default,
             ]
         );
 

@@ -55,7 +55,7 @@ class DoctrineGeneratedColumnsListener
 
                 $table->addIndex($generatedColumn->getIndexColumns(), $generatedColumn->getIndexName());
             } catch (\Exception $e) {
-                //table doesn't exist or something bad happened so oh well
+                // table doesn't exist or something bad happened so oh well
                 $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
             }
         }

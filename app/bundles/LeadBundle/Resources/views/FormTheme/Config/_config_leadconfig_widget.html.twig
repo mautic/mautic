@@ -1,0 +1,53 @@
+{% block _config_leadconfig_widget %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.contact.merge.settings'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.contact_unique_identifiers_operator) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.contact.list.settings'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.contact_columns) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.importconfig'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.background_import_if_more_rows_than) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.exportconfig'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.contact_export_in_background) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

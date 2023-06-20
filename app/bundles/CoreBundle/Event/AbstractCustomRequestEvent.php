@@ -67,8 +67,6 @@ abstract class AbstractCustomRequestEvent extends Event
     }
 
     /**
-     * @param $route
-     *
      * @return bool
      */
     public function checkRouteContext($route)

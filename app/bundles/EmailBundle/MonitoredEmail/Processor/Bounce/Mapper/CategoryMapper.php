@@ -36,8 +36,6 @@ class CategoryMapper
     ];
 
     /**
-     * @param $category
-     *
      * @return CategoryObject
      *
      * @throws CategoryNotFound

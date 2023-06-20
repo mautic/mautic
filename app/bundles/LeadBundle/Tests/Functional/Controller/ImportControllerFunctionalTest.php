@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
@@ -64,7 +63,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         $importButton = $html->selectButton('Import');
@@ -105,7 +104,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         // Run command to import CSV.
@@ -133,7 +132,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(): Import
     {
-        $now    = new DateTime();
+        $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);

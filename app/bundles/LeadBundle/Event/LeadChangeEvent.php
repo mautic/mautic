@@ -21,10 +21,6 @@ class LeadChangeEvent extends Event
 
     private $newTrackingId;
 
-    /**
-     * @param $oldTrackingId
-     * @param $newTrackingId
-     */
     public function __construct(Lead $oldLead, $oldTrackingId, Lead $newLead, $newTrackingId)
     {
         $this->oldLead       = $oldLead;

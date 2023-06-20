@@ -105,12 +105,9 @@ class ExpressionBuilder
     /**
      * Creates a between comparison expression.
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function between($x, $arr)
     {
@@ -131,12 +128,9 @@ class ExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function notBetween($x, $arr)
     {
@@ -390,8 +384,6 @@ class ExpressionBuilder
     /**
      * Puts argument into EXISTS mysql function.
      *
-     * @param $input
-     *
      * @return string
      */
     public function exists($input)
@@ -401,8 +393,6 @@ class ExpressionBuilder
 
     /**
      * Puts argument into NOT EXISTS mysql function.
-     *
-     * @param $input
      *
      * @return string
      */

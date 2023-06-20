@@ -2,10 +2,23 @@
 
 namespace Mautic\PageBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Page>
@@ -17,9 +30,9 @@ class PageApiController extends CommonApiController
      */
     protected $model = null;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $pageModel = $this->getModel('page');
+        $pageModel = $modelFactory->getModel('page');
         \assert($pageModel instanceof PageModel);
 
         $this->model            = $pageModel;
@@ -29,7 +42,7 @@ class PageApiController extends CommonApiController
         $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails'];
         $this->dataInputMasks   = ['customHtml' => 'html'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -37,9 +50,9 @@ class PageApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request, UserHelper $userHelper)
     {
-        //get parent level only
+        // get parent level only
         $this->listFilters[] = [
             'column' => 'p.variantParent',
             'expr'   => 'isNull',
@@ -50,6 +63,6 @@ class PageApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request, $userHelper);
     }
 }

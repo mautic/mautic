@@ -3,7 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -14,11 +14,8 @@ use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="tweets")
- * @ORM\Entity(repositoryClass="MauticPlugin\MauticSocialBundle\Entity\TweetRepository")
- */
+#[ORM\Table(name: 'tweets')]
+#[ORM\Entity(repositoryClass: TweetRepository::class)]
 class Tweet extends FormEntity
 {
     /**
@@ -31,14 +28,14 @@ class Tweet extends FormEntity
     /**
      * ID of the Twitter media object attached to the tweet.
      *
-     * @var string
+     * @var string|null
      */
     private $mediaId;
 
     /**
      * Path to the local media file.
      *
-     * @var string
+     * @var string|null
      */
     private $mediaPath;
 
@@ -59,47 +56,47 @@ class Tweet extends FormEntity
     /**
      * Internal Mautic description.
      *
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $language = 'en';
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sentCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $favoriteCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retweetCount = 0;
 
     /**
-     * @var Page
+     * @var Page|null
      */
     private $page;
 
     /**
-     * @var Asset
+     * @var Asset|null
      */
     private $asset;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, TweetStat>
      */
     private $stats;
 
@@ -131,13 +128,13 @@ class Tweet extends FormEntity
 
         $builder->addIdColumns();
         $builder->addCategory();
-        $builder->addNullableField('mediaId', Type::STRING, 'media_id');
-        $builder->addNullableField('mediaPath', Type::STRING, 'media_path');
-        $builder->addField('text', Type::STRING, ['length' => 280]);
-        $builder->addNullableField('sentCount', Type::INTEGER, 'sent_count');
-        $builder->addNullableField('favoriteCount', Type::INTEGER, 'favorite_count');
-        $builder->addNullableField('retweetCount', Type::INTEGER, 'retweet_count');
-        $builder->addNullableField('language', Type::STRING, 'lang');
+        $builder->addNullableField('mediaId', Types::STRING, 'media_id');
+        $builder->addNullableField('mediaPath', Types::STRING, 'media_path');
+        $builder->addField('text', Types::STRING, ['length' => 280]);
+        $builder->addNullableField('sentCount', Types::INTEGER, 'sent_count');
+        $builder->addNullableField('favoriteCount', Types::INTEGER, 'favorite_count');
+        $builder->addNullableField('retweetCount', Types::INTEGER, 'retweet_count');
+        $builder->addNullableField('language', Types::STRING, 'lang');
 
         $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
@@ -157,8 +154,6 @@ class Tweet extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -247,7 +242,7 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param int $description
+     * @param string|null $description
      *
      * @return $this
      */

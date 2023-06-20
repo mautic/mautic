@@ -11,8 +11,7 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
      */
     protected function configure()
     {
-        $this->setName('social:monitor:twitter:mentions')
-            ->setDescription('Searches for mentioned tweets');
+        $this->setName('social:monitor:twitter:mentions');
 
         parent::configure();
     }
@@ -53,4 +52,5 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
     {
         return 'twitter';
     }
+    protected static $defaultDescription = 'Searches for mentioned tweets';
 }

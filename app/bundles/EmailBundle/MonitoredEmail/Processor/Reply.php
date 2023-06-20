@@ -111,8 +111,10 @@ class Reply implements ProcessorInterface
         $this->createReply($stat, $message->id);
         $this->dispatchEvent($stat);
 
-        $this->statRepo->clear();
-        $this->leadModel->clearEntities();
+        if (null !== $stat->getLead()) {
+            $this->leadModel->getRepository()->detachEntity($stat->getLead());
+        }
+        $this->statRepo->detachEntity($stat);
     }
 
     /**

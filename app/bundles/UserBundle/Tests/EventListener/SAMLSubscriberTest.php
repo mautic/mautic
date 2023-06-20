@@ -33,7 +33,7 @@ class SAMLSubscriberTest extends TestCase
     {
         $this->event = $this->createMock(RequestEvent::class);
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

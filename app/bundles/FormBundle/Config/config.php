@@ -183,7 +183,7 @@ return [
                 'class'     => FormModel::class,
                 'arguments' => [
                     'request_stack',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.helper.theme',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
@@ -200,7 +200,7 @@ return [
                 'class'     => SubmissionModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.form.model.form',
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
@@ -213,7 +213,7 @@ return [
                     'mautic.form.helper.form_uploader',
                     'mautic.lead.service.device_tracking_service',
                     'mautic.form.service.field.value.transformer',
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                     'mautic.tracker.contact',
                     'mautic.lead.merger',
                 ],
@@ -325,5 +325,6 @@ return [
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,
+        'successful_submit_action'  => 'top',
     ],
 ];

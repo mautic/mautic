@@ -25,7 +25,7 @@ class Category extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -35,7 +35,7 @@ class Category extends FormEntity
     private $alias;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $color;
 
@@ -89,8 +89,6 @@ class Category extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

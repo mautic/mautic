@@ -10,9 +10,6 @@ class StatDAO
     private $stats = [];
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function addStat($key, $value)
@@ -27,8 +24,6 @@ class StatDAO
     }
 
     /**
-     * @param $key
-     *
      * @return mixed
      */
     public function getStat($key)
