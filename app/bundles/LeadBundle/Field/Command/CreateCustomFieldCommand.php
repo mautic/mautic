@@ -50,6 +50,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
         $this->setName(self::COMMAND_NAME)
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
+            ->addOption('--all', '-a', InputOption::VALUE_NONE, 'Create all columns which have not been created yet. This option does not work with --id or --user options.')
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
@@ -63,11 +64,16 @@ EOT
     {
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
+        $all         = (bool) $input->getOption('all');
 
         $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
 
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
+        }
+
+        if ($all) {
+            return $this->addAllMissingColumns($output) ? \Symfony\Component\Console\Command\Command::SUCCESS : \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         if (!$leadFieldId) {
@@ -79,6 +85,18 @@ EOT
         }
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
+    }
+
+    private function addAllMissingColumns(OutputInterface $output): bool
+    {
+        $hasNoErrors = true;
+        while($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
+            if (!$this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $output)) {
+                $hasNoErrors = false;
+            }
+        }
+
+        return $hasNoErrors;
     }
 
     private function findAndAddColumn(OutputInterface $output): bool
