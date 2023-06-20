@@ -24,6 +24,8 @@ class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 
+    protected static $defaultDescription = 'Create custom field column in the background';
+
     private BackgroundService $backgroundService;
     private TranslatorInterface $translator;
     private LeadFieldRepository $leadFieldRepository;
@@ -122,5 +124,4 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-    protected static $defaultDescription = 'Create custom field column in the background';
 }
