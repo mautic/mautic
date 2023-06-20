@@ -205,16 +205,14 @@ class ExportHelperTest extends TestCase
     public function testExportDataIntoFileInvalidFileType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->translatorInterfaceMock->expects($this->once())
-            ->method('trans')
-            ->with('mautic.error.invalid.specific.export.type', [
+        $this->translatorInterfaceMock->expects($this->once())->method('trans')->with(
+            'mautic.error.invalid.specific.export.type', [
                 '%type%'          => ExportHelper::EXPORT_TYPE_EXCEL,
                 '%expected_type%' => ExportHelper::EXPORT_TYPE_CSV,
-            ])
-            ->willReturn(
-                'Invalid export type "'.ExportHelper::EXPORT_TYPE_EXCEL.
-                '". Must be of "'.ExportHelper::EXPORT_TYPE_CSV.'".'
-            );
+            ]
+        )->willReturn(
+            'Invalid export type "'.ExportHelper::EXPORT_TYPE_EXCEL.'". Must be of "'.ExportHelper::EXPORT_TYPE_CSV.'".'
+        );
         $iteratorExportDataModelMock = $this->iteratorDataMock($this->dummyData);
         $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock,
@@ -225,17 +223,12 @@ class ExportHelperTest extends TestCase
 
     public function testExportDataIntoFileCsvWithExistingFileNameWithZip(): void
     {
-        $this->coreParametersHelperMock
-            ->method('get')
-            ->with('contact_export_dir')
-            ->willReturn('/tmp');
+        $this->coreParametersHelperMock->method('get')->with('contact_export_dir')->willReturn('/tmp');
 
-        $this->filePathResolver
-            ->method('createDirectory')
-            ->with('/tmp');
+        $this->filePathResolver->method('createDirectory')->with('/tmp');
 
         $iteratorExportDataModelMock1 = $this->iteratorDataMock($this->dummyData);
-        $this->filePaths[]            = $filePath  = $this->exportHelper->exportDataIntoFile(
+        $this->filePaths[]            = $filePath = $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock1,
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv'
@@ -248,7 +241,7 @@ class ExportHelperTest extends TestCase
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
 
         $iteratorExportDataModelMock2 = $this->iteratorDataMock($this->dummyData);
-        $this->filePaths[]            = $filePath2  = $this->exportHelper->exportDataIntoFile(
+        $this->filePaths[]            = $filePath2 = $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock2,
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv' // give same file name
