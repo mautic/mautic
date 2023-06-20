@@ -425,9 +425,6 @@ return [
             'mautic.guzzle.client' => [
                 'class'     => \Http\Adapter\Guzzle7\Client::class,
             ],
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
