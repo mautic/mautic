@@ -515,13 +515,17 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param string $prop
+     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|Event|null $val
      */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ('category' == $prop) {
+            /**
+             * @var \Mautic\CategoryBundle\Entity\Category|null $current
+             * @var \Mautic\CategoryBundle\Entity\Category|null $val
+             */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

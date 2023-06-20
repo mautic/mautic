@@ -4,16 +4,11 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CategoryBundle\Entity\Category;
-use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\FrequencyRule;
-use Mautic\LeadBundle\Entity\Tag;
-use Mautic\StageBundle\Entity\Stage;
-use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Entity\User;
-use Mautic\WebhookBundle\Entity\Event;
 
+/**
+ * Class CommonEntity.
+ */
 class CommonEntity
 {
     /**
@@ -65,14 +60,18 @@ class CommonEntity
     }
 
     /**
-     * @param string                                                                                                                                                                                                                                             $prop
-     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|self|FormEntity|IpAddress|TranslationEntityInterface|VariantEntityInterface|Category|Channel|FrequencyRule|Tag|Stage|User|Event|Role|null $val
+     * @param string                                                                                                               $prop
+     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null $val
      */
     protected function isChanged($prop, $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ('category' == $prop) {
+            /**
+             * @var \Mautic\CategoryBundle\Entity\Category|null $current
+             * @var \Mautic\CategoryBundle\Entity\Category|null $val
+             */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
