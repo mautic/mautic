@@ -348,7 +348,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get plain password.
      *
-     * @return string
+     * @return ?string
      */
     public function getPlainPassword()
     {
@@ -358,7 +358,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get current password (that a user has typed into a form).
      *
-     * @return string
+     * @return ?string
      */
     public function getCurrentPassword()
     {
