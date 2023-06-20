@@ -153,6 +153,55 @@ class ExportHelperTest extends TestCase
         $this->exportHelper->exportDataAs([], ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
     }
 
+    public function testExportDataAsInvalidFileType(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->translatorInterfaceMock->expects($this->once())->method('trans')
+            ->with(
+                'mautic.error.invalid.specific.export.type', [
+                    '%type%'          => 'xls',
+                    '%expected_type%' => ExportHelper::EXPORT_TYPE_EXCEL,
+                ]
+            )->willReturn(
+                'Invalid export type "xls". Must be of "'.
+                ExportHelper::EXPORT_TYPE_EXCEL.'".'
+            );
+        $this->exportHelper->exportDataAs($this->dummyData, 'xls', 'demo.xls');
+    }
+
+    public function testExportDataAsExcel(): void
+    {
+        $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
+        Assert::assertSame(200, $stream->getStatusCode());
+        Assert::assertFalse($stream->isEmpty());
+
+        ob_start();
+        $stream->sendContent();
+        $content = ob_get_clean();
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('demo.xlsx', $content);
+        $spreadsheet       = IOFactory::load('demo.xlsx');
+        $this->filePaths[] = 'demo.xlsx';
+
+        $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
+        $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
+        $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
+    }
+
+    public function testExportDataIntoFileInvalidData(): void
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No or invalid data given');
+        $iteratorExportDataModelMock = $this->iteratorDataMock();
+        $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            ExportHelper::EXPORT_TYPE_CSV,
+            'demo.csv'
+        );
+    }
+
     public function testExportDataIntoFileInvalidFileType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -214,39 +263,6 @@ class ExportHelperTest extends TestCase
 
         $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath, 'contacts_export.csv');
         Assert::assertFileExists($zipFilePath);
-    }
-
-    public function testExportDataAsExcel(): void
-    {
-        $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
-        Assert::assertSame(200, $stream->getStatusCode());
-        Assert::assertFalse($stream->isEmpty());
-
-        ob_start();
-        $stream->sendContent();
-        $content = ob_get_clean();
-
-        // We need to write to a temp file as PhpSpreadsheet can only read from files
-        file_put_contents('demo.xlsx', $content);
-        $spreadsheet       = IOFactory::load('demo.xlsx');
-        $this->filePaths[] = 'demo.xlsx';
-
-        $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
-        $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
-        $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
-        $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
-    }
-
-    public function testExportDataIntoFileInvalidData(): void
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('No or invalid data given');
-        $iteratorExportDataModelMock = $this->iteratorDataMock();
-        $this->exportHelper->exportDataIntoFile(
-            $iteratorExportDataModelMock,
-            ExportHelper::EXPORT_TYPE_CSV,
-            'demo.csv'
-        );
     }
 
     /**
