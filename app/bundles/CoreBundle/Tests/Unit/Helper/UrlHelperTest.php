@@ -88,6 +88,13 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
                 'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
             )
         );
+
+        $this->assertEquals(
+            'http://username:password@hostname:9090/path?a',
+            UrlHelper::sanitizeAbsoluteUrl(
+                'http://username:password@hostname:9090/path?a='
+            )
+        );
     }
 
     public function testSanitizeAbsoluteUrlSanitizePathWhitespace()
