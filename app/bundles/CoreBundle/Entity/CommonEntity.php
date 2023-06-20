@@ -66,7 +66,7 @@ class CommonEntity
 
     /**
      * @param string                                                                                                                                                                                                                     $prop
-     * @param array<int|string, array|int|string>|\DateTime|\DateTimeInterface|bool|int|string|self|FormEntity|IpAddress|TranslationEntityInterface|VariantEntityInterface|Category|Channel|FrequencyRule|Tag|Stage|User|Event|Role|null $val
+     * @param array<int|string, int|string>|\DateTime|\DateTimeInterface|bool|int|string|self|FormEntity|IpAddress|TranslationEntityInterface|VariantEntityInterface|Category|Channel|FrequencyRule|Tag|Stage|User|Event|Role|null $val
      */
     protected function isChanged($prop, $val)
     {
