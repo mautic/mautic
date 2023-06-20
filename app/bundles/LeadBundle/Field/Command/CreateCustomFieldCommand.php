@@ -93,7 +93,7 @@ EOT
     private function addAllMissingColumns(OutputInterface $output): bool
     {
         $hasNoErrors = true;
-        while($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
+        while ($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
             if (!$this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $output)) {
                 $hasNoErrors = false;
             }
