@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Email;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -22,7 +24,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertQueuedEmailCount(0, message: 'Test emails should never be queued.');
         $this->assertEmailCount(1);
-        $email = $this->getMailerMessage();
+
+        $email = KernelTestCase::getMailerMessage();
+        \assert($email instanceof Email);
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);
