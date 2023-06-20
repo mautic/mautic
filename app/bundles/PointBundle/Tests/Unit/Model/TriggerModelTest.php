@@ -14,11 +14,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
-use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
-use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -115,35 +113,9 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->willReturn($triggerEvent);
 
-        $this->dispatcher->expects($this->exactly(2))
+        $this->dispatcher->expects($this->exactly(1))
             ->method('dispatch')
             ->withConsecutive(
-                [
-                    $this->callback(
-                        // Emulate a subscriber:
-                        function (TriggerBuilderEvent $event) {
-                            // PHPUNIT calls this callback twice for unknown reason. We need to set it only once.
-                            if (array_key_exists('email.send_to_user', $event->getEvents())) {
-                                return true;
-                            }
-
-                            $event->addEvent(
-                                'email.send_to_user',
-                                [
-                                    'group'           => 'mautic.email.point.trigger',
-                                    'label'           => 'mautic.email.point.trigger.send_email_to_user',
-                                    'formType'        => \Mautic\EmailBundle\Form\Type\EmailToUserType::class,
-                                    'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-                                    'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-                                    'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
-                                ]
-                            );
-
-                            return true;
-                        }
-                    ),
-                    PointEvents::TRIGGER_ON_BUILD,
-                ],
                 // Ensure the event is triggered if the point trigger event has 'eventName' defined instead of 'callback'.
                 [
                     $this->callback(
