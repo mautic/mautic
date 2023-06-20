@@ -9,6 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @template T of FormFieldNumberType
+ *
+ * @extends AbstractType<T>
+ */
 class FormFieldNumberType extends AbstractType
 {
     /**
