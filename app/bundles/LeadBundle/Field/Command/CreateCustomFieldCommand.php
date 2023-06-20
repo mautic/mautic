@@ -118,7 +118,6 @@ EOT
         }
 
         try {
-            echo "adding column";
             $this->backgroundService->addColumn($leadFieldId, $userId);
         } catch (LeadFieldWasNotFoundException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');

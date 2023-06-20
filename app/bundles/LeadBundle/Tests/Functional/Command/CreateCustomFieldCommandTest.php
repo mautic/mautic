@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
+use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -37,6 +38,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
 
         $application   = new Application($kernel);
+        $application->setAutoExit(false);
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);
         $commandTester->execute([
@@ -46,7 +48,14 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columns = $this->em->getConnection()->getSchemaManager()->listTableColumns($leadTableName);
-        self::assertArrayHasKey('custom_field_1', $columns);
+        $columnsSchema = $this->em->getConnection()->getSchemaManager()->listTableColumns($leadTableName);
+        $columnNames   = array_map(
+            static function (Column $column) {
+                return $column->getName();
+            },
+            $columnsSchema
+        );
+
+        self::assertContains('custom_field_1', $columnNames);
     }
 }
