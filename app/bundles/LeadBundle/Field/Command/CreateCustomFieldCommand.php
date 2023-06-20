@@ -78,10 +78,6 @@ EOT
             return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
-        $output->writeln('');
-        $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
-        $this->completeRun();
-
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
@@ -135,6 +131,10 @@ EOT
 
             return false;
         }
+
+        $output->writeln('');
+        $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
+        $this->completeRun();
 
         return true;
     }
