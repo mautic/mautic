@@ -1330,8 +1330,12 @@ blockquote > p:after {
 }
 .btn,
 .btn:active,
-.btn.active {
-  outline: 0;
+.btn.focus,
+.btn:focus,
+.btn.active,
+.btn:active:focus,
+.btn.active:focus {
+  outline: 0 !important;
 }
 .btn .fa {
   min-width: 13px;
@@ -4525,6 +4529,72 @@ a.inline-token:focus {
 a.inline-token .text-muted {
   color: #8393a2;
 }
+.map-options {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+.map-options h5 {
+  color: #47535f;
+  font-size: 13px;
+}
+.map-options__cointainer {
+  display: flex;
+  flex-direction: row;
+}
+.map-options__item.active,
+.map-options__item.active:hover {
+  color: #fff;
+  background-color: #35b5b9;
+}
+.map-options__item:focus,
+.map-options__item.focus,
+.map-options__item:active,
+.map-options__item.active.focus,
+.map-options__item:hover {
+  color: #fff;
+  background-color: #35b5b9;
+}
+.jvectormap-zoomin,
+.jvectormap-zoomout {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  left: 10px;
+  padding: 0;
+  background-color: #4e5e9e;
+  border-radius: 4px;
+  box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.04), 0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 6px 12px 0 rgba(0, 0, 0, 0.16);
+  font-size: 20px;
+}
+.jvectormap-zoomin:hover,
+.jvectormap-zoomout:hover {
+  background-color: #2c355a;
+}
+.jvectormap-zoomin {
+  top: 16px;
+}
+.jvectormap-zoomout {
+  top: 52px;
+}
+.jvectormap-tip {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.jvectormap-legend-cnt {
+  right: auto;
+  left: 0;
+}
+.jvectormap-legend-cnt-h .jvectormap-legend {
+  margin: 0 0 16px 10px;
+  padding: 8px;
+}
+.jvectormap-legend-cnt-h .jvectormap-legend-title {
+  font-weight: normal;
+}
+.jvectormap-legend .jvectormap-legend-inner {
+  display: none;
+}
 @media (min-width: 992px) {
   .modal-xl {
     width: 1140px;
@@ -4796,32 +4866,4 @@ ul.media-list.media-list-feed div.media-object {
   float: right;
   position: relative;
   right: 10px;
-}
-.map-options__container{
-  display: flex;
-  flex-direction: row;
-}
-.map-options__item label::before {
-  content:"";
-  width: 10px;
-  height: 10px;
-  background-color: white;
-  border: 1px solid grey;
-  display: inline-block;
-  margin-right:  5px;
-}
-.map-options__item input {
-  visibility: hidden;
-  width: 0;
-  height: 0;
-}
-.map-options__item label {
-  color: grey;
-}
-.map-options__item.active label {
-  color: #00b49c !important;
-}
-.map-options__item.active label::before {
-  background-color: #00b49c;
-  border: 1px solid #00b49c;
 }

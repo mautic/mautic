@@ -716,7 +716,27 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     const maps= document.querySelectorAll('[data-load="map"]');
     if(maps.length) {
-        maps.forEach(map => map.addEventListener('click', Mautic.loadMap, false));
+        maps.forEach(map => map.addEventListener('click', () => {
+            const scopeId = event.target.getAttribute('href');
+            const scope = mQuery(scopeId);
+
+            if (scope.length) {
+                // Check if map is not already rendered
+                if (scope.children('.map-rendered').length) {
+                    return;
+                }
+
+                // Loaded via AJAX not to block loading a whole page
+                const mapUrl = scope.attr('data-map-url');
+
+                scope.load(mapUrl, '', () => {
+                    const map = Mautic.initMap(scope, 'regions');
+                });
+            }
+
+
+            //Mautic.loadMap
+        }, false));
     }
 };
 

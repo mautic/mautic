@@ -1,36 +1,42 @@
 <hr>
-{% set initData = results.read.data|default([])  %}
+{% set initData = results.read.data|default([]) %}
+{% set legendText = "Total: %s (%s with country)" %}
 {{ results|json_encode }}
 <hr>
-<fieldset class="map-options">
-    <legend class="map-options__title">Choose stats:</legend>
-    <div class="map-options__container">
-        <div class="map-options__item active" data-map-data="{{ results.read|json_encode }}" data-map-option="read">
-            <label>
-                <input type="radio" id="reads" name="map-stats" checked>
-                {{ 'mautic.email.stat.read'|trans }}
-            </label>
-        </div>
-        <div class="map-options__item" data-map-data="{{ results.clicked|json_encode }}" data-map-option="clicked">
-            <label>
-                <input type="radio" id="clicks" name="map-stats">
-                {{ 'mautic.email.clicked'|trans }}
-            </label>
-        </div>
+<div class="map-options">
+    <h5 class="map-options__title text-white dark-md fw-sb mb-xs">Choose stats:</h5>
+    <div class="map-options__container btn-group btn-block" data-toggle="buttons">
+        <label class="map-options__item active btn btn-default"
+               data-map-option="read"
+               data-map-series="{{ results.read.data|json_encode }}"
+               data-legend-text="{{ legendText|format(results.read.total|default(0), results.read.totalWithCountry|default(0)) }}"
+        >
+            <input type="radio"
+                   name="map-stats"
+                   id="read"
+                   autocomplete="off"
+                   checked
+            >
+            {{ 'mautic.email.stat.read'|trans }}
+        </label>
+        <label class="map-options__item btn btn-default"
+               data-map-option="clicked"
+               data-map-series="{{ results.clicked.data|json_encode }}"
+               data-legend-text="{{ legendText|format(results.clicked.total|default(0), results.clicked.totalWithCountry|default(0)) }}"
+        >
+            <input type="radio"
+                   name="map-stats"
+                   id="clicked"
+                   autocomplete="off"
+            >
+            {{ 'mautic.email.clicked'|trans }}
+        </label>
     </div>
-</fieldset>
-
-<div>
-    {{- include('@MauticCore/Helper/map.html.twig', {
-        'data' : initData,
-        'chartHeight' : 300
-    })
-    -}}
 </div>
+{{- include('@MauticCore/Helper/map.html.twig', {
+        'data' : initData,
+        'height' : 400
+})
+-}}
 
-{% if initData %}
-    <div class="map-legend">
-        <span>Total: {{ results.read.total|default('') }}</span>
-        <span>({{ results.read.totalWithCountry }} with country)</span>
-    </div>
-{% endif %}
+

@@ -8,8 +8,12 @@
 .btn {
   &,
   &:active,
-  &.active {
-    outline: 0;
+  &.focus,
+  &:focus,
+  &.active,
+  &:active:focus,
+  &.active:focus {
+    outline: 0 !important;
   }
 
   // reset font awesome width
