@@ -23,7 +23,7 @@ class MomentumCallbackTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo('5'), 'unsubscribed', DoNotContact::UNSUBSCRIBED],
                 [$this->equalTo('6'), 'unsubscribed', DoNotContact::UNSUBSCRIBED]
                 // cc recipient type is ignored so addFailureByHashId should not be called
-        );
+            );
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')

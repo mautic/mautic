@@ -39,8 +39,6 @@ class OutlookIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)

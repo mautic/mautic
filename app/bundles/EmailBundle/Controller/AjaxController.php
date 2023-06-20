@@ -83,8 +83,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Called by parent::getBuilderTokensAction().
      *
-     * @param $query
-     *
      * @return array
      */
     protected function getBuilderTokens($query)
@@ -121,7 +119,7 @@ class AjaxController extends CommonAjaxController
      */
     public function getAttachmentsSizeAction(Request $request)
     {
-        $assets = $request->query->get('assets', []);
+        $assets = $request->query->get('assets') ?? [];
         $size   = 0;
         if ($assets) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
@@ -301,7 +299,7 @@ class AjaxController extends CommonAjaxController
                 $queued  = $model->getQueuedCounts($email);
 
                 $data[] = [
-                    'id'          => $id,
+                    'id'          => $email->getId(),
                     'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]

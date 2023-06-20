@@ -16,6 +16,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Message>
+ *
  * @implements AjaxLookupModelInterface<Message>
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
@@ -72,11 +73,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:Message');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
     /**
@@ -148,7 +149,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -164,8 +164,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                 $entities = $this->getRepository()->getMessageList(
                     $filter,
                     $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother')
+                    $start
                 );
 
                 foreach ($entities as $entity) {
@@ -182,8 +181,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -192,8 +189,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -202,7 +197,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      * @param null $channel
@@ -226,7 +220,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      *

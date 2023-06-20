@@ -66,7 +66,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
                     $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents\Search/global.html.twig',
+                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -75,7 +75,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($stageCount > 5) {
                     $stagesResults[] = $this->twig->render(
-                        '@MauticStage/SubscribedEvents\Search/global.html.twig',
+                        '@MauticStage/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

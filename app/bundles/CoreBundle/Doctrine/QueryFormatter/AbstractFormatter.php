@@ -36,7 +36,6 @@ abstract class AbstractFormatter
     /**
      * Format field to datetime.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -46,7 +45,6 @@ abstract class AbstractFormatter
     /**
      * Format field to date.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -56,7 +54,6 @@ abstract class AbstractFormatter
     /**
      * Format field to time.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -65,8 +62,6 @@ abstract class AbstractFormatter
 
     /**
      * Format field to a numeric.
-     *
-     * @param $field
      *
      * @return mixed
      */

@@ -11,8 +11,6 @@ trait VariantMigrationTrait
 {
     /**
      * Add variant parent/child relationship schema.
-     *
-     * @param $tableName
      */
     protected function addVariantSchema(Schema $schema, $tableName)
     {

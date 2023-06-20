@@ -283,7 +283,7 @@ return [
                 ],
                 'alias' => 'version',
             ],
-            'mautic.helper.tiwg.security' => [
+            'mautic.helper.twig.security' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
@@ -542,15 +542,6 @@ return [
                 ],
             ],
             // Helpers
-            'mautic.helper.assetgeneration' => [
-                'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.bundle',
-                    'mautic.helper.paths',
-                    'mautic.helper.app_version',
-                ],
-            ],
             'mautic.helper.cookie' => [
                 'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
@@ -945,8 +936,8 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
-        'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'             => 31536000, //365 days in seconds
+        'rememberme_key'                  => '%mautic.secret_key%',
+        'rememberme_lifetime'             => 31536000, // 365 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,
@@ -1466,6 +1457,7 @@ return [
             ],
         ],
         'composer_updates'   => false,
+        'load_froala_assets' => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only' => false,
     ],
 ];

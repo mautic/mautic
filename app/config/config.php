@@ -65,7 +65,7 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'session'         => [ //handler_id set to null will use default session handler from php.ini
+    'session'         => [ // handler_id set to null will use default session handler from php.ini
         'handler_id'           => null,
         'name'                 => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure'        => $secureCookie,
@@ -105,8 +105,8 @@ $container->loadFromExtension('framework', [
 
 $container->setParameter('mautic.famework.csrf_protection', true);
 
-//Doctrine Configuration
-$dbalSettings = [
+// Doctrine Configuration
+$connectionSettings = [
     'driver'                => '%mautic.db_driver%',
     'host'                  => '%mautic.db_host%',
     'port'                  => '%mautic.db_port%',
@@ -119,11 +119,6 @@ $dbalSettings = [
         'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
-    'types'    => [
-        'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
-        'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
-        'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
-    ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [
         'enum'  => 'string',
@@ -133,6 +128,7 @@ $dbalSettings = [
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
     'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
+    'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
@@ -151,7 +147,23 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
 }
 
 $container->loadFromExtension('doctrine', [
-    'dbal' => $dbalSettings,
+    'dbal' => [
+        'default_connection' => 'default',
+        'connections'        => [
+            'default'    => $connectionSettings,
+            'unbuffered' => array_merge($connectionSettings, [
+                'options' => [
+                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
+                    \PDO::ATTR_STRINGIFY_FETCHES       => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+                ],
+            ]),
+        ],
+        'types'    => [
+            'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
+            'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
+            'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
+        ],
+    ],
     'orm'  => [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
@@ -164,7 +176,7 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
-//MigrationsBundle Configuration
+// MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
     'migrations_paths' => [
         'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
@@ -192,7 +204,7 @@ $container->loadFromExtension('swiftmailer', [
     ],
 ]);
 
-//KnpMenu Configuration
+// KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
     'default_renderer' => 'mautic',
 ]);
@@ -220,7 +232,7 @@ $container->loadFromExtension('oneup_uploader', [
     ],
 ]);
 
-//FOS Rest for API
+// FOS Rest for API
 $container->loadFromExtension('fos_rest', [
     'routing_loader' => false,
     'body_listener'  => true,
@@ -234,7 +246,7 @@ $container->loadFromExtension('fos_rest', [
     'disable_csrf_role' => 'ROLE_API',
 ]);
 
-//JMS Serializer for API and Webhooks
+// JMS Serializer for API and Webhooks
 $container->loadFromExtension('jms_serializer', [
     'handlers' => [
         'datetime' => [
@@ -266,7 +278,7 @@ $container->loadFromExtension('framework', [
     ],
 ]);
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'exception_controller' => null,
 ]);
@@ -298,7 +310,7 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('includeStacktraces', [true])
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
-//Register command line logging
+// Register command line logging
 $container->setParameter(
     'console_error_listener.class',
     ConsoleErrorListener::class
@@ -339,10 +351,11 @@ $container->loadFromExtension('fm_elfinder', [
     'instances'   => [
         'default' => [
             'locale'          => '%mautic.locale%',
+            'cors_support'    => true,
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
-            //'include_assets'  => true,
+            // 'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
@@ -357,8 +370,7 @@ $container->loadFromExtension('fm_elfinder', [
                 'plugins' => [
                     'Sanitizer' => [
                         'enable'   => true,
-                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
-                        'replace'  => '-', // replace to this
+                        'callBack' => '\Mautic\CoreBundle\Helper\InputHelper::transliterateFilename',
                     ],
                 ],
                 'roots' => [

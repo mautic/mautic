@@ -16,22 +16,22 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
         parent::setUp();
 
         $this->integration = new OutlookIntegration(
-                $this->dispatcher,
-                $this->cache,
-                $this->em,
-                $this->session,
-                $this->request,
-                $this->router,
-                $this->translator,
-                $this->logger,
-                $this->encryptionHelper,
-                $this->leadModel,
-                $this->companyModel,
-                $this->pathsHelper,
-                $this->notificationModel,
-                $this->fieldModel,
-                $this->integrationEntityModel,
-                $this->doNotContact,
+            $this->dispatcher,
+            $this->cache,
+            $this->em,
+            $this->session,
+            $this->request,
+            $this->router,
+            $this->translator,
+            $this->logger,
+            $this->encryptionHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->pathsHelper,
+            $this->notificationModel,
+            $this->fieldModel,
+            $this->integrationEntityModel,
+            $this->doNotContact,
         );
     }
 

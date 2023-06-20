@@ -30,7 +30,7 @@ trait VariantAjaxControllerTrait
         $id   = (int) $request->request->get('id');
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             $model  = $this->getModel($modelName);
             if (!$model instanceof EmailModel && !$model instanceof PageModel) {
                 throw new \InvalidArgumentException('Model should be either email or page model.');

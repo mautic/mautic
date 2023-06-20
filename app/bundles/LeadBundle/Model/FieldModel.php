@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -24,7 +23,6 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use RuntimeException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -485,10 +483,7 @@ class FieldModel extends FormModel
         $this->leadFieldSaver             = $leadFieldSaver;
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }
@@ -506,8 +501,6 @@ class FieldModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return LeadField|null
      */
     public function getEntity($id = null)
@@ -521,8 +514,6 @@ class FieldModel extends FormModel
 
     /**
      * Returns lead custom fields.
-     *
-     * @param $args
      *
      * @return array
      */
@@ -572,7 +563,7 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -586,7 +577,7 @@ class FieldModel extends FormModel
         $this->setTimestamps($entity, $entity->isNew(), $unlock);
 
         if ('time' === $entity->getType()) {
-            //time does not work well with list filters
+            // time does not work well with list filters
             $entity->setIsListable(false);
         }
 
@@ -599,7 +590,7 @@ class FieldModel extends FormModel
             $this->customFieldColumn->createLeadColumn($entity);
         } catch (CustomFieldLimitException $e) {
             // Convert to original Exception not to cause BC
-            throw new DBALException($this->translator->trans($e->getMessage()));
+            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.
@@ -615,7 +606,7 @@ class FieldModel extends FormModel
      * @return array|void
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -708,8 +699,6 @@ class FieldModel extends FormModel
 
     /**
      * Reorder fields based on passed entity position.
-     *
-     * @param $entity
      */
     public function reorderFieldsByEntity($entity)
     {
@@ -780,7 +769,6 @@ class FieldModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
      * @param null  $action
      * @param array $options
      *
@@ -802,8 +790,6 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param $properties
-     *
      * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)
@@ -814,7 +800,7 @@ class FieldModel extends FormModel
             $properties = [];
         }
 
-        //validate properties
+        // validate properties
         $type   = $entity->getType();
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
@@ -828,11 +814,6 @@ class FieldModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -858,7 +839,7 @@ class FieldModel extends FormModel
         }
 
         if (null !== $event && !$event instanceof LeadFieldEvent) {
-            throw new RuntimeException('Event should be LeadFieldEvent|null.');
+            throw new \RuntimeException('Event should be LeadFieldEvent|null.');
         }
 
         try {
@@ -952,7 +933,6 @@ class FieldModel extends FormModel
     /**
      * Get the fields for a specific group.
      *
-     * @param       $group
      * @param array $filters
      *
      * @return array
@@ -1024,8 +1004,6 @@ class FieldModel extends FormModel
      *
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
-     * @param      $alias
-     * @param      $type
      * @param bool $isUnique
      *
      * @return array

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -16,7 +16,7 @@ class ObjectMapping
     private $id;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateCreated;
 
@@ -31,7 +31,7 @@ class ObjectMapping
     private $internalObjectName;
 
     /**
-     * @var int
+     * @var string
      */
     private $internalObjectId;
 
@@ -79,49 +79,49 @@ class ObjectMapping
         $builder->addId();
 
         $builder
-            ->createField('dateCreated', Type::DATETIME)
+            ->createField('dateCreated', Types::DATETIME_MUTABLE)
             ->columnName('date_created')
             ->build();
 
         $builder
-            ->createField('integration', Type::STRING)
+            ->createField('integration', Types::STRING)
             ->build();
 
         $builder
-            ->createField('internalObjectName', Type::STRING)
+            ->createField('internalObjectName', Types::STRING)
             ->columnName('internal_object_name')
             ->build();
 
         $builder->addBigIntIdField('internalObjectId', 'internal_object_id', false);
 
         $builder
-            ->createField('integrationObjectName', Type::STRING)
+            ->createField('integrationObjectName', Types::STRING)
             ->columnName('integration_object_name')
             ->build();
 
         // Must be a string as not all IDs are integer based
         $builder
-            ->createField('integrationObjectId', Type::STRING)
+            ->createField('integrationObjectId', Types::STRING)
             ->columnName('integration_object_id')
             ->build();
 
         $builder
-            ->createField('lastSyncDate', Type::DATETIME)
+            ->createField('lastSyncDate', Types::DATETIME_MUTABLE)
             ->columnName('last_sync_date')
             ->build();
 
         $builder
-            ->createField('internalStorage', Type::JSON_ARRAY)
+            ->createField('internalStorage', Types::JSON)
             ->columnName('internal_storage')
             ->build();
 
         $builder
-            ->createField('isDeleted', Type::BOOLEAN)
+            ->createField('isDeleted', Types::BOOLEAN)
             ->columnName('is_deleted')
             ->build();
 
         $builder
-            ->createField('integrationReferenceId', Type::STRING)
+            ->createField('integrationReferenceId', Types::STRING)
             ->columnName('integration_reference_id')
             ->nullable()
             ->build();
@@ -163,7 +163,7 @@ class ObjectMapping
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateCreated()
     {
@@ -215,7 +215,7 @@ class ObjectMapping
      */
     public function getInternalObjectId()
     {
-        return $this->internalObjectId;
+        return (int) $this->internalObjectId;
     }
 
     /**
@@ -225,7 +225,7 @@ class ObjectMapping
      */
     public function setInternalObjectId($internalObjectId)
     {
-        $this->internalObjectId = $internalObjectId;
+        $this->internalObjectId = (string) $internalObjectId;
 
         return $this;
     }
@@ -317,9 +317,6 @@ class ObjectMapping
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function appendToInternalStorage($key, $value)

@@ -22,12 +22,6 @@ class CampaignDecisionEvent extends Event
     protected $logs;
 
     /**
-     * @param $lead
-     * @param $decisionType
-     * @param $decisionEventDetails
-     * @param $events
-     * @param $eventSettings
-     * @param $isRootLevel
      * @param LeadEventLog[] $logs
      */
     public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false, $logs = [])

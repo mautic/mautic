@@ -24,7 +24,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $declaration
      * @param string $location
      * @param string $context
      */
@@ -38,7 +37,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $script
      * @param string $location
      * @param bool   $async
      * @param null   $name
@@ -54,7 +52,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $script
      * @param string $location
      * @param string $context
      */
@@ -68,7 +65,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $stylesheet
      * @param string $context
      */
     public function addStylesheet($stylesheet, $context = AssetsHelper::CONTEXT_APP)
@@ -81,7 +77,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $styles
      * @param string $context
      */
     public function addStyleDeclaration($styles, $context = AssetsHelper::CONTEXT_APP)

@@ -177,7 +177,6 @@ class FormBuilderEvent extends Event
     /**
      * Add a field validator.
      *
-     * @param       $key
      * @param array $validator
      *                         $validator = [
      *                         'eventName' => (required) Event name to dispatch to validate the form; it will recieve a ValidationEvent object
@@ -191,7 +190,7 @@ class FormBuilderEvent extends Event
             throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(['eventName'], $validator);
 
         $this->validators[$key] = $validator;

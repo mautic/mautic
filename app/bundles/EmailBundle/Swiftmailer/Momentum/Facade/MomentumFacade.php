@@ -105,8 +105,6 @@ final class MomentumFacade implements MomentumFacadeInterface
     }
 
     /**
-     * @param $body
-     *
      * @return string
      */
     private function getErrors($body)

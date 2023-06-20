@@ -34,7 +34,7 @@ class PluginRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
-            ->from('MauticPluginBundle:Plugin', $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
+            ->from(\Mautic\PluginBundle\Entity\Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 
         $args['qb']               = $q;
         $args['ignore_paginator'] = true;

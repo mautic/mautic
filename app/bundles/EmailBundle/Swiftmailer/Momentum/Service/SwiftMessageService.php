@@ -70,7 +70,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
                             $swiftAttachment->setDisposition('inline');
                         }
                         $attachmentContent = $swiftAttachment->getEncoder()->encodeString($swiftAttachment->getBody());
-                        $attachment        = new TransmissionDTO\ContentDTO\AttachementDTO(
+                        $attachment        = new TransmissionDTO\ContentDTO\AttachmentDTO(
                             $swiftAttachment->getContentType(),
                             $swiftAttachment->getFilename(),
                             $attachmentContent

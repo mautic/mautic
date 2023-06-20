@@ -93,8 +93,6 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $content
-     *
      * @return bool
      */
     private function validateXml($content)

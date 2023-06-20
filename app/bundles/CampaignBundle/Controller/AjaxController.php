@@ -2,13 +2,22 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class AjaxController.
@@ -17,10 +26,11 @@ class AjaxController extends CommonAjaxController
 {
     private DateHelper $dateHelper;
 
-    public function __construct(CorePermissions $security, DateHelper $dateHelper)
+    public function __construct(DateHelper $dateHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->security   = $security;
         $this->dateHelper = $dateHelper;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -30,7 +40,7 @@ class AjaxController extends CommonAjaxController
     {
         $session        = $request->getSession();
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
-        $canvasSettings = $request->request->get('canvasSettings', [], true);
+        $canvasSettings = $request->request->get('canvasSettings') ?? [];
         if (empty($campaignId)) {
             $dataArray = ['success' => 0];
         } else {
@@ -107,9 +117,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param $eventId
-     * @param $contactId
-     *
      * @return LeadEventLog|null
      */
     protected function getContactEventLog($eventId, $contactId)

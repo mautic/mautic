@@ -42,7 +42,7 @@ class PreferenceCenterListType extends AbstractType
             [
                 'choices' => function (Options $options) use ($model, $canViewOther) {
                     $choices = [];
-                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
+                    $pages   = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
                     foreach ($pages as $page) {
                         if ($page['isPreferenceCenter']) {
                             $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
