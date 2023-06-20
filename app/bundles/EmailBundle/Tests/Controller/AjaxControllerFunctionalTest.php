@@ -20,26 +20,21 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $this->assertQueuedEmailCount(1);
+        $this->assertQueuedEmailCount(0, message: 'Test emails should never be queued.');
+        $this->assertEmailCount(1);
         $email = $this->getMailerMessage();
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);
-
-        $user         = $userHelper->getUser();
-        $expectedBody = 'Hi! This is a test email from Mautic. Testing...testing...1...2...3!';
+        $user       = $userHelper->getUser();
 
         Assert::assertSame('Mautic test email', $email->getSubject());
-        Assert::assertStringContainsString($expectedBody, $email->getHtmlBody());
-        Assert::assertSame($expectedBody, $email->getTextBody());
+        Assert::assertSame('Hi! This is a test email from Mautic. Testing...testing...1...2...3!', $email->getTextBody());
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
         Assert::assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email->getTo());
         Assert::assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
         Assert::assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame($parameters->get('mailer_from_email'), $email->getReplyTo()[0]->getAddress());
     }
 }
