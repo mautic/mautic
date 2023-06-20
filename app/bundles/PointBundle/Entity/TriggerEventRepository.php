@@ -54,7 +54,7 @@ class TriggerEventRepository extends CommonRepository
             ->leftJoin('r.league', 'pl')
             ->orderBy('a.order');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
 
         $leaguesExpr = $q->expr()->orX();

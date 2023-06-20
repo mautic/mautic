@@ -38,7 +38,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        //-- test report table in mautic panel
+        // -- test report table in mautic panel
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
@@ -54,7 +54,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             ['5', 'test type', 'Adjust points', 'test2@example.com', '1', 'League B'],
         ], array_slice($crawlerReportTable, 1, 5));
 
-        //-- test API report data
+        // -- test API report data
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
         $result         = json_decode($clientResponse->getContent(), true);
@@ -112,7 +112,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        //-- test report table in mautic panel
+        // -- test report table in mautic panel
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
@@ -128,7 +128,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             ['5', 'League B', '1', 'test2@example.com'],
         ], array_slice($crawlerReportTable, 1, 5));
 
-        //-- test API report data
+        // -- test API report data
         $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
         $clientResponse = $this->client->getResponse();
         $result         = json_decode($clientResponse->getContent(), true);

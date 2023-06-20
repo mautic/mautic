@@ -56,7 +56,7 @@ class LeagueContactScoreRepository extends CommonRepository
         $q->select('lcs.contact_id')
             ->from(MAUTIC_TABLE_PREFIX.LeagueContactScore::TABLE_NAME, 'lcs');
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq('lcs.contact_id', ':lead'),
             $q->expr()->eq('lcs.league_id', ':leagueId'),
             $q->expr()->$operatorExpr('lcs.score', ':score'),
