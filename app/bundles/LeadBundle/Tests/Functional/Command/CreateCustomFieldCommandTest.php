@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
-    public function testWithNoArgs()
+    public function testWithNoArgs(): void
     {
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
@@ -33,7 +33,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $customFieldNotification
             ->expects(self::once())
             ->method('customFieldWasCreated')
-            ->with(self::isInstanceOf(LeadField::class, self::equalTo($expectedUserId)));
+            ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
 
         $application   = new Application($kernel);
