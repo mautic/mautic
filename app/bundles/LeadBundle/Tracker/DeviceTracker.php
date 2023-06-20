@@ -57,8 +57,6 @@ class DeviceTracker
     }
 
     /**
-     * @param $userAgent
-     *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
@@ -102,7 +100,7 @@ class DeviceTracker
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
         if (null !== $trackedDevice) {
-            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
+            $this->logger->debug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 
         return $trackedDevice;

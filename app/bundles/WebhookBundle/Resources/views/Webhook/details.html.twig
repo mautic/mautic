@@ -1,11 +1,11 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ item.getName() }}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}
 
 {% block actions %}
     {{- include(
-        'MauticCoreBundle:Helper:page_actions.html.twig', {
+        '@MauticCore/Helper/page_actions.html.twig', {
             item: item,
             templateButtons: {
                 'edit': securityHasEntityAccess(
@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-xs-2 text-right">
                         {{- include(
-                            'MauticCoreBundle:Helper:page_actions.html.twig', {
+                            '@MauticCore/Helper/page_actions.html.twig', {
                                 entity: item
                             }
                         ) }}
@@ -86,7 +86,7 @@
                                     <tr>
                                         <td>{{ log.getId() }}</td>
                                         <td>{{- include(
-                                            'MauticWebhookBundle:Helper:labelcode.html.twig', {
+                                            '@MauticWebhook/Helper/labelcode.html.twig', {
                                                 code: log.getStatusCode()
                                             }
                                         ) }}</td>
@@ -134,7 +134,7 @@
 
             <!-- recent activity -->
             {{- include(
-                'MauticCoreBundle:Helper:recentactivity.html.twig', {
+                '@MauticCore/Helper/recentactivity.html.twig', {
                     logs: logs
                 }
             ) }}

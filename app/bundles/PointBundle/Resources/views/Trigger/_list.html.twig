@@ -3,7 +3,7 @@
         <table class="table table-hover table-striped table-bordered pointtrigger-list" id="triggerTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#triggerTable',
                         'langVar': 'point.trigger',
@@ -15,7 +15,7 @@
 
                 <th class='col-pointtrigger-color'></th>
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 't.name',
                         'text': 'mautic.core.name',
@@ -23,14 +23,14 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 'cat.title',
                         'text': 'mautic.core.category',
                         'class': 'col-pointtrigger-category visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 'pl.name',
                         'text': 'mmautic.point.thead.league',
@@ -44,7 +44,7 @@
                         'class': 'col-pointtrigger-points',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 't.id',
                         'text': 'mautic.core.id',
@@ -56,7 +56,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': permissions['point:triggers:edit'],
@@ -72,7 +72,7 @@
                     </td>
                     <td>
                         <div>
-                            {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'point.trigger'}) }}
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'point.trigger'}) }}
                             {% if permissions['point:triggers:edit'] %}
                                 <a href="{{ path('mautic_pointtrigger_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
                                     {{ item.name }}
@@ -109,7 +109,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems': items|length,
                 'page': page,
                 'limit': limit,
@@ -119,5 +119,5 @@
         }) }}
     </div>
 {% else %}
-    {{ include('MauticCoreBundle:Helper:noresults.html.twig', {'tip': 'mautic.point.trigger.noresults.tip'}) }}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.trigger.noresults.tip'}) }}
 {% endif %}

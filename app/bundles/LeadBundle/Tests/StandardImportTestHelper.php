@@ -140,8 +140,8 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:LeadEventLog', $logRepository],
-                        ['MauticLeadBundle:Import', $importRepository],
+                        [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                        [\Mautic\LeadBundle\Entity\Import::class, $importRepository],
                     ]
                 )
             );

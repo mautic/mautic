@@ -1,4 +1,4 @@
-{% extends not app.request.isXmlHttpRequest ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends not app.request.isXmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block content %}
   {% set leadId = lead is defined ? lead.id : null %}
@@ -75,7 +75,7 @@
                       <span class="fa fa-fw fa-level-down"></span>
                   </a>
               </th>
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'eventLabel',
                   'text': 'mautic.lead.timeline.event_name',
                   'class': 'timeline-name',
@@ -84,7 +84,7 @@
                   'target': '#timeline-table',
               }) }}
 
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'eventType',
                   'text': 'mautic.lead.timeline.event_type',
                   'class': 'visible-md visible-lg timeline-type',
@@ -93,7 +93,7 @@
                   'target': '#timeline-table',
               }) }}
 
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'timestamp',
                   'text': 'mautic.lead.timeline.event_timestamp',
                   'class': 'visible-md visible-lg timeline-timestamp',

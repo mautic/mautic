@@ -3,7 +3,7 @@
     - form
 #}
 {% form_theme form with [
-      'MauticCampaignBundle:FormTheme:Event/_campaignevent_properties_row.html.twig',
+      '@MauticCampaign/FormTheme/Event/_campaignevent_properties_row.html.twig',
 ] %}
 {% if formTheme is defined %}
   {% form_theme form formTheme %}

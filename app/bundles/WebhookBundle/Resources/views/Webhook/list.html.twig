@@ -2,14 +2,14 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block headerTitle %}{% trans %}mautic.webhook.webhooks{% endtrans %}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}
 
 {% block actions %}
     {{- include(
-        'MauticCoreBundle:Helper:page_actions.html.twig', {
+        '@MauticCore/Helper/page_actions.html.twig', {
             templateButtons: {
                 'new': permissions['webhook:webhooks:create']
             },
@@ -21,7 +21,7 @@
 {% if isIndex %}
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     {{- include(
-        'MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        '@MauticCore/Helper/list_toolbar.html.twig', {
             searchValue: searchValue,
             searchHelp: 'mautic.page.help.searchcommands',
             action: currentRoute
@@ -42,7 +42,7 @@
             <thead>
             <tr>
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig', {
+                    '@MauticCore/Helper/tableheader.html.twig', {
                         checkall: 'true',
                         target: '#webhookTable',
                         routeBase: 'webhook',
@@ -51,7 +51,7 @@
                         }
                 }) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig', {
+                    '@MauticCore/Helper/tableheader.html.twig', {
                         sessionVar: 'mautic_webhook',
                         orderBy: 'e.name',
                         text: 'mautic.core.name',
@@ -59,14 +59,14 @@
                         default: true
                 }) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig', {
+                    '@MauticCore/Helper/tableheader.html.twig', {
                         sessionVar: 'mautic_webhook',
                         orderBy: 'e.webhookUrl',
                         text: 'mautic.webhook.webhook_url',
                         class: 'col-webhook-id visible-md visible-lg'
                 }) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig', {
+                    '@MauticCore/Helper/tableheader.html.twig', {
                         sessionVar: 'mautic_webhook',
                         orderBy: 'e.id',
                         text: 'mautic.core.id',
@@ -79,7 +79,7 @@
                 <tr>
                     <td>
                         {{- include(
-                            'MauticCoreBundle:Helper:list_actions.html.twig', {
+                            '@MauticCore/Helper/list_actions.html.twig', {
                                 item: item,
                                 templateButtons: {
                                     edit: securityHasEntityAccess(
@@ -100,7 +100,7 @@
                     <td>
                         <div>
                             {{- include(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                                '@MauticCore/Helper/publishstatus_icon.html.twig', {
                                     item: item,
                                     model: 'webhook'
                                 }
@@ -128,7 +128,7 @@
 
     <div class="panel-footer">
         {{- include(
-            'MauticCoreBundle:Helper:pagination.html.twig', {
+            '@MauticCore/Helper/pagination.html.twig', {
                 totalItems: items|length,
                 page: page,
                 limit: limit,
@@ -139,6 +139,6 @@
         ) }}
     </div>
 {% else %}
-    {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
 {% endif %}
 {% endblock %}

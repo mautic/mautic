@@ -16,9 +16,11 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReplyTest extends \PHPUnit\Framework\TestCase
@@ -37,6 +39,11 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      */
     private $processor;
 
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,11 +51,12 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->statRepo           = $this->createMock(StatRepository::class);
         $this->contactFinder      = $this->createMock(ContactFinder::class);
         $this->leadModel          = $this->createMock(LeadModel::class);
-        $this->leadModel          = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->logger             = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $this->emailAddressHelper = new EmailAddressHelper();
+        $this->leadRepository     = $this->createMock(LeadRepository::class);
+        $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
         $this->processor          = new Reply(
             $this->statRepo,
             $this->contactFinder,
@@ -74,6 +82,9 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         // This tells us that a reply was found and processed
         $this->statRepo->expects($this->once())
             ->method('saveEntity');
+
+        $this->leadRepository->expects(self::atLeastOnce())
+            ->method('detachEntity');
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(

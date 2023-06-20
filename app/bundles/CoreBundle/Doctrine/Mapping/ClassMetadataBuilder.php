@@ -367,9 +367,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a field with a custom column name.
      *
-     * @param      $name
-     * @param      $type
-     * @param      $columnName
      * @param bool $nullable
      *
      * @return $this

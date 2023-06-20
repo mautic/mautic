@@ -28,6 +28,6 @@ class CompanyHelper
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where('c.id = '.$id)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

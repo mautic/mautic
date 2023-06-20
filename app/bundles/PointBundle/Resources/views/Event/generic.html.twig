@@ -7,7 +7,7 @@
 #}
 {% set deleted = deleted|default(false) %}
 <div class="trigger-event-row {% if deleted %}bg-danger{% endif %}" id="triggerEvent_{{ id }}">
-    {{ include('MauticPointBundle:Event:actions.html.twig', {
+    {{ include('@MauticPoint/Event/actions.html.twig', {
         'deleted': deleted,
         'id': id,
         'route': 'mautic_pointtriggerevent_action',

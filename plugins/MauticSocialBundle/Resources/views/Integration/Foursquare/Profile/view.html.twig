@@ -15,13 +15,13 @@
 
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="FoursquareProfile">
-        {{ include('MauticSocialBundle:Integration:Foursquare/Profile/profile.html.twig', {
+        {{ include('@MauticSocial/Integration/Foursquare/Profile/profile.html.twig', {
             'lead': lead,
             'profile': details.profile,
         }) }}
     </div>
     <div class="tab-pane" id="FoursquareTips">
-        {{ include('MauticSocialBundle:Integration:Foursquare/Profile/tips.html.twig', {
+        {{ include('@MauticSocial/Integration/Foursquare/Profile/tips.html.twig', {
             'lead': lead,
             'activity': details.activity.tips|default([]),
         }) }}

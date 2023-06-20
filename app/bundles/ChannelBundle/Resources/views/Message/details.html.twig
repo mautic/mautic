@@ -1,11 +1,11 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauicContent %}message
 {% endblock %}
 {% block headerTitle %}
 	{{ item.getName() }}
 {% endblock %}
 {% block actions %}
-	{{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+	{{- include('@MauticCore/Helper/page_actions.html.twig', {
         'item': item,
         'templateButtons': {
             'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy()),
@@ -16,7 +16,7 @@
     }) -}}
 {% endblock %}
 {% block publishStatus %}
-    {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity' : item}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
 {% endblock %}
 {% block content %}
 <!-- start: box layout -->
@@ -40,7 +40,7 @@
                         <div class="panel shd-none mb-0">
                             <table class="table table-bordered table-striped mb-0">
                                 <tbody>
-                                {{- include('MauticCoreBundle:Helper:details.html.twig', {'entity' : item}) -}}
+                                {{- include('@MauticCore/Helper/details.html.twig', {'entity' : item}) -}}
                                 </tbody>
                             </table>
                         </div>
@@ -70,11 +70,11 @@
                                         </h5>
                                     </div>
                                     <div class="col-md-9 va-m">
-                                        {{- include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                     </div>
                                 </div>
                                 <div class="pt-0 pl-15 pb-10 pr-15">
-                                    {{- include('MauticCoreBundle:Helper:chart.html.twig', {'chartData' : eventCounts, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                                    {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : eventCounts, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                                 </div>
                             </div>
                         </div>
@@ -116,7 +116,7 @@
         <!-- right section -->
         <div class="col-md-3 bg-white bdr-l height-auto">
             <!-- recent activity -->
-            {{- include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs' : logs}) -}}
+            {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
             {% block rightFormContent %}
             {% endblock %}
         </div>

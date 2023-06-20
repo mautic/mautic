@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}
     {% if entity.id %}
@@ -45,7 +45,7 @@
 </div>
 
 {{ form_end(form) }}
-{{- include('MauticCampaignBundle:Campaign:_builder.html.twig', {
+{{- include('@MauticCampaign/Campaign/_builder.html.twig', {
     'campaignId': form.sessionId.vars['data'],
     'campaignEvents': campaignEvents,
     'campaignSources': campaignSources,

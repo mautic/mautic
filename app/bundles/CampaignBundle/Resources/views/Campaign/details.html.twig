@@ -1,9 +1,9 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
-  {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
     'templateButtons': {
         'edit': securityHasEntityAccess(
@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-  {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': campaign}) }}
+  {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
 {% endblock %}
 
 {% block content %}
@@ -53,7 +53,7 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': campaign}) }}
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
                             {% for sourceType, typeNames in sources %}
                               {% if typeNames is not empty %}
                                 <tr>
@@ -99,14 +99,14 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    {{- include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
                                       'dateRangeForm': dateRangeForm,
                                       'class':  'pull-right',
                                     }) -}}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{- include('MauticCoreBundle:Helper:chart.html.twig', {
+                                  {{- include('@MauticCore/Helper/chart.html.twig', {
                                     'chartData': stats,
                                     'chartType': 'line',
                                     'chartHeight': 300
@@ -162,7 +162,7 @@
         <div class="tab-content pa-md">
             <!-- #events-container -->
                 <div class="active tab-pane fade in bdr-w-0" id="preview-container">
-                  {{- include('MauticCampaignBundle:Campaign:_preview.html.twig', {
+                  {{- include('@MauticCampaign/Campaign/_preview.html.twig', {
                         'campaignId': campaign.id,
                         'campaign': campaign,
                         'campaignEvents': campaignEvents,
@@ -173,23 +173,23 @@
                 </div>
               {% if events.decision is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="decisions-container">
-                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['decision']}) -}}
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['decision']}) -}}
                 </div>
               {% endif %}
               {% if events.action is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="actions-container">
-                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['action']}) -}}
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['action']}) -}}
                 </div>
               {% endif %}
               {% if events.condition is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="conditions-container">
-                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['condition']}) -}}
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['condition']}) -}}
                 </div>
               {% endif %}
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list"
                  id="leads-container"
-                 data-target-url="{{ url('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
+                 data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
@@ -205,7 +205,7 @@
     <div class="col-md-3 bg-white bdr-l height-auto">
         {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
 
-        {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }}
+        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
 
         {{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
     </div>

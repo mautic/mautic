@@ -9,7 +9,7 @@
     <link rel="icon" type="image/x-icon" href="{{ getAssetUrl('media/images/favicon.ico') }}" />
     <link rel="apple-touch-icon" href="{{ getAssetUrl('media/images/apple-touch-icon.png') }}" />
     {{ outputSystemStylesheets() }}
-    {{- include('MauticCoreBundle:Default:script.html.twig') -}}
+    {{- include('@MauticCore/Default/script.html.twig') -}}
     {{ outputHeadDeclarations() }}
 </head>
 <body>
@@ -32,7 +32,7 @@
                             </svg>
                         </div>
                         <div id="main-panel-flash-msgs">
-                            {{- include('MauticCoreBundle:Notification:flashes.html.twig') -}}
+                            {{- include('@MauticCore/Notification/flashes.html.twig') -}}
                         </div>
                         {% block content %}{% endblock %}
                     </div>

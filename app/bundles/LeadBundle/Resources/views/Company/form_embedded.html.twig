@@ -17,7 +17,7 @@
         </ul>
     </div>
     <div class="tab-content pa-md">
-        {{ include('MauticLeadBundle:Company:form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true}) }}
+        {{ include('@MauticLead/Company/form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true}) }}
     </div>
     </div>
 {{ form_end(form) }}

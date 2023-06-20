@@ -10,7 +10,7 @@
 {% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
 <tr>
     <td>
-        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                 'item': item,
                 'templateButtons': {
                     'edit': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
@@ -33,7 +33,7 @@
     </td>
     <td>
         <div>
-            {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'lead.list'}) }}
+            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.list'}) }}
             {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
                 <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                   {{ item.name }} ({{ item.alias }})

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    {{ include('MauticCoreBundle:Default:head.html.twig', {
+    {{ include('@MauticCore/Default/head.html.twig', {
             headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
             pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
         })
@@ -9,15 +9,20 @@
         {{ outputScripts('bodyOpen') }}
 
         <section id="app-content" class="container content-only">
-            {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
+            {{ include('@MauticCore/Notification/flashes.html.twig', {
                 alertType: 'standard'
             }) }}
 
             {% block _content %}
-                {{ include('MauticCoreBundle:Default:output.html.twig') }}
+                {{ include('@MauticCore/Default/output.html.twig', {
+                    headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
+                    publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+                    actions: block('actions') is defined ? block('actions') : actions|default(''),
+                    toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
+                }) }}
             {% endblock %}
         </section>
-        {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+        {{ include('@MauticCore/Helper/modal.html.twig', {
             id: 'MauticSharedModal',
             footerButtons: true
         }) }}

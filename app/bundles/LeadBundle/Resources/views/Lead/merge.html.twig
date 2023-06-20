@@ -8,7 +8,7 @@
 #}
 {% if 'index' == tmpl %}
 <div class="lead-merge-form">
-    {{ include('MauticCoreBundle:Helper:search.html.twig', {
+    {{ include('@MauticCore/Helper/search.html.twig', {
         'searchId': searchId|default(null),
         'searchValue': searchValue,
         'action': currentRoute,

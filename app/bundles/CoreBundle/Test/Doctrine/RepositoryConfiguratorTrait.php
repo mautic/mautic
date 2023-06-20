@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,9 +39,9 @@ trait RepositoryConfiguratorTrait
     private $connection;
 
     /**
-     * @var MockObject&ResultStatement<mixed>
+     * @var MockObject&Result
      */
-    private $resultStatement;
+    private $result;
 
     /**
      * @return object the repository for the entity
@@ -52,7 +52,7 @@ trait RepositoryConfiguratorTrait
         $this->entityManager   = $this->createMock(EntityManagerInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->connection      = $this->createMock(Connection::class);
-        $this->resultStatement = $this->createMock(ResultStatement::class);
+        $this->result          = $this->createMock(Result::class);
 
         $this->configureMocks($entityClass);
 
@@ -67,7 +67,7 @@ trait RepositoryConfiguratorTrait
         $this->entityManager->method('getClassMetadata')->with($entityClass)->willReturn($this->classMetadata);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('getExpressionBuilder')->willReturnCallback(fn () => new ExpressionBuilder($this->connection));
-        $this->connection->method('executeQuery')->willReturn($this->resultStatement);
+        $this->connection->method('executeQuery')->willReturn($this->result);
         $this->connection->method('quote')->willReturnCallback(fn ($value) => "'$value'");
     }
 }

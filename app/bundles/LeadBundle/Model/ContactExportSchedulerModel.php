@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
@@ -126,7 +124,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $contactExportScheduler = new ContactExportScheduler();
         $contactExportScheduler
             ->setUser($this->userHelper->getUser())
-            ->setScheduledDateTime(new DateTimeImmutable('now', new DateTimeZone('UTC')))
+            ->setScheduledDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
             ->setData($data);
 
         $this->em->persist($contactExportScheduler);
@@ -148,7 +146,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
             $resultsCallback,
             true
         );
-        /** @var DateTimeImmutable $scheduledDateTime */
+        /** @var \DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
         $fileName          = 'contacts_export_'.$scheduledDateTime->format(self::EXPORT_FILE_NAME_DATE_FORMAT);
 

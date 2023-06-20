@@ -71,6 +71,7 @@ class DecisionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        \assert($config instanceof DecisionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
         $failedLogs        = [];
 
@@ -106,13 +107,11 @@ class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @param mixed $passthrough
-     *
      * @throws DecisionNotApplicableException
      */
-    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
+    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log)
     {
-        $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log, $passthrough);
+        $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log);
 
         if (!$decisionEvent->wasDecisionApplicable()) {
             throw new DecisionNotApplicableException('evaluation failed');

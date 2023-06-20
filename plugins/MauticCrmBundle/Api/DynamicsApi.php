@@ -19,7 +19,6 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $operation
      * @param string $method
      * @param string $moduleobject
      *
@@ -89,19 +88,13 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $data
      * @param Lead $lead
-     * @param $object
      */
     public function createLead($data, $lead, $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
 
-    /**
-     * @param $data
-     * @param $objectId
-     */
     public function updateLead($data, $objectId): ResponseInterface
     {
         //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
@@ -204,7 +197,6 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param array $data
-     * @param $object
      *
      * @return array
      */

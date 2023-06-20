@@ -44,7 +44,7 @@
                         </h5>
                     </div>
                     <div class="col-xs-8 va-m">
-                        {{- include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {
+                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
                             'dateRangeForm' : dateRangeForm,
                             'class'         : 'pull-right'
                         })
@@ -53,7 +53,7 @@
                 </div>
                 <div class="row">
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
-                        {{- include('MauticCoreBundle:Helper:chart.html.twig', {
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : stats,
                             'chartType' : type,
                             'chartHeight' : 300
@@ -61,7 +61,7 @@
                         -}}
                     </div>
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
-                        {{- include('MauticCoreBundle:Helper:chart.html.twig', {
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : statsDevices,
                             'chartType' : 'horizontal-bar',
                             'chartHeight' : 300

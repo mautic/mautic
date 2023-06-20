@@ -99,6 +99,7 @@ class EventType extends AbstractType
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
+                    'html5'  => false,
                     'format' => 'yyyy-MM-dd HH:mm',
                 ]
             );
@@ -282,8 +283,6 @@ class EventType extends AbstractType
     }
 
     /**
-     * @param $name
-     *
      * @return \DateTime|mixed|null
      */
     private function getTimeValue(array $data, $name)

@@ -2,38 +2,37 @@
 
 namespace Mautic\InstallBundle\Tests\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $translatorMock;
     private $sessionMock;
-    private $modelFactoryMock;
     private $containerMock;
     private $routerMock;
     private $flashBagMock;
     private $controller;
-    private $corePermissionsMock;
     private $pathsHelper;
-    private $formFactoryMock;
-    private $formMock;
-    private $templatingMock;
 
     private $configurator;
     private $installer;
@@ -42,47 +41,48 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translatorMock       = $this->createMock(TranslatorInterface::class);
         $this->sessionMock          = $this->createMock(Session::class);
-        $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
         $this->containerMock        = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
         $this->flashBagMock         = $this->createMock(FlashBagInterface::class);
-        $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->formFactoryMock      = $this->createMock(FormFactory::class);
-        $this->formMock             = $this->createMock(Form::class);
-        $this->templatingMock       = $this->createMock(DelegatingEngine::class);
 
-        $this->configurator         = $this->createMock(Configurator::class);
-        $this->installer            = $this->createMock(InstallService::class);
+        $this->configurator   = $this->createMock(Configurator::class);
+        $this->installer      = $this->createMock(InstallService::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $modelFactory         = $this->createMock(ModelFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+        $security             = $this->createMock(CorePermissions::class);
 
-        $this->controller           = new InstallController();
+        $this->controller = new InstallController(
+            $this->configurator,
+            $this->installer,
+            $doctrine,
+            $factory,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $this->translatorMock,
+            $flashBag,
+            $requestStack,
+            $security
+        );
         $this->controller->setContainer($this->containerMock);
-        $this->controller->setTranslator($this->translatorMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
-        $this->controller->setRequest(new Request());
 
         $this->containerMock->method('get')
-            ->withConsecutive(
-                ['mautic.configurator'],
-                ['mautic.install.service'],
-                ['router'],
-                ['session'],
-                ['mautic.helper.paths']
-            )->willReturnOnConsecutiveCalls(
-                $this->configurator,
-                $this->installer,
-                $this->routerMock,
-                $this->sessionMock,
-                $this->pathsHelper
-            );
-
-        $event = $this->createMock(ControllerEvent::class);
-        $this->controller->initialize($event);
+            ->with('router')
+            ->willReturn($this->routerMock);
     }
 
-    public function testStepActionWhenInstalled()
+    public function testStepActionWhenInstalled(): void
     {
         $this->installer->expects($this->once())
             ->method('checkIfInstalled')
@@ -95,7 +95,12 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
             ->with('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('http://localhost/');
 
-        $response = $this->controller->stepAction(InstallService::CHECK_STEP);
+        $response = $this->controller->stepAction(
+            new Request(),
+            $this->createMock(EntityManagerInterface::class),
+            $this->pathsHelper,
+            InstallService::CHECK_STEP
+        );
         $this->assertEquals(302, $response->getStatusCode());
     }
 }

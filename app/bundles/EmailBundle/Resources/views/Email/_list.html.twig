@@ -3,7 +3,7 @@
         <table class="table table-hover table-striped table-bordered email-list">
             <thead>
             <tr>
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'checkall'        : 'true',
                     'routeBase'       : 'email',
                     'templateButtons' : {
@@ -11,14 +11,14 @@
                     },
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'e.name',
                     'text'       : 'mautic.core.name',
                     'class'      : 'col-email-name',
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'c.title',
                     'text'       : 'mautic.core.category',
@@ -27,14 +27,14 @@
 
                 <th class="visible-sm visible-md visible-lg col-email-stats">{{ 'mautic.core.stats'|trans }}</th>
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'e.dateAdded',
                     'text'       : 'mautic.lead.import.label.dateAdded',
                     'class'      : 'visible-lg col-email-dateAdded',
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'e.dateModified',
                     'defaultDir' : 'DESC',
@@ -43,14 +43,14 @@
                     'default'    : true,
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'e.createdByUser',
                     'text'       : 'mautic.core.createdby',
                     'class'      : 'visible-lg col-email-createdByUser',
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'email',
                     'orderBy'    : 'e.id',
                     'text'       : 'mautic.core.id',
@@ -71,18 +71,31 @@
                             permissions['email:emails:editother'],
                             item.getCreatedBy()
                         ) %}
-                        {% set customButtons = ('list' == type) ? [
-                            {
-                                'attr' : {
-                                'data-toggle' : 'ajax',
+
+                        {% set sendButton = {
+                            'attr': {
+                                'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                                'iconClass' : 'fa fa-send-o',
-                                'btnText'   : 'mautic.email.send',
-                            }
-                        ] : {} %}
+                            'iconClass': 'fa fa-send-o',
+                            'btnText': 'mautic.email.send'
+                        } %}
 
-                        {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {% if item.isBackgroundSending() %}
+                            {% set sendButton = sendButton|merge({
+                                'attr': {
+                                    'href': 'javascript:void(0);',
+                                    'disabled': true
+                                },
+                                'tooltip': 'mautic.email.send.disabled',
+                                'btnClass': 'disabled'
+                            }) %}
+                        {% endif %}
+
+                        {% set customButtons = ('list' == type) ? [sendButton] : [] %}
+
+
+                        {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
                             'templateButtons' : {
                                 'edit'   : edit,
@@ -100,7 +113,7 @@
                     </td>
                     <td>
                         <div>
-                            {{- include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                                 'item'  : item,
                                 'model' : 'email'
                             }) -}}
@@ -184,7 +197,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
             'totalItems'    : totalItems,
             'page'          : page,
             'limit'         : limit,
@@ -193,5 +206,5 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('MauticCoreBundle:Helper:noresults.html.twig') -}}
+    {{- include('@MauticCore/Helper/noresults.html.twig') -}}
 {% endif %}

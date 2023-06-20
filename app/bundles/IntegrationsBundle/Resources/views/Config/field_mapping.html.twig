@@ -14,7 +14,7 @@
         <hr />
     {% endif %}
 {% endfor %}
-{{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+{{- include('@MauticCore/Helper/pagination.html.twig', {
     'totalItems'  : form['filter-totalFieldCount'].vars.data,
     'page'        : page,
     'limit'       : 15,

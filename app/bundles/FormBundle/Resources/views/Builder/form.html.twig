@@ -25,6 +25,7 @@
 {% set isAjax = isAjax|default(true) %}
 {% set submissions = submissions|default(null) %}
 {% set lead = lead|default(null) %}
+{% set successfulSubmitAction = successfulSubmitAction|default('') %}
 
 {{ style|raw }}
 <style type="text/css" scoped>
@@ -32,8 +33,10 @@
 </style>
 <div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes }}>
-        <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
-        <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
+        {%- if successfulSubmitAction == 'top' -%}
+            <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
+            <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
+        {%- endif -%}
         <div class="mauticform-innerform">
             {# @var \Mautic\FormBundle\Entity\Field $f #}
             {%- for fieldId, f in fields -%}
@@ -60,11 +63,12 @@
                       {%- else -%}
                           {%- do displayManager.increaseDisplayedFields(f) -%}
                       {%- endif -%}
-                      {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif %}
-
+                
+                {%- if theme is empty -%}                    
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template, {
+                  {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -73,6 +77,17 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
+                  {%- else -%}                    
+                  {{- include(template, {
+                          'field': f.convertToArray,
+                          'id': f.alias,
+                          'formName': formName,
+                          'fieldPage': (pageCount - 1),
+                          'mappedFields': mappedFields,
+                          'inBuilder': inBuilder,
+                          'fields': fields,
+                  }) -}}
+                {%- endif -%}                    
                   <!-- end: "{{ theme }}{{ template }}" -->
               {%- endif -%}
 
@@ -93,11 +108,13 @@
                       %}
                           {%- do f.setType('hidden') -%}
                       {% endif %}
-                      {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
+
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template, {
+                  {%- if theme is empty -%}                    
+                  {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -106,6 +123,17 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
+                  {%- else -%}                    
+                  {{- include(template, {
+                          'field': f.convertToArray,
+                          'id': f.alias,
+                          'formName': formName,
+                          'fieldPage': (pageCount - 1),
+                          'mappedFields': mappedFields,
+                          'inBuilder': inBuilder,
+                          'fields': fields,
+                  }) -}}
+                {%- endif -%}                    
                   <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}
@@ -117,6 +145,11 @@
               {%- endif -%}
             {%- endfor -%}
         </div>
+
+        {%- if successfulSubmitAction == 'bottom' -%}
+            <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
+            <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
+        {%- endif -%}
 
         <input type="hidden" name="mauticform[formId]" id="mauticform{{ formName }}_id" value="{{ form.id|e }}"/>
         <input type="hidden" name="mauticform[return]" id="mauticform{{ formName }}_return" value=""/>

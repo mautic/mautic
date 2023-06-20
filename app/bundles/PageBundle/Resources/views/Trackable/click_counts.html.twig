@@ -61,6 +61,6 @@
         </table>
     </div>
 {% else %}
-    {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'header' : 'mautic.trackable.click_counts.header_none', 'message' : 'mautic.trackable.click_counts.none'}) -}}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'header' : 'mautic.trackable.click_counts.header_none', 'message' : 'mautic.trackable.click_counts.none'}) -}}
     <div class="clearfix"></div>
 {% endif %}

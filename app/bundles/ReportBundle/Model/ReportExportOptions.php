@@ -17,12 +17,12 @@ class ReportExportOptions
     private $page;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateFrom;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTo;
 
@@ -67,7 +67,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateFrom()
     {
@@ -83,7 +83,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateTo()
     {

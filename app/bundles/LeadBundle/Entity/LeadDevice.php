@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -27,47 +27,47 @@ class LeadDevice
     private $clientInfo = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $device;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsShortName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsVersion;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsPlatform;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceBrand;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceModel;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -138,8 +138,6 @@ class LeadDevice
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -162,11 +160,11 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,28 +28,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
-
-        $configPath = $this->getConfigPath();
-        if (file_exists($configPath)) {
-            // backup original local.php
-            copy($configPath, $configPath.'.backup');
-        } else {
-            // write a temporary local.php
-            file_put_contents($configPath, '<?php $parameters = [];');
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        if (file_exists($this->getConfigPath().'.backup')) {
-            // restore original local.php
-            rename($this->getConfigPath().'.backup', $this->getConfigPath());
-        } else {
-            // local.php didn't exist to start with so delete
-            unlink($this->getConfigPath());
-        }
-
-        parent::tearDown();
     }
 
     public function testValuesAreEscapedProperly(): void
@@ -121,9 +98,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigParameters(): array
     {
+        $parameters = [];
         include $this->getConfigPath();
 
-        /* @var array $parameters */
         return $parameters;
     }
 
@@ -137,7 +114,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page1',
             'alias'        => 'page1',
             'template'     => 'blank',
@@ -153,7 +130,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert unpublished record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 0,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page2',
             'alias'        => 'page2',
             'template'     => 'blank',
@@ -169,7 +146,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page3',
             'alias'        => 'page3',
             'template'     => 'blank',

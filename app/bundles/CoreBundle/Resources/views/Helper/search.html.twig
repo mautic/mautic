@@ -23,7 +23,7 @@
 </div>
 
 {% if searchHelp %}
-{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+{{- include('@MauticCore/Helper/modal.html.twig', {
     id: (searchId ~ '-search-help'),
     header: 'mautic.core.search.header'|trans,
     body: ('mautic.core.search.help'|trans ~ searchHelp|trans)

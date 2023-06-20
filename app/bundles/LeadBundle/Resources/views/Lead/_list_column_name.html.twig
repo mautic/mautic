@@ -2,7 +2,7 @@
     <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
         {% if item.id in noContactList|keys %}
             <div class="pull-right">
-                {{ include('MauticLeadBundle:Lead:dnc_small.html.twig', {
+                {{ include('@MauticLead/Lead/dnc_small.html.twig', {
                     'dncList': noContactList[item.id],
                 }) }}
             </div>

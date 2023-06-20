@@ -25,8 +25,10 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $handler = 'Handler';
+        $report  = new Report();
 
-        $report    = new Report();
+        $report->setName('Report A');
+
         $scheduler = new Scheduler($report, new \DateTime());
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
@@ -73,6 +75,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
 
+        $report->setName('Report A');
+
         $exportHandler->expects($this->once())
             ->method('removeFile');
 
@@ -93,6 +97,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
+
+        $report->setName('Report A');
 
         $exportHandler->expects($this->once())
             ->method('getPath');

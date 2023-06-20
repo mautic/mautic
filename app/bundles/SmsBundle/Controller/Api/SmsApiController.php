@@ -2,13 +2,26 @@
 
 namespace Mautic\SmsBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
+use Mautic\SmsBundle\Sms\TransportChain;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Sms>
@@ -22,9 +35,9 @@ class SmsApiController extends CommonApiController
      */
     protected $model = null;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $smsModel = $this->getModel('sms');
+        $smsModel = $modelFactory->getModel('sms');
         \assert($smsModel instanceof SmsModel);
 
         $this->model           = $smsModel;
@@ -32,18 +45,15 @@ class SmsApiController extends CommonApiController
         $this->entityNameOne   = 'sms';
         $this->entityNameMulti = 'smses';
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
-     * @param $id
-     * @param $contactId
-     *
      * @return JsonResponse|Response
      */
-    public function sendAction($id, $contactId)
+    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId)
     {
-        if (!$this->get('mautic.sms.transport_chain')->getEnabledTransports()) {
+        if (!$transportChain->getEnabledTransports()) {
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
         }
 
@@ -59,13 +69,12 @@ class SmsApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->get('monolog.logger.mautic')
-             ->addDebug("Sending SMS #{$id} to contact #{$contactId}", ['originator' => 'api']);
+        $mauticLogger->debug("Sending SMS #{$id} to contact #{$contactId}", ['originator' => 'api']);
 
         try {
             $response = $this->model->sendSms($message, $contact, ['channel' => 'api'])[$contact->getId()];
         } catch (\Exception $e) {
-            $this->get('monolog.logger.mautic')->addError($e->getMessage(), ['error' => (array) $e]);
+            $mauticLogger->error($e->getMessage(), ['error' => (array) $e]);
 
             return new Response('Interval server error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -73,13 +82,13 @@ class SmsApiController extends CommonApiController
         $success = !empty($response['sent']);
 
         if (!$success) {
-            $this->get('monolog.logger.mautic')->addError('Failed to send SMS.', ['error' => $response['status']]);
+            $mauticLogger->error('Failed to send SMS.', ['error' => $response['status']]);
         }
 
         $view = $this->view(
             [
                 'success' => $success,
-                'status'  => $this->get('translator')->trans($response['status']),
+                'status'  => $this->translator->trans($response['status']),
                 'result'  => $response,
                 'errors'  => $success ? [] : [['message' => $response['status']]],
             ],

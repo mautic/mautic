@@ -3,7 +3,7 @@
 {% set eventType = log.type %}
 {% set eventSettings = extra.campaignEventSettings %}
 {% set messageSettings = eventSettings.action[eventType].timelineTemplateVars.messageSettings %}
-{% set template = 'MauticCampaignBundle:SubscribedEvents/Timeline:index.html.twig' %}
+{% set template = '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig' %}
 {% set channelEvent = event %}
 {% set channelEvent = channelEvent|merge({extra: {log: log}}) %}
 {% set vars = {'event' : channelEvent} %}

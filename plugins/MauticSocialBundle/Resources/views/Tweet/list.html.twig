@@ -1,13 +1,13 @@
 {%- set isIndex = 'index' == tmpl -%}
 {%- set tmpl = 'list' -%}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'tweet' %}
 
 {% block headerTitle 'mautic.social.tweets'|trans %}
 
 {% block actions %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
       'templateButtons': {
         'new': securityIsGranted('mauticSocial:tweet:create'),
       },
@@ -19,15 +19,15 @@
 {% block content %}
   {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
-      {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+      {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
           'searchValue': searchValue,
           'action': currentRoute,
           }) }}
       <div class="page-list">
-        {{- include('MauticSocialBundle:Tweet:_list.html.twig') -}}
+        {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
       </div>
     </div>
   {% else %}
-    {{- include('MauticSocialBundle:Tweet:_list.html.twig') -}}
+    {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
   {% endif %}
 {% endblock %}

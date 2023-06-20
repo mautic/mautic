@@ -101,7 +101,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($campaignEvent);
         $this->em->persist($campaign);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaignEvent);
+        $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
         $event   = new CampaignExecutionEvent(
@@ -139,11 +140,9 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
-
-        parent::tearDown();
 
         if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");

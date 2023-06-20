@@ -6,7 +6,7 @@
 #}
 
 {% if not app.getRequest().isXmlHttpRequest() and (false == slot('contentOnly', false)) %}
-    {% extends 'MauticInstallBundle:Install:base.html.twig' %}
+    {% extends '@MauticInstall/Install/base.html.twig' %}
 {% endif %}
 
 {% block content %}

@@ -8,5 +8,5 @@
 </div>
 {% endif %}
 {% for n in notifications %}
-    {{ include('MauticCoreBundle:Notification:notification.html.twig', {n: n}) }}
+    {{ include('@MauticCore/Notification/notification.html.twig', {n: n}) }}
 {% endfor %}

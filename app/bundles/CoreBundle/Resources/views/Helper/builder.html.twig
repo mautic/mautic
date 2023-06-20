@@ -18,7 +18,7 @@
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
-            {{ include('MauticCoreBundle:Helper:builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');'}, with_context=false) }}
+            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');'}, with_context=false) }}
 
             <div class="code-mode-toolbar {% if not isCodeMode %}hide{% endif %}">
                 <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">

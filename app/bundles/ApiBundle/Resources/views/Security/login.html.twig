@@ -1,4 +1,4 @@
-{% extends 'MauticUserBundle:Security:base.html.twig' %}
+{% extends '@MauticUser/Security/base.html.twig' %}
 {% block headerTitle %}{{ 'mautic.api.oauth.header'|trans }}{% endblock %}
 {% block content %}
 <form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path(route) }}" method="post">
@@ -12,6 +12,6 @@
         <label for="password" class="sr-only">{{ 'mautic.core.password'|trans }}:</label>
         <input type="password" id="password" name="_password" class="form-control input-lg" required placeholder="{{ 'mautic.core.password'|trans }}" />
     </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">{{ 'mautic.user.auth.form.loginbtn'|trans }}></button>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">{{ 'mautic.user.auth.form.loginbtn'|trans }}</button>
 </form>
 {% endblock %}

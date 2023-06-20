@@ -1,11 +1,11 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ 'mautic.dashboard.header.index'|trans }}{% endblock %}
 
 {% block mauticContent %}dashboard{% endblock %}
 
 {% block actions %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
       'routeBase': 'dashboard',
       'langVar': 'dashboard',
       'customButtons': [
@@ -24,7 +24,7 @@
               'attr': {
                   'class': 'btn btn-default btn-nospin',
                   'href': 'javascript:void()',
-                  'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'~"');",
+                  'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
                   'data-toggle': '',
               },
               'iconClass': 'fa fa-save',
@@ -65,7 +65,7 @@
 
   <div class="row pt-md pl-md">
       <div class="col-sm-6">
-          {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
+          {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
       </div>
   </div>
 

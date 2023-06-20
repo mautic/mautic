@@ -16,7 +16,7 @@ class ConfigBuilderEvent extends Event
      * @var string[]
      */
     private array $formThemes = [
-        'MauticConfigBundle:FormTheme:_config_file_row.html.twig',
+        '@MauticConfig/FormTheme/_config_file_row.html.twig',
     ];
 
     private BundleHelper $bundleHelper;
@@ -93,8 +93,6 @@ class ConfigBuilderEvent extends Event
     /**
      * Get default parameters from config defined in bundles.
      *
-     * @param $bundle
-     *
      * @return array
      */
     public function getParametersFromConfig($bundle)
@@ -113,8 +111,6 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * @param $fields
-     *
      * @return $this
      */
     public function addFileFields($fields)

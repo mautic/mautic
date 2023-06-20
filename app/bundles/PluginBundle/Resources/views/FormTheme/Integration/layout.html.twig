@@ -206,7 +206,7 @@
     </div>
     {% if (indexCount - 1) < totalFields %}
       <div class="panel-footer">
-          {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+          {{ include('@MauticCore/Helper/pagination.html.twig', {
                   'page': page,
                   'fixedPages': fixedPageNum,
                   'fixedLimit': true,

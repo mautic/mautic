@@ -1,5 +1,5 @@
 {% if field.defaultValue is defined and field.defaultValue is not empty %}
-    {{ include('MauticFormBundle:Field:hidden.html.twig', {
+    {{ include('@MauticForm/Field/hidden.html.twig', {
             'field': field,
             'fields': fields|default([]),
             'inForm': inForm|default(false),
@@ -12,7 +12,7 @@
             '<input': '<input value="' ~ field.defaultValue ~ '"',
     }) }}
 {% endif %}
-{{ include('MauticFormBundle:Field:group.html.twig', {
+{{ include('@MauticForm/Field/group.html.twig', {
         'field': field,
         'inForm': inForm|default(false),
         'id': id,

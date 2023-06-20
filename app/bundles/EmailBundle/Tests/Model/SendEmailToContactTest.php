@@ -205,13 +205,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $emailMock = $this->getMockBuilder(Email::class)
-            ->getMock();
-        $emailMock
-            ->method('getId')
-            ->will($this->returnValue(1));
-        $emailMock->method('getFromAddress')
-            ->willReturn('test@mautic.com');
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->will($this->returnValue(1));
+        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
+        $emailMock->method('getSubject')->willReturn('Subject');
+        $emailMock->method('getCustomHtml')->willReturn('content');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -329,15 +327,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $emailMock = $this->getMockBuilder(Email::class)
-            ->getMock();
-        $emailMock
-            ->method('getId')
-            ->will($this->returnValue(1));
-        $emailMock->method('getFromAddress')
-            ->willReturn('test@mautic.com');
-        $emailMock->method('getCustomHtml')
-            ->willReturn('Hi {contactfield=firstname}');
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->will($this->returnValue(1));
+        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
+        $emailMock->method('getSubject')->willReturn('Subject');
+        $emailMock->method('getCustomHtml')->willReturn('Hi {contactfield=firstname}');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -383,6 +377,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $tokens['{hash}'] = $event->getIdHash();
 
                     $event->addTokens($tokens);
+
+                    return $event;
                 }
             );
         $factoryMock->method('getDispatcher')
@@ -467,13 +463,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $emailMock = $this->getMockBuilder(Email::class)
-            ->getMock();
-        $emailMock
-            ->method('getId')
-            ->will($this->returnValue(1));
-        $emailMock->method('getFromAddress')
-            ->willReturn('test@mautic.com');
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
+        $emailMock->method('getSubject')->willReturn('Subject');
+        $emailMock->method('getCustomHtml')->willReturn('content');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -604,22 +598,18 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $emailMock = $this->getMockBuilder(Email::class)
-            ->getMock();
-        $emailMock
-            ->method('getId')
-            ->will($this->returnValue(1));
-        $emailMock->method('getFromAddress')
-            ->willReturn('test@mautic.com');
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
+        $emailMock->method('getSubject')->willReturn(''); // The subject must be empty for the email to fail.
+        $emailMock->method('getCustomHtml')->willReturn('content');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
         $mailer    = new \Swift_Mailer($transport);
 
         // Mock factory to ensure that queue mode is handled until MailHelper is refactored completely away from MauticFactory
-        $factoryMock = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $factoryMock = $this->createMock(MauticFactory::class);
         $factoryMock->method('getParameter')
             ->willReturnCallback(
                 function ($param) {
@@ -631,19 +621,10 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     }
                 }
             );
-        $factoryMock->method('getLogger')
-            ->willReturn(
-                new NullLogger()
-            );
-        $factoryMock->method('getDispatcher')
-            ->willReturn(
-                new EventDispatcher()
-            );
-        $routerMock = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $factoryMock->method('getRouter')
-            ->willReturn($routerMock);
+        $factoryMock->method('getLogger')->willReturn(new NullLogger());
+        $factoryMock->method('getDispatcher')->willReturn(new EventDispatcher());
+        $routerMock = $this->createMock(Router::class);
+        $factoryMock->method('getRouter')->willReturn($routerMock);
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
@@ -656,10 +637,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $stat = new Stat();
                     $stat->setEmail($emailMock);
 
-                    $leadMock = $this->getMockBuilder(Lead::class)
-                        ->getMock();
-                    $leadMock->method('getId')
-                        ->willReturn(1);
+                    $leadMock = $this->createMock(Lead::class);
+                    $leadMock->method('getId')->willReturn(1);
 
                     $stat->setLead($leadMock);
 
@@ -670,20 +649,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         // Enable queueing
         $mailHelper->enableQueue();
 
-        $statRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $statRepository = $this->createMock(StatRepository::class);
+        $dncModel       = $this->createMock(DoNotContact::class);
+        $translator     = $this->createMock(Translator::class);
 
-        $dncModel = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dncModel->expects($this->never())
-            ->method('addDncForContact');
-
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dncModel->expects($this->never())->method('addDncForContact');
 
         $statHelper = new StatHelper($statRepository);
 
@@ -692,8 +662,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         foreach ($this->contacts as $contact) {
             try {
-                $model->setContact($contact)
-                    ->send();
+                $model->setContact($contact)->send();
             } catch (FailedToSendToContactException $exception) {
                 // We're good here
             } catch (BatchQueueMaxException $exception) {
@@ -728,9 +697,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockFactory = $this->createMock(MauticFactory::class);
         $mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
@@ -745,32 +712,17 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new NullLogger()
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
-
-        $mailHelper = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-
-        $statRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dncModel = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $statHelper = new StatHelper($statRepository);
-
-        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
-
-        $emailMock = $this->getMockBuilder(Email::class)
-            ->getMock();
-        $emailMock
-            ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(1));
+        $swiftMailer    = new \Swift_Mailer(new BatchTransport());
+        $mailHelper     = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $statRepository = $this->createMock(StatRepository::class);
+        $dncModel       = $this->createMock(DoNotContact::class);
+        $translator     = $this->createMock(Translator::class);
+        $statHelper     = new StatHelper($statRepository);
+        $model          = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $emailMock      = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+        $emailMock->method('getSubject')->willReturn('subject');
+        $emailMock->method('getCustomHtml')->willReturn('content');
 
         // Set invalid BCC (should use comma as separator)
         $emailMock

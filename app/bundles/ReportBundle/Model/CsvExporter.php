@@ -3,8 +3,9 @@
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CsvExporter.
@@ -21,10 +22,13 @@ class CsvExporter
      */
     private $coreParametersHelper;
 
-    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper)
+    private TranslatorInterface $translator;
+
+    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
         $this->formatterHelper      = $formatterHelper;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -46,14 +50,38 @@ class CsvExporter
             }
             $this->putRow($handle, $row);
         }
+
+        if ($reportDataResult->isLastPage()) {
+            $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
+
+            if (!empty($totalsRow)) {
+                $this->putTotals($totalsRow, $handle);
+            }
+        }
     }
 
     /**
      * @param resource $handle
      */
-    private function putHeader(ReportDataResult $reportDataResult, $handle)
+    public function putHeader(ReportDataResult $reportDataResult, $handle): void
     {
         $this->putRow($handle, $reportDataResult->getHeaders());
+    }
+
+    /**
+     * @param array<string> $totals
+     * @param resource      $handle
+     */
+    public function putTotals(array $totals, $handle): void
+    {
+        // Put label if the first item is empty
+        $key = array_key_first($totals);
+
+        if (empty($totals[$key])) {
+            $totals[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+        }
+
+        $this->putRow($handle, $totals);
     }
 
     /**

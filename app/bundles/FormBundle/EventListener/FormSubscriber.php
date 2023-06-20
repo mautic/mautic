@@ -113,7 +113,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
             'formType'           => SubmitActionEmailType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme:FormAction/_formaction_properties_row.html.twig',
+            'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],
@@ -126,7 +126,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
             'formType'           => SubmitActionRepostType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme:SubmitAction/_submit_action_repost_widget.html.twig',
+            'formTheme'          => '@MauticForm/FormTheme/SubmitAction/_submit_action_repost_widget.html.twig',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
@@ -378,8 +378,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $post
-     *
      * @return string
      */
     private function postToHtml($post)
@@ -399,8 +397,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $emailString
-     *
      * @return array<string, null>
      */
     private function getEmailsFromString($emailString): array

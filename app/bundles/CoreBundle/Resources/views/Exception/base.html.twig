@@ -73,7 +73,7 @@
                 <div class="col-sm-12">
                     <h5 class="ml-lg text-danger">{{ exception.class }}</h5>
                     <div class="well well-sm ma-md">
-                        {{ include ('MauticCoreBundle:Exception:traces.html.twig', {
+                        {{ include ('@MauticCore/Exception/traces.html.twig', {
                             'traces': exception.trace,
                         })}}
                     </div>
@@ -97,7 +97,7 @@
                             <div id="previous_body_{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div class="panel-body">
                                     <div class="pa-sm">
-                                        {{ include ('MauticCoreBundle:Exception:traces.html.twig', {
+                                        {{ include ('@MauticCore/Exception/traces.html.twig', {
                                             'traces': e.trace,
                                         })}}
                                     </div>
