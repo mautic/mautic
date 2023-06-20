@@ -87,11 +87,7 @@ EOT
             return $this->findAndAddColumn($output) ? Command::SUCCESS : Command::FAILURE;
         }
 
-        if (!$this->addColumn($leadFieldId, $userId, $output)) {
-            return Command::FAILURE;
-        }
-
-        return Command::SUCCESS;
+        return $this->addColumn($leadFieldId, $userId, $output) ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function addAllMissingColumns(OutputInterface $output): bool
