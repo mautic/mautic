@@ -16,16 +16,6 @@ use Mautic\PointBundle\Model\TriggerModel;
 
 class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
-    protected function tearDown(): void
-    {
-        /** @var TriggerModel $triggerModel */
-        $triggerModel = self::$container->get('mautic.point.model.trigger');
-
-        $reflector = new \ReflectionClass(get_class($triggerModel));
-        $reflector->setStaticPropertyValue('events', []);
-        parent::tearDown();
-    }
-
     public function testPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */

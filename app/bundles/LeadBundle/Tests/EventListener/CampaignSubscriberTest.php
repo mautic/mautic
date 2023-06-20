@@ -216,6 +216,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $doNotContact       = $this->createMock(DoNotContact::class);
+        $mockLeagueModel    = $this->createMock(LeagueModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -232,7 +238,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCompanyModel,
             $mockCampaignModel,
             $mockCoreParametersHelper,
-            $doNotContact
+            $doNotContact,
+            $mockLeagueModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -265,6 +273,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockLeagueModel    = $this->createMock(LeagueModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -280,6 +294,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockLeagueModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -332,6 +348,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockLeagueModel    = $this->createMock(LeagueModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -347,6 +369,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockLeagueModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -400,6 +424,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockLeagueModel    = $this->createMock(LeagueModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -415,6 +445,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockLeagueModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();

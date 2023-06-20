@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\Tests\Functional;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\League;
 use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\ReportBundle\Entity\Report;
@@ -165,7 +164,6 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
     private function createTestContactWithLeaguePoints(): void
     {
         $contactModel = self::$container->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
 
         $leagueA = $this->createLeague('League A');
         $leagueB = $this->createLeague('League B');

@@ -5,6 +5,7 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeagueController extends AbstractStandardFormController
@@ -24,9 +25,9 @@ class LeagueController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
@@ -34,9 +35,9 @@ class LeagueController extends AbstractStandardFormController
      *
      * @return JsonResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        return parent::newStandard();
+        return parent::newStandard($request);
     }
 
     /**
@@ -47,9 +48,9 @@ class LeagueController extends AbstractStandardFormController
      *
      * @return JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
@@ -59,9 +60,9 @@ class LeagueController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
@@ -69,8 +70,8 @@ class LeagueController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 }

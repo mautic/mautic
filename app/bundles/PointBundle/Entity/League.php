@@ -23,7 +23,7 @@ class League extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 

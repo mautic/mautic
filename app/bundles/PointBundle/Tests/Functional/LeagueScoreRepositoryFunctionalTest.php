@@ -17,10 +17,7 @@ class LeagueScoreRepositoryFunctionalTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $repository = $this->em->getRepository(LeagueContactScore::class);
-        \assert($repository instanceof LeagueContactScoreRepository);
-        $this->repository = $repository;
+        $this->repository = $this->em->getRepository(LeagueContactScore::class);
     }
 
     public function testCompareScore(): void

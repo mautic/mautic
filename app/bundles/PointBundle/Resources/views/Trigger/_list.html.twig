@@ -37,7 +37,7 @@
                         'class': 'visible-md visible-lg col-point-league',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 't.points',
                         'text': 'mautic.point.trigger.thead.points',

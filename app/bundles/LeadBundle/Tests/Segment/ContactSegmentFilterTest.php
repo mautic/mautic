@@ -442,7 +442,7 @@ class ContactSegmentFilterTest extends TestCase
         $contactColumn = 'contact_id';
 
         $filter = $this->createContactSegmentFilter();
-        self::assertSame(null, $filter->getForeignContactColumn());
+        self::assertNull($filter->getForeignContactColumn());
 
         $this->filterDecorator->expects(self::once())
             ->method('getForeignContactColumn')

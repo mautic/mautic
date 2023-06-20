@@ -6,15 +6,12 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
 
 /**
  * @extends CommonRepository<LeagueContactScore>
  */
 class LeagueContactScoreRepository extends CommonRepository
 {
-    use OperatorListTrait;
-
     public function adjustPoints(Lead $contact, League $league, int $points, string $operator = Lead::POINTS_ADD): Lead
     {
         $contactScore = $this->findOneBy(['contact' => $contact, 'league' => $league]);
@@ -67,6 +64,6 @@ class LeagueContactScoreRepository extends CommonRepository
             ->setParameter('leagueId', $leagueId)
             ->setParameter('score', $score);
 
-        return false !== $q->execute()->fetchOne();
+        return false !== $q->executeQuery()->fetchOne();
     }
 }

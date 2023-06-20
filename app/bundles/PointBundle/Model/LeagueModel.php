@@ -21,10 +21,7 @@ class LeagueModel extends CommonFormModel
 {
     public function getRepository(): LeagueRepository
     {
-        $result = $this->em->getRepository(League::class);
-        \assert($result instanceof LeagueRepository);
-
-        return $result;
+        return $this->em->getRepository(League::class);
     }
 
     public function getPermissionBase(): string

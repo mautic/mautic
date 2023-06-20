@@ -344,10 +344,7 @@ class LeadModel extends FormModel
 
     public function getLeagueContactScoreRepository(): LeagueContactScoreRepository
     {
-        $result = $this->em->getRepository(LeagueContactScore::class);
-        \assert($result instanceof LeagueContactScoreRepository);
-
-        return $result;
+        return $this->em->getRepository(LeagueContactScore::class);
     }
 
     /**

@@ -34,7 +34,7 @@
                         'class': 'visible-md visible-lg col-point-league',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point',
                         'orderBy': 'p.delta',
                         'text': 'mautic.point.thead.delta',
