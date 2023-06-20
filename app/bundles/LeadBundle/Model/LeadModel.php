@@ -579,7 +579,7 @@ class LeadModel extends FormModel
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
                 /** @var Stage|null $currentStage */
-                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
+                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName((int) $currentLeadStageId);
                 if ($currentStage) {
                     $currentLeadStageName = $currentStage->getName();
                 }
