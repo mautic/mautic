@@ -88,7 +88,7 @@ class FieldModel extends CommonFormModel
         return 'form:forms';
     }
 
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Field
     {
         if (null === $id) {
             return new Field();
@@ -111,9 +111,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return string
+     * @param string[] $aliases
      */
-    public function generateAlias($label, &$aliases)
+    public function generateAlias(string $label, array &$aliases): string
     {
         $alias = $this->cleanAlias($label, 'f_', 25);
 

@@ -280,7 +280,7 @@ class PublicController extends CommonFormController
         $model = $this->getModel('form.form');
         \assert($model instanceof FormModel);
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
-        $css               = InputHelper::string($request->get('css'));
+        $css               = InputHelper::string((string) $request->get('css'));
         $form              = $model->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;

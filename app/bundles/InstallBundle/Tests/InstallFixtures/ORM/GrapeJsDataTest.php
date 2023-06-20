@@ -9,25 +9,19 @@ use Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GrapeJsDataTest extends MauticMysqlTestCase
 {
-    use FakeContainerTrait;
-
     protected $useCleanupRollback = false;
 
     private GrapesJsData $fixture;
-
-    protected ContainerInterface $tempContainer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->tempContainer = self::$container;
-        $this->fixture       = new GrapesJsData();
-        $this->fixture->setContainer($this->getContainerFake());
+        $this->fixture = new GrapesJsData();
+        $this->fixture->setContainer(self::$container);
     }
 
     public function testGetGroups(): void

@@ -161,6 +161,8 @@ class CommonController extends AbstractController implements MauticController
     public function delegateView($args)
     {
         $request = $this->getCurrentRequest();
+        $bundle  = $request->query->get('bundle');
+        $bundle  = $bundle ? strtolower(InputHelper::alphanum($bundle)) : '';
 
         // Used for error handling
         defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
@@ -169,7 +171,7 @@ class CommonController extends AbstractController implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower(InputHelper::alphanum($request->query->get('bundle'))),
+                    'mauticContent' => $bundle,
                 ],
             ];
         }
@@ -186,7 +188,7 @@ class CommonController extends AbstractController implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower(InputHelper::alphanum($request->query->get('bundle')));
+                $mauticContent = $bundle;
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }

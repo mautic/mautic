@@ -563,11 +563,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param string|null  $tokenFilter
      *
      * @return array
      */
-    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', $tokenFilter = null, $withBC = true)
+    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '', $withBC = true)
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
