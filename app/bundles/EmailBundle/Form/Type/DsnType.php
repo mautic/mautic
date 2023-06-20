@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Dsn\Dsn;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -53,10 +54,11 @@ class DsnType extends AbstractType
 
         $builder->add(
             'port',
-            TextType::class,
+            NumberType::class,
             [
                 'label'    => 'mautic.email.config.mailer.dsn.port',
                 'required' => false,
+                'html5'    => true,
                 'attr'     => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
@@ -124,10 +126,15 @@ class DsnType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        $dsn = Dsn::fromString($this->coreParametersHelper->get('mailer_dsn'));
+        $dsn = $this->coreParametersHelper->get('mailer_dsn');
 
-        if ($dsn->getPassword()) {
-            $dsn = $dsn->setPassword('SECRET');
+        try {
+            $dsn = Dsn::fromString($dsn);
+
+            if ($dsn->getPassword()) {
+                $dsn = $dsn->setPassword('SECRET');
+            }
+        } catch (\InvalidArgumentException) {
         }
 
         $view->vars['currentDns'] = $dsn;

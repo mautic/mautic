@@ -28,7 +28,11 @@ class DsnTransformer implements DataTransformerInterface
         // unescape the DSN before the transformation to array
         $value = $this->escapeTransformer->transform((string) $value);
 
-        $dsn = Dsn::fromString($value);
+        try {
+            $dsn = Dsn::fromString($value);
+        } catch (\InvalidArgumentException) {
+            return [];
+        }
 
         return [
             'scheme'   => $dsn->getScheme(),
