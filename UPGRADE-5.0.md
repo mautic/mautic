@@ -11,7 +11,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
 3. SMTP transport is the only transport supported by Mautic after fresh installation.
 4. The "Email Step" was removed from the installation wizzard because the transports were removed. The email transport must be configurad right after Mautic installation.
 5. The email transport configuration has changed from various fields unique for each transport to unified "DSN". Any transport can be configured using the same form. There is a migration that should handle most of the email transport configuration from Mautic 4 and re-configure it for Mautic 5.
-6. The command `bin/console mautic:email:process` for sending emails via cron jobs was removed and now [Symfony Messenger](https://symfony.com/doc/5.4/messenger.html) is used instead. Use this command if you want to send emails via a cron job: `bin/console messenger:consume email_transport`. The Messenger in the async configuration can work with various queues. It uses MySql by default.
+6. The command `bin/console mautic:emails:send` for sending emails via cron jobs was removed and now [Symfony Messenger](https://symfony.com/doc/5.4/messenger.html) is used instead. Use this command if you want to send emails via a cron job: `bin/console messenger:consume email_transport`. The Messenger in the async configuration can work with various queues. It uses MySql by
 
 # Backwards compatibility breaking changes
 *   Platform Requirements
