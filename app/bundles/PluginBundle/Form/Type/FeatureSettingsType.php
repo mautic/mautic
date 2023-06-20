@@ -44,7 +44,7 @@ class FeatureSettingsType extends AbstractType
     {
         $integrationObject = $options['integration_object'];
 
-        //add custom feature settings
+        // add custom feature settings
         $integrationObject->appendToForm($builder, $options['data'], 'features');
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];

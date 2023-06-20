@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Command;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,9 +25,10 @@ class SummarizeCommand extends ModeratedCommand
     public function __construct(
         TranslatorInterface $translator,
         SummaryModel $summaryModel,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->translator   = $translator;
         $this->summaryModel = $summaryModel;
@@ -54,19 +55,18 @@ class SummarizeCommand extends ModeratedCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Rebuild existing data. To be used only if database exceptions have been known to cause inaccuracies.'
-            )
-            ->setDescription('Builds historical campaign summary statistics if they do not already exist.');
+            );
 
         parent::configure();
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $batchLimit = (int) $input->getOption('batch-limit');
@@ -81,6 +81,7 @@ class SummarizeCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Builds historical campaign summary statistics if they do not already exist.';
 }

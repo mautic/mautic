@@ -2,29 +2,21 @@
 
 namespace Mautic\StatsBundle\Aggregate\Helper;
 
-use DateTime;
-use Exception;
-use InvalidArgumentException;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 
 class CalculatorHelper
 {
     /**
-     * @param $year
-     * @param $labelFormat
-     *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getYearLabel($year, $labelFormat)
     {
-        return (new DateTime(self::getYearDateString($year)))->format($labelFormat);
+        return (new \DateTime(self::getYearDateString($year)))->format($labelFormat);
     }
 
     /**
-     * @param $year
-     *
      * @return string
      */
     public static function getYearDateString($year)
@@ -37,7 +29,7 @@ class CalculatorHelper
      * @param string $thisYear
      * @param string $labelFormat
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fillInMissingYears(StatDAO $statDAO, $lastYear, $thisYear, $labelFormat)
     {
@@ -45,8 +37,8 @@ class CalculatorHelper
             return;
         }
 
-        $lastYear = new DateTime(self::getYearDateString($lastYear));
-        $thisYear = new DateTime(self::getYearDateString($thisYear));
+        $lastYear = new \DateTime(self::getYearDateString($lastYear));
+        $thisYear = new \DateTime(self::getYearDateString($thisYear));
 
         if (!isset($statDAO->getStats()[$lastYear->format($labelFormat)])) {
             $statDAO->addStat($lastYear->format($labelFormat), 0);
@@ -59,21 +51,16 @@ class CalculatorHelper
     }
 
     /**
-     * @param $month
-     * @param $labelFormat
-     *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getMonthLabel($month, $labelFormat)
     {
-        return (new DateTime(self::getMonthDateString($month)))->format($labelFormat);
+        return (new \DateTime(self::getMonthDateString($month)))->format($labelFormat);
     }
 
     /**
-     * @param $month
-     *
      * @return string
      */
     public static function getMonthDateString($month)
@@ -86,7 +73,7 @@ class CalculatorHelper
      * @param string $thisMonth
      * @param string $labelFormat
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fillInMissingMonths(StatDAO $statDAO, $lastMonth, $thisMonth, $labelFormat)
     {
@@ -94,8 +81,8 @@ class CalculatorHelper
             return;
         }
 
-        $lastMonth = new DateTime(self::getMonthDateString($lastMonth));
-        $thisMonth = new DateTime(self::getMonthDateString($thisMonth));
+        $lastMonth = new \DateTime(self::getMonthDateString($lastMonth));
+        $thisMonth = new \DateTime(self::getMonthDateString($thisMonth));
 
         if (!isset($statDAO->getStats()[$lastMonth->format($labelFormat)])) {
             $statDAO->addStat($lastMonth->format($labelFormat), 0);
@@ -108,21 +95,16 @@ class CalculatorHelper
     }
 
     /**
-     * @param $day
-     * @param $labelFormat
-     *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getDayLabel($day, $labelFormat)
     {
-        return (new DateTime(self::getDayDateString($day)))->format($labelFormat);
+        return (new \DateTime(self::getDayDateString($day)))->format($labelFormat);
     }
 
     /**
-     * @param $day
-     *
      * @return string
      */
     public static function getDayDateString($day)
@@ -135,11 +117,11 @@ class CalculatorHelper
      *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getWeekFromDayString($date)
     {
-        return (new DateTime($date))->format('Y-W');
+        return (new \DateTime($date))->format('Y-W');
     }
 
     /**
@@ -148,11 +130,11 @@ class CalculatorHelper
      *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getWeekLabel($date, $labelFormat = 'Y-W')
     {
-        return (new DateTime(self::getWeekDateString($date)))->format($labelFormat);
+        return (new \DateTime(self::getWeekDateString($date)))->format($labelFormat);
     }
 
     /**
@@ -163,7 +145,7 @@ class CalculatorHelper
     public static function getWeekDateString($date)
     {
         if (!preg_match('/^([0-9]{4})-([0-9]{2})$/', $date, $matches)) {
-            throw new InvalidArgumentException('Invalid argument, Y-W format is required.');
+            throw new \InvalidArgumentException('Invalid argument, Y-W format is required.');
         }
         $year = $matches[1];
         $week = $matches[2];
@@ -176,7 +158,7 @@ class CalculatorHelper
      * @param string $today
      * @param string $labelFormat
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fillInMissingWeeks(StatDAO $statDAO, $yesterday, $today, $labelFormat)
     {
@@ -184,8 +166,8 @@ class CalculatorHelper
             return;
         }
 
-        $yesterday = new DateTime(self::getWeekDateString($yesterday));
-        $today     = new DateTime(self::getWeekDateString($today));
+        $yesterday = new \DateTime(self::getWeekDateString($yesterday));
+        $today     = new \DateTime(self::getWeekDateString($today));
 
         while ($yesterday < $today) {
             $statDAO->addStat($yesterday->format($labelFormat), 0);
@@ -198,7 +180,7 @@ class CalculatorHelper
      * @param string $today
      * @param string $labelFormat
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fillInMissingDays(StatDAO $statDAO, $yesterday, $today, $labelFormat)
     {
@@ -206,8 +188,8 @@ class CalculatorHelper
             return;
         }
 
-        $yesterday = (new DateTime(self::getDayDateString($yesterday)))->modify('-1 day');
-        $today     = new DateTime(self::getDayDateString($today));
+        $yesterday = (new \DateTime(self::getDayDateString($yesterday)))->modify('-1 day');
+        $today     = new \DateTime(self::getDayDateString($today));
 
         while ($yesterday < $today) {
             $yesterday->modify('+1 day');
@@ -216,21 +198,16 @@ class CalculatorHelper
     }
 
     /**
-     * @param $hour
-     * @param $labelFormat
-     *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getHourLabel($hour, $labelFormat)
     {
-        return (new DateTime(self::getHourDateString($hour)))->format($labelFormat);
+        return (new \DateTime(self::getHourDateString($hour)))->format($labelFormat);
     }
 
     /**
-     * @param $hour
-     *
      * @return string
      */
     public static function getHourDateString($hour)
@@ -243,7 +220,7 @@ class CalculatorHelper
      * @param string $thisHour
      * @param string $labelFormat
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fillInMissingHours(StatDAO $statDAO, $lastHour, $thisHour, $labelFormat)
     {
@@ -251,8 +228,8 @@ class CalculatorHelper
             return;
         }
 
-        $lastHour = new DateTime(self::getHourDateString($lastHour));
-        $thisHour = new DateTime(self::getHourDateString($thisHour));
+        $lastHour = new \DateTime(self::getHourDateString($lastHour));
+        $thisHour = new \DateTime(self::getHourDateString($thisHour));
 
         while ($lastHour < $thisHour) {
             $lastHour->modify('+1 hour');

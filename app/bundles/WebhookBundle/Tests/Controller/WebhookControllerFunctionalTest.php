@@ -10,6 +10,7 @@ use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -23,6 +24,7 @@ final class WebhookControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/webhooks/view/'.$webhook->getId());
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
 
         $logList = $crawler->filter('.table.table-responsive > tbody > tr')->count();
         Assert::assertSame(Webhook::LOGS_DISPLAY_LIMIT, $logList);

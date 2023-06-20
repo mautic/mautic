@@ -93,15 +93,6 @@ class TransportType
         'mautic.transport.amazon_api',
     ];
 
-    /**
-     * @param $serviceId
-     * @param $translatableAlias
-     * @param $showHost
-     * @param $showPort
-     * @param $showUser
-     * @param $showPassword
-     * @param $showApiKey
-     */
     public function addTransport($serviceId, $translatableAlias, $showHost, $showPort, $showUser, $showPassword, $showApiKey)
     {
         $this->transportTypes[$serviceId] = $translatableAlias;

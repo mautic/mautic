@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -14,8 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Assert;
-use ReflectionProperty;
-use Swift_Mailer;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CompanyRepositoryTest extends MauticMysqlTestCase
@@ -28,12 +25,11 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->setUpMailer();
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $this->setPrivateProperty($mailHelper, 'leadOwners', []);
-        parent::tearDown();
     }
 
     public function testEmailSendWithCompanyTokens(): void
@@ -130,7 +126,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
             $reference = new ListLead();
             $reference->setLead($contact);
             $reference->setList($segment);
-            $reference->setDateAdded(new DateTime());
+            $reference->setDateAdded(new \DateTime());
             $this->em->persist($reference);
         }
 
@@ -161,7 +157,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
-        $mailer     = new Swift_Mailer($transport);
+        $mailer     = new \Swift_Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
         $this->transport = $transport;
@@ -172,14 +168,14 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
      */
     private function setPrivateProperty(MailHelper $object, string $property, $value): void
     {
-        $reflector = new ReflectionProperty(get_class($object), $property);
+        $reflector = new \ReflectionProperty(get_class($object), $property);
         $reflector->setAccessible(true);
         $reflector->setValue($object, $value);
     }
 
     private function sendEmailViaApi(int $emailId): void
     {
-        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
         Assert::assertSame(

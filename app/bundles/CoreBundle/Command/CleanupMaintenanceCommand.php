@@ -4,7 +4,8 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Component\Console\Command\Command;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,14 +17,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends Command
+class CleanupMaintenanceCommand extends ModeratedCommand
 {
     private TranslatorInterface $translator;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct();
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
@@ -32,7 +33,6 @@ class CleanupMaintenanceCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:maintenance:cleanup')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -61,17 +61,22 @@ You can also optionally specify a dry run without deleting any records:
 <info>php %command.full_name% --days-old=365 --dry-run</info>
 EOT
             );
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->checkRunStatus($input, $output)) {
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
+        }
+
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
         $gdpr          = $input->getOption('gdpr');
         if (empty($daysOld) && empty($gdpr)) {
             // Safety catch; bail
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         if (!empty($gdpr)) {
@@ -87,7 +92,9 @@ EOT
             );
 
             if (!$helper->ask($input, $output, $question)) {
-                return 0;
+                $this->completeRun();
+
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -116,6 +123,9 @@ EOT
             }
         }
 
-        return 0;
+        $this->completeRun();
+
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

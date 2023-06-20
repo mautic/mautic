@@ -2,21 +2,34 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Submission>
  */
 class SubmissionApiController extends CommonApiController
 {
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $formSubmissionModel = $this->getModel('form.submission');
+        $formSubmissionModel = $modelFactory->getModel('form.submission');
         \assert($formSubmissionModel instanceof SubmissionModel);
 
         $this->model            = $formSubmissionModel;
@@ -26,7 +39,7 @@ class SubmissionApiController extends CommonApiController
         $this->permissionBase   = 'form:forms';
         $this->serializerGroups = ['submissionDetails', 'formList', 'ipAddressList', 'leadBasicList', 'pageList'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -36,7 +49,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesAction($formId = null)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null)
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -53,7 +66,7 @@ class SubmissionApiController extends CommonApiController
             ]
         );
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request, $userHelper);
     }
 
     /**
@@ -64,7 +77,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesForContactAction($formId, $contactId)
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId)
     {
         $filter = [
             'filter' => [
@@ -80,7 +93,7 @@ class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($formId);
+        return $this->getEntitiesAction($request, $userHelper, $formId);
     }
 
     /**
@@ -90,7 +103,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntityAction($formId = null, $submissionId = null)
+    public function getEntityAction(Request $request, $formId = null, $submissionId = null)
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -98,7 +111,7 @@ class SubmissionApiController extends CommonApiController
             return $form;
         }
 
-        return parent::getEntityAction($submissionId);
+        return parent::getEntityAction($request, $submissionId);
     }
 
     /**

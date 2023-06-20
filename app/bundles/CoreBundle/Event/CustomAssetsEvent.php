@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -24,7 +24,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $declaration
      * @param string $location
      * @param string $context
      */
@@ -38,7 +37,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $script
      * @param string $location
      * @param bool   $async
      * @param null   $name
@@ -54,21 +52,19 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $script
      * @param string $location
      * @param string $context
      */
     public function addScriptDeclaration($script, $location = 'head', $context = AssetsHelper::CONTEXT_APP)
     {
         $this->assetsHelper->setContext($context)
-            ->addScriptDeclaration($script, $location, $context)
+            ->addScriptDeclaration($script, $location)
             ->setContext(AssetsHelper::CONTEXT_APP);
 
         return $this;
     }
 
     /**
-     * @param        $stylesheet
      * @param string $context
      */
     public function addStylesheet($stylesheet, $context = AssetsHelper::CONTEXT_APP)
@@ -81,7 +77,6 @@ class CustomAssetsEvent extends Event
     }
 
     /**
-     * @param        $styles
      * @param string $context
      */
     public function addStyleDeclaration($styles, $context = AssetsHelper::CONTEXT_APP)

@@ -2,7 +2,6 @@
 
 namespace FormBundle\Tests\EventListener;
 
-use Generator;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -189,7 +188,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
     }
 
-    public function toCcBccProvider(): Generator
+    public function toCcBccProvider(): \Generator
     {
         yield ['to@email.email, to2@email.email', null, null];
         yield [null, 'cc@email.email, cc2@email.email', null];

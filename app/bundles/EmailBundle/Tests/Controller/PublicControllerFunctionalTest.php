@@ -44,7 +44,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
         $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
-        $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text()));
+        $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
@@ -150,6 +150,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName($emailName);
         $email->setSubject($emailName);
         $email->setEmailType('template');
+        $email->setCustomHtml('some content');
         $this->em->persist($email);
 
         $this->client->request('GET', '/email/preview/'.$email->getId());
@@ -174,6 +175,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setPublishUp(new \DateTime('-2 day'));
         $email->setPublishDown(new \DateTime('-1 day'));
         $email->setEmailType('template');
+        $email->setCustomHtml('some content');
         $email->setPublicPreview(true);
         $this->em->persist($email);
 

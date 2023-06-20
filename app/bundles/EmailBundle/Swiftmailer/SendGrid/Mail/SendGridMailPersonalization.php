@@ -11,7 +11,7 @@ class SendGridMailPersonalization
 {
     public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
-        if (!$message instanceof MauticMessage) { //Used for "Send test email" in settings
+        if (!$message instanceof MauticMessage) { // Used for "Send test email" in settings
             foreach ($message->getTo() as $recipientEmail => $recipientName) {
                 $personalization = new Personalization();
                 $to              = new Email($recipientName, $recipientEmail);
@@ -29,7 +29,7 @@ class SendGridMailPersonalization
         }
         foreach ($message->getTo() as $recipientEmail => $recipientName) {
             if (empty($metadata[$recipientEmail])) {
-                //Recipient is not in metadata = we do not have tokens for this email.
+                // Recipient is not in metadata = we do not have tokens for this email.
                 continue;
             }
             $personalization = new Personalization();

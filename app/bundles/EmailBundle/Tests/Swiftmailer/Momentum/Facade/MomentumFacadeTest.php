@@ -7,6 +7,8 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\Momentum\Facade;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Adapter\AdapterInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallbackInterface;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\FromDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Facade\MomentumSendException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Facade\MomentumFacade;
@@ -20,7 +22,7 @@ use SparkPost\SparkPostResponse;
 /**
  * @todo this test is slow as it calls methods with sleep(5). Find a better way to speed it up.
  */
-class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
+final class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|AdapterInterface
@@ -61,8 +63,8 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
     {
         $swiftMessageMock      = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $sparkPostResponseMock = $this->createMock(SparkPostResponse::class);
-        $transmissionDTOMock   = $this->createMock(TransmissionDTO::class);
         $sparkPostPromiseMock  = $this->createMock(SparkPostPromise::class);
+        $transmissionDTO       = $this->buildTransmissionDTO();
         $totalRecipients       = 0;
         $bodyResults           = [
             'results' => [
@@ -77,11 +79,11 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
         $this->swiftMessageServiceMock->expects($this->once())
             ->method('transformToTransmission')
             ->with($swiftMessageMock)
-            ->willReturn($transmissionDTOMock);
+            ->willReturn($transmissionDTO);
 
         $this->adapterMock->expects($this->once())
             ->method('createTransmission')
-            ->with($transmissionDTOMock)
+            ->with($transmissionDTO)
             ->willReturn($sparkPostPromiseMock);
 
         $sparkPostPromiseMock->expects($this->once())
@@ -118,7 +120,7 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($swiftMessageValidationExceptionMock);
 
         $this->loggerMock->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with('Momentum send exception', [
                 'message' => $exceptionMessage,
             ]);
@@ -136,10 +138,10 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
     public function testSend500FirstAttempt(): void
     {
         $swiftMessageMock         = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $transmissionDTOMock      = $this->createMock(TransmissionDTO::class);
         $sparkPostPromiseMock     = $this->createMock(SparkPostPromise::class);
         $sparkPostResponseMock500 = $this->createMock(SparkPostResponse::class);
         $sparkPostResponseMock200 = $this->createMock(SparkPostResponse::class);
+        $transmissionDTO          = $this->buildTransmissionDTO();
         $totalRecipients          = 0;
         $bodyResults              = [
             'results' => [
@@ -150,11 +152,11 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
         $this->swiftMessageServiceMock->expects($this->once())
             ->method('transformToTransmission')
             ->with($swiftMessageMock)
-            ->willReturn($transmissionDTOMock);
+            ->willReturn($transmissionDTO);
 
         $this->adapterMock->expects($this->exactly(2))
             ->method('createTransmission')
-            ->with($transmissionDTOMock)
+            ->with($transmissionDTO)
             ->willReturn($sparkPostPromiseMock);
 
         $sparkPostPromiseMock->expects($this->exactly(2))
@@ -186,21 +188,21 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
     public function testSend500Repeated(): void
     {
         $swiftMessageMock       = $this->createMock(\Swift_Mime_SimpleMessage::class);
-        $transmissionDTOMock    = $this->createMock(TransmissionDTO::class);
         $sparkPostPromiseMock   = $this->createMock(SparkPostPromise::class);
         $sparkPostResponseMock1 = $this->createMock(SparkPostResponse::class);
         $sparkPostResponseMock2 = $this->createMock(SparkPostResponse::class);
         $sparkPostResponseMock3 = $this->createMock(SparkPostResponse::class);
+        $transmissionDTO        = $this->buildTransmissionDTO();
         $responseBody           = 'Empty';
 
         $this->swiftMessageServiceMock->expects($this->once())
             ->method('transformToTransmission')
             ->with($swiftMessageMock)
-            ->willReturn($transmissionDTOMock);
+            ->willReturn($transmissionDTO);
 
         $this->adapterMock->expects($this->exactly(3))
             ->method('createTransmission')
-            ->with($transmissionDTOMock)
+            ->with($transmissionDTO)
             ->willReturn($sparkPostPromiseMock);
 
         $sparkPostResponseMock1->expects($this->once())
@@ -228,7 +230,7 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
             ->willReturn($responseBody);
 
         $this->loggerMock->expects($this->exactly(2))
-            ->method('addError')
+            ->method('error')
             ->withConsecutive(
                 [
                     'Momentum send: 500', [
@@ -258,5 +260,13 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
             $this->momentumCallbackMock,
             $this->loggerMock
         );
+    }
+
+    private function buildTransmissionDTO(): TransmissionDTO
+    {
+        $fromDTO    = new FromDTO('test@mautic.com');
+        $contentDTO = new ContentDTO('subject', $fromDTO);
+
+        return new TransmissionDTO($contentDTO, '/dev/null', null);
     }
 }

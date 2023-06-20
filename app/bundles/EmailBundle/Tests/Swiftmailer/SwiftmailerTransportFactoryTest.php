@@ -83,6 +83,8 @@ class SwiftmailerTransportFactoryTest extends TestCase
         $this->container->expects($this->never())
             ->method('get');
 
+        $this->requestContext->method('getHost')->willReturn('host');
+
         $options = ['transport' => 'smtp'];
 
         $transport = SwiftmailerTransportFactory::createTransport($options, $this->requestContext, $this->eventDispatcher, $this->container);

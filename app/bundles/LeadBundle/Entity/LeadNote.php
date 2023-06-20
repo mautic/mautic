@@ -30,12 +30,12 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $type = 'general';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTime;
 
@@ -65,8 +65,6 @@ class LeadNote extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

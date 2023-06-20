@@ -156,9 +156,6 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param $format
-     * @param $choices
-     *
      * @return mixed[]|string
      */
     public static function formatList($format, $choices)

@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use function assert;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait FrequencyRuleTrait
 {
@@ -21,8 +21,11 @@ trait FrequencyRuleTrait
      */
     protected $isPublicView = false;
 
+    private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
+
+    private ?RequestStack $requestStack = null;
+
     /**
-     * @param       $lead
      * @param array $viewParameters
      * @param null  $data
      * @param bool  $isPublic
@@ -49,11 +52,11 @@ trait FrequencyRuleTrait
             ]
         );
 
-        //find the email
+        // find the email
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
-            assert($emailModel instanceof EmailModel);
+            \assert($emailModel instanceof EmailModel);
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
@@ -65,7 +68,7 @@ trait FrequencyRuleTrait
             $data = $this->getFrequencyRuleFormData($lead, $allChannels, $leadChannels, $isPublic, null, $isPreferenceCenter);
         }
         /** @var Form $form */
-        $form = $this->get('form.factory')->create(
+        $form = $this->formFactory->create(
             ContactFrequencyType::class,
             $data,
             [
@@ -77,10 +80,12 @@ trait FrequencyRuleTrait
             ]
         );
 
-        $method = $this->request->getMethod();
+        $request = $this->requestStack->getCurrentRequest();
+        \assert(null !== $request);
+        $method = $request->getMethod();
         if ('GET' !== $method) {
             if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form, $data)) {
+                if ($this->isFormValid($form)) {
                     $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels, $currentChannelId);
 
                     return true;
@@ -153,7 +158,6 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param     $leadChannels
      * @param int $currentChannelId
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
@@ -161,11 +165,13 @@ trait FrequencyRuleTrait
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
 
-        $dncModel = $this->get('mautic.lead.model.dnc');
-        assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
+        $dncModel = $this->doNotContactModel;
+        \assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
 
+        $request = $this->requestStack->getCurrentRequest();
+        \assert(null !== $request);
         // iF subscribed_channels are enabled in form, then touch DNC
-        if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
+        if (isset($request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
                     $contactable = $dncModel->isContactable($lead, $contactChannel);
@@ -185,5 +191,20 @@ trait FrequencyRuleTrait
             }
         }
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setDoNotContactModel(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel): void
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
+
+    /**
+     * The name is different, so it won't collide with other setters.
+     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setRequestStackObject(RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }
