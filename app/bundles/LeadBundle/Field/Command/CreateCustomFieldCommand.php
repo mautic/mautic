@@ -69,17 +69,9 @@ EOT
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
+
         if (!$leadFieldId) {
-            $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
-
-            if (!$leadField) {
-                $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.all_fields_have_columns').'</info>');
-
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
-            }
-
-            $leadFieldId = $leadField->getId();
-            $userId      = $leadField->getCreatedBy();
+            return $this->findAndAddColumn($output) ? \Symfony\Component\Console\Command\Command::SUCCESS : \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         if (!$this->addColumn($leadFieldId, $userId, $output)) {
@@ -91,6 +83,19 @@ EOT
         $this->completeRun();
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
+    }
+
+    private function findAndAddColumn(OutputInterface $output): bool
+    {
+        $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
+
+        if (!$leadField) {
+            $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.all_fields_have_columns').'</info>');
+
+            return true;
+        }
+
+        return $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $output);
     }
 
     private function addColumn(int $leadFieldId, ?int $userId, OutputInterface $output): bool
