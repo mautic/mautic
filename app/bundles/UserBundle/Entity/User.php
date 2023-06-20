@@ -572,8 +572,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role|null $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
