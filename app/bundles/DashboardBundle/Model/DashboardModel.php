@@ -81,8 +81,6 @@ class DashboardModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)

@@ -29,7 +29,7 @@ class ConfigController extends FormController
      */
     public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
@@ -183,13 +183,11 @@ class ConfigController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
@@ -224,13 +222,11 @@ class ConfigController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }

@@ -106,8 +106,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            '`country`' => 'Australia',
-            '`state`'   => 'Victoria',
+            'country' => 'Australia',
+            'state'   => 'Victoria',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -200,7 +200,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            '`country`' => '',
+            'country' => '',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -529,11 +529,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         return $user;
     }
 
-    private function getUserPlainPassword(): string
-    {
-        return 'test-pass';
-    }
-
     public function testSendSubmissionWhenFieldHaveMysqlReservedWords(): void
     {
         // Create the test form.
@@ -569,7 +564,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $formCrawler->count());
         $form = $formCrawler->form();
         $form->setValues([
-            'mauticform[all]' => 'test',
+            'mauticform[f_all]' => 'test',
         ]);
         $this->client->submit($form);
 
@@ -580,7 +575,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            '`all`' => 'test',
+            'f_all' => 'test',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -599,8 +594,12 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    private function getUserPlainPassword(): string
+    {
+        return 'test-pass';
     }
 }

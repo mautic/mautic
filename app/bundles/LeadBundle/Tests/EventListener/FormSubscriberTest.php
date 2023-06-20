@@ -59,12 +59,12 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper     = $this->createMock(IpLookupHelper::class);
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->subscriber         = new FormSubscriber(
-          $this->emailModel,
-          $this->leadModel,
-          $this->contactTracker,
-          $this->ipLookupHelper,
-          $this->leadFieldRepostory
-      );
+            $this->emailModel,
+            $this->leadModel,
+            $this->contactTracker,
+            $this->ipLookupHelper,
+            $this->leadFieldRepostory
+        );
     }
 
     public function testOnFormSubmitActionChangePoints(): void

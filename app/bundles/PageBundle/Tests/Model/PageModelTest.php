@@ -11,7 +11,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
@@ -79,7 +78,7 @@ class PageModelTest extends PageTestAbstract
     public function testCleanQueryWhenCalledReturnsSafeAndValidData()
     {
         $pageModel           = $this->getPageModel();
-        $pageModelReflection = new ReflectionClass(get_class($pageModel));
+        $pageModelReflection = new \ReflectionClass(get_class($pageModel));
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
         $res = $cleanQueryMethod->invokeArgs($pageModel, [

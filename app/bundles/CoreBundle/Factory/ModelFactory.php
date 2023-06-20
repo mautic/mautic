@@ -48,8 +48,6 @@ class ModelFactory
 
     /**
      * Check if a model exists.
-     *
-     * @param $modelNameKey
      */
     public function hasModel($modelNameKey)
     {

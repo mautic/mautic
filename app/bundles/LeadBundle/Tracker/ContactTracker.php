@@ -312,7 +312,7 @@ class ContactTracker
      */
     private function createNewContact(IpAddress $ip = null, $persist = true)
     {
-        //let's create a lead
+        // let's create a lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
 
@@ -366,9 +366,6 @@ class ContactTracker
         return !$this->security->isAnonymous();
     }
 
-    /**
-     * @param $previouslyTrackedId
-     */
     private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId)
     {
         $newTrackingId = $this->getTrackingId();

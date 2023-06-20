@@ -245,8 +245,6 @@ class Monitoring extends FormEntity
     /**
      * Set the monitor lists.
      *
-     * @param $lists
-     *
      * @return Monitoring
      */
     public function setLists($lists)
@@ -259,8 +257,6 @@ class Monitoring extends FormEntity
 
     /**
      * Set the network type.
-     *
-     * @param $networkType
      *
      * @return Monitoring
      */

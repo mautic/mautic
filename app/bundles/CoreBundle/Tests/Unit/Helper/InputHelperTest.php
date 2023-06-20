@@ -298,4 +298,34 @@ class InputHelperTest extends TestCase
             [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
         ];
     }
+
+    /**
+     * @dataProvider underscoreProvider
+     */
+    public function testUndersore(mixed $provided, mixed $expected): void
+    {
+        $this->assertSame($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function underscoreProvider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, null],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], [null]],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
+        ];
+    }
 }

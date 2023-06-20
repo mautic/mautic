@@ -94,8 +94,6 @@ class TriggerEvent
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -113,10 +111,6 @@ class TriggerEvent
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -17,6 +19,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -78,11 +81,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $corePermissionsMock;
 
     /**
-     * @var MockObject|UserHelper
-     */
-    private $helperUserMock;
-
-    /**
      * @var MockObject|FormFactory
      */
     private $formFactoryMock;
@@ -97,34 +95,51 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
      */
     private $twigMock;
 
+    private RequestStack $requestStack;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translatorMock       = $this->createMock(Translator::class);
-        $this->sessionMock          = $this->createMock(Session::class);
-        $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
-        $this->containerMock        = $this->createMock(Container::class);
-        $this->routerMock           = $this->createMock(Router::class);
-        $this->modelMock            = $this->createMock(EmailModel::class);
-        $this->emailMock            = $this->createMock(Email::class);
-        $this->flashBagMock         = $this->createMock(FlashBag::class);
-        $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
-        $this->helperUserMock       = $this->createMock(UserHelper::class);
+        $this->sessionMock   = $this->createMock(Session::class);
+        $this->containerMock = $this->createMock(Container::class);
+        $this->routerMock    = $this->createMock(Router::class);
+        $this->modelMock     = $this->createMock(EmailModel::class);
+        $this->emailMock     = $this->createMock(Email::class);
+        $this->formMock      = $this->createMock(Form::class);
+        $this->twigMock      = $this->createMock(Environment::class);
+
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
-        $this->formMock             = $this->createMock(Form::class);
-        $this->twigMock             = $this->createMock(Environment::class);
-        $this->controller           = new EmailController(
-            $this->corePermissionsMock,
-            $this->helperUserMock,
+        $formFieldHelper            = $this->createMock(FormFieldHelper::class);
+        $doctrine                   = $this->createMock(ManagerRegistry::class);
+        $factory                    = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
+        $helperUserMock             = $this->createMock(UserHelper::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock       = $this->createMock(Translator::class);
+        $this->flashBagMock         = $this->createMock(FlashBag::class);
+        $this->requestStack         = new RequestStack();
+        $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
+
+        $helperUserMock->method('getUser')
+            ->willReturn(new User(false));
+
+        $this->controller = new EmailController(
             $this->formFactoryMock,
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFieldHelper,
+            $doctrine,
+            $factory,
+            $this->modelFactoryMock,
+            $helperUserMock,
+            $coreParametersHelper,
+            $dispatcher,
+            $this->translatorMock,
+            $this->flashBagMock,
+            $this->requestStack,
+            $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
-        $this->controller->setTranslator($this->translatorMock);
-        $this->controller->setFlashBag($this->flashBagMock);
-        $this->controller->setModelFactory($this->modelFactoryMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
     }
 
@@ -156,11 +171,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects(self::any())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-        $this->controller->setRequestStack($requestStack);
+        $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
         $this->assertEquals(302, $response->getStatusCode());
     }
@@ -197,11 +208,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects(self::any())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-        $this->controller->setRequestStack($requestStack);
+        $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
         $this->assertEquals(302, $response->getStatusCode());
     }
@@ -246,10 +253,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ], 1)
             ->willReturn('someUrl');
 
-        $this->helperUserMock->expects($this->once())
-            ->method('getUser')
-            ->willReturn(new User(false));
-
         $this->formFactoryMock->expects($this->once())
             ->method('create')
             ->with('Mautic\EmailBundle\Form\Type\ExampleSendType',
@@ -270,12 +273,8 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ->method('render')
             ->willReturn('');
 
-        $request      = new Request();
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects(self::any())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-        $this->controller->setRequestStack($requestStack);
+        $request = new Request();
+        $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1);
     }
 }

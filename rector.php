@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Php80\Rector\Class_\DoctrineAnnotationClassToAttributeRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
@@ -19,7 +20,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             \Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
                 __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
                 __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
-                __DIR__.'/app/bundles/CoreBundle/Helper/TemplatingHelper.php', // Will be removed once Twig refactoring is done.
             ],
         ]
     );
@@ -40,19 +40,19 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30, this rule should run after the upgrade to doctrine 3.0
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30,
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_213,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
-        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
 
         // @todo implement the whole set. Start rule by rule below.
@@ -102,5 +102,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
             'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
         ],
+    ]);
+
+    $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
+        DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
     ]);
 };

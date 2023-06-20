@@ -32,8 +32,6 @@ class ReplyController extends AbstractController
     }
 
     /**
-     * @param $transport
-     *
      * @return Response
      *
      * @throws \Exception

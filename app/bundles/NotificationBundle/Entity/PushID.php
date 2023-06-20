@@ -126,8 +126,6 @@ class PushID
     }
 
     /**
-     * @param $enabled
-     *
      * @return $this
      */
     public function setEnabled($enabled)

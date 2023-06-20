@@ -49,8 +49,6 @@ class NoteModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -65,7 +63,6 @@ class NoteModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -88,11 +85,6 @@ class NoteModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -134,8 +126,6 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param $useFilters
-     *
      * @return mixed
      */
     public function getNoteCount(Lead $lead, $useFilters = false)

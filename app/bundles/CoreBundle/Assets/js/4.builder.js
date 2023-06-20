@@ -17,6 +17,12 @@ Mautic.getUrlParameter = function (name) {
  * @param actionName
  */
 Mautic.launchBuilder = function (formName, actionName) {
+
+    if (!mauticFroalaEnabled) {
+        alert('The legacy builder needs Froala library to work. Please go to Global Configuration > System Settings and enable Froala.');
+        return;
+    }
+
     var builder = mQuery('.builder');
     Mautic.codeMode = builder.hasClass('code-mode');
     Mautic.showChangeThemeWarning = true;

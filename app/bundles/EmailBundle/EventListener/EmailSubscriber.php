@@ -137,13 +137,13 @@ class EmailSubscriber implements EventSubscriberInterface
 
                 $retries = $stat->getRetryCount();
                 if ($retries > 3) {
-                    //tried too many times so just fail
+                    // tried too many times so just fail
                     $reason = $this->translator->trans('mautic.email.dnc.retries', [
                         '%subject%' => EmojiHelper::toShort($message->getSubject()),
                     ]);
                     $this->emailModel->setDoNotContact($stat, $reason);
                 } else {
-                    //set it to try again
+                    // set it to try again
                     $event->tryAgain();
                 }
 

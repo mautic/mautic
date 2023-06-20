@@ -112,9 +112,9 @@ class AssetModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
-            //make sure alias is not already taken
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $count     = $repo->checkUniqueAlias($testAlias, $entity);
@@ -132,7 +132,7 @@ class AssetModel extends FormModel
         }
 
         if (!$entity->isNew()) {
-            //increase the revision
+            // increase the revision
             $revision = $entity->getRevision();
             ++$revision;
             $entity->setRevision($revision);
@@ -142,7 +142,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param $asset
      * @param null   $request
      * @param string $code
      * @param array  $systemEntry
@@ -162,7 +161,7 @@ class AssetModel extends FormModel
         }
 
         $download = new Download();
-        $download->setDateDownload(new \Datetime());
+        $download->setDateDownload(new \DateTime());
         $download->setUtmCampaign($request->get('utm_campaign'));
         $download->setUtmContent($request->get('utm_content'));
         $download->setUtmMedium($request->get('utm_medium'));
@@ -171,7 +170,7 @@ class AssetModel extends FormModel
 
         // Download triggered by lead
         if (empty($systemEntry)) {
-            //check for any clickthrough info
+            // check for any clickthrough info
             $clickthrough = $request->get('ct', false);
             if (!empty($clickthrough)) {
                 $clickthrough = $this->decodeArrayFromUrl($clickthrough);
@@ -288,7 +287,7 @@ class AssetModel extends FormModel
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
-        //check for existing IP
+        // check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $download->setCode($code);
@@ -322,7 +321,6 @@ class AssetModel extends FormModel
     /**
      * Increase the download count.
      *
-     * @param            $asset
      * @param int        $increaseBy
      * @param bool|false $unique
      */
@@ -386,8 +384,6 @@ class AssetModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Asset|null
      */
     public function getEntity($id = null)
@@ -403,11 +399,6 @@ class AssetModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -450,10 +441,6 @@ class AssetModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $type
-     * @param $filter
-     * @param $limit
      *
      * @return array
      */
@@ -529,8 +516,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param $assets
-     *
      * @return int|string
      */
     public function getTotalFilesize($assets)

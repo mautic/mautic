@@ -191,12 +191,12 @@ class ConfigController extends AbstractFormController
             $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
         $hasFeatureErrors = (
-                $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
-                $formExtension->containsErrors($formView['featureSettings']['integration'])
-            ) || (
-                isset($formView['featureSettings']['sync']['integration']) &&
-                $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
-            );
+            $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
+            $formExtension->containsErrors($formView['featureSettings']['integration'])
+        ) || (
+            isset($formView['featureSettings']['sync']['integration']) &&
+            $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
+        );
 
         $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
 

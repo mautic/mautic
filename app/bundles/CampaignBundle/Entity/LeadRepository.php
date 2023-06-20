@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -19,7 +18,6 @@ class LeadRepository extends CommonRepository
     /**
      * Get the details of leads added to a campaign.
      *
-     * @param      $campaignId
      * @param null $leads
      *
      * @return array
@@ -54,7 +52,6 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign.
      *
-     * @param      $campaignId
      * @param null $eventId
      *
      * @return array
@@ -94,9 +91,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -105,7 +99,7 @@ class LeadRepository extends CommonRepository
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $campaigns = [];
@@ -121,15 +115,15 @@ class LeadRepository extends CommonRepository
         if (!empty($campaigns)) {
             $q->andWhere(
                 $q->expr()->notIn('campaign_id', $campaigns)
-            )->execute();
+            )->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'campaign_leads')
                 ->where('lead_id = '.(int) $fromLeadId)
-                ->execute();
+                ->executeStatement();
         } else {
-            $q->execute();
+            $q->executeStatement();
         }
     }
 
@@ -150,11 +144,11 @@ class LeadRepository extends CommonRepository
         $q->select('l.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
         $q->where(
-                $q->expr()->and(
-                    $q->expr()->eq('l.lead_id', ':leadId'),
-                    $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
-                )
-            );
+            $q->expr()->and(
+                $q->expr()->eq('l.lead_id', ':leadId'),
+                $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            )
+        );
 
         if (!empty($options['dataAddedLimit'])) {
             $q->andWhere($q->expr()
@@ -164,7 +158,7 @@ class LeadRepository extends CommonRepository
 
         $q->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchOne();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -245,7 +239,7 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -304,7 +298,7 @@ class LeadRepository extends CommonRepository
                 sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
             );
 
-            $totalCount += (int) $q->execute()->fetchOne();
+            $totalCount += (int) $q->executeQuery()->fetchOne();
         }
 
         return $totalCount;
@@ -324,7 +318,7 @@ class LeadRepository extends CommonRepository
             )
         )
             ->setParameter('campaign', $campaign)
-            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
 
         $results = $qb->getQuery()->getResult();
 
@@ -339,8 +333,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
-     *
      * @return array
      */
     public function getContactRotations(array $contactIds, $campaignId)
@@ -355,7 +347,7 @@ class LeadRepository extends CommonRepository
                 )
             )
             ->setParameter('campaignId', (int) $campaignId)
-            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
 
         $results = $qb->execute()->fetchAllAssociative();
 
@@ -396,7 +388,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $result = $qb->execute()->fetchAssociative();
+        $result = $qb->executeQuery()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
@@ -435,7 +427,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -468,14 +460,12 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $result = $qb->execute()->fetchAssociative();
+        $result = $qb->executeQuery()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
     /**
-     * @param $campaignId
-     *
      * @return array
      */
     public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
@@ -496,7 +486,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -527,14 +517,12 @@ class LeadRepository extends CommonRepository
                     $q->expr()->eq('cl.campaign_id', ':campaignId')
                 )
             )
-            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER)
             ->setParameter('campaignId', (int) $campaignId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
-     * @param $campaignId
-     *
      * @return array
      */
     private function getCampaignSegments($campaignId)
@@ -545,7 +533,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
             ->where('cl.campaign_id = '.(int) $campaignId)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         if (empty($segmentResults)) {
@@ -618,8 +606,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
-     *
-     * @param $campaignId
      */
     private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
     {

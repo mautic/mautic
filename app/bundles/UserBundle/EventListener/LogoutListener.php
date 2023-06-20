@@ -1,18 +1,14 @@
 <?php
 
-namespace Mautic\UserBundle\Security\Authentication;
+namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Event\LogoutEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 
-class LogoutHandler implements LogoutHandlerInterface
+class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
     /**
      * @var UserModel
@@ -39,29 +35,35 @@ class LogoutHandler implements LogoutHandlerInterface
         $this->user       = $userHelper->getUser();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Response never null
-     */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function onLogout(\Symfony\Component\Security\Http\Event\LogoutEvent $logoutEvent): void
     {
-        if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
-            $event = new LogoutEvent($this->user, $request);
-            $this->dispatcher->dispatch($event, UserEvents::USER_LOGOUT);
-        }
-
-        // Clear session
+        $request = $logoutEvent->getRequest();
         $session = $request->getSession();
-        $session->clear();
-
-        if (isset($event)) {
-            $sessionItems = $event->getPostSessionItems();
+        if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
+            $mauticEvent = new LogoutEvent($this->user, $request);
+            $this->dispatcher->dispatch($mauticEvent, UserEvents::USER_LOGOUT);
+            $sessionItems = $mauticEvent->getPostSessionItems();
             foreach ($sessionItems as $key => $value) {
                 $session->set($key, $value);
             }
         }
+        // Clear session
+        $session->clear();
+
         // Note that a logout occurred
         $session->set('post_logout', true);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [\Symfony\Component\Security\Http\Event\LogoutEvent::class => 'onLogout'];
+    }
+
+    public function onSymfonyComponentSecurityHttpEventLogoutEvent(\Symfony\Component\Security\Http\Event\LogoutEvent $logoutEvent): void
+    {
+        $this->onLogout($logoutEvent);
     }
 }

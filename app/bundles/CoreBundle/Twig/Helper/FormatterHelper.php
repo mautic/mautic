@@ -44,7 +44,7 @@ final class FormatterHelper
         switch ($type) {
             case 'array':
                 if (!is_array($val)) {
-                    //assume that it's serialized
+                    // assume that it's serialized
                     $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;

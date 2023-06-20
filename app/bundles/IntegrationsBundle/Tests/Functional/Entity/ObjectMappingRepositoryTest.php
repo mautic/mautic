@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Entity;
 
-use DateTimeImmutable;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -76,7 +75,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
             self::INTEGRATION_OBJECT_ID,
             self::INTERNAL_OBJECT_NAME,
             self::INTERNAL_OBJECT_ID,
-            $now = new DateTimeImmutable()
+            $now = new \DateTimeImmutable()
         );
 
         Assert::assertSame(1, $affectedRows);

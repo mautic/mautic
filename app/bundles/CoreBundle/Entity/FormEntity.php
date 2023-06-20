@@ -130,8 +130,6 @@ class FormEntity extends CommonEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -181,7 +179,7 @@ class FormEntity extends CommonEntity
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
             if ('published' == $status) {
-                //check to see if there is a category to check
+                // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
                     if (null !== $category && !$category->isPublished()) {

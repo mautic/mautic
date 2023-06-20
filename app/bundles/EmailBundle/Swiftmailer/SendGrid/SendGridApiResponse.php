@@ -28,7 +28,7 @@ class SendGridApiResponse
         $statusCode = $response->statusCode();
 
         if ($statusCode >= 200 && $statusCode <= 299) {
-            //Request was successful
+            // Request was successful
             return;
         }
 

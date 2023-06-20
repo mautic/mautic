@@ -30,7 +30,7 @@ trait ConfigAwareTrait
             $localParameters = $parameters;
         }
 
-        //check for parameter overrides
+        // check for parameter overrides
         if (file_exists($root.'/config/parameters_local.php')) {
             include $root.'/config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);

@@ -81,7 +81,7 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject()
     {
-        //create an integration object
+        // create an integration object
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
@@ -117,11 +117,11 @@ class ConfigFormTest extends KernelTestCase
                 ->method('getRepository')
                 ->will(
                     $this->returnValueMap(
-                            [
-                                [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
-                                [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
-                                [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
-                            ]
+                        [
+                            [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                            [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                            [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        ]
                     )
                 );
 
@@ -133,7 +133,7 @@ class ConfigFormTest extends KernelTestCase
             $coreParametersHelper,
             $twig,
             $pluginModel
-            );
+        );
 
         return $integrationHelper;
     }

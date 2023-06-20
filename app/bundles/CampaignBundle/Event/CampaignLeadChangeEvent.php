@@ -33,9 +33,6 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * CampaignLeadChangeEvent constructor.
-     *
-     * @param $leads
-     * @param $action
      */
     public function __construct(Campaign $campaign, $leads, $action)
     {
