@@ -17,8 +17,7 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
 
             return str_replace('%%', '%', $env);
         } catch (\InvalidArgumentException) {
-            // if the DSN is invalid, return null transport and then show a warning
-            return 'null://null';
+            return 'invalid://null';
         }
     }
 
