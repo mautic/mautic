@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -69,28 +70,28 @@ EOT
         if ($all && $leadFieldId) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.all_option_conflict').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
 
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         if ($all) {
-            return $this->addAllMissingColumns($output) ? \Symfony\Component\Console\Command\Command::SUCCESS : \Symfony\Component\Console\Command\Command::FAILURE;
+            return $this->addAllMissingColumns($output) ? Command::SUCCESS : Command::FAILURE;
         }
 
         if (!$leadFieldId) {
-            return $this->findAndAddColumn($output) ? \Symfony\Component\Console\Command\Command::SUCCESS : \Symfony\Component\Console\Command\Command::FAILURE;
+            return $this->findAndAddColumn($output) ? Command::SUCCESS : Command::FAILURE;
         }
 
         if (!$this->addColumn($leadFieldId, $userId, $output)) {
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     private function addAllMissingColumns(OutputInterface $output): bool
