@@ -8703,16 +8703,16 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.61",
+            "version": "2.1.62",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "33bee2654615db62e9b722efb4fdd2a21844fbb2"
+                "reference": "91133c14a341158beca82aede0b2138236a96bc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/33bee2654615db62e9b722efb4fdd2a21844fbb2",
-                "reference": "33bee2654615db62e9b722efb4fdd2a21844fbb2",
+                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/91133c14a341158beca82aede0b2138236a96bc8",
+                "reference": "91133c14a341158beca82aede0b2138236a96bc8",
                 "shasum": ""
             },
             "require": {
@@ -8759,7 +8759,7 @@
             "homepage": "http://elfinder.org",
             "support": {
                 "issues": "https://github.com/Studio-42/elFinder/issues",
-                "source": "https://github.com/Studio-42/elFinder/tree/2.1.61"
+                "source": "https://github.com/Studio-42/elFinder/tree/2.1.62"
             },
             "funding": [
                 {
@@ -8767,7 +8767,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-14T15:07:52+00:00"
+            "time": "2023-06-13T16:39:07+00:00"
         },
         {
             "name": "symfony/amqp-messenger",
