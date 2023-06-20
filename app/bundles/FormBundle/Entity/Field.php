@@ -123,7 +123,7 @@ class Field
     private $isAutoFill = false;
 
     /**
-     * @var array
+     * @var array<int, array|int|string>
      */
     private $changes;
 
@@ -259,7 +259,7 @@ class Field
     }
 
     /**
-     * @return array
+     * @return array<int, array|int|string>
      */
     public function getChanges()
     {
