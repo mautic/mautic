@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Iterator;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -12,7 +11,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -63,32 +61,15 @@ class ExportHelper
             throw new \Exception('No or invalid data given');
         }
 
-        switch ($type) {
-            case self::EXPORT_TYPE_CSV:
-                return $this->exportAsCsv($data, $filename);
-
-            case self::EXPORT_TYPE_EXCEL:
-                return $this->exportAsExcel($data, $filename);
-
-            default:
-                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
-        }
-    }
-
-    public function zipFile(string $filePath, string $fileName): string
-    {
-        $zipFilePath = str_replace('.csv', '.zip', $filePath);
-        $zipArchive  = new ZipArchive();
-
-        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
-            $zipArchive->addFile($filePath, $fileName);
-            $zipArchive->close();
-            $this->filePathResolver->delete($filePath);
-
-            return $zipFilePath;
+        if (self::EXPORT_TYPE_EXCEL === $type) {
+            return $this->exportAsExcel($data, $filename);
         }
 
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+        if (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsv($data, $filename);
+        }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
     }
 
     public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
@@ -102,6 +83,22 @@ class ExportHelper
         }
 
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
+    }
+
+    public function zipFile(string $filePath, string $fileName): string
+    {
+        $zipFilePath = str_replace('.csv', '.zip', $filePath);
+        $zipArchive  = new \ZipArchive();
+
+        if (true === $zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, $fileName);
+            $zipArchive->close();
+            $this->filePathResolver->delete($filePath);
+
+            return $zipFilePath;
+        }
+
+        throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
@@ -224,24 +221,5 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
-    }
-
-    public function getValidExportFileName(string $fileName, string $directory): string
-    {
-        $contactExportDir = $this->coreParametersHelper->get($directory);
-        $this->filePathResolver->createDirectory($contactExportDir);
-        $filePath     = $contactExportDir.'/'.$fileName;
-        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
-        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
-        $originalName = $fileName;
-        $i            = 1;
-
-        while (file_exists($filePath)) {
-            $fileName = $originalName.'_'.$i;
-            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
-            ++$i;
-        }
-
-        return $filePath;
     }
 }
