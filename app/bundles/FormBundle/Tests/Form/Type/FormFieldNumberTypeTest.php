@@ -78,7 +78,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
         $this->assertNotEmpty($form->getData());
 
-        $view = $form->createView();
+        $view     = $form->createView();
         $children = $view->children;
 
         foreach (array_keys($formData) as $key) {
