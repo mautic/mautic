@@ -53,6 +53,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
                     [
                         'label'      => 'mautic.form.field.form.number_precision',
                         'label_attr' => ['class' => 'control-label'],
+                        'data'       => (!isset($options['data']['precision'])) ? 0 : (int) $options['data']['precision'],
                         'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.form.field.form.number_precision.tooltip',
