@@ -82,39 +82,7 @@ EOT
             $userId      = $leadField->getCreatedBy();
         }
 
-        try {
-            $this->backgroundService->addColumn($leadFieldId, $userId);
-        } catch (LeadFieldWasNotFoundException $e) {
-            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ColumnAlreadyCreatedException $e) {
-            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
-
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
-        } catch (AbortColumnCreateException $e) {
-            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
-
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
-        } catch (CustomFieldLimitException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (DriverException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (SchemaException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (\Doctrine\DBAL\Exception $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
+        if (!$this->addColumn($leadFieldId, $userId, $output)) {
             return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
@@ -123,5 +91,46 @@ EOT
         $this->completeRun();
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
+    }
+
+    private function addColumn(int $leadFieldId, ?int $userId, OutputInterface $output): bool
+    {
+        try {
+            $this->backgroundService->addColumn($leadFieldId, $userId);
+        } catch (LeadFieldWasNotFoundException $e) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
+
+            return false;
+        } catch (ColumnAlreadyCreatedException $e) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
+
+            return true;
+        } catch (AbortColumnCreateException $e) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
+
+            return true;
+        } catch (CustomFieldLimitException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return false;
+        } catch (DriverException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return false;
+        } catch (SchemaException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return false;
+        } catch (\Doctrine\DBAL\Exception $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return false;
+        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
+            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
+
+            return false;
+        }
+
+        return true;
     }
 }
