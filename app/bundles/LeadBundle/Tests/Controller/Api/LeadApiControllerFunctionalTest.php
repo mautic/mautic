@@ -387,7 +387,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
         $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertSame(4, $response['contact']['points']);
-        $this->assertSame(null, $response['contact']['stage']); // stage was not set on the contact
+        $this->assertNull($response['contact']['stage']); // stage was not set on the contact
         $this->assertSame(2, $response['contact']['owner']['id']);
 
         // set the owner again for the other tests to work
