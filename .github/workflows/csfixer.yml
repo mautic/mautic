@@ -21,6 +21,9 @@ jobs:
               with:
                 args: fix --config=.php-cs-fixer.php --verbose --using-cache=no --show-progress=dots
 
+            - name: Pull changes
+              run: git pull
+              
             - uses: stefanzweifel/git-auto-commit-action@v4
               id: auto_commit_action
               with:
