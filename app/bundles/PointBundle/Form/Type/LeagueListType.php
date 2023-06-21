@@ -4,6 +4,7 @@ namespace Mautic\PointBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\PointBundle\Entity\League;
 use Mautic\PointBundle\Entity\LeagueRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -35,7 +36,7 @@ class LeagueListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (true === $options['return_entity']) {
-            $transformer = new IdToEntityModelTransformer($this->em, 'MauticPointBundle:League', 'id');
+            $transformer = new IdToEntityModelTransformer($this->em, League::class, 'id');
             $builder->addModelTransformer($transformer);
         }
     }
