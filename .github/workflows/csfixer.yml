@@ -31,7 +31,7 @@ jobs:
             - name: PHP-CS-Fixer
               uses: docker://oskarstark/php-cs-fixer-ga
               with:
-                args: fix --config=.php-cs-fixer.php --verbose --using-cache=no --show-progress=dots
+                args: --config=.php-cs-fixer.php --verbose --using-cache=no --show-progress=dots
 
             - name: Pull changes
               run: git pull
