@@ -34,6 +34,18 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * `Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
     * `Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
     * `Mautic\EmailBundle\Event\TransportWebhookEvent` does not have the transport in it. Each transport must validate the callback payload and decide if they are able to process it or not. If so, set the `Response` to the event to indicate success.
+    * `Swift_Message` was replaced with `Mautic\EmailBundle\Mailer\Message\MauticMessage`.
+    * `Swift_Transport` was replaced with `Symfony\Component\Mailer\Transport\TransportInterface`.
+    * The following classes were removed without any replacement:
+      * `Mautic\EmailBundle\Exception\PartialEmailSendFailure`
+      * `Mautic\EmailBundle\Helper\PlainTextMessageHelper`
+      * `Mautic\EmailBundle\Model\TransportType`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\SpoolTransportPass`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\EmailTransportPass`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\SwiftmailerDynamicMailerPass`
+    * All configuration keys connected with the email transports (starting with `mailer_`) were replaced with the single configuration key `mailer_dsn`.
+    * All classes the resided in the `app/bundles/EmailBundle/SwiftMailer` were removed.
+    * Spooling was removed in favour of the queuing functionality provided by the Symfony messenger.
 * Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
