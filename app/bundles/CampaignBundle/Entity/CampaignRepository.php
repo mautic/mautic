@@ -486,8 +486,8 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        if ($this->getSlaveConnection()->getConfiguration()->getResultCache()) {
-            $results = $this->getSlaveConnection()->executeCacheQuery(
+        if ($this->getReplicaConnection()->getConfiguration()->getResultCache()) {
+            $results = $this->getReplicaConnection()->executeCacheQuery(
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
