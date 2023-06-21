@@ -116,7 +116,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $mockGroupModel    = $this->createMock(GroupModel::class);
+        $mockGroupModel     = $this->createMock(GroupModel::class);
         $companyEntityFrom  = $this->createMock(Company::class);
         $doNotContact       = $this->createMock(DoNotContact::class);
 
@@ -216,7 +216,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $doNotContact       = $this->createMock(DoNotContact::class);
-        $mockGroupModel    = $this->createMock(GroupModel::class);
+        $mockGroupModel     = $this->createMock(GroupModel::class);
 
         $filterOperatorProvider = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),
@@ -273,7 +273,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel    = $this->createMock(GroupModel::class);
+        $mockGroupModel     = $this->createMock(GroupModel::class);
 
         $filterOperatorProvider = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),
@@ -348,7 +348,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel    = $this->createMock(GroupModel::class);
+        $mockGroupModel     = $this->createMock(GroupModel::class);
 
         $filterOperatorProvider = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),
@@ -424,7 +424,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
-        $mockGroupModel    = $this->createMock(GroupModel::class);
+        $mockGroupModel     = $this->createMock(GroupModel::class);
 
         $filterOperatorProvider = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),

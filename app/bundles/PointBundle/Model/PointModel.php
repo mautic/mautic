@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
+use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
@@ -290,7 +290,7 @@ class PointModel extends CommonFormModel
                     $delta = $action->getDelta();
 
                     $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
-                    $pointGroup              = $action->getGroup();
+                    $pointGroup               = $action->getGroup();
                     if (!empty($pointGroup)) {
                         /** @var GroupContactScoreRepository $scoreRepository */
                         $scoreRepository = $this->em->getRepository(GroupContactScore::class);

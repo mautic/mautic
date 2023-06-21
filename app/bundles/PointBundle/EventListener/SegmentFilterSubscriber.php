@@ -25,7 +25,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
         TypeOperatorProviderInterface $typeOperatorProvider,
         TranslatorInterface $translator)
     {
-        $this->groupRepository     = $groupRepository;
+        $this->groupRepository      = $groupRepository;
         $this->typeOperatorProvider = $typeOperatorProvider;
         $this->translator           = $translator;
     }
@@ -52,7 +52,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $groups = $this->groupRepository->getEntities();
+        $groups  = $this->groupRepository->getEntities();
         $choices = [];
 
         /** @var Group $group */

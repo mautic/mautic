@@ -52,7 +52,7 @@ class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testCompareScoreContactWithoutScoreInGroup(): void
     {
         $contactWithoutScore = $this->createContact('no-score@example.com');
-        $group              = $this->createGroup('A');
+        $group               = $this->createGroup('A');
         $this->em->flush();
 
         $this->assertFalse($this->repository->compareScore($contactWithoutScore->getId(), $group->getId(), 0, 'eq'));

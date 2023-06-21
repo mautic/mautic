@@ -45,7 +45,7 @@ class GroupListType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {
-                $groups = $this->repo->getEntities();
+                $groups  = $this->repo->getEntities();
                 $choices = [];
                 foreach ($groups as $l) {
                     $choices[$l->getName()] = $l->getId();

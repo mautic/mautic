@@ -40,7 +40,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
 
         $lead   = $this->createLead('john@doe.email');
         $email  = $this->createEmail();
-        $group = $this->createGroup('Group A');
+        $group  = $this->createGroup('Group A');
 
         $trackingHash = 'tracking_hash_123';
         $this->createEmailStat($lead, $email, $trackingHash);
@@ -48,7 +48,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
         $this->em->clear(Lead::class);
         $lead        = $leadModel->getEntity($lead->getId());
-        $groupScore = $lead->getGroupScores()->first();
+        $groupScore  = $lead->getGroupScores()->first();
 
         $this->assertEquals($pointAction->getDelta(), $groupScore->getScore());
         // group point action shouldn't update main contact points

@@ -118,7 +118,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->campaignModel          = $campaignModel;
         $this->coreParametersHelper   = $coreParametersHelper;
         $this->doNotContact           = $doNotContact;
-        $this->groupModel            = $groupModel;
+        $this->groupModel             = $groupModel;
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
@@ -320,8 +320,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null !== $lead && !empty($points)) {
             $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
             $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
-            $pointGroupId            = $event->getConfig()['group'] ?? null;
-            $pointGroup              = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+            $pointGroupId             = $event->getConfig()['group'] ?? null;
+            $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
 
             if (!empty($pointGroup)) {
                 $scoreRepository = $this->leadModel->getGroupContactScoreRepository();
@@ -674,7 +674,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         } elseif ($event->checkContext('lead.points')) {
             $operators    = $this->filterOperatorProvider->getAllOperators();
-            $group       = $event->getConfig()['group'] ?? null;
+            $group        = $event->getConfig()['group'] ?? null;
             $score        = $event->getConfig()['score'];
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 

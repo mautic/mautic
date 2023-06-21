@@ -232,7 +232,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
-        $this->groupScores     = new ArrayCollection();
+        $this->groupScores      = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)

@@ -23,7 +23,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $contactA = $this->createContact('contact-a@example.com');
         $contactB = $this->createContact('contact-b@example.com');
         $contactC = $this->createContact('contact-c@example.com');
-        $groupA  = $this->createGroup('Group A');
+        $groupA   = $this->createGroup('Group A');
         $this->em->flush();
 
         $this->addGroupContactScore($contactA, $groupA, 1);

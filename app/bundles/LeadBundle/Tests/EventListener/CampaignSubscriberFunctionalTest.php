@@ -778,7 +778,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'properties'                 => [
                     'operator'                   => 'gte',
                     'score'                      => 1,
-                    'group'                     => $pointGroup,
+                    'group'                      => $pointGroup,
                 ],
                 'type'                       => 'lead.points',
                 'eventType'                  => 'condition',
@@ -788,7 +788,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'buttons'                    => ['save' => ''],
                 'operator'                   => 'gte',
                 'score'                      => 1,
-                'group'                     => $pointGroup,
+                'group'                      => $pointGroup,
             ]
         );
 
@@ -821,7 +821,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'anchor'                     => 'yes',
                 'properties'                 => [
                     'points'                     => 1,
-                    'group'                     => $pointGroup,
+                    'group'                      => $pointGroup,
                 ],
                 'type'                       => 'lead.changepoints',
                 'eventType'                  => 'action',
@@ -830,7 +830,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
                 'buttons'                    => ['save' => ''],
                 'points'                     => 1,
-                'group'                     => $pointGroup,
+                'group'                      => $pointGroup,
             ]
         );
 

@@ -10,8 +10,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\GroupContactScore;
+use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
@@ -138,7 +138,7 @@ class TriggerModel extends CommonFormModel
             $repo        = $this->getEventRepository();
             $persist     = [];
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
-            $pointGroup = $entity->getGroup();
+            $pointGroup  = $entity->getGroup();
 
             /** @var LeadRepository $leadRepository */
             $leadRepository = $this->em->getRepository(Lead::class);
@@ -432,7 +432,7 @@ class TriggerModel extends CommonFormModel
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo         = $this->getEventRepository();
         $events       = $repo->getPublishedByPointTotal($points);
-        $groupEvents = $repo->getPublishedByGroupScore($lead->getGroupScores());
+        $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());
         $events       = array_merge($events, $groupEvents);
 
         if (!empty($events)) {

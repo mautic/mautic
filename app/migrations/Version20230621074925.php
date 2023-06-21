@@ -26,7 +26,7 @@ final class Version20230621074925 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $groupTableName              = $this->generateTableName(Group::TABLE_NAME);
+        $groupTableName               = $this->generateTableName(Group::TABLE_NAME);
         $contactScoreTableName        = $this->generateTableName(GroupContactScore::TABLE_NAME);
         $contactTableName             = $this->generateTableName('leads');
         $pointsTableName              = $this->generateTableName('points');
@@ -34,7 +34,7 @@ final class Version20230621074925 extends AbstractMauticMigration
         $leadPointsChangeLogTableName = $this->generateTableName('lead_points_change_log');
 
         $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
-        $contactScoreGroupFk  = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
+        $contactScoreGroupFk   = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
 
         $pointsGroupFk              = $this->generatePropertyName($pointsTableName, 'fk', ['group_id']);
         $pointTriggersGroupFk       = $this->generatePropertyName($pointTriggersTableName, 'fk', ['group_id']);
@@ -88,12 +88,12 @@ final class Version20230621074925 extends AbstractMauticMigration
     {
         $pointsTableName              = $this->generateTableName('points');
         $pointTriggersTableName       = $this->generateTableName('point_triggers');
-        $groupTableName              = $this->generateTableName(Group::TABLE_NAME);
+        $groupTableName               = $this->generateTableName(Group::TABLE_NAME);
         $contactScoreTableName        = $this->generateTableName(GroupContactScore::TABLE_NAME);
         $leadPointsChangeLogTableName = $this->generateTableName('lead_points_change_log');
 
         $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
-        $contactScoreGroupFk  = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
+        $contactScoreGroupFk   = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
 
         $pointsGroupFk              = $this->generatePropertyName($pointsTableName, 'fk', ['group_id']);
         $pointTriggersGroupFk       = $this->generatePropertyName($pointTriggersTableName, 'fk', ['group_id']);
