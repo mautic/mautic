@@ -80,7 +80,7 @@ $container->loadFromExtension('framework', [
         'failure_transport' => 'failed_default',
         'transports'        => [
             'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN)%',
                 'options'        => [
                     'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
                 ],
@@ -92,7 +92,7 @@ $container->loadFromExtension('framework', [
                 ],
             ],
             'failed_default' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN)%',
                 'options'        => [
                     'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
                 ],
