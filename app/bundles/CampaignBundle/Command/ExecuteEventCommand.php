@@ -34,8 +34,8 @@ class ExecuteEventCommand extends Command
                     parent::__construct();
 
         $this->scheduledExecutioner = $scheduledExecutioner;
-                $this->translator           = $translator;
-        $this->formatterHelper      = $formatterHelper;
+                   $this->translator           = $translator;
+           $this->formatterHelper      = $formatterHelper;
     }
 
     /**
