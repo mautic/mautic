@@ -16,6 +16,18 @@ jobs:
                 token: ${{ secrets.PAT }}
                 ref: ${{ github.head_ref }}
 
+            - name: Setup PHP, with composer and extensions
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: '8.1'
+                extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+            
+            - name: Install dependencies
+              run: |
+                composer validate
+                composer install --prefer-dist --no-progress --no-suggest
+                rm -rf var/cache
+
             - name: PHP-CS-Fixer
               uses: docker://oskarstark/php-cs-fixer-ga
               with:
