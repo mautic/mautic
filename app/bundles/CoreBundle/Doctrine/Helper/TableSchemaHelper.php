@@ -20,7 +20,7 @@ class TableSchemaHelper
     protected $db;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected $sm;
 
@@ -49,9 +49,6 @@ class TableSchemaHelper
      */
     protected $addTables;
 
-    /**
-     * @param $prefix
-     */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
         $this->db           = $db;
@@ -63,7 +60,7 @@ class TableSchemaHelper
     /**
      * Get the SchemaManager.
      *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager()
     {
@@ -79,7 +76,7 @@ class TableSchemaHelper
      */
     public function addTables(array $tables)
     {
-        //ensure none of the tables exist before manipulating the schema
+        // ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
             if (empty($table['name'])) {
                 throw new SchemaException('Table is missing required name key.');
@@ -88,7 +85,7 @@ class TableSchemaHelper
             $this->checkTableExists($table['name'], true);
         }
 
-        //now add the tables
+        // now add the tables
         foreach ($tables as $table) {
             $this->addTables[] = $table;
             $this->addTable($table, false);
@@ -116,8 +113,6 @@ class TableSchemaHelper
      *                     'primaryKey' => array(),
      *                     'uniqueIndex' => array()
      *                     )
-     * @param $checkExists
-     * @param $dropExisting
      *
      * @return $this
      *
@@ -144,7 +139,7 @@ class TableSchemaHelper
         $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
         if (!empty($columns)) {
-            //just to make sure a same name column is not added
+            // just to make sure a same name column is not added
             $columnsAdded = [];
             foreach ($columns as $column) {
                 if (empty($column['name'])) {
@@ -172,8 +167,6 @@ class TableSchemaHelper
     }
 
     /**
-     * @param $table
-     *
      * @return $this
      *
      * @throws SchemaException
@@ -208,7 +201,7 @@ class TableSchemaHelper
             }
         }
 
-        //reset schema
+        // reset schema
         $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
         $this->dropTables = $this->addTables = [];
     }
@@ -242,7 +235,7 @@ class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof PrimaryReadReplicaConnection) {
+        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

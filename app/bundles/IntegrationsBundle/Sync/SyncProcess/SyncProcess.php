@@ -328,8 +328,6 @@ class SyncProcess
     }
 
     /**
-     * @param $inputOptions
-     *
      * @throws IntegrationNotFoundException
      */
     private function processParallelSync($inputOptions): void

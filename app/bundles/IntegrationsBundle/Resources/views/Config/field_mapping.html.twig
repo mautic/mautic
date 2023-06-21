@@ -1,0 +1,32 @@
+
+{{ form_row(form.filter-totalFieldCount) }}
+{% for fieldName, fieldForm in form %}
+    {% if fieldForm.mappedField is defined %}
+        <div class="row">
+            <div class="col-sm-12">{{ form_label(fieldForm) }}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6{% if formContainsErrors(fieldForm.mappedField) %} has-error{% endif %}">
+                {{ form_widget(fieldForm.mappedField) }}
+            </div>
+            <div class="col-sm-6">{{ form_widget(fieldForm.syncDirection) }}</div>
+        </div>
+        <hr />
+    {% endif %}
+{% endfor %}
+{{- include('@MauticCore/Helper/pagination.html.twig', {
+    'totalItems'  : form['filter-totalFieldCount'].vars.data,
+    'page'        : page,
+    'limit'       : 15,
+    'fixedLimit'  : true,
+    'sessionVar'  : integration ~ '-' ~ object,
+    'target'      : '#IntegrationEditModal',
+    'jsCallback'  : 'Mautic.getPaginatedIntegrationFields',
+    'jsArguments' : [
+        {
+            'object'      : object,
+            'integration' : integration,
+            'keyword'     : form['filter-keyword'].vars.data,
+        }
+    ]
+}) -}}

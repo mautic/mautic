@@ -54,13 +54,15 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'cache'            => '%env(resolve:MAUTIC_TWIG_CACHE_DIR)%',
     'auto_reload'      => true,
     'strict_variables' => true,
     'paths'            => [
-        '%kernel.project_dir%/app/bundles' => 'bundles',
+        '%kernel.project_dir%/app/bundles'                  => 'bundles',
+        '%kernel.project_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%kernel.project_dir%/themes'                       => 'themes',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig

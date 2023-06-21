@@ -317,15 +317,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('+420444555666', $company->getPhone());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony(
-            [
-                'api_enabled'                       => true,
-                'api_enable_basic_auth'             => true,
-                'create_custom_field_in_background' => false,
-                'mailer_from_name'                  => 'Mautic',
-                'db_driver'                         => 'pdo_mysql',
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");

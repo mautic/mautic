@@ -1,0 +1,215 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ campaign.name }}{% endblock %}
+
+{% block actions %}
+  {{- include('@MauticCore/Helper/page_actions.html.twig', {
+    'item': campaign,
+    'templateButtons': {
+        'edit': securityHasEntityAccess(
+            permissions['campaign:campaigns:editown'],
+            permissions['campaign:campaigns:editother'],
+            campaign.createdBy
+        ),
+        'clone': permissions['campaign:campaigns:create'],
+        'delete': securityHasEntityAccess(
+            permissions['campaign:campaigns:deleteown'],
+            permissions['campaign:campaigns:deleteother'],
+            campaign.createdBy
+        ),
+        'close': securityHasEntityAccess(
+            permissions['campaign:campaigns:viewown'],
+            permissions['campaign:campaigns:viewother'],
+            campaign.createdBy
+        ),
+    },
+    'routeBase': 'campaign',
+  }) -}}
+{% endblock %}
+
+{% block publishStatus %}
+  {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
+{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- campaign detail header -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-6 va-m">
+                        <div class="text-white dark-sm mb-0">{{ campaign.description|purify }}</div>
+                    </div>
+                </div>
+            </div>
+            <!--/ campaign detail header -->
+
+            <!-- campaign detail collapseable -->
+            <div class="collapse" id="campaign-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
+                            {% for sourceType, typeNames in sources %}
+                              {% if typeNames is not empty %}
+                                <tr>
+                                    <td width="20%"><span class="fw-b textTitle">
+                                      {{ ('mautic.campaign.leadsource.'~sourceType)|trans }}
+                                    </td>
+                                    <td>
+                                        {{ typeNames|join(', ') }}
+                                    </td>
+                                </tr>
+                              {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ campaign detail collapseable -->
+        </div>
+
+        <div class="bg-auto bg-dark-xs">
+            <!-- campaign detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#campaign-details"><span
+                            class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                </span>
+            </div>
+            <!--/ campaign detail collapseable toggler -->
+
+            {{ customContent('left.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-line-chart"></span>
+                                        {{ 'mautic.campaign.stats'|trans }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-9 va-m">
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                                      'dateRangeForm': dateRangeForm,
+                                      'class':  'pull-right',
+                                    }) -}}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                  {{- include('@MauticCore/Helper/chart.html.twig', {
+                                    'chartData': stats,
+                                    'chartType': 'line',
+                                    'chartHeight': 300
+                                  }) -}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+
+            {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#preview-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.campaign.preview.header'|trans }}
+                    </a>
+                </li>
+                {% if events.decision is not empty %}
+                    <li class="">
+                        <a href="#decisions-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.campaign.event.decisions.header'|trans }}
+                        </a>
+                    </li>
+                {% endif %}
+                {% if events.action is not empty %}
+                    <li class="">
+                        <a href="#actions-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.campaign.event.actions.header'|trans }}
+                        </a>
+                    </li>
+                {% endif %}
+                {% if events.condition is not empty %}
+                    <li class="">
+                        <a href="#conditions-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.campaign.event.conditions.header'|trans }}
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="">
+                    <a href="#leads-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.lead.leads'|trans }}
+                    </a>
+                </li>
+                {{ customContent('tabs', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            </ul>
+            <!--/ tabs controls -->
+        </div>
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <!-- #events-container -->
+                <div class="active tab-pane fade in bdr-w-0" id="preview-container">
+                  {{- include('@MauticCampaign/Campaign/_preview.html.twig', {
+                        'campaignId': campaign.id,
+                        'campaign': campaign,
+                        'campaignEvents': campaignEvents,
+                        'campaignSources': campaignSources,
+                        'eventSettings': eventSettings,
+                        'canvasSettings': campaign.canvasSettings,
+                  }) -}}
+                </div>
+              {% if events.decision is not empty %}
+                <div class="tab-pane fade in bdr-w-0" id="decisions-container">
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['decision']}) -}}
+                </div>
+              {% endif %}
+              {% if events.action is not empty %}
+                <div class="tab-pane fade in bdr-w-0" id="actions-container">
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['action']}) -}}
+                </div>
+              {% endif %}
+              {% if events.condition is not empty %}
+                <div class="tab-pane fade in bdr-w-0" id="conditions-container">
+                  {{- include('@MauticCampaign/Campaign/_events.html.twig', {'events': events['condition']}) -}}
+                </div>
+              {% endif %}
+            <!--/ #events-container -->
+            <div class="tab-pane fade in bdr-w-0 page-list"
+                 id="leads-container"
+                 data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                <div class="clearfix"></div>
+            </div>
+            {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        </div>
+        <!--/ end: tab-content -->
+
+        {{ customContent('left.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+
+        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+
+        {{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+    </div>
+    <!--/ right section -->
+</div>
+<!--/ end: box layout -->
+{% endblock %}

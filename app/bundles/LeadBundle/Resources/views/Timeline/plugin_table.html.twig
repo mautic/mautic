@@ -1,0 +1,148 @@
+{% extends not app.request.isXmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block content %}
+  {% set leadId = lead is defined ? lead.id : null %}
+
+  {% if not app.request.isXmlHttpRequest %}
+    <style>.container { margin: auto !important; }</style>
+    <!-- filter form -->
+    <form method="post" action="{% if lead is defined %}{{ path('mautic_plugin_timeline_view', {'leadId': lead.id, 'integration': integration}) }}{% else %}{{ path('mautic_plugin_timeline_index', {'integration': integration}) }}{% endif %}" class="panel" id="timeline-filters">
+        <div class="form-control-icon pa-xs">
+            <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
+            <span class="the-icon fa fa-search text-muted mt-xs"></span>
+        </div>
+        {% if events.types is defined and events.types is iterable %}
+            <div class="history-search panel-footer text-muted">
+                <div class="col-xs-6">
+                    <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.includeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.exclude.placeholder'|trans }}">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.excludeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if lead is defined %}
+            <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}"/>
+        {% endif %}
+    </form>
+
+    <script>
+        mauticLang['showMore'] = '{{ 'mautic.core.more.show'|trans }}';
+        mauticLang['hideMore'] = '{{ 'mautic.core.more.hide'|trans }}';
+
+        var timelineForm = mQuery('#timeline-filters');
+        if (timelineForm.length) {
+            timelineForm.on('change', function() {
+                timelineForm.submit();
+            }).on('keyup', function() {
+                timelineForm.delay(200).submit();
+            }).on('submit', function(e) {
+                e.preventDefault();
+                Mautic.refreshLeadTimeline(timelineForm);
+            });
+
+        }
+    </script>
+
+    <div id="timeline-table">
+  {% endif %}
+
+  {% set baseUrl = lead is defined ?  path('mautic_plugin_timeline_view', {'leadId': lead.id, 'integration': integration}) : path('mautic_plugin_timeline_index', {'integration': integration}) %}
+  <div class="table-responsive">
+      <div class="tl-header">
+          {{ 'mautic.lead.timeline.displaying_events'|trans({'%total%': events.total}) }}
+          {% if lead is defined %}{{ 'mautic.lead.timeline.displaying_events_for_contact'|trans({'%contact%': lead.name, '%id%': lead.id}) }}{% endif %}
+          (<span class="tl-new">{{ newCount }}</span> {{ 'mautic.lead.timeline.events_new'|trans }})
+      </div>
+      <table class="table table-hover table-bordered" id="contact-timeline">
+          <thead>
+          <tr>
+              <th class="timeline-icon">
+                  <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                      <span class="fa fa-fw fa-level-down"></span>
+                  </a>
+              </th>
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'eventLabel',
+                  'text': 'mautic.lead.timeline.event_name',
+                  'class': 'timeline-name',
+                  'sessionVar': 'lead.' ~ leadId ~ '.timeline',
+                  'baseUrl': baseUrl,
+                  'target': '#timeline-table',
+              }) }}
+
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'eventType',
+                  'text': 'mautic.lead.timeline.event_type',
+                  'class': 'visible-md visible-lg timeline-type',
+                  'sessionVar': 'lead.' ~ leadId ~ '.timeline',
+                  'baseUrl': baseUrl,
+                  'target': '#timeline-table',
+              }) }}
+
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'timestamp',
+                  'text': 'mautic.lead.timeline.event_timestamp',
+                  'class': 'visible-md visible-lg timeline-timestamp',
+                  'sessionVar': 'lead.' ~ leadId ~ '.timeline',
+                  'baseUrl': baseUrl,
+                  'target': '#timeline-table',
+              }) }}
+          </tr>
+          <tbody>
+          {% for event in events.events %}
+              {% set icon = event.icon is defined ? event.icon : 'fa-history' %}
+              {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
+              {% if eventLabel is iterable %}
+                  {% set eventLabel %}
+                    <a href="{{ eventLabel.href }}" {% if eventLabel.isExternal is not defined %}data-toggle="ajax"{% else %}target="_new"{% endif %}>
+                      {{- eventLabel.label -}}
+                    </a>
+                  {% endset %}
+              {% endif %}
+
+              {% set details = '' %}
+              {% if lead is defined and event.contentTemplate is defined %}
+                  {% set details = include(event.contentTemplate, {'event': event, 'lead': lead}, with_context=false, ignore_missing=true)|trim %}
+              {% endif %}
+
+              <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.feature is defined %}timeline-featured{% endif %}">
+                  <td class="timeline-icon">
+                      <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-default {% if details is empty %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-target="timeline-details-{{ loop.index }}">
+                          <span class="fa fa-fw {{ icon }}"></span>
+                      </a>
+                  </td>
+                  <td class="timeline-name">{{ eventLabel }}</td>
+                  <td class="timeline-type">{% if event.eventType is defined %}{{ event.eventType }}{% endif %}</td>
+                  <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
+              </tr>
+              {% if details is not empty %}
+                  <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} timeline-details hide" id="timeline-details-{{ loop.index }}">
+                      <td colspan="4">
+                          {{ details|raw }}
+                      </td>
+                  </tr>
+              {% endif %}
+          {% endfor %}
+          </tbody>
+      </table>
+  </div>
+  <!--/ timeline -->
+
+  {% if not app.request.isXmlHttpRequest %}
+    </div>
+  {% endif %}
+{% endblock %}

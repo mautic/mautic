@@ -22,8 +22,6 @@ trait ChannelTrait
     /**
      * Get the model for a channel.
      *
-     * @param $channel
-     *
      * @return mixed
      */
     protected function getChannelModel($channel)
@@ -37,9 +35,6 @@ trait ChannelTrait
 
     /**
      * Get the entity for a channel item.
-     *
-     * @param $channel
-     * @param $channelId
      *
      * @return mixed
      */
@@ -60,8 +55,6 @@ trait ChannelTrait
     /**
      * Get the name and/or view URL for a channel entity.
      *
-     * @param      $channel
-     * @param      $channelId
      * @param bool $returnWithViewUrl
      *
      * @return array|bool|string

@@ -57,8 +57,6 @@ class MetadataProcessor
     }
 
     /**
-     * @param $email
-     *
      * @return array|mixed
      */
     public function getMetadata($email)
@@ -76,8 +74,6 @@ class MetadataProcessor
     }
 
     /**
-     * @param $email
-     *
      * @return array
      */
     public function getSubstitutionData($email)

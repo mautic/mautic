@@ -11,10 +11,6 @@ class VideoHitEvent extends CommonEvent
 
     protected $code;
 
-    /**
-     * @param $request
-     * @param $code
-     */
     public function __construct(VideoHit $hit, $request, $code)
     {
         $this->entity  = $hit;

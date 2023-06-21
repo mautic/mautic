@@ -1,107 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO\AddressDTO;
 
-/**
- * Class RecipientDTO.
- */
 final class RecipientDTO implements \JsonSerializable
 {
-    /**
-     * @var string|null
-     */
-    private $returnPath;
+    private ?string $returnPath = null;
+
+    private AddressDTO $address;
 
     /**
-     * @var AddressDTO
+     * @var array<string, string>
      */
-    private $address;
+    private array $tags = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $tags = [];
+    private array $metadata;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $metadata = [];
-
-    /**
-     * @var array
-     */
-    private $substitutionData = [];
+    private array $substitutionData;
 
     /**
      * RecipientDTO constructor.
      *
-     * @param array $metadata
-     * @param array $substitutionData
+     * @param array<string, mixed> $metadata
+     * @param array<string, mixed> $substitutionData
      */
-    public function __construct(AddressDTO $addressDTO, $metadata = [], $substitutionData = [])
+    public function __construct(AddressDTO $addressDTO, array $metadata = [], array $substitutionData = [])
     {
         $this->address          = $addressDTO;
         $this->metadata         = $metadata;
         $this->substitutionData = $substitutionData;
     }
 
-    /**
-     * @param string|null $returnPath
-     *
-     * @return RecipientDTO
-     */
-    public function setReturnPath($returnPath)
+    public function setReturnPath(?string $returnPath): self
     {
         $this->returnPath = $returnPath;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     *
-     * @return RecipientDTO
-     */
-    public function addTag($key, $value)
+    public function addTag(string $key, string $value): self
     {
         $this->tags[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return RecipientDTO
-     */
-    public function addMetadata($key, $value)
+    public function addMetadata(string $key, mixed $value): self
     {
         $this->metadata[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    public function addSubstitutionData($key, $value)
+    public function addSubstitutionData(string $key, mixed $value): self
     {
         $this->substitutionData[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'address' => $this->address,
@@ -115,7 +83,7 @@ final class RecipientDTO implements \JsonSerializable
 
         if (0 === count($this->substitutionData)) {
             // `substitution_data` is required but Sparkpost will return the following error with empty arrays:
-            // field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
+            // field 'substitution_data' is of type 'json', but needs to be of type 'json_object'
             $json['substitution_data'] = new \stdClass();
         } else {
             $json['substitution_data'] = $this->substitutionData;

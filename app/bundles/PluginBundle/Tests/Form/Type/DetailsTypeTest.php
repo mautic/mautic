@@ -158,6 +158,7 @@ class DetailsTypeTest extends TestCase
 
     /**
      * @param array<string> $expectedFeatures
+     *
      * @dataProvider withFeaturesProvider
      */
     public function testBuildFormWithFeatures(?int $integrationId, array $expectedFeatures): void

@@ -2,9 +2,7 @@
 
 namespace Mautic\ReportBundle\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
-
-class ReportHelper extends Helper
+final class ReportHelper
 {
     /**
      * @return string
@@ -15,8 +13,6 @@ class ReportHelper extends Helper
     }
 
     /**
-     * @param $type
-     *
      * @return string
      */
     public function getReportBuilderFieldType($type)

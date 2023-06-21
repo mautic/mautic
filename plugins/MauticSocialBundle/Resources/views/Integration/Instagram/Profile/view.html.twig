@@ -1,0 +1,26 @@
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs pr-md pl-md">
+        <li class="active">
+            <a href="#InstagramProfile" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.profile'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#InstagramPhotos" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.photos'|trans }}
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="np panel-body tab-content">
+    <div class="pa-20 tab-pane active" id="InstagramProfile">
+        {{ include('@MauticSocial/Integration/Instagram/Profile/profile.html.twig', {
+            'profile': details.profile,
+        }) }}
+    </div>
+    <div class="pa-20 tab-pane" id="InstagramPhotos">
+        {{ include('@MauticSocial/Integration/Instagram/Profile/photos.html.twig', {
+            'activity': details.activity.photos|default([]),
+        }) }}
+    </div>
+</div>

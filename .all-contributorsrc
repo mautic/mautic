@@ -951,7 +951,8 @@
       "profile": "http://rembo.me",
       "contributions": [
         "userTesting",
-        "code"
+        "code",
+        "review"
       ]
     },
     {
@@ -998,6 +999,51 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "JeanMarcAivie",
+      "name": "Jean-Marc ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/127292186?v=4",
+      "profile": "https://github.com/JeanMarcAivie",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "paulsanduleac",
+      "name": "Paul Sanduleac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67867?v=4",
+      "profile": "http://paulsanduleac.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lenonleite",
+      "name": "Lenon Leite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218436?v=4",
+      "profile": "http://lenonleite.com.br",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Syrgak-Alan",
+      "name": "Alan Syrgak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96595532?v=4",
+      "profile": "https://github.com/Syrgak-Alan",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "MohHeader",
+      "name": "Mohammed Header",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3213925?v=4",
+      "profile": "https://github.com/MohHeader",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -1006,5 +1052,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }

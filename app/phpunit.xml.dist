@@ -54,10 +54,12 @@
     <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
+    <server name="APP_ENV" value="test" force="true" />
     <ini name="error_reporting" value="E_ALL" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+    <listener class="\Mautic\CoreBundle\Test\Listeners\SeparateProcessListener" />
   </listeners>
   <extensions>
     <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />

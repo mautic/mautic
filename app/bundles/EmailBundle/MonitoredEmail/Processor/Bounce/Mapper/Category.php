@@ -24,10 +24,6 @@ class Category
 
     /**
      * Category constructor.
-     *
-     * @param $category
-     * @param $type
-     * @param $isPermanent
      */
     public function __construct($category, $type, $isPermanent)
     {

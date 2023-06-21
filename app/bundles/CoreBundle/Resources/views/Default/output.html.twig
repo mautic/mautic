@@ -1,0 +1,6 @@
+<div class="content-body">
+    {{ include('@MauticCore/Default/pageheader.html.twig') }}
+    {{ content|default('')|raw }}
+</div>
+{{ modal|default('')|raw }}
+{{ securityGetAuthenticationContext() }}

@@ -85,8 +85,6 @@ class Fetcher
     /**
      * Return SF query to fetch the object information for a CampaignMember.
      *
-     * @param $object
-     *
      * @return string
      *
      * @throws NoObjectsToFetchException

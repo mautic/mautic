@@ -95,8 +95,7 @@
         };
 
         Form.getFormLink = function(options) {
-            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
+            return Core.getMauticBaseUrl() + 'index.php/form/' + options.data['id'] + '?' + options.params;
         };
 
         Form.createIframe = function(options, embed) {
@@ -138,6 +137,8 @@
                     Form.prepareValidation(formId);
                     Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
+
+                    Form.populateValuesWithGetParameters();
                 }
             }
         };
@@ -776,6 +777,23 @@
             }
 
             return containerId;
+        };
+
+        Form.populateValuesWithGetParameters = function() {
+            if (document.forms.length !== 0 && window.location.search) {
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const entries = urlParams.entries();
+
+                for (const entry of entries) {
+                    const inputs = document.getElementsByName(`mauticform[${entry[0]}]`);
+                    inputs.forEach(function (input) {
+                        if (input.type !== 'hidden' && input.value === '') {
+                            input.value = entry[1].replace(/<[^>]*>?/gm, '');
+                        }
+                    });
+                }
+            }
         };
 
         Core.getValidator = function(formId) {
