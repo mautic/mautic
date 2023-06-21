@@ -22,7 +22,7 @@ class ExecuteEventCommand extends Command
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+                private $translator;
 
     /**
      * @var FormatterHelper
@@ -31,10 +31,10 @@ class ExecuteEventCommand extends Command
 
     public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
-        parent::__construct();
+                    parent::__construct();
 
         $this->scheduledExecutioner = $scheduledExecutioner;
-        $this->translator           = $translator;
+                $this->translator           = $translator;
         $this->formatterHelper      = $formatterHelper;
     }
 
