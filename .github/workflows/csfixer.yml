@@ -16,10 +16,18 @@ jobs:
                 token: ${{ secrets.PAT }}
                 ref: ${{ github.head_ref }}
 
-            - name: PHP-CS-Fixer
-              uses: docker://oskarstark/php-cs-fixer-ga
+            - name: Setup PHP, with composer and extensions
+              uses: shivammathur/setup-php@v2
               with:
-                args: fix --config=.php-cs-fixer.php --verbose --using-cache=no --show-progress=dots
+                php-version: '8.1'
+                extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+            
+            - name: Install dependencies & Run Fixer
+              run: |
+                composer validate
+                composer install --prefer-dist --no-progress --no-suggest
+                rm -rf var/cache
+                bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots
 
             - name: Pull changes
               run: git pull
