@@ -3,8 +3,16 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\FrequencyRule;
+use Mautic\LeadBundle\Entity\Tag;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Mautic\WebhookBundle\Entity\Event;
 
 class CommonEntity
 {
@@ -18,7 +26,7 @@ class CommonEntity
      */
     protected $pastChanges = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -57,8 +65,8 @@ class CommonEntity
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param string                                                                                                                                                                                                       $prop
+     * @param array<string, string>|\DateTime|\DateTimeInterface|bool|int|string|self|FormEntity|IpAddress|TranslationEntityInterface|VariantEntityInterface|Category|Channel|FrequencyRule|Tag|Stage|User|Event|Role|null $val
      */
     protected function isChanged($prop, $val)
     {
