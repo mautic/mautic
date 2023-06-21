@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
