@@ -312,7 +312,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->build();
 
-        $builder->addField('headers', 'json');
+        $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
     }

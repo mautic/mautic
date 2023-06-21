@@ -1,0 +1,38 @@
+name: Fix CS
+on:
+    pull_request:
+      types:
+        - closed  
+jobs:
+    if_merged:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        permissions:
+            # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+            contents: write        
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                token: ${{ secrets.PAT }}
+                ref: ${{ github.head_ref }}
+
+            - name: Setup PHP, with composer and extensions
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: '8.1'
+                extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+            
+            - name: Install dependencies & Run Fixer
+              run: |
+                composer validate
+                composer install --prefer-dist --no-progress --no-suggest
+                rm -rf var/cache
+                bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots
+
+            - name: Pull changes
+              run: git pull
+              
+            - uses: stefanzweifel/git-auto-commit-action@v4
+              id: auto_commit_action
+              with:
+                commit_message: "CS-Fixes"
