@@ -14,7 +14,6 @@ jobs:
             - uses: actions/checkout@v3
               with:
                 token: ${{ secrets.PAT }}
-                ref: ${{ github.head_ref }}
 
             - name: Setup PHP, with composer and extensions
               uses: shivammathur/setup-php@v2
