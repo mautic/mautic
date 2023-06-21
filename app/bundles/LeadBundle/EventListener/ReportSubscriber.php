@@ -284,7 +284,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($event->usesColumn(['pl.id', 'pl.name'])) {
-                    $qb->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leagues', 'pl', 'lp.league_id = pl.id');
+                    $qb->leftJoin('lp', MAUTIC_TABLE_PREFIX.'point_groups', 'pl', 'lp.group_id = pl.id');
                 }
 
                 break;
@@ -714,13 +714,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 'groupByFormula' => 'DATE(lp.date_added)',
             ],
             'pl.id' => [
-                'alias'          => 'league_id',
-                'label'          => 'mautic.lead.report.points.league_id',
+                'alias'          => 'group_id',
+                'label'          => 'mautic.lead.report.points.group_id',
                 'type'           => 'int',
             ],
             'pl.name' => [
-                'alias'          => 'league_name',
-                'label'          => 'mautic.lead.report.points.league_name',
+                'alias'          => 'group_name',
+                'label'          => 'mautic.lead.report.points.group_name',
                 'type'           => 'string',
             ],
         ];

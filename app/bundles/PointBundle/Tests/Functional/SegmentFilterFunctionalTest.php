@@ -5,8 +5,8 @@ namespace Mautic\PointBundle\Tests\Functional\EmailTriggerTest;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -14,7 +14,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    public function testLeaguePointSegmentFilter(): void
+    public function testGroupPointSegmentFilter(): void
     {
         $application = new Application(self::$kernel);
         $application->setAutoExit(false);
@@ -23,25 +23,25 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $contactA = $this->createContact('contact-a@example.com');
         $contactB = $this->createContact('contact-b@example.com');
         $contactC = $this->createContact('contact-c@example.com');
-        $leagueA  = $this->createLeague('League A');
+        $groupA  = $this->createGroup('Group A');
         $this->em->flush();
 
-        $this->addLeagueContactScore($contactA, $leagueA, 1);
-        $this->addLeagueContactScore($contactB, $leagueA, 0);
+        $this->addGroupContactScore($contactA, $groupA, 1);
+        $this->addGroupContactScore($contactB, $groupA, 0);
         $this->em->persist($contactA);
         $this->em->persist($contactB);
         $this->em->flush();
 
         $segmentA = new LeadList();
-        $segmentA->setName('League A points >= 1');
-        $segmentA->setPublicName('League A points >= 1');
-        $segmentA->setAlias('league-a-points-gte1');
+        $segmentA->setName('Group A points >= 1');
+        $segmentA->setPublicName('Group A points >= 1');
+        $segmentA->setAlias('group-a-points-gte1');
         $segmentA->setIsPublished(true);
         $segmentA->setFilters([
             [
                 'glue'       => 'and',
-                'field'      => 'league_points_'.$leagueA->getId(),
-                'object'     => 'leagues',
+                'field'      => 'group_points_'.$groupA->getId(),
+                'object'     => 'groups',
                 'type'       => 'number',
                 'operator'   => 'gte',
                 'properties' => [
@@ -65,7 +65,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
-        $this->client->request('GET', '/api/contacts?search=segment:league-a-points-gte1');
+        $this->client->request('GET', '/api/contacts?search=segment:group-a-points-gte1');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($this->client->getResponse()->isOk());
         $response = json_decode($clientResponse->getContent(), true);
@@ -86,25 +86,25 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createLeague(
+    private function createGroup(
         string $name
-    ): League {
-        $league = new League();
-        $league->setName($name);
-        $this->em->persist($league);
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
 
-        return $league;
+        return $group;
     }
 
-    private function addLeagueContactScore(
+    private function addGroupContactScore(
         Lead $lead,
-        League $league,
+        Group $group,
         int $score
     ): void {
-        $leagueContactScore = new LeagueContactScore();
-        $leagueContactScore->setContact($lead);
-        $leagueContactScore->setLeague($league);
-        $leagueContactScore->setScore($score);
-        $lead->addLeagueScore($leagueContactScore);
+        $groupContactScore = new GroupContactScore();
+        $groupContactScore->setContact($lead);
+        $groupContactScore->setGroup($group);
+        $groupContactScore->setScore($score);
+        $lead->addGroupScore($groupContactScore);
     }
 }

@@ -39,7 +39,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
-use Mautic\PointBundle\Model\LeagueModel;
+use Mautic\PointBundle\Model\GroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -77,9 +77,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
-     * @var LeagueModel
+     * @var GroupModel
      */
-    private $leagueModel;
+    private $groupModel;
 
     /**
      * @var CoreParametersHelper
@@ -107,7 +107,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         CampaignModel $campaignModel,
         CoreParametersHelper $coreParametersHelper,
         DoNotContact $doNotContact,
-        LeagueModel $leagueModel,
+        GroupModel $groupModel,
         FilterOperatorProvider $filterOperatorProvider
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
@@ -118,7 +118,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->campaignModel          = $campaignModel;
         $this->coreParametersHelper   = $coreParametersHelper;
         $this->doNotContact           = $doNotContact;
-        $this->leagueModel            = $leagueModel;
+        $this->groupModel            = $groupModel;
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
@@ -320,12 +320,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null !== $lead && !empty($points)) {
             $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
             $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
-            $pointLeagueId            = $event->getConfig()['league'] ?? null;
-            $pointLeague              = $pointLeagueId ? $this->leagueModel->getEntity($pointLeagueId) : null;
+            $pointGroupId            = $event->getConfig()['group'] ?? null;
+            $pointGroup              = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
 
-            if (!empty($pointLeague)) {
-                $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
-                $scoreRepository->adjustPoints($lead, $pointLeague, $points);
+            if (!empty($pointGroup)) {
+                $scoreRepository = $this->leadModel->getGroupContactScoreRepository();
+                $scoreRepository->adjustPoints($lead, $pointGroup, $points);
             } else {
                 $lead->adjustPoints($points);
             }
@@ -339,8 +339,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             $log->setActionName($pointsLogActionName);
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
-            if ($pointLeague) {
-                $log->setLeague($pointLeague);
+            if ($pointGroup) {
+                $log->setGroup($pointGroup);
             }
             $lead->addPointsChangeLog($log);
 
@@ -674,13 +674,13 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         } elseif ($event->checkContext('lead.points')) {
             $operators    = $this->filterOperatorProvider->getAllOperators();
-            $league       = $event->getConfig()['league'] ?? null;
+            $group       = $event->getConfig()['group'] ?? null;
             $score        = $event->getConfig()['score'];
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 
-            if ($league) {
-                $result = $this->leadModel->getLeagueContactScoreRepository()->compareScore(
-                    $lead->getId(), $league, $score, $operatorExpr,
+            if ($group) {
+                $result = $this->leadModel->getGroupContactScoreRepository()->compareScore(
+                    $lead->getId(), $group, $score, $operatorExpr,
                 );
             } else {
                 $result = $this->leadFieldModel->getRepository()->compareValue(

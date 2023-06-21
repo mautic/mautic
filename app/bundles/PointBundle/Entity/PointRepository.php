@@ -19,7 +19,7 @@ class PointRepository extends CommonRepository
             ->select($this->getTableAlias().', cat')
             ->from(\Mautic\PointBundle\Entity\Point::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
-            ->leftJoin($this->getTableAlias().'.league', 'pl');
+            ->leftJoin($this->getTableAlias().'.group', 'pl');
 
         $args['qb'] = $q;
 

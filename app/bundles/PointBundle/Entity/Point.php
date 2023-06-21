@@ -69,7 +69,7 @@ class Point extends FormEntity
      **/
     private $category;
 
-    private ?League $league = null;
+    private ?Group $group = null;
 
     public function __clone()
     {
@@ -115,8 +115,8 @@ class Point extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToOne('league', League::class)
-            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
     }
 
@@ -386,13 +386,13 @@ class Point extends FormEntity
         return $this->repeatable;
     }
 
-    public function getLeague(): ?League
+    public function getGroup(): ?Group
     {
-        return $this->league;
+        return $this->group;
     }
 
-    public function setLeague(League $league): void
+    public function setGroup(Group $group): void
     {
-        $this->league = $league;
+        $this->group = $group;
     }
 }

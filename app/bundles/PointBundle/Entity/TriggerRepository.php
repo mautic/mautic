@@ -19,7 +19,7 @@ class TriggerRepository extends CommonRepository
             ->select($this->getTableAlias().', cat')
             ->from(\Mautic\PointBundle\Entity\Trigger::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
-            ->leftJoin($this->getTableAlias().'.league', 'pl');
+            ->leftJoin($this->getTableAlias().'.group', 'pl');
 
         $args['qb'] = $q;
 

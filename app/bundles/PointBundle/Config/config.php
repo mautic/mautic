@@ -15,13 +15,13 @@ return [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
-            'mautic_point.league_index' => [
-                'path'       => '/points/leagues/{page}',
-                'controller' => 'Mautic\PointBundle\Controller\LeagueController::indexAction',
+            'mautic_point.group_index' => [
+                'path'       => '/points/groups/{page}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::indexAction',
             ],
-            'mautic_point.league_action' => [
-                'path'       => '/points/leagues/{objectAction}/{objectId}',
-                'controller' => 'Mautic\PointBundle\Controller\LeagueController::executeAction',
+            'mautic_point.group_action' => [
+                'path'       => '/points/groups/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
             ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
@@ -71,7 +71,7 @@ return [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
                 'iconClass' => 'fa-calculator',
-                'access'    => ['point:points:view', 'point:triggers:view', 'point:leagues:view'],
+                'access'    => ['point:points:view', 'point:triggers:view', 'point:groups:view'],
                 'priority'  => 30,
                 'children'  => [
                     'mautic.point.menu.index' => [
@@ -82,9 +82,9 @@ return [
                         'route'  => 'mautic_pointtrigger_index',
                         'access' => 'point:triggers:view',
                     ],
-                    'mautic.point.league.menu.index' => [
-                        'route'  => 'mautic_point.league_index',
-                        'access' => 'point:leagues:view',
+                    'mautic.point.group.menu.index' => [
+                        'route'  => 'mautic_point.group_index',
+                        'access' => 'point:groups:view',
                     ],
                 ],
             ],
@@ -107,8 +107,8 @@ return [
                     'mautic.tracker.contact',
                 ],
             ],
-            'mautic.point.model.league' => [
-                'class'     => \Mautic\PointBundle\Model\LeagueModel::class,
+            'mautic.point.model.group' => [
+                'class'     => \Mautic\PointBundle\Model\GroupModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',

@@ -1,19 +1,19 @@
 {% set isIndex = 'index' == tmpl ? true : false %}
 {% set tmpl = 'list' %}
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
-{% block mauticContent %}league{% endblock %}
+{% block mauticContent %}group{% endblock %}
 
-{% block headerTitle %}{{ 'mautic.point.league.header.index'|trans }}{% endblock %}
+{% block headerTitle %}{{ 'mautic.point.group.header.index'|trans }}{% endblock %}
 
 {% block actions %}
     {{- include(
         '@MauticCore/Helper/page_actions.html.twig',
         {
             'templateButtons': {
-            'new': permissions['point:leagues:create']
+            'new': permissions['point:groups:create']
         },
-            'routeBase': 'point.league',
-            'langVar': 'point.league'
+            'routeBase': 'point.group',
+            'langVar': 'point.group'
         }
     ) -}}
 {% endblock %}
@@ -28,27 +28,27 @@
             }) -}}
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped table-bordered" id="leagueTable">
+                    <table class="table table-hover table-striped table-bordered" id="groupTable">
                         <thead>
                         <tr>
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'checkall': 'true',
-                                    'target': '#leagueTable',
-                                    'langVar': 'point.league',
-                                    'routeBase': 'point.league',
+                                    'target': '#groupTable',
+                                    'langVar': 'point.group',
+                                    'routeBase': 'point.group',
                                     'templateButtons': {
-                                    'delete': permissions['point:leagues:delete'],
+                                    'delete': permissions['point:groups:delete'],
                                 }
                                 }) }}
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
-                                    'sessionVar': 'point.league',
+                                    'sessionVar': 'point.group',
                                     'orderBy'   : 'pl.name',
                                     'text'      : 'mautic.core.name',
-                                    'class'     : 'col-league-name',
+                                    'class'     : 'col-group-name',
                                     'default'   : true,
                                 }
                             ) }}
@@ -56,10 +56,10 @@
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {
-                                    'sessionVar' : 'point.league',
+                                    'sessionVar' : 'point.group',
                                     'orderBy'    : 'pl.id',
                                     'text'       : 'mautic.core.id',
-                                    'class'      : 'visible-md visible-lg col-league-id',
+                                    'class'      : 'visible-md visible-lg col-group-id',
                                 }
                             ) }}
                         </tr>
@@ -71,11 +71,11 @@
                                     {{- include('@MauticCore/Helper/list_actions.html.twig', {
                                         item: item,
                                         templateButtons: {
-                                            edit: permissions['point:leagues:edit'],
-                                            delete: permissions['point:leagues:delete'],
+                                            edit: permissions['point:groups:edit'],
+                                            delete: permissions['point:groups:delete'],
                                         },
-                                        routeBase: 'point.league',
-                                        langVar: 'point.league',
+                                        routeBase: 'point.group',
+                                        langVar: 'point.group',
                                     }) -}}
                                 </td>
                                 <td>
@@ -83,12 +83,12 @@
                                         {{- include(
                                             '@MauticCore/Helper/publishstatus_icon.html.twig',
                                             {
-                                                'item': item, 'model': 'point.league'
+                                                'item': item, 'model': 'point.group'
                                             }
                                         )}}
 
-                                        {% if permissions['point:leagues:edit'] %}
-                                            <a href="{{ path('mautic_point.league_action', {
+                                        {% if permissions['point:groups:edit'] %}
+                                            <a href="{{ path('mautic_point.group_action', {
                                                 objectAction: 'edit',
                                                 objectId: item.getId()
                                             }) }}" data-toggle="ajax">
@@ -115,8 +115,8 @@
                             'totalItems' : items|length,
                             'page'       : page,
                             'limit'      : limit,
-                            'baseUrl'    : path('mautic_point.league_index'),
-                            'sessionVar' : 'point.league',
+                            'baseUrl'    : path('mautic_point.group_index'),
+                            'sessionVar' : 'point.group',
                         }) -}}
                     </div>
                 </div>

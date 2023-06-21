@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Mautic\PointBundle\Form\Type\LeagueListType;
+use Mautic\PointBundle\Form\Type\GroupListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -58,12 +58,12 @@ class CampaignEventPointType extends AbstractType
             ]
         );
 
-        $builder->add('league', LeagueListType::class, [
-            'label'            => 'mautic.lead.campaign.event.point_league',
+        $builder->add('group', GroupListType::class, [
+            'label'            => 'mautic.lead.campaign.event.point_group',
             'label_attr'       => ['class' => 'control-label'],
             'attr'             => [
                 'class'    => 'form-control',
-                'tooltip'  => 'mautic.lead.campaign.event.point_league.help',
+                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
             ],
             'required'         => false,
             'by_reference'     => false,

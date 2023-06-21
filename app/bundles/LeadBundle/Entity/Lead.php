@@ -13,8 +13,8 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -208,9 +208,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $frequencyRules;
 
     /**
-     * @var ArrayCollection<int,LeagueContactScore>
+     * @var ArrayCollection<int,GroupContactScore>
      */
-    private $leagueScores;
+    private $groupScores;
 
     private $primaryCompany;
 
@@ -232,7 +232,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
-        $this->leagueScores     = new ArrayCollection();
+        $this->groupScores     = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -385,7 +385,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('leagueScores', 'Mautic\PointBundle\Entity\LeagueContactScore')
+        $builder->createOneToMany('groupScores', 'Mautic\PointBundle\Entity\GroupContactScore')
             ->mappedBy('contact')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -892,7 +892,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip, League $league = null)
+    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip, Group $group = null)
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -908,8 +908,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
-        if ($league) {
-            $event->setLeague($league);
+        if ($group) {
+            $event->setGroup($group);
         }
         $this->addPointsChangeLog($event);
     }
@@ -1994,30 +1994,30 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection<int,LeagueContactScore>
+     * @return ArrayCollection<int,GroupContactScore>
      */
-    public function getLeagueScores()
+    public function getGroupScores()
     {
-        return $this->leagueScores;
+        return $this->groupScores;
     }
 
     /**
-     * @param ArrayCollection<int,LeagueContactScore> $leagueScores
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
      */
-    public function setLeagueScores($leagueScores): void
+    public function setGroupScores($groupScores): void
     {
-        $this->leagueScores = $leagueScores;
+        $this->groupScores = $groupScores;
     }
 
-    public function addLeagueScore(LeagueContactScore $leagueContactScore): Lead
+    public function addGroupScore(GroupContactScore $groupContactScore): Lead
     {
-        $this->leagueScores[] = $leagueContactScore;
+        $this->groupScores[] = $groupContactScore;
 
         return $this;
     }
 
-    public function removeLeagueScore(LeagueContactScore $leagueContactScore): void
+    public function removeGroupScore(GroupContactScore $groupContactScore): void
     {
-        $this->leagueScores->removeElement($leagueContactScore);
+        $this->groupScores->removeElement($groupContactScore);
     }
 }

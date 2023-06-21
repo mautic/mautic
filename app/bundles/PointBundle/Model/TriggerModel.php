@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
@@ -138,7 +138,7 @@ class TriggerModel extends CommonFormModel
             $repo        = $this->getEventRepository();
             $persist     = [];
             $ipAddress   = $this->ipLookupHelper->getIpAddress();
-            $pointLeague = $entity->getLeague();
+            $pointGroup = $entity->getGroup();
 
             /** @var LeadRepository $leadRepository */
             $leadRepository = $this->em->getRepository(Lead::class);
@@ -156,7 +156,7 @@ class TriggerModel extends CommonFormModel
                     ],
                 ];
 
-                if (!$pointLeague) {
+                if (!$pointGroup) {
                     $args['filter']['force'][] = [
                         'column' => 'l.points',
                         'expr'   => 'gte',
@@ -164,16 +164,16 @@ class TriggerModel extends CommonFormModel
                     ];
                 } else {
                     $args['qb'] = $leadRepository->getEntitiesDbalQueryBuilder()
-                        ->leftJoin('l', MAUTIC_TABLE_PREFIX.LeagueContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
+                        ->leftJoin('l', MAUTIC_TABLE_PREFIX.GroupContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
                     $args['filter']['force'][] = [
                         'column' => 'pls.score',
                         'expr'   => 'gte',
                         'value'  => $entity->getPoints(),
                     ];
                     $args['filter']['force'][] = [
-                        'column' => 'pls.league_id',
+                        'column' => 'pls.group_id',
                         'expr'   => 'eq',
-                        'value'  => $entity->getLeague()->getId(),
+                        'value'  => $entity->getGroup()->getId(),
                     ];
                 }
 
@@ -432,8 +432,8 @@ class TriggerModel extends CommonFormModel
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo         = $this->getEventRepository();
         $events       = $repo->getPublishedByPointTotal($points);
-        $leagueEvents = $repo->getPublishedByLeagueScore($lead->getLeagueScores());
-        $events       = array_merge($events, $leagueEvents);
+        $groupEvents = $repo->getPublishedByGroupScore($lead->getGroupScores());
+        $events       = array_merge($events, $groupEvents);
 
         if (!empty($events)) {
             // get a list of actions that has already been applied to this lead

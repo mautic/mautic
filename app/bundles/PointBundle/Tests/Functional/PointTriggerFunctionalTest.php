@@ -8,8 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -38,18 +38,18 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($this->leadHasTag($lead, 'tag6'));
     }
 
-    public function testLeaguePointsTriggerWithTagAction(): void
+    public function testGroupPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */
         $model = self::$container->get('mautic.lead.model.lead');
 
-        $leagueA = $this->createLeague('League A');
-        $leagueB = $this->createLeague('League B');
+        $groupA = $this->createGroup('Group A');
+        $groupB = $this->createGroup('Group B');
 
-        $triggerA = $this->createTrigger('League A Trigger (should trigger)', 5, $leagueA);
+        $triggerA = $this->createTrigger('Group A Trigger (should trigger)', 5, $groupA);
         $this->createAddTagEvent('tagA', $triggerA);
 
-        $triggerB = $this->createTrigger('League B Trigger (should not trigger)', 5, $leagueB);
+        $triggerB = $this->createTrigger('Group B Trigger (should not trigger)', 5, $groupB);
         $this->createAddTagEvent('tagB', $triggerB);
 
         $lead = new Lead();
@@ -60,7 +60,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear(Lead::class);
         $lead = $model->getEntity($lead->getId());
 
-        $this->addLeagueContactScore($lead, $leagueA, 5);
+        $this->addGroupContactScore($lead, $groupA, 5);
         $model->setFieldValues($lead, ['points' => 5], false, true, true);
         $model->saveEntity($lead);
 
@@ -85,12 +85,12 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Lead::class);
 
-        $triggerA      = $this->createTrigger('League A Trigger (should trigger)', 5, null, true);
+        $triggerA      = $this->createTrigger('Group A Trigger (should trigger)', 5, null, true);
         $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
         $triggerA->addTriggerEvent(0, $triggerEventA);
         $triggerModel->saveEntity($triggerA);
 
-        $triggerB      = $this->createTrigger('League B Trigger (should not trigger)', 6, null, true);
+        $triggerB      = $this->createTrigger('Group B Trigger (should not trigger)', 6, null, true);
         $triggerEventB = $this->createAddTagEvent('tagB', $triggerB);
         $triggerB->addTriggerEvent(0, $triggerEventB);
         $triggerModel->saveEntity($triggerB);
@@ -101,7 +101,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
     }
 
-    public function testTriggerWithLeagueForExistingContacts(): void
+    public function testTriggerWithGroupForExistingContacts(): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = self::$container->get('mautic.lead.model.lead');
@@ -109,21 +109,21 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         /** @var TriggerModel $triggerModel */
         $triggerModel = self::$container->get('mautic.point.model.trigger');
 
-        $leagueA = $this->createLeague('League A');
-        $leagueB = $this->createLeague('League B');
+        $groupA = $this->createGroup('Group A');
+        $groupB = $this->createGroup('Group B');
 
         $lead = new Lead();
         $data = ['email' => 'pointtest@example.com', 'points' => 5];
         $leadModel->setFieldValues($lead, $data, false, true, true);
-        $this->addLeagueContactScore($lead, $leagueA, 5);
+        $this->addGroupContactScore($lead, $groupA, 5);
         $leadModel->saveEntity($lead);
 
-        $triggerA      = $this->createTrigger('League A Trigger (should trigger)', 5, $leagueA, true);
+        $triggerA      = $this->createTrigger('Group A Trigger (should trigger)', 5, $groupA, true);
         $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
         $triggerA->addTriggerEvent(0, $triggerEventA);
         $triggerModel->saveEntity($triggerA);
 
-        $triggerB      = $this->createTrigger('League B Trigger (should not trigger)', 5, $leagueB, true);
+        $triggerB      = $this->createTrigger('Group B Trigger (should not trigger)', 5, $groupB, true);
         $triggerEventB = $this->createAddTagEvent('tagB', $triggerB);
         $triggerB->addTriggerEvent(0, $triggerEventB);
         $triggerModel->saveEntity($triggerB);
@@ -136,15 +136,15 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     private function createTrigger(
         string $name,
         int $points = 0,
-        League $league = null,
+        Group $group = null,
         bool $triggerExistingLeads = false
     ): Trigger {
         $trigger = new Trigger();
         $trigger->setName($name);
         $trigger->setPoints($points);
 
-        if (isset($league)) {
-            $trigger->setLeague($league);
+        if (isset($group)) {
+            $trigger->setGroup($group);
         }
         if ($triggerExistingLeads) {
             $trigger->setTriggerExistingLeads($triggerExistingLeads);
@@ -171,26 +171,26 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         return $triggerEvent;
     }
 
-    private function createLeague(
+    private function createGroup(
         string $name
-    ): League {
-        $league = new League();
-        $league->setName($name);
-        $this->em->persist($league);
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
 
-        return $league;
+        return $group;
     }
 
-    private function addLeagueContactScore(
+    private function addGroupContactScore(
         Lead $lead,
-        League $league,
+        Group $group,
         int $score
     ): void {
-        $leagueContactScore = new LeagueContactScore();
-        $leagueContactScore->setContact($lead);
-        $leagueContactScore->setLeague($league);
-        $leagueContactScore->setScore($score);
-        $lead->addLeagueScore($leagueContactScore);
+        $groupContactScore = new GroupContactScore();
+        $groupContactScore->setContact($lead);
+        $groupContactScore->setGroup($group);
+        $groupContactScore->setScore($score);
+        $lead->addGroupScore($groupContactScore);
     }
 
     private function leadHasTag(

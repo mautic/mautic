@@ -13,8 +13,8 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -229,29 +229,29 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, $contactC->getPoints());
     }
 
-    public function testLeadLeaguePointEvents(): void
+    public function testLeadGroupPointEvents(): void
     {
         $application = new Application(self::$kernel);
         $application->setAutoExit(false);
         $applicationTester = new ApplicationTester($application);
 
-        $leagueA    = $this->createLeague('A');
+        $groupA    = $this->createGroup('A');
         $this->em->flush();
 
         $contactIds = $this->createContacts();
 
         /** @var Lead $contactB */
         $contactB = $this->contactRepository->getEntity($contactIds[1]);
-        $this->addLeagueContactScore($contactB, $leagueA, 0);
+        $this->addGroupContactScore($contactB, $groupA, 0);
         $this->em->persist($contactB);
 
         /** @var Lead $contactC */
         $contactC = $this->contactRepository->getEntity($contactIds[2]);
-        $this->addLeagueContactScore($contactC, $leagueA, 1);
+        $this->addGroupContactScore($contactC, $groupA, 1);
         $this->em->persist($contactC);
         $this->em->flush();
 
-        $campaign   = $this->createCampaignWithPointEvents($contactIds, $leagueA->getId());
+        $campaign   = $this->createCampaignWithPointEvents($contactIds, $groupA->getId());
 
         // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
         $this->em->clear();
@@ -273,22 +273,22 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var Lead $contactC */
         $contactC = $this->contactRepository->getEntity($contactIds[2]);
 
-        // point update action with selected league shouldn't update contact main points
+        // point update action with selected group shouldn't update contact main points
         $this->assertEquals(0, $contactA->getPoints());
         $this->assertEquals(0, $contactB->getPoints());
         $this->assertEquals(1, $contactC->getPoints());
 
-        $contactALeagueScores = $contactA->getLeagueScores();
-        $contactBLeagueScores = $contactB->getLeagueScores();
-        $contactCLeagueScores = $contactC->getLeagueScores();
+        $contactAGroupScores = $contactA->getGroupScores();
+        $contactBGroupScores = $contactB->getGroupScores();
+        $contactCGroupScores = $contactC->getGroupScores();
 
-        $this->assertEmpty($contactALeagueScores);
-        $this->assertNotEmpty($contactBLeagueScores);
-        $this->assertNotEmpty($contactCLeagueScores);
+        $this->assertEmpty($contactAGroupScores);
+        $this->assertNotEmpty($contactBGroupScores);
+        $this->assertNotEmpty($contactCGroupScores);
 
         $this->assertEquals(0, $contactA->getPoints());
-        $this->assertEquals(0, $contactBLeagueScores->first()->getScore());
-        $this->assertEquals(2, $contactCLeagueScores->first()->getScore());
+        $this->assertEquals(0, $contactBGroupScores->first()->getScore());
+        $this->assertEquals(2, $contactCGroupScores->first()->getScore());
     }
 
     /**
@@ -550,26 +550,26 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         return $campaign;
     }
 
-    private function createLeague(
+    private function createGroup(
         string $name
-    ): League {
-        $league = new League();
-        $league->setName($name);
-        $this->em->persist($league);
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
 
-        return $league;
+        return $group;
     }
 
-    private function addLeagueContactScore(
+    private function addGroupContactScore(
         Lead $lead,
-        League $league,
+        Group $group,
         int $score
     ): void {
-        $leagueContactScore = new LeagueContactScore();
-        $leagueContactScore->setContact($lead);
-        $leagueContactScore->setLeague($league);
-        $leagueContactScore->setScore($score);
-        $lead->addLeagueScore($leagueContactScore);
+        $groupContactScore = new GroupContactScore();
+        $groupContactScore->setContact($lead);
+        $groupContactScore->setGroup($group);
+        $groupContactScore->setScore($score);
+        $lead->addGroupScore($groupContactScore);
     }
 
     /**
@@ -728,12 +728,12 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      * -------------------
      *
      * @param array<int, int> $contactIds
-     * @param int|null        $pointLeague optional use of point league in campaign
+     * @param int|null        $pointGroup optional use of point group in campaign
      *
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    private function createCampaignWithPointEvents(array $contactIds, int $pointLeague = null): Campaign
+    private function createCampaignWithPointEvents(array $contactIds, int $pointGroup = null): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName('Test Update contact');
@@ -778,7 +778,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'properties'                 => [
                     'operator'                   => 'gte',
                     'score'                      => 1,
-                    'league'                     => $pointLeague,
+                    'group'                     => $pointGroup,
                 ],
                 'type'                       => 'lead.points',
                 'eventType'                  => 'condition',
@@ -788,7 +788,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'buttons'                    => ['save' => ''],
                 'operator'                   => 'gte',
                 'score'                      => 1,
-                'league'                     => $pointLeague,
+                'group'                     => $pointGroup,
             ]
         );
 
@@ -821,7 +821,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'anchor'                     => 'yes',
                 'properties'                 => [
                     'points'                     => 1,
-                    'league'                     => $pointLeague,
+                    'group'                     => $pointGroup,
                 ],
                 'type'                       => 'lead.changepoints',
                 'eventType'                  => 'action',
@@ -830,7 +830,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
                 'buttons'                    => ['save' => ''],
                 'points'                     => 1,
-                'league'                     => $pointLeague,
+                'group'                     => $pointGroup,
             ]
         );
 

@@ -32,45 +32,45 @@ class TriggerEventRepository extends CommonRepository
         );
 
         $q->where($expr);
-        $q->andWhere('r.league IS NULL');
+        $q->andWhere('r.group IS NULL');
 
         return $q->getQuery()->getArrayResult();
     }
 
     /**
-     * @param ArrayCollection<int,LeagueContactScore> $leagueScores
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
      *
      * @return mixed[]
      */
-    public function getPublishedByLeagueScore($leagueScores)
+    public function getPublishedByGroupScore($groupScores)
     {
-        if ($leagueScores->isEmpty()) {
+        if ($groupScores->isEmpty()) {
             return [];
         }
 
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}, partial pl.{id, name}')
             ->leftJoin('a.trigger', 'r')
-            ->leftJoin('r.league', 'pl')
+            ->leftJoin('r.group', 'pl')
             ->orderBy('a.order');
 
         // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
 
-        $leaguesExpr = $q->expr()->orX();
-        /** @var LeagueContactScore $score */
-        foreach ($leagueScores as $score) {
-            $leaguesExpr->add(
+        $groupsExpr = $q->expr()->orX();
+        /** @var GroupContactScore $score */
+        foreach ($groupScores as $score) {
+            $groupsExpr->add(
                 $q->expr()->andX(
-                    $q->expr()->eq('pl.id', $score->getLeague()->getId()),
+                    $q->expr()->eq('pl.id', $score->getGroup()->getId()),
                     $q->expr()->lte('r.points', $score->getScore())
                 )
             );
         }
 
         $q->where($expr);
-        $q->andWhere($leaguesExpr);
-        $q->andWhere('r.league IS NOT NULL');
+        $q->andWhere($groupsExpr);
+        $q->andWhere('r.group IS NOT NULL');
 
         return $q->getQuery()->getArrayResult();
     }

@@ -385,21 +385,21 @@
                 {% endif %}
             </div>
 
-            {% if lead.leagueScores is not empty %}
+            {% if lead.groupScores is not empty %}
                 <div class="panel-heading">
                     <div class="panel-title">
-                        {{ 'mautic.lead.leagues.panel.title'|trans }}
+                        {{ 'mautic.lead.groups.panel.title'|trans }}
                     </div>
                 </div>
 
-                <div class="panel-body pt-sm league-points-panel">
-                    {% for leagueScore in lead.leagueScores %}
+                <div class="panel-body pt-sm group-points-panel">
+                    {% for groupScore in lead.groupScores %}
                         <div class="row">
                             <h6 class="fw-sb col-md-6">
-                                {{ leagueScore.league.name }}
+                                {{ groupScore.group.name }}
                             </h6>
                             <p class="text-muted col-md-6">
-                                {{ 'mautic.lead.points.count'|trans({'%count%': leagueScore.score}) }}
+                                {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
                             </p>
                         </div>
                     {% endfor %}

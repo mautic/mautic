@@ -8,17 +8,17 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * @extends CommonRepository<LeagueContactScore>
+ * @extends CommonRepository<GroupContactScore>
  */
-class LeagueContactScoreRepository extends CommonRepository
+class GroupContactScoreRepository extends CommonRepository
 {
-    public function adjustPoints(Lead $contact, League $league, int $points, string $operator = Lead::POINTS_ADD): Lead
+    public function adjustPoints(Lead $contact, Group $group, int $points, string $operator = Lead::POINTS_ADD): Lead
     {
-        $contactScore = $this->findOneBy(['contact' => $contact, 'league' => $league]);
+        $contactScore = $this->findOneBy(['contact' => $contact, 'group' => $group]);
         if (empty($contactScore)) {
-            $contactScore = new LeagueContactScore();
+            $contactScore = new GroupContactScore();
             $contactScore->setContact($contact);
-            $contactScore->setLeague($league);
+            $contactScore->setGroup($group);
             $contactScore->setScore(0);
         }
         $oldScore = $contactScore->getScore();
@@ -47,21 +47,21 @@ class LeagueContactScoreRepository extends CommonRepository
         return $contact;
     }
 
-    public function compareScore(int $leadId, int $leagueId, int $score, string $operatorExpr): bool
+    public function compareScore(int $leadId, int $groupId, int $score, string $operatorExpr): bool
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('lcs.contact_id')
-            ->from(MAUTIC_TABLE_PREFIX.LeagueContactScore::TABLE_NAME, 'lcs');
+            ->from(MAUTIC_TABLE_PREFIX.GroupContactScore::TABLE_NAME, 'lcs');
 
         $expr = $q->expr()->and(
             $q->expr()->eq('lcs.contact_id', ':lead'),
-            $q->expr()->eq('lcs.league_id', ':leagueId'),
+            $q->expr()->eq('lcs.group_id', ':groupId'),
             $q->expr()->$operatorExpr('lcs.score', ':score'),
         );
 
         $q->where($expr)
             ->setParameter('lead', $leadId)
-            ->setParameter('leagueId', $leagueId)
+            ->setParameter('groupId', $groupId)
             ->setParameter('score', $score);
 
         return false !== $q->executeQuery()->fetchOne();

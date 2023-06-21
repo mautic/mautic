@@ -613,12 +613,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias'          => 'date_added',
                         ],
                         'pl.id' => [
-                            'alias' => 'league_id',
+                            'alias' => 'group_id',
                             'label' => '',
                             'type'  => 'int',
                         ],
                         'pl.name' => [
-                            'alias' => 'league_name',
+                            'alias' => 'group_name',
                             'label' => '',
                             'type'  => 'string',
                         ],
@@ -671,12 +671,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias'          => 'date_added',
                         ],
                         'pl.id' => [
-                            'alias' => 'league_id',
+                            'alias' => 'group_id',
                             'label' => '',
                             'type'  => 'int',
                         ],
                         'pl.name' => [
-                            'alias' => 'league_name',
+                            'alias' => 'group_name',
                             'label' => '',
                             'type'  => 'string',
                         ],

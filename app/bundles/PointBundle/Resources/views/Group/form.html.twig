@@ -1,12 +1,12 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block mauticContent %}league{% endblock %}
+{% block mauticContent %}group{% endblock %}
 
 {% block headerTitle %}
     {% if entity.id %}
-        {{ 'mautic.point.league.menu.edit'|trans }}
+        {{ 'mautic.point.group.menu.edit'|trans }}
     {% else %}
-        {{ 'mautic.point.league.menu.new'|trans }}
+        {{ 'mautic.point.group.menu.new'|trans }}
     {% endif %}
 {% endblock %}
 

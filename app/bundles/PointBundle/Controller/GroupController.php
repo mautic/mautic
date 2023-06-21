@@ -8,16 +8,16 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeagueController extends AbstractStandardFormController
+class GroupController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
-        return '@MauticPoint/League';
+        return '@MauticPoint/Group';
     }
 
     protected function getModelName(): string
     {
-        return 'point.league';
+        return 'point.group';
     }
 
     /**

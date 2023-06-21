@@ -11,8 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadPointLog;
-use Mautic\PointBundle\Entity\LeagueContactScore;
-use Mautic\PointBundle\Entity\LeagueContactScoreRepository;
+use Mautic\PointBundle\Entity\GroupContactScore;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
@@ -290,11 +290,11 @@ class PointModel extends CommonFormModel
                     $delta = $action->getDelta();
 
                     $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
-                    $pointLeague              = $action->getLeague();
-                    if (!empty($pointLeague)) {
-                        /** @var LeagueContactScoreRepository $scoreRepository */
-                        $scoreRepository = $this->em->getRepository(LeagueContactScore::class);
-                        $scoreRepository->adjustPoints($lead, $pointLeague, $delta);
+                    $pointGroup              = $action->getGroup();
+                    if (!empty($pointGroup)) {
+                        /** @var GroupContactScoreRepository $scoreRepository */
+                        $scoreRepository = $this->em->getRepository(GroupContactScore::class);
+                        $scoreRepository->adjustPoints($lead, $pointGroup, $delta);
                     } else {
                         $lead->adjustPoints($delta);
                     }
@@ -307,7 +307,7 @@ class PointModel extends CommonFormModel
                         $parsed[1],
                         $delta,
                         $ipAddress,
-                        $pointLeague
+                        $pointGroup
                     );
 
                     $event = new PointActionEvent($action, $lead);

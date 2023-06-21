@@ -7,25 +7,25 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueRepository;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentFilterSubscriber implements EventSubscriberInterface
 {
-    private LeagueRepository $leagueRepository;
+    private GroupRepository $groupRepository;
 
     private TypeOperatorProviderInterface $typeOperatorProvider;
 
     private TranslatorInterface $translator;
 
     public function __construct(
-        LeagueRepository $leagueRepository,
+        GroupRepository $groupRepository,
         TypeOperatorProviderInterface $typeOperatorProvider,
         TranslatorInterface $translator)
     {
-        $this->leagueRepository     = $leagueRepository;
+        $this->groupRepository     = $groupRepository;
         $this->typeOperatorProvider = $typeOperatorProvider;
         $this->translator           = $translator;
     }
@@ -37,7 +37,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
-                ['onGenerateSegmentFiltersAddPointLeagues', -10],
+                ['onGenerateSegmentFiltersAddPointGroups', -10],
             ],
             LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE   => [
                 ['onSegmentDictionaryGenerate', 0],
@@ -45,20 +45,20 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGenerateSegmentFiltersAddPointLeagues(LeadListFiltersChoicesEvent $event): void
+    public function onGenerateSegmentFiltersAddPointGroups(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
         if (!$event->isForSegmentation()) {
             return;
         }
 
-        $leagues = $this->leagueRepository->getEntities();
+        $groups = $this->groupRepository->getEntities();
         $choices = [];
 
-        /** @var League $league */
-        foreach ($leagues as $league) {
-            $choices['league_points_'.$league->getId()] = [
-                'label'      => $this->translator->trans('mautic.lead.lead.event.leaguepoints', ['%league%' => $league->getName()]),
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            $choices['group_points_'.$group->getId()] = [
+                'label'      => $this->translator->trans('mautic.lead.lead.event.grouppoints', ['%group%' => $group->getName()]),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
@@ -66,24 +66,24 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
         }
 
         foreach ($choices as $alias => $fieldOptions) {
-            $event->addChoice('leagues', $alias, $fieldOptions);
+            $event->addChoice('groups', $alias, $fieldOptions);
         }
     }
 
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {
-        $leagues = $this->leagueRepository->getEntities();
+        $groups = $this->groupRepository->getEntities();
 
-        /** @var League $league */
-        foreach ($leagues as $league) {
-            $event->addTranslation('league_points_'.$league->getId(), [
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            $event->addTranslation('group_points_'.$group->getId(), [
                 'type'                => ForeignValueFilterQueryBuilder::getServiceId(),
-                'foreign_table'       => 'league_contact_score',
+                'foreign_table'       => 'point_group_contact_score',
                 'foreign_table_field' => 'contact_id',
                 'table'               => 'leads',
                 'table_field'         => 'id',
                 'field'               => 'score',
-                'where'               => 'league_contact_score.league_id = '.$league->getId(),
+                'where'               => 'point_group_contact_score.group_id = '.$group->getId(),
                 'null_value'          => 0,
             ]);
         }

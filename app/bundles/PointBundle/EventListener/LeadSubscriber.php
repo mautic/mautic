@@ -110,8 +110,8 @@ class LeadSubscriber implements EventSubscriberInterface
             // Add the logs to the event array
             foreach ($logs['results'] as $log) {
                 $eventLabel = $log['eventName'].' / '.$log['delta'];
-                if (!empty($log['leagueName'])) {
-                    $eventLabel .= ' ('.$log['leagueName'].')';
+                if (!empty($log['groupName'])) {
+                    $eventLabel .= ' ('.$log['groupName'].')';
                 }
 
                 $event->addEvent(

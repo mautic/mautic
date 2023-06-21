@@ -102,8 +102,8 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
-            'league',
-            LeagueListType::class
+            'group',
+            GroupListType::class
         );
 
         $builder->add(

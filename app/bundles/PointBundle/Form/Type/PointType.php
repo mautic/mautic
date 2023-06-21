@@ -103,12 +103,12 @@ class PointType extends AbstractType
         }
 
         $builder->add(
-            'league',
-            LeagueListType::class,
+            'group',
+            GroupListType::class,
             [
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.league.form.league_descr',
+                    'tooltip' => 'mautic.point.group.form.group_descr',
                 ],
             ]
         );

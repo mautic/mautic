@@ -7,8 +7,8 @@ namespace Mautic\PointBundle\Tests\Functional;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PointBundle\Entity\League;
-use Mautic\PointBundle\Entity\LeagueContactScore;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +22,9 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testContactPointLogReportWithLeague(): void
+    public function testContactPointLogReportWithGroup(): void
     {
-        $this->createTestContactWithLeaguePoints();
+        $this->createTestContactWithGroupPoints();
         $report = new Report();
         $report->setName('Contact point log');
         $report->setSource('lead.pointlog');
@@ -45,12 +45,12 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         $this->assertSame([
-            // no., event_type, event_name,      email,       points_delta, league_name
-            ['1', 'test type', 'Adjust points', 'test2@example.com', '15', 'League A'],
-            ['2', 'test type', 'Adjust points', 'test3@example.com', '10', 'League A'],
-            ['3', 'test type', 'Adjust points', 'test1@example.com', '5', 'League A'],
-            ['4', 'test type', 'Adjust points', 'test3@example.com', '2', 'League B'],
-            ['5', 'test type', 'Adjust points', 'test2@example.com', '1', 'League B'],
+            // no., event_type, event_name,      email,       points_delta, group_name
+            ['1', 'test type', 'Adjust points', 'test2@example.com', '15', 'Group A'],
+            ['2', 'test type', 'Adjust points', 'test3@example.com', '10', 'Group A'],
+            ['3', 'test type', 'Adjust points', 'test1@example.com', '5', 'Group A'],
+            ['4', 'test type', 'Adjust points', 'test3@example.com', '2', 'Group B'],
+            ['5', 'test type', 'Adjust points', 'test2@example.com', '1', 'Group B'],
         ], array_slice($crawlerReportTable, 1, 5));
 
         // -- test API report data
@@ -63,45 +63,45 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
                 'event_name'  => 'Adjust points',
                 'email'       => 'test2@example.com',
                 'delta'       => '15',
-                'league_name' => 'League A',
+                'group_name' => 'Group A',
             ],
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
                 'email'       => 'test3@example.com',
                 'delta'       => '10',
-                'league_name' => 'League A',
+                'group_name' => 'Group A',
             ],
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
                 'email'       => 'test1@example.com',
                 'delta'       => '5',
-                'league_name' => 'League A',
+                'group_name' => 'Group A',
             ],
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
                 'email'       => 'test3@example.com',
                 'delta'       => '2',
-                'league_name' => 'League B',
+                'group_name' => 'Group B',
             ],
             [
                 'type'        => 'test type',
                 'event_name'  => 'Adjust points',
                 'email'       => 'test2@example.com',
                 'delta'       => '1',
-                'league_name' => 'League B',
+                'group_name' => 'Group B',
             ],
         ], $result['data']);
     }
 
-    public function testLeagueScoreReport(): void
+    public function testGroupScoreReport(): void
     {
-        $this->createTestContactWithLeaguePoints();
+        $this->createTestContactWithGroupPoints();
         $report = new Report();
-        $report->setName('League score report');
-        $report->setSource('league.score');
+        $report->setName('Group score report');
+        $report->setSource('group.score');
         $report->setColumns(['pl.name', 'ls.score', 'l.email']);
         $report->setTableOrder([[
             'column'    => 'ls.score',
@@ -119,12 +119,12 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         $this->assertSame([
-            // no., league_name, league_score, email
-            ['1', 'League A', '15', 'test2@example.com'],
-            ['2', 'League A', '10', 'test3@example.com'],
-            ['3', 'League A', '5', 'test1@example.com'],
-            ['4', 'League B', '2', 'test3@example.com'],
-            ['5', 'League B', '1', 'test2@example.com'],
+            // no., group_name, group_score, email
+            ['1', 'Group A', '15', 'test2@example.com'],
+            ['2', 'Group A', '10', 'test3@example.com'],
+            ['3', 'Group A', '5', 'test1@example.com'],
+            ['4', 'Group B', '2', 'test3@example.com'],
+            ['5', 'Group B', '1', 'test2@example.com'],
         ], array_slice($crawlerReportTable, 1, 5));
 
         // -- test API report data
@@ -134,39 +134,39 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame([
             [
-                'league_name'  => 'League A',
-                'league_score' => '15',
+                'group_name'  => 'Group A',
+                'group_score' => '15',
                 'email'        => 'test2@example.com',
             ],
             [
-                'league_name'  => 'League A',
-                'league_score' => '10',
+                'group_name'  => 'Group A',
+                'group_score' => '10',
                 'email'        => 'test3@example.com',
             ],
             [
-                'league_name'  => 'League A',
-                'league_score' => '5',
+                'group_name'  => 'Group A',
+                'group_score' => '5',
                 'email'        => 'test1@example.com',
             ],
             [
-                'league_name'  => 'League B',
-                'league_score' => '2',
+                'group_name'  => 'Group B',
+                'group_score' => '2',
                 'email'        => 'test3@example.com',
             ],
             [
-                'league_name'  => 'League B',
-                'league_score' => '1',
+                'group_name'  => 'Group B',
+                'group_score' => '1',
                 'email'        => 'test2@example.com',
             ],
         ], $result['data']);
     }
 
-    private function createTestContactWithLeaguePoints(): void
+    private function createTestContactWithGroupPoints(): void
     {
         $contactModel = self::$container->get('mautic.lead.model.lead');
 
-        $leagueA = $this->createLeague('League A');
-        $leagueB = $this->createLeague('League B');
+        $groupA = $this->createGroup('Group A');
+        $groupB = $this->createGroup('Group B');
         $this->em->flush();
 
         $contacts = [
@@ -176,11 +176,11 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
         $contactModel->saveEntities($contacts);
 
-        $this->adjustContactPoints($contacts[0], 5, $leagueA);
-        $this->adjustContactPoints($contacts[1], 15, $leagueA);
-        $this->adjustContactPoints($contacts[2], 10, $leagueA);
-        $this->adjustContactPoints($contacts[2], 2, $leagueB);
-        $this->adjustContactPoints($contacts[1], 1, $leagueB);
+        $this->adjustContactPoints($contacts[0], 5, $groupA);
+        $this->adjustContactPoints($contacts[1], 15, $groupA);
+        $this->adjustContactPoints($contacts[2], 10, $groupA);
+        $this->adjustContactPoints($contacts[2], 2, $groupB);
+        $this->adjustContactPoints($contacts[1], 1, $groupB);
 
         $contactModel->saveEntities($contacts);
     }
@@ -194,7 +194,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         return $contact;
     }
 
-    private function adjustContactPoints(Lead $contact, int $points, League $league): void
+    private function adjustContactPoints(Lead $contact, int $points, Group $group): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setIpAddress('127.0.0.1');
@@ -204,24 +204,24 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             'test action',
             $points,
             $ipAddress,
-            $league
+            $group
         );
         $contact->adjustPoints($points);
-        $leagueContactScore = new LeagueContactScore();
-        $leagueContactScore->setContact($contact);
-        $leagueContactScore->setLeague($league);
-        $leagueContactScore->setScore($points);
-        $contact->addLeagueScore($leagueContactScore);
+        $groupContactScore = new GroupContactScore();
+        $groupContactScore->setContact($contact);
+        $groupContactScore->setGroup($group);
+        $groupContactScore->setScore($points);
+        $contact->addGroupScore($groupContactScore);
     }
 
-    private function createLeague(
+    private function createGroup(
         string $name
-    ): League {
-        $league = new League();
-        $league->setName($name);
-        $this->em->persist($league);
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
 
-        return $league;
+        return $group;
     }
 
     /**

@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class League extends FormEntity
+class Group extends FormEntity
 {
-    public const TABLE_NAME = 'leagues';
+    public const TABLE_NAME = 'point_groups';
 
     /**
      * @var int
@@ -28,14 +28,14 @@ class League extends FormEntity
     private $description;
 
     /**
-     * @param ORM\ClassMetadata<League> $metadata
+     * @param ORM\ClassMetadata<Group> $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueRepository');
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\GroupRepository');
 
         $builder->addIdColumns();
     }

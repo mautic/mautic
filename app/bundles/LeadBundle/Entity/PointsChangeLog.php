@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\PointBundle\Entity\League;
+use Mautic\PointBundle\Entity\Group;
 
 /**
  * Class PointsChangeLog.
@@ -51,7 +51,7 @@ class PointsChangeLog
      */
     private $dateAdded;
 
-    private ?League $league = null;
+    private ?Group $group = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
@@ -81,8 +81,8 @@ class PointsChangeLog
 
         $builder->addField('delta', 'integer');
 
-        $builder->createManyToOne('league', League::class)
-            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addDateAdded();
@@ -262,13 +262,13 @@ class PointsChangeLog
         return $this->ipAddress;
     }
 
-    public function getLeague(): ?League
+    public function getGroup(): ?Group
     {
-        return $this->league;
+        return $this->group;
     }
 
-    public function setLeague(League $league): void
+    public function setGroup(Group $group): void
     {
-        $this->league = $league;
+        $this->group = $group;
     }
 }

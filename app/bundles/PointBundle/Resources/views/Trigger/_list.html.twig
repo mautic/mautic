@@ -33,8 +33,8 @@
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'point.trigger',
                         'orderBy': 'pl.name',
-                        'text': 'mautic.point.thead.league',
-                        'class': 'visible-md visible-lg col-point-league',
+                        'text': 'mautic.point.thead.group',
+                        'class': 'visible-md visible-lg col-point-group',
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -97,9 +97,9 @@
                         </span>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set league = item.league %}
-                        {% set leagueName = league.name|default('mautic.point.league.form.noleague'|trans) %}
-                        {{ leagueName }}
+                        {% set group = item.group %}
+                        {% set groupName = group.name|default('mautic.point.group.form.nogroup'|trans) %}
+                        {{ groupName }}
                     </td>
                     <td>{{ item.points }}</td>
                     <td class="visible-md visible-lg">{{ item.id }}</td>

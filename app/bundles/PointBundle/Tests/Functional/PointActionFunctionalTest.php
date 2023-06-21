@@ -10,7 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Entity\League;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\Point;
 
 class PointActionFunctionalTest extends MauticMysqlTestCase
@@ -33,36 +33,36 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($pointAction->getDelta(), $lead->getPoints());
     }
 
-    public function testPointActionWithLeagueReadEmail(): void
+    public function testPointActionWithGroupReadEmail(): void
     {
         /** @var LeadModel $leadModel */
         $leadModel = self::$container->get('mautic.lead.model.lead');
 
         $lead   = $this->createLead('john@doe.email');
         $email  = $this->createEmail();
-        $league = $this->createLeague('League A');
+        $group = $this->createGroup('Group A');
 
         $trackingHash = 'tracking_hash_123';
         $this->createEmailStat($lead, $email, $trackingHash);
-        $pointAction = $this->createReadEmailAction(5, $league);
+        $pointAction = $this->createReadEmailAction(5, $group);
         $this->client->request('GET', '/email/'.$trackingHash.'.gif');
         $this->em->clear(Lead::class);
         $lead        = $leadModel->getEntity($lead->getId());
-        $leagueScore = $lead->getLeagueScores()->first();
+        $groupScore = $lead->getGroupScores()->first();
 
-        $this->assertEquals($pointAction->getDelta(), $leagueScore->getScore());
-        // league point action shouldn't update main contact points
+        $this->assertEquals($pointAction->getDelta(), $groupScore->getScore());
+        // group point action shouldn't update main contact points
         $this->assertEquals(0, $lead->getPoints());
     }
 
-    private function createReadEmailAction(int $delta, League $league = null): Point
+    private function createReadEmailAction(int $delta, Group $group = null): Point
     {
         $pointAction = new Point();
         $pointAction->setName('Read email action');
         $pointAction->setDelta($delta);
         $pointAction->setType('email.open');
-        if ($league) {
-            $pointAction->setLeague($league);
+        if ($group) {
+            $pointAction->setGroup($group);
         }
         $this->em->persist($pointAction);
 
@@ -113,13 +113,13 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    private function createLeague(
+    private function createGroup(
         string $name
-    ): League {
-        $league = new League();
-        $league->setName($name);
-        $this->em->persist($league);
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
 
-        return $league;
+        return $group;
     }
 }

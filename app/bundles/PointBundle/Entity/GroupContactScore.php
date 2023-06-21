@@ -9,29 +9,29 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeagueContactScore extends CommonEntity
+class GroupContactScore extends CommonEntity
 {
-    public const TABLE_NAME = 'league_contact_score';
+    public const TABLE_NAME = 'point_group_contact_score';
 
     private Lead $contact;
-    private League $league;
+    private Group $group;
     private int $score;
 
     /**
-     * @param ORM\ClassMetadata<LeagueContactScore> $metadata
+     * @param ORM\ClassMetadata<GroupContactScore> $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueContactScoreRepository');
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\GroupContactScoreRepository');
 
-        $builder->addContact(false, 'CASCADE', true, 'league_score');
+        $builder->addContact(false, 'CASCADE', true, 'group_score');
 
-        $builder->createManyToOne('league', 'Mautic\PointBundle\Entity\League')
+        $builder->createManyToOne('group', 'Mautic\PointBundle\Entity\Group')
             ->isPrimaryKey()
-            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->createField('score', 'integer')
@@ -48,14 +48,14 @@ class LeagueContactScore extends CommonEntity
         $this->contact = $contact;
     }
 
-    public function getLeague(): League
+    public function getGroup(): Group
     {
-        return $this->league;
+        return $this->group;
     }
 
-    public function setLeague(League $league): void
+    public function setGroup(Group $group): void
     {
-        $this->league = $league;
+        $this->group = $group;
     }
 
     public function getScore(): int
