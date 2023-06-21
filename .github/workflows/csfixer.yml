@@ -1,0 +1,27 @@
+name: Fix CS
+on:
+    pull_request:
+      types:
+        - closed  
+jobs:
+    if_merged:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        permissions:
+            # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+            contents: write        
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                token: ${{ secrets.PAT }}
+                ref: ${{ github.head_ref }}
+
+            - name: PHP-CS-Fixer
+              uses: docker://oskarstark/php-cs-fixer-ga
+              with:
+                args: fix --config=.php-cs-fixer.php --verbose --using-cache=no --show-progress=dots
+
+            - uses: stefanzweifel/git-auto-commit-action@v4
+              id: auto_commit_action
+              with:
+                commit_message: "CS-Fixes"
