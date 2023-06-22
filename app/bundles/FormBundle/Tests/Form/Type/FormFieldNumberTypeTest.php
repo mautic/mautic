@@ -34,6 +34,12 @@ final class FormFieldNumberTypeTest extends TypeTestCase
 
     public function testBuildFormIfParentIsEmpty(): void
     {
+        $options = [
+            'data' => [
+                'precision' => 0,
+            ],
+        ];
+
         $this->formBuilder->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
@@ -53,17 +59,17 @@ final class FormFieldNumberTypeTest extends TypeTestCase
                     [
                         'label'      => 'mautic.form.field.form.number_precision',
                         'label_attr' => ['class' => 'control-label'],
-                        'data'       => (!isset($options['data']['precision'])) ? 0 : (int) $options['data']['precision'],
+                        'data'       => 0,
+                        'required'   => false,
                         'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.form.field.form.number_precision.tooltip',
                         ],
-                        'required' => false,
                     ],
                 ]
             );
 
-        $this->form->buildForm($this->formBuilder, []);
+        $this->form->buildForm($this->formBuilder, $options);
     }
 
     public function testSubmitValidData(): void
