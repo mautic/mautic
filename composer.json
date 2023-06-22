@@ -30,7 +30,6 @@
     "liip/functional-test-bundle": "^4.3",
     "liip/test-fixtures-bundle": "^2.6",
     "mautic/transifex": "^5.0",
-    "php-http/mock-client": "^1.4",
     "phpstan/extension-installer": "^1.3",
     "phpstan/phpstan": "^1.10",
     "phpstan/phpstan-deprecation-rules": "^1.1",
