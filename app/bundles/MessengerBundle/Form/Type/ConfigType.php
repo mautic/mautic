@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Form\Type;
 
-use Mautic\EmailBundle\Form\DataTransformer\DsnTransformer;
-use Mautic\EmailBundle\Form\Type\DsnType;
+use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\MessengerBundle\Validator\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -13,28 +12,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
 {
-    public function __construct(private DsnTransformer $dsnTransformer)
-    {
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'messenger_dsn',
             DsnType::class,
             [
-                'label'       => false,
-                'constraints' => [
-                    new Dsn(),
-                ],
-                'error_mapping' => [
-                    '.' => 'scheme',
-                ],
+                'constraints' => [new Dsn()],
             ]
         );
-
-        $builder->get('messenger_dsn')
-            ->addModelTransformer($this->dsnTransformer);
 
         $builder->add(
             'messenger_retry_strategy_max_retries',

@@ -6,39 +6,7 @@
         <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
     </div>
     <div class="panel-body">
-        <div class="row">
-            <div class="col-md-6 col-lg-3">
-                {{ form_row(fields.messenger_dsn.scheme) }}
-            </div>
-            <div class="col-md-6 col-lg-3">
-                {{ form_row(fields.messenger_dsn.host, { 'attr': {'preaddon_text': '://'} }) }}
-            </div>
-            <div class="col-md-6 col-lg-3">
-                {{ form_row(fields.messenger_dsn.port, { 'attr': {'preaddon_text': ':'} }) }}
-            </div>
-            <div class="col-md-6 col-lg-3">
-                {{ form_row(fields.messenger_dsn.path, { 'attr': {'preaddon_text': '/'} }) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-lg-6">
-                        {{ form_row(fields.messenger_dsn.user) }}
-                    </div>
-                    <div class="col-lg-6">
-                        {{ form_row(fields.messenger_dsn.password, { 'attr': {'preaddon_text': ':'} }) }}
-                    </div>
-                </div>
-                <div>
-                    <code>{{ fields.messenger_dsn.vars.currentDns }}</code>
-                </div>
-            </div>
-            <div class="col-md-6">
-                {{ form_row(fields.messenger_dsn.options) }}
-            </div>
-        </div>
-        {{ form_rest(fields.messenger_dsn) }}
+        {{ form_row(fields.messenger_dsn) }}
     </div>
 </div>
 
