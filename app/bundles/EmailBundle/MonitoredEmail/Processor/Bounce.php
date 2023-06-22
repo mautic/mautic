@@ -6,21 +6,22 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Mailer\Transport\BounceProcessorInterface;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
     /**
-     * @var \Swift_Transport
+     * @var TransportInterface
      */
     protected $transport;
 
@@ -68,7 +69,7 @@ class Bounce implements ProcessorInterface
      * Bounce constructor.
      */
     public function __construct(
-        \Swift_Transport $transport,
+        TransportInterface $transport,
         ContactFinder $contactFinder,
         StatRepository $statRepository,
         LeadModel $leadModel,

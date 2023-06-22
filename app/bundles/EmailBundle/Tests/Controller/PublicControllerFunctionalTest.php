@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -16,6 +20,32 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['show_contact_preferences'] = 1;
         parent::setUp();
+    }
+
+    public function testMailerCallbackWhenNoTransportProccessesIt(): void
+    {
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+    }
+
+    public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
+    {
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn () => null /* exists but does nothing */);
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+    }
+
+    public function testMailerCallbackWhenTransportProccessesIt(): void
+    {
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('OK', $this->client->getResponse()->getContent());
     }
 
     public function testUnsubscribeFormActionWithoutTheme(): void
