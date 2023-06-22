@@ -90,6 +90,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
     * Deprecated cookie `mtc_sid` removed.
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
+    * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
 
 # Dependency injection improvements
 
