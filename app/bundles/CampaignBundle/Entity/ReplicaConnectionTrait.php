@@ -12,10 +12,10 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 trait ReplicaConnectionTrait
 {
     /**
-     * Get a connection, preferring a slave connection if available and prudent.
+     * Get a connection, preferring a replica connection if available and prudent.
      *
      * If a query is being executed with a limiter with specific contacts
-     * then this could be a real-time request being handled so we should avoid forcing a slave connection.
+     * then this could be a real-time request being handled so we should avoid forcing a replica connection.
      */
     private function getReplicaConnection(ContactLimiter $limiter = null): Connection
     {
