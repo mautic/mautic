@@ -33,7 +33,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $owner;
 
     /**
-     * @var mixed[]
+     * @var array<string, array<string, string>>
      */
     private $socialCache = [];
 
@@ -69,7 +69,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, array<string, string>>
      */
     public function getSocialCache()
     {
@@ -77,7 +77,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed[] $cache
+     * @param array<string, array<string, string>> $cache
      */
     public function setSocialCache($cache)
     {
@@ -182,8 +182,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param string|User                                                       $prop
+     * @param int|string|User|Company|array<string, array<string, string>>|null $val
      */
     protected function isChanged($prop, $val)
     {
@@ -282,7 +282,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -290,7 +290,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      *
      * @return Company
      */
@@ -302,7 +302,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEmail()
     {
@@ -310,7 +310,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $email
+     * @param string $email
      *
      * @return Company
      */
@@ -322,7 +322,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getAddress1()
     {
@@ -330,7 +330,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $address1
+     * @param string $address1
      *
      * @return Company
      */
@@ -342,7 +342,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getAddress2()
     {
@@ -350,7 +350,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $address2
+     * @param string $address2
      *
      * @return Company
      */
@@ -362,7 +362,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPhone()
     {
@@ -370,7 +370,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $phone
+     * @param string $phone
      *
      * @return Company
      */
@@ -382,7 +382,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getCity()
     {
@@ -390,7 +390,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $city
+     * @param string $city
      *
      * @return Company
      */
@@ -402,7 +402,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getState()
     {
@@ -410,7 +410,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $state
+     * @param string $state
      *
      * @return Company
      */
@@ -422,7 +422,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getZipcode()
     {
@@ -430,7 +430,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $zipcode
+     * @param string $zipcode
      *
      * @return Company
      */
@@ -442,7 +442,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getCountry()
     {
@@ -450,7 +450,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $country
+     * @param string $country
      *
      * @return Company
      */
@@ -462,7 +462,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getWebsite()
     {
@@ -470,7 +470,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $website
+     * @param string $website
      *
      * @return Company
      */
@@ -482,7 +482,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getIndustry()
     {
@@ -490,7 +490,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $industry
+     * @param string $industry
      *
      * @return Company
      */
@@ -502,7 +502,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDescription()
     {
@@ -510,7 +510,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
      *
      * @return Company
      */
