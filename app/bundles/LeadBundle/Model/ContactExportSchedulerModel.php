@@ -220,7 +220,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $csvFilePath = $this->exportHelper
             ->exportDataIntoFile($iterator, $fileType, strtolower($fileName.'.'.$fileType));
 
-        return $this->exportHelper->zipFile($csvFilePath);
+        return $this->exportHelper->zipFile($csvFilePath, 'contacts_export.csv');
     }
 
     private function getContactExportFileContentType(string $fileName): string
