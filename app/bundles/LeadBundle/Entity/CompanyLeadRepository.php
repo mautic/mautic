@@ -40,7 +40,7 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**

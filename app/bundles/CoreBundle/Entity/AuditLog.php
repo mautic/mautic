@@ -46,7 +46,7 @@ class AuditLog
     protected $action;
 
     /**
-     * @var array
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $details = [];
 
@@ -121,7 +121,7 @@ class AuditLog
      *
      * @param int $userId
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setUserId($userId)
     {
@@ -145,7 +145,7 @@ class AuditLog
      *
      * @param string $object
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setObject($object)
     {
@@ -169,7 +169,7 @@ class AuditLog
      *
      * @param int $objectId
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setObjectId($objectId)
     {
@@ -193,7 +193,7 @@ class AuditLog
      *
      * @param string $action
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setAction($action)
     {
@@ -215,7 +215,7 @@ class AuditLog
     /**
      * Set details.
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setDetails(array $details)
     {
@@ -239,7 +239,7 @@ class AuditLog
      *
      * @param \DateTime $dateAdded
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setDateAdded($dateAdded)
     {
@@ -263,7 +263,7 @@ class AuditLog
      *
      * @param string $ipAddress
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setIpAddress($ipAddress)
     {
@@ -287,7 +287,7 @@ class AuditLog
      *
      * @param string $bundle
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setBundle($bundle)
     {
@@ -311,7 +311,7 @@ class AuditLog
      *
      * @param string $userName
      *
-     * @return AuditLog
+     * @return $this
      */
     public function setUserName($userName)
     {
