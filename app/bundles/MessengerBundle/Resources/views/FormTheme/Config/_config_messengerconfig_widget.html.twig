@@ -1,52 +1,73 @@
-{%- macro row_if_exists(form, field) %}
-  {% if form[field] is defined %}
-    <div class="col-md-6">
-      {{ form_row(form[field]) }}
-    </div>
-  {% endif %}
-{%- endmacro %}
-
 {% block _config_messengerconfig_widget %}
 {% set fields = form.children %}
-{% set fieldKeys = fields|keys %}
-
-{# we want to show these keys no matter what is the transport selected #}
-{% set retryKeys = [
-    'messenger_retry_strategy_max_retries',
-    'messenger_retry_strategy_delay',
-    'messenger_retry_strategy_multiplier',
-    'messenger_retry_strategy_max_delay'
-] %}
 
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
     </div>
     <div class="panel-body">
-    <div class='row'>
-    {% for key in fieldKeys|filter(v => v not in retryKeys) %}
-        {{ _self.row_if_exists(fields, key) }}
-    {% endfor %}
-    </div>
-        {% if fields.messenger_type is defined %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(fields.messenger_dsn.scheme) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(fields.messenger_dsn.host, { 'attr': {'preaddon_text': '://'} }) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(fields.messenger_dsn.port, { 'attr': {'preaddon_text': ':'} }) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(fields.messenger_dsn.path, { 'attr': {'preaddon_text': '/'} }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-lg-6">
+                        {{ form_row(fields.messenger_dsn.user) }}
+                    </div>
+                    <div class="col-lg-6">
+                        {{ form_row(fields.messenger_dsn.password, { 'attr': {'preaddon_text': ':'} }) }}
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_retries') }}
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_delay') }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_multiplier') }}
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_delay') }}
-                        </div>
+                <div>
+                    <code>{{ fields.messenger_dsn.vars.currentDns }}</code>
+                </div>
+            </div>
+            <div class="col-md-6">
+                {{ form_row(fields.messenger_dsn.options) }}
+            </div>
+        </div>
+        {{ form_rest(fields.messenger_dsn) }}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3">
+                        {{ form_row(fields.messenger_retry_strategy_max_retries) }}
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        {{ form_row(fields.messenger_retry_strategy_delay) }}
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        {{ form_row(fields.messenger_retry_strategy_multiplier) }}
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        {{ form_row(fields.messenger_retry_strategy_max_delay) }}
                     </div>
                 </div>
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -22,7 +22,6 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
-use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -76,7 +75,6 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_append_tracking_pixel'          => true,
                 'mailer_convert_embed_images'           => false,
                 'mailer_dsn'                            => 'smtp://null:25',
-                'messenger_type'                        => 'async',
                 'messenger_dsn'                         => 'doctrine://default',
                 'messenger_retry_strategy_max_retries'  => 3,
                 'messenger_retry_strategy_delay'        => 1000,
@@ -256,12 +254,6 @@ class RestrictionHelperTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper));
-
-        $messengerType = $this->getMockBuilder(MessengerTransportType::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $messengerType->method('getTransportTypes')
-            ->willReturn([]);
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);

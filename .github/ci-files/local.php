@@ -13,7 +13,6 @@ $parameters = [
     'admin_email'                           => 'github-actions@mautic.org',
     'admin_password'                        => 'GitHubActionsIsAwesome',
     'mailer_dsn'                            => 'smtp://localhost:25',
-    'messenger_type'                        => 'async',
     'messenger_dsn'                         => 'in-memory://',
     'messenger_retry_strategy_max_retries'  => 3,
     'messenger_retry_strategy_delay'        => 1000,

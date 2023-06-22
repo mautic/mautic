@@ -22,7 +22,6 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
                 'mailer_append_tracking_pixel'          => true,
                 'mailer_convert_embed_images'           => false,
                 'mailer_dsn'                            => 'smtp://null:25',
-                'messenger_type'                        => 'async',
                 'messenger_dsn'                         => 'doctrine://default',
                 'messenger_retry_strategy_max_retries'  => 3,
                 'messenger_retry_strategy_delay'        => 1000,

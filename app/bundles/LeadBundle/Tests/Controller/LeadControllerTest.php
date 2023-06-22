@@ -30,7 +30,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email'] = 'admin@mautic-community.test';
-        $this->configParams['messenger_type']    = 'testEmailSendToContactSync' === $this->getName() ? 'sync' : 'async';
+        $this->configParams['messenger_dsn']     = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
 
         parent::setUp();
     }
