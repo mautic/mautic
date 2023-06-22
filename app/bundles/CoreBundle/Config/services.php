@@ -30,7 +30,6 @@ return function (ContainerConfigurator $configurator) {
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
-        'Helper/Dsn/Dsn/DsnGenerator.php',
     ];
 
     $services->load('Mautic\\CoreBundle\\', '../')

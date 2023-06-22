@@ -55,8 +55,8 @@ class ContactSegmentQueryBuilder
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
-            // Prefer a slave connection if available.
-            $connection->connect('slave');
+            // Prefer a replica connection if available.
+            $connection->ensureConnectedToReplica();
         }
 
         /** @var QueryBuilder $queryBuilder */
@@ -107,8 +107,8 @@ class ContactSegmentQueryBuilder
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
-            // Prefer a slave connection if available.
-            $connection->connect('slave');
+            // Prefer a replica connection if available.
+            $connection->ensureConnectedToReplica();
         }
 
         // Add count functions to the query

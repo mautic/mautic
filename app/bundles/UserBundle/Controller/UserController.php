@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -406,7 +407,7 @@ class UserController extends FormController
      *
      * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -441,12 +442,12 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
-                    $message = (new \Swift_Message())
-                        ->setSubject($subject)
-                        ->setFrom($currentUser->getEmail(), $currentUser->getName())
-                        ->setTo($user->getEmail(), $user->getName())
-                        ->setBody($body);
-                    $this->get('mailer')->send($message);
+
+                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                    $mailer->setSubject($subject);
+                    $mailer->setTo($user->getEmail(), $user->getName());
+                    $mailer->setBody($body);
+                    $mailer->send();
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
