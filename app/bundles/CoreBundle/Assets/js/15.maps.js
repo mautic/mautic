@@ -1,137 +1,3 @@
-Mautic.getMaps = (scope) => {
-    let maps;
-
-    if (mQuery.type(scope) === 'string') {
-        maps = mQuery(scope).find('.vector-map');
-    } else if (scope) {
-        maps = scope.find('.vector-map');
-    } else {
-        maps = mQuery('.vector-map');
-    }
-
-    return maps;
-}
-
-/**
- * Render vector maps
- *
- * @param scope
- */
-Mautic.renderMaps = function(scope) {
-    const maps = Mautic.getMaps(scope);
-
-    if (maps.length) {
-        maps.each(function(index, element) {
-            Mautic.renderMap(mQuery(element));
-        });
-    }
-};
-
-/**
- *
- * @param wrapper
- * @returns {*}
- */
-Mautic.renderMap = function(wrapper) {
-    // Map render causes a JS error on FF when the element is hidden
-    //if (wrapper.is(':visible')) {
-    if (!Mautic.mapObjects) Mautic.mapObjects = [];
-    let data = wrapper.data('map-data');
-
-    if (typeof data === 'undefined' || !data.length) {
-        try {
-            data = JSON.parse(wrapper.text());
-            wrapper.data('map-data', data);
-        } catch (error) {
-
-            return;
-        }
-    }
-
-    // Markers have numerical indexes
-    const firstKey = Object.keys(data)[0];
-    let markersData, regionsData;
-
-    // Check type of data
-    if (firstKey === "0") {
-        // Markers
-        markersData = data;
-        regionsData = {};
-    } else {
-        // Regions
-        markersData = {};
-        regionsData = data;
-    }
-
-    wrapper.text('');
-    wrapper.vectorMap({
-        backgroundColor: 'transparent',
-        zoomOnScroll: false,
-        zoomAnimate: true,
-        markers: markersData,
-        markerStyle: {
-            initial: {
-                fill: '#40C7B5'
-            },
-            selected: {
-                fill: '#40C7B5'
-            }
-        },
-        regionStyle: {
-            initial: {
-                "fill": '#dce0e5',
-                "fill-opacity": 1,
-                "stroke": 'none',
-                "stroke-width": 0,
-                "stroke-opacity": 1
-            },
-            hover: {
-                "fill-opacity": 0.7,
-                "cursor": 'pointer'
-            }
-        },
-        map: 'world_mill_en',
-        series: {
-            regions: [{
-                values: regionsData,
-                scale: ['#b9ebe4', '#40C7B5'],
-                normalizeFunction: 'polynomial',
-                legend: {
-                    horizontal: true,
-                    title: '<div data-map-legend="true"></div>',
-                }
-            }]
-        },
-        onRegionTipShow: function (event, label, index) {
-            if (data[index] > 0) {
-                label.html(
-                    '<b>'+label.html()+'</b></br>'+
-                    data[index]+' Leads'
-                );
-            }
-        }
-    });
-    wrapper.addClass('map-rendered');
-    Mautic.mapObjects.push(wrapper);
-
-    wrapper.parent().trigger('map-rendered');
-
-    return wrapper;
-};
-
-/**
- * Destroy a jVector map
- */
-Mautic.destroyMap = function(wrapper) {
-    if (wrapper.hasClass('map-rendered')) {
-        const map = wrapper.vectorMap('get', 'mapObject');
-        map.removeAllMarkers();
-        map.remove();
-        wrapper.empty();
-        wrapper.removeClass('map-rendered');
-    }
-};
-
 class MauticMap {
 
     static TYPES = {
@@ -169,10 +35,6 @@ class MauticMap {
             regions: [{
                 scale: ['#b9ebe4', '#40C7B5'],
                 normalizeFunction: 'polynomial',
-                legend: {
-                    horizontal: true,
-                    title: '<div data-map-legend="true"></div>',
-                }
             }]
         },
 
@@ -183,15 +45,26 @@ class MauticMap {
         this.scope = mQuery(wrapper);
         this.mapData = this.getMapData();
         this.settings = MauticMap.SETTINGS;
+        this.map = this.getMapsInScope();
+        this.legendEnabled = this.isLegendEnabled();
+        this.statUnit = this.getStatUnitFromItem(this.map);
+
         this.settings.onRegionTipShow = (event, label, index) => {
-            if (this.mapData[index] > 0) {
-                 label.html(
-                     '<b>'+label.html()+'</b></br>'+
-                     this.mapData[index]+' Leads'
-                 );
+            const value = this.mapData[index];
+
+            if (value > 0) {
+                const tooltip = `<b>${label.html()}</b></br>${value} ${this.statUnit}${(value > 1) ? 's' : ''}`;
+                label.text(tooltip);
              }
         }
-        this.map = this.getMapsInScope();
+
+        if (this.legendEnabled) {
+            this.settings.series.regions[0].legend = {
+                horizontal: true,
+                title: '<div data-map-legend="true"></div>',
+            }
+        }
+
         this.mapOptions = this.scope.find('[data-map-option]');
     }
 
@@ -212,21 +85,20 @@ class MauticMap {
         }
     }
 
+    isLegendEnabled() {
+        return this.map.data('legend-enabled');
+    }
+
     getMapsInScope() {
         return this.scope.find('.vector-map');
     }
 
-    /**
-     * Render vector maps
-     **/
-    renderMaps() {
-        const maps = this.getMapsInScope();
+    getStatUnitFromItem(item) {
+        return mQuery(item).data('stat-unit');
+    }
 
-        if (maps.length) {
-            maps.each((index, element) => {
-                this.renderMap(mQuery(element));
-            });
-        }
+    setStatUnit(value) {
+        this.statUnit = value;
     }
 
     getMapData() {
@@ -246,23 +118,13 @@ class MauticMap {
         return data;
     }
 
-    /**
-     *
-     * @returns {*}
-     */
     renderMap() {
         // Map render causes a JS error on FF when the element is hidden
-        //if (wrapper.is(':visible')) {
-        if (!Mautic.mapObjects) Mautic.mapObjects = [];
-
-        this.map.text('');
-        this.map.vectorMap(this.settings);
-        mQuery(this.map).addClass('map-rendered');
-
-        Mautic.mapObjects.push(this.scope);
-        this.scope.parent().trigger("map-rendered");
-
-        return this.scope;
+        if (this.scope.is(':visible')) {
+            this.map.text('');
+            this.map.vectorMap(this.settings);
+            mQuery(this.map).addClass('map-rendered');
+        }
     };
 
     /**
@@ -278,20 +140,41 @@ class MauticMap {
         }
     };
 
+    /**
+     * Get legend content from option
+     */
+    getOptionLegendText(option) {
+        return option.data('legend-text');
+    }
+
+    /**
+     * Add click listeners to map option buttons
+     */
     addMapOptionsListener() {
         if (this.mapOptions.length) {
             mQuery(this.mapOptions).on('click', (event) => {
                 const currentOption = mQuery(event.currentTarget);
                 const newValues = currentOption.data('map-series');
-                const legendText = currentOption.data('legend-text');
+                const legendText = this.getOptionLegendText(currentOption);
+                const statUnit = this.getStatUnitFromItem(currentOption);
 
                 this.setMapValues(newValues);
                 this.setActiveOption(currentOption);
-                this.setLegend(legendText);
+
+                if (this.legendEnabled) {
+                    this.setLegend(legendText);
+                }
+
+                if (statUnit) {
+                    this.setStatUnit(statUnit);
+                }
             });
 
-            const legendText = mQuery(this.mapOptions[0]).data('legend-text');
-            this.setLegend(legendText);
+            if (this.legendEnabled) {
+                const defaultOption = mQuery(this.mapOptions[0]);
+                const legendText = this.getOptionLegendText(defaultOption);
+                this.setLegend(legendText);
+            }
         }
     }
 
@@ -320,10 +203,9 @@ class MauticMap {
                 return;
             }
 
-            // Loaded via AJAX not to block loading a whole page
-            const mapUrl = this.scope.attr('data-map-url');
+            const map = this.getMapsInScope()
 
-            this.renderMaps(this.scope);
+            this.renderMap(map);
             this.addMapOptionsListener();
         }
     }
@@ -332,6 +214,9 @@ class MauticMap {
 Mautic.initMap = (wrapper, typeKey) => {
     const map = new MauticMap(wrapper, typeKey);
     map.init();
+
+    if (!Mautic.mapObjects) Mautic.mapObjects = [];
+    Mautic.mapObjects.push(map);
 
     return map;
 }

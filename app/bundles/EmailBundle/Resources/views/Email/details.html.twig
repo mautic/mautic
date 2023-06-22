@@ -222,6 +222,13 @@
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
+              <div class="va-m">
+                  {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                      'dateRangeForm': dateRangeForm,
+                      'class': 'pull-right',
+                  }) }}
+              </div>
+
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md mt-lg">
                   <li class="active">

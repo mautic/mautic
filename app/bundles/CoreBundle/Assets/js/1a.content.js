@@ -706,7 +706,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     Mautic.renderCharts(container);
-    Mautic.renderMaps(container);
+    Mautic.initMap(container, 'markers');
     Mautic.stopIconSpinPostEvent();
 
     //stop loading bar
@@ -873,8 +873,8 @@ Mautic.onPageUnload = function (container, response) {
 
         // trash created map objects to save some memory
         if (typeof Mautic.mapObjects !== 'undefined') {
-            mQuery.each(Mautic.mapObjects, function (i, map) {
-                Mautic.destroyMap(map);
+            mQuery.each(Mautic.mapObjects, (i, map) => {
+                map.destroyMap();
             });
             Mautic.mapObjects = [];
         }

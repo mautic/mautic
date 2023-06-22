@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ class EmailMapStatsController extends AbstractController
         string $dateFrom = '',
         string $dateTo = ''
     ): Response {
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email     = $model->getEntity($objectId);
         $results   = [];
 
@@ -66,12 +67,32 @@ class EmailMapStatsController extends AbstractController
 
         $results['read']    = empty($statsCountries['read']) ? [] : $this->mapData($statsCountries['read'], 'count');
         $results['clicked'] = empty($statsCountries['clicked']) ? [] : $this->mapData($statsCountries['clicked'], 'click_count');
+        $legendText         = 'Total: %s (%s with country)';
 
         return $this->render(
-            '@MauticEmail/Email/map.html.twig',
+            '@MauticCore/Helper/map.html.twig',
             [
-                'results' => $results,
-                'height'  => 300,
+                'data'           => $results['read']['data'],
+                'height'         => 400,
+                'optionsEnabled' => true,
+                'optionsTitle'   => 'Choose stats:',
+                'options'        => [
+                    [
+                        'data'       => $results['read']['data'],
+                        'label'      => 'mautic.email.stat.read',
+                        'legendText' => vsprintf($legendText, [$results['read']['total'] ?? 0, $results['read']['totalWithCountry'] ?? 0]),
+                        'unit'       => 'Read',
+                    ],
+                    [
+                        'data'       => $results['clicked']['data'],
+                        'label'      => 'mautic.email.clicked',
+                        'legendText' => vsprintf($legendText, [$results['clicked']['total'] ?? 0, $results['clicked']['totalWithCountry'] ?? 0]),
+                        'unit'       => 'Click',
+                    ],
+                ],
+                'legendEnabled' => true,
+                'statUnit'      => 'Read',
+                'results'       => $results,
             ]
         );
     }

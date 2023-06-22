@@ -108,7 +108,7 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
-    Mautic.renderMaps(widgetHtml);
+    Mautic.initMap(widgetHtml, 'regions');
     Mautic.initWidgetRemoveEvents();
     Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
