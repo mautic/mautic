@@ -14,8 +14,4 @@ $parameters = [
     'admin_password'                        => 'GitHubActionsIsAwesome',
     'mailer_dsn'                            => 'smtp://localhost:25',
     'messenger_dsn'                         => 'in-memory://',
-    'messenger_retry_strategy_max_retries'  => 3,
-    'messenger_retry_strategy_delay'        => 1000,
-    'messenger_retry_strategy_multiplier'   => 2,
-    'messenger_retry_strategy_max_delay'    => 0,
 ];
