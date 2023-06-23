@@ -188,7 +188,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 null,
                 $this->throwException(new InvalidEmailException('{invalid-token}'))
             );
-        //Send email method
+        // Send email method
 
         $this->emailModel
             ->expects($this->once())

@@ -41,6 +41,6 @@ final class VersionProvider implements VersionProviderInterface
 
     private function fetchVersionFromDb(): string
     {
-        return $this->connection->executeQuery('SELECT VERSION()')->fetchColumn();
+        return $this->connection->executeQuery('SELECT VERSION()')->fetchOne();
     }
 }

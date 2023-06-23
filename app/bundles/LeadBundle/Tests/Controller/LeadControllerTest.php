@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
@@ -18,12 +19,22 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams['mailer_from_email'] = 'admin@mautic-community.test';
+        $this->configParams['messenger_type']    = 'testEmailSendToContactSync' === $this->getName() ? 'sync' : 'async';
+
+        parent::setUp();
+    }
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
@@ -325,7 +336,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $this->assertEquals(true, (strlen($content) > 10000));
+        $this->assertEquals(true, strlen($content) > 10000);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -359,7 +370,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([]);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue([]);
         $this->client->submit($form);
         $companies  = $this->getCompanyLeads(1);
         $collection = new Collection($companies);
@@ -467,6 +480,49 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(2, $leadsTableRows->count(), $crawler->html());
     }
 
+    public function testEmailSendToContactSync(): void
+    {
+        $contact = $this->createContact('contact@an.email');
+
+        $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Send')->form();
+        $form->setValues(
+            [
+                'lead_quickemail[subject]' => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'    => 'Your email is <b>{contactfield=email}</b>',
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertQueuedEmailCount(1);
+
+        $email      = $this->getMailerMessage();
+        $userHelper = static::getContainer()->get(UserHelper::class);
+        $user       = $userHelper->getUser();
+
+        Assert::assertSame('Ahoy contact@an.email', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Your email is <b>contact@an\.email<\/b><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertSame('Your email is contact@an.email', $email->getTextBody());
+        Assert::assertCount(1, $email->getFrom());
+        Assert::assertSame($user->getName(), $email->getFrom()[0]->getName());
+        Assert::assertSame($user->getEmail(), $email->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $email->getTo());
+        Assert::assertSame('', $email->getTo()[0]->getName());
+        Assert::assertSame($contact->getEmail(), $email->getTo()[0]->getAddress());
+        Assert::assertCount(1, $email->getReplyTo());
+        Assert::assertSame('', $email->getReplyTo()[0]->getName());
+        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+    }
+
+    public function testEmailSendToContactAsync(): void
+    {
+        // This test should behave the same as sending it via Sync. Just with different settings. See setUp().
+        $this->testEmailSendToContactSync();
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();
@@ -569,7 +625,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Lead[]
+     * @return array<int, array<string, mixed>>
      */
     private function getCompanyLeads(int $leadId): array
     {
@@ -580,7 +636,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("cl.lead_id = {$leadId}")
             ->orderBy('cl.company_id')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     private function getLeadPrimaryCompany(int $leadId): ?string
@@ -590,7 +646,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**
@@ -601,7 +657,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue($expectedCompanies);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue($expectedCompanies);
         $crawler    = $this->client->submit($form);
         $companies  = $this->getCompanyLeads($leadId);
         $collection = (new Collection($companies))->keyBy('company_id');

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -102,7 +101,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray  = ['success' => 1];
         $filter     = InputHelper::clean($request->query->get('filter'));
-        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, null, ['_']);
 
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getModel('lead.field');
@@ -196,7 +195,7 @@ class AjaxController extends CommonAjaxController
         $formHtml = $this->renderView(
             '@MauticLead/List/filterpropform.html.twig',
             [
-                //'form' => $this->setFormTheme($form, '@MauticLead/List/filterpropform.html.twig', []),
+                // 'form' => $this->setFormTheme($form, '@MauticLead/List/filterpropform.html.twig', []),
                 'form' => $form->createView(),
             ]
         );
@@ -225,7 +224,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -285,7 +284,7 @@ class AjaxController extends CommonAjaxController
         $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -322,13 +321,13 @@ class AjaxController extends CommonAjaxController
     public function updateTimelineAction(Request $request)
     {
         $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents', []));
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', []));
+        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
+        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
         $search        = InputHelper::clean($request->request->get('search'));
         $leadId        = (int) $request->request->get('leadId');
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
@@ -526,7 +525,7 @@ class AjaxController extends CommonAjaxController
             $doNotContact = $this->getModel('lead.dnc');
 
             /** @var DoNotContactModel $dnc */
-            $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
+            $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->findOneBy(
                 [
                     'id' => $dncId,
                 ]
@@ -559,7 +558,7 @@ class AjaxController extends CommonAjaxController
         $maxId     = $request->get('maxId');
 
         if (!empty($maxId)) {
-            //set some permissions
+            // set some permissions
             $permissions = $this->security->isGranted(
                 [
                     'lead:leads:viewown',
@@ -593,7 +592,7 @@ class AjaxController extends CommonAjaxController
 
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
             if ('list' != $indexMode) {
-                //remove anonymous leads unless requested to prevent clutter
+                // remove anonymous leads unless requested to prevent clutter
                 $filter['force'][] = "!$anonymous";
             }
 
@@ -681,7 +680,7 @@ class AjaxController extends CommonAjaxController
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel   = $this->getModel('lead');
-        $post        = $request->request->get('lead_tags', [], true);
+        $post        = $request->request->all()['lead_tags'] ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
@@ -937,7 +936,7 @@ class AjaxController extends CommonAjaxController
 
     public function getCampaignShareStatsAction(Request $request, SegmentCampaignShare $segmentCampaignShareService)
     {
-        $ids      = $request->query->get('ids');
+        $ids      = $request->query->all()['ids'] ?? [];
         $entityid = $request->query->get('entityId');
 
         $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
@@ -951,7 +950,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getLeadCountAction(Request $request): JsonResponse
     {

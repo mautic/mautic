@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use RuntimeException;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -14,20 +11,7 @@ abstract class AbstractFormController extends CommonController
 {
     protected $permissionBase;
 
-    protected ?CorePermissions $security;
-
-    protected UserHelper $userHelper;
-
-    public function __construct(CorePermissions $security, UserHelper $userHelper)
-    {
-        $this->security   = $security;
-        $this->userHelper = $userHelper;
-    }
-
     /**
-     * @param $id
-     * @param $modelName
-     *
      * @return mixed
      */
     public function unlockAction(Request $request, $id, $modelName)
@@ -45,7 +29,7 @@ abstract class AbstractFormController extends CommonController
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
                     '%name%' => urldecode($request->get('name')),
@@ -144,7 +128,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -161,7 +145,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -180,10 +164,10 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
-        //bind request to the form
+        // bind request to the form
         $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();
@@ -219,7 +203,7 @@ abstract class AbstractFormController extends CommonController
             }
         }
 
-        return $this->userHelper->getUser()->isAdmin();
+        return $this->user->isAdmin();
     }
 
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
@@ -246,7 +230,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         if (empty($request->server->get('HTTP_REFERER'))) {

@@ -2,34 +2,38 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use function assert;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ClientController extends FormController
 {
-    private CorePermissions $corePermissions;
-
     private ClientModel $clientModel;
 
-    public function __construct(CorePermissions $corePermissions, UserHelper $userHelper, ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    public function __construct(ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->corePermissions = $corePermissions;
         $this->clientModel     = $clientModel;
 
-        parent::__construct($corePermissions, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -41,7 +45,7 @@ class ClientController extends FormController
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        if (!$this->corePermissions->isGranted('api:clients:view')) {
+        if (!$this->security->isGranted('api:clients:view')) {
             return $this->accessDenied();
         }
 
@@ -104,9 +108,9 @@ class ClientController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => [
-                        'create' => $this->corePermissions->isGranted('api:clients:create'),
-                        'edit'   => $this->corePermissions->isGranted('api:clients:editother'),
-                        'delete' => $this->corePermissions->isGranted('api:clients:deleteother'),
+                        'create' => $this->security->isGranted('api:clients:create'),
+                        'edit'   => $this->security->isGranted('api:clients:editother'),
+                        'delete' => $this->security->isGranted('api:clients:deleteother'),
                     ],
                     'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'searchValue' => $filter,
@@ -127,9 +131,9 @@ class ClientController extends FormController
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage)
     {
         $apiClientModel = $this->clientModel;
-        assert($apiClientModel instanceof ClientModel);
+        \assert($apiClientModel instanceof ClientModel);
         $me = $tokenStorage->getToken()->getUser();
-        assert($me instanceof User);
+        \assert($me instanceof User);
         $clients = $apiClientModel->getUserClients($me);
 
         return $this->render('@MauticApi/Client/authorized.html.twig', ['clients' => $clients]);
@@ -191,7 +195,7 @@ class ClientController extends FormController
      */
     public function newAction(Request $request, $objectId = 0)
     {
-        if (!$this->corePermissions->isGranted('api:clients:create')) {
+        if (!$this->security->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
 
@@ -202,36 +206,38 @@ class ClientController extends FormController
         $model = $this->clientModel;
         $model->setApiMode($apiMode);
 
-        //retrieve the entity
+        // retrieve the entity
         $client = $model->getEntity();
 
-        //set the return URL for post actions
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_client_index');
 
-        //get the user form factory
+        // get the user form factory
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'new']);
         $form   = $model->createForm($client, $this->formFactory, $action);
 
-        //remove the client id and secret fields as they'll be auto generated
+        // remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
         $form->remove('secret');
         $form->remove('publicId');
         $form->remove('consumerKey');
         $form->remove('consumerSecret');
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     // If the admin is creating API credentials, enable 'Client Credential' grant type
-                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $this->getUser()->getRole()->isAdmin()) {
+                    /** @var User $user */
+                    $user = $this->getUser();
+                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $user->getRole()->isAdmin()) {
                         $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
                     }
-                    $client->setRole($this->getUser()->getRole());
+                    $client->setRole($user->getRole());
                     $model->saveEntity($client);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.api.client.notice.created',
                         [
                             '%name%'         => $client->getName(),
@@ -291,7 +297,7 @@ class ClientController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        if (!$this->corePermissions->isGranted('api:clients:editother')) {
+        if (!$this->security->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
 
@@ -309,7 +315,7 @@ class ClientController extends FormController
             ],
         ];
 
-        //client not found
+        // client not found
         if (null === $client) {
             return $this->postActionRedirect(
                 array_merge(
@@ -326,7 +332,7 @@ class ClientController extends FormController
                 )
             );
         } elseif ($model->isLocked($client)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }
 
@@ -336,13 +342,13 @@ class ClientController extends FormController
         // remove api_mode field
         $form->remove('api_mode');
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $client->getName(),
@@ -362,13 +368,13 @@ class ClientController extends FormController
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($client);
 
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($client);
         }
 
@@ -397,7 +403,7 @@ class ClientController extends FormController
      */
     public function deleteAction(Request $request, $objectId)
     {
-        if (!$this->corePermissions->isGranted('api:clients:delete')) {
+        if (!$this->security->isGranted('api:clients:delete')) {
             return $this->accessDenied();
         }
 
@@ -426,7 +432,7 @@ class ClientController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif ($model->isLocked($entity)) {
-                //deny access if the entity is locked
+                // deny access if the entity is locked
                 return $this->isLocked($postActionVars, $entity, 'api.client');
             } else {
                 $model->deleteEntity($entity);

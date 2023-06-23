@@ -1,6 +1,5 @@
 {% set scriptSrc = getAssetUrl('media/js/' ~ ('dev' == app.environment ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true)|replace({
-  '/index.php': '',
-  '/index_dev.php': ''
+  '/index.php': ''
 }) %}
 <script type="text/javascript">
     /** This section is only needed once per page if manually copying **/
@@ -14,7 +13,7 @@
             MauticSDK.onLoad();
         };
         head.appendChild(script);
-        var MauticDomain = '{{ assetGetBaseUrl()|replace({'/index_dev.php': '', '/index.php': ''}) }}';
+        var MauticDomain = '{{ assetGetBaseUrl()|replace({'/index.php': ''}) }}';
         var MauticLang   = {
             'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans }}"
         }

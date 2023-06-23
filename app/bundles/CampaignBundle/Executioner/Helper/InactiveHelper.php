@@ -41,7 +41,7 @@ class InactiveHelper
     private DecisionHelper $decisionHelper;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $earliestInactiveDate;
 
@@ -139,7 +139,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getEarliestInactiveDateTime()
     {
@@ -147,8 +147,6 @@ class InactiveHelper
     }
 
     /**
-     * @param $decisionId
-     *
      * @return ArrayCollection
      */
     public function getCollectionByDecisionId($decisionId)
@@ -164,7 +162,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
@@ -182,8 +180,6 @@ class InactiveHelper
     }
 
     /**
-     * @param $lastActiveEventId
-     *
      * @return array|ArrayCollection
      */
     private function getLastActiveDates($lastActiveEventId, array $contactIds)

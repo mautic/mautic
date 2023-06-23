@@ -21,7 +21,7 @@ class ThemeController extends FormController
      */
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted([
             'core:themes:view',
             'core:themes:create',
@@ -59,7 +59,7 @@ class ThemeController extends FormController
                                 try {
                                     $fileData->move($dir, $fileName);
                                     $themeHelper->install($dir.'/'.$fileName);
-                                    $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                                    $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
                                 } catch (\Exception $e) {
                                     $form->addError(
                                         new FormError(

@@ -9,9 +9,6 @@ trait ExpressionHelperTrait
 {
     /**
      * @param QueryBuilder|\Doctrine\ORM\QueryBuilder $q
-     * @param $column
-     * @param $operator
-     * @param $parameter
      * @param $includeIsNull    true/false or null to auto determine based on operator
      *
      * @return mixed
@@ -25,7 +22,7 @@ trait ExpressionHelperTrait
 
         if (null === $includeIsNull) {
             // Auto determine based on negate operators
-            $includeIsNull = (in_array($operator, ['neq', 'notLike', 'notIn']));
+            $includeIsNull = in_array($operator, ['neq', 'notLike', 'notIn']);
         }
 
         if ($includeIsNull) {
@@ -38,9 +35,7 @@ trait ExpressionHelperTrait
         }
 
         if ($appendTo) {
-            $appendTo->add($expr);
-
-            return $appendTo;
+            return $appendTo->with($expr);
         }
 
         return $expr;

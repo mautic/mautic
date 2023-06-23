@@ -42,15 +42,11 @@ class oAuthHelper
     }
 
     /**
-     * @param $url
-     * @param $parameters
-     * @param $method
-     *
      * @return array
      */
     public function getAuthorizationHeader($url, $parameters, $method)
     {
-        //Get standard OAuth headers
+        // Get standard OAuth headers
         $headers = $this->getOauthHeaders();
 
         if (!empty($this->settings['include_verifier']) && $this->request && $this->request->query->has('oauth_verifier')) {
@@ -126,10 +122,6 @@ class oAuthHelper
     /**
      * Build base string for OAuth 1 signature signing.
      *
-     * @param $baseURI
-     * @param $method
-     * @param $params
-     *
      * @return string
      */
     private function buildBaseString($baseURI, $method, $params)
@@ -141,8 +133,6 @@ class oAuthHelper
 
     /**
      * Build header for OAuth 1 authorization.
-     *
-     * @param $oauth
      *
      * @return string
      */
@@ -157,7 +147,6 @@ class oAuthHelper
     /**
      * Normalize parameters.
      *
-     * @param      $parameters
      * @param bool $encode
      * @param bool $returnarray
      *
@@ -165,7 +154,7 @@ class oAuthHelper
      */
     private function normalizeParameters($parameters, $encode = false, $returnarray = false, $normalized = [], $key = '')
     {
-        //Sort by key
+        // Sort by key
         ksort($parameters);
 
         foreach ($parameters as $k => $v) {
@@ -173,8 +162,8 @@ class oAuthHelper
                 $normalized = $this->normalizeParameters($v, $encode, true, $normalized, $k);
             } else {
                 if ($key) {
-                    //Multidimensional array; using foo=baz&foo=bar rather than foo[bar]=baz&foo[baz]=bar as this is
-                    //what the server expects when creating the signature
+                    // Multidimensional array; using foo=baz&foo=bar rather than foo[bar]=baz&foo[baz]=bar as this is
+                    // what the server expects when creating the signature
                     $k = $key;
                 }
                 if ($encode) {
@@ -190,8 +179,6 @@ class oAuthHelper
 
     /**
      * Returns an encoded string according to the RFC3986.
-     *
-     * @param $string
      *
      * @return string
      */

@@ -3,11 +3,12 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
-use Symfony\Component\Form\FormError;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PublicController extends FormController
 {
@@ -16,32 +17,30 @@ class PublicController extends FormController
      */
     public function passwordResetAction(Request $request)
     {
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user');
 
         $data   = ['identifier' => ''];
         $action = $this->generateUrl('mautic_user_passwordreset');
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if (null == $user) {
-                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
-                } else {
-                    try {
+                try {
+                    if (null !== $user) {
                         $model->sendResetEmail($user);
-                        $this->addFlash('mautic.user.user.notice.passwordreset');
-                    } catch (\Exception $exception) {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
-
-                    return $this->redirectToRoute('login');
+                    $this->addFlashMessage('mautic.user.user.notice.passwordreset');
+                } catch (\Exception $exception) {
+                    $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
+
+                return $this->redirectToRoute('login');
             }
         }
 
@@ -56,7 +55,7 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordEncoderInterface $encoder)
+    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): mixed
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->getModel('user');
@@ -70,26 +69,28 @@ class PublicController extends FormController
             $request->getSession()->set('resetToken', $token);
         }
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
-                /** @var \Mautic\UserBundle\Entity\User $user */
+                /** @var User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 if (null == $user) {
-                    $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
+                    $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
+
+                    return $this->redirectToRoute('login');
                 } else {
                     if ($request->getSession()->has('resetToken')) {
                         $resetToken = $request->getSession()->get('resetToken');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
+                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 
-                            $this->addFlash('mautic.user.user.notice.passwordreset.success');
+                            $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
                             $request->getSession()->remove('resetToken');
 
@@ -106,7 +107,7 @@ class PublicController extends FormController
                             ],
                         ]);
                     } else {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken');
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
 
                         return $this->redirectToRoute('mautic_user_passwordresetconfirm');
                     }

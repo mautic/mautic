@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class GroupExecutionDateDAO
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $executionDate;
 
@@ -20,7 +20,7 @@ class GroupExecutionDateDAO
     /**
      * GroupExecutionDateDAO constructor.
      */
-    public function __construct(\DateTime $executionDate)
+    public function __construct(\DateTimeInterface $executionDate)
     {
         $this->executionDate = $executionDate;
         $this->contacts      = new ArrayCollection();
@@ -32,7 +32,7 @@ class GroupExecutionDateDAO
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {

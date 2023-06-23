@@ -92,7 +92,7 @@ class TweetController extends FormController
         $request = $this->getCurrentRequest();
 
         return ('POST' === $request->getMethod())
-            ? $request->request->get('twitter_tweet[updateSelect]', false, true)
+            ? $request->request->get('twitter_tweet[updateSelect]', false)
             : $request->get('updateSelect', false);
     }
 
@@ -131,8 +131,6 @@ class TweetController extends FormController
     /**
      * Get the template file.
      *
-     * @param $file
-     *
      * @return string
      */
     protected function getTemplateName($file)
@@ -159,8 +157,6 @@ class TweetController extends FormController
 
     /**
      * Displays details.
-     *
-     * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */

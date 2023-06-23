@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -62,7 +61,7 @@ class BackgroundService
      * @throws ColumnAlreadyCreatedException
      * @throws CustomFieldLimitException
      * @throws LeadFieldWasNotFoundException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException

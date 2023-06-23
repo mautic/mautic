@@ -175,8 +175,6 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * @param $content
-     *
      * @return string
      */
     public function encodeFileContents($content)

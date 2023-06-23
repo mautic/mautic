@@ -27,7 +27,7 @@ class AuthController extends CommonController
         }
 
         return $this->render(
-            'Integrations/Auth/authenticated.html.twig',
+            '@Integrations/Auth/authenticated.html.twig',
             [
                 'message'             => $message,
                 'authenticationError' => $authenticationError,

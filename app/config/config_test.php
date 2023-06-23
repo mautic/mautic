@@ -13,7 +13,7 @@ EnvLoader::load();
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',
@@ -51,6 +51,9 @@ $container->loadFromExtension('framework', [
             ],
         ],
     ],
+    'mailer' => [
+        'dsn' => 'null://null',
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -60,29 +63,19 @@ $container->loadFromExtension('web_profiler', [
     'intercept_redirects' => false,
 ]);
 
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
-]);
-
+$connectionSettings = [
+    'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
+    'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
+    'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
+    'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
+    'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+    'options'  => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
-        'default_connection' => 'default',
-        'connections'        => [
-            'default' => [
-                'driver'   => 'pdo_mysql',
-                'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
-                'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
-                'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
-                'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
-                'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
-                'charset'  => 'utf8mb4',
-                // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
-                'mapping_types' => [
-                    'enum'  => 'string',
-                    'point' => 'string',
-                    'bit'   => 'string',
-                ],
-            ],
+        'connections' => [
+            'default'    => $connectionSettings,
+            'unbuffered' => $connectionSettings,
         ],
     ],
 ]);

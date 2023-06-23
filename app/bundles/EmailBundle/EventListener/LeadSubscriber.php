@@ -75,9 +75,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param $state
-     */
     private function addEmailEvents(LeadTimelineEvent $event, $state)
     {
         // Set available event types
@@ -118,7 +115,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 } else {
                     $dateSent = 'read';
@@ -137,7 +134,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat' => $stat,
                             'type' => $state,
                         ],
-                        'contentTemplate' => '@MauticEmail/SubscribedEvents\Timeline/index.html.twig',
+                        'contentTemplate' => '@MauticEmail/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]

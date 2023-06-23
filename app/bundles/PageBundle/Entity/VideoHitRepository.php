@@ -66,7 +66,8 @@ class VideoHitRepository extends CommonRepository
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
-            ->where('h.lead = '.(int) $leadId);
+            ->where('h.lead = :leadId')
+            ->setParameter('leadId', (int) $leadId);
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
@@ -113,14 +114,11 @@ class VideoHitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

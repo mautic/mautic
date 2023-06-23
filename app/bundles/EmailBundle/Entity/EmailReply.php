@@ -20,7 +20,7 @@ class EmailReply
     private $stat;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateReplied;
 
@@ -56,8 +56,6 @@ class EmailReply
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -100,7 +98,7 @@ class EmailReply
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateReplied()
     {

@@ -2,13 +2,19 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
@@ -20,9 +26,11 @@ use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
@@ -37,12 +45,12 @@ class FormController extends CommonFormController
      */
     private $mappedObjectCollector;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
         $this->mappedObjectCollector       = $mappedObjectCollector;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -52,7 +60,7 @@ class FormController extends CommonFormController
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'form:forms:viewown',
@@ -102,7 +110,7 @@ class FormController extends CommonFormController
         $count = count($forms);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $lastPage]);
@@ -157,11 +165,11 @@ class FormController extends CommonFormController
         $model      = $this->getModel('form');
         $activeForm = $model->getEntity($objectId);
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.form.page', 1);
 
         if (null === $activeForm) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
 
             return $this->postActionRedirect(
@@ -296,33 +304,33 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // set the page we came from
         $page       = $request->getSession()->get('mautic.form.page', 1);
-        $mauticform = $request->request->get('mauticform', []);
+        $mauticform = $request->request->get('mauticform') ?? [];
         $sessionId  = $mauticform['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
-        //set added/updated fields
+        // set added/updated fields
         $modifiedFields = $session->get('mautic.form.'.$sessionId.'.fields.modified', []);
         $deletedFields  = $session->get('mautic.form.'.$sessionId.'.fields.deleted', []);
 
-        //set added/updated actions
+        // set added/updated actions
         $modifiedActions = $session->get('mautic.form.'.$sessionId.'.actions.modified', []);
         $deletedActions  = $session->get('mautic.form.'.$sessionId.'.actions.deleted', []);
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'new']);
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //only save fields that are not to be deleted
+                    // only save fields that are not to be deleted
                     $fields = array_diff_key($modifiedFields, array_flip($deletedFields));
 
-                    //make sure that at least one field is selected
+                    // make sure that at least one field is selected
                     if (empty($fields)) {
-                        //set the error
+                        // set the error
                         $form->addError(
                             new FormError(
                                 $this->translator->trans('mautic.form.form.fields.notempty', [], 'validators')
@@ -354,7 +362,7 @@ class FormController extends CommonFormController
                             // Save and trigger listeners
                             $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.core.notice.created',
                                 [
                                     '%name%'      => $entity->getName(),
@@ -377,7 +385,7 @@ class FormController extends CommonFormController
                                 $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
                                 $template  = 'Mautic\FormBundle\Controller\FormController::viewAction';
                             } else {
-                                //return edit view so that all the session stuff is loaded
+                                // return edit view so that all the session stuff is loaded
                                 return $this->editAction($request, $entity->getId(), true);
                             }
                         } catch (ValidationException $ex) {
@@ -406,7 +414,7 @@ class FormController extends CommonFormController
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                //clear temporary fields
+                // clear temporary fields
                 $this->clearSessionComponents($request, $sessionId);
 
                 return $this->postActionRedirect(
@@ -422,13 +430,13 @@ class FormController extends CommonFormController
                 );
             }
         } else {
-            //clear out existing fields in case the form was refreshed, browser closed, etc
+            // clear out existing fields in case the form was refreshed, browser closed, etc
             $this->clearSessionComponents($request, $sessionId);
             $modifiedFields = $modifiedActions = $deletedActions = $deletedFields = [];
 
             $form->get('sessionId')->setData($sessionId);
 
-            //add a submit button
+            // add a submit button
             $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
             $field = new Field();
 
@@ -444,7 +452,7 @@ class FormController extends CommonFormController
             $session->set('mautic.form.'.$sessionId.'.fields.modified', $modifiedFields);
         }
 
-        //fire the form builder event
+        // fire the form builder event
         $customComponents = $model->getCustomComponents($sessionId);
 
         return $this->delegateView(
@@ -471,7 +479,7 @@ class FormController extends CommonFormController
                     'route'         => $this->generateUrl(
                         'mautic_form_action',
                         [
-                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                             'objectId'     => $entity->getId(),
                         ]
                     ),
@@ -516,10 +524,10 @@ class FormController extends CommonFormController
         $session    = $request->getSession();
         $cleanSlate = true;
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.form.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
 
         $postActionVars = [
@@ -532,7 +540,7 @@ class FormController extends CommonFormController
             ],
         ];
 
-        //form not found
+        // form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -556,31 +564,31 @@ class FormController extends CommonFormController
         ) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'form.form');
         }
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                //set added/updated fields
+                // set added/updated fields
                 $modifiedFields = $session->get('mautic.form.'.$objectId.'.fields.modified', []);
                 $deletedFields  = $session->get('mautic.form.'.$objectId.'.fields.deleted', []);
                 $fields         = array_diff_key($modifiedFields, array_flip($deletedFields));
 
-                //set added/updated actions
+                // set added/updated actions
                 $modifiedActions = $session->get('mautic.form.'.$objectId.'.actions.modified', []);
                 $deletedActions  = $session->get('mautic.form.'.$objectId.'.actions.deleted', []);
                 $actions         = array_diff_key($modifiedActions, array_flip($deletedActions));
 
                 if ($valid = $this->isFormValid($form)) {
-                    //make sure that at least one field is selected
+                    // make sure that at least one field is selected
                     if (empty($fields)) {
-                        //set the error
+                        // set the error
                         $form->addError(
                             new FormError(
                                 $this->translator->trans('mautic.form.form.fields.notempty', [], 'validators')
@@ -632,7 +640,7 @@ class FormController extends CommonFormController
                             // Reset objectId to entity ID (can be session ID in case of cloned entity)
                             $objectId = $entity->getId();
 
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.core.notice.updated',
                                 [
                                     '%name%'      => $entity->getName(),
@@ -666,7 +674,7 @@ class FormController extends CommonFormController
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
 
                 $viewParameters = ['page' => $page];
@@ -675,7 +683,7 @@ class FormController extends CommonFormController
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                //remove fields from session
+                // remove fields from session
                 $this->clearSessionComponents($request, $objectId);
 
                 // Clear session items in case columns changed
@@ -707,7 +715,7 @@ class FormController extends CommonFormController
         } else {
             $cleanSlate = true;
 
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -719,11 +727,11 @@ class FormController extends CommonFormController
         $availableFields = $this->fieldHelper->getChoiceList($customComponents['fields']);
 
         if ($cleanSlate) {
-            //clean slate
+            // clean slate
             $this->clearSessionComponents($request, $objectId);
             $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
 
-            //load existing fields into session
+            // load existing fields into session
             $modifiedFields   = [];
             $existingFields   = $entity->getFields()->toArray();
             $submitButton     = false;
@@ -732,7 +740,7 @@ class FormController extends CommonFormController
                 // Check to see if the field still exists
 
                 if ('button' == $formField->getType()) {
-                    //submit button found
+                    // submit button found
                     $submitButton = true;
                 }
                 if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
@@ -762,8 +770,8 @@ class FormController extends CommonFormController
                 }
             }
 
-            if (!$submitButton) { //means something deleted the submit button from the form
-                //add a submit button
+            if (!$submitButton) { // means something deleted the submit button from the form
+                // add a submit button
                 $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
                 $field = new Field();
 
@@ -993,7 +1001,7 @@ class FormController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('@MauticForm//form.html.twig', $viewParams);
+        return $this->render('@MauticForm/form.html.twig', $viewParams);
     }
 
     /**
@@ -1052,7 +1060,7 @@ class FormController extends CommonFormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -1128,7 +1136,7 @@ class FormController extends CommonFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -1207,7 +1215,7 @@ class FormController extends CommonFormController
                     '%count%'     => $count,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(

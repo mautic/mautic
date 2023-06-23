@@ -20,7 +20,7 @@ class StageController extends AbstractFormController
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'stage:stages:view',
@@ -81,7 +81,7 @@ class StageController extends AbstractFormController
 
         $pageHelper->rememberPage($page);
 
-        //get the list of actions
+        // get the list of actions
         $actions = $stageModel->getStageActions();
 
         return $this->delegateView(
@@ -126,10 +126,10 @@ class StageController extends AbstractFormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // set the page we came from
         $page       = $request->getSession()->get('mautic.stage.page', 1);
         $method     = $request->getMethod();
-        $stage      = $request->request->get('stage', []);
+        $stage      = $request->request->get('stage') ?? [];
         $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
         $actions    = $model->getStageActions();
@@ -144,16 +144,16 @@ class StageController extends AbstractFormController
         );
         $viewParameters = ['page' => $page];
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -172,7 +172,7 @@ class StageController extends AbstractFormController
                         $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
                         $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
+                        // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $formFactory, $entity->getId(), true);
                     }
                 }
@@ -216,7 +216,7 @@ class StageController extends AbstractFormController
                     'route'         => $this->generateUrl(
                         'mautic_stage_action',
                         [
-                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                             'objectId'     => $entity->getId(),
                         ]
                     ),
@@ -239,12 +239,12 @@ class StageController extends AbstractFormController
         \assert($model instanceof StageModel);
         $entity = $model->getEntity($objectId);
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.stage.page', 1);
 
         $viewParameters = ['page' => $page];
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $page]);
 
         $postActionVars = [
@@ -257,7 +257,7 @@ class StageController extends AbstractFormController
             ],
         ];
 
-        //form not found
+        // form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -276,7 +276,7 @@ class StageController extends AbstractFormController
         } elseif (!$this->security->isGranted('stage:stages:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'stage');
         }
 
@@ -294,15 +294,15 @@ class StageController extends AbstractFormController
             ]
         );
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -323,7 +323,7 @@ class StageController extends AbstractFormController
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
@@ -343,7 +343,7 @@ class StageController extends AbstractFormController
                 );
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -451,7 +451,7 @@ class StageController extends AbstractFormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -521,7 +521,7 @@ class StageController extends AbstractFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(

@@ -218,4 +218,114 @@ class InputHelperTest extends TestCase
         // fragment is not included
         yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
     }
+
+    /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
+     * @dataProvider minifyHTMLProvider
+     */
+    public function testMinifyHTML(string $html, string $expected): void
+    {
+        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public function minifyHTMLProvider(): array
+    {
+        return [
+            // Test with a simple HTML string with no whitespace
+            ['<p>Hello World</p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple spaces between tags
+            ['<p>    Hello World    </p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple newlines between tags
+            ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'],
+            // Test with an HTML string with inline CSS
+            ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
+            // Test with an empty HTML string
+            ['', ''],
+            // Test with an HTML string with multiple attributes
+            ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
+            // Test with an HTML string with multiple same tag
+            ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
+            // Test with an HTML string with multiple same tag but with different attributes
+            ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
+            [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
+        ];
+    }
+
+    /**
+     * @dataProvider underscoreProvider
+     */
+    public function testUndersore(mixed $provided, mixed $expected): void
+    {
+        $this->assertSame($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function underscoreProvider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, null],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], [null]],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
+        ];
+    }
 }

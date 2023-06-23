@@ -40,7 +40,7 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $result           = json_decode($request->request->get('result', []), true);
+        $result           = json_decode($request->request->get('result') ?? [], true);
         $oid              = $request->request->get('webhookId', '');
         $validatedRequest = $lookupHelper->validateRequest($oid);
 
@@ -105,18 +105,18 @@ class PublicController extends FormController
 
             if (array_key_exists('contactInfo', $result)) {
                 if (array_key_exists(
-                        'familyName',
-                        $result['contactInfo']
-                    )
+                    'familyName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['lastname']['value'])
                 ) {
                     $data['lastname'] = $result['contactInfo']['familyName'];
                 }
 
                 if (array_key_exists(
-                        'givenName',
-                        $result['contactInfo']
-                    )
+                    'givenName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['firstname']['value'])
                 ) {
                     $data['firstname'] = $result['contactInfo']['givenName'];
@@ -327,9 +327,9 @@ class PublicController extends FormController
             }
 
             if (array_key_exists(
-                    'approxEmployees',
-                    $org
-                )
+                'approxEmployees',
+                $org
+            )
                 && empty($currFields['companynumber_of_employees']['value'])
             ) {
                 $data['companynumber_of_employees'] = $org['approxEmployees'];

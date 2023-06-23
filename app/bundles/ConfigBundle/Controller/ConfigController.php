@@ -29,7 +29,7 @@ class ConfigController extends FormController
      */
     public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
@@ -123,7 +123,7 @@ class ConfigController extends FormController
                             $configurator->write();
                             $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
-                            $this->addFlash('mautic.config.config.notice.updated');
+                            $this->addFlashMessage('mautic.config.config.notice.updated');
 
                             $cacheHelper->refreshConfig();
 
@@ -131,7 +131,7 @@ class ConfigController extends FormController
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
                             }
                         } catch (\RuntimeException $exception) {
-                            $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
+                            $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
                         $this->setLocale($request, $tokenStorage, $params);
@@ -183,13 +183,11 @@ class ConfigController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
@@ -224,13 +222,11 @@ class ConfigController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
     {
-        //admin only allowed
+        // admin only allowed
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
@@ -269,6 +265,7 @@ class ConfigController extends FormController
 
         // Import the current local configuration, $parameters is defined in this file
 
+        $parameters = [];
         /** @var array $parameters */
         include $localConfigFile;
 

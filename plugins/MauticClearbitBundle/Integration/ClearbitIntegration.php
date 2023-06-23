@@ -71,8 +71,6 @@ class ClearbitIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)

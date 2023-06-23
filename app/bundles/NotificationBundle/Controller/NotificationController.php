@@ -29,7 +29,7 @@ class NotificationController extends AbstractFormController
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'notification:notifications:viewown',
@@ -55,7 +55,7 @@ class NotificationController extends AbstractFormController
 
         $session = $request->getSession();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.notification.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -96,7 +96,7 @@ class NotificationController extends AbstractFormController
 
         $count = count($notifications);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -146,8 +146,6 @@ class NotificationController extends AbstractFormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, FormFactoryInterface $formFactory, $objectId)
@@ -158,11 +156,11 @@ class NotificationController extends AbstractFormController
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $model->getEntity($objectId);
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.notification.page', 1);
 
         if (null === $notification) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
 
             return $this->postActionRedirect(
@@ -273,10 +271,10 @@ class NotificationController extends AbstractFormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // set the page we came from
         $page         = $session->get('mautic.notification.page', 1);
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
-        $notification = $request->request->get('notification', []);
+        $notification = $request->request->get('notification') ?? [];
         $updateSelect = ('POST' == $method)
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -285,18 +283,18 @@ class NotificationController extends AbstractFormController
             $entity->setNotificationType('template');
         }
 
-        //create the form
+        // create the form
         $form = $model->createForm($entity, $formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -319,7 +317,7 @@ class NotificationController extends AbstractFormController
                         $returnUrl = $this->generateUrl('mautic_notification_action', $viewParameters);
                         $template  = 'Mautic\NotificationBundle\Controller\NotificationController::viewAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
+                        // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $formFactory, $entity->getId(), true);
                     }
                 }
@@ -327,7 +325,7 @@ class NotificationController extends AbstractFormController
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_notification_index', $viewParameters);
                 $template       = 'Mautic\NotificationBundle\Controller\NotificationController::indexAction';
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.notification.'.$entity->getId().'.content');
             }
 
@@ -385,7 +383,6 @@ class NotificationController extends AbstractFormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
@@ -400,7 +397,7 @@ class NotificationController extends AbstractFormController
         $session = $request->getSession();
         $page    = $session->get('mautic.notification.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
 
         $postActionVars = [
@@ -413,7 +410,7 @@ class NotificationController extends AbstractFormController
             ],
         ];
 
-        //not found
+        // not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -437,29 +434,29 @@ class NotificationController extends AbstractFormController
         ) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'notification');
         }
 
-        //Create the form
+        // Create the form
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $notification = $request->request->get('notification', []);
+        $notification = $request->request->get('notification') ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -476,9 +473,9 @@ class NotificationController extends AbstractFormController
                     );
                 }
             } else {
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.notification.'.$objectId.'.content');
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
 
@@ -521,7 +518,7 @@ class NotificationController extends AbstractFormController
                 );
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -551,8 +548,6 @@ class NotificationController extends AbstractFormController
 
     /**
      * Clone an entity.
-     *
-     * @param $objectId
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -584,8 +579,6 @@ class NotificationController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @param $objectId
      *
      * @return Response
      */
@@ -637,7 +630,7 @@ class NotificationController extends AbstractFormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -713,7 +706,7 @@ class NotificationController extends AbstractFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -726,8 +719,6 @@ class NotificationController extends AbstractFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return JsonResponse|Response
      */
     public function previewAction($objectId)
@@ -747,7 +738,6 @@ class NotificationController extends AbstractFormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

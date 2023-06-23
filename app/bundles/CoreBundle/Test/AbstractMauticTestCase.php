@@ -5,9 +5,9 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use InvalidArgumentException;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -39,10 +40,42 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,
-        'mailer_from_name'                  => 'Mautic',
+        'site_url'                          => 'https://localhost',
     ];
 
     protected AbstractDatabaseTool $databaseTool;
+
+    /**
+     * Overloading the method from MailerAssertionsTrait to get better typehint.
+     *
+     * @return MauticMessage[]
+     */
+    public static function getMailerMessages(string $transport = null): array
+    {
+        $messages = parent::getMailerMessages($transport);
+
+        return array_map(function (RawMessage $message): MauticMessage {
+            \assert($message instanceof MauticMessage);
+
+            return $message;
+        }, $messages);
+    }
+
+    /**
+     * Overloading the method from MailerAssertionsTrait to get better typehint.
+     */
+    public static function getMailerMessage(int $index = 0, string $transport = null): ?MauticMessage
+    {
+        return self::getMailerMessages($transport)[$index] ?? null;
+    }
+
+    /**
+     * @return MauticMessage[]
+     */
+    public static function getMailerMessagesByToAddress(string $toAddress, string $transport = null): array
+    {
+        return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
+    }
 
     protected function setUp(): void
     {
@@ -55,6 +88,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
         EnvLoader::load();
 
+        self::ensureKernelShutdown();
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
@@ -66,13 +100,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
 
-        $this->client->setServerParameter('HTTPS', $secure);
+        $this->client->setServerParameter('HTTPS', (string) $secure);
     }
 
     /**
      * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
      */
-    protected function getContainer(): ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
         return self::$container;
     }
@@ -162,22 +196,25 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $message;
     }
 
-    protected function loginUser(string $username): void
+    protected function loginUser(string $username): User
     {
+        /** @var User|null $user */
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $username]);
 
         if (!$user) {
-            throw new InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
+            throw new \InvalidArgumentException(sprintf('User with username "%s" not found.', $username));
         }
 
         $firewall = 'mautic';
         $session  = self::$container->get('session');
-        $token    = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
+        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
+
+        return $user;
     }
 
     /**

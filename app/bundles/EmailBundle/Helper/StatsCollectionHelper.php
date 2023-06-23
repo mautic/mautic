@@ -107,8 +107,6 @@ class StatsCollectionHelper
     /**
      * Generate stats from Mautic's raw data.
      *
-     * @param $statName
-     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function generateStats(

@@ -74,7 +74,7 @@ class FocusModelTest extends TestCase
             $this->dispatcher,
             $this->leadFieldModel,
             $this->contactTracker,
-            );
+        );
         $focus = [
             'form' => 'xxx',
             'type' => $type,

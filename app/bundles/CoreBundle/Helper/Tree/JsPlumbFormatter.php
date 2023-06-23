@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Tree;
 
-use RecursiveIteratorIterator;
-
 /**
  * Will generate this structure:.
  *
@@ -28,7 +26,7 @@ class JsPlumbFormatter implements NodeFormatterInterface
      */
     public function format(NodeInterface $node): array
     {
-        $iterator = new RecursiveIteratorIterator($node, RecursiveIteratorIterator::SELF_FIRST);
+        $iterator = new \RecursiveIteratorIterator($node, \RecursiveIteratorIterator::SELF_FIRST);
         $data     = $this->addNodeAndEdges($node, ['levels' => [], 'edges' => []], 0);
 
         foreach ($iterator as $childNode) {

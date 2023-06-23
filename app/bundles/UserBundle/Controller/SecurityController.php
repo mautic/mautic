@@ -2,7 +2,6 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -11,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception as Exception;
+use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
@@ -19,16 +18,16 @@ class SecurityController extends CommonController implements EventSubscriberInte
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
-        assert(is_string($controller));
+        \assert(is_string($controller));
 
         if (false === strpos($controller, self::class)) {
             return;
         }
 
         $authChecker = $this->get('security.authorization_checker');
-        assert($authChecker instanceof AuthorizationCheckerInterface);
+        \assert($authChecker instanceof AuthorizationCheckerInterface);
 
-        //redirect user if they are already authenticated
+        // redirect user if they are already authenticated
         if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
             $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
@@ -74,7 +73,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
-            if (($error instanceof Exception\BadCredentialsException)) {
+            if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
@@ -82,7 +81,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = $error->getMessage();
             }
 
-            $this->addFlash($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], 'error', null, false);
         }
         $request->query->set('tmpl', 'login');
 
@@ -113,8 +112,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * The plugin should be handling this in it's listener.
      *
-     * @param $integration
-     *
      * @return RedirectResponse
      */
     public function ssoLoginAction($integration)
@@ -124,8 +121,6 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @param $integration
      *
      * @return RedirectResponse
      */

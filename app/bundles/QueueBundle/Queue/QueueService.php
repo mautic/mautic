@@ -73,8 +73,6 @@ class QueueService
     }
 
     /**
-     * @param $payload
-     *
      * @return QueueConsumerEvent
      */
     public function dispatchConsumerEventFromPayload($payload)
