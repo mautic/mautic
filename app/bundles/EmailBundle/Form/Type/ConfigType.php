@@ -266,7 +266,10 @@ class ConfigType extends AbstractType
             DsnType::class,
             [
                 'constraints' => [new Dsn()],
-                'test_action' => 'email:sendTestEmail',
+                'test_button' => [
+                    'action' => 'email:sendTestEmail',
+                    'label'  => $this->translator->trans('mautic.email.config.mailer.transport.test_send'),
+                ],
             ]
         );
 

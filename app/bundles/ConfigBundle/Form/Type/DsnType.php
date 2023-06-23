@@ -42,7 +42,7 @@ class DsnType extends AbstractType
             'scheme',
             TextType::class,
             [
-                'label' => 'mautic.email.config.mailer.dsn.scheme',
+                'label' => 'mautic.config.dsn.scheme',
                 'attr'  => $attr,
             ]
         );
@@ -51,7 +51,7 @@ class DsnType extends AbstractType
             'host',
             TextType::class,
             [
-                'label'    => 'mautic.email.config.mailer.dsn.host',
+                'label'    => 'mautic.config.dsn.host',
                 'required' => false,
                 'attr'     => $attr,
             ]
@@ -61,7 +61,7 @@ class DsnType extends AbstractType
             'port',
             NumberType::class,
             [
-                'label'    => 'mautic.email.config.mailer.dsn.port',
+                'label'    => 'mautic.config.dsn.port',
                 'required' => false,
                 'html5'    => true,
                 'attr'     => $attr,
@@ -72,7 +72,7 @@ class DsnType extends AbstractType
             'user',
             TextType::class,
             [
-                'label'    => 'mautic.email.config.mailer.dsn.user',
+                'label'    => 'mautic.config.dsn.user',
                 'required' => false,
                 'attr'     => $attr,
             ]
@@ -82,7 +82,7 @@ class DsnType extends AbstractType
             'password',
             TextType::class,
             [
-                'label'    => 'mautic.email.config.mailer.dsn.password',
+                'label'    => 'mautic.config.dsn.password',
                 'required' => false,
                 'attr'     => $attr,
             ]
@@ -92,7 +92,7 @@ class DsnType extends AbstractType
             'path',
             TextType::class,
             [
-                'label'    => 'mautic.email.config.mailer.dsn.path',
+                'label'    => 'mautic.config.dsn.path',
                 'required' => false,
                 'attr'     => $attr,
             ]
@@ -103,7 +103,7 @@ class DsnType extends AbstractType
             SortableListType::class,
             [
                 'required'        => false,
-                'label'           => 'mautic.email.config.mailer.dsn.options',
+                'label'           => 'mautic.config.dsn.options',
                 'attr'            => [
                     'onchange' => $onChange,
                 ],
@@ -113,16 +113,16 @@ class DsnType extends AbstractType
             ]
         );
 
-        if ($options['test_action']) {
+        if ($options['test_button']['action']) {
             $builder->add(
                 'test_button',
                 StandAloneButtonType::class,
                 [
-                    'label'    => 'mautic.email.config.mailer.transport.test_send',
+                    'label'    => $options['test_button']['label'],
                     'required' => false,
                     'attr'     => [
                         'class'   => 'btn btn-info config-dsn-test-button',
-                        'onclick' => sprintf('Mautic.configDnsTestExecute(this, "%s", "%s")', $options['test_action'], $name),
+                        'onclick' => sprintf('Mautic.configDnsTestExecute(this, "%s", "%s")', $options['test_button']['action'], $name),
                     ],
                 ]
             );
@@ -138,7 +138,10 @@ class DsnType extends AbstractType
             'error_mapping' => [
                 '.' => 'scheme',
             ],
-            'test_action'  => null,
+            'test_button'  => [
+                'action'   => null,
+                'label'    => null,
+            ],
         ]);
     }
 
