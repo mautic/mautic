@@ -9,7 +9,7 @@ class MessengerRequestFactory
 {
     public static function toArray(Request $request): array
     {
-        return [
+        return array_filter([
             'attributes' => $request->attributes->all(),
             'request'    => $request->request->all(),
             'query'      => $request->query->all(),
@@ -17,22 +17,18 @@ class MessengerRequestFactory
             'files'      => $request->files->all(),
             'server'     => $request->server->all(),
             'headers'    => $request->headers->all(),
-        ];
+        ]);
     }
 
     public static function fromArray(array $request): Request
     {
-        if (!isset($request['attributes'])) {
-            throw new InvalidArgumentException('Request does not have expected keys. Use QueueRequestFactory::toArray to prepare a Request object');
-        }
-
         return new Request(
-            $request['query'],
-            $request['request'],
-            $request['attributes'],
-            $request['cookies'],
-            $request['files'],
-            $request['server']
+            $request['query'] ?? [],
+            $request['request'] ?? [],
+            $request['attributes'] ?? [],
+            $request['cookies'] ?? [],
+            $request['files'] ?? [],
+            $request['server'] ?? []
         );
     }
 }
