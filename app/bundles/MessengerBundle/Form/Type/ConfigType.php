@@ -74,18 +74,9 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
-        /***
-         * For doctorine we are using the default settings
-         * for other transports their settings should be injected here
-         * Here is an example of the fields that needs to be added
-         * https://symfony.com/doc/current/messenger.html#doctrine-transport
-         */
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'messengerconfig';
     }

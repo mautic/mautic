@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
