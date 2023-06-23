@@ -81,9 +81,6 @@ $container->loadFromExtension('framework', [
         'transports'        => [
             'email_transport' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
-                ],
                 'retry_strategy' => [
                     'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
                     'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
@@ -92,10 +89,7 @@ $container->loadFromExtension('framework', [
                 ],
             ],
             'failed_default' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
-                ],
+                'dsn' => '%env(MAUTIC_MESSENGER_DSN)%',
             ],
         ],
         'routing' => [
@@ -132,7 +126,6 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
     'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
