@@ -1,18 +1,17 @@
 <?php
 
-/*
- * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
- * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
- */
-
-// List of critical migrations
-$criticalMigrations = [];
+$criticalMigrations = []; // List of critical migrations
 
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
 $args              = getopt('b::', ['repackage']);
 $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
+
+/*
+ * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
+ * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
+ */
 
 // We need the version number so get the app kernel
 require_once dirname(__DIR__).'/vendor/autoload.php';
