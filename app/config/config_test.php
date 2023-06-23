@@ -46,8 +46,8 @@ $container->loadFromExtension('framework', [
     ],
     'messenger' => [
         'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
+            'email' => [
+                'dsn' => 'in-memory://',
             ],
         ],
     ],
