@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -700,6 +701,20 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                     }),
                 ]
             );
+
+        $unitOfWork = new class () extends UnitOfWork {
+            public function __construct()
+            {
+            }
+            public function getEntityState($entity, $assume = null): bool {
+                return true;
+            }
+        };
+
+        $this->entityManager->expects($this->exactly(1))
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork)
+            ;
 
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');

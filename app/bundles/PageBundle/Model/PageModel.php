@@ -462,8 +462,7 @@ class PageModel extends FormModel
         }
 
         if (null === $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
-
+            $lead = $this->contactRequestHelper->getContactFromQuery($query);
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             $companyChangeLog                      = null;
