@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\EmailBundle\Tests\Controller;
+namespace Mautic\SmsBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
