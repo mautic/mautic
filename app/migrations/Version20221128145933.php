@@ -28,7 +28,7 @@ final class Version20221128145933 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $confFile = dirname(__DIR__).'/config/local.php';
+        $confFile = \Mautic\CoreBundle\Loader\ParameterLoader::getLocalConfigFile(__DIR__.'/../');
 
         if (!file_exists($confFile)) {
             return;
