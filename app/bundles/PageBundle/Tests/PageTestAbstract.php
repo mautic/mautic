@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,18 +21,24 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class PageTestAbstract extends WebTestCase
+class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
-    protected $mockTrackingId;
+    protected string $mockTrackingId;
+
+    /**
+     * @var Router|MockObject
+     */
+    protected $router;
 
     protected function setUp(): void
     {
-        self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
     }
 
@@ -45,7 +52,7 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $router = self::$container->get('router');
+        $this->router = $this->createMock(Router::class);
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
@@ -109,6 +116,9 @@ class PageTestAbstract extends WebTestCase
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
+        /** @var ContactRequestHelper&MockObject $contactRequestHelper */
+        $contactRequestHelper = $this->createMock(ContactRequestHelper::class);
+
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
@@ -129,8 +139,8 @@ class PageTestAbstract extends WebTestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticPageBundle:Page', $pageRepository],
-                        ['MauticPageBundle:Hit', $hitRepository],
+                        [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
+                        [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
                     ]
                 )
             );
@@ -153,13 +163,14 @@ class PageTestAbstract extends WebTestCase
             $companyModel,
             $deviceTrackerMock,
             $contactTracker,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $contactRequestHelper
         );
 
         $pageModel->setDispatcher($dispatcher);
         $pageModel->setTranslator($translator);
         $pageModel->setEntityManager($entityManager);
-        $pageModel->setRouter($router);
+        $pageModel->setRouter($this->router);
         $pageModel->setUserHelper($userHelper);
 
         return $pageModel;

@@ -15,11 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactSegmentQueryBuilderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testAddNewContactsRestrictions(): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
@@ -30,7 +25,36 @@ class ContactSegmentQueryBuilderTest extends TestCase
         $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createMock(EntityManager::class), new RandomParameterName(), new EventDispatcher());
 
         Assert::assertSame($queryBuilder, $filterQueryBuilder->addNewContactsRestrictions($queryBuilder, 8));
-        Assert::assertSame('SELECT 1 FROM leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
+        Assert::assertSame('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function dataAddNewContactsRestrictionsWithBatchLimiters(): iterable
+    {
+        yield [['minId' => 1,  'maxId' => 2], 'par0.lead_id BETWEEN 1 and 2'];
+        yield [['minId' => 1], 'par0.lead_id >= 1'];
+        yield [['maxId' => 2], 'par0.lead_id <= 2'];
+        yield [['lead_id' => 1], 'par0.lead_id = 1'];
+    }
+
+    /**
+     * @dataProvider dataAddNewContactsRestrictionsWithBatchLimiters
+     *
+     * @param array<string, mixed> $batchLimiters
+     */
+    public function testAddNewContactsRestrictionsWithBatchLimiters(array $batchLimiters, string $expectedWhereClause): void
+    {
+        $queryBuilder = new QueryBuilder($this->createConnection());
+        $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $queryBuilder->where('NULL');
+
+        $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createMock(EntityManager::class), new RandomParameterName(), new EventDispatcher());
+
+        Assert::assertSame($queryBuilder, $filterQueryBuilder->addNewContactsRestrictions($queryBuilder, 8, $batchLimiters));
+        Assert::assertSame('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads par0 WHERE (par0.leadlist_id = 8) AND ('.$expectedWhereClause.')))', $queryBuilder->getDebugOutput());
     }
 
     private function createConnection(): Connection

@@ -10,16 +10,18 @@ use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class MessageModel.
+ * @extends FormModel<Message>
+ *
+ * @implements AjaxLookupModelInterface<Message>
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
-    const CHANNEL_FEATURE = 'marketing_messages';
+    public const CHANNEL_FEATURE = 'marketing_messages';
 
     /**
      * @var ChannelListHelper
@@ -71,11 +73,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:Message');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
     /**
@@ -93,14 +95,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param object      $entity
-     * @param FormFactory $formFactory
-     * @param null        $action
-     * @param array       $options
+     * @param object $entity
+     * @param null   $action
+     * @param array  $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -148,7 +149,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -164,8 +164,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                 $entities = $this->getRepository()->getMessageList(
                     $filter,
                     $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother')
+                    $start
                 );
 
                 foreach ($entities as $entity) {
@@ -182,8 +181,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -192,8 +189,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -202,7 +197,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      * @param null $channel
@@ -226,7 +220,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      *
@@ -300,7 +293,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
             if (empty($event)) {
                 $event = new MessageEvent($entity, $isNew);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

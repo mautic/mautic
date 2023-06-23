@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldFilterTransformer implements DataTransformerInterface
 {

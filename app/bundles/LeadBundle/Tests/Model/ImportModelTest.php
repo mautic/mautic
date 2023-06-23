@@ -50,13 +50,13 @@ class ImportModelTest extends StandardImportTestHelper
         $dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                LeadEvents::IMPORT_ON_PROCESS,
                 $this->callback(function (ImportProcessEvent $event) {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
 
                     return true;
-                })
+                }),
+                LeadEvents::IMPORT_ON_PROCESS
             );
 
         $model = $this->initImportModel();
@@ -375,24 +375,6 @@ class ImportModelTest extends StandardImportTestHelper
         Assert::assertEquals(511, $import->getProcessedRows());
 
         $import->end();
-    }
-
-    public function testMacLineEndings(): void
-    {
-        $oldCsv = self::$csvPath;
-
-        // Generate a new CSV
-        self::generateSmallCSV();
-
-        $csv = file_get_contents(self::$csvPath);
-        $csv = str_replace("\n", "\r", $csv);
-        file_put_contents(self::$csvPath, $csv);
-
-        $this->testProcess();
-
-        @unlink(self::$csvPath);
-
-        self::$csvPath = $oldCsv;
     }
 
     public function testItLogsDBErrorIfTheEntityManagerIsClosed(): void

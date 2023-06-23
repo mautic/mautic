@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractCustomRequestEvent extends Event
 {
@@ -67,8 +67,6 @@ abstract class AbstractCustomRequestEvent extends Event
     }
 
     /**
-     * @param $route
-     *
      * @return bool
      */
     public function checkRouteContext($route)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectEvent extends Event
 {

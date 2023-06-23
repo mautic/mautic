@@ -2,19 +2,34 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    public function __construct()
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -22,35 +37,34 @@ class ResultController extends CommonFormController
             'mautic_form', // route base
             'mautic.formresult', // session base
             'mautic.form.result', // lang string base
-            'MauticFormBundle:Result', // template base
+            '@MauticForm/Result', // template base
             'mautic_form', // activeLink
             'formresult' // mauticContent
         );
+
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
-     * @param int $objectId
-     * @param int $page
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($objectId, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1)
     {
         /** @var FormModel $formModel */
         $formModel      = $this->getModel('form.form');
         $form           = $formModel->getEntity($objectId);
-        $session        = $this->get('session');
+        $session        = $request->getSession();
         $formPage       = $session->get('mautic.form.page', 1);
         $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
         $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -64,7 +78,7 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -73,15 +87,13 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
-        if ('POST' == $this->request->getMethod()) {
-            $this->setListFilters($this->request->query->get('name'));
+        if ('POST' === $request->getMethod()) {
+            $this->setListFilters($request->query->get('name'));
         }
 
-        /** @var PageHelperFactoryInterface $pageHelperFacotry */
-        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
-        $pageHelper        = $pageHelperFacotry->make("mautic.formresult.{$objectId}", $page);
+        $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
-        //set limits
+        // set limits
         $limit = $pageHelper->getLimit();
         $start = $pageHelper->getStart();
 
@@ -95,13 +107,13 @@ class ResultController extends CommonFormController
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
         $model      = $this->getModel('form.submission');
 
-        if ($this->request->query->has('result')) {
+        if ($request->query->has('result')) {
             // Force ID
-            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $this->request->query->get('result'), 'strict' => false];
+            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $request->query->get('result'), 'strict' => false];
             $session->set("mautic.formresult.$objectId.filters", $filters);
         }
 
-        //get the results
+        // get the results
         $entities = $model->getEntities(
             [
                 'start'          => $start,
@@ -121,7 +133,7 @@ class ResultController extends CommonFormController
         unset($entities);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_results', ['objectId' => $objectId, 'page' => $lastPage]);
@@ -130,7 +142,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticFormBundle:Result:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'formresult',
@@ -139,7 +151,7 @@ class ResultController extends CommonFormController
             );
         }
 
-        //set what page currently on so that we can return here if need be
+        // set what page currently on so that we can return here if need be
         $pageHelper->rememberPage($page);
 
         return $this->delegateView(
@@ -152,14 +164,14 @@ class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
-                    'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'canDelete'      => $this->get('mautic.security')->hasEntityAccess(
+                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
+                'contentTemplate' => '@MauticForm/Result/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_form_index',
                     'mauticContent' => 'formresult',
@@ -176,12 +188,9 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @param int    $submissionId
-     * @param string $field
-     *
      * @return BinaryFileResponse
      */
-    public function downloadFileAction($submissionId, $field)
+    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader)
     {
         /** @var SubmissionResultLoader $submissionResultLoader */
         $submissionResultLoader = $this->getModel('form.submission_result_loader');
@@ -198,16 +207,13 @@ class ResultController extends CommonFormController
             throw $this->createNotFoundException();
         }
 
-        if (empty($fieldEntity->getProperties()['public']) && !$this->get('mautic.security')->hasEntityAccess(
+        if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $submission->getForm()->getCreatedBy())
         ) {
             return $this->accessDenied();
         }
-
-        /** @var FormUploader $formUploader */
-        $formUploader = $this->get('mautic.form.helper.form_uploader');
 
         $fileName = $results[$field];
         $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
@@ -231,25 +237,25 @@ class ResultController extends CommonFormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return Response
      *
      * @throws \Exception
      */
-    public function exportAction($objectId, $format = 'csv')
+    public function exportAction(Request $request, $objectId, $format = 'csv')
     {
         $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
-        $session   = $this->get('session');
+        $session   = $request->getSession();
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
         if (null === $form) {
-            //redirect back to form list
+            // redirect back to form list
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -263,7 +269,7 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -293,18 +299,19 @@ class ResultController extends CommonFormController
     /**
      * Delete a form result.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|Response
      */
-    public function deleteAction()
+    public function deleteAction(Request $request)
     {
-        $formId   = $this->request->get('formId', 0);
-        $objectId = $this->request->get('objectId', 0);
-        $session  = $this->get('session');
-        $page     = $session->get("mautic.formresult.{$formId}.page", 1);
+        $formId   = $request->get('formId', 0);
+        $objectId = $request->get('objectId', 0);
+        $session  = $request->getSession();
+        $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
         $flashes  = [];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
 
             // Find the result
             $entity = $model->getEntity($objectId);
@@ -315,7 +322,7 @@ class ResultController extends CommonFormController
                     'msg'     => 'mautic.form.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->hasEntityAccess('form:forms:editown', 'form:forms:editother', $entity->getCreatedBy())) {
+            } elseif (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $entity->getCreatedBy())) {
                 return $this->accessDenied();
             } else {
                 $id = $entity->getId();
@@ -329,7 +336,7 @@ class ResultController extends CommonFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         $viewParameters = [
             'objectId' => $formId,
@@ -340,7 +347,7 @@ class ResultController extends CommonFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticFormBundle:Result:index',
+                'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                 'passthroughVars' => [
                     'mauticContent' => 'formresult',
                 ],
@@ -352,9 +359,9 @@ class ResultController extends CommonFormController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return $this->batchDeleteStandard();
+        return $this->batchDeleteStandard($request);
     }
 
     /**
@@ -399,9 +406,6 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    /**
-     * @param $action
-     */
     public function getPostActionRedirectArguments(array $args, $action)
     {
         switch ($action) {
@@ -421,13 +425,14 @@ class ResultController extends CommonFormController
      */
     protected function getFormIdFromRequest($parameters = [])
     {
-        if ($this->request->attributes->has('formId')) {
-            $formId = $this->request->attributes->get('formId');
-        } elseif ($this->request->request->has('formId')) {
-            $formId = $this->request->request->get('formId');
+        $request = $this->getCurrentRequest();
+        if ($request->attributes->has('formId')) {
+            $formId = $request->attributes->get('formId');
+        } elseif ($request->request->has('formId')) {
+            $formId = $request->request->get('formId');
         } else {
             $objectId = isset($parameters['objectId']) ? $parameters['objectId'] : 0;
-            $formId   = (isset($parameters['formId'])) ? $parameters['formId'] : $this->request->query->get('formId', $objectId);
+            $formId   = (isset($parameters['formId'])) ? $parameters['formId'] : $request->query->get('formId', $objectId);
         }
 
         return $formId;

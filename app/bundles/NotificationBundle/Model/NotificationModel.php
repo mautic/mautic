@@ -15,12 +15,14 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NotificationModel
- * {@inheritdoc}
+ * @extends FormModel<Notification>
+ *
+ * @implements AjaxLookupModelInterface<Notification>
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -44,7 +46,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticNotificationBundle:Notification');
+        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Notification::class);
     }
 
     /**
@@ -52,7 +54,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticNotificationBundle:Stat');
+        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Stat::class);
     }
 
     /**
@@ -66,20 +68,17 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
-     *
      * @return array
      */
     public function saveEntities($entities, $unlock = true)
     {
-        //iterate over the results so the events are dispatched on each delete
+        // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
-            //set some defaults
+            // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
             if ($dispatchEvent = $entity instanceof Notification) {
@@ -102,17 +101,16 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Notification|null $entity
+     * @param string|null       $action
+     * @param array             $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
@@ -128,8 +126,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return Notification|null
      */
@@ -163,11 +159,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -190,7 +181,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $name = NotificationEvents::NOTIFICATION_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -199,12 +190,12 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**
@@ -254,8 +245,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $idHash
-     *
      * @return Stat
      */
     public function getNotificationStatus($idHash)
@@ -265,9 +254,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Search for an notification stat by notification and lead IDs.
-     *
-     * @param $notificationId
-     * @param $leadId
      *
      * @return array
      */
@@ -285,8 +271,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get an array of tracked links.
      *
-     * @param $notificationId
-     *
      * @return array
      */
     public function getNotificationClickStats($notificationId)
@@ -295,7 +279,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -320,7 +303,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;
@@ -337,7 +320,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;

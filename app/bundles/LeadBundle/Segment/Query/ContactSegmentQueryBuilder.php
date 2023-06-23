@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -22,6 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContactSegmentQueryBuilder
 {
+    use LeadBatchLimiterTrait;
+
     /** @var EntityManager */
     private $entityManager;
 
@@ -53,9 +54,9 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
-            // Prefer a slave connection if available.
-            $connection->connect('slave');
+        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+            // Prefer a replica connection if available.
+            $connection->ensureConnectedToReplica();
         }
 
         /** @var QueryBuilder $queryBuilder */
@@ -99,15 +100,15 @@ class ContactSegmentQueryBuilder
     /**
      * @return QueryBuilder
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function wrapInCount(QueryBuilder $qb)
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
-            // Prefer a slave connection if available.
-            $connection->connect('slave');
+        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+            // Prefer a replica connection if available.
+            $connection->ensureConnectedToReplica();
         }
 
         // Add count functions to the query
@@ -139,13 +140,11 @@ class ContactSegmentQueryBuilder
     /**
      * Restrict the query to NEW members of segment.
      *
-     * @param int $segmentId
-     *
-     * @return QueryBuilder
+     * @param array<string, mixed> $batchLimiters
      *
      * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, int $segmentId, array $batchLimiters = []): QueryBuilder
     {
         $leadsTableAlias    = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $expr               = $queryBuilder->expr();
@@ -158,22 +157,20 @@ class ContactSegmentQueryBuilder
             ->andWhere($expr->eq($tableAlias.'.leadlist_id', $segmentIdParameter));
 
         $queryBuilder->setParameter($segmentIdParameter, $segmentId);
+
+        $this->addLeadAndMinMaxLimiters($segmentQueryBuilder, $batchLimiters, 'lead_lists_leads');
+
         $queryBuilder->andWhere($expr->notIn($leadsTableAlias.'.id', $segmentQueryBuilder->getSQL()));
 
         return $queryBuilder;
     }
 
-    /**
-     * @param int $leadListId
-     *
-     * @return QueryBuilder
-     */
-    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
+    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, int $leadListId): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();
 
-        $existsQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $existsQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
 
         $existsQueryBuilder
             ->select('null')
@@ -198,13 +195,9 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param int $leadListId
-     *
-     * @return QueryBuilder
-     *
      * @throws QueryException
      */
-    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
+    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, int $leadListId): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();
@@ -227,7 +220,7 @@ class ContactSegmentQueryBuilder
         }
 
         $event = new LeadListQueryBuilderGeneratedEvent($segment, $queryBuilder);
-        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED);
     }
 
     /**
@@ -251,7 +244,7 @@ class ContactSegmentQueryBuilder
 
             $alias = $this->generateRandomParameterName();
             $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_ON_FILTERING);
             if ($event->isFilteringDone()) {
                 $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 
@@ -302,7 +295,7 @@ class ContactSegmentQueryBuilder
      */
     private function getSegmentEdges($segmentId)
     {
-        $segment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
+        $segment = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\LeadList::class)->find($segmentId);
         if (null === $segment) {
             return [];
         }

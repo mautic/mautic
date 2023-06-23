@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\FetchMode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -13,13 +12,6 @@ use PHPUnit\Framework\Assert;
 
 class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
@@ -83,7 +75,9 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                 Connection::PARAM_STR_ARRAY
             )
             ->execute()
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
+
+        $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);
 
         $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
 
@@ -114,5 +108,8 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertNull($mouseOver);
         Assert::assertSame(sprintf('Campaigns %s is part of', $firstName), $dataHeader);
+        $response = $this->client->getResponse();
+        // Make sure the data-target-url is not an absolute URL
+        Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), $response->getContent());
     }
 }

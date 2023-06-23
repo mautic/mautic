@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
@@ -119,15 +119,12 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param $type
-     * @param $properties
-     *
-     * @return bool
+     * @return array{0: bool, 1:string}
      */
     public static function validateProperties($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
-            //ensure the field type is supported
+            // ensure the field type is supported
             return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
@@ -138,7 +135,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             }
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
-                //ensure requirements are met
+                // ensure requirements are met
                 return [false, $fieldType['properties'][$key]['error_msg']];
             }
         }
@@ -210,11 +207,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array
+     * @return array<string,string>
      */
     public static function getLocaleChoices()
     {
-        return array_flip(Intl::getLocaleBundle()->getLocaleNames());
+        return array_flip(Locales::getNames());
     }
 
     /**
@@ -225,10 +222,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function getDateChoices()
     {
         return [
-            $this->translator->trans('mautic.campaign.event.timed.choice.anniversary') => 'anniversary',
-            $this->translator->trans('mautic.campaign.event.timed.choice.today')       => '+P0D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.yesterday')   => '-P1D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow')    => '+P1D',
+            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
+            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
         ];
     }
 }

@@ -38,14 +38,6 @@ class RoleListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'role_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return ChoiceType::class;
@@ -75,7 +67,7 @@ class RoleListType extends AbstractType
             $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by name
+        // sort by name
         ksort($choices);
 
         return $choices;

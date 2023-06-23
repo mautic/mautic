@@ -4,11 +4,9 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CampaignExecutionEvent.
- *
  * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignExecutionEvent extends Event
@@ -96,7 +94,7 @@ class CampaignExecutionEvent extends Event
     public function getLeadFields()
     {
         $lead         = $this->getLead();
-        $isLeadEntity = ($lead instanceof Lead);
+        $isLeadEntity = $lead instanceof Lead;
 
         // In case Lead is a scalar value:
         if (!$isLeadEntity && !is_array($lead)) {

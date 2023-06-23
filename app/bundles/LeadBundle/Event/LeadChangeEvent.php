@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadChangeEvent extends Event
 {
@@ -21,10 +21,6 @@ class LeadChangeEvent extends Event
 
     private $newTrackingId;
 
-    /**
-     * @param $oldTrackingId
-     * @param $newTrackingId
-     */
     public function __construct(Lead $oldLead, $oldTrackingId, Lead $newLead, $newTrackingId)
     {
         $this->oldLead       = $oldLead;

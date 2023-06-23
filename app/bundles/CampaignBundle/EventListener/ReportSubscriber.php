@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
+    public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
     /**
      * @var CompanyReportData
@@ -161,7 +161,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG, $data);
 
         // Register graphs
-        //$event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
+        // $event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
     }
 
     /**

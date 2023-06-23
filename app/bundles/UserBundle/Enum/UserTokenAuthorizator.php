@@ -7,5 +7,5 @@ namespace Mautic\UserBundle\Enum;
  */
 final class UserTokenAuthorizator
 {
-    const RESET_PASSWORD_AUTHORIZATOR = 'reset-password';
+    public const RESET_PASSWORD_AUTHORIZATOR = 'reset-password';
 }

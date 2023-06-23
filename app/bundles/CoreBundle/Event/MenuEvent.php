@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MenuEvent extends Event
 {
@@ -50,7 +50,7 @@ class MenuEvent extends Event
 
             $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
         } else {
-            //make sure the root does not override the children
+            // make sure the root does not override the children
             if (isset($this->menuItems['children'])) {
                 if (isset($items['children'])) {
                     $items['children'] = array_merge_recursive($this->menuItems['children'], $items['children']);

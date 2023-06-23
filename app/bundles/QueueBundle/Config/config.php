@@ -2,19 +2,6 @@
 
 return [
     'services' => [
-        'events' => [
-            'mautic.queue.rabbitmq.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\RabbitMqSubscriber::class,
-                'arguments' => 'service_container',
-            ],
-            'mautic.queue.beanstalkd.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\BeanstalkdSubscriber::class,
-                'arguments' => [
-                    'service_container',
-                    'mautic.queue.service',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.queue.service' => [
                 'class'     => \Mautic\QueueBundle\Queue\QueueService::class,

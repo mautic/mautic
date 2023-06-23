@@ -9,17 +9,20 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
+use Mautic\EmailBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType as EmailConfigType;
-use Mautic\EmailBundle\Model\TransportType;
+use Mautic\EmailBundle\Form\Type\DsnType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -65,31 +68,25 @@ class RestrictionHelperTest extends TypeTestCase
             'formType'   => EmailConfigType::class,
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'               => null,
-                'mailer_from_name'             => 'Mautic',
-                'mailer_from_email'            => 'email@yoursite.com',
-                'mailer_return_path'           => null,
-                'mailer_transport'             => 'mail',
-                'mailer_append_tracking_pixel' => true,
-                'mailer_convert_embed_images'  => false,
-                'mailer_host'                  => '',
-                'mailer_port'                  => null,
-                'mailer_user'                  => null,
-                'mailer_password'              => null,
-                'mailer_encryption'            => null,
-                'mailer_auth_mode'             => null,
-                'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
-                'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
-                'mailer_spool_msg_limit'       => null,
-                'mailer_spool_time_limit'      => null,
-                'mailer_spool_recover_timeout' => 900,
-                'mailer_spool_clear_timeout'   => 1800,
-                'unsubscribe_text'             => null,
-                'webview_text'                 => null,
-                'unsubscribe_message'          => null,
-                'resubscribe_message'          => null,
-                'monitored_email'              => [
+                'mailer_api_key'                        => null,
+                'mailer_from_name'                      => 'Mautic',
+                'mailer_from_email'                     => 'email@yoursite.com',
+                'mailer_return_path'                    => null,
+                'mailer_transport'                      => 'mail',
+                'mailer_append_tracking_pixel'          => true,
+                'mailer_convert_embed_images'           => false,
+                'mailer_dsn'                            => 'smtp://null:25',
+                'messenger_type'                        => 'async',
+                'messenger_dsn'                         => 'doctrine://default',
+                'messenger_retry_strategy_max_retries'  => 3,
+                'messenger_retry_strategy_delay'        => 1000,
+                'messenger_retry_strategy_multiplier'   => 2,
+                'messenger_retry_strategy_max_delay'    => 0,
+                'unsubscribe_text'                      => null,
+                'webview_text'                          => null,
+                'unsubscribe_message'                   => null,
+                'resubscribe_message'                   => null,
+                'monitored_email'                       => [
                     'general' => [
                         'address'    => null,
                         'host'       => null,
@@ -259,10 +256,11 @@ class RestrictionHelperTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper));
-        $transportType = $this->getMockBuilder(TransportType::class)
+
+        $messengerType = $this->getMockBuilder(MessengerTransportType::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $transportType->method('getTransportTypes')
+        $messengerType->method('getTransportTypes')
             ->willReturn([]);
 
         // This is what we're really testing here
@@ -281,7 +279,8 @@ class RestrictionHelperTest extends TypeTestCase
                     new NumberType(),
                     new FormButtonsType(),
                     new ButtonGroupType(),
-                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType),
+                    new EmailConfigType($translator, $this->createMock(DsnTransformer::class)),
+                    new DsnType($this->createMock(CoreParametersHelper::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper, $escapeTransformer),

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
@@ -70,12 +70,12 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->lte('log.date_added', ':date')
                 )
                 ->execute()
-                ->fetchColumn();
+                ->fetchOne();
         } else {
             $qb->select('log.id')
               ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
               ->where(
-                $qb->expr()->lte('log.date_added', ':date')
+                  $qb->expr()->lte('log.date_added', ':date')
               );
 
             $rows = 0;
@@ -83,7 +83,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
-                $ids = array_column($qb->execute()->fetchAll(), 'id');
+                $ids = array_column($qb->execute()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($ids)) {
                     break;
@@ -91,9 +91,9 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
                 $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.$table)
                   ->where(
-                    $qb2->expr()->in(
-                      'id', $ids
-                    )
+                      $qb2->expr()->in(
+                          'id', $ids
+                      )
                   )
                   ->execute();
             }

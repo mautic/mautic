@@ -118,7 +118,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     public function testSessionExpiredIsRefreshed(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
-        $message     = 'Session expired';
+        $message     = '["errorCode":"INVALID_SESSION_ID","body":"Session expired or invalid"]';
 
         $integration->expects($this->exactly(2))
             ->method('authCallback');
@@ -128,7 +128,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     [
-                        'errorCode' => 'INVALID_SESSION_ID',
                         'message'   => $message,
                     ],
                 ]

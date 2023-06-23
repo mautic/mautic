@@ -76,7 +76,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => CampaignEventFormFieldValueType::class,
-            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'formTheme'   => '@MauticForm/FormTheme/FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('form.field_value', $trigger);
@@ -101,7 +101,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $limitToForms = $event->getConfig()['forms'];
 
-        //check against selected forms
+        // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
             return $event->setResult(false);
         }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use DateTime;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -45,7 +44,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $frequencyRule->setFrequencyNumber(1);
         $frequencyRule->setFrequencyTime('DAY');
         $frequencyRule->setChannel('email');
-        $frequencyRule->setDateAdded(new DateTime());
+        $frequencyRule->setDateAdded(new \DateTime());
         $frequencyRule->setLead($lead);
 
         $this->em->persist($frequencyRule);
@@ -53,7 +52,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $emailStats1 = new Stat();
         $emailStats1->setLead($lead);
         $emailStats1->setEmailAddress('testemail@test.test');
-        $emailStats1->setDateSent(new DateTime());
+        $emailStats1->setDateSent(new \DateTime());
         $emailStats1->setIsRead(true);
         $emailStats1->setIsFailed(false);
         $emailStats1->setViewedInBrowser(false);
@@ -61,7 +60,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $emailStats2 = new Stat();
         $emailStats2->setLead($lead);
         $emailStats2->setEmailAddress('testemail@test.test');
-        $emailStats2->setDateSent(new DateTime());
+        $emailStats2->setDateSent(new \DateTime());
         $emailStats2->setIsRead(true);
         $emailStats2->setIsFailed(false);
         $emailStats2->setViewedInBrowser(false);
@@ -73,7 +72,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [$lead->getId()], 1, 'DAY');
         $expectedViolations = [
             [
-                'lead_id'          => $lead->getId(),
+                'lead_id'          => (string) $lead->getId(),
                 'frequency_number' => '1',
                 'frequency_time'   => 'DAY',
             ],

@@ -29,7 +29,7 @@ class IpAddress
     private $ipAddress;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
     private $ipDetails;
 
@@ -56,8 +56,6 @@ class IpAddress
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -101,8 +99,6 @@ class IpAddress
     /**
      * Set ipAddress.
      *
-     * @param $ipAddress
-     *
      * @return $this
      */
     public function setIpAddress($ipAddress)
@@ -125,7 +121,7 @@ class IpAddress
     /**
      * Set ipDetails.
      *
-     * @param string $ipDetails
+     * @param array<string,string> $ipDetails
      *
      * @return IpAddress
      */
@@ -139,7 +135,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return string
+     * @return array<string,string>
      */
     public function getIpDetails()
     {
@@ -177,10 +173,10 @@ class IpAddress
                     list($range, $netmask) = explode('/', $ip, 2);
                     $range_decimal         = ip2long($range);
                     $ip_decimal            = ip2long($this->ipAddress);
-                    $wildcard_decimal      = pow(2, (32 - $netmask)) - 1;
+                    $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
                     $netmask_decimal       = ~$wildcard_decimal;
 
-                    if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
+                    if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
                         return false;
                     }
 

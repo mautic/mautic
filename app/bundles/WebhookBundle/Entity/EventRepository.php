@@ -4,11 +4,12 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**
-     * @param $type
-     *
      * @return array
      */
     public function getEntitiesByEventType($type)

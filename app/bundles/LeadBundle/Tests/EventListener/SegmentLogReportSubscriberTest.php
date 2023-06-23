@@ -24,7 +24,6 @@ class SegmentLogReportSubscriberTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
 
@@ -33,7 +32,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilder()
+    public function testOnReportBuilder(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -70,13 +69,13 @@ class SegmentLogReportSubscriberTest extends TestCase
         $this->assertCount(1, $setTables);
     }
 
-    public function testOnReportGenerate()
+    public function testOnReportGenerate(): void
     {
         // Mock query builder
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['from', 'andWhere', 'leftJoin', 'expr', 'setParameter', 'groupBy'])
-            ->addMethods(['orX', 'isNotNull'])
+            ->addMethods(['or', 'isNotNull'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -100,7 +99,7 @@ class SegmentLogReportSubscriberTest extends TestCase
             ->willReturn($mockQueryBuilder);
 
         $mockQueryBuilder->expects($this->exactly(1))
-            ->method('orX')
+            ->method('or')
             ->willReturn($mockQueryBuilder);
 
         $mockQueryBuilder->expects($this->exactly(2))

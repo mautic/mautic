@@ -4,13 +4,15 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Stat>
+ */
 class StatRepository extends CommonRepository
 {
     /**
      * Fetch the base stat data from the database.
      *
      * @param int  $id
-     * @param      $type
      * @param null $fromDate
      *
      * @return mixed

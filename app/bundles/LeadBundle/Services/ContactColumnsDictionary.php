@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactColumnsDictionary
 {

@@ -73,7 +73,7 @@ class FullObjectReportBuilder
 
                 if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
                     $idChunks = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($requestedObjectDAO->getObject()), $limit);
-                    $idChunk  = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                    $idChunk  = $idChunks[$requestDAO->getSyncIteration() - 1] ?? [];
                     $event->setIds($idChunk);
                 } else {
                     $event->setDateRange(
@@ -87,8 +87,8 @@ class FullObjectReportBuilder
                 }
 
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-                    $event
+                    $event,
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
                 );
 
                 $foundObjects = $event->getFoundObjects();

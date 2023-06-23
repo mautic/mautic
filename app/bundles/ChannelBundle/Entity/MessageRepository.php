@@ -2,8 +2,12 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Message>
+ */
 class MessageRepository extends CommonRepository
 {
     /**
@@ -11,14 +15,18 @@ class MessageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $args['qb'] = $this->createQueryBuilder($this->getTableAlias());
-        $args['qb']->join('MauticChannelBundle:Channel', 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->join(Channel::class, 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+        $qb->leftJoin(Category::class, 'cat', 'WITH', 'cat.id = '.$this->getTableAlias().'.category');
+        $qb->groupBy($this->getTableAlias().'.id');
+
+        $args['qb'] = $qb;
 
         return parent::getEntities($args);
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -59,8 +67,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -72,7 +78,7 @@ class MessageRepository extends CommonRepository
             ->setParameter('messageId', $messageId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $channels = [];
         foreach ($results as $result) {
@@ -84,8 +90,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -97,6 +101,6 @@ class MessageRepository extends CommonRepository
             ->setParameter('channelId', $channelId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        return $q->execute()->fetch();
+        return $q->execute()->fetchAssociative();
     }
 }

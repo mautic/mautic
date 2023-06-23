@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -77,6 +77,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $event->setType(Event::TYPE_ACTION);
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog

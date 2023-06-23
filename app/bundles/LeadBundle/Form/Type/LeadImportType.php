@@ -65,7 +65,7 @@ class LeadImportType extends AbstractType
             ]
         );
 
-        $default = (empty($options['data']['enclosure'])) ? '&quot;' : htmlspecialchars($options['data']['enclosure']);
+        $default = (empty($options['data']['enclosure'])) ? '"' : htmlspecialchars($options['data']['enclosure']);
         $builder->add(
             'enclosure',
             TextType::class,
@@ -124,13 +124,5 @@ class LeadImportType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'lead_import';
     }
 }

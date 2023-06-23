@@ -9,9 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     // Used for querying stats
-    const TYPE_FORM         = 'submission';
-    const TYPE_CLICK        = 'click';
-    const TYPE_NOTIFICATION = 'view';
+    public const TYPE_FORM         = 'submission';
+    public const TYPE_CLICK        = 'click';
+    public const TYPE_NOTIFICATION = 'view';
 
     /**
      * @var int
@@ -29,12 +29,12 @@ class Stat
     private $type;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $typeId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

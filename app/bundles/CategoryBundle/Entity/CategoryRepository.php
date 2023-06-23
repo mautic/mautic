@@ -6,7 +6,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CategoryRepository.
+ * @extends CommonRepository<Category>
  */
 class CategoryRepository extends CommonRepository
 {
@@ -27,7 +27,6 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param        $bundle
      * @param string $search
      * @param int    $limit
      * @param int    $start
@@ -72,7 +71,6 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -86,7 +84,6 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -133,7 +130,7 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

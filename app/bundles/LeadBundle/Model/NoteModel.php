@@ -5,16 +5,17 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NoteModel
- * {@inheritdoc}
+ * @extends FormModel<LeadNote>
  */
 class NoteModel extends FormModel
 {
@@ -28,14 +29,11 @@ class NoteModel extends FormModel
         $this->session = $session;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getRepository()
+    public function getRepository(): LeadNoteRepository
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadNote');
+        $result = $this->em->getRepository(LeadNote::class);
+
+        return $result;
     }
 
     /**
@@ -51,8 +49,6 @@ class NoteModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -67,16 +63,14 @@ class NoteModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -91,11 +85,6 @@ class NoteModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -128,7 +117,7 @@ class NoteModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -137,8 +126,6 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param $useFilters
-     *
      * @return mixed
      */
     public function getNoteCount(Lead $lead, $useFilters = false)

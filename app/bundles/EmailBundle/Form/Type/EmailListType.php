@@ -47,21 +47,15 @@ class EmailListType extends AbstractType
                         ],
                     ];
                 },
-                //'modal_route_parameters' => 'template'
+                // 'modal_route_parameters' => 'template'
                 'email_type'     => 'template',
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],
+
+                'email' => null,
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'email_list';
     }
 
     /**

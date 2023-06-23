@@ -31,20 +31,16 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
+        $filter          = $event->getFilter();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
+        $parts           = [$expr->isNull($field)];
 
-        $event->addExpression(
-            new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [
-                    $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->eq(
-                        $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
-            )
-        );
+        if ($filter->doesColumnSupportEmptyValue()) {
+            $parts[] = $expr->eq($field, $expr->literal(''));
+        }
 
+        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_OR, $parts));
         $event->stopPropagation();
     }
 
@@ -55,20 +51,16 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
+        $filter          = $event->getFilter();
+        $field           = $leadsTableAlias.'.'.$filter->getField();
+        $expr            = $event->getQueryBuilder()->expr();
+        $parts           = [$expr->isNotNull($field)];
 
-        $event->addExpression(
-            new CompositeExpression(
-                CompositeExpression::TYPE_AND,
-                [
-                    $event->getQueryBuilder()->expr()->isNotNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                    $event->getQueryBuilder()->expr()->neq(
-                        $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                        $event->getQueryBuilder()->expr()->literal('')
-                    ),
-                ]
-            )
-        );
+        if ($filter->doesColumnSupportEmptyValue()) {
+            $parts[] = $expr->neq($field, $expr->literal(''));
+        }
 
+        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_AND, $parts));
         $event->stopPropagation();
     }
 
@@ -77,7 +69,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         if (!$event->operatorIsOneOf(
             'neq',
             'notLike',
-            'notBetween', //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
+            'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             'notIn'
         )) {
             return;
@@ -129,9 +121,9 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'lt',
             'lte',
             'in',
-            'between', //Used only for date with week combination (EQUAL [this week, next week, last week])
+            'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
             'regexp',
-            'notRegexp' //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            'notRegexp' // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
         )) {
             return;
         }

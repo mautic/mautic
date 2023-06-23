@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests;
 
 class Fixtures
 {
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportResult()
+    public static function getValidReportResult(): array
     {
         return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
             'totalResults' => '11',
             'data'         => self::getValidReportData(),
             'dataColumns'  => [
@@ -47,14 +51,15 @@ class Fixtures
                     'alias' => 'email',
                 ],
             ],
+            'page'  => 1,
             'limit' => 10000,
         ];
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportData()
+    public static function getValidReportData(): array
     {
         return [
             [
@@ -137,7 +142,10 @@ class Fixtures
         ];
     }
 
-    public static function getValidReportHeaders()
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportHeaders(): array
     {
         return [
             'City',
@@ -148,39 +156,45 @@ class Fixtures
         ];
     }
 
-    /**
-     * @return int
-     */
-    public static function getValidReportTotalResult()
+    public static function getValidReportTotalResult(): int
     {
         return 11;
     }
 
-    /**
-     * @return string
-     */
-    public static function getStringType()
+    public static function getStringType(): string
     {
         return 'string';
     }
 
-    /**
-     * @return string
-     */
-    public static function getDateType()
+    public static function getIntegerType(): string
+    {
+        return 'int';
+    }
+
+    public static function getBooleanType(): string
+    {
+        return 'bool';
+    }
+
+    public static function getFloatType(): string
+    {
+        return 'float';
+    }
+
+    public static function getDateType(): string
     {
         return 'datetime';
     }
 
-    /**
-     * @return string
-     */
-    public static function getEmailType()
+    public static function getEmailType(): string
     {
         return 'email';
     }
 
-    public static function getReportBuilderEventData()
+    /**
+     * @return mixed[]
+     */
+    public static function getReportBuilderEventData(): array
     {
         return [
             'all' => [
@@ -212,7 +226,7 @@ class Fixtures
         ];
     }
 
-    public static function getGoodColumnList()
+    public static function getGoodColumnList(): \stdClass
     {
         $list          = new \stdClass();
         $list->choices = [
@@ -234,5 +248,202 @@ class Fixtures
         ];
 
         return $list;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getValidReportResultWithAggregatedColumns(): array
+    {
+        return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
+            'totalResults' => '2',
+            'data'         => self::getValidReportDataAggregatedColumns(),
+            'dataColumns'  => [
+                'e_id'           => 'e.id',
+                'e_name'         => 'e.name',
+                'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
+                'COUNT l.id'     => 'l.id',
+            ],
+            'columns' => [
+                'e.id' => [
+                    'label' => 'ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'e_id',
+                ],
+                'e.name' => [
+                    'label' => 'Name',
+                    'type'  => self::getStringType(),
+                    'alias' => 'e_name',
+                ],
+                'es.is_read' => [
+                    'label' => 'Read',
+                    'type'  => self::getBooleanType(),
+                    'alias' => 'is_read',
+                ],
+                'l.id' => [
+                    'label' => 'Contact ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'contactId',
+                ],
+            ],
+            'aggregatorColumns' => [
+                'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
+                'COUNT l.id'     => 'l.id',
+            ],
+            'limit' => 0,
+        ];
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getValidReportDataAggregatedColumns(): array
+    {
+        return [
+            [
+                'e_id'           => '1',
+                'e_name'         => 'Email 1',
+                'SUM es.is_read' => '50',
+                'AVG es.is_read' => '0.5000',
+                'COUNT l.id'     => '100',
+            ],
+            [
+                'e_id'           => '2',
+                'e_name'         => 'Email 2',
+                'SUM es.is_read' => '10',
+                'AVG es.is_read' => '0.1666',
+                'COUNT l.id'     => '60',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<float>
+     */
+    public static function getValidReportDataAggregatedTotals(): array
+    {
+        return [
+            'SUM es.is_read' => 60,
+            'AVG es.is_read' => 0.3333,
+            'COUNT l.id'     => 160,
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportWithAggregatedColumnsHeaders(): array
+    {
+        return [
+            'ID',
+            'Name',
+            'SUM Read',
+            'AVG Read',
+            'COUNT Contact ID',
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportWithAggregatedColumnsKeys(): array
+    {
+        return [
+            'e_id',
+            'e_name',
+            'SUM es.is_read',
+            'AVG es.is_read',
+            'COUNT l.id',
+        ];
+    }
+
+    public static function getValidReportWithAggregatedColumnsTotalResult(): int
+    {
+        return 2;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getValidReportResultWithNoGraphs(): array
+    {
+        $validReportResult           = Fixtures::getValidReportResult();
+        $validReportResult['graphs'] = [];
+
+        return $validReportResult;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getValidReportResultWithGraphs(): array
+    {
+        return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
+            'totalResults' => '2',
+            'data'         => [
+                [
+                    'e_id'           => '1',
+                    'e_name'         => 'Test 123',
+                    'e_date_added'   => '2023-02-27 10:00:00',
+                ],
+                [
+                    'e_id'           => '2',
+                    'e_name'         => 'Test abc',
+                    'e_date_added'   => '2023-01-15 9:00:00',
+                ],
+            ],
+            'dataColumns'  => [
+                'e_id'         => 'e.id',
+                'subject'      => 'vp.subject',
+                'bounced'      => 'bounced',
+                'e_name'       => 'e.name',
+                'e_date_added' => 'e.date_added',
+            ],
+            'columns' => [
+                'e.id' => [
+                    'label' => 'ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'e_id',
+                ],
+                'e.name' => [
+                    'label' => 'Name',
+                    'type'  => self::getStringType(),
+                    'alias' => 'e_name',
+                ],
+                'e.date_added' => [
+                    'label' => 'Date created',
+                    'type'  => 'datetime',
+                    'alias' => 'e_date_added',
+                ],
+            ],
+            'page'   => 1,
+            'limit'  => 10,
+            'graphs' => [
+                'mautic.email.graph.line.stats' => [
+                    'options'        => [],
+                    'dynamicFilters' => [],
+                    'paginate'       => true,
+                ],
+            ],
+        ];
+    }
+
+    public static function getDateFrom(): \DateTime
+    {
+        return new \DateTime('2023-02-24 00:00');
+    }
+
+    public static function getDateTo(): \DateTime
+    {
+        return new \DateTime('2023-03-24 00:00');
     }
 }

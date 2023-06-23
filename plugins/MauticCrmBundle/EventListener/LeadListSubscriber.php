@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
@@ -101,7 +101,7 @@ class LeadListSubscriber implements EventSubscriberInterface
      */
     public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
-        //get Integration Campaign members
+        // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];

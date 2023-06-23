@@ -5,22 +5,22 @@ return [
         'main' => [
             'mautic_category_batch_contact_set' => [
                 'path'       => '/categories/batch/contact/set',
-                'controller' => 'MauticCategoryBundle:BatchContact:exec',
+                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::execAction',
             ],
             'mautic_category_batch_contact_view' => [
                 'path'       => '/categories/batch/contact/view',
-                'controller' => 'MauticCategoryBundle:BatchContact:index',
+                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::indexAction',
             ],
             'mautic_category_index' => [
                 'path'       => '/categories/{bundle}/{page}',
-                'controller' => 'MauticCategoryBundle:Category:index',
+                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                 'defaults'   => [
                     'bundle' => 'category',
                 ],
             ],
             'mautic_category_action' => [
                 'path'       => '/categories/{bundle}/{objectAction}/{objectId}',
-                'controller' => 'MauticCategoryBundle:Category:executeCategory',
+                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::executeCategoryAction',
                 'defaults'   => [
                     'bundle' => 'category',
                 ],
@@ -31,7 +31,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'MauticCategoryBundle:Api\CategoryApi',
+                'controller'      => 'Mautic\CategoryBundle\Controller\Api\CategoryApiController',
             ],
         ],
     ],
@@ -48,46 +48,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.category.subscriber' => [
-                'class'     => \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
-                'arguments' => [
-                    'mautic.helper.bundle',
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.category.button.subscriber' => [
-                'class'     => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
-                'arguments' => [
-                    'router',
-                    'translator',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.category' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryListType',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'translator',
-                    'mautic.category.model.category',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.category_form' => [
-                'class'     => \Mautic\CategoryBundle\Form\Type\CategoryType::class,
-                'arguments' => [
-                    'session',
-                ],
-            ],
-            'mautic.form.type.category_bundles_form' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.category.model.category' => [
                 'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',

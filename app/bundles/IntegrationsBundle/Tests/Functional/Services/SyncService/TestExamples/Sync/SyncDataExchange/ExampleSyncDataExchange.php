@@ -17,12 +17,12 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
-    const OBJECT_LEAD = 'integration_lead';
+    public const OBJECT_LEAD = 'integration_lead';
 
     /**
      * @var array
      */
-    const FIELDS = [
+    public const FIELDS = [
         'id'            => [
             'label' => 'ID',
             'type'  => NormalizedValueDAO::INT_TYPE,
@@ -149,7 +149,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     );
 
                     break;
-                case 201: //created
+                case 201: // created
                     $syncOrderDAO->addObjectMapping(
                         $changeObject,
                         $result['object'],
@@ -217,7 +217,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
                     // If we know for certain that this specific field was modified at a specific date/time, set the change timestamp
                     // on the field itself for the judge to weigh certain versus possible changes
-                    //$reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
+                    // $reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
 
                     $objectDAO->addField($reportFieldDAO);
                 }
@@ -238,8 +238,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param $object
-     *
      * @return mixed
      */
     private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields)

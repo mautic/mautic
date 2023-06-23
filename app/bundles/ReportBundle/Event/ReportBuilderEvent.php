@@ -6,7 +6,7 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ReportBuilderEvent.
@@ -58,18 +58,21 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     private $reportHelper;
 
+    private ?string $reportSource;
+
     /**
      * ReportBuilderEvent constructor.
      *
      * @param string $context
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
+    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper, ?string $reportSource = null)
     {
         $this->context           = $context;
         $this->translator        = $translator;
         $this->channelListHelper = $channelListHelper;
         $this->leadFields        = $leadFields;
         $this->reportHelper      = $reportHelper;
+        $this->reportSource      = $reportSource;
     }
 
     /**
@@ -89,7 +92,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         $data['group'] = (null == $group) ? $context : $group;
 
         foreach ($data['columns'] as $column => &$d) {
-            $d['label'] = $this->translator->trans($d['label']);
+            $d['label'] = null !== $d['label'] ? $this->translator->trans($d['label']) : '';
             if (!isset($d['alias'])) {
                 $d['alias'] = substr(
                     $column,
@@ -98,12 +101,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             }
         }
 
-        uasort(
-            $data['columns'],
-            function ($a, $b) {
-                return strnatcmp($a['label'], $b['label']);
-            }
-        );
+        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
 
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
@@ -116,12 +114,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 }
             }
 
-            uasort(
-                $data['filters'],
-                function ($a, $b) {
-                    return strnatcmp($a['label'], $b['label']);
-                }
-            );
+            uasort($data['filters'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
         }
 
         $this->tableArray[$context] = $data;
@@ -144,6 +137,14 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
+     * Fetch the source of the report.
+     */
+    public function getReportSource(): ?string
+    {
+        return $this->reportSource;
+    }
+
+    /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
      * @param string $prefix
@@ -157,8 +158,6 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Returns lead columns.
-     *
-     * @param $prefix
      *
      * @return array
      */
@@ -308,9 +307,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * @param       $context
-     * @param       $type
-     * @param       $graphId
      * @param array $options
      *
      * @return $this

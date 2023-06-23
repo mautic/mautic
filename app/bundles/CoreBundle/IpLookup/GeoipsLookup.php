@@ -20,9 +20,6 @@ class GeoipsLookup extends AbstractRemoteDataLookup
         return "http://api.geoips.com/ip/{$this->ip}/key/{$this->auth}/output/json";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

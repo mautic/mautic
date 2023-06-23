@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\PluginRepository;
@@ -14,6 +13,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Twig\Environment;
 
 class ConfigFormTest extends KernelTestCase
 {
@@ -81,12 +81,12 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject()
     {
-        //create an integration object
+        // create an integration object
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $templatingHelper     = $this->getMockBuilder(TemplatingHelper::class)->disableOriginalConstructor()->getMock();
+        $twig                 = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $entityManager        = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
@@ -117,11 +117,11 @@ class ConfigFormTest extends KernelTestCase
                 ->method('getRepository')
                 ->will(
                     $this->returnValueMap(
-                            [
-                                ['MauticPluginBundle:Plugin', $pluginRepository],
-                                ['MauticPluginBundle:Integration', $integrationRepository],
-                                ['MauticPluginBundle:IntegrationEntity', $integrationEntityRepository],
-                            ]
+                        [
+                            [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                            [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                            [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        ]
                     )
                 );
 
@@ -131,9 +131,9 @@ class ConfigFormTest extends KernelTestCase
             $pathsHelper,
             $bundleHelper,
             $coreParametersHelper,
-            $templatingHelper,
+            $twig,
             $pluginModel
-            );
+        );
 
         return $integrationHelper;
     }

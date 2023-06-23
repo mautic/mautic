@@ -23,16 +23,20 @@ use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    public const ACCESS_KEY = 'accessKey';
+
     /**
      * @var UserHelper
      */
@@ -96,9 +100,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return [
-            $this->getApiKey() => 'mautic.hubspot.form.apikey',
-        ];
+        return [];
     }
 
     /**
@@ -128,13 +130,36 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param bool $inAuthorization
+     *
+     * @return mixed|string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        $tokenData = $this->getKeys();
+
+        return $tokenData[self::ACCESS_KEY] ?? null;
+    }
+
+    /**
+     * @return array<string,bool>
+     */
+    public function getFormSettings()
+    {
+        return [
+            'requires_callback'      => false,
+            'requires_authorization' => false,
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
      */
     public function getAuthenticationType()
     {
-        return 'key';
+        return $this->getBearerToken() ? 'oauth2' : 'key';
     }
 
     /**
@@ -239,7 +264,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $fieldsToUpdate
      * @param array $objects
      *
      * @return array
@@ -295,7 +319,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         $keys = $this->getKeys();
 
-        return isset($keys[$this->getAuthTokenKey()]);
+        return isset($keys[$this->getAuthTokenKey()]) || isset($keys[self::ACCESS_KEY]);
     }
 
     /**
@@ -309,12 +333,40 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param FormBuilder $builder
+     * @param array       $data
+     * @param string      $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        if ('keys' === $formArea) {
+            $builder->add(
+                self::ACCESS_KEY,
+                TextType::class,
+                [
+                    'label'       => 'mautic.hubspot.form.accessKey',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'    => 'form-control',
+                    ],
+                    'required'    => false,
+                ]
+            );
+
+            $builder->add(
+                $this->getApiKey(),
+                TextType::class,
+                [
+                    'label'       => 'mautic.hubspot.form.apikey',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'    => 'form-control',
+                        'readonly' => true,
+                    ],
+                    'required'    => false,
+                ]
+            );
+        }
         if ('features' == $formArea) {
             $builder->add(
                 'objects',
@@ -336,9 +388,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @param $object
-     *
      * @return array
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
@@ -391,9 +440,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                         if (is_array($contact)) {
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
-                            if ($contact && !$contact->isNewlyCreated()) { //updated
+                            if ($contact && !$contact->isNewlyCreated()) { // updated
                                 $executed[0] = $executed[0] + 1;
-                            } elseif ($contact && $contact->isNewlyCreated()) { //newly created
+                            } elseif ($contact && $contact->isNewlyCreated()) { // newly created
                                 $executed[1] = $executed[1] + 1;
                             }
 
@@ -473,7 +522,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead
@@ -482,7 +531,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -500,7 +549,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+                $stage = $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class)->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -510,7 +559,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 if (!$lead->getStage() && $lead->getStage() != $stage) {
                     $lead->setStage($stage);
 
-                    //add a contact stage change log
+                    // add a contact stage change log
                     $log = new StagesChangeLog();
                     $log->setStage($stage);
                     $log->setEventName($stage->getId().':'.$stage->getName());
@@ -543,7 +592,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->em->detach($company);
                     }
                 } catch (\Exception $exception) {
-                    $this->logger->addWarning($exception->getMessage());
+                    $this->logger->warning($exception->getMessage());
 
                     return;
                 }
@@ -571,7 +620,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
 
-        //@todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
+        // @todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
         $updateFields = array_intersect_key(
             $createFields,
             $fieldsToUpdate
@@ -608,7 +657,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
                 $integrationEntity     = (empty($integrationId)) ?
                     $this->createIntegrationEntity(
@@ -633,8 +682,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Amend mapped lead data before pushing to CRM.
-     *
-     * @param $mappedData
      */
     public function amendLeadDataBeforePush(&$mappedData)
     {
@@ -644,8 +691,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $object
-     *
      * @return array
      *
      * @throws \Exception

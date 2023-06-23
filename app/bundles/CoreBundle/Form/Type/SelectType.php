@@ -29,12 +29,4 @@ class SelectType extends AbstractType
     {
         return ChoiceType::class;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'select';
-    }
 }

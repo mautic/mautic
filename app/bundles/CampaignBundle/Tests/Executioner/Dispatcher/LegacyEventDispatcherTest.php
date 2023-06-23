@@ -22,10 +22,11 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
+class LegacyEventDispatcherTest extends TestCase
 {
     /**
      * @var MockObject|EventDispatcherInterface
@@ -86,7 +87,7 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->pendingEvent->expects($this->once())
             ->method('failAll');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent, $this->mauticFactory);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
     public function testPrimayLegacyEventsAreProcessed(): void
@@ -114,11 +115,11 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 // Legacy custom event should dispatch
-                ['something', $this->isInstanceOf(CampaignExecutionEvent::class)],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
                 // Legacy execution event should dispatch
-                [CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED, $this->isInstanceOf(ExecutedEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED_BATCH, $this->isInstanceOf(ExecutedBatchEvent::class)]
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             );
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
@@ -149,9 +150,9 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED, $this->isInstanceOf(ExecutedEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED_BATCH, $this->isInstanceOf(ExecutedBatchEvent::class)]
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             );
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
@@ -184,17 +185,22 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
-                ['something', $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED, $this->isInstanceOf(ExecutedEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED_BATCH, $this->isInstanceOf(ExecutedBatchEvent::class)]
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function (string $eventName, CampaignExecutionEvent $event) {
+                    function (CampaignExecutionEvent $event, string $eventName) {
                         $event->setResult(['foo' => 'bar']);
+
+                        return $event;
                     }
-                )
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
             );
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
@@ -230,16 +236,20 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                ['something', $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class)]
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, $event) {
+                    function (CampaignExecutionEvent $event, string $eventName) {
                         $event->setResult(false);
+
+                        return $event;
                     }
-                )
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (FailedEvent $event) => $event),
             );
 
         $this->scheduler->expects($this->once())
@@ -278,16 +288,20 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                ['something', $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class)],
-                [CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class)]
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
+                    function (CampaignExecutionEvent $event, string $eventName) {
                         $event->setResult(['result' => false, 'foo' => 'bar']);
+
+                        return $event;
                     }
-                )
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (FailedEvent $event) => $event),
             );
 
         $this->scheduler->expects($this->once())
@@ -321,13 +335,16 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
-                $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
-                        $event->setResult(['failed' => 1, 'reason' => 'because']);
-                    }
-                )
+                $this->returnCallback(function (CampaignExecutionEvent $event, string $eventName): object {
+                    $event->setResult(['failed' => 1, 'reason' => 'because']);
+
+                    return $event;
+                }),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
             );
 
         $this->scheduler->expects($this->never())
@@ -361,13 +378,17 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         // Should pass
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
+                    function (CampaignExecutionEvent $event, $eventName) {
                         $event->setResult(true);
-                    }
-                )
+
+                        return $event;
+                    }),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
             );
 
         $this->scheduler->expects($this->never())
@@ -400,12 +421,10 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('setSystemContact');
 
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
-                        $event->setResult(true);
-                    }
+                    fn (CampaignExecutionEvent $event) => $event->setResult(true)
                 )
             );
 

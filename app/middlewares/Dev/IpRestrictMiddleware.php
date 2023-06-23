@@ -12,7 +12,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 20;
+    public const PRIORITY = 20;
 
     /**
      * @var HttpKernelInterface

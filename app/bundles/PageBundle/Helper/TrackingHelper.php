@@ -57,7 +57,7 @@ class TrackingHelper
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (($id = $this->coreParametersHelper->get($key.'_id'))) {
+            if ($id = $this->coreParametersHelper->get($key.'_id')) {
                 $result[$service] = $key;
             }
         }
@@ -101,8 +101,6 @@ class TrackingHelper
     }
 
     /**
-     * @param $service
-     *
      * @return bool|mixed
      */
     public function displayInitCode($service)

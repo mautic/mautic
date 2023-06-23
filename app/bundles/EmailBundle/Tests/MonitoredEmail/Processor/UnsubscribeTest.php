@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +21,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
      * @testdox Test that the transport interface processes the message appropriately
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::process()
-     * @covers  \Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface::processUnsubscription()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
@@ -28,7 +28,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessorInterfaceProcessesMessage()
     {
-        $transport     = new TestTransport(new \Swift_Events_SimpleEventDispatcher());
+        $transport     = new TestTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,7 +85,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
      */
     public function testContactIsFoundFromMessageAndDncRecordAdded()
     {
-        $transport     = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher());
+        $transport     = new NullTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();

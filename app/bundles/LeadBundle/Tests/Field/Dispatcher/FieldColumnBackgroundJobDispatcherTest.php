@@ -46,8 +46,8 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
+                $this->isInstanceOf(AddColumnBackgroundEvent::class),
                 'mautic.lead_field_pre_add_column_background_job',
-                $this->isInstanceOf(AddColumnBackgroundEvent::class)
             );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
@@ -71,13 +71,13 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                'mautic.lead_field_pre_add_column_background_job',
                 $this->callback(function ($event) {
                     /* @var AddColumnBackgroundEvent $event */
                     $event->stopPropagation();
 
                     return $event instanceof AddColumnBackgroundEvent;
-                })
+                }),
+                'mautic.lead_field_pre_add_column_background_job'
             );
 
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);

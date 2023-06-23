@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -19,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -29,8 +28,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     private IpLookupHelper $ipLookupHelper;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     private TranslatorInterface $translator;
 
     private RouterInterface $router;
@@ -39,14 +36,12 @@ class FormSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
         $this->router               = $router;
     }
@@ -113,7 +108,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
             'formType'           => SubmitActionEmailType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],
@@ -126,7 +121,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
             'formType'           => SubmitActionRepostType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTheme'          => '@MauticForm/FormTheme/SubmitAction/_submit_action_repost_widget.html.twig',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
@@ -137,7 +132,7 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event)
+    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
             return;
@@ -148,14 +143,26 @@ class FormSubscriber implements EventSubscriberInterface
             foreach ($tokens as &$value) {
                 $value = nl2br(html_entity_decode($value, ENT_QUOTES));
             }
+            unset($value);
         }
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
         $leadEmail = null !== $lead ? $lead->getEmail() : null;
+        $ccEmails  = $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
-        if (!empty($emails)) {
+        if (isset($config['cc']) && '' !== $config['cc']) {
+            $ccEmails = $this->getEmailsFromString($config['cc']);
+            unset($config['cc']);
+        }
+
+        if (isset($config['bcc']) && '' !== $config['bcc']) {
+            $bccEmails = $this->getEmailsFromString($config['bcc']);
+            unset($config['bcc']);
+        }
+
+        if (count($emails) > 0 || count($ccEmails) > 0 || count($bccEmails) > 0) {
             $this->setMailer($config, $tokens, $emails, $lead);
 
             // Check for !isset to keep BC to existing behavior prior to 2.13.0
@@ -164,14 +171,12 @@ class FormSubscriber implements EventSubscriberInterface
                 $this->mailer->setReplyTo($leadEmail);
             }
 
-            if (!empty($config['cc'])) {
-                $emails = $this->getEmailsFromString($config['cc']);
-                $this->mailer->setCc($emails);
+            if (count($ccEmails) > 0) {
+                $this->mailer->setCc($ccEmails);
             }
 
-            if (!empty($config['bcc'])) {
-                $emails = $this->getEmailsFromString($config['bcc']);
-                $this->mailer->setBcc($emails);
+            if (count($bccEmails) > 0) {
+                $this->mailer->setBcc($bccEmails);
             }
 
             $this->mailer->send(true);
@@ -179,7 +184,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, $leadEmail, $lead, false);
+            $this->setMailer($config, $tokens, [$leadEmail => null], $lead, false);
 
             $this->mailer->send(true);
         }
@@ -187,7 +192,7 @@ class FormSubscriber implements EventSubscriberInterface
         $owner = null !== $lead ? $lead->getOwner() : null;
         if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $owner->getEmail(), $lead);
+            $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
             $this->mailer->send(true);
         }
@@ -368,8 +373,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $post
-     *
      * @return string
      */
     private function postToHtml($post)
@@ -389,29 +392,26 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $emailString
-     *
-     * @return array
+     * @return array<string, null>
      */
-    private function getEmailsFromString($emailString)
+    private function getEmailsFromString($emailString): array
     {
         return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
     }
 
     /**
-     * @param      $to
-     * @param bool $internalSend
+     * @param array<mixed>               $config
+     * @param array<mixed>               $tokens
+     * @param array<string, string|null> $to
      */
-    private function setMailer(array $config, array $tokens, $to, Lead $lead = null, $internalSend = true)
+    private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
 
-        // ingore queue
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type') && $config['immediately']) {
-            $this->mailer = $this->mailer->getSampleMailer();
+        if (count($to)) {
+            $this->mailer->setTo($to);
         }
 
-        $this->mailer->setTo($to);
         $this->mailer->setSubject($config['subject']);
         $this->mailer->addTokens($tokens);
         $this->mailer->setBody($config['message']);

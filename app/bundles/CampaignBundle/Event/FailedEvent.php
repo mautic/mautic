@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class FailedEvent extends \Symfony\Component\EventDispatcher\Event
+class FailedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var AbstractEventAccessor

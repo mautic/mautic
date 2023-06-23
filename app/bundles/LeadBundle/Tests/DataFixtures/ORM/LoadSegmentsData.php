@@ -965,6 +965,96 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 47
+                'name'     => 'Tags empty',
+                'alias'    => 'tags-empty',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'tags',
+                        'field'      => 'tags',
+                        'operator'   => 'empty',
+                        'properties' => [
+                            'filter' => '',
+                        ],
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 48
+                'name'     => 'Tags not empty',
+                'alias'    => 'tags-not-empty',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'tags',
+                        'field'      => 'tags',
+                        'operator'   => 'notEmpty',
+                        'properties' => [
+                            'filter' => '',
+                        ],
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 49
+                'name'     => 'Has company',
+                'alias'    => 'segment-having-company',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'lead',
+                        'field'      => 'company',
+                        'operator'   => '!empty',
+                        'properties' => ['filter' => null],
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 50
+                'name'     => 'Has no company',
+                'alias'    => 'segment-not-having-company',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'lead',
+                        'field'      => 'company',
+                        'operator'   => 'empty',
+                        'properties' => ['filter' => null],
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 51
+                'name'     => 'Has Email and visited URL',
+                'alias'    => 'has-email-and-visited-url',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'email',
+                        'object'     => 'lead',
+                        'field'      => 'email',
+                        'operator'   => '!empty',
+                        'properties' => ['filter' => null, 'display' => null],
+                    ],
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'behaviors',
+                        'field'      => 'hit_url',
+                        'operator'   => 'regexp',
+                        'properties' => ['filter' => 'segment-[[:digit:]]+'],
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
