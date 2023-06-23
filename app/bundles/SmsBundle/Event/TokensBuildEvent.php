@@ -12,7 +12,7 @@ class TokensBuildEvent extends Event
     private array $tokens;
 
     /**
-     * @param array<int|string> $tokens
+     * @param array<string, array<int|string>> $tokens
      */
     public function __construct(array $tokens)
     {
