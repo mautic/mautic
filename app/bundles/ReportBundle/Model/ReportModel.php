@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -664,7 +665,7 @@ class ReportModel extends FormModel
 
         foreach ($data as $keys => $lead) {
             foreach ($lead as $key => $field) {
-                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+                $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
             }
         }
 
@@ -775,11 +776,12 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
-            $this->em->getConnection()->connect('slave');
+        $connection = $this->em->getConnection();
+        if ($connection instanceof PrimaryReadReplicaConnection) {
+            $connection->ensureConnectedToReplica();
         }
 
-        return $this->em->getConnection();
+        return $connection;
     }
 
     protected function isDebugMode(): bool

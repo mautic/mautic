@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -92,7 +91,6 @@ class EmailType extends AbstractType
             ]
         );
 
-        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
                 'subject',
@@ -102,7 +100,7 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $builder->add(
@@ -264,7 +262,7 @@ class EmailType extends AbstractType
                         'rows'                 => '15',
                     ],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');

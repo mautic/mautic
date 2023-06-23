@@ -35,9 +35,7 @@ trait ExpressionHelperTrait
         }
 
         if ($appendTo) {
-            $appendTo->with($expr);
-
-            return $appendTo;
+            return $appendTo->with($expr);
         }
 
         return $expr;

@@ -19,15 +19,6 @@ return function (ContainerConfigurator $configurator) {
         'MonitoredEmail/Organizer',
         'MonitoredEmail/Processor',
         'Stat/Reference.php',
-        // Will be removed in M5:
-        'Swiftmailer/Exception',
-        'Swiftmailer/Momentum/Callback/ResponseItem.php',
-        'Swiftmailer/Momentum/Callback/ResponseItems.php',
-        'Swiftmailer/Momentum/DTO',
-        'Swiftmailer/Momentum/Exception',
-        'Swiftmailer/Momentum/Metadata',
-        'Swiftmailer/SendGrid/Callback/ResponseItem.php',
-        'Swiftmailer/SendGrid/Callback/ResponseItems.php',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')
@@ -37,4 +28,6 @@ return function (ContainerConfigurator $configurator) {
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
     $services->alias('mautic.email.variant.converter', EmailVariantConverterService::class);
+    $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
+        ->decorate('mailer.transport_factory');
 };

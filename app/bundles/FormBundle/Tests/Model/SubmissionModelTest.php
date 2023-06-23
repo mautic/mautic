@@ -213,6 +213,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
 
+        $this->fieldHelper->method('getFieldFilter')->willReturn('string');
+
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->twigMock,

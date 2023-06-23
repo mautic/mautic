@@ -51,6 +51,9 @@ $container->loadFromExtension('framework', [
             ],
         ],
     ],
+    'mailer' => [
+        'dsn' => 'null://null',
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -60,16 +63,13 @@ $container->loadFromExtension('web_profiler', [
     'intercept_redirects' => false,
 ]);
 
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
-]);
-
 $connectionSettings = [
     'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
     'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
     'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
     'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+    'options'  => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [

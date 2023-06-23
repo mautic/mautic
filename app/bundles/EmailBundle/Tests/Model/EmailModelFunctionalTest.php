@@ -14,6 +14,11 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['leads']);
+    }
+
     public function testSendEmailToListsInThreads(): void
     {
         $contacts = $this->generateContacts(23);
@@ -24,9 +29,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $emailModel                                             =  self::$container->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
         [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
-        $this->assertEquals($sentCount, 8);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
         $this->assertEquals($sentCount, 7);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
+        $this->assertEquals($sentCount, 8);
         [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 8);
     }
@@ -84,6 +89,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email');
         $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
         $email->setIsPublished(true);

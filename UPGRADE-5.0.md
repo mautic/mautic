@@ -4,6 +4,15 @@
 - The calendar feature was removed. See https://github.com/mautic/mautic/pull/11270
 - The Froala assets are disabled by default. Enable them if you use the legacy email or page builder. See https://github.com/mautic/mautic/pull/12416
 
+## Mailer
+The underlying library used for sending emails (Swift Mailer) was discontinued and Mautic 5 is using the [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) library instead. There are user facing changes coming with this change.
+1. All the email transports were removed from Mautic's core and must be re-created as separate plugins.
+2. The good news is that Mautic now supports email transports created for Symfony Mailer.
+3. SMTP transport is the only transport supported by Mautic after fresh installation.
+4. The "Email Step" was removed from the installation wizzard because the transports were removed. The email transport must be configurad right after Mautic installation.
+5. The email transport configuration has changed from various fields unique for each transport to unified "DSN". Any transport can be configured using the same form. There is a migration that should handle most of the email transport configuration from Mautic 4 and re-configure it for Mautic 5.
+6. The command `bin/console mautic:emails:send` for sending emails via cron jobs was removed and now [Symfony Messenger](https://symfony.com/doc/5.4/messenger.html) is used instead. Use this command if you want to send emails via a cron job: `bin/console messenger:consume email_transport`. The Messenger in the async configuration can work with various queues. It uses MySql by
+
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
@@ -19,6 +28,24 @@
 * Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
+* Mailer
+    * The Swiftmailer library was replaced with SymfonyMailer. Details in https://github.com/mautic/mautic/pull/11613
+    * There is only one callback route for all transports now. Changed from `/mailer/{transport}/callback` to `/mailer/callback`.
+    * `Mautic\EmailBundle\Mailer\Exception\UnsupportedTransportException` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
+    * `Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface` was removed. Use `EmailEvents::ON_TRANSPORT_WEBHOOK` instead.
+    * `Mautic\EmailBundle\Event\TransportWebhookEvent` does not have the transport in it. Each transport must validate the callback payload and decide if they are able to process it or not. If so, set the `Response` to the event to indicate success.
+    * `Swift_Message` was replaced with `Mautic\EmailBundle\Mailer\Message\MauticMessage`.
+    * `Swift_Transport` was replaced with `Symfony\Component\Mailer\Transport\TransportInterface`.
+    * The following classes were removed without any replacement:
+      * `Mautic\EmailBundle\Exception\PartialEmailSendFailure`
+      * `Mautic\EmailBundle\Helper\PlainTextMessageHelper`
+      * `Mautic\EmailBundle\Model\TransportType`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\SpoolTransportPass`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\EmailTransportPass`
+      * `Mautic\EmailBundle\DependencyInjection\Compiler\SwiftmailerDynamicMailerPass`
+    * All configuration keys connected with the email transports (starting with `mailer_`) were replaced with the single configuration key `mailer_dsn`.
+    * All classes the resided in the `app/bundles/EmailBundle/SwiftMailer` were removed.
+    * Spooling was removed in favour of the queuing functionality provided by the Symfony messenger.
 * Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
@@ -46,6 +73,7 @@
     * `Mautic\LeadBundle\Model\LeadModel::checkForDuplicateContact()` method do not take Lead as a second parameter anymore and so it do not merges contacts. Use `\Mautic\LeadBundle\Deduplicate\ContactMerger::merge()` afterwards.
     * Class `Mautic\LeadBundle\Model\LegacyLeadModel` removed. Use `\Mautic\LeadBundle\Deduplicate\ContactMerger` instead.
     * Method `Mautic\ReportBundle\Event\ReportGeneratorEvent::applyTagFilter()` removed. Use `Mautic\ReportBundle\Builder\MauticReportBuilder::getTagCondition()` instead.
+    * Class `Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer` was removed. [Details](https://github.com/mautic/mautic/pull/12483)
     * `Mautic\CoreBundle\Doctrine\AbstractMauticMigration::entityManager` protected property was removed as unused.
     * The User entity no longer implements `Symfony\Component\Security\Core\User\AdvancedUserInterface` as it was removed from Symfony 5. These methods required by the interface were also removed:
         * `Mautic\UserBundle\Entity\User::isAccountNonExpired()`
@@ -60,6 +88,9 @@
     * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
     * Region names in Austria, Germany and Switzerland were updated based on Standard: ISO_3166-2.
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
+    * Deprecated cookie `mtc_sid` removed.
+    * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
+    * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
 
 # Dependency injection improvements
 
