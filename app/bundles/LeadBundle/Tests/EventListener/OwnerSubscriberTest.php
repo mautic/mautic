@@ -16,8 +16,8 @@ use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
