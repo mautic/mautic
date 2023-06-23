@@ -1,12 +1,4 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 /*
  * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
@@ -67,7 +59,7 @@ if (!isset($args['repackage'])) {
     }
 
     // Compile prod assets
-    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
+    system('cd '.__DIR__.'/packaging && npm ci && npx patch-package && php bin/console mautic:assets:generate -e prod', $result);
     if (0 !== $result) {
         exit;
     }
