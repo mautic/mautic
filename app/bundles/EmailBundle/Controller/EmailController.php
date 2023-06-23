@@ -325,10 +325,10 @@ class EmailController extends FormController
                         $lastCriteria = $variantSettings['winnerCriteria'];
                     }
 
-                        // make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
+                    // make sure all the variants are configured with the same criteria
+                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                        $variantError = true;
+                    }
 
                     $weight += $variantSettings['weight'];
                 } else {
@@ -391,6 +391,7 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'stats'        => $request->query->get('stats', false),
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
