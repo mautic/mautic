@@ -116,7 +116,7 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @return int|float|string|array<string|int, string|int>
+     * @return array<int, object>
      */
     public function getEntitiesByLead(Lead $lead)
     {
