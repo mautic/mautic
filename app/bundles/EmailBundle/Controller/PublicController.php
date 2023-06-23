@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -413,23 +412,13 @@ class PublicController extends CommonFormController
 
     /**
      * Handles mailer transport webhook post.
-     *
-     * @return Response
      */
-    public function mailerCallbackAction(Request $request, $transport)
+    public function mailerCallbackAction(Request $request): Response
     {
-        ignore_user_abort(true);
-
-        $realTransport = $this->container->get('swiftmailer.mailer.default.transport.real');
-
-        if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
-            return $this->notFound();
-        }
-
-        $event = new TransportWebhookEvent($realTransport, $request);
+        $event = new TransportWebhookEvent($request);
         $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
-        return new Response('success');
+        return $event->getResponse() ?? new Response('No email transport that could process this callback was found', Response::HTTP_NOT_FOUND);
     }
 
     /**

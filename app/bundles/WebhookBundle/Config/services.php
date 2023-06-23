@@ -13,6 +13,7 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Form/DataTransformer/EventsToArrayTransformer.php',
     ];
 
     $services->load('Mautic\\WebhookBundle\\', '../')

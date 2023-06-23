@@ -24,7 +24,6 @@ class MauticCoreExtension extends Extension
         'Migrations',
         'Migration',
         'Message',
-        'Form/DataTransformer',
         'Security',
     ];
 

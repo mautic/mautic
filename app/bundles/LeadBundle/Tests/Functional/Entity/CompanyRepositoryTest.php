@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Mailer;
 
 final class CompanyRepositoryTest extends MauticMysqlTestCase
 {
@@ -46,8 +47,9 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $testEmail = function () use ($suffix): void {
             $message = $this->transport->sentMessage;
             Assert::assertSame($message->getSubject(), 'Subject'.$suffix);
-            Assert::assertSame($message->getTo(), ['JohnDoe'.$suffix.'@email.com' => 'John'.$suffix]);
-            $messageBody = $message->getBody();
+            Assert::assertSame($message->getTo()[0]->getAddress(), 'JohnDoe'.$suffix.'@email.com');
+            Assert::assertSame($message->getTo()[0]->getName(), 'John'.$suffix);
+            $messageBody = $message->getBody()->toString();
             Assert::assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
             Assert::assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
             Assert::assertStringContainsString('Second Street'.$suffix, $messageBody);
@@ -157,7 +159,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
-        $mailer     = new \Swift_Mailer($transport);
+        $mailer     = new Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
         $this->transport = $transport;
