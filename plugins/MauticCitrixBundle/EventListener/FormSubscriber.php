@@ -603,7 +603,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @param Collection<int,Field> $fields
      */
-    protected function getEmailFieldAlias(Collection $fields): string
+    private function getEmailFieldAlias(Collection $fields): string
     {
         foreach ($fields as $field) {
             if ('email' === $field->getType()) {
