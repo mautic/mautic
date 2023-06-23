@@ -90,9 +90,9 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            'http://username:password@hostname:9090/path?a',
+            'http://username:password@hostname:9090/path?a=',
             UrlHelper::sanitizeAbsoluteUrl(
-                'http://username:password@hostname:9090/path?a='
+                'http://username:password@hostname:9090/path?a'
             )
         );
     }
