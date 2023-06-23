@@ -80,7 +80,7 @@ $container->loadFromExtension('framework', [
         'failure_transport' => 'failed_default',
         'transports'        => [
             'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN)%',
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
                     'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
                     'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
@@ -89,7 +89,7 @@ $container->loadFromExtension('framework', [
                 ],
             ],
             'failed_default' => [
-                'dsn' => '%env(MAUTIC_MESSENGER_DSN)%',
+                'dsn' => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
             ],
         ],
         'routing' => [

@@ -73,7 +73,7 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_append_tracking_pixel'          => true,
                 'mailer_convert_embed_images'           => false,
                 'mailer_dsn'                            => 'smtp://null:25',
-                'messenger_dsn'                         => 'doctrine://default',
+                'messenger_dsn_email'                   => 'doctrine://default',
                 'messenger_retry_strategy_max_retries'  => 3,
                 'messenger_retry_strategy_delay'        => 1000,
                 'messenger_retry_strategy_multiplier'   => 2,

@@ -15,7 +15,7 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
-            'messenger_dsn',
+            'messenger_dsn_email',
             DsnType::class,
             [
                 'constraints' => [new Dsn()],
