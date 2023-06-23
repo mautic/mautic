@@ -62,7 +62,7 @@ class DeviceTracker
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
         $signature = $trackedContact->getId().$userAgent;
-        if (isset($this->trackedDevice[$signature])) { // This allows batch processing
+        if (isset($this->trackedDevice[$signature])) {
             // Prevent subsequent calls within the same session from creating multiple entries
             return $this->trackedDevice[$signature];
         }
