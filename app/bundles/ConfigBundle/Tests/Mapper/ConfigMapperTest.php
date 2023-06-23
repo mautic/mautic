@@ -14,7 +14,6 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'                        => null,
                 'mailer_from_name'                      => 'Mautic',
                 'mailer_from_email'                     => 'email@yoursite.com',
                 'mailer_return_path'                    => null,

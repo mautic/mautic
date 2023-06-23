@@ -51,7 +51,6 @@ class RestrictionHelperTest extends TypeTestCase
      * @var array
      */
     private $restrictedFields = [
-        'mailer_api_key',
         'monitored_email' => [
             'EmailBundle_bounces',
             'EmailBundle_unsubscribes' => [
@@ -67,7 +66,6 @@ class RestrictionHelperTest extends TypeTestCase
             'formType'   => EmailConfigType::class,
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'                        => null,
                 'mailer_from_name'                      => 'Mautic',
                 'mailer_from_email'                     => 'email@yoursite.com',
                 'mailer_return_path'                    => null,
@@ -154,9 +152,6 @@ class RestrictionHelperTest extends TypeTestCase
         $this->assertTrue($form->has('emailconfig'));
 
         $emailConfig = $form->get('emailconfig');
-
-        // mailer_api_key is restricted and so should not be included
-        $this->assertFalse($emailConfig->has('mailer_api_key'));
 
         // monitored_email is partially restricted so should be included
         $this->assertTrue($emailConfig->has('monitored_email'));
