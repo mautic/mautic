@@ -31,7 +31,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param        $operation
      * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
@@ -81,7 +80,7 @@ class SalesforceApi extends CrmApi
     public function getLeadFields($object = null)
     {
         if ('company' == $object) {
-            $object = 'Account'; //salesforce object name
+            $object = 'Account'; // salesforce object name
         }
 
         return $this->request('describe', [], 'GET', false, $object);
@@ -101,7 +100,7 @@ class SalesforceApi extends CrmApi
             'Lead'    => [],
         ];
 
-        //try searching for lead as this has been changed before in updated done to the plugin
+        // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
             $fields[]    = 'Id';
@@ -144,7 +143,7 @@ class SalesforceApi extends CrmApi
 
         $appendToQuery = '';
 
-        //try searching for lead as this has been changed before in updated done to the plugin
+        // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
             $fields = $this->integration->getFieldsForQuery('Account');
 
@@ -188,8 +187,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $sfObject
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -208,9 +205,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $sfObject
-     * @param $sfObjectId
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -239,8 +233,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $object
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -389,7 +381,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param      $campaignId
      * @param null $modifiedSince
      * @param null $queryUrl
      *
@@ -422,9 +413,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
-     * @param $object
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -449,8 +437,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -491,8 +477,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $requiredFieldString
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -542,8 +526,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $isRetry
-     *
      * @return string|false
      *
      * @throws ApiErrorException
@@ -568,8 +550,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $isRetry
-     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
@@ -603,8 +583,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $value
-     *
      * @return bool|float|mixed|string
      */
     private function escapeQueryValue($value)

@@ -1,0 +1,9 @@
+{
+  "options": [
+    "setClasses"
+  ],
+  "feature-detects": [
+    "css/transforms3d",
+    "touchevents"
+  ]
+}

@@ -1,0 +1,14 @@
+<div class="col-sm-12">
+    <div class="panel">
+        <div class="panel-body box-layout">
+            <div class="col-xs-8 va-m">
+                <h5 class="text-white dark-md fw-sb mb-xs">{{ graph.name|trans }}</h5>
+            </div>
+            <div class="col-xs-4 va-t text-right">
+                <h3 class="text-white dark-sm"><span class="fa {{ graph.iconClass|default('') }}"></span></h3>
+            </div>
+        </div>
+        {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': graph, 'chartType': 'line', 'chartHeight': 300}) }}
+    </div>
+</div>
+

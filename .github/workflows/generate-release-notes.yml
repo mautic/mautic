@@ -15,7 +15,7 @@ jobs:
     name: Create draft release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Generate release notes for milestone ${{ github.event.inputs.milestone }}
       run: |
         # Download changelog generator
@@ -26,11 +26,10 @@ jobs:
         java -jar ./github-changelog-generator.jar --spring.config.location="./release-notes.yml" ${{ github.event.inputs.milestone }} mautic-changelog.txt || true
     
     - name: Upload mautic-changelog.txt artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: mautic-changelog.txt
         path: ./mautic-changelog.txt
 
     - name: You can now find the changelog in this run's artifacts
       run: echo "You can now find the changelog in this run's artifacts!"
-      

@@ -72,7 +72,7 @@ class AssetSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
 
-        //In case of batch delete, this method call remove the uploaded file
+        // In case of batch delete, this method call remove the uploaded file
         $asset->removeUpload();
     }
 }

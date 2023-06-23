@@ -74,16 +74,10 @@ mQuery( document ).ready(function() {
     });
 });
 
-//Fix for back/forward buttons not loading ajax content with History.pushState()
-MauticVars.manualStateChange = true;
-
-if (typeof History != 'undefined') {
-    History.Adapter.bind(window, 'statechange', function () {
-        if (MauticVars.manualStateChange == true) {
-            //back/forward button pressed
-            window.location.reload();
-        }
-        MauticVars.manualStateChange = true;
+if (typeof history != 'undefined') {
+    //back/forward button pressed
+    window.addEventListener('popstate', function (event) {
+        window.location.reload();
     });
 }
 
@@ -206,28 +200,6 @@ var Mautic = {
         }
 
         return translated;
-    },
-
-    /**
-     * Setups browser notifications
-     */
-    setupBrowserNotifier: function () {
-        //request notification support
-        notify.requestPermission();
-        notify.config({
-            autoClose: 10000
-        });
-
-        Mautic.browserNotifier = {
-            isSupported: notify.isSupported,
-            permissionLevel: notify.permissionLevel()
-        };
-
-        Mautic.browserNotifier.isSupported = notify.isSupported;
-        Mautic.browserNotifier.permissionLevel = notify.permissionLevel();
-        Mautic.browserNotifier.createNotification = function (title, options) {
-            return notify.createNotification(title, options);
-        }
     },
 
     /**
@@ -540,6 +512,7 @@ var Mautic = {
         Mautic.dismissConfirmation();
 
         if (action.indexOf('batchExport') >= 0) {
+            delete Mautic.activeActions[action]
             Mautic.initiateFileDownload(action);
             return;
         }
@@ -574,7 +547,10 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        if (textStatus == 'abort') {
+        if (textStatus === 'abort' || textStatus.includes('error')) {
+            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
+            Mautic.setFlashes(flashMessage);
+
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
             Mautic.stopIconSpinPostEvent();
@@ -617,8 +593,7 @@ var Mautic = {
                 mQuery('#app-content .content-body').html(response.newContent);
                 if (response.route && response.route.indexOf("ajax") == -1) {
                     //update URL in address bar
-                    MauticVars.manualStateChange = false;
-                    History.pushState(null, "Mautic", response.route);
+                    history.pushState(null, "Mautic", response.route);
                 }
             } else if (response.newContent && mQuery('.modal.in').length) {
                 //assume a modal was the recipient of the information
@@ -713,21 +688,28 @@ var Mautic = {
         });
     },
 
-    /**
-     * Set browser notifications
-     *
-     * @param notifications
-     */
-    setBrowserNotifications: function (notifications) {
-        mQuery.each(notifications, function (key, notification) {
-            Mautic.browserNotifier.createNotification(
-                notification.title,
-                {
-                    body: notification.message,
-                    icon: notification.icon
-                }
-            );
-        });
+    addFlashMessage: function (message) {
+        const elDiv = document.createElement('div');
+        elDiv.className = 'alert alert-growl alert-growl--error alert-new';
+
+        const elButton = document.createElement('button');
+        elButton.classList.add('close');
+        elButton.type = "button";
+        elButton.dataset.dismiss = "alert";
+        elButton.ariaHidden = "true";
+        elButton.ariaLabel = "Close";
+
+        const elI = document.createElement('i');
+        elI.className = 'fa fa-times';
+
+        const elSpan = document.createElement('span');
+        elSpan.innerHTML = message;
+
+        elButton.append(elI);
+        elDiv.append(elButton);
+        elDiv.append(elSpan);
+
+        return elDiv;
     },
 
     /**
@@ -755,12 +737,6 @@ var Mautic = {
             if (!mQuery('#notificationMautibot').hasClass('hide')) {
                 mQuery('#notificationMautibot').addClass('hide');
             }
-        }
-
-        if (notifications.sound) {
-            mQuery('.playSound').remove();
-
-            mQuery.playSound(notifications.sound);
         }
     },
 

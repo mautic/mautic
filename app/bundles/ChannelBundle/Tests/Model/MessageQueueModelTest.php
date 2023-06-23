@@ -63,6 +63,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $oldScheduleDate = $this->message->getScheduledDate();
         $this->messageQueue->reschedule($this->message, $interval);
         $scheduleDate = $this->message->getScheduledDate();
+        /** @var \DateTime $oldScheduleDate */
         $oldScheduleDate->add($interval);
 
         $this->assertEquals($oldScheduleDate, $scheduleDate);

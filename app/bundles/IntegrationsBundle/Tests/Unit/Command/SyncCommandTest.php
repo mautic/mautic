@@ -14,13 +14,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * This test must run in a separate process because it sets the global constant
- * MAUTIC_INTEGRATION_SYNC_IN_PROGRESS which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class SyncCommandTest extends TestCase
 {
     use IsolatedTestTrait;
@@ -67,6 +60,11 @@ class SyncCommandTest extends TestCase
         $this->assertSame(1, $this->commandTester->execute([]));
     }
 
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
     public function testExecuteWithSomeOptions(): void
     {
         $this->syncService->expects($this->once())
@@ -90,6 +88,11 @@ class SyncCommandTest extends TestCase
         $this->assertSame(0, $code);
     }
 
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
     public function testExecuteWhenSyncThrowsException(): void
     {
         $this->syncService->expects($this->once())

@@ -41,7 +41,6 @@ class VideoModel extends FormModel
     public function getHitRepository(): VideoHitRepository
     {
         $result = $this->em->getRepository(VideoHit::class);
-        \assert($result instanceof VideoHitRepository);
 
         return $result;
     }
@@ -81,9 +80,9 @@ class VideoModel extends FormModel
      */
     public function hitVideo($request, $code = '200')
     {
-        //don't skew results with in-house hits
+        // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {
-            //return;
+            // return;
         }
 
         $lead = $this->contactTracker->getContact();
@@ -92,13 +91,13 @@ class VideoModel extends FormModel
         $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
 
         $hit->setGuid($guid);
-        $hit->setDateHit(new \Datetime());
+        $hit->setDateHit(new \DateTime());
 
         $hit->setDuration($request->get('duration'));
         $hit->setUrl($request->get('url'));
         $hit->setTimeWatched($request->get('total_watched'));
 
-        //check for existing IP
+        // check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
@@ -111,7 +110,7 @@ class VideoModel extends FormModel
             $hit->setLead($lead);
         }
 
-        //glean info from the IP address
+        // glean info from the IP address
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
@@ -128,13 +127,13 @@ class VideoModel extends FormModel
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
-        //get a list of the languages the user prefers
+        // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
                 if (($pos = strpos(';q=', $l)) !== false) {
-                    //remove weights
+                    // remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
             }

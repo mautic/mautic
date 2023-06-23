@@ -8,11 +8,12 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -20,9 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class SmsType.
- */
 class SmsType extends AbstractType
 {
     /**
@@ -76,8 +74,8 @@ class SmsType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        //add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        // add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -96,46 +94,17 @@ class SmsType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
+
+        // add category
         $builder->add(
-            'publishUp',
-            DateTimeType::class,
+            'category',
+            CategoryListType::class,
             [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
+                'bundle' => 'sms',
             ]
         );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        //add category
-        $builder->add(
-             'category',
-             CategoryListType::class,
-             [
-                 'bundle' => 'sms',
-             ]
-         );
 
         $builder->add(
             'language',

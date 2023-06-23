@@ -51,7 +51,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
                 'pauseToDate'      => '',
             ],
             'channel6' => [
-                'frequencyNumber'  => '10',
+                'frequencyNumber'  => 10,
                 'frequencyTime'    => FrequencyRule::TIME_MONTH, // 10
                 'preferredChannel' => 0,
                 'pauseFromDate'    => '',
@@ -68,7 +68,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
                 ->setFrequencyTime($rule['frequencyTime'])
                 ->setChannel($channel)
                 ->setPauseFromDate(($rule['pauseFromDate']) ? new \DateTime($rule['pauseFromDate']) : null)
-                ->setPauseToDate((($rule['pauseToDate']) ? new \DateTime($rule['pauseToDate']) : null));
+                ->setPauseToDate(($rule['pauseToDate']) ? new \DateTime($rule['pauseToDate']) : null);
 
             $lead->addFrequencyRule($frequencyRule);
         }
@@ -208,7 +208,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->addUpdatedField('attribution', 100);
         $lead->checkAttributionDate();
-        $this->assertEquals((new \Datetime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertEquals((new \DateTime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
         $this->assertNotEmpty($lead->getChanges());
     }
 
@@ -292,8 +292,6 @@ class LeadTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param      $points
-     * @param      $expected
      * @param bool $operator
      */
     private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)

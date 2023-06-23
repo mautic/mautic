@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;

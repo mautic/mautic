@@ -16,7 +16,7 @@ class ApiFactory implements SecurityFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.mautic_api.'.$id;
         $container

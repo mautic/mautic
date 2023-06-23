@@ -1,0 +1,174 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.campaign.campaigns'|trans }}{% endblock %}
+
+{% block actions %}
+	{{- include('@MauticCore/Helper/page_actions.html.twig', {
+         'templateButtons': {
+            'new': permissions['campaign:campaigns:create'],
+         },
+            'routeBase': 'campaign',
+            'langVar': 'campaign.campaigns',
+    }) -}}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': searchHelp|default(null),
+                'action': currentRoute,
+                'actionRoute': actionRoute,
+                'indexRoute': indexRoute,
+                'translationBase': translationBase,
+                'preCustomButtons': toolBarButtons|default(null),
+                'templateButtons': {
+                    'delete': permissions[permissionBase~':delete'],
+                },
+                'filters': filters|default([]),
+        }) -}}
+        <div class="page-list">
+            {{- customContent('content.above', mauticTemplateVars|default({})) -}}
+  {% endif %}
+
+  {% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
+          <thead>
+            <tr>
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'checkall': 'true',
+                  'target': '#campaignTable',
+                  'routeBase': 'campaign',
+                  'templateButtons': {
+                    'delete': permissions['campaign:campaigns:deleteown'] or permissions['campaign:campaigns:deleteother'],
+                  },
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'c.name',
+                  'text': 'mautic.core.name',
+                  'class': 'col-campaign-name',
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'cat.title',
+                  'text': 'mautic.core.category',
+                  'class': 'visible-md visible-lg col-campaign-category',
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'c.dateAdded',
+                  'text': 'mautic.lead.import.label.dateAdded',
+                  'class': 'visible-md visible-lg col-campaign-dateAdded',
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'c.dateModified',
+                  'text': 'mautic.lead.import.label.dateModified',
+                  'class': 'visible-md visible-lg col-campaign-dateModified',
+                  'default': true,
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'c.createdByUser',
+                  'text': 'mautic.core.createdby',
+                  'class': 'visible-md visible-lg col-campaign-createdByUser',
+              }) -}}
+
+              {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                  'sessionVar': 'campaign',
+                  'orderBy': 'c.id',
+                  'text': 'mautic.core.id',
+                  'class': 'visible-md visible-lg col-campaign-id',
+              }) -}}
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+                {% set mauticTemplateVars = {'item': item} %}
+                <tr>
+                    <td>
+                      {{- include('@MauticCore/Helper/list_actions.html.twig', {
+                          'item': item,
+                          'templateButtons' : {
+                          'edit': securityHasEntityAccess(
+                                permissions['campaign:campaigns:editown'],
+                                permissions['campaign:campaigns:editother'],
+                                item.createdBy
+                              ),
+                          'clone': permissions['campaign:campaigns:create'],
+                          'delete': securityHasEntityAccess(
+                                permissions['campaign:campaigns:deleteown'],
+                                permissions['campaign:campaigns:deleteother'],
+                                item.createdBy
+                              ),
+                          },
+                          'routeBase': 'campaign',
+                      }) -}}
+                    </td>
+                    <td>
+                        <div>
+                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                              'item': item,
+                              'model': 'campaign',
+                              'onclick': item.onclickMethod,
+                              'attributes': item.dataAttributes,
+                              'transKeys': item.translationKeysDataAttributes,
+                          }) -}}
+                            <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                                {{- item.name -}}
+                                {{- customContent('campaign.name', mauticTemplateVars) -}}
+                            </a>
+                        </div>
+                        {%- if item.description -%}
+                            <div class="text-muted mt-4"><small>{{ item.description|purify }}</small></div>
+                        {%- endif -%}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName, color = (category) ? category.title : 'mautic.core.form.uncategorized'|trans, (category) ? '#' ~ category.color : 'inherit' %}
+                        <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span></span>
+                    </td>
+                    <td class="visible-md visible-lg" title="{{ item.dateAdded ? dateToFullConcat(item.dateAdded) : '' }}">
+                        {{ item.dateAdded ? dateToDate(item.dateAdded) : '' }}
+                    </td>
+                    <td class="visible-md visible-lg" title="{{ item.dateModified ? dateToFullConcat(item.dateModified) : '' }}">
+                        {{ item.dateModified ? dateToDate(item.dateModified) : '' }}
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.createdByUser }}</td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems': items|length,
+            'page': page,
+            'limit': limit,
+            'menuLinkId': 'mautic_campaign_index',
+            'baseUrl': path('mautic_campaign_index'),
+            'sessionVar': 'campaign',
+        }) -}}
+    </div>
+  {% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.campaign.noresults.tip'}) -}}
+  {% endif %}
+
+  {% if isIndex %}
+            {{- customContent('content.below', mauticTemplateVars|default({})) -}}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

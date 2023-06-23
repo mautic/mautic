@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailReply;
@@ -15,13 +16,17 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReplyTest extends \PHPUnit\Framework\TestCase
 {
+    private EmailAddressHelper $emailAddressHelper;
+
     private $statRepo;
     private $contactFinder;
     private $leadModel;
@@ -34,24 +39,32 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      */
     private $processor;
 
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->statRepo       = $this->createMock(StatRepository::class);
-        $this->contactFinder  = $this->createMock(ContactFinder::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
-        $this->logger         = $this->createMock(Logger::class);
-        $this->contactTracker = $this->createMock(ContactTracker::class);
-        $this->processor      = new Reply(
+        $this->statRepo           = $this->createMock(StatRepository::class);
+        $this->contactFinder      = $this->createMock(ContactFinder::class);
+        $this->leadModel          = $this->createMock(LeadModel::class);
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $this->logger             = $this->createMock(Logger::class);
+        $this->contactTracker     = $this->createMock(ContactTracker::class);
+        $this->emailAddressHelper = new EmailAddressHelper();
+        $this->leadRepository     = $this->createMock(LeadRepository::class);
+        $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
+        $this->processor          = new Reply(
             $this->statRepo,
             $this->contactFinder,
             $this->leadModel,
             $this->dispatcher,
             $this->logger,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->emailAddressHelper
         );
     }
 
@@ -69,6 +82,9 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         // This tells us that a reply was found and processed
         $this->statRepo->expects($this->once())
             ->method('saveEntity');
+
+        $this->leadRepository->expects(self::atLeastOnce())
+            ->method('detachEntity');
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(

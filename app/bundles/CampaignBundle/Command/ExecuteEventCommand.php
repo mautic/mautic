@@ -3,7 +3,7 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,7 +45,6 @@ class ExecuteEventCommand extends Command
     {
         $this
             ->setName('mautic:campaigns:execute')
-            ->setDescription('Execute specific scheduled events.')
             ->addOption(
                 '--scheduled-log-ids',
                 null,
@@ -68,6 +67,7 @@ class ExecuteEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Execute specific scheduled events.';
 }

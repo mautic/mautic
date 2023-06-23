@@ -148,4 +148,24 @@ final class FormEvents
      * @var string
      */
     public const ON_DETERMINE_SUBMISSION_RATE_WINNER = 'mautic.form.on_submission_rate_winner';
+
+    /**
+     * The mautic.form.on_object_collect event is fired when there is a call for all available objects that can provide fields for mapping.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\ObjectCollectEvent
+     *
+     * @var string
+     */
+    public const ON_OBJECT_COLLECT = 'mautic.form.on_object_collect';
+
+    /**
+     * The mautic.form.on_field_collect event is fired when there is a call for all available fields for specific object that can be provided for mapping.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\FieldCollectEvent
+     *
+     * @var string
+     */
+    public const ON_FIELD_COLLECT = 'mautic.form.on_field_collect';
 }

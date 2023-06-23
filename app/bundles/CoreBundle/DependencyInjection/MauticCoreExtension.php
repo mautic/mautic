@@ -23,9 +23,7 @@ class MauticCoreExtension extends Extension
         'DTO',
         'Migrations',
         'Migration',
-        'Form/DataTransformer',
         'Security',
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
     ];
 
     /**

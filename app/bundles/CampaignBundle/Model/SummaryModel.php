@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Model;
 
-use DateInterval;
-use DateTime;
-use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
@@ -28,11 +25,11 @@ class SummaryModel extends AbstractCommonModel
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function updateSummary(iterable $logs): void
     {
-        $now = new DateTime();
+        $now = new \DateTime();
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -44,7 +41,7 @@ class SummaryModel extends AbstractCommonModel
 
             $timestamp = $log->getDateTriggered()->getTimestamp();
             $timestamp -= ($timestamp % 3600);
-            $dateFrom = ($now)->setTimestamp($timestamp);
+            $dateFrom = $now->setTimestamp($timestamp);
             $dateTo   = (clone $dateFrom)->modify('+1 hour -1 second');
 
             $campaign  = $log->getCampaign();
@@ -77,7 +74,7 @@ class SummaryModel extends AbstractCommonModel
     /**
      * Summarize all of history.
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function summarize(OutputInterface $output, int $hoursPerBatch = 1, int $maxHours = null, bool $rebuild = false): void
     {
@@ -88,7 +85,7 @@ class SummaryModel extends AbstractCommonModel
         }
 
         // Start with the current hour.
-        $start = $start ?? new DateTime('+1 hour');
+        $start = $start ?? new \DateTime('+1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
 
@@ -99,7 +96,7 @@ class SummaryModel extends AbstractCommonModel
         }
 
         $end       = $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
-        $startedAt = new DateTime();
+        $startedAt = new \DateTime();
         $output->writeln('<comment>Started at: '.$startedAt->format('Y-m-d H:i:s').'</comment>');
 
         if ($end <= $start) {
@@ -107,13 +104,13 @@ class SummaryModel extends AbstractCommonModel
 
             if ($maxHours && $hours > $maxHours) {
                 $end = clone $start;
-                $end = $end->sub(new DateInterval('PT'.$maxHours.'H'));
+                $end = $end->sub(new \DateInterval('PT'.$maxHours.'H'));
             }
 
             $progressBar = ProgressBarHelper::init($output, $hours);
             $progressBar->start();
 
-            $interval = new DateInterval('PT'.$hoursPerBatch.'H');
+            $interval = new \DateInterval('PT'.$hoursPerBatch.'H');
             $dateFrom = clone $start;
             $dateTo   = (clone $start)->modify('-1 second');
 
@@ -141,7 +138,7 @@ class SummaryModel extends AbstractCommonModel
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function persistSummaries(): void
     {
@@ -154,9 +151,9 @@ class SummaryModel extends AbstractCommonModel
         }
     }
 
-    private function outputProcessTime(DateTime $startedAt, OutputInterface $output): void
+    private function outputProcessTime(\DateTime $startedAt, OutputInterface $output): void
     {
-        $endedAt = new DateTime();
+        $endedAt = new \DateTime();
         $output->writeln("\n".'<comment>Ended at: '.$endedAt->format('Y-m-d H:i:s').'</comment>');
         $completedInterval = $startedAt->diff($endedAt);
         $output->writeln('<info>Summary completed in: '.$completedInterval->format('%H:%I:%S').'</info>');

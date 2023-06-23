@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -214,23 +214,8 @@ JS;
         );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
-            null,
-            null,
-            true
-        );
-        $froogaloop2       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/froogaloop2.min.js',
-            null,
-            null,
-            true
-        );
-
-        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
-        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
-        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
-        $froogaloop2     = str_replace('/index_dev.php', '', $froogaloop2);
+        $jQueryUrl       = $this->assetsHelper->getUrl('media/js/jquery.min.js', null, null, true);
+        $froogaloop2     = $this->assetsHelper->getUrl('media/js/froogaloop.min.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -264,6 +249,37 @@ b.media.removeEventListener("click",b.clickToPlayPauseCallback),e=!1}},g={},h=["
 JS;
 
         $js = <<<JS
+MauticJS.convertIframesToVideos = function() {
+    var iframes = document.querySelectorAll("iframe[data-form-id][data-gate-time]");
+    iframes.forEach(function(iframe) {
+        var formId = iframe.getAttribute("data-form-id");
+        var gateTime = iframe.getAttribute("data-gate-time");
+        var video = document.createElement("video");
+        video.width = iframe.width;
+        video.height = iframe.height;
+        video.controls = true;
+        var type = "video/mp4";
+        var src = iframe.src;
+        if (src.includes("youtube.com") || src.includes("youtu.be")) {
+            type = "video/youtube";
+            src = src.replace("https://www.youtube.com/embed/", "https://youtu.be/");
+        }
+        else if (src.includes("vimeo.com")) {
+            type = "video/vimeo";
+            const videoId = src.split("/").pop().split("?")[0];
+            src = 'https://vimeo.com/' + videoId;
+        }
+        var source = document.createElement("source");
+        source.src = src;
+        source.type = type;
+        video.appendChild(source);
+        video.dataset.formId = formId;
+        video.dataset.gateTime = gateTime;
+        iframe.replaceWith(video);
+    });
+};
+
+
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
  
@@ -482,7 +498,7 @@ MauticJS.processGatedVideos = function (videoElements) {
         }
     });
 }
-
+MauticJS.documentReady(MauticJS.convertIframesToVideos);
 MauticJS.documentReady(MauticJS.initGatedVideo);
 JS;
         $event->appendJs($js, 'Mautic Gated Videos');

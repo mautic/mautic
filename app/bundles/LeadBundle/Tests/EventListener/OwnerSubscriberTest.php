@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use Symfony\Component\Mailer\Mailer;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -84,16 +85,15 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
 
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
-        $this->assertEquals('owner3@owner.com', $tokens['{ownerfield=email}']);
         $this->assertEquals('John', $tokens['{ownerfield=firstname}']);
         $this->assertEquals('S&#39;mith', $tokens['{ownerfield=lastname}']);
     }
@@ -107,7 +107,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -125,7 +125,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -147,11 +147,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
@@ -165,7 +165,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -183,7 +183,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -234,7 +234,6 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $parameterMap = array_merge(
             [
                 ['mailer_return_path', false, null],
-                ['mailer_spool_type', false, 'memory'],
                 ['mailer_is_owner', false, $mailIsOwner],
             ],
             $parameterMap
@@ -285,12 +284,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MauticFactory $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->setLead($lead);
+        $transport    = new SmtpTransport();
+        $mailer       = new Mailer($transport);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailerHelper->setLead($lead);
 
-        return $mailer;
+        return $mailerHelper;
     }
 
     /**
@@ -307,5 +306,13 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(false));
 
         return $translator;
+    }
+
+    protected function getEmailSendEvent(MailHelper $mailer): EmailSendEvent
+    {
+        $event = new EmailSendEvent($mailer);
+        $event->setContent('<html><body>{ownerfield=firstname} {ownerfield=lastname}</body></html>');
+
+        return $event;
     }
 }
