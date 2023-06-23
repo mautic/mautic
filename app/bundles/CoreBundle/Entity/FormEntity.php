@@ -301,7 +301,7 @@ class FormEntity extends CommonEntity
      *
      * @param User $modifiedBy
      *
-     * @return mixed
+     * @return $this
      */
     public function setModifiedBy($modifiedBy = null)
     {
@@ -333,7 +333,7 @@ class FormEntity extends CommonEntity
      *
      * @param User $checkedOutBy
      *
-     * @return mixed
+     * @return $this
      */
     public function setCheckedOutBy($checkedOutBy = null)
     {
@@ -467,7 +467,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $createdByUser
+     * @param string|null $createdByUser
      *
      * @return $this
      */
@@ -479,7 +479,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $modifiedByUser
+     * @param string|null $modifiedByUser
      *
      * @return $this
      */
@@ -491,7 +491,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @param mixed $checkedOutByUser
+     * @param string|null $checkedOutByUser
      *
      * @return $this
      */
