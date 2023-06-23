@@ -195,8 +195,6 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $ownerId
-     *
      * @return array|null
      */
     private function getOwner($ownerId)

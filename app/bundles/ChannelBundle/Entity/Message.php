@@ -19,7 +19,7 @@ class Message extends FormEntity
     private $id;
 
     /**
-     * @var ?string
+     * @var string
      */
     private $name;
 

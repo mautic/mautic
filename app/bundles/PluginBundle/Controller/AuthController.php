@@ -28,7 +28,7 @@ class AuthController extends FormController
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
-        //check to see if the service exists
+        // check to see if the service exists
         if (!$integrationObject) {
             $session->set('mautic.integration.postauth.message', ['mautic.integration.notfound', ['%name%' => $integration], 'error']);
             if ($isAjax) {
@@ -50,7 +50,7 @@ class AuthController extends FormController
             }
         }
 
-        //check for error
+        // check for error
         if ($error) {
             $type    = 'error';
             $message = 'mautic.integration.error.oauthfail';
@@ -73,8 +73,6 @@ class AuthController extends FormController
     }
 
     /**
-     * @param $integration
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authStatusAction(Request $request, $integration)
@@ -104,8 +102,6 @@ class AuthController extends FormController
     }
 
     /**
-     * @param $integration
-     *
      * @return RedirectResponse
      */
     public function authUserAction($integration)

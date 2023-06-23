@@ -87,7 +87,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
         $filter    = ['string' => $str, 'force' => ''];
 
-        //only show results that are not anonymous so as to not clutter up things
+        // only show results that are not anonymous so as to not clutter up things
         if (false === strpos($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
@@ -98,7 +98,7 @@ class SearchSubscriber implements EventSubscriberInterface
         );
 
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
-            //only show own leads if the user does not have permission to view others
+            // only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
                 $filter['force'] .= " $mine";
             }

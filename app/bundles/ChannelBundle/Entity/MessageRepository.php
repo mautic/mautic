@@ -26,7 +26,7 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -67,8 +67,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -92,8 +90,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)

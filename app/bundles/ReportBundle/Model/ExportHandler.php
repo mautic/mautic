@@ -26,8 +26,6 @@ class ExportHandler
     }
 
     /**
-     * @param $fileName
-     *
      * @return bool|resource
      *
      * @throws FileIOException
@@ -64,8 +62,6 @@ class ExportHandler
     }
 
     /**
-     * @param $fileName
-     *
      * @return string
      *
      * @throws FileIOException

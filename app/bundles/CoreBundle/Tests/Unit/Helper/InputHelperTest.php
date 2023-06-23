@@ -220,6 +220,52 @@ class InputHelperTest extends TestCase
     }
 
     /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
      * @dataProvider minifyHTMLProvider
      */
     public function testMinifyHTML(string $html, string $expected): void
@@ -250,6 +296,36 @@ class InputHelperTest extends TestCase
             // Test with an HTML string with multiple same tag but with different attributes
             ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
             [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
+        ];
+    }
+
+    /**
+     * @dataProvider underscoreProvider
+     */
+    public function testUndersore(mixed $provided, mixed $expected): void
+    {
+        $this->assertSame($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function underscoreProvider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, null],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], [null]],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
         ];
     }
 }

@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Mailer\Mailer;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -237,7 +238,6 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $parameterMap = array_merge(
             [
                 ['mailer_return_path', false, null],
-                ['mailer_spool_type', false, 'memory'],
                 ['mailer_is_owner', false, $mailIsOwner],
             ],
             $parameterMap
@@ -288,12 +288,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MauticFactory $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->setLead($lead);
+        $transport    = new SmtpTransport();
+        $mailer       = new Mailer($transport);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailerHelper->setLead($lead);
 
-        return $mailer;
+        return $mailerHelper;
     }
 
     /**

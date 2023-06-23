@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -45,11 +46,6 @@ final class AssetsHelper
     private $version;
 
     /**
-     * @var Packages
-     */
-    private $packages;
-
-    /**
      * @var string
      */
     private $siteUrl;
@@ -62,9 +58,8 @@ final class AssetsHelper
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
     private InstallService $installService;
 
-    public function __construct(Packages $packages)
+    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->packages = $packages;
     }
 
     /**
@@ -174,7 +169,7 @@ final class AssetsHelper
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
-                //special place for these so that declarations and scripts can be mingled
+                // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
                 if (!isset($assets['scripts'][$location])) {
@@ -209,7 +204,7 @@ final class AssetsHelper
     public function addScriptDeclaration($script, $location = 'head')
     {
         if ('head' == $location) {
-            //special place for these so that declarations and scripts can be mingled
+            // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
             if (!isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
@@ -502,7 +497,7 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base = 'node_modules/ckeditor4/';
+        $base = 'media/js/ckeditor4/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
@@ -514,10 +509,14 @@ final class AssetsHelper
     /**
      * Load Froala JS source files.
      *
-     * @return array<string>
+     * @return string[]
      */
-    public function getFroalaScripts()
+    public function getFroalaScripts(): array
     {
+        if (!$this->coreParametersHelper->get('load_froala_assets')) {
+            return [];
+        }
+
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
         $plugins = $base.'plugins/';
 
@@ -544,7 +543,7 @@ final class AssetsHelper
             $plugins.'quote.js?v'.$this->version,
             $plugins.'table.js?v'.$this->version,
             $plugins.'url.js?v'.$this->version,
-            //$plugins . 'video.js?v' . $this->version,
+            // $plugins . 'video.js?v' . $this->version,
             $plugins.'gatedvideo.js?v'.$this->version,
             $plugins.'token.js?v'.$this->version,
             $plugins.'dynamic_content.js?v'.$this->version,
@@ -748,8 +747,6 @@ final class AssetsHelper
     }
 
     /**
-     * @param $string
-     *
      * @return string
      */
     private function escape(string $string)

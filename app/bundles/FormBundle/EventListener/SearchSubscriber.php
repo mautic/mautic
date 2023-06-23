@@ -66,7 +66,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $permissions = $this->security->isGranted(['form:forms:viewown', 'form:forms:viewother'], 'RETURN_ARRAY');
         if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
-            //only show own forms if the user does not have permission to view others
+            // only show own forms if the user does not have permission to view others
             if (!$permissions['form:forms:viewother']) {
                 $filter['force'] = [
                     ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId()],

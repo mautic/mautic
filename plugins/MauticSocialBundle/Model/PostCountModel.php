@@ -13,8 +13,6 @@ class PostCountModel extends AbstractCommonModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -38,7 +36,7 @@ class PostCountModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSocialBundle:PostCount');
+        return $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\PostCount::class);
     }
 
     /*

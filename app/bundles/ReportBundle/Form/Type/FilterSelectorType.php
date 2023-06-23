@@ -39,8 +39,11 @@ class FilterSelectorType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $column) use ($options) {
-            if (null == $column) {
+        $formModifier = function (FormEvent $formEvent) use ($options) {
+            $data   = $formEvent->getData();
+            $column = $data['column'] ?? null;
+            $form   = $formEvent->getForm();
+            if (null === $column) {
                 reset($options['filterList']);
                 $column = key($options['filterList']);
             }
@@ -64,7 +67,7 @@ class FilterSelectorType extends AbstractType
                 ]
             );
 
-            if (array_key_exists('in', $choices)) {
+            if (array_key_exists('in', $choices) && isset($data['value']) && is_array($data['value'])) {
                 $form->add('value', CollectionType::class, [
                     'entry_type'    => TextType::class,
                     'allow_add'     => true,
@@ -90,18 +93,12 @@ class FilterSelectorType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
-                $data = !empty($event->getData()) ? $event->getData()['column'] : null;
-                $formModifier($event->getForm(), $data);
-            }
+            fn (FormEvent $event) => $formModifier($event)
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
-                $data = !empty($event->getData()) ? $event->getData()['column'] : null;
-                $formModifier($event->getForm(), $data);
-            }
+            fn (FormEvent $event) => $formModifier($event)
         );
 
         $builder->add(

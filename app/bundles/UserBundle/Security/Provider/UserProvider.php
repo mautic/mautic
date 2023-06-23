@@ -10,7 +10,7 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -41,7 +41,7 @@ class UserProvider implements UserProviderInterface
     protected $dispatcher;
 
     /**
-     * @var UserPasswordEncoder
+     * @var UserPasswordHasher
      */
     protected $encoder;
 
@@ -50,7 +50,7 @@ class UserProvider implements UserProviderInterface
         PermissionRepository $permissionRepository,
         Session $session,
         EventDispatcherInterface $dispatcher,
-        UserPasswordEncoder $encoder
+        UserPasswordHasher $encoder
     ) {
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
@@ -85,7 +85,7 @@ class UserProvider implements UserProviderInterface
             throw new UserNotFoundException($message, 0);
         }
 
-        //load permissions
+        // load permissions
         if ($user->getId()) {
             $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
             $user->setActivePermissions($permissions);
@@ -157,12 +157,12 @@ class UserProvider implements UserProviderInterface
         if ($plainPassword) {
             // Encode plain text
             $user->setPassword(
-                $this->encoder->encodePassword($user, $plainPassword)
+                $this->encoder->hashPassword($user, $plainPassword)
             );
         } elseif (!$password = $user->getPassword()) {
             // Generate and encode a random password
             $user->setPassword(
-                $this->encoder->encodePassword($user, EncryptionHelper::generateKey())
+                $this->encoder->hashPassword($user, EncryptionHelper::generateKey())
             );
         }
 
