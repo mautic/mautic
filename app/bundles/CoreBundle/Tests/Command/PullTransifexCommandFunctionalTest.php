@@ -35,7 +35,6 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
         $someTranslation = 'some.translation="Some translation"';
 
         $handlerStack = self::$container->get(MockHandler::class);
-        \assert($handlerStack instanceof MockHandler);
         $handlerStack->append(
             // Fetches all languages for webhook's messages.ini
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/language-stats.json')),

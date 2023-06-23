@@ -566,7 +566,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '', $withBC = true)
+    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);

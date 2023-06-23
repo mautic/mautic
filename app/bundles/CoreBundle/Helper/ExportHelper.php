@@ -86,13 +86,13 @@ class ExportHelper
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
     }
 
-    public function zipFile(string $filePath): string
+    public function zipFile(string $filePath, string $fileName): string
     {
         $zipFilePath = str_replace('.csv', '.zip', $filePath);
         $zipArchive  = new \ZipArchive();
 
         if (true === $zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE)) {
-            $zipArchive->addFile($filePath, 'contacts_export.csv');
+            $zipArchive->addFile($filePath, $fileName);
             $zipArchive->close();
             $this->filePathResolver->delete($filePath);
 

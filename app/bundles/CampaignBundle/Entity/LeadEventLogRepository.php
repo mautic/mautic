@@ -17,7 +17,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
-    use SlaveConnectionTrait;
+    use ReplicaConnectionTrait;
 
     public function getEntities(array $args = [])
     {
@@ -258,7 +258,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         // Exclude failed events
-        $failedSq = $this->getSlaveConnection()->createQueryBuilder();
+        $failedSq = $this->getReplicaConnection()->createQueryBuilder();
         $failedSq->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
             ->where(
@@ -358,10 +358,10 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getChartQuery($options)
     {
-        $chartQuery = new ChartQuery($this->getSlaveConnection(), $options['dateFrom'], $options['dateTo']);
+        $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 
         // Load points for selected period
-        $query = $this->getSlaveConnection()->createQueryBuilder();
+        $query = $this->getReplicaConnection()->createQueryBuilder();
         $query->select('ll.id, ll.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
@@ -408,7 +408,7 @@ class LeadEventLogRepository extends CommonRepository
             return new ArrayCollection();
         }
 
-        $this->getSlaveConnection($limiter);
+        $this->getReplicaConnection($limiter);
 
         $q = $this->createQueryBuilder('o');
 
@@ -450,7 +450,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getScheduledByIds(array $ids)
     {
-        $this->getSlaveConnection();
+        $this->getReplicaConnection();
         $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
@@ -478,7 +478,7 @@ class LeadEventLogRepository extends CommonRepository
         $now = clone $date;
         $now->setTimezone(new \DateTimeZone('UTC'));
 
-        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
 
         $expr = $q->expr()->and(
             $q->expr()->eq('l.campaign_id', ':campaignId'),
@@ -514,7 +514,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getDatesExecuted($eventId, array $contactIds)
     {
-        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
@@ -539,7 +539,7 @@ class LeadEventLogRepository extends CommonRepository
 
     public function getOldestTriggeredDate(): ?\DateTime
     {
-        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->orderBy('log.date_triggered', 'ASC')
@@ -559,7 +559,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
     {
-        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
