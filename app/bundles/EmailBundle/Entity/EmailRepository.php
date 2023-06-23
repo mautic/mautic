@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -538,51 +537,28 @@ class EmailRepository extends CommonRepository
     /**
      * Clones email list cross-reference records and updates child emails to match the parent email.
      *
-     * @param Email $parent the parent email entity
+     * @param Email $entity the parent email entity
      */
-    public function cloneFromParentToVariant(Email $parent): void
+    public function cloneFromParentToVariant(Email $entity): void
     {
-        $connection    = $this->getEntityManager()->getConnection();
-        $tableName     = MAUTIC_TABLE_PREFIX.'email_list_xref';
-        $childrenIds   = array_map('intval', (array) $parent->getOnlyChildrenRelatedEntityIds());
+        $parent    = $entity->getVariantParent() ?: $entity;
+        $hasParent = !empty($entity->getVariantParent());
 
-        if (empty($childrenIds)) {
-            return;
-        }
-
-        // Delete existing cross-reference records for child emails.
-        $connection->createQueryBuilder()
-            ->delete($tableName)
-            ->where('email_id IN (:ids)')
-            ->setParameter('ids', $childrenIds, ArrayParameterType::INTEGER)
-            ->execute();
-
-        // Add new cross-reference records for child emails.
-        foreach ($childrenIds as $children) {
-            foreach ($parent->getLists()->toArray() as $listId => $parentList) {
-                $connection->executeStatement(
-                    'INSERT INTO '.MAUTIC_TABLE_PREFIX.'email_list_xref (email_id, leadlist_id) VALUES (:new_email_id, :list_id);',
-                    [
-                        'new_email_id' => $children,
-                        'list_id'      => $listId,
-                    ]
-                );
+        if ($hasParent) {
+            $entity->setPublishUp($parent->getPublishUp());
+            $entity->setPublishDown($parent->getPublishDown());
+            $entity->setIsPublished($parent->getIsPublished());
+            $entity->setLists($parent->getLists()->toArray());
+        } else {
+            $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
+            foreach ($variantsToUpdateFromParent as $variant) {
+                $variant->setPublishUp($parent->getPublishUp());
+                $variant->setPublishDown($parent->getPublishDown());
+                $variant->setIsPublished($parent->getIsPublished());
+                $variant->setLists($parent->getLists()->toArray());
             }
+            $this->saveEntities($variantsToUpdateFromParent);
         }
-        // Update child emails to match the parent email's publish status.
-        $connection->executeStatement('  
-        UPDATE '.MAUTIC_TABLE_PREFIX.'emails e  
-        JOIN '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id  
-        SET e.is_published = :is_published,  
-            e.publish_up = :publish_up,  
-            e.publish_down = :publish_down  
-        WHERE parent.id = :parent_id  
-    ', [
-            'parent_id'      => $parent->getId(),
-            'is_published'   => (int) $parent->getIsPublished(),
-            'publish_up'     => $parent->getPublishUp() ? $parent->getPublishUp()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null,
-            'publish_down'   => $parent->getPublishDown() ? $parent->getPublishDown()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null,
-        ]);
     }
 
     /**

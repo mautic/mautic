@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class VariantModelTrait.
@@ -137,24 +136,6 @@ trait VariantModelTrait
         // Reset associated variants if applicable due to changes
         if ($resetVariants && empty($this->inConversion)) {
             $this->resetVariants($entity, $relatedIds, $variantStartDate);
-        }
-    }
-
-    /**
-     * @param VariantEntityInterface $entity
-     */
-    public function cloneFromParentToVariant($entity): void
-    {
-        if ($this->inConversion) {
-            return;
-        }
-
-        $parent = $entity->getVariantParent() ?: $entity;
-
-        $repo = $this->getRepository();
-
-        if (method_exists($repo, 'cloneFromParentToVariant')) {
-            $repo->cloneFromParentToVariant($parent);
         }
     }
 
