@@ -53,7 +53,7 @@ class Trackable
 
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->build();
 
         $builder->addField('channel', 'string');
@@ -65,8 +65,6 @@ class Trackable
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

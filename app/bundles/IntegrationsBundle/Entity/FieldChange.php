@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -22,7 +21,7 @@ class FieldChange
     private $integration;
 
     /**
-     * @var int
+     * @var string
      */
     private $objectId;
 
@@ -32,7 +31,7 @@ class FieldChange
     private $objectType;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $modifiedAt;
 
@@ -65,28 +64,28 @@ class FieldChange
         $builder->addId();
 
         $builder
-            ->createField('integration', Type::STRING)
+            ->createField('integration', Types::STRING)
             ->build();
 
         $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder
-            ->createField('objectType', Type::STRING)
+            ->createField('objectType', Types::STRING)
             ->columnName('object_type')
             ->build();
 
         $builder
-            ->createField('modifiedAt', Type::DATETIME)
+            ->createField('modifiedAt', Types::DATETIME_MUTABLE)
             ->columnName('modified_at')
             ->build();
 
         $builder
-            ->createField('columnName', Type::STRING)
+            ->createField('columnName', Types::STRING)
             ->columnName('column_name')
             ->build();
 
         $builder
-            ->createField('columnType', Type::STRING)
+            ->createField('columnType', Types::STRING)
             ->columnName('column_type')
             ->build();
 
@@ -121,24 +120,18 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setObjectId(int $id): self
     {
-        $this->objectId = $id;
+        $this->objectId = (string) $id;
 
         return $this;
     }
 
     public function getObjectId(): int
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setObjectType(string $type): self
     {
         $this->objectType = $type;
@@ -151,9 +144,6 @@ class FieldChange
         return $this->objectType;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setModifiedAt(\DateTime $time): self
     {
         $this->modifiedAt = $time;
@@ -161,14 +151,11 @@ class FieldChange
         return $this;
     }
 
-    public function getModifiedAt(): \DateTime
+    public function getModifiedAt(): \DateTimeInterface
     {
         return $this->modifiedAt;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnName(string $name): self
     {
         $this->columnName = $name;
@@ -181,9 +168,6 @@ class FieldChange
         return $this->columnName;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnType(string $type): self
     {
         $this->columnType = $type;
@@ -196,9 +180,6 @@ class FieldChange
         return $this->columnType;
     }
 
-    /**
-     * @return FieldChange
-     */
     public function setColumnValue(string $value): self
     {
         $this->columnValue = $value;

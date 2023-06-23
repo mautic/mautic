@@ -5,13 +5,12 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Templating\TemplateReference;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -21,9 +20,9 @@ class ThemeHelper implements ThemeHelperInterface
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var TranslatorInterface
@@ -51,7 +50,7 @@ class ThemeHelper implements ThemeHelperInterface
     private $defaultTheme;
 
     /**
-     * @var TemplatingThemeHelper[]
+     * @var twigThemeHelper[]
      */
     private $themeHelpers = [];
 
@@ -112,7 +111,7 @@ class ThemeHelper implements ThemeHelperInterface
 
     public function __construct(
         PathsHelper $pathsHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
@@ -120,7 +119,7 @@ class ThemeHelper implements ThemeHelperInterface
         BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
         $this->pathsHelper               = $pathsHelper;
-        $this->templatingHelper          = $templatingHelper;
+        $this->twig                      = $twig;
         $this->translator                = $translator;
         $this->coreParametersHelper      = $coreParametersHelper;
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
@@ -144,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
             $themeName = $this->defaultTheme;
         }
 
-        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
+        return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
     /**
@@ -170,7 +169,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -191,7 +190,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -212,7 +211,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -252,30 +251,14 @@ class ThemeHelper implements ThemeHelperInterface
         return $minors;
     }
 
-    public function checkForTwigTemplate($template)
+    public function checkForTwigTemplate($template): string
     {
-        $parser     = $this->templatingHelper->getTemplateNameParser();
-        $templating = $this->templatingHelper->getTemplating();
-
-        $template = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        // Does a twig version exist?
-        if ($templating->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
-        }
-
-        // Does a PHP version exist?
-        if ($templating->exists($template)) {
-            return $template->getLogicalName();
+        if ($this->twig->getLoader()->exists($template)) {
+            return $template;
         }
 
         // Try any theme as a fall back starting with default
-        $this->findThemeWithTemplate($templating, $twigTemplate);
-
-        return $twigTemplate->getLogicalName();
+        return $this->findThemeWithTemplate($template);
     }
 
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
@@ -468,37 +451,41 @@ class ThemeHelper implements ThemeHelperInterface
 
     /**
      * @throws BadConfigurationException
-     * @throws FileNotFoundException
      */
-    private function findThemeWithTemplate(EngineInterface $templating, TemplateReference $template)
+    private function findThemeWithTemplate(string $template): string
     {
-        preg_match('/^:(.*?):(.*?)$/', $template->getLogicalName(), $match);
+        preg_match('/^@themes\/(.*?)\/(.*?)$/', $template, $match);
+
         $requestedThemeName = $match[1];
+        $templatePath       = $match[2];
 
         // Try the default theme first
         $defaultTheme = $this->getTheme();
+
         if ($requestedThemeName !== $defaultTheme->getTheme()) {
-            $template->set('controller', $defaultTheme->getTheme());
-            if ($templating->exists($template)) {
-                return;
+            $defaultTemplate = '@themes/'.$defaultTheme->getTheme().'/'.$templatePath;
+            if ($this->twig->getLoader()->exists($defaultTemplate)) {
+                return $defaultTemplate;
             }
         }
 
         // Find any theme as a fallback
         $themes = $this->getInstalledThemes('all', true);
+
         foreach ($themes as $theme) {
             // Already handled the default
             if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
 
-            // Theme name is stored in the controller parameter
-            $template->set('controller', $theme['key']);
+            $fallbackTemplate = '@themes/'.$theme['key'].'/'.$templatePath;
 
-            if ($templating->exists($template)) {
-                return;
+            if ($this->twig->getLoader()->exists($template)) {
+                return $fallbackTemplate;
             }
         }
+
+        throw new BadConfigurationException(sprintf('Could not find theme %s nor a fall back theme to replace it', $requestedThemeName));
     }
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void

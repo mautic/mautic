@@ -49,7 +49,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
             'mautic/unicorn',
             SymfonyResponse::HTTP_NOT_FOUND,
             'mautic/unicorn',
-            'Package \'mautic/unicorn\' not found in allowlist.',
+            'Package &#039;mautic/unicorn&#039; not found in allowlist.',
         ];
 
         // Package that exists in the allowlist with display name.

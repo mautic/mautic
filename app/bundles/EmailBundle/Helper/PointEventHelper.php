@@ -11,9 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 class PointEventHelper
 {
     /**
-     * @param $eventDetails
-     * @param $action
-     *
      * @return int
      */
     public static function validateEmail($eventDetails, $action)
@@ -29,7 +26,7 @@ class PointEventHelper
         }
 
         if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
-            //no points change
+            // no points change
             return false;
         }
 
@@ -37,8 +34,6 @@ class PointEventHelper
     }
 
     /**
-     * @param $event
-     *
      * @return bool
      */
     public static function sendEmail($event, Lead $lead, MauticFactory $factory)
@@ -50,7 +45,7 @@ class PointEventHelper
         $model = $factory->getModel('email');
         $email = $model->getEntity($emailId);
 
-        //make sure the email still exists and is published
+        // make sure the email still exists and is published
         if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {

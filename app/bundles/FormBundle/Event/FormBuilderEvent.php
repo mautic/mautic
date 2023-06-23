@@ -53,7 +53,7 @@ class FormBuilderEvent extends Event
      *                       'formType'           => (required) name of the form type SERVICE for the action
      *                       'allowCampaignForm'  => (optional) true to allow this action for campaign forms; defaults to false
      *                       'description'        => (optional) short description of event
-     *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.php
+     *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.twig
      *                       'formTypeOptions'    => (optional) array of options to pass to formType
      *                       'formTheme'          => (optional  theme for custom form views
      *                       ]
@@ -122,7 +122,7 @@ class FormBuilderEvent extends Event
      *                      $field = [
      *                      'label'            => (required) what to display in the list
      *                      'formType'         => (required) name of the form type SERVICE for the field's property column
-     *                      'template'         => (required) template to use for the field's HTML eg AcmeMyBundle:FormField:thefield.html.php
+     *                      'template'         => (required) template to use for the field's HTML eg AcmeMyBundle:FormField:thefield.html.twig
      *                      'formTypeOptions'  => (optional) array of options to pass to formType
      *                      'formTheme'        => (optional) theme for custom form view
      *                      'valueFilter'      => (optional) the filter to use to clean the input as supported by InputHelper or a callback;
@@ -177,7 +177,6 @@ class FormBuilderEvent extends Event
     /**
      * Add a field validator.
      *
-     * @param       $key
      * @param array $validator
      *                         $validator = [
      *                         'eventName' => (required) Event name to dispatch to validate the form; it will recieve a ValidationEvent object
@@ -191,7 +190,7 @@ class FormBuilderEvent extends Event
             throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(['eventName'], $validator);
 
         $this->validators[$key] = $validator;

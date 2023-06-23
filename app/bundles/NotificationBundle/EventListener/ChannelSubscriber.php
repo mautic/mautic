@@ -48,7 +48,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => NotificationListType::class,
-                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'repository'     => \Mautic\NotificationBundle\Entity\Notification::class,
                         'lookupOptions'  => [
                             'mobile'  => false,
                             'desktop' => true,
@@ -74,7 +74,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                                 'form.submit',
                             ],
                             'lookupFormType'             => NotificationListType::class,
-                            'repository'                 => 'MauticNotificationBundle:Notification',
+                            'repository'                 => \Mautic\NotificationBundle\Entity\Notification::class,
                             'lookupOptions'              => [
                                 'mobile'  => true,
                                 'desktop' => false,

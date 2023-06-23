@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function setUp(): void
     {
-        $this->clientOptions = ['debug' => true];
+        $this->configParams['mailer_from_name']      = 'Mautic Admin';
+        $this->configParams['mailer_from_email']     = 'admin@email.com';
+        $this->configParams['mailer_custom_headers'] = ['x-global-custom-header' => 'value123'];
+        $this->clientOptions                         = ['debug' => true];
 
         parent::setUp();
     }
@@ -40,7 +44,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->persist($email);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($email);
 
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
@@ -140,7 +144,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $dncQueries = array_filter(
             $queries['default'],
-            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = :channel) AND (l.id IN ({$contact->getId()}))" === $query['sql']
+            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN ({$contact->getId()}))" === $query['sql']
         );
 
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
@@ -160,12 +164,20 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
         $this->assertStringContainsString('Email is sending in the background', $html, $html);
 
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
+
         $email->setPublishUp(new \DateTime('now +1 hour'));
         $this->em->persist($email);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
         $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
 
         $email->setPublishUp(null);
@@ -219,6 +231,126 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
     }
 
+    public function testSegmentEmailSend(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+        $email->setSubject('Subject A');
+        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+
+        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
+            $contact = new Lead();
+            $contact->setEmail($emailAddress);
+
+            $member = new ListLead();
+            $member->setLead($contact);
+            $member->setList($segment);
+            $member->setDateAdded(new \DateTime());
+
+            $this->em->persist($member);
+            $this->em->persist($contact);
+        }
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
+            'id'         => $email->getId(),
+            'pending'    => 2,
+            'batchLimit' => 10,
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(2);
+
+        $email = $this->getMailerMessage();
+
+        // The order of the recipients is not guaranteed, so we need to check both possibilities.
+        Assert::assertSame('Subject A', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
+        Assert::assertCount(1, $email->getFrom());
+        Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
+        Assert::assertSame($this->configParams['mailer_from_email'], $email->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $email->getTo());
+        Assert::assertSame('', $email->getTo()[0]->getName());
+        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
+        Assert::assertCount(1, $email->getReplyTo());
+        Assert::assertSame('', $email->getReplyTo()[0]->getName());
+        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
+    public function testSegmentEmailSendWithAdvancedOptions(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+        $email->setSubject('Subject A');
+        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $email->setPlainText('Dear {contactfield=email}');
+        $email->setFromAddress('custom@from.address');
+        $email->setFromName('Custom From Name');
+        $email->setReplyToAddress('custom@replyto.address');
+        $email->setBccAddress('custom@bcc.address');
+        $email->setHeaders(['x-global-custom-header' => 'value123 overridden']);
+        $email->setUtmTags(
+            [
+                'utmSource'   => 'utmSourceA',
+                'utmMedium'   => 'utmMediumA',
+                'utmCampaign' => 'utmCampaignA',
+                'utmContent'  => 'utmContentA',
+            ]
+        );
+
+        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
+            $contact = new Lead();
+            $contact->setEmail($emailAddress);
+
+            $member = new ListLead();
+            $member->setLead($contact);
+            $member->setList($segment);
+            $member->setDateAdded(new \DateTime());
+
+            $this->em->persist($member);
+            $this->em->persist($contact);
+        }
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
+            'id'         => $email->getId(),
+            'pending'    => 2,
+            'batchLimit' => 10,
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(2);
+
+        $email = $this->getMailerMessage();
+
+        // The order of the recipients is not guaranteed, so we need to check both possibilities.
+        Assert::assertSame('Subject A', $email->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
+        Assert::assertCount(1, $email->getFrom());
+        Assert::assertSame('Custom From Name', $email->getFrom()[0]->getName());
+        Assert::assertSame('custom@from.address', $email->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $email->getTo());
+        Assert::assertSame('', $email->getTo()[0]->getName());
+        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
+        Assert::assertCount(1, $email->getReplyTo());
+        Assert::assertSame('', $email->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
     private function createSegment(string $suffix = 'A'): LeadList
     {
         $segment = new LeadList();
@@ -262,7 +394,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
 
         // checking if pending count is removed from details page ui
-        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text());
+        $emailDetailsContainer = trim($crawler->filter('#email-details')->filter('tbody')->text(null, false));
         $this->assertStringNotContainsString('Pending', $emailDetailsContainer);
 
         $profile = $this->client->getProfile();

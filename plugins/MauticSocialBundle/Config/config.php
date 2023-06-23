@@ -148,28 +148,6 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
-            'mautic.integration.linkedin' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\LinkedInIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                    'mautic.helper.integration',
-                ],
-            ],
             'mautic.integration.twitter' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
                 'arguments' => [
@@ -190,34 +168,6 @@ return [
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
                     'mautic.helper.integration',
-                ],
-            ],
-        ],
-        'command' => [
-            'mautic.social.command.twitter_hashtags' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterHashtagsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.social.command.twitter_mentions' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterMentionsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.social.command.social_monitoring' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MauticSocialMonitoringCommand::class,
-                'arguments' => [
-                    'mautic.social.model.monitoring',
                 ],
             ],
         ],

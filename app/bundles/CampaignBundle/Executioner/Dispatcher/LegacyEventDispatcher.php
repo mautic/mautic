@@ -79,9 +79,6 @@ class LegacyEventDispatcher
         $this->contactTracker     = $contactTracker;
     }
 
-    /**
-     * @param $wasBatchProcessed
-     */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
         ArrayCollection $logs,
@@ -106,7 +103,8 @@ class LegacyEventDispatcher
             $this->contactTracker->setSystemContact($log->getLead());
 
             if (isset($settings['eventName'])) {
-                $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $event  = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $result = $event->getResult();
             } else {
                 if (!is_callable($settings['callback'])) {
                     // No use to keep trying for the other logs as it won't ever work
@@ -192,9 +190,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param $eventName
-     *
-     * @return bool
+     * @return CampaignExecutionEvent
      */
     private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
     {
@@ -219,7 +215,7 @@ class LegacyEventDispatcher
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        return $campaignEvent->getResult();
+        return $campaignEvent;
     }
 
     /**
@@ -265,9 +261,6 @@ class LegacyEventDispatcher
         }
     }
 
-    /**
-     * @param $result
-     */
     private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result)
     {
         $eventArray = $this->getEventArray($log->getEvent());
@@ -315,8 +308,6 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param $result
-     *
      * @return bool
      */
     private function isFailed($result)
@@ -329,7 +320,7 @@ class LegacyEventDispatcher
     private function processFailedLog(LeadEventLog $log, PendingEvent $pendingEvent)
     {
         $this->logger->debug(
-            'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+            'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
         );
 
         $metadata = $log->getMetadata();

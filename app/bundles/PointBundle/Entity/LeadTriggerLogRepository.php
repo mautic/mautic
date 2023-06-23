@@ -11,9 +11,6 @@ class LeadTriggerLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -23,8 +20,9 @@ class LeadTriggerLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
-        $events = [];
+            ->fetchAllAssociative();
+
+        $events  = [];
         foreach ($results as $r) {
             $events[] = $r['event_id'];
         }

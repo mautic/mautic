@@ -41,14 +41,14 @@ class PageListType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => function (Options $options) use ($model, $canViewOther) {
-                    $choices = [];
+                    $choices       = [];
                     $publishedOnly = $options['published_only'] ?? false;
-                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
+                    $pages         = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
                     foreach ($pages as $page) {
                         $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices);
 
                     foreach ($choices as &$pages) {

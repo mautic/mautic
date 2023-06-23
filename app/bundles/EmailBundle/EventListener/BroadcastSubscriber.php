@@ -66,7 +66,9 @@ class BroadcastSubscriber implements EventSubscriberInterface
                 $event->getBatch(),
                 $event->getOutput(),
                 $event->getMinContactIdFilter(),
-                $event->getMaxContactIdFilter()
+                $event->getMaxContactIdFilter(),
+                $event->getMaxThreads(),
+                $event->getThreadId()
             );
 
             $event->setResults(

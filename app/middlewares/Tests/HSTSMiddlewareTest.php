@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\Middleware\Tests;
 
-use Exception;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\Middleware\HSTSMiddleware;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,20 +15,20 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
     public const HSTS_KEY = 'strict-transport-security';
 
-    protected ReflectionProperty $addHSTS;
-    protected ReflectionProperty $includeDubDomains;
-    protected ReflectionProperty $preload;
+    protected \ReflectionProperty $addHSTS;
+    protected \ReflectionProperty $includeDubDomains;
+    protected \ReflectionProperty $preload;
     protected HSTSMiddleware $middleware;
-    protected ReflectionClass $middlewareReflection;
+    protected \ReflectionClass $middlewareReflection;
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function setUp(): void
     {
         parent::setUp();
         $this->middleware           = new HSTSMiddleware($this->client->getKernel());
-        $this->middlewareReflection = new ReflectionClass($this->middleware);
+        $this->middlewareReflection = new \ReflectionClass($this->middleware);
 
         $this->addHSTS = $this->middlewareReflection->getProperty('enableHSTS');
         $this->addHSTS->setAccessible(true);
@@ -133,7 +129,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testExpireTime(): void
     {
@@ -176,7 +172,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
     {
         try {
             return $this->middleware->handle(Request::create('s/login', Request::METHOD_GET));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new PHPUnitException($e->getMessage());
         }
     }

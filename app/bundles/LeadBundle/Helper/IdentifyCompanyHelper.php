@@ -47,7 +47,7 @@ class IdentifyCompanyHelper
         } else {
             $companyData = $parameters;
 
-            //create new company
+            // create new company
             $companyEntity = new Company();
             $companyModel->setFieldValues($companyEntity, $companyData, true);
             $companyModel->saveEntity($companyEntity);
@@ -128,7 +128,7 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
-        if (!strstr($email, '@')) { //not a valid email adress
+        if (!strstr($email, '@')) { // not a valid email adress
             return false;
         }
 
