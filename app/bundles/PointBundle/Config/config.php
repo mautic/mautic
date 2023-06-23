@@ -105,10 +105,11 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.factory',
                     'mautic.tracker.contact',
+                    'mautic.point.model.group',
                 ],
             ],
             'mautic.point.model.group' => [
-                'class'     => \Mautic\PointBundle\Model\GroupModel::class,
+                'class'     => \Mautic\PointBundle\Model\PointGroupModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',

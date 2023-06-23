@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\PointBundle\Entity\GroupContactScore;
-use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
@@ -57,18 +55,22 @@ class PointModel extends CommonFormModel
      */
     private $contactTracker;
 
+    private PointGroupModel $pointGroupModel;
+
     public function __construct(
         Session $session,
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         MauticFactory $mauticFactory,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        PointGroupModel $pointGroupModel
     ) {
         $this->session            = $session;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
+        $this->pointGroupModel    = $pointGroupModel;
     }
 
     /**
@@ -292,9 +294,7 @@ class PointModel extends CommonFormModel
                     $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
                     $pointGroup               = $action->getGroup();
                     if (!empty($pointGroup)) {
-                        /** @var GroupContactScoreRepository $scoreRepository */
-                        $scoreRepository = $this->em->getRepository(GroupContactScore::class);
-                        $scoreRepository->adjustPoints($lead, $pointGroup, $delta);
+                        $this->pointGroupModel->adjustPoints($lead, $pointGroup, $delta);
                     } else {
                         $lead->adjustPoints($delta);
                     }

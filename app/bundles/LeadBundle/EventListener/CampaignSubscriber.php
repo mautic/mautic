@@ -39,7 +39,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
-use Mautic\PointBundle\Model\GroupModel;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -77,7 +77,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
-     * @var GroupModel
+     * @var PointGroupModel
      */
     private $groupModel;
 
@@ -107,8 +107,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         CampaignModel $campaignModel,
         CoreParametersHelper $coreParametersHelper,
         DoNotContact $doNotContact,
-        GroupModel $groupModel,
-        FilterOperatorProvider $filterOperatorProvider
+        PointGroupModel $groupModel,
+        FilterOperatorProvider $filterOperatorProvider,
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
@@ -324,8 +324,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
 
             if (!empty($pointGroup)) {
-                $scoreRepository = $this->leadModel->getGroupContactScoreRepository();
-                $scoreRepository->adjustPoints($lead, $pointGroup, $points);
+                $this->groupModel->adjustPoints($lead, $pointGroup, $points);
             } else {
                 $lead->adjustPoints($points);
             }

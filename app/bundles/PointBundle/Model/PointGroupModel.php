@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
-use Mautic\PointBundle\GroupEvents;
+use Mautic\PointBundle\PointGroupEvents;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -17,11 +20,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Group>
  */
-class GroupModel extends CommonFormModel
+class PointGroupModel extends CommonFormModel
 {
     public function getRepository(): GroupRepository
     {
         return $this->em->getRepository(Group::class);
+    }
+
+    public function getContactScoreRepository(): GroupContactScoreRepository
+    {
+        return $this->em->getRepository(GroupContactScore::class);
     }
 
     public function getPermissionBase(): string
@@ -83,16 +91,16 @@ class GroupModel extends CommonFormModel
 
         switch ($action) {
             case 'pre_save':
-                $name = GroupEvents::GROUP_PRE_SAVE;
+                $name = PointGroupEvents::GROUP_PRE_SAVE;
                 break;
             case 'post_save':
-                $name = GroupEvents::GROUP_POST_SAVE;
+                $name = PointGroupEvents::GROUP_POST_SAVE;
                 break;
             case 'pre_delete':
-                $name = GroupEvents::GROUP_PRE_DELETE;
+                $name = PointGroupEvents::GROUP_PRE_DELETE;
                 break;
             case 'post_delete':
-                $name = GroupEvents::GROUP_POST_DELETE;
+                $name = PointGroupEvents::GROUP_POST_DELETE;
                 break;
             default:
                 return null;
@@ -110,5 +118,43 @@ class GroupModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    public function adjustPoints(Lead $contact, Group $group, int $points, string $operator = Lead::POINTS_ADD): Lead
+    {
+        $contactScore = $this->getContactScoreRepository()->findOneBy(['contact' => $contact, 'group' => $group]);
+        if (empty($contactScore)) {
+            $contactScore = new GroupContactScore();
+            $contactScore->setContact($contact);
+            $contactScore->setGroup($group);
+            $contactScore->setScore(0);
+        }
+        $oldScore = $contactScore->getScore();
+        $newScore = $oldScore;
+
+        switch ($operator) {
+            case Lead::POINTS_ADD:
+                $newScore += $points;
+                break;
+            case Lead::POINTS_SUBTRACT:
+                $newScore -= $points;
+                break;
+            case Lead::POINTS_MULTIPLY:
+                $newScore *= $points;
+                break;
+            case Lead::POINTS_DIVIDE:
+                $newScore /= $points;
+                break;
+            default:
+                throw new \UnexpectedValueException('Invalid operator');
+        }
+        $contactScore->setScore($newScore);
+        $this->em->persist($contactScore);
+        $this->em->flush();
+
+        $scoreChangeEvent = new Events\GroupScoreChangeEvent($contactScore, $oldScore, $newScore);
+        $this->dispatcher->dispatch($scoreChangeEvent, PointGroupEvents::SCORE_CHANGE);
+
+        return $contact;
     }
 }

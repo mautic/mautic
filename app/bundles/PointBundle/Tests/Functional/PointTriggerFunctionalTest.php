@@ -9,9 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
-use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\TriggerModel;
 
 class PointTriggerFunctionalTest extends MauticMysqlTestCase
@@ -19,7 +19,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     public function testPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $trigger = $this->createTrigger('Trigger', 5);
         $this->createAddTagEvent('tag5', $trigger);
@@ -41,7 +41,10 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     public function testGroupPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
+
+        /** @var PointGroupModel $pointGroupModel */
+        $pointGroupModel = self::getContainer()->get('mautic.point.model.group');
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');
@@ -59,11 +62,7 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Lead::class);
         $lead = $model->getEntity($lead->getId());
-
-        $this->addGroupContactScore($lead, $groupA, 5);
-        $model->setFieldValues($lead, ['points' => 5], false, true, true);
-        $model->saveEntity($lead);
-
+        $pointGroupModel->adjustPoints($lead, $groupA, 5);
         $lead = $model->getEntity($lead->getId());
 
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
@@ -73,10 +72,10 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     public function testTriggerForExistingContacts(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
 
         /** @var TriggerModel $triggerModel */
-        $triggerModel = self::$container->get('mautic.point.model.trigger');
+        $triggerModel = self::getContainer()->get('mautic.point.model.trigger');
 
         $lead = new Lead();
         $data = ['email' => 'pointtest@example.com', 'points' => 5];
@@ -104,19 +103,22 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
     public function testTriggerWithGroupForExistingContacts(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
 
         /** @var TriggerModel $triggerModel */
-        $triggerModel = self::$container->get('mautic.point.model.trigger');
+        $triggerModel = self::getContainer()->get('mautic.point.model.trigger');
+
+        /** @var PointGroupModel $pointGroupModel */
+        $pointGroupModel = self::getContainer()->get('mautic.point.model.group');
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');
 
         $lead = new Lead();
-        $data = ['email' => 'pointtest@example.com', 'points' => 5];
+        $data = ['email' => 'pointtest@example.com'];
         $leadModel->setFieldValues($lead, $data, false, true, true);
-        $this->addGroupContactScore($lead, $groupA, 5);
         $leadModel->saveEntity($lead);
+        $pointGroupModel->adjustPoints($lead, $groupA, 5);
 
         $triggerA      = $this->createTrigger('Group A Trigger (should trigger)', 5, $groupA, true);
         $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
@@ -129,6 +131,13 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $triggerModel->saveEntity($triggerB);
         $lead = $leadModel->getEntity($lead->getId());
 
+        $triggerC      = $this->createTrigger('General Trigger (should not trigger)', 5, $groupB, true);
+        $triggerEventB = $this->createAddTagEvent('tagC', $triggerC);
+        $triggerC->addTriggerEvent(0, $triggerEventB);
+        $triggerModel->saveEntity($triggerC);
+        $lead = $leadModel->getEntity($lead->getId());
+
+        $this->assertFalse($this->leadHasTag($lead, 'tagC'));
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
     }
@@ -179,18 +188,6 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($group);
 
         return $group;
-    }
-
-    private function addGroupContactScore(
-        Lead $lead,
-        Group $group,
-        int $score
-    ): void {
-        $groupContactScore = new GroupContactScore();
-        $groupContactScore->setContact($lead);
-        $groupContactScore->setGroup($group);
-        $groupContactScore->setScore($score);
-        $lead->addGroupScore($groupContactScore);
     }
 
     private function leadHasTag(

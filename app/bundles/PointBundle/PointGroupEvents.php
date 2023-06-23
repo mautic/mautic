@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle;
 
-final class GroupEvents
+final class PointGroupEvents
 {
     /**
      * The mautic.group_pre_save event is thrown right before a form is persisted.
@@ -41,20 +41,11 @@ final class GroupEvents
     public const GROUP_POST_DELETE = 'mautic.group_post_delete';
 
     /**
-     * The mautic.group_on_build event is thrown before displaying the group builder form to allow adding of custom actions.
+     * The mautic.group_contact_score_change event is dispatched if a group contact score changes.
      *
-     * The event listener receives a Mautic\PointBundle\Event\ScoringCategoryBuilderEvent instance.
-     *
-     * @var string
-     */
-    public const GROUP_ON_BUILD = 'mautic.group_on_build';
-
-    /**
-     * The mautic.group_on_action event is thrown to execute a group action.
-     *
-     * The event listener receives a Mautic\PointBundle\Event\ScoringCategoryActionEvent instance.
+     * The event listener receives a Mautic\PointBundle\Event\GroupScoreChangeEvent instance.
      *
      * @var string
      */
-    public const GROUP_ON_ACTION = 'mautic.group_on_action';
+    public const SCORE_CHANGE = 'mautic.group_contact_score_change';
 }
