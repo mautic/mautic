@@ -61,7 +61,7 @@ class FormEntity extends CommonEntity
     private $checkedOutByUser;
 
     /**
-     * @var array
+     * {@inheritdoc}
      */
     protected $changes = [];
 

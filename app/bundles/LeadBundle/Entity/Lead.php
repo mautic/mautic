@@ -1975,4 +1975,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         return $rules;
     }
+
+    /**
+     * @param bool $includePast
+     *
+     * @return array<string, array<int|string, array<int|string, int|string>|int|string|IpAddress>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
+     */
+    public function getChanges($includePast = false)
+    {
+        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+            return $this->pastChanges;
+        }
+
+        return $this->changes;
+    }
 }

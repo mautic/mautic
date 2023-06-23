@@ -12,15 +12,18 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class CommonEntity
 {
     /**
-     * @var array
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $changes = [];
 
     /**
-     * @var array
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $pastChanges = [];
 
+    /**
+     * @return void
+     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -32,6 +35,8 @@ class CommonEntity
      * Wrapper function for isProperty methods.
      *
      * @param string $name
+     *
+     * @return string
      *
      * @throws \InvalidArgumentException
      */
@@ -114,6 +119,10 @@ class CommonEntity
         }
     }
 
+    /**
+     * @param string                                                                                                               $key
+     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null $value
+     */
     protected function addChange($key, $value)
     {
         if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
@@ -124,7 +133,9 @@ class CommonEntity
     }
 
     /**
-     * @return array
+     * @param bool $includePast
+     *
+     * @return array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     public function getChanges($includePast = false)
     {
@@ -137,6 +148,8 @@ class CommonEntity
 
     /**
      * Reset changes.
+     *
+     * @return void
      */
     public function resetChanges()
     {
@@ -144,6 +157,11 @@ class CommonEntity
         $this->changes     = [];
     }
 
+    /**
+     * @param array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null> $changes
+     *
+     * @return void
+     */
     public function setChanges(array $changes)
     {
         $this->changes = $changes;

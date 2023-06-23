@@ -22,7 +22,6 @@ class MessageTest extends TestCase
         $message->setPublishDown(new \DateTime());
         $message->setPublishUp(new \DateTime());
 
-        $this->assertIsArray($message->getChanges());
         $this->assertNotEmpty($message->getChanges());
     }
 }
