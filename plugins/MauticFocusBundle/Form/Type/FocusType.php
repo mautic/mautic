@@ -7,12 +7,13 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,9 +28,6 @@ class FocusType extends AbstractType
      */
     private $security;
 
-    /**
-     * FocusType constructor.
-     */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;
@@ -139,7 +137,7 @@ class FocusType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -170,38 +168,8 @@ class FocusType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'publishUp',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('properties', PropertiesType::class, ['data' => $options['data']->getProperties()]);
 
         // Will be managed by JS

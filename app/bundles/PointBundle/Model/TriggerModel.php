@@ -15,6 +15,7 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -99,7 +100,7 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -124,7 +125,7 @@ class TriggerModel extends CommonFormModel
 
         parent::saveEntity($entity, $unlock);
 
-        //should we trigger for existing leads?
+        // should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
             $events    = $entity->getEvents();
             $repo      = $this->getEventRepository();
@@ -146,7 +147,7 @@ class TriggerModel extends CommonFormModel
                 ]];
 
                 if (!$isNew) {
-                    //get a list of leads that has already had this event applied
+                    // get a list of leads that has already had this event applied
                     $leadIds = $repo->getLeadsForEvent($event->getId());
                     if (!empty($leadIds)) {
                         $filter['force'][] = [
@@ -157,7 +158,7 @@ class TriggerModel extends CommonFormModel
                     }
                 }
 
-                //get a list of leads that are before the trigger's date_added and trigger if not already done so
+                // get a list of leads that are before the trigger's date_added and trigger if not already done so
                 $leads = $this->leadModel->getEntities([
                     'filter' => $filter,
                 ]);
@@ -280,7 +281,7 @@ class TriggerModel extends CommonFormModel
         static $events;
 
         if (empty($events)) {
-            //build them
+            // build them
             $events = [];
             $event  = new Events\TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
@@ -316,7 +317,7 @@ class TriggerModel extends CommonFormModel
      */
     public function triggerEvent($event, Lead $lead = null, $force = false)
     {
-        //only trigger events for anonymous users
+        // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
             return false;
         }
@@ -326,10 +327,10 @@ class TriggerModel extends CommonFormModel
         }
 
         if (!$force) {
-            //get a list of events that has already been performed on this lead
+            // get a list of events that has already been performed on this lead
             $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
 
-            //if it's already been done, then skip it
+            // if it's already been done, then skip it
             if (isset($appliedEvents[$event['id']])) {
                 return false;
             }
@@ -338,7 +339,7 @@ class TriggerModel extends CommonFormModel
         $availableEvents = $this->getEvents();
         $eventType       = $event['type'];
 
-        //make sure the event still exists
+        // make sure the event still exists
         if (!isset($availableEvents[$eventType])) {
             return false;
         }
@@ -360,8 +361,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param $event
-     *
      * @return bool
      */
     private function invokeCallback($event, Lead $lead, array $settings)
@@ -401,26 +400,26 @@ class TriggerModel extends CommonFormModel
     {
         $points = $lead->getPoints();
 
-        //find all published triggers that is applicable to this points
+        // find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo   = $this->getEventRepository();
         $events = $repo->getPublishedByPointTotal($points);
 
         if (!empty($events)) {
-            //get a list of actions that has already been applied to this lead
+            // get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
             $persist       = [];
             foreach ($events as $event) {
                 if (isset($appliedEvents[$event['id']])) {
-                    //don't apply the event to the lead if it's already been done
+                    // don't apply the event to the lead if it's already been done
                     continue;
                 }
 
                 if ($this->triggerEvent($event, $lead, true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
-                    $log->setEvent($this->em->getReference('MauticPointBundle:TriggerEvent', $event['id']));
+                    $log->setEvent($triggerEvent = $this->getEventRepository()->find($event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
                     $persist[] = $log;
@@ -429,17 +428,16 @@ class TriggerModel extends CommonFormModel
 
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
-
-                $this->em->clear('Mautic\PointBundle\Entity\LeadTriggerLog');
-                $this->em->clear('Mautic\PointBundle\Entity\TriggerEvent');
+                $this->getEventRepository()->detachEntities($persist);
+                if (isset($triggerEvent)) {
+                    $this->getEventRepository()->deleteEntity($triggerEvent);
+                }
             }
         }
     }
 
     /**
      * Returns configured color based on passed in $points.
-     *
-     * @param $points
      *
      * @return string
      */

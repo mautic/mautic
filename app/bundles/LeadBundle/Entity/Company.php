@@ -23,12 +23,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $score = 0;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -91,7 +91,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -131,8 +131,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

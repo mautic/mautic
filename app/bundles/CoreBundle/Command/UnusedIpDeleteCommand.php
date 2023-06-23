@@ -2,9 +2,9 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,23 +12,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-class UnusedIpDeleteCommand extends Command
+class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
 
     private IpAddressModel $ipAddressModel;
 
-    public function __construct(IpAddressModel $ipAddressModel)
+    public function __construct(IpAddressModel $ipAddressModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->ipAddressModel = $ipAddressModel;
 
-        parent::__construct();
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
-            ->setDescription('Deletes IP addresses that are not used in any other database table')
             ->addOption(
                 '--limit',
                 '-l',
@@ -43,20 +42,28 @@ class UnusedIpDeleteCommand extends Command
 <info>php %command.full_name%</info>
 EOT
             );
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        try {
-            $limit       = $input->getOption('limit');
-            $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
-            $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
-        } catch (DBALException $e) {
-            $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
-
-            return 1;
+        if (!$this->checkRunStatus($input, $output)) {
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
-        return 0;
+        try {
+            $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
+            $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
+            $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
+        } catch (\Doctrine\DBAL\Exception $e) {
+            $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
+            $this->completeRun();
+
+            return \Symfony\Component\Console\Command\Command::FAILURE;
+        }
+        $this->completeRun();
+
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Deletes IP addresses that are not used in any other database table';
 }

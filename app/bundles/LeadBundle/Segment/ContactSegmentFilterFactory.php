@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Exception;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
@@ -39,7 +38,7 @@ class ContactSegmentFilterFactory
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function getSegmentFilters(LeadList $leadList, array $batchLimiters = []): ContactSegmentFilters
     {
@@ -57,7 +56,7 @@ class ContactSegmentFilterFactory
      * @param array<string, mixed> $filter
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function factorSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
     {
@@ -73,7 +72,7 @@ class ContactSegmentFilterFactory
     /**
      * @return FilterQueryBuilderInterface
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function getQueryBuilderForFilter(FilterDecoratorInterface $decorator, ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

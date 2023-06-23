@@ -72,7 +72,7 @@ class RouteLoader extends Loader
         // Elfinder file manager
         $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yaml'));
 
-        //API
+        // API
         $event = new RouteEvent($this, 'api');
         $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $apiCollection = $event->getCollection();

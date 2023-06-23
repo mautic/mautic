@@ -71,15 +71,13 @@ class ClearbitIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticClearbitBundle:Integration:form.html.twig',
+                'template'   => '@MauticClearbit/Integration/form.html.twig',
                 'parameters' => [
                     'mauticUrl' => $this->router->generate(
                         'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL

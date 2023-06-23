@@ -52,8 +52,6 @@ class EventModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -65,10 +63,6 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @param $currentEvents
-     * @param $deletedEvents
-     */
     public function deleteEvents($currentEvents, $deletedEvents)
     {
         $deletedKeys = [];

@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

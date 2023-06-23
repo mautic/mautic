@@ -118,8 +118,6 @@ class ContactSegmentFilter
     }
 
     /**
-     * @param $argument
-     *
      * @return mixed
      */
     public function getParameterHolder($argument)

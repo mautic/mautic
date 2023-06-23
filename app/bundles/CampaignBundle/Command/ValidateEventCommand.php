@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,7 +46,6 @@ class ValidateEventCommand extends Command
     {
         $this
             ->setName('mautic:campaigns:validate')
-            ->setDescription('Validate if a contact has been inactive for a decision and execute events if so.')
             ->addOption(
                 '--decision-id',
                 null,
@@ -87,7 +86,7 @@ class ValidateEventCommand extends Command
                 .'</comment>'
             );
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $limiter = new ContactLimiter(null, $contactId, null, null, $contactIds);
@@ -95,6 +94,7 @@ class ValidateEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

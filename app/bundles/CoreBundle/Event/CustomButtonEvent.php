@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class CustomButtonEvent extends AbstractCustomRequestEvent
@@ -27,7 +27,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * CustomButtonEvent constructor.
      *
-     * @param      $location
      * @param null $item
      */
     public function __construct($location, Request $request, array $buttons = [], $item = null)
@@ -106,9 +105,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this;
     }
 
-    /**
-     * @param $button
-     */
     public function removeButton($button)
     {
         $buttonKey = $this->generateButtonKey($button);
@@ -126,8 +122,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param $location
-     *
      * @return bool
      */
     public function checkLocationContext($location)
@@ -143,8 +137,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Generate a button ID that can be overridden by other plugins.
-     *
-     * @param $button
      *
      * @return string
      */

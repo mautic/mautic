@@ -124,27 +124,27 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailSendType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => 'MauticEmailBundle:FormTheme:EmailSendList/_emailsend_list_row.html.twig',
+                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
             ]
         );
 
         $event->addDecision(
-                'email.reply',
-                [
-                    'label'                  => 'mautic.email.campaign.event.reply',
-                    'description'            => 'mautic.email.campaign.event.reply_descr',
-                    'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                    'connectionRestrictions' => [
-                        'source' => [
-                            'action' => [
-                                'email.send',
-                            ],
+            'email.reply',
+            [
+                'label'                  => 'mautic.email.campaign.event.reply',
+                'description'            => 'mautic.email.campaign.event.reply_descr',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
                         ],
                     ],
-                ]
-            );
+                ],
+            ]
+        );
 
         $event->addAction(
             'email.send.to.user',
@@ -154,7 +154,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailToUserType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
-                'formTheme'            => 'MauticEmailBundle:FormTheme:EmailSendList/_email_to_user_row.html.twig',
+                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_email_to_user_row.html.twig',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
             ]
@@ -205,7 +205,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             return $event->setResult(false);
         }
 
-        //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
+        // check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
         if (!empty($eventParent) && 'email.send' === $eventParent['type']) {
             // click decision
             if ($event->checkContext('email.click')) {
@@ -279,10 +279,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $contactIds      = $event->getContactIds();
         $credentialArray = [];
 
-        /**
-         * @var int
-         * @var Lead $contact
-         */
         foreach ($contacts as $logId => $contact) {
             $leadCredentials                      = $contact->getProfileFields();
             $leadCredentials['primaryIdentifier'] = $contact->getPrimaryIdentifier();

@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -17,6 +16,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class SearchSubscriberTest extends TestCase
 {
@@ -32,7 +32,7 @@ class SearchSubscriberTest extends TestCase
         $leadModel         = $this->createMock(LeadModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
         $security          = $this->createMock(CorePermissions::class);
-        $templating        = $this->createMock(TemplatingHelper::class);
+        $twig              = $this->createMock(Environment::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -41,7 +41,7 @@ class SearchSubscriberTest extends TestCase
                     $primaryTable = $tables[0];
                     unset($tables[0]);
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
-                    $joins = $q->getQueryPart('join');
+                    $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
                         $q->$joinType(
                             $primaryTable['from_alias'],
@@ -89,7 +89,7 @@ class SearchSubscriberTest extends TestCase
             $emailRepository,
             $translator,
             $security,
-            $templating
+            $twig
         );
 
         $dispatcher = new EventDispatcher();

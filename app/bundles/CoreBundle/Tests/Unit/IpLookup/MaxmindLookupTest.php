@@ -156,7 +156,7 @@ RESPONSE);
 
     public function testCountryIpLookupSuccessful()
     {
-        $ipService = new MaxmindCountryLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindCountryLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -165,7 +165,7 @@ RESPONSE);
 
     public function testOmniIpLookupSuccessful()
     {
-        $ipService = new MaxmindOmniLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindOmniLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -174,7 +174,7 @@ RESPONSE);
 
     public function testPrecisionIpLookupSuccessful()
     {
-        $ipService = new MaxmindPrecisionLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindPrecisionLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 

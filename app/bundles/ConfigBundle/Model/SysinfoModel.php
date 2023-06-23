@@ -71,7 +71,7 @@ class SysinfoModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
-            //ensure TZ is set back to default
+            // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
@@ -118,11 +118,6 @@ class SysinfoModel
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
-        // Show the spool folder only if the email queue is configured
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
-        }
-
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
             $folderKey  = ($folderPath) ? $folderPath : $folder;
@@ -155,8 +150,8 @@ class SysinfoModel
     public function getDbInfo(): array
     {
         return [
-            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
-            'driver'   => $this->connection->getDriver()->getName(),
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
+            'driver'   => $this->connection->getParams()['driver'],
             'platform' => get_class($this->connection->getDatabasePlatform()),
         ];
     }
@@ -164,7 +159,6 @@ class SysinfoModel
     /**
      * Method to tail (a few last rows) of a file.
      *
-     * @param     $filename
      * @param int $lines
      * @param int $buffer
      *

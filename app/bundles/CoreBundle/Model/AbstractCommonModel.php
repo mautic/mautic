@@ -164,7 +164,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function getEntities(array $args = [])
     {
-        //set the translator
+        // set the translator
         $repo = $this->getRepository();
 
         $repo->setTranslator($this->translator);
@@ -197,8 +197,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * Encode an array to append to a URL.
      *
-     * @param $array
-     *
      * @return string
      */
     public function encodeArrayForUrl($array)
@@ -209,7 +207,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * Decode a string appended to URL into an array.
      *
-     * @param      $string
      * @param bool $urlDecode
      *
      * @return mixed
@@ -220,7 +217,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @param       $route
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough

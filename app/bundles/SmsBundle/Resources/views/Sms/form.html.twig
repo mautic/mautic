@@ -1,0 +1,71 @@
+{% extends '@MauticCore/FormTheme/form_simple.html.twig' %}
+{% form_theme form with [
+    '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig'
+] %}
+
+{% block mauticContent %}sms{% endblock %}
+{# @var sms \Mautic\SmsBundle\Entity\Sms #}
+{% set type            = sms.getSmsType() %}
+{% set isExisting      = sms.getId() %}
+{% set translationBase = 'mautic.sms' %}
+{% set mauticContent   = 'sms' %}
+
+{% block primaryFormContent %}
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.name) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="characters-count">
+            <label class="control-label" for="" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
+                {{ 'mautic.sms.form.nbcharacter.counter'|trans }}
+                <span class="label label-default" id="sms_nb_char">0</span>
+            </label>
+        </div>
+        {{ form_row(form.message) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block rightFormContent %}
+{{ form_row(form.category) }}
+{{ form_row(form.language) }}
+{{ form_row(form.isPublished) }}
+
+<div id="leadList"{% if 'template' == type %} class="hide"{% endif %}>
+    {{ form_row(form.lists) }}
+    {{ form_row(form.publishUp) }}
+    {{ form_row(form.publishDown) }}
+</div>
+
+<div class="hide">
+    {{ form_rest(form) }}
+</div>
+
+{% if (updateSelect is not defined or updateSelect is empty) and not isExisting and not formContainsErrors(form) or type is empty %}
+    {{- include('@MauticCore/Helper/form_selecttype.html.twig',
+        {
+            'item'       : sms,
+            'mauticLang' : {
+                'newListSms'     : 'mautic.sms.type.list.header',
+                'newTemplateSms' : 'mautic.sms.type.template.header',
+            },
+            'typePrefix'         : 'sms',
+            'cancelUrl'          : 'mautic_sms_index',
+            'header'             : 'mautic.sms.type.header',
+            'typeOneHeader'      : 'mautic.sms.type.template.header',
+            'typeOneIconClass'   : 'fa-cube',
+            'typeOneDescription' : 'mautic.sms.type.template.description',
+            'typeOneOnClick'     : "Mautic.selectSmsType('template');",
+            'typeTwoHeader'      : 'mautic.sms.type.list.header',
+            'typeTwoIconClass'   : 'fa-pie-chart',
+            'typeTwoDescription' : 'mautic.sms.type.list.description',
+            'typeTwoOnClick'     : "Mautic.selectSmsType('list');",
+        }
+    ) -}}
+{% endif %}
+{% endblock %}
+

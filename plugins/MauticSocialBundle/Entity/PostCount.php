@@ -16,12 +16,12 @@ class PostCount
     private $id;
 
     /**
-     * @var Monitoring
+     * @var Monitoring|null
      */
     private $monitor;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $postDate;
 
@@ -97,7 +97,7 @@ class PostCount
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPostDate()
     {
@@ -105,8 +105,6 @@ class PostCount
     }
 
     /**
-     * @param $postDate
-     *
      * @return $this
      */
     public function setPostDate($postDate)

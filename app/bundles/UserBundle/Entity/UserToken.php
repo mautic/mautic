@@ -28,7 +28,7 @@ class UserToken
     private $secret;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $expiration = null;
 
@@ -131,7 +131,7 @@ class UserToken
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getExpiration()
     {

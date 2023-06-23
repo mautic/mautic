@@ -38,20 +38,13 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'EmailBundle',
             'formType'   => ConfigType::class,
             'formAlias'  => 'emailconfig',
-            'formTheme'  => 'MauticEmailBundle:FormTheme:Config/_config_emailconfig_widget.html.twig',
+            'formTheme'  => '@MauticEmail/FormTheme/Config/_config_emailconfig_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
         ]);
     }
 
     public function onConfigBeforeSave(ConfigEvent $event)
     {
-        $event->unsetIfEmpty(
-            [
-                'mailer_password',
-                'mailer_api_key',
-            ]
-        );
-
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost

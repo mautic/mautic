@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
-use DateTime;
-use DateTimeZone;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -180,7 +178,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         /** @var LeadRepository $leadRepository */
         $leadRepository = self::$container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
 
-        $date = new DateTime($initialTime, new DateTimeZone('UTC'));
+        $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
         $date->modify($dateModifier);
 
         $lead = new Lead();

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
-use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,7 +28,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
     private $kernel;
 
     /**
-     * @var MockObject|MigrationsMigrateDoctrineCommand
+     * @var MockObject|MigrateCommand
      */
     private $migrateCommand;
 
@@ -53,7 +53,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
             ->method('getBundles')
             ->willReturn([]);
 
-        $this->migrateCommand = $this->createMock(MigrationsMigrateDoctrineCommand::class);
+        $this->migrateCommand = $this->createMock(MigrateCommand::class);
         $this->migrateCommand->method('isEnabled')
             ->willReturn(true);
         $this->migrateCommand->method('getName')
@@ -119,6 +119,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -142,6 +144,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 

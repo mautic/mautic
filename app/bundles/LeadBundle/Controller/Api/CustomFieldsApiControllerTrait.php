@@ -8,19 +8,21 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait CustomFieldsApiControllerTrait
 {
+    private ?RequestStack $requestStack = null;
+
     /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
-     * @param $parameters
      * @param Lead $entity
-     * @param $action
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         if ('company' === $this->entityNameOne) {
             $object = 'company';
@@ -29,7 +31,7 @@ trait CustomFieldsApiControllerTrait
             unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
         }
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
             // is not defined in the request
 
@@ -143,8 +145,8 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
-        //set the custom field values
-        //pull the data from the form in order to apply the form's formatting
+        // set the custom field values
+        // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
             $parameters[$f->getName()] = $f->getData();
         }
@@ -191,5 +193,11 @@ trait CustomFieldsApiControllerTrait
                 $this->dataInputMasks[$field['alias']]  = 'html';
             }
         }
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setRequestStack(RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

@@ -15,12 +15,12 @@ class DynamicContentLeadData extends CommonEntity
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 
@@ -30,7 +30,7 @@ class DynamicContentLeadData extends CommonEntity
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dataAdded;
 
@@ -71,7 +71,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -131,7 +131,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDataAdded()
     {
