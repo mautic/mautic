@@ -16,8 +16,12 @@ class DsnTransformer implements DataTransformerInterface
 {
     private const PASSWORD_MASK = '🔒';
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private EscapeTransformer $escapeTransformer, private string $configKey)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private EscapeTransformer $escapeTransformer,
+        private string $configKey,
+        private bool $allowEmpty
+    ) {
     }
 
     /**
@@ -50,6 +54,10 @@ class DsnTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value): string
     {
+        if ($this->allowEmpty && !array_filter($value)) {
+            return '';
+        }
+
         // unescape the values as they are escaped by the escape transformer applied to the child elements
         $value = $this->escapeTransformer->transform($value);
 

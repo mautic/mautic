@@ -42,8 +42,9 @@ class DsnType extends AbstractType
             'scheme',
             TextType::class,
             [
-                'label' => 'mautic.config.dsn.scheme',
-                'attr'  => $attr,
+                'label'    => 'mautic.config.dsn.scheme',
+                'required' => $options['required'],
+                'attr'     => $attr,
             ]
         );
 
@@ -128,7 +129,7 @@ class DsnType extends AbstractType
             );
         }
 
-        $builder->addModelTransformer($this->dsnTransformerFactory->create($name));
+        $builder->addModelTransformer($this->dsnTransformerFactory->create($name, !$options['required']));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -150,7 +151,7 @@ class DsnType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        $dsn = $this->coreParametersHelper->get($form->getName());
+        $dsn = (string) $this->coreParametersHelper->get($form->getName());
 
         try {
             $dsn = Dsn::fromString($dsn);
@@ -159,6 +160,7 @@ class DsnType extends AbstractType
                 $dsn = $dsn->setPassword('SECRET');
             }
         } catch (\InvalidArgumentException) {
+            $dsn = 'n/a';
         }
 
         $view->vars['currentDns'] = $dsn;

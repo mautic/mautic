@@ -23,6 +23,15 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'messenger_dsn_failed',
+            DsnType::class,
+            [
+                'constraints' => [new Dsn()],
+                'required'    => false,
+            ]
+        );
+
+        $builder->add(
             'messenger_retry_strategy_max_retries',
             NumberType::class,
             [

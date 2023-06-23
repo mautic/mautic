@@ -2,10 +2,19 @@
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_email'|trans }}</h3>
     </div>
     <div class="panel-body">
         {{ form_row(form.messenger_dsn_email) }}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_failed'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_failed) }}
     </div>
 </div>
 
