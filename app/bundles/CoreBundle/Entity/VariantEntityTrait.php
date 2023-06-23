@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\PageBundle\Entity\Page;
 
 trait VariantEntityTrait
 {
@@ -16,7 +19,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|FormEntity|object|null
+     * @var VariantEntityInterface|Page|Email|DynamicContent|null
      **/
     private $variantParent;
 
