@@ -64,6 +64,20 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * @return JsonResponse
+     */
+    public function getBuilderTokensAction(Request $request, EventDispatcherInterface $eventDispatcher = null)
+    {
+        $query  = $request->get('query', '');
+        $tokens = $this->getBuilderTokens($query);
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $event           = new TokensBuildEvent($tokens);
+        $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
+
+        return $this->sendJsonResponse(['tokens'=>$event->getTokens()]);
+    }
+
+    /**
      * Just selected get tokens from email  builder.
      *
      * @param string|null $query
@@ -88,11 +102,6 @@ class AjaxController extends CommonAjaxController
                 }
             }, array_keys($tokens), $tokens);
 
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->get('event_dispatcher');
-        $event           = new TokensBuildEvent($returnTokens);
-        $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
-
-        return ['tokens'=>$event->getTokens()];
+        return $returnTokens;
     }
 }
