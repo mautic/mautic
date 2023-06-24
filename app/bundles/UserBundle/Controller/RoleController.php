@@ -160,7 +160,7 @@ class RoleController extends FormController
                         'mauticContent' => 'role',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
