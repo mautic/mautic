@@ -220,7 +220,7 @@ class DoNotContact
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -228,7 +228,7 @@ class DoNotContact
     }
 
     /**
-     * @param mixed $channelId
+     * @param int $channelId
      *
      * @return DoNotContact
      */
