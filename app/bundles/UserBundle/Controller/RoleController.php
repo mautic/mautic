@@ -161,7 +161,7 @@ class RoleController extends FormController
                     ],
                 ]);
             } else {
-                return $this->editAction($request, $entity->getId());
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 
@@ -188,7 +188,7 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = true)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:roles:edit')) {
             return $this->accessDenied();
