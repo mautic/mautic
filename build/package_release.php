@@ -38,6 +38,10 @@ if (!isset($args['repackage'])) {
     ob_start();
     passthru('which git', $systemGit);
     $systemGit = trim(ob_get_clean());
+
+    // set the diff limit to ensure we get all files
+    system($systemGit.' config diff.renamelimit 8192');
+
     // Checkout the version tag into the packaging space
     chdir(dirname(__DIR__));
     system($systemGit.' archive '.$gitSource.' | tar -x -C '.__DIR__.'/packaging', $result);
