@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class CommonEntity
 {
     /**
-     * @var array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string|\DateTime|\DateTimeInterface>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $changes = [];
 
