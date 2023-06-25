@@ -76,7 +76,7 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @var bool|null
+     * @var bool|false
      */
     private $isUniqueIdentifer = false;
 
@@ -282,7 +282,7 @@ class LeadField extends FormEntity
      *
      * @param string $label
      *
-     * @return LeadField
+     * @return $this
      */
     public function setLabel($label)
     {
@@ -307,7 +307,7 @@ class LeadField extends FormEntity
      *
      * @param string $label
      *
-     * @return LeadField
+     * @return $this
      */
     public function setName($label)
     {
@@ -331,7 +331,7 @@ class LeadField extends FormEntity
      *
      * @param string $type
      *
-     * @return LeadField
+     * @return $this
      */
     public function setType($type)
     {
@@ -356,7 +356,7 @@ class LeadField extends FormEntity
      *
      * @param string|array<string> $defaultValue
      *
-     * @return LeadField
+     * @return $this
      */
     public function setDefaultValue($defaultValue)
     {
@@ -382,7 +382,7 @@ class LeadField extends FormEntity
      *
      * @param bool $isRequired
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsRequired($isRequired)
     {
@@ -417,7 +417,7 @@ class LeadField extends FormEntity
      *
      * @param bool $isFixed
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsFixed($isFixed)
     {
@@ -447,9 +447,9 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @param mixed[] $properties
+     * @param array<string, int|string> $properties
      *
-     * @return LeadField
+     * @return $this
      */
     public function setProperties($properties)
     {
@@ -460,7 +460,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, int|string>
      */
     public function getProperties()
     {
@@ -472,7 +472,7 @@ class LeadField extends FormEntity
      *
      * @param int $order
      *
-     * @return LeadField
+     * @return $this
      */
     public function setOrder($order)
     {
@@ -509,7 +509,7 @@ class LeadField extends FormEntity
      *
      * @param string $object
      *
-     * @return LeadField
+     * @return $this
      */
     public function setObject($object)
     {
@@ -534,7 +534,7 @@ class LeadField extends FormEntity
      *
      * @param bool $isVisible
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsVisible($isVisible)
     {
@@ -569,7 +569,7 @@ class LeadField extends FormEntity
      *
      * @param bool $isShortVisible
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsShortVisible($isShortVisible)
     {
@@ -612,9 +612,9 @@ class LeadField extends FormEntity
     /**
      * Set the unique identifer state of the field.
      *
-     * @param mixed $isUniqueIdentifer
+     * @param bool|null $isUniqueIdentifer
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
@@ -624,7 +624,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Wrapper for incorrectly spelled setIsUniqueIdentifer.
+     * Wrapper for incorrectly spelled setIsUniqueIdentifier.
      *
      * @return bool
      */
@@ -634,11 +634,11 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Wrapper for incorrectly spelled setIsUniqueIdentifer.
+     * Wrapper for incorrectly spelled setIsUniqueIdentifier.
      *
-     * @param mixed $isUniqueIdentifier
+     * @param bool|null $isUniqueIdentifier
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsUniqueIdentifier($isUniqueIdentifier)
     {
@@ -650,7 +650,7 @@ class LeadField extends FormEntity
      *
      * @param string $alias
      *
-     * @return LeadField
+     * @return $this
      */
     public function setAlias($alias)
     {
@@ -675,7 +675,7 @@ class LeadField extends FormEntity
      *
      * @param bool $isListable
      *
-     * @return LeadField
+     * @return $this
      */
     public function setIsListable($isListable)
     {
@@ -706,7 +706,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getGroup()
     {
@@ -714,7 +714,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @param mixed $group
+     * @param string $group
      */
     public function setGroup($group)
     {
@@ -722,7 +722,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsPubliclyUpdatable()
     {
@@ -730,7 +730,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @param mixed $isPubliclyUpdatable
+     * @param bool $isPubliclyUpdatable
      */
     public function setIsPubliclyUpdatable($isPubliclyUpdatable)
     {

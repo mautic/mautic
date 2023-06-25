@@ -471,9 +471,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param string                                                                                                                                                                                                                                                                                                                                                                                              $prop
+     * @param string                                                                                                                                                                                                                                                                                                                                                                                                        $prop
      * @param int|string|bool|array<string, array<string, string>>|\DateTimeInterface|User|Company|Stage|Collection<int, PointsChangeLog>|Collection<int, CompanyChangeLog>|Collection<int, DoNotContact>|IpAddress|Collection<int, IpAddress>|Collection<int, PushID>|Collection<int, LeadEventLog>|Collection<int, LeadNote>|Collection<int, StagesChangeLog>|Collection<int, UtmTag>|Collection<int, FrequencyRule>|null $val
-     * @param null                                                                                                                                                                                                                                                                                                                                                                                                $oldValue
+     * @param null                                                                                                                                                                                                                                                                                                                                                                                                          $oldValue
      */
     protected function isChanged($prop, $val, $oldValue = null)
     {

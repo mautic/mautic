@@ -78,7 +78,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return array<int|string, array<string, mixed>>
+     * @return array<int|string, array<string, int|string>>
      */
     public function getFields(): array
     {
@@ -199,10 +199,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param string $field        alias
-     * @param mixed  $value        to compare with
-     * @param string $operatorExpr for WHERE clause
+     * @param int        $lead         ID
+     * @param string     $field        alias
+     * @param int|string $value        to compare with
+     * @param string     $operatorExpr for WHERE clause
      *
      * @return bool
      */
@@ -436,7 +436,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, array<string, int|string|bool>>
      */
     public function getFieldSchemaData(string $object): array
     {
