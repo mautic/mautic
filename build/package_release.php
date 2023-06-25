@@ -1,26 +1,17 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
-/*
- * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
- * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
- */
-
-// List of critical migrations
-$criticalMigrations = [];
+$criticalMigrations = []; // List of critical migrations
 
 $baseDir = __DIR__;
 
 // Check if the version is in a branch or tag
 $args              = getopt('b::', ['repackage']);
 $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
+
+/*
+ * Build a release package, this should be run after the new version is tagged; note the tag must match the version string in AppKernel
+ * so if the version string is 1.0.0-beta2 then the tag must be 1.0.0-beta2
+ */
 
 // We need the version number so get the app kernel
 require_once dirname(__DIR__).'/vendor/autoload.php';
@@ -67,7 +58,7 @@ if (!isset($args['repackage'])) {
     }
 
     // Compile prod assets
-    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
+    system('cd '.__DIR__.'/packaging && npm ci && npx patch-package && php bin/console mautic:assets:generate -e prod', $result);
     if (0 !== $result) {
         exit;
     }

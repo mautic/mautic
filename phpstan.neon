@@ -35,6 +35,6 @@ parameters:
 		objectManagerLoader: tests/object-manager.php
 		allowNullablePropertyForRequiredField: true
 	symfony:
-		containerXmlPath: var/cache/dev/AppKernelDevDebugContainer.xml
+		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
 		
