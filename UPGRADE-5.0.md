@@ -1,6 +1,7 @@
 # User facing changes
 - The Pipedrive Plugin has been removed from Mautic Core, you can use https://www.mautic.org/blog/integrator/exciting-news-new-integration-plugin-pipedrive-crm instead.
 - The Citrix Plugin has been removed from Mautic Core. you can use https://www.leuchtfeuer.com/en/mautic/downloads/mautic-goto-plugin/ instead.
+- The LinkedIn plugin has been removed from Mautic Core as it did not work with new LinkedIn API. See https://github.com/mautic/mautic/pull/12147
 - The calendar feature was removed. See https://github.com/mautic/mautic/pull/11270
 - The Froala assets are disabled by default. Enable them if you use the legacy email or page builder. See https://github.com/mautic/mautic/pull/12416
 
@@ -89,6 +90,8 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Region names in Austria, Germany and Switzerland were updated based on Standard: ISO_3166-2.
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
     * Deprecated cookie `mtc_sid` removed.
+    * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
+    * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
 
 # Dependency injection improvements
 
