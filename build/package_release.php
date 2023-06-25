@@ -96,19 +96,24 @@ if (!isset($args['repackage'])) {
         passthru($systemGit.' diff tags/'.$tag.$gitSourceLocation.$gitSource.' --name-status', $fileDiff);
         $fileDiff = explode("\n", trim(ob_get_clean()));
 
-        foreach ($fileDiff as $file) {
-            $filename       = substr($file, 2);
-            $folderPath     = explode('/', $filename);
-            $baseFolderName = $folderPath[0];
+        foreach ($fileDiff as $fileInfo) {
+            [$type, $filename, $newFileName] = explode("\t", $fileInfo."\t");
+            $folderPath                      = explode('/', $filename);
+            $baseFolderName                  = $folderPath[0];
 
             if (!$vendorsChanged && 'composer.lock' == $filename) {
                 $vendorsChanged = true;
             }
 
-            if ('D' == substr($file, 0, 1)) {
+            if ('D' == $type) {
                 if (!in_array($filename, $releaseFiles)) {
                     $deletedFiles[$filename] = true;
                 }
+            } elseif (str_starts_with($type, 'R')) {
+                if (!in_array($filename, $releaseFiles)) {
+                    $deletedFiles[$filename] = true;
+                }
+                $modifiedFiles[$newFileName] = true;
             } elseif (in_array($filename, $releaseFiles)) {
                 $modifiedFiles[$filename] = true;
             }
