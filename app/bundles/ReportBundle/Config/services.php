@@ -15,6 +15,7 @@ return function (ContainerConfigurator $configurator) {
     $excludes = [
         'Generator',
         'Builder/MauticReportBuilder.php',
+        'Form/DataTransformer/ReportFilterDataTransformer.php',
         'Scheduler/Entity',
         'Scheduler/Option',
     ];

@@ -21,16 +21,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
-    private $actionModel;
-
-    private $segmentModel;
-
-    public function __construct(SegmentActionModel $segmentModel, ListModel $listModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private SegmentActionModel $segmentActionModel, private ListModel $segmentModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
-
-        $this->actionModel  = $listModel;
-        $this->segmentModel = $segmentModel;
     }
 
     /**
@@ -48,11 +41,11 @@ class BatchSegmentController extends AbstractFormController
             $segmentsToRemove = $params['remove'] ?? [];
 
             if ($segmentsToAdd) {
-                $this->actionModel->addContacts($contactIds, $segmentsToAdd);
+                $this->segmentActionModel->addContacts($contactIds, $segmentsToAdd);
             }
 
             if ($segmentsToRemove) {
-                $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+                $this->segmentActionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
