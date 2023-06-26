@@ -6,7 +6,7 @@ namespace Mautic\MessengerBundle\DependencyInjection\EnvProcessor;
 
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
-class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
+class MessengerNullableEnvVarProcessor implements EnvVarProcessorInterface
 {
     public function getEnv($prefix, $name, \Closure $getEnv)
     {
