@@ -1,57 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
-use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event triggered when a transport service send Mautic a webhook request.
  */
-class TransportWebhookEvent extends Event
+final class TransportWebhookEvent extends Event
 {
-    /**
-     * @var CallbackTransportInterface
-     */
-    private $transport;
+    private ?Response $response = null;
 
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(CallbackTransportInterface $transport, Request $request)
+    public function __construct(private Request $request)
     {
-        $this->transport = $transport;
-        $this->request   = $request;
     }
 
-    /**
-     * @return CallbackTransportInterface
-     */
-    public function getTransport()
-    {
-        return $this->transport;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * Checks if the event is for specific transport.
-     *
-     * @param string $transportClassName
-     *
-     * @return bool
-     */
-    public function transportIsInstanceOf($transportClassName)
+    public function getResponse(): ?Response
     {
-        return $this->transport instanceof $transportClassName;
+        return $this->response;
+    }
+
+    public function setResponse(Response $response): void
+    {
+        $this->response = $response;
     }
 }

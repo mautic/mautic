@@ -3,7 +3,6 @@
 namespace FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -36,7 +35,6 @@ class FormSubscriberTest extends TestCase
         $ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $auditLogModel        = $this->createMock(AuditLogModel::class);
         $this->mailer         = $this->createMock(MailHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $router               = $this->createMock(RouterInterface::class);
 
@@ -48,7 +46,6 @@ class FormSubscriberTest extends TestCase
             $ipLookupHelper,
             $auditLogModel,
             $this->mailer,
-            $coreParametersHelper,
             $translator,
             $router
         );
