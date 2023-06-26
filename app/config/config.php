@@ -77,6 +77,7 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
+        'failure_transport' => 'failed',
         'transports'        => [
             'email' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
@@ -84,6 +85,7 @@ $container->loadFromExtension('framework', [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
+            'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
             \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator) {
@@ -12,7 +11,10 @@ return function (ContainerConfigurator $configurator) {
         ->autoconfigure();
 
     $services->load('Mautic\\MessengerBundle\\', '../')
-        ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+        ->exclude('../{'.implode(',', [
+                'Config',
+                'Tests',
+            ]).'}');
 
     $services->alias(\Symfony\Component\Messenger\Transport\TransportFactory::class, 'messenger.transport_factory');
 };
