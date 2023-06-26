@@ -14,25 +14,14 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private Configuration $configuration;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
-    /**
-     * @var string
-     */
-    private $sendingPhoneNumber;
+    /** @phpstan-ignore-next-line */
+    private string $messagingServiceSid;
 
     /**
      * TwilioTransport constructor.
@@ -59,6 +48,16 @@ class TwilioTransport implements TransportInterface
         try {
             $this->configureClient();
 
+<<<<<<< HEAD
+=======
+            $payload = [
+                'messagingServiceSid' => $this->messagingServiceSid,
+                'body'                => $content,
+            ];
+            if (!empty($media)) {
+                $payload['mediaUrl'] = $media;
+            }
+>>>>>>> 6eae533a18 (replace sender number to messaging service sid)
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
                 [
@@ -118,8 +117,8 @@ class TwilioTransport implements TransportInterface
             return;
         }
 
-        $this->sendingPhoneNumber = $this->configuration->getSendingNumber();
-        $this->client             = new Client(
+        $this->messagingServiceSid = $this->configuration->getMessagingServiceSid();
+        $this->client              = new Client(
             $this->configuration->getAccountSid(),
             $this->configuration->getAuthToken()
         );
