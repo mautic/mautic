@@ -61,7 +61,7 @@ class ConfigType extends AbstractType
             'messenger_retry_strategy_multiplier',
             NumberType::class,
             [
-                'scale'      => 0,
+                'scale'      => 2,
                 'label'      => 'mautic.messenger.config.retry_strategy.multiplier',
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
