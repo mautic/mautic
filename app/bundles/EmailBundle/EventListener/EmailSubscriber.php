@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
-use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -64,7 +63,6 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
-            EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
     }
 
@@ -109,10 +107,11 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailFailed(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
@@ -128,10 +127,11 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailResend(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
             if (null !== $stat) {
                 $stat->upRetryCount();
 
@@ -151,14 +151,5 @@ class EmailSubscriber implements EventSubscriberInterface
                 $this->entityManager->flush();
             }
         }
-    }
-
-    /**
-     * This is default handling of email transport webhook requests.
-     * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
-     */
-    public function onTransportWebhook(TransportWebhookEvent $event)
-    {
-        $event->getTransport()->processCallbackRequest($event->getRequest());
     }
 }

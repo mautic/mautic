@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -29,8 +28,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     private IpLookupHelper $ipLookupHelper;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     private TranslatorInterface $translator;
 
     private RouterInterface $router;
@@ -39,14 +36,12 @@ class FormSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
         $this->router               = $router;
     }
@@ -412,11 +407,6 @@ class FormSubscriber implements EventSubscriberInterface
     private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
-
-        // ingore queue
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type') && $config['immediately']) {
-            $this->mailer = $this->mailer->getSampleMailer();
-        }
 
         if (count($to)) {
             $this->mailer->setTo($to);

@@ -73,12 +73,12 @@ $container->loadFromExtension('framework', [
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'mailer'               => [
+        'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
+    ],
     'messenger'            => [
-        'default_bus' => 'email.bus',
-        'buses'       => [
-            'email.bus' => null,
-        ],
-        'transports'  => [
+        'failure_transport' => 'failed_default',
+        'transports'        => [
             'email_transport' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
                 'options'        => [
@@ -91,10 +91,15 @@ $container->loadFromExtension('framework', [
                     'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
                 ],
             ],
+            'failed_default' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
+                ],
+            ],
         ],
         'routing' => [
-            // TODO: Enable this line when you want to merge symfony/mailer
-            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email_transport',
         ],
     ],
 
@@ -187,21 +192,6 @@ $container->loadFromExtension('doctrine_migrations', [
         ],
     ],
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
-]);
-
-// Swiftmailer Configuration
-$container->loadFromExtension('swiftmailer', [
-    'transport'  => '%mautic.mailer_transport%',
-    'host'       => '%mautic.mailer_host%',
-    'port'       => '%mautic.mailer_port%',
-    'username'   => '%mautic.mailer_user%',
-    'password'   => '%mautic.mailer_password%',
-    'encryption' => '%mautic.mailer_encryption%',
-    'auth_mode'  => '%mautic.mailer_auth_mode%',
-    'spool'      => [
-        'type' => 'service',
-        'id'   => 'mautic.transport.spool',
-    ],
 ]);
 
 // KnpMenu Configuration
