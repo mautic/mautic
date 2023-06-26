@@ -4,8 +4,7 @@ The bundle makes use of [Symfony's messenger component](https://symfony.com/doc/
 
 ## Transports
 
-It creates `synchronous` transport and declares `failed` transport. Default doctrine setting is `messenger_messages` table
-, as default, but you can use whatever transport that suits your needs.
+It creates `synchronous` transport only, it is necessary for processing in case external messenger is not used. 
 
 https://symfony.com/doc/current/messenger.html#transports-async-queued-messages
 
@@ -13,7 +12,7 @@ The only thing you need to do is to map the routing key to the transport you wis
 
 https://symfony.com/doc/current/messenger.html#routing-messages-to-a-transport
 
-By default, the transport is set to **synchronous**, meaning no AMQP/Doctrine or whatsoever is used and the request is handled directly.
+By default, the transport is set to **synchronous**, meaning no AMQP/Doctrine or whatsoever is used and the request is handled directly and the message is marked as synchronous process if it implements **RequestStatusInterface**.
 
 [Currently defined routes](MauticMessengerRoutes.php) are SYNC, PAGE_HIT, EMAIL_HIT although in default configuration only the SYNC is used.
 
@@ -31,46 +30,55 @@ configuring transports:
 
 
 ### Sample configuration
+I believe the best place to configure the messenger is `app/config/config_local.php` or your own bundle.
+
 ```php
+<?php # app/config/config_local.php
+
 $container->loadFromExtension('framework', [
-    'routing' => [
-        PageHitNotification::class  => MauticMessengerRoutes::SYNC,
-        EmailHitNotification::class => MauticMessengerRoutes::EMAIL_HIT,
-    ],
     'messenger' => [
+        'routing'   => [
+            \Mautic\MessengerBundle\Message\PageHitNotification::class  => \Mautic\MessengerBundle\MauticMessengerRoutes::SYNC,
+            \Mautic\MessengerBundle\Message\EmailHitNotification::class => \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT,
+        ],
         'failure_transport' => 'failed', // Define other than default if you wish
-        'transports'        => [
-            MauticMessengerRoutes::SYNC      => 'sync://',
-            MauticMessengerRoutes::PAGE_HIT  => [
-                'dsn'     => '%MESSENGER_TRANSPORT_DSN%',
-                'options' => [
+        'transports' => [
+            'failed' => [
+                'dsn' => 'doctrine://default?queue_name=failed',
+            ],
+            \Mautic\MessengerBundle\MauticMessengerRoutes::SYNC      => 'sync://',
+            \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
                     'heartbeat'  => 1,
                     'persistent' => true,
                     'vhost'      => '/',
                     'exchange'   => [
-                        'name'                        => 'my_exchange',
+                        'name'                        => 'mautic',
                         'type'                        => 'direct',
-                        'default_publish_routing_key' => 'page_hit',
+                        'default_publish_routing_key' => \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT,
                     ],
                     'queues'     => [
-                        'page_hit' => [
-                            'binding_keys' => ['page_hit'],
+                        'email_hit' => [
+                            'binding_keys' => [\Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT],
+                            'arguments'    => [
+                                'x-expires' => 60 * 60 * 24 * 21 * 1000, // queue ttl without consumer using it
+                            ],
                         ],
                     ],
                 ],
-
+                'serializer'     => 'messenger.transport.native_php_serializer',
                 'retry_strategy' => [
-                    'max_retries' => 5,
+                    'max_retries' => 3,
                     'delay'       => 500,
                     'multiplier'  => 3,
                     'max_delay'   => 0,
                 ],
             ],
         ],
-],
+    ],
+]);
 ```
-where `MauticMessengerRoutes::PAGE_HIT` is the transport name and can be changed to whatever you wish as long as it is mapped in parameters
-
 ## Usage
 
 to run consumer, simply 

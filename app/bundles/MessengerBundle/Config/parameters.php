@@ -17,16 +17,12 @@ $container->loadFromExtension('framework', [
                 ],
             ],
         ],
-        'failure_transport' => 'failed',
         'routing'           => [
             PageHitNotification::class  => MauticMessengerRoutes::SYNC,
             EmailHitNotification::class => MauticMessengerRoutes::SYNC,
         ],
         'transports'        => [
             MauticMessengerRoutes::SYNC      => 'sync://',
-            'failed'                         => [
-                'dsn' => 'doctrine://default?queue_name=failed',
-            ],
         ],
     ],
 ]);
