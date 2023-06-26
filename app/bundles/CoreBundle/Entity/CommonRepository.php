@@ -1743,6 +1743,14 @@ class CommonRepository extends ServiceEntityRepository
             if ($this->translator->trans($k) == $command || $this->translator->trans($k, [], null, 'en_US') == $command) {
                 return true;
             }
+            elseif ($this->translator->trans($k) == "{$command}:{$subcommand}"
+                || $this->translator->trans($k, [], null, 'en_US') == "{$command}:{$subcommand}"
+            ) {
+                $command    = "{$command}:{$subcommand}";
+                $subcommand = '';
+
+                return true;
+            }
         }
 
         return false;
