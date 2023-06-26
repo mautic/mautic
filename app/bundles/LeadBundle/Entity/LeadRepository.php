@@ -363,7 +363,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param int $id
      *
-     * @return mixed|null
+     * @return object|null
      */
     public function getEntity($id = 0)
     {
@@ -412,9 +412,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * The primary company data will be a flat array on the entity
      * with a key of `primaryCompany`
      *
-     * @param mixed $entity
+     * @param int|object|null $entity
      *
-     * @return mixed|null
+     * @return Lead|null
      */
     public function getEntityWithPrimaryCompany($entity)
     {
@@ -555,7 +555,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param mixed[] $args
+     * @param array<string, int|string|bool> $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */

@@ -48,7 +48,7 @@ class LeadListRepository extends CommonRepository
      *
      * @param int $id
      *
-     * @return mixed|null
+     * @return object|null
      */
     public function getEntity($id = 0)
     {
@@ -114,7 +114,7 @@ class LeadListRepository extends CommonRepository
      * @param bool       $singleArrayHydration
      * @param bool       $isPublic
      *
-     * @return mixed
+     * @return array<int, int|string|array<int, string|int|mixed>>
      */
     public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {

@@ -272,7 +272,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<int, int|string|array<string, int|string|null>|null>
      */
     public function getFilters()
     {
@@ -440,9 +440,9 @@ class LeadList extends FormEntity
     }
 
     /**
-     * @param mixed[] $filters
+     * @param array<int, int|string|array<string, int|string|null>|null> $filters
      *
-     * @return mixed[]
+     * @return array<int, int|string|array<string, int|string|null>|null>
      */
     private function setFirstFilterGlueToAnd(array $filters): array
     {

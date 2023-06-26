@@ -82,7 +82,7 @@ class ListLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -90,7 +90,7 @@ class ListLead
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
      */
     public function setLead($lead)
     {

@@ -76,7 +76,7 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @var bool|false
+     * @var bool|false|null
      */
     private $isUniqueIdentifer = false;
 
@@ -447,7 +447,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * @param array<string, int|string> $properties
+     * @param array<int|string, int|string|array<int|string, string|array<int|string, string|array<int|string, string|array<int, string>>>>> $properties
      *
      * @return $this
      */

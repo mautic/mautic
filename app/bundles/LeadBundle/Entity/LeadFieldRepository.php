@@ -199,10 +199,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int        $lead         ID
-     * @param string     $field        alias
-     * @param int|string $value        to compare with
-     * @param string     $operatorExpr for WHERE clause
+     * @param int                                $lead         ID
+     * @param string                             $field        alias
+     * @param int|string|array<int, string>|null $value        to compare with
+     * @param string                             $operatorExpr for WHERE clause
      *
      * @return bool
      */

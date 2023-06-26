@@ -108,10 +108,10 @@ trait OperatorListTrait
     }
 
     /**
-     * @param string|mixed[]|null $type
-     * @param mixed[]             $overrideHiddenTypes
+     * @param string|array<string, array<int, string>>|null $type
+     * @param mixed[]                                       $overrideHiddenTypes
      *
-     * @return mixed[]
+     * @return int[]|string[]
      */
     public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
     {
@@ -141,10 +141,10 @@ trait OperatorListTrait
     }
 
     /**
-     * @param mixed[] $definition
-     * @param mixed[] $overrideHiddenOperators
+     * @param array<string, string|string[]> $definition
+     * @param array<string, string[]>        $overrideHiddenOperators
      *
-     * @return mixed[]
+     * @return int[]|string[]
      */
     public function getOperatorChoiceList($definition, $overrideHiddenOperators = [])
     {

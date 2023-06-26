@@ -173,7 +173,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getDateTime()
     {
@@ -181,7 +181,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @param mixed $dateTime
+     * @param \DateTimeInterface $dateTime
      */
     public function setDateTime($dateTime)
     {

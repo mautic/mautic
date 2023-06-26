@@ -58,7 +58,7 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @param int $leadId
      *
-     * @return mixed
+     * @return int|null
      */
     public function getCurrentLeadStage($leadId)
     {
