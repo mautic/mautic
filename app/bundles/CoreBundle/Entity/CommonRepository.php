@@ -1742,8 +1742,7 @@ class CommonRepository extends ServiceEntityRepository
             // subcommands
             if ($this->translator->trans($k) == $command || $this->translator->trans($k, [], null, 'en_US') == $command) {
                 return true;
-            }
-            elseif ($this->translator->trans($k) == "{$command}:{$subcommand}"
+            } elseif ($this->translator->trans($k) == "{$command}:{$subcommand}"
                 || $this->translator->trans($k, [], null, 'en_US') == "{$command}:{$subcommand}"
             ) {
                 $command    = "{$command}:{$subcommand}";
