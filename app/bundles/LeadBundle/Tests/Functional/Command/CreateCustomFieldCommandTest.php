@@ -16,6 +16,8 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
     public function testWithNoArgs(): void
     {
+        $this->useCleanupRollback = false;
+
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
