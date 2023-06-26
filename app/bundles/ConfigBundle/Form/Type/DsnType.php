@@ -114,7 +114,7 @@ class DsnType extends AbstractType
             ]
         );
 
-        if ($options['test_button']['action']) {
+        if ($options['test_button']['action'] && $this->getCurrentDsn($name)) {
             $builder->add(
                 'test_button',
                 StandAloneButtonType::class,
@@ -151,18 +151,23 @@ class DsnType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        $dsn = (string) $this->coreParametersHelper->get($form->getName());
+        $view->vars['currentDns'] = $this->getCurrentDsn($form->getName());
+    }
+
+    private function getCurrentDsn(string $name): ?Dsn
+    {
+        $dsn = (string) $this->coreParametersHelper->get($name);
 
         try {
             $dsn = Dsn::fromString($dsn);
-
-            if ($dsn->getPassword()) {
-                $dsn = $dsn->setPassword('SECRET');
-            }
         } catch (\InvalidArgumentException) {
-            $dsn = 'n/a';
+            return null;
         }
 
-        $view->vars['currentDns'] = $dsn;
+        if ($dsn->getPassword()) {
+            $dsn = $dsn->setPassword('SECRET');
+        }
+
+        return $dsn;
     }
 }

@@ -89,6 +89,8 @@ $container->loadFromExtension('framework', [
         ],
         'routing' => [
             \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
         ],
     ],
 
