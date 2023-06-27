@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use DateTime;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,8 +11,15 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Notification>
@@ -24,11 +32,6 @@ class NotificationModel extends FormModel
     protected $disableUpdates;
 
     /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
      * @var PathsHelper
      */
     protected $pathsHelper;
@@ -38,24 +41,34 @@ class NotificationModel extends FormModel
      */
     protected $updateHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    private RequestStack $requestStack;
 
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        RequestStack $requestStack,
     ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->updateHelper         = $updateHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->pathsHelper  = $pathsHelper;
+        $this->updateHelper = $updateHelper;
+        $this->requestStack = $requestStack;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    private function getSession(): Session
     {
-        $this->session = $session;
+        $session = $this->requestStack->getSession();
+        \assert($session instanceof Session);
+
+        return $session;
     }
 
     /**
@@ -187,10 +200,10 @@ class NotificationModel extends FormModel
             $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
             // check to see when we last checked for an update
-            $lastChecked = $this->session->get('mautic.update.checked', 0);
+            $lastChecked = $this->getSession()->get('mautic.update.checked', 0);
 
             if (time() - $lastChecked > 3600) {
-                $this->session->set('mautic.update.checked', time());
+                $this->getSession()->set('mautic.update.checked', time());
 
                 $updateData = $this->updateHelper->fetchData();
             } elseif (file_exists($cacheFile)) {
@@ -209,11 +222,11 @@ class NotificationModel extends FormModel
                     ['%version%' => $updateData['version'], '%announcement%' => $announcement]
                 );
 
-                $alreadyNotified = $this->session->get('mautic.update.notified');
+                $alreadyNotified = $this->getSession()->get('mautic.update.notified');
 
                 if (empty($alreadyNotified) || $alreadyNotified != $updateData['version']) {
                     $newUpdate = true;
-                    $this->session->set('mautic.update.notified', $updateData['version']);
+                    $this->getSession()->set('mautic.update.notified', $updateData['version']);
                 }
             }
         }

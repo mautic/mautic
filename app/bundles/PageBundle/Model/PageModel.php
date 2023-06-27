@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -11,10 +12,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,12 +39,14 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
-use Mautic\QueueBundle\Queue\QueueService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -98,11 +104,6 @@ class PageModel extends FormModel
     protected $queueService;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -132,7 +133,14 @@ class PageModel extends FormModel
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper
+        ContactRequestHelper $contactRequestHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -144,9 +152,10 @@ class PageModel extends FormModel
         $this->companyModel         = $companyModel;
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->contactRequestHelper = $contactRequestHelper;
         $this->messageBus           = $messageBus;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function setCatInUrl($catInUrl)
@@ -173,17 +182,25 @@ class PageModel extends FormModel
         return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissionBase()
     {
         return 'page:pages';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNameGetter()
     {
         return 'getTitle';
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @param Page $entity
      * @param bool $unlock
      */
@@ -247,6 +264,8 @@ class PageModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
@@ -269,6 +288,8 @@ class PageModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @return Page|null
      */
     public function getEntity($id = null)
@@ -287,6 +308,8 @@ class PageModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -447,8 +470,10 @@ class PageModel extends FormModel
             $query = $this->getHitQuery($request, $page);
         }
 
-        if (null === $lead) {
+        // Get lead if required
+        if (null == $lead) {
             $lead = $this->contactRequestHelper->getContactFromQuery($query);
+
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
             $companyChangeLog                      = null;
@@ -747,7 +772,7 @@ class PageModel extends FormModel
                 $data = [
                     'unique'             => ($isUnique ? 'true' : 'false'),
                     'lead'               => $lead->getId(),
-                    'page'               => null === $page ? null : $page->getId(),
+                    'page'               => $page?->getId(),
                     'hit'                => $hit->getId(),
                     'lastActiveOriginal' => $leadLastActive,
                     'newLastActive'      => $hitDate,
@@ -761,10 +786,6 @@ class PageModel extends FormModel
                         ['context' => $data]
                     );
                 }
-            } else {
-                $this->logger->info(
-                    'HIT: No update will be performed to lead #'.$lead->getId()
-                );
             }
         }
     }

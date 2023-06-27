@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -14,15 +15,18 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -49,11 +53,14 @@ use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -149,11 +156,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $contactTracker;
 
     /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    /**
      * @var DNC
      */
     private $doNotContact;
@@ -180,8 +182,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions,
-        Connection $connection
+        CorePermissions $security,
+        Connection $connection,
+        EntityManagerInterface $em,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -199,8 +208,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
-        $this->corePermissions          = $corePermissions;
         $this->connection               = $connection;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -235,13 +245,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissionBase()
     {
         return 'email:emails';
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @param Email $entity
+     *
+     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -347,8 +364,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @param string|null $action
      * @param array       $options
+     *
+     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -412,6 +433,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -511,10 +534,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 } catch (\Exception $exception) {
                     error_log($exception);
                 }
-            }
-
-            if ($lead instanceof Lead && ($hitDateTime > $lead->getLastActive())) {
-                $updateLastActive = true;
             }
         }
 
@@ -941,7 +960,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
-        $fetchOptions->setCanViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
+        $fetchOptions->setCanViewOthers($this->security->isGranted('email:emails:viewother'));
         $fetchOptions->setUnit($chart->getUnit());
 
         $chart->setDataset(
@@ -1349,6 +1368,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                  array assetAttachments Array of optional Asset IDs to attach
      *
+     * @return mixed
+     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendEmail(Email $email, $leads, $options = [])
@@ -1570,6 +1591,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param array|int $users
      * @param array     $lead
      * @param bool      $saveStat
+     *
+     * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -2222,9 +2245,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
+     * @param mixed $leadFields
      * @param array $tokens
      * @param array $assetAttachments
      * @param bool  $saveStat
+     *
+     * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
