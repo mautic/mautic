@@ -37,37 +37,6 @@ class PageSubscriberTest extends TestCase
         $this->assertArrayHasKey('{token_test}', $tokens);
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
-
-    public function testOnPageHitWhenCalledAcknowledgesHit()
-    {
-        $dispatcher = new EventDispatcher();
-        $subscriber = $this->getPageSubscriber();
-
-        $dispatcher->addSubscriber($subscriber);
-
-        $payload = $this->getNonEmptyPayload();
-        $event   = new QueueConsumerEvent($payload);
-
-        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
-
-        $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
-    }
-
-    public function testOnPageHitWhenCalledRejectsBadHit()
-    {
-        $dispatcher = new EventDispatcher();
-        $subscriber = $this->getPageSubscriber();
-
-        $dispatcher->addSubscriber($subscriber);
-
-        $payload = $this->getEmptyPayload();
-        $event   = new QueueConsumerEvent($payload);
-
-        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
-
-        $this->assertEquals($event->getResult(), QueueConsumerResults::REJECT);
-    }
-
     /**
      * Get page subscriber with mocked dependencies.
      */

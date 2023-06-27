@@ -33,10 +33,6 @@ class EmailHitNotificationHandlerTest extends TestCase
         $message = new EmailHitNotification($hitId, $request);
 
         $handler  = new EmailHitNotificationHandler($emailModelMock, $loggerMock);
-        $response = $handler->__invoke($message);
-        $this->assertEquals(
-            MauticMessengerBundle::LOG_PREFIX.'processed email hit #'.$message->getStatId(),
-            $response
-        );
+        $handler->__invoke($message);
     }
 }

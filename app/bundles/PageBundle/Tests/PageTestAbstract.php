@@ -25,6 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Messenger\MessageBus;
 
 class PageTestAbstract extends TestCase
 {
@@ -109,8 +110,8 @@ class PageTestAbstract extends TestCase
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
-        $queueService = $this
-            ->getMockBuilder(QueueService::class)
+        $messageBus = $this
+            ->getMockBuilder(MessageBus::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -124,13 +125,6 @@ class PageTestAbstract extends TestCase
             ->method('getContact')
             ->willReturn($this
                 ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
-            );
-
-        $queueService->expects($this
-            ->any())
-            ->method('isQueueEnabled')
-            ->will(
-                $this->returnValue(false)
             );
 
         $entityManager->expects($this
@@ -159,7 +153,7 @@ class PageTestAbstract extends TestCase
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
-            $queueService,
+            $messageBus,
             $companyModel,
             $deviceTrackerMock,
             $contactTracker,
