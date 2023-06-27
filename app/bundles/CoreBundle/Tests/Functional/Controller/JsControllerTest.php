@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  * This test is breaking other tests, so running it in a separate process.
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 final class JsControllerTest extends MauticMysqlTestCase
