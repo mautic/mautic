@@ -78,6 +78,8 @@ EOT
         }
 
         if (!$leadFieldId) {
+            @trigger_error('Must pass an id with the --id flag or use the --all flag. Future versions will use --all as the default behaviour', E_USER_DEPRECATED);
+
             return $this->findAndAddColumn($input, $output) ? Command::SUCCESS : Command::FAILURE;
         }
 
