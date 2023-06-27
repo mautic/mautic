@@ -16,7 +16,7 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->configParams['google_analytics_trackingpage_enabled'] = true;
         parent::setUp();
     }
-    
+
     public function testIndexActionRendersSuccessfully(): void
     {
         $this->client->request('GET', '/mtc.js');
