@@ -62,7 +62,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
-        public function testLandingPageTracking(): void
+    public function testLandingPageTracking(): void
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,

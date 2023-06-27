@@ -3,7 +3,6 @@
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\MessengerBundle\MauticMessengerBundle;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler;
 use PHPUnit\Framework\MockObject\MockObject;

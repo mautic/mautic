@@ -16,14 +16,10 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
@@ -37,6 +33,7 @@ class PageSubscriberTest extends TestCase
         $this->assertArrayHasKey('{token_test}', $tokens);
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
+
     /**
      * Get page subscriber with mocked dependencies.
      */

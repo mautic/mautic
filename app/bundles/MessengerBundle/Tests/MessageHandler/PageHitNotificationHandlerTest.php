@@ -4,7 +4,6 @@ namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\MessengerBundle\MauticMessengerBundle;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\MessengerBundle\MessageHandler\PageHitNotificationHandler;
 use Mautic\PageBundle\Entity\Hit;
