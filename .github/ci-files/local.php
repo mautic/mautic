@@ -12,6 +12,4 @@ $parameters = [
     'db_password'           => '',
     'admin_email'           => 'github-actions@mautic.org',
     'admin_password'        => 'GitHubActionsIsAwesome',
-    'mailer_dsn'            => 'smtp://localhost:25',
-    'messenger_dsn_email'   => 'in-memory://',
 ];
