@@ -12,6 +12,7 @@ return [
             PageHitNotificationHandler::class  => [
                 'class'     => PageHitNotificationHandler::class,
                 'tag'       => 'messenger.message_handler',
+                'tagArguments'  => ['bus' => 'messenger.bus.hit'],
                 'arguments' => [
                     'mautic.page.repository.page',
                     'mautic.page.repository.hit',
@@ -22,9 +23,11 @@ return [
                 ],
             ],
             EmailHitNotificationHandler::class => [
-                'class'     => EmailHitNotificationHandler::class,
-                'tag'       => 'messenger.message_handler',
-                'arguments' => [
+                'class'         => EmailHitNotificationHandler::class,
+                'tag'           => 'messenger.message_handler',
+                'tagArguments'  => ['bus' => 'messenger.bus.hit'],
+                'autoconfigure' => false,
+                'arguments'     => [
                     'mautic.email.model.email',
                     'logger',
                 ],

@@ -77,9 +77,9 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'default_bus' => 'email.bus',
+        'default_bus' => 'messenger.bus.email',
         'buses'       => [
-            'email.bus' => null,
+            'messenger.bus.email' => null,
         ],
         'transports'  => [
             'email_transport' => [
@@ -97,7 +97,7 @@ $container->loadFromExtension('framework', [
         ],
         'routing' => [
             // TODO: Enable this line when you want to merge symfony/mailer
-            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            //'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
         ],
     ],
 

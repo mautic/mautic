@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 $container->loadFromExtension('framework', [
     'messenger' => [
         'buses' => [
-            'messenger.bus.default' => [
+            'messenger.bus.hit' => [
                 'default_middleware'    => true,
                 'middleware'    => [
                     SynchronousExtrasMiddleware::class,
