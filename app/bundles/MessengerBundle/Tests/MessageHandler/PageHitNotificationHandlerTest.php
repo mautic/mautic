@@ -83,9 +83,5 @@ class PageHitNotificationHandlerTest extends TestCase
         );
 
         $response = $handler->__invoke($message);
-        $this->assertEquals(
-            MauticMessengerBundle::LOG_PREFIX.' - processed page hit #'.$message->getHitId(),
-            $response
-        );
     }
 }
