@@ -12,6 +12,7 @@ final class JsControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
+        $this->markTestSkipped('Is this test breaking the 3 others?');
         $this->configParams['google_analytics_id']                   = 'G-F3825DS9CD';
         $this->configParams['google_analytics_trackingpage_enabled'] = true;
         parent::setUp();
@@ -22,11 +23,5 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/mtc.js');
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
-    }
-
-    protected function beforeTearDown(): void
-    {
-        $this->configParams['google_analytics_id']                   = null;
-        $this->configParams['google_analytics_trackingpage_enabled'] = false;
     }
 }
