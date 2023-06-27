@@ -82,6 +82,6 @@ class PageHitNotificationHandlerTest extends TestCase
             $pageRepoMock, $hitRepoMock, $leadRepoMock, $loggerMock, $redirectRepoMock, $pageModelMock
         );
 
-        $response = $handler->__invoke($message);
+        $handler->__invoke($message);
     }
 }
