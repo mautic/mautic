@@ -8,11 +8,16 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * This test is breaking other tests, so running it in a separate process.
+ *
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class JsControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->markTestSkipped('Is this test breaking the 3 others?');
         $this->configParams['google_analytics_id']                   = 'G-F3825DS9CD';
         $this->configParams['google_analytics_trackingpage_enabled'] = true;
         parent::setUp();
