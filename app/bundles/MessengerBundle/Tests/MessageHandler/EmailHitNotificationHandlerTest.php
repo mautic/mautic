@@ -14,7 +14,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {
-        $hitId   = sha1(rand());
+        $hitId   = sha1((string)rand(0,1000000));
         $request = new Request();
         $request->query->set('testMe', 'I am here');
 

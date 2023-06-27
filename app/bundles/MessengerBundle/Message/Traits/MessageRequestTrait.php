@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 trait MessageRequestTrait
 {
     private string $eventTime; // The ISO-8601 date
+    /**
+     * @var array<string,mixed>
+     */
     private array $request; //  Simplified interpretation of symfony request
     private bool $isSynchronous = false;
 
@@ -20,21 +23,20 @@ trait MessageRequestTrait
         return $this->eventTime;
     }
 
-    /**
-     * @return MessageRequestTrait|EmailHitNotification
-     */
     public function setEventTime(\DateTimeInterface $eventTime = null): self
     {
         $eventTime ??= (new \DateTime())->format('c');
 
         $this->eventTime = $eventTime instanceof \DateTimeInterface
             ? $eventTime->format('c')
-            : $eventTime
-        ;
+            : $eventTime;
 
         return $this;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function getRequest(): array
     {
         return $this->request;
@@ -45,6 +47,9 @@ trait MessageRequestTrait
         return MessengerRequestFactory::fromArray($this->request);
     }
 
+    /**
+     * @param array<string,mixed>|Request $request
+     */
     public function setRequest(array|Request $request): self
     {
         $this->request = $request instanceof Request ? MessengerRequestFactory::toArray($request) : $request;

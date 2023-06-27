@@ -27,7 +27,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
     }
 
     /** @throws MauticMessengerException */
-    public function __invoke(PageHitNotification $message, Acknowledger $ack = null)
+    public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
     {
         try {
             $parsed = $this->parseMessage($message);
@@ -43,12 +43,16 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
         $this->logger->info(MauticMessengerBundle::LOG_PREFIX.'processed page hit #'.$message->getHitId());
     }
 
+    /** @return iterable<string, mixed> */
     public static function getHandledMessages(): iterable
     {
         yield PageHitNotification::class => [];
     }
 
-    /** @throws InvalidPayloadException */
+    /**
+     * @return array<string, mixed>
+     * @throws InvalidPayloadException
+     */
     private function parseMessage(PageHitNotification $message): array
     {
         $hit = $message->getHitId() > 0 ? $this->hitRepository->find($message->getHitId()) : null;
@@ -86,7 +90,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             throw new InvalidPayloadException('Invalid lead id', (array) $message);
         }
 
-        $parsed = [
+        return [
             'hit'                    => $hit,
             'page'                   => $pageObject,
             'request'                => MessengerRequestFactory::fromArray($message->getRequest()),
@@ -95,7 +99,5 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             'activeRequest'          => false,
             'hitDate'                => new \DateTime((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
         ];
-
-        return array_values($parsed); // TOTO remove in 8.0
     }
 }

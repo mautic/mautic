@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MessengerRequestFactory
 {
+    /**
+     * @return array<string,mixed>
+     */
     public static function toArray(Request $request): array
     {
         return array_filter([
@@ -19,6 +22,9 @@ class MessengerRequestFactory
         ]);
     }
 
+    /**
+     * @param array<string,mixed> $request
+     */
     public static function fromArray(array $request): Request
     {
         return new Request(

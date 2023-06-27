@@ -8,6 +8,9 @@ use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 
 class InvalidPayloadException extends MauticMessengerException implements UnrecoverableExceptionInterface
 {
+    /**
+     * @param array<mixed> $payload
+     */
     public function __construct(string $message = '', array $payload = [], \Throwable $previous = null)
     {
         $message .= json_encode($payload);

@@ -23,7 +23,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
     }
 
     /** @throws MauticMessengerException */
-    public function __invoke(EmailHitNotification $message, Acknowledger $ack = null)
+    public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void
     {
         $hitDateTime = (new DateTimeHelper($message->getEventTime()))->getDateTime();
 
@@ -46,6 +46,9 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
         }
     }
 
+    /**
+     * @return iterable<string, mixed>
+     */
     public static function getHandledMessages(): iterable
     {
         yield EmailHitNotification::class => [];
