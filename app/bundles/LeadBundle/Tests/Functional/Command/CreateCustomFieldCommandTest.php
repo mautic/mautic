@@ -16,8 +16,6 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
     public function testWithNoArgs(): void
     {
-        $this->useCleanupRollback = false;
-
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
@@ -50,7 +48,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columnsSchema = $this->em->getConnection()->getSchemaManager()->listTableColumns($leadTableName);
+        $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
         $columnNames   = array_map(
             static function (Column $column) {
                 return $column->getName();
