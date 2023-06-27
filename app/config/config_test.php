@@ -44,13 +44,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email' => [
-                'dsn' => 'in-memory://',
-            ],
-        ],
-    ],
     'mailer' => [
         'dsn' => 'null://null',
     ],
