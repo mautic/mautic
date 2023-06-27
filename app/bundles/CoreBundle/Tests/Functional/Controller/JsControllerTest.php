@@ -23,4 +23,10 @@ final class JsControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
     }
+
+    protected function beforeTearDown(): void
+    {
+        $this->configParams['google_analytics_id']                   = null;
+        $this->configParams['google_analytics_trackingpage_enabled'] = false;
+    }
 }
