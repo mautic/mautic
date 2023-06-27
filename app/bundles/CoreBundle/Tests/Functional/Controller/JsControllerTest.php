@@ -21,6 +21,7 @@ final class JsControllerTest extends MauticMysqlTestCase
     {
         $this->configParams['google_analytics_id']                   = 'G-F3825DS9CD';
         $this->configParams['google_analytics_trackingpage_enabled'] = true;
+        $this->configParams['google_analytics_anonymize_ip']         = $this->getName() === 'testIndexActionRendersSuccessfullyWithAnonymizeIp';
         parent::setUp();
     }
 
@@ -29,5 +30,14 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/mtc.js');
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\')', $this->client->getResponse()->getContent());
+    }
+
+    public function testIndexActionRendersSuccessfullyWithAnonymizeIp(): void
+    {
+        $this->client->request('GET', '/mtc.js');
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":true})', $this->client->getResponse()->getContent());
     }
 }
