@@ -51,6 +51,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
 
     /**
      * @return array<string, mixed>
+     *
      * @throws InvalidPayloadException
      */
     private function parseMessage(PageHitNotification $message): array

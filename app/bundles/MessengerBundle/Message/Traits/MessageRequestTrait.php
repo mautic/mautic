@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MessengerBundle\Message\Traits;
 
 use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
-use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Symfony\Component\HttpFoundation\Request;
 
 trait MessageRequestTrait
