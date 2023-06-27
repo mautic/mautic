@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message\Traits;
 
-use DateTime;
-use DateTimeInterface;
 use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +23,11 @@ trait MessageRequestTrait
     /**
      * @return MessageRequestTrait|EmailHitNotification
      */
-    public function setEventTime(?DateTimeInterface $eventTime = null): self
+    public function setEventTime(\DateTimeInterface $eventTime = null): self
     {
-        $eventTime ??= (new DateTime())->format('c');
+        $eventTime ??= (new \DateTime())->format('c');
 
-        $this->eventTime = $eventTime instanceof DateTimeInterface
+        $this->eventTime = $eventTime instanceof \DateTimeInterface
             ? $eventTime->format('c')
             : $eventTime
         ;
@@ -54,7 +52,8 @@ trait MessageRequestTrait
         return $this;
     }
 
-    public function setIsSynchronousRequest(bool $isSynchronous = true): self {
+    public function setIsSynchronousRequest(bool $isSynchronous = true): self
+    {
         $this->isSynchronous = $isSynchronous;
 
         return $this;

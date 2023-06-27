@@ -204,8 +204,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\EmailBundle\Entity\EmailRepository
      */
     public function getRepository()
@@ -237,20 +235,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'email:emails';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Email $entity
-     *
-     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -356,12 +347,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
-     *
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -425,8 +412,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -470,7 +455,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param ?Stat|string $stat
      * @param Request      $request
      * @param bool         $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
-     * @param bool $viaBrowser
+     * @param bool         $viaBrowser
      *
      * @throws ORMException
      * @throws OptimisticLockException
@@ -480,7 +465,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ?Request $request,
         $viaBrowser = false,
         $activeRequest = true,
-        ?\DateTime $hitDateTime = null,
+        \DateTime $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ) {
         if (!$stat instanceof Stat) {
@@ -576,7 +561,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             );
 
             // As the entity might be cached, present in EM, but not attached, we need to reload it
-            if ($this->em->getUnitOfWork()->getEntityState($trackedDevice) === UnitOfWork::STATE_DETACHED) {
+            if (UnitOfWork::STATE_DETACHED === $this->em->getUnitOfWork()->getEntityState($trackedDevice)) {
                 $trackedDevice = $this->em->merge($trackedDevice);
             }
 
@@ -710,8 +695,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $idHash
-     *
      * @return Stat|null
      */
     public function getEmailStatus($idHash)
@@ -1366,8 +1349,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                  array assetAttachments Array of optional Asset IDs to attach
      *
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendEmail(Email $email, $leads, $options = [])
@@ -1589,8 +1570,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param array|int $users
      * @param array     $lead
      * @param bool      $saveStat
-     *
-     * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -2243,12 +2222,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param mixed $leadFields
      * @param array $tokens
      * @param array $assetAttachments
      * @param bool  $saveStat
-     *
-     * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */

@@ -702,11 +702,13 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $unitOfWork = new class () extends UnitOfWork {
+        $unitOfWork = new class() extends UnitOfWork {
             public function __construct()
             {
             }
-            public function getEntityState($entity, $assume = null): bool {
+
+            public function getEntityState($entity, $assume = null): bool
+            {
                 return true;
             }
         };
@@ -714,7 +716,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->exactly(1))
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork)
-            ;
+        ;
 
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');

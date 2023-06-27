@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message;
 
-use DateTime;
 use Mautic\MessengerBundle\Message\Interfaces\RequestStatusInterface;
 use Mautic\MessengerBundle\Message\Traits\MessageRequestTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,9 +15,9 @@ class EmailHitNotification implements RequestStatusInterface
     public function __construct(
         private string $statId,
         Request $request,
-        ?DateTime $eventTime = null
+        \DateTime $eventTime = null
     ) {
-        $this->setEventTime($eventTime ?? new DateTime());
+        $this->setEventTime($eventTime ?? new \DateTime());
         $this->setRequest($request);
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message;
 
-use DateTime;
 use Mautic\MessengerBundle\Message\Traits\MessageRequestTrait;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,17 +13,14 @@ class PageHitNotification
 
     private array $request;
 
-    /**
-     * @param array|Request $request
-     */
     public function __construct(
-        private int   $hitId,
-        private ?int  $pageId,
+        private int $hitId,
+        private ?int $pageId,
         array|Request $request,
-        private ?int  $leadId,
-        private bool  $isNew,
-        private bool  $isRedirect,
-        ?DateTime     $eventTime = null
+        private ?int $leadId,
+        private bool $isNew,
+        private bool $isRedirect,
+        \DateTime $eventTime = null
     ) {
         $this->setRequest($request);
         $this->setEventTime($eventTime);

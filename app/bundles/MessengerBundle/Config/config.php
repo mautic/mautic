@@ -10,10 +10,10 @@ return [
     'services'   => [
         'other' => [
             PageHitNotificationHandler::class  => [
-                'class'     => PageHitNotificationHandler::class,
-                'tag'       => 'messenger.message_handler',
+                'class'         => PageHitNotificationHandler::class,
+                'tag'           => 'messenger.message_handler',
                 'tagArguments'  => ['bus' => 'messenger.bus.hit'],
-                'arguments' => [
+                'arguments'     => [
                     'mautic.page.repository.page',
                     'mautic.page.repository.hit',
                     'mautic.lead.repository.lead',
@@ -33,11 +33,11 @@ return [
                 ],
             ],
             SynchronousExtrasMiddleware::class => [
-                'class' => SynchronousExtrasMiddleware::class,
+                'class'     => SynchronousExtrasMiddleware::class,
                 'arguments' => [
                     'messenger.senders_locator',
-                ]
-            ]
+                ],
+            ],
         ],
     ],
 ];

@@ -215,9 +215,6 @@ class AppKernel extends Kernel
             ->addTag(\Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function boot(): void
     {
         if (true === $this->booted) {
@@ -254,9 +251,6 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
@@ -292,8 +286,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @api
      */
     public function getCacheDir(): string

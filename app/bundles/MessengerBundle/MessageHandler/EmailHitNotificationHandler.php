@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MessengerBundle\MessageHandler;
 
 use Doctrine\ORM\OptimisticLockException;
-use Exception;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
@@ -40,7 +39,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
             );
         } catch (OptimisticLockException $lockException) {
             throw new RecoverableMessageHandlingException($lockException->getMessage());
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->error(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), (array) $exception);
             printf("Failed email hit #%s with %s\n", $message->getStatId(), $exception->getMessage());
             throw new MauticMessengerException(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), 400, $exception);

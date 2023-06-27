@@ -25,7 +25,7 @@ class EmailHitNotificationHandlerTest extends TestCase
             ->expects($this->exactly(1))
             ->method('hitEmail')
             ->with($hitId, $request)
-            ;
+        ;
 
         /** @var MockObject|LoggerInterface $loggerMock */
         $loggerMock = $this->createMock(LoggerInterface::class);

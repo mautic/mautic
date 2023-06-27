@@ -12,7 +12,7 @@ $container->loadFromExtension('framework', [
         'buses' => [
             'messenger.bus.hit' => [
                 'default_middleware'    => true,
-                'middleware'    => [
+                'middleware'            => [
                     SynchronousExtrasMiddleware::class,
                 ],
             ],

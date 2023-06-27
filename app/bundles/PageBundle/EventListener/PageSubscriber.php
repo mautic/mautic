@@ -84,9 +84,6 @@ class PageSubscriber implements EventSubscriberInterface
         $this->contactRepository  = $contactRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

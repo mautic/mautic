@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\MessageHandler;
 
-use Mautic\PageBundle\Entity\Hit;
-use DateTime;
-use Exception;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\MessengerBundle\Exceptions\InvalidPayloadException;
@@ -14,6 +11,7 @@ use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
 use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
 use Mautic\MessengerBundle\MauticMessengerBundle;
 use Mautic\MessengerBundle\Message\PageHitNotification;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
@@ -38,7 +36,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             $this->logger->error(MauticMessengerBundle::LOG_PREFIX.' Invalid payload #'.$message->getHitId().' '.$payloadException->getMessage());
 
             throw $payloadException;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->logger->error(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), (array) $exception);
             throw new MauticMessengerException(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), 400, $exception);
         }
@@ -95,7 +93,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             'lead'                   => $lead,
             'trackingNewlyGenerated' => $message->isNew(),
             'activeRequest'          => false,
-            'hitDate'                => new DateTime((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
+            'hitDate'                => new \DateTime((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
         ];
 
         return array_values($parsed); // TOTO remove in 8.0

@@ -76,7 +76,7 @@ class IpLookupHelper
      *
      * @return string
      */
-    public function getIpAddressFromRequest(?HttpRequest $request = null)
+    public function getIpAddressFromRequest(HttpRequest $request = null)
     {
         $request ??= $this->requestStack->getCurrentRequest();
 
@@ -217,8 +217,6 @@ class IpLookupHelper
 
     /**
      * Validates if an IP address if valid.
-     *
-     * @return mixed
      */
     public function ipIsValid($ip)
     {

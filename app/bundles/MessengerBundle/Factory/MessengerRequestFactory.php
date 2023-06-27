@@ -2,7 +2,6 @@
 
 namespace Mautic\MessengerBundle\Factory;
 
-use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 class MessengerRequestFactory

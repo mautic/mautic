@@ -97,7 +97,7 @@ $container->loadFromExtension('framework', [
         ],
         'routing' => [
             // TODO: Enable this line when you want to merge symfony/mailer
-            //'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
         ],
     ],
 

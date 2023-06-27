@@ -173,25 +173,17 @@ class PageModel extends FormModel
         return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'page:pages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter()
     {
         return 'getTitle';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Page $entity
      * @param bool $unlock
      */
@@ -255,8 +247,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
@@ -279,8 +269,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Page|null
      */
     public function getEntity($id = null)
@@ -299,8 +287,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -560,7 +546,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        ?\DateTime $hitDate = null
+        \DateTime $hitDate = null
     ) {
         //  There is somewhere sometimes, modified the last_active; as a temporary fix we will prevent it by tracking it
         /** @var ?DateTimeInterface $leadLastActive */

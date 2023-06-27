@@ -893,8 +893,6 @@ class MailHelper
 
     /**
      * Get a copy of the raw body.
-     *
-     * @return mixed
      */
     public function getBody()
     {
@@ -976,7 +974,6 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
@@ -1008,8 +1005,7 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param mixed $address
-     * @param null  $name
+     * @param null $name
      *
      * @return bool
      */
@@ -1032,7 +1028,6 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * //TODO: same bug for the name as the one we have in setCc
@@ -1969,9 +1964,6 @@ class MailHelper
         return $owner;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getContactOwnerSignature($owner)
     {
         return empty($owner['signature'])
