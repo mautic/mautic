@@ -36,7 +36,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->integrationObject);
     }
 
-    public function getMessagingServiceSid(): void
+    public function testGetMessagingServiceSid(): void
     {
         $this->integrationObject->method('getDecryptedApiKeys')
             ->willReturn(
