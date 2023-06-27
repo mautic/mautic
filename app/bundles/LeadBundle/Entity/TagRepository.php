@@ -76,8 +76,6 @@ class TagRepository extends CommonRepository
     /**
      * Check Lead tags by Ids.
      *
-     * @param $tags
-     *
      * @return bool
      */
     public function checkLeadByTags(Lead $lead, $tags)
@@ -92,7 +90,7 @@ class TagRepository extends CommonRepository
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('t.tag', ':tags'),
                     $q->expr()->eq('l.id', ':leadId')
                 )

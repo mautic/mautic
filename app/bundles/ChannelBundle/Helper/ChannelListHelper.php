@@ -46,7 +46,6 @@ class ChannelListHelper
     }
 
     /**
-     * @param      $features
      * @param bool $listOnly
      *
      * @return array
@@ -95,8 +94,6 @@ class ChannelListHelper
     }
 
     /**
-     * @param $channel
-     *
      * @return string
      */
     public function getChannelLabel($channel)

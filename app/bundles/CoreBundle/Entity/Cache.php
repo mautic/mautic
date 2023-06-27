@@ -8,17 +8,17 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class Cache
 {
     /**
-     * @var int
+     * @var mixed
      */
     private $id;
 
     /**
-     * @var string
+     * @var mixed
      */
     private $data;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $lifetime;
 

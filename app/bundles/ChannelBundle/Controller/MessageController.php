@@ -2,15 +2,22 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +32,11 @@ class MessageController extends AbstractStandardFormController
 
     private RequestStack $requestStack;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, RequestStack $requestStack)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->requestStack = $requestStack;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -41,8 +48,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cloneAction(Request $request, $objectId)
@@ -51,7 +56,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
@@ -80,8 +84,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
@@ -90,9 +92,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $args
-     * @param $action
-     *
      * @return mixed
      */
     protected function getViewArguments(array $args, $action)
@@ -195,8 +194,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function deleteAction(Request $request, $objectId)
@@ -210,8 +207,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param $view
-     *
      * @return \Symfony\Component\Form\FormView
      */
     protected function getFormView(Form $form, $view)
@@ -262,7 +257,6 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

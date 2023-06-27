@@ -34,7 +34,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($lead);
 
         // Clear from doctrine memory so we get a fresh entity to ensure the points are definitely saved
-        $em->clear(Lead::class);
+        $em->detach($lead);
         $lead = $model->getEntity($lead->getId());
 
         $this->assertEquals(10, $lead->getPoints());

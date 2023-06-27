@@ -25,17 +25,17 @@ class ContactColumnsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-          [
-              'choices'    => array_flip($this->columnsDictionary->getFields()),
-              'label'      => false,
-              'label_attr' => ['class' => 'control-label'],
-              'required'   => false,
-              'multiple'   => true,
-              'expanded'   => false,
-              'attr'       => [
-                  'class'         => 'form-control',
-              ],
-          ]
+            [
+                'choices'    => array_flip($this->columnsDictionary->getFields()),
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'multiple'   => true,
+                'expanded'   => false,
+                'attr'       => [
+                    'class'         => 'form-control',
+                ],
+            ]
         );
     }
 

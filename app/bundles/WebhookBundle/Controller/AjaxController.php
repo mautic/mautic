@@ -92,7 +92,7 @@ class AjaxController extends CommonAjaxController
 
             $prefixParts = explode('.', $prefix);
 
-            $bundleName = (array_pop($prefixParts));
+            $bundleName = array_pop($prefixParts);
 
             $payloadPath .= '/'.ucfirst($bundleName).'Bundle/Assets/WebhookPayload/'.$bundleName.'_'.$eventName.'.json';
 

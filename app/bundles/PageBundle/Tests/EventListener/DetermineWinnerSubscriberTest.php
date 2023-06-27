@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -49,7 +48,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         $ids           = [1, 3];
         $parameters    = ['parent' => $parentMock, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
-        $startDate     = new DateTime();
+        $startDate     = new \DateTime();
         $translation   = 'bounces';
 
         $bounces = [
@@ -140,7 +139,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         $ids         = [1, 2];
         $parameters  = ['parent' => $parentMock];
         $event       = new DetermineWinnerEvent($parameters);
-        $startDate   = new DateTime();
+        $startDate   = new \DateTime();
         $translation = 'dewlltime';
 
         $counts = [

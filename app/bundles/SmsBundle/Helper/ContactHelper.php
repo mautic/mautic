@@ -55,7 +55,7 @@ class ContactHelper
         $foundContacts = $qb->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->orX(
+                $qb->expr()->or(
                     'l.mobile IN (:numbers)',
                     'l.phone IN (:numbers)'
                 )

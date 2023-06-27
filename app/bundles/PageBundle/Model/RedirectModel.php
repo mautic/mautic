@@ -30,14 +30,11 @@ class RedirectModel extends FormModel
     public function getRepository(): RedirectRepository
     {
         $result = $this->em->getRepository(Redirect::class);
-        \assert($result instanceof RedirectRepository);
 
         return $result;
     }
 
     /**
-     * @param $identifier
-     *
      * @return Redirect|null
      */
     public function getRedirectById($identifier)
@@ -103,8 +100,6 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param $url
-     *
      * @return Redirect|null
      */
     public function getRedirectByUrl($url)
@@ -169,8 +164,6 @@ class RedirectModel extends FormModel
 
     /**
      * Create a Redirect entity for URL.
-     *
-     * @param $url
      *
      * @return Redirect
      */

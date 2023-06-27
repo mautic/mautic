@@ -11,6 +11,7 @@ class StatTest extends TestCase
 {
     /**
      * @param int $count How many openDetails to add to the entity
+     *
      * @dataProvider addOpenDetailsTestProvider
      */
     public function testAddOpenDetails(int $count)

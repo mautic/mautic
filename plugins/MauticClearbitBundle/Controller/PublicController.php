@@ -78,7 +78,7 @@ class PublicController extends FormController
                 foreach ([
                              'facebook' => 'http://www.facebook.com/',
                              'linkedin' => 'http://www.linkedin.com/',
-                             'twitter' => 'http://www.twitter.com/',
+                             'twitter'  => 'http://www.twitter.com/',
                          ] as $p => $u) {
                     foreach ($result as $type => $socialProfile) {
                         if ($type === $p && empty($currFields[$p]['value'])) {

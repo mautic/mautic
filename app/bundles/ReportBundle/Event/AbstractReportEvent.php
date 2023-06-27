@@ -38,8 +38,6 @@ class AbstractReportEvent extends Event
     }
 
     /**
-     * @param $context
-     *
      * @return bool
      */
     public function checkContext($context)

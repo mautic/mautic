@@ -58,8 +58,6 @@ class ContactFinder
     }
 
     /**
-     * @param $hash
-     *
      * @return Result
      */
     public function findByHash($hash)
@@ -79,8 +77,6 @@ class ContactFinder
     }
 
     /**
-     * @param $address
-     *
      * @return Result
      */
     public function findByAddress($address)

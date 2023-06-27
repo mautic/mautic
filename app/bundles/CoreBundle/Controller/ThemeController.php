@@ -21,7 +21,7 @@ class ThemeController extends FormController
      */
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted([
             'core:themes:view',
             'core:themes:create',
