@@ -27,8 +27,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageTestAbstract extends TestCase
