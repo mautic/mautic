@@ -1,5 +1,9 @@
 {% block _config_messengerconfig_widget %}
 
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#transport-configuration' } %}mautic.messenger.config.dns_help_general{% endtrans %}
+</div>
+
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">{{ 'mautic.messenger.config.dns_email'|trans }}</h3>
@@ -9,13 +13,8 @@
     </div>
 </div>
 
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_failed'|trans }}</h3>
-    </div>
-    <div class="panel-body">
-        {{ form_row(form.messenger_dsn_failed) }}
-    </div>
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#retries-failures' } %}mautic.messenger.config.dns_help_retry_strategy{% endtrans %}
 </div>
 
 <div class="panel panel-primary">
@@ -37,6 +36,19 @@
                 {{ form_row(form.messenger_retry_strategy_max_delay) }}
             </div>
         </div>
+    </div>
+</div>
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#saving-retrying-failed-messages' } %}mautic.messenger.config.dns_help_failed{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_failed'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_failed) }}
     </div>
 </div>
 {% endblock %}
