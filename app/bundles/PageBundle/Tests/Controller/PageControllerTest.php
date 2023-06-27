@@ -78,7 +78,6 @@ class PageControllerTest extends MauticMysqlTestCase
             'lang'         => 'en',
         ]);
         $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
-        dump($leadsBeforeTest);
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
@@ -89,7 +88,6 @@ class PageControllerTest extends MauticMysqlTestCase
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeads);
-        dump($newLeads);
         $leadId        = reset($newLeads)['id'];
         $leadEventLogs = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`, `lead_id`
@@ -97,7 +95,6 @@ class PageControllerTest extends MauticMysqlTestCase
           WHERE `lead_id` = :leadId
           AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
         );
-        dump($leadEventLogs);
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
     }

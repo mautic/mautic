@@ -753,20 +753,10 @@ class PageModel extends FormModel
                     'newLastActive'      => $hitDate,
                 ];
 
-                $this->logger->warn(
-                    'HIT: Updating last active to event time',
-                    ['context' => $data]
-                );
-
                 try {
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
-
-                    $this->logger->addWarning(
-                        'HIT: Last active updated to event time',
-                        ['context' => $data]
-                    );
                 } catch (\Exception $e) {
-                    $this->logger->addError(
+                    $this->logger->error(
                         'HIT: Failed to update event time due to '.$e->getMessage(),
                         ['context' => $data]
                     );
