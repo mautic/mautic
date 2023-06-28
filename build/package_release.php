@@ -19,6 +19,7 @@ require_once dirname(__DIR__).'/app/AppKernel.php';
 
 $releaseMetadata = \Mautic\CoreBundle\Release\ThisRelease::getMetadata();
 $appVersion      = $releaseMetadata->getVersion();
+$minimalVersion  = $releaseMetadata->getMinSupportedMauticVersion();
 
 // Use branch if applicable otherwise a version tag
 $gitSource = (!empty($args['b'])) ? $args['b'] : $appVersion;
@@ -38,6 +39,10 @@ if (!isset($args['repackage'])) {
     ob_start();
     passthru('which git', $systemGit);
     $systemGit = trim(ob_get_clean());
+
+    // set the diff limit to ensure we get all files
+    system($systemGit.' config diff.renamelimit 8192');
+
     // Checkout the version tag into the packaging space
     chdir(dirname(__DIR__));
     system($systemGit.' archive '.$gitSource.' | tar -x -C '.__DIR__.'/packaging', $result);
@@ -67,9 +72,9 @@ if (!isset($args['repackage'])) {
     include_once __DIR__.'/processfiles.php';
 
     // In this step, we'll compile a list of files that may have been deleted so our update script can remove them
-    // First, get a list of git tags
+    // First, get a list of git tags since the minimal version.
     ob_start();
-    passthru($systemGit.' tag -l', $tags);
+    passthru($systemGit.' for-each-ref --sort=creatordate --format \'%(refname)\' refs/tags | cut -d\/ -f3 | sed -n \'/^'.$minimalVersion.'$/,${p;/^'.$gitSource.'$/q}\' | sed \'$d\'', $tags);
     $tags = explode("\n", trim(ob_get_clean()));
 
     // Only add deleted files to our list; new and modified files will be covered by the archive
@@ -91,19 +96,24 @@ if (!isset($args['repackage'])) {
         passthru($systemGit.' diff tags/'.$tag.$gitSourceLocation.$gitSource.' --name-status', $fileDiff);
         $fileDiff = explode("\n", trim(ob_get_clean()));
 
-        foreach ($fileDiff as $file) {
-            $filename       = substr($file, 2);
-            $folderPath     = explode('/', $filename);
-            $baseFolderName = $folderPath[0];
+        foreach ($fileDiff as $fileInfo) {
+            [$type, $filename, $newFileName] = explode("\t", $fileInfo."\t");
+            $folderPath                      = explode('/', $filename);
+            $baseFolderName                  = $folderPath[0];
 
             if (!$vendorsChanged && 'composer.lock' == $filename) {
                 $vendorsChanged = true;
             }
 
-            if ('D' == substr($file, 0, 1)) {
+            if ('D' == $type) {
                 if (!in_array($filename, $releaseFiles)) {
                     $deletedFiles[$filename] = true;
                 }
+            } elseif (str_starts_with($type, 'R')) {
+                if (!in_array($filename, $releaseFiles)) {
+                    $deletedFiles[$filename] = true;
+                }
+                $modifiedFiles[$newFileName] = true;
             } elseif (in_array($filename, $releaseFiles)) {
                 $modifiedFiles[$filename] = true;
             }
