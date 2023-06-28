@@ -6,21 +6,21 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-final class Version20230627140512 extends PreUpAssertionMigration
+final class Version20230627140512 extends AbstractMauticMigration
 {
-    protected function preUpAssertions(): void
+    public function preUp(Schema $schema): void
     {
         $configurator = $this->getConfigurator();
 
-        $this->skipAssertion(
-            fn () => !$configurator->isFileWritable(),
+        $this->skipIf(
+            !$configurator->isFileWritable(),
             'The local.php file is not writable. Skipping the migration. Replace the usages of "%kernel.root_dir%" in your local.config file with "%kernel.project_dir%/app".'
         );
 
-        $this->skipAssertion(
-            fn () => str_contains('%kernel.root_dir%', $configurator->render()),
+        $this->skipIf(
+            !str_contains($configurator->render(), '%kernel.root_dir%'),
             'The deprecated %kernel.root_dir% is unused. Your local.php file is just fine. Skipping the migration.'
         );
     }
