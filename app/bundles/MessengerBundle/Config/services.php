@@ -11,10 +11,7 @@ return function (ContainerConfigurator $configurator) {
         ->autoconfigure();
 
     $services->load('Mautic\\MessengerBundle\\', '../')
-        ->exclude('../{'.implode(',', [
-                'Config',
-                'Tests',
-            ]).'}');
+        ->exclude('../{Config,Tests}');
 
     $services->alias(\Symfony\Component\Messenger\Transport\TransportFactory::class, 'messenger.transport_factory');
 };
