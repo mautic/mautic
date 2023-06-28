@@ -7,8 +7,6 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\MessengerBundle\Form\Type\ConfigType;
-use Mautic\MessengerBundle\Helper\DsnDoctrineConvertor;
-use Mautic\MessengerBundle\Helper\MessengerDsnConvertor;
 use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -69,9 +67,9 @@ class ConfigSubscriber implements EventSubscriberInterface
             $data['messenger_dsn'] = 'sync://';
         } else {
             if ('doctrine' === $data['messenger_transport']) {
-                $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
+                // $data['messenger_dsn'] = DsnDoctrineConvertor::convertArrayToDsnString($data);
             } else {
-                $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
+                // $data['messenger_dsn'] = MessengerDsnConvertor::convertArrayToDsnString($data, $this->transportType->getTransportDsnConvertors());
             }
         }
 
@@ -89,8 +87,8 @@ class ConfigSubscriber implements EventSubscriberInterface
         $parameters       = $event->getParametersFromConfig('MauticMessengerBundle');
         $loadedParameters = $this->coreParametersHelper->all();
         if (!empty($loadedParameters['messenger_dsn'])) {
-            $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
-            $parameters          = array_merge($parameters, $messengerParameters);
+            // $messengerParameters = MessengerDsnConvertor::convertDsnToArray($loadedParameters['messenger_dsn']);
+            // $parameters          = array_merge($parameters, $messengerParameters);
         }
 
         return $parameters;
