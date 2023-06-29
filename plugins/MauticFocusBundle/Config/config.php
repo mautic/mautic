@@ -59,18 +59,6 @@ return [
                 ],
             ],
         ],
-//        'repositories' => [
-//            'mautic.focus.repository' => [
-//                'class'     => \Doctrine\ORM\EntityRepository::class,
-//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class,
-//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-//            ],
-//            'mautic.focus.stat.repository' => [
-//                'class'     => \Doctrine\ORM\EntityRepository::class,
-//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\StatRepository::class,
-//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-//            ],
-//        ]
     ],
 
     'menu' => [
