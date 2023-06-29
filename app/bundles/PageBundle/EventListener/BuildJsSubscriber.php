@@ -563,16 +563,17 @@ MauticJS.setTrackedEvents = function(events) {
                 }
                 
                 if (typeof ga  !== 'undefined' && typeof events.google_analytics !== 'undefined') {
-                 var e = events.google_analytics; 
-                     for(var i = 0; i < e.length; i++) {
-                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
-                             	ga('send', {
-                                    hitType: 'event',
-                                    eventCategory: e[i]['category'],
-                                    eventAction: e[i]['action'],
-                                    eventLabel: e[i]['label'],
-			                     });
-                     }
+                    var e = events.google_analytics; 
+                    for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' ) {
+                            ga('send', {
+                                hitType: 'event',
+                                eventCategory: e[i]['category'],
+                                eventAction: e[i]['action'],
+                                eventLabel: e[i]['label'],
+                            });
+                        }
+                    }
                 }        
                 
                 if (typeof events.focus_item !== 'undefined') {
