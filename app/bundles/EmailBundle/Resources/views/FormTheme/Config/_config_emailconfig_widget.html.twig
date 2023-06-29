@@ -119,7 +119,7 @@
             {% if 'imap_open' is function %}
                 {{ form_widget(form.monitored_email) }}
             {% else %}
-                <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans|raw }}</div>
+                <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans|purify }}</div>
             {% endif %}
         </div>
     </div>
