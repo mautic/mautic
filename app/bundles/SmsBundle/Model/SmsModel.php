@@ -3,14 +3,19 @@
 namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -22,8 +27,11 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -58,13 +66,15 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     private $cacheStorageHelper;
 
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
         $this->messageQueueModel  = $messageQueueModel;
         $this->transport          = $transport;
         $this->cacheStorageHelper = $cacheStorageHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**

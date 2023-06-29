@@ -28,4 +28,9 @@ return function (ContainerConfigurator $configurator) {
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
     $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
         ->decorate('mailer.transport_factory');
+
+    $services->alias('mautic.email.model.email', \Mautic\EmailBundle\Model\EmailModel::class);
+    $services->alias('mautic.email.model.send_email_to_user', \Mautic\EmailBundle\Model\SendEmailToUser::class);
+    $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);
+    $services->alias('mautic.email.model.transport_callback', \Mautic\EmailBundle\Model\TransportCallback::class);
 };

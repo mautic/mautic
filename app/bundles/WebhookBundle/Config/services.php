@@ -20,4 +20,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\WebhookBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.webhook.model.webhook', \Mautic\WebhookBundle\Model\WebhookModel::class);
 };
