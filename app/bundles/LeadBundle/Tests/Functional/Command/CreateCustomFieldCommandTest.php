@@ -14,10 +14,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->useCleanupRollback = false;
+    }
+
     public function testWithNoArgs(): void
     {
-        $this->useCleanupRollback = false;
-
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
@@ -61,8 +66,6 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
     public function testWithIdAndUserArgs(): void
     {
-        $this->useCleanupRollback = false;
-
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
@@ -109,8 +112,6 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
     public function testWithAllFlag(): void
     {
-        $this->useCleanupRollback = false;
-
         $leadField1 = new LeadField();
         $leadField1->setLabel('Custom Field 1');
         $leadField1->setAlias('custom_field_1');
@@ -167,8 +168,6 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
     public function testWithAllArgsFails(): void
     {
-        $this->useCleanupRollback = false;
-
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
