@@ -34,7 +34,7 @@ interface CustomFieldRepositoryInterface
     /**
      * Requires table alias.
      *
-     * @return mixed
+     * @return string
      */
     public function getTableAlias();
 }
