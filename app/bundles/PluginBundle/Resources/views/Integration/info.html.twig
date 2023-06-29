@@ -16,7 +16,7 @@
 {% if bundle.hasSecondaryDescription %}
 <div class="row mt-lg">
     <div class="col-xs-12">
-        {{ bundle.secondaryDescription|raw }}
+        {{ bundle.secondaryDescription|purify }}
     </div>
 </div>
 {% endif %}
