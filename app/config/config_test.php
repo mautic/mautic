@@ -44,16 +44,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
-    'mailer' => [
-        'dsn' => 'null://null',
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
