@@ -15,7 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeleteContactSecondaryCompaniesCommand extends Command
 {
-    public const NAME = 'mautic:contact:delete:secondary-companies';
+    protected static $defaultDescription = 'Deletes all contact\'s secondary companies.';
+    public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
     private LoggerInterface $logger;
 
@@ -40,7 +41,6 @@ class DeleteContactSecondaryCompaniesCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Deletes all contact\'s secondary companies.')
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command deletes non-primary companies of every contact.
@@ -61,7 +61,7 @@ EOT
         if ($allowMultiple) {
             $output->writeln($this->translator->trans('mautic.lead.command.delete_contact_secondary_company.allow_multiple_enabled'));
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
@@ -74,6 +74,6 @@ EOT
 
         $output->writeln($this->translator->trans('mautic.lead.command.delete_contact_secondary_company.success'));
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 }

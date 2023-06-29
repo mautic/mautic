@@ -449,10 +449,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
