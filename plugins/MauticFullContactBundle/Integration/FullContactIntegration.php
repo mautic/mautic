@@ -101,8 +101,6 @@ class FullContactIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)

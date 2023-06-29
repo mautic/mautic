@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -19,7 +20,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
@@ -664,153 +664,153 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'group' => 'contacts',
                 ];
                 break;
-                case 'contact.attribution.first':
-                case 'contact.attribution.last':
-                case 'contact.attribution.multi':
-                    $displayName      = 'mautic.lead.report.attribution.'.explode('.', $event)[2];
-                    $expected[$event] = [
-                        'display_name' => $displayName,
-                        'columns'      => [
-                            'xx.yy' => [
-                                'label' => '',
-                                'type'  => 'bool',
-                                'alias' => 'first',
-                            ],
-                            'comp.name' => [
-                                'label' => '',
-                                'type'  => 'text',
-                                'alias' => 'name',
-                            ],
-                            'cat.id' => [
-                                'label' => '',
-                                'type'  => 'int',
-                                'alias' => 'category_id',
-                            ],
-                            'cat.title' => [
-                                'label' => '',
-                                'type'  => 'string',
-                                'alias' => 'category_title',
-                            ],
-                            'log.campaign_id' => [
-                                'label' => '',
-                                'type'  => 'int',
-                                'link'  => 'mautic_campaign_action',
-                                'alias' => 'campaign_id',
-                            ],
-                            'log.date_triggered' => [
-                                'label'          => '',
-                                'type'           => 'datetime',
-                                'groupByFormula' => 'DATE(log.date_triggered)',
-                                'alias'          => 'date_triggered',
-                            ],
-                            'c.name' => [
-                                'alias' => 'campaign_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
-                            'l.stage_id' => [
-                                'label' => '',
-                                'type'  => 'int',
-                                'alias' => 'stage_id',
-                            ],
-                            'ss.name' => [
-                                'alias' => 'stage_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
-                            'channel' => [
-                                'alias'   => 'channel',
-                                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
-                                'label'   => '',
-                                'type'    => 'string',
-                            ],
-                            'channel_action' => [
-                                'alias'   => 'channel_action',
-                                'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
-                                'label'   => '',
-                                'type'    => 'string',
-                            ],
-                            'e.name' => [
-                                'alias' => 'action_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
+            case 'contact.attribution.first':
+            case 'contact.attribution.last':
+            case 'contact.attribution.multi':
+                $displayName      = 'mautic.lead.report.attribution.'.explode('.', $event)[2];
+                $expected[$event] = [
+                    'display_name' => $displayName,
+                    'columns'      => [
+                        'xx.yy' => [
+                            'label' => '',
+                            'type'  => 'bool',
+                            'alias' => 'first',
                         ],
-                        'filters' => [
-                            'filter' => [
-                                'label' => '',
-                                'type'  => 'text',
-                                'alias' => 'filter',
-                            ],
-                            'comp.name' => [
-                                'label' => '',
-                                'type'  => 'text',
-                                'alias' => 'name',
-                            ],
-                            'cat.id' => [
-                                'label' => '',
-                                'type'  => 'int',
-                                'alias' => 'category_id',
-                            ],
-                            'cat.title' => [
-                                'label' => '',
-                                'type'  => 'string',
-                                'alias' => 'category_title',
-                            ],
-                            'log.campaign_id' => [
-                                'label' => '',
-                                'type'  => 'select',
-                                'list'  => null,
-                                'alias' => 'campaign_id',
-                            ],
-                            'log.date_triggered' => [
-                                'label'          => null,
-                                'type'           => 'datetime',
-                                'groupByFormula' => 'DATE(log.date_triggered)',
-                                'alias'          => 'date_triggered',
-                            ],
-                            'c.name' => [
-                                'alias' => 'campaign_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
-                            'l.stage_id' => [
-                                'label' => '',
-                                'type'  => 'select',
-                                'list'  => [
-                                    1 => 'Stage One',
-                                ],
-                                'alias' => 'stage_id',
-                            ],
-                            'ss.name' => [
-                                'alias' => 'stage_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
-                            'channel' => [
-                                'label' => '',
-                                'type'  => 'select',
-                                'list'  => [
-                                    'email' => 'Email',
-                                ],
-                                'alias' => 'channel',
-                            ],
-                            'channel_action' => [
-                                'label' => '',
-                                'type'  => 'select',
-                                'list'  => [
-                                    'click' => 'email: click',
-                                ],
-                                'alias' => 'channel_action',
-                            ],
-                            'e.name' => [
-                                'alias' => 'action_name',
-                                'label' => '',
-                                'type'  => 'string',
-                            ],
+                        'comp.name' => [
+                            'label' => '',
+                            'type'  => 'text',
+                            'alias' => 'name',
                         ],
-                        'group' => 'contacts',
-                    ];
+                        'cat.id' => [
+                            'label' => '',
+                            'type'  => 'int',
+                            'alias' => 'category_id',
+                        ],
+                        'cat.title' => [
+                            'label' => '',
+                            'type'  => 'string',
+                            'alias' => 'category_title',
+                        ],
+                        'log.campaign_id' => [
+                            'label' => '',
+                            'type'  => 'int',
+                            'link'  => 'mautic_campaign_action',
+                            'alias' => 'campaign_id',
+                        ],
+                        'log.date_triggered' => [
+                            'label'          => '',
+                            'type'           => 'datetime',
+                            'groupByFormula' => 'DATE(log.date_triggered)',
+                            'alias'          => 'date_triggered',
+                        ],
+                        'c.name' => [
+                            'alias' => 'campaign_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                        'l.stage_id' => [
+                            'label' => '',
+                            'type'  => 'int',
+                            'alias' => 'stage_id',
+                        ],
+                        'ss.name' => [
+                            'alias' => 'stage_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                        'channel' => [
+                            'alias'   => 'channel',
+                            'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
+                            'label'   => '',
+                            'type'    => 'string',
+                        ],
+                        'channel_action' => [
+                            'alias'   => 'channel_action',
+                            'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
+                            'label'   => '',
+                            'type'    => 'string',
+                        ],
+                        'e.name' => [
+                            'alias' => 'action_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                    ],
+                    'filters' => [
+                        'filter' => [
+                            'label' => '',
+                            'type'  => 'text',
+                            'alias' => 'filter',
+                        ],
+                        'comp.name' => [
+                            'label' => '',
+                            'type'  => 'text',
+                            'alias' => 'name',
+                        ],
+                        'cat.id' => [
+                            'label' => '',
+                            'type'  => 'int',
+                            'alias' => 'category_id',
+                        ],
+                        'cat.title' => [
+                            'label' => '',
+                            'type'  => 'string',
+                            'alias' => 'category_title',
+                        ],
+                        'log.campaign_id' => [
+                            'label' => '',
+                            'type'  => 'select',
+                            'list'  => null,
+                            'alias' => 'campaign_id',
+                        ],
+                        'log.date_triggered' => [
+                            'label'          => null,
+                            'type'           => 'datetime',
+                            'groupByFormula' => 'DATE(log.date_triggered)',
+                            'alias'          => 'date_triggered',
+                        ],
+                        'c.name' => [
+                            'alias' => 'campaign_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                        'l.stage_id' => [
+                            'label' => '',
+                            'type'  => 'select',
+                            'list'  => [
+                                1 => 'Stage One',
+                            ],
+                            'alias' => 'stage_id',
+                        ],
+                        'ss.name' => [
+                            'alias' => 'stage_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                        'channel' => [
+                            'label' => '',
+                            'type'  => 'select',
+                            'list'  => [
+                                'email' => 'Email',
+                            ],
+                            'alias' => 'channel',
+                        ],
+                        'channel_action' => [
+                            'label' => '',
+                            'type'  => 'select',
+                            'list'  => [
+                                'click' => 'email: click',
+                            ],
+                            'alias' => 'channel_action',
+                        ],
+                        'e.name' => [
+                            'alias' => 'action_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
+                    ],
+                    'group' => 'contacts',
+                ];
 
                 break;
             case 'companies':

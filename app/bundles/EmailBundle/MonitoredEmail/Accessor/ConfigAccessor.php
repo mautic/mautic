@@ -63,8 +63,6 @@ class ConfigAccessor
     }
 
     /**
-     * @param $property
-     *
      * @return string|null
      */
     protected function getProperty($property)

@@ -12,7 +12,7 @@ interface VariantEntityInterface
     /**
      * Get translation parent.
      *
-     * @return VariantEntityInterface
+     * @return mixed
      */
     public function getVariantParent();
 

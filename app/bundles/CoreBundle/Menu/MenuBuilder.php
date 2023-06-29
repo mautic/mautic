@@ -46,9 +46,6 @@ class MenuBuilder
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     *
      * @return mixed
      */
     public function __call($name, $arguments)
@@ -73,13 +70,13 @@ class MenuBuilder
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
-                    //current match
+                    // current match
                     return $item;
                 } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
-                    //route uri match
+                    // route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
-                    //route name match
+                    // route name match
                     return $item;
                 }
 
@@ -88,15 +85,13 @@ class MenuBuilder
                 }
             }
         } catch (\Exception $e) {
-            //do nothing
+            // do nothing
         }
 
         return null;
     }
 
     /**
-     * @param $name
-     *
      * @return mixed
      */
     private function buildMenu($name)
@@ -106,7 +101,7 @@ class MenuBuilder
         if (!isset($menus[$name])) {
             $loader = new ArrayLoader($this->factory);
 
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            // dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
             $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 

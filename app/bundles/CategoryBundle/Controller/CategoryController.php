@@ -2,31 +2,37 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractFormController
 {
     private FormFactoryInterface $formFactory;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory)
+    public function __construct(FormFactoryInterface $formFactory, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->formFactory = $formFactory;
 
-        parent::__construct($security, $userHelper);
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
-     * @param        $bundle
-     * @param        $objectAction
      * @param int    $objectId
      * @param string $objectModel
      */
@@ -48,7 +54,6 @@ class CategoryController extends AbstractFormController
     }
 
     /**
-     * @param     $bundle
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -71,7 +76,7 @@ class CategoryController extends AbstractFormController
 
         $session->set('mautic.category.filter', $search);
 
-        //set some permissions
+        // set some permissions
         $categoryModel  = $this->getModel('category');
         \assert($categoryModel instanceof CategoryModel);
         $permissionBase = $categoryModel->getPermissionBase($bundle);
@@ -96,7 +101,7 @@ class CategoryController extends AbstractFormController
             'bundle' => $bundle,
         ];
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.category.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -130,7 +135,7 @@ class CategoryController extends AbstractFormController
 
         $count = count($entities);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -162,7 +167,7 @@ class CategoryController extends AbstractFormController
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.category.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -208,25 +213,25 @@ class CategoryController extends AbstractFormController
         $inForm     = $this->getInFormValue($request, $method);
         $showSelect = $request->get('show_bundle_select', false);
 
-        //not found
+        // not found
         if (!$this->security->isGranted($model->getPermissionBase($bundle).':create')) {
             return $this->modalAccessDenied();
         }
-        //Create the form
+        // Create the form
         $action = $this->generateUrl('mautic_category_action', [
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
         $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
         $form['inForm']->setData($inForm);
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.category.notice.created', [
@@ -267,7 +272,7 @@ class CategoryController extends AbstractFormController
                 ],
             ]);
         } elseif (!empty($valid)) {
-            //return edit view to prevent duplicates
+            // return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {
             return $this->ajaxAction(
@@ -304,7 +309,7 @@ class CategoryController extends AbstractFormController
         $cancelled = $valid = false;
         $method    = $request->getMethod();
         $inForm    = $this->getInFormValue($request, $method);
-        //not found
+        // not found
         if (null === $entity) {
             $closeModal = true;
         } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':view')) {
@@ -313,7 +318,7 @@ class CategoryController extends AbstractFormController
             return $this->modalAccessDenied();
         }
 
-        //Create the form
+        // Create the form
         $action = $this->generateUrl(
             'mautic_category_action',
             [
@@ -325,14 +330,14 @@ class CategoryController extends AbstractFormController
         $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle]);
         $form['inForm']->setData($inForm);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
@@ -358,11 +363,11 @@ class CategoryController extends AbstractFormController
             } else {
                 $success = 1;
 
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -421,8 +426,6 @@ class CategoryController extends AbstractFormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
      * @return Response
      */
     public function deleteAction(Request $request, $bundle, $objectId)
@@ -473,7 +476,7 @@ class CategoryController extends AbstractFormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -547,7 +550,7 @@ class CategoryController extends AbstractFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

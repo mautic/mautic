@@ -17,7 +17,7 @@ class PublicController extends CommonFormController
      */
     public function downloadAction(Request $request, CoreParametersHelper $parametersHelper, $slug)
     {
-        //find the asset
+        // find the asset
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
 
@@ -27,24 +27,24 @@ class PublicController extends CommonFormController
         if (!empty($entity)) {
             $published = $entity->isPublished();
 
-            //make sure the asset is published or deny access if not
+            // make sure the asset is published or deny access if not
             if ((!$published) && (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
                 $model->trackDownload($entity, $request, 401);
 
                 return $this->accessDenied();
             }
 
-            //make sure URLs match up
+            // make sure URLs match up
             $url        = $model->generateUrl($entity, false);
             $requestUri = $request->getRequestUri();
-            //remove query
+            // remove query
             $query = $request->getQueryString();
 
             if (!empty($query)) {
                 $requestUri = str_replace("?{$query}", '', $url);
             }
 
-            //redirect if they don't match
+            // redirect if they don't match
             if ($requestUri != $url) {
                 $model->trackDownload($entity, $request, 301);
 
@@ -58,7 +58,7 @@ class PublicController extends CommonFormController
                 $response = new RedirectResponse($entity->getRemotePath());
             } else {
                 try {
-                    //set the uploadDir
+                    // set the uploadDir
                     $entity->setUploadDir($parametersHelper->get('upload_dir'));
                     $contents = $entity->getFileContents();
                     $model->trackDownload($entity, $request, 200);

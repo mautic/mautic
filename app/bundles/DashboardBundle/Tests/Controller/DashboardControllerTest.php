@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -14,6 +17,7 @@ use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -80,21 +84,36 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->requestMock        = $this->createMock(Request::class);
-        $this->securityMock       = $this->createMock(CorePermissions::class);
-        $this->translatorMock     = $this->createMock(Translator::class);
-        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->sessionMock        = $this->createMock(Session::class);
-        $this->flashBagMock       = $this->createMock(FlashBag::class);
         $this->containerMock      = $this->createMock(Container::class);
-        $this->controller         = new DashboardController($this->securityMock, $this->createMock(UserHelper::class));
+
+        $doctrine                 = $this->createMock(ManagerRegistry::class);
+        $factory                  = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
+        $userHelper               = $this->createMock(UserHelper::class);
+        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $dispatcher               = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock     = $this->createMock(Translator::class);
+        $this->flashBagMock       = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
+        $this->securityMock       = $this->createMock(CorePermissions::class);
+
         $requestStack->push($this->requestMock);
-        $this->controller->setRequestStack($requestStack);
+        $this->controller = new DashboardController(
+            $doctrine,
+            $factory,
+            $this->modelFactoryMock,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $this->translatorMock,
+            $this->flashBagMock,
+            $requestStack,
+            $this->securityMock
+        );
         $this->controller->setContainer($this->containerMock);
-        $this->controller->setTranslator($this->translatorMock);
-        $this->controller->setFlashBag($this->flashBagMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
     }
 
@@ -109,8 +128,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isXmlHttpRequest')
             ->willReturn(false);
 
-        $this->controller->setSecurity($this->securityMock);
-
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction($this->requestMock);
     }
@@ -124,8 +141,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(false);
-
-        $this->controller->setSecurity($this->securityMock);
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
@@ -179,7 +194,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
-        $this->controller->setModelFactory($this->modelFactoryMock);
         $this->controller->saveAction($this->requestMock);
     }
 
@@ -221,7 +235,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
-        $this->controller->setModelFactory($this->modelFactoryMock);
         $this->controller->saveAction($this->requestMock);
     }
 

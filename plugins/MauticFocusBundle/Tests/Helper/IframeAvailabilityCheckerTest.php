@@ -38,11 +38,11 @@ class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->once())
             ->method('trans')
             ->with(
-                    'mautic.focus.protocol.mismatch',
-                    [
-                        '%url%' => str_replace('http://', 'https://', $url),
-                    ]
-                )
+                'mautic.focus.protocol.mismatch',
+                [
+                    '%url%' => str_replace('http://', 'https://', $url),
+                ]
+            )
             ->willReturn($translatedErrorMessage);
 
         /** @var JsonResponse $response */

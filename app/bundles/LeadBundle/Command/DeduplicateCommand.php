@@ -35,7 +35,6 @@ class DeduplicateCommand extends Command
         parent::configure();
 
         $this->setName(self::NAME)
-            ->setDescription('Merge contacts based on same unique identifiers')
             ->addOption(
                 '--newer-into-older',
                 null,
@@ -77,7 +76,7 @@ EOT
         if (!$duplicateCount) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $stopwatch->start('deduplicate');
@@ -149,6 +148,7 @@ EOT
         $output->writeln('');
         $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

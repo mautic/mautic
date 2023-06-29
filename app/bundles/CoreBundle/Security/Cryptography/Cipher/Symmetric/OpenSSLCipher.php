@@ -92,8 +92,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
     }
 
     /**
-     * @param $binaryKey
-     *
      * @return string
      */
     private function getHashKey($binaryKey)

@@ -61,7 +61,7 @@ class RoleType extends AbstractType
             PermissionsType::class,
             [
                 'label'    => 'mautic.user.role.permissions',
-                'mapped'   => false, //we'll have to manually build the permissions for persisting
+                'mapped'   => false, // we'll have to manually build the permissions for persisting
                 'required' => false,
                 'attr'     => [
                     'class' => $hidden,

@@ -11,8 +11,6 @@ class RunLimitReachedException extends \Exception
 
     /**
      * MaxContactsReachedException constructor.
-     *
-     * @param $contactsProcessed
      */
     public function __construct($contactsProcessed)
     {

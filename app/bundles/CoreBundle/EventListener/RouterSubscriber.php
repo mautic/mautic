@@ -77,14 +77,14 @@ class RouterSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $originalContext = $this->router->getContext();
 
-        // Remove index_dev.php, index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
-        $originalBaseUrl = str_replace(['index_dev.php', 'index.php'], '', $originalContext->getBaseUrl());
+        // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
+        $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
         if ('/' == substr($originalBaseUrl, -1)) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
@@ -92,11 +92,6 @@ class RouterSubscriber implements EventSubscriberInterface
         if ($originalBaseUrl && !$this->baseUrl) {
             // Likely in installation where the request parameters passed into this listener are not set yet so just use the original context
             return;
-        }
-
-        // Append index_dev.php for installations at the root level
-        if ('dev' === MAUTIC_ENV && false === strpos($this->baseUrl, 'index_dev.php')) {
-            $this->baseUrl = $this->baseUrl.'/index_dev.php';
         }
 
         $context = $this->router->getContext();

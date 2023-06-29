@@ -47,7 +47,7 @@ class UTCDateTimeType extends DateTimeType
     /**
      * @param mixed $value
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws ConversionException
      */
@@ -69,7 +69,9 @@ class UTCDateTimeType extends DateTimeType
 
         // Set to local timezone
         date_default_timezone_set($timezone);
-        $value->setTimezone(new \DateTimeZone($timezone));
+        if ($value instanceof \DateTime) {
+            $value->setTimezone(new \DateTimeZone($timezone));
+        }
 
         return $value;
     }
