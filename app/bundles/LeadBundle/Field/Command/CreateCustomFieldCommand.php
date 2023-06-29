@@ -49,12 +49,11 @@ class CreateCustomFieldCommand extends ModeratedCommand
         parent::configure();
 
         $this->setName(self::COMMAND_NAME)
-            ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
+            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
-            ->addOption('--all', '-a', InputOption::VALUE_NONE, 'Create all columns which have not been created yet. This option does not work with --id option.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
+The <info>%command.name%</info> command will create columns in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
 EOT
@@ -65,25 +64,12 @@ EOT
     {
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
-        $all         = (bool) $input->getOption('all');
 
-        if ($all && $leadFieldId) {
-            $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.all_option_conflict').'</error>');
-
-            return Command::FAILURE;
+        if ($leadFieldId) {
+            return $this->addColumn($leadFieldId, $userId, $input, $output) ? Command::SUCCESS : Command::FAILURE;
         }
 
-        if ($all) {
-            return $this->addAllMissingColumns($input, $output) ? Command::SUCCESS : Command::FAILURE;
-        }
-
-        if (!$leadFieldId) {
-            @trigger_error('Must pass an id with the --id flag or use the --all flag. Future versions will use --all as the default behaviour', E_USER_DEPRECATED);
-
-            return $this->findAndAddColumn($input, $output) ? Command::SUCCESS : Command::FAILURE;
-        }
-
-        return $this->addColumn($leadFieldId, $userId, $input, $output) ? Command::SUCCESS : Command::FAILURE;
+        return $this->addAllMissingColumns($input, $output) ? Command::SUCCESS : Command::FAILURE;
     }
 
     private function addAllMissingColumns(InputInterface $input, OutputInterface $output): bool
@@ -96,19 +82,6 @@ EOT
         }
 
         return $hasNoErrors;
-    }
-
-    private function findAndAddColumn(InputInterface $input, OutputInterface $output): bool
-    {
-        $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
-
-        if (!$leadField) {
-            $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.all_fields_have_columns').'</info>');
-
-            return true;
-        }
-
-        return $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output);
     }
 
     private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): bool
