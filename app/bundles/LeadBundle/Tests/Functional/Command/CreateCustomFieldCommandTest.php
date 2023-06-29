@@ -21,49 +21,6 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->useCleanupRollback = false;
     }
 
-    public function testWithNoArgs(): void
-    {
-        $leadField = new LeadField();
-        $leadField->setLabel('Custom Field 1');
-        $leadField->setAlias('custom_field_1');
-        $leadField->setObject('lead');
-        $leadField->setColumnIsNotCreated();
-        $leadField->setDateAdded(new \DateTime());
-        $leadField->setCreatedBy(1);
-        $this->em->persist($leadField);
-        $this->em->flush();
-
-        $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
-
-        $expectedUserId          = 1;
-        $customFieldNotification = self::createMock(CustomFieldNotification::class);
-        $customFieldNotification
-            ->expects(self::once())
-            ->method('customFieldWasCreated')
-            ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
-        $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
-
-        $application   = new Application($kernel);
-        $application->setAutoExit(false);
-        $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
-
-        self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
-
-        $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
-        $columnNames   = array_map(
-            static function (Column $column) {
-                return $column->getName();
-            },
-            $columnsSchema
-        );
-
-        self::assertContains('custom_field_1', $columnNames);
-    }
-
     public function testWithIdAndUserArgs(): void
     {
         $leadField = new LeadField();
@@ -110,7 +67,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         self::assertContains('custom_field_1', $columnNames);
     }
 
-    public function testWithAllFlag(): void
+    public function testWithNoArgs(): void
     {
         $leadField1 = new LeadField();
         $leadField1->setLabel('Custom Field 1');
@@ -147,9 +104,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $application->setAutoExit(false);
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            '--all' => 1,
-        ]);
+        $commandTester->execute([]);
 
         self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
@@ -164,52 +119,5 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
         self::assertContains('custom_field_1', $columnNames);
         self::assertContains('custom_field_2', $columnNames);
-    }
-
-    public function testWithAllArgsFails(): void
-    {
-        $leadField = new LeadField();
-        $leadField->setLabel('Custom Field 1');
-        $leadField->setAlias('custom_field_1');
-        $leadField->setObject('lead');
-        $leadField->setColumnIsNotCreated();
-        $leadField->setDateAdded(new \DateTime());
-        $leadField->setCreatedBy(1);
-        $this->em->persist($leadField);
-        $this->em->flush();
-
-        $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
-
-        $expectedUserId          = 1;
-        $customFieldNotification = self::createMock(CustomFieldNotification::class);
-        $customFieldNotification
-            ->expects(self::never())
-            ->method('customFieldWasCreated')
-            ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
-        $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
-
-        $application   = new Application($kernel);
-        $application->setAutoExit(false);
-        $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            '--user' => 1,
-            '--id'   => $leadField->getId(),
-            '--all'  => 1,
-        ]);
-
-        self::assertEquals(1, $commandTester->getStatusCode(), $commandTester->getDisplay());
-
-        $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
-        $columnNames   = array_map(
-            static function (Column $column) {
-                return $column->getName();
-            },
-            $columnsSchema
-        );
-
-        self::assertNotContains('custom_field_1', $columnNames);
     }
 }
