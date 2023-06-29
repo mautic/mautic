@@ -683,11 +683,6 @@ parameters:
 			path: app/bundles/ApiBundle/Model/ClientModel.php
 
 		-
-			message: "#^Method Mautic\\\\ApiBundle\\\\Model\\\\ClientModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/ApiBundle/Model/ClientModel.php
-
-		-
 			message: "#^Method Mautic\\\\ApiBundle\\\\Security\\\\Permissions\\\\ApiPermissions\\:\\:__construct\\(\\) has parameter \\$params with no type specified\\.$#"
 			count: 1
 			path: app/bundles/ApiBundle/Security/Permissions/ApiPermissions.php
@@ -7179,11 +7174,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Tests/Command/AbstractCampaignCommand.php
 
 		-
-			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Executioner\\\\ScheduledExecutioner\\:\\:setNowTime\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/ExecuteEventCommandTest.php
-
-		-
 			message: """
 				#^Call to deprecated method runCommand\\(\\) of class Mautic\\\\CoreBundle\\\\Test\\\\AbstractMauticTestCase\\:
 				use testSymfonyCommand\\(\\) instead$#
@@ -7203,16 +7193,6 @@ parameters:
 			"""
 			count: 2
 			path: app/bundles/CampaignBundle/Tests/Command/SummarizeCommandTest.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Executioner\\\\InactiveExecutioner\\:\\:setNowTime\\(\\)\\.$#"
-			count: 3
-			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Executioner\\\\ScheduledExecutioner\\:\\:setNowTime\\(\\)\\.$#"
-			count: 3
-			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
 
 		-
 			message: """
@@ -7254,16 +7234,6 @@ parameters:
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Tests\\\\Command\\\\TriggerCampaignCommandTest\\:\\:testCampaignExecutionForSome\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Executioner\\\\InactiveExecutioner\\:\\:setNowTime\\(\\)\\.$#"
-			count: 3
-			path: app/bundles/CampaignBundle/Tests/Command/ValidateEventCommandTest.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Executioner\\\\ScheduledExecutioner\\:\\:setNowTime\\(\\)\\.$#"
-			count: 3
-			path: app/bundles/CampaignBundle/Tests/Command/ValidateEventCommandTest.php
 
 		-
 			message: """
@@ -9427,11 +9397,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
 
 		-
-			message: "#^Unable to resolve the template type T in call to method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\)$#"
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageModel.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: app/bundles/ChannelBundle/Model/MessageModel.php
@@ -9928,12 +9893,12 @@ parameters:
 			path: app/bundles/ConfigBundle/Event/ConfigEvent.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(ParameterBag\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 30$#"
+			message: "#^PHPDoc tag @param has invalid value \\(ParameterBag\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 30 on line 2$#"
 			count: 1
 			path: app/bundles/ConfigBundle/Event/ConfigEvent.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 23$#"
+			message: "#^PHPDoc tag @param has invalid value \\(array\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 23 on line 2$#"
 			count: 1
 			path: app/bundles/ConfigBundle/Event/ConfigEvent.php
 
@@ -11118,11 +11083,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\ConfiguratorPass\\:\\:process\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\ModelPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Compiler/ModelPass.php
 
 		-
 			message: "#^Argument of an invalid type string supplied for foreach, only iterables are supported\\.$#"
@@ -12657,7 +12617,7 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/VariantEntityInterface.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parent, \\$children\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 84$#"
+			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parent, \\$children\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 84 on line 4$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/VariantEntityInterface.php
 
@@ -12848,11 +12808,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:\\:__construct\\(\\) has parameter \\$requested with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:\\:__construct\\(\\) has parameter \\$tokenFilter with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
@@ -13078,11 +13033,6 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:\\:\\$slotTypes has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:\\:\\$tokenFilter has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
@@ -13966,16 +13916,6 @@ parameters:
 			path: app/bundles/CoreBundle/Exception/FileExistsException.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Exception\\\\FileNotFoundException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Exception/FileNotFoundException.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Exception\\\\FileNotFoundException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Exception/FileNotFoundException.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Exception\\\\SchemaException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Exception/SchemaException.php
@@ -14117,11 +14057,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Factory\\\\ModelFactory\\:\\:hasModel\\(\\) has parameter \\$modelNameKey with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Factory/ModelFactory.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Factory\\\\ModelFactory\\:\\:\\$container has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Factory/ModelFactory.php
 
@@ -15514,7 +15449,7 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(CacheStorageHelper;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 112$#"
+			message: "#^PHPDoc tag @return has invalid value \\(CacheStorageHelper;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 112 on line 5$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
 
@@ -15872,17 +15807,17 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/ColorHelper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(float \\(0 \\- 1\\)\\)\\: Unexpected token \"\\(\", expected variable at offset 95$#"
+			message: "#^PHPDoc tag @param has invalid value \\(float \\(0 \\- 1\\)\\)\\: Unexpected token \"\\(\", expected variable at offset 95 on line 4$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/ColorHelper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string in format \\#xxxxxx or \\#xxx\\)\\: Unexpected token \"in\", expected variable at offset 53$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string in format \\#xxxxxx or \\#xxx\\)\\: Unexpected token \"in\", expected variable at offset 53 on line 4$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/ColorHelper.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string in format \\#xxxxxx or \\#xxx\\)\\: Unexpected token \"in\", expected variable at offset 78$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string in format \\#xxxxxx or \\#xxx\\)\\: Unexpected token \"in\", expected variable at offset 78 on line 4$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/ColorHelper.php
 
@@ -16057,56 +15992,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/DateTimeHelper.php
 
 		-
-			message: "#^Strict comparison using \\!\\=\\= between null and string will always evaluate to true\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Dsn/DsnGenerator.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:emojiConvert\\(\\) has parameter \\$from with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:emojiConvert\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:emojiConvert\\(\\) has parameter \\$to with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:removeEmoji\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:toEmoji\\(\\) has parameter \\$from with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:toEmoji\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:toHtml\\(\\) has parameter \\$from with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:toHtml\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\EmojiHelper\\:\\:toShort\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiHelper.php
-
-		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Helper\\\\EmojiMap\\\\HtmlToUnicodeEmojiMap\\:\\:\\$map has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/EmojiMap/HtmlToUnicodeEmojiMap.php
@@ -16232,11 +16117,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:alphanum\\(\\) has parameter \\$allowedCharacters with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/InputHelper.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:clean\\(\\) has parameter \\$value with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
@@ -16252,22 +16132,12 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:html\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/InputHelper.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:raw\\(\\) has parameter \\$value with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:strict_html\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Helper/InputHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\InputHelper\\:\\:string\\(\\) has parameter \\$value with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/InputHelper.php
 
@@ -16932,11 +16802,6 @@ parameters:
 			path: app/bundles/CoreBundle/IpLookup/AbstractLookup.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\IpLookup\\\\AbstractLookup\\:\\:\\$auth has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/IpLookup/AbstractLookup.php
-
-		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\IpLookup\\\\AbstractLookup\\:\\:\\$city has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/IpLookup/AbstractLookup.php
@@ -17352,7 +17217,7 @@ parameters:
 			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(int\\|array id\\)\\: Unexpected token \"id\", expected variable at offset 65$#"
+			message: "#^PHPDoc tag @param has invalid value \\(int\\|array id\\)\\: Unexpected token \"id\", expected variable at offset 65 on line 4$#"
 			count: 1
 			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
 
@@ -17548,11 +17413,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Model\\\\NotificationModel\\:\\:setDisableUpdates\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Model/NotificationModel.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Model\\\\NotificationModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Model/NotificationModel.php
 
@@ -17950,11 +17810,6 @@ parameters:
 			path: app/bundles/CoreBundle/Test/AbstractMauticTestCase.php
 
 		-
-			message: "#^Service \"Liip\\\\TestFixturesBundle\\\\Services\\\\DatabaseToolCollection\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Test/AbstractMauticTestCase.php
-
-		-
 			message: "#^Service \"session\" is not registered in the container\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Test/AbstractMauticTestCase.php
@@ -18212,16 +18067,6 @@ parameters:
 			path: app/bundles/CoreBundle/Tests/Command/CleanupMaintenanceCommandTest.php
 
 		-
-			message: "#^Service \"GuzzleHttp\\\\Handler\\\\MockHandler\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Command/PullTransifexCommandFunctionalTest.php
-
-		-
-			message: "#^Service \"GuzzleHttp\\\\Handler\\\\MockHandler\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Command/PushTransifexCommandFunctionalTest.php
-
-		-
 			message: """
 				#^Call to deprecated method runCommand\\(\\) of class Mautic\\\\CoreBundle\\\\Test\\\\AbstractMauticTestCase\\:
 				use testSymfonyCommand\\(\\) instead$#
@@ -18238,11 +18083,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Form\\\\RequestTraitTest\\:\\:testMultiSelectPrepareParametersFromRequest\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Form/RequestTraitTest.php
-
-		-
-			message: "#^Service \"GuzzleHttp\\\\Handler\\\\MockHandler\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
 
 		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Tests\\\\Functional\\\\Controller\\\\FileControllerTest\\:\\:\\$uploadedFilePath has no type specified\\.$#"
@@ -19395,11 +19235,6 @@ parameters:
 			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/IpstackLookupTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$auth of class Mautic\\\\CoreBundle\\\\IpLookup\\\\IpstackLookup constructor expects null, string given\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/IpstackLookupTest.php
-
-		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\IpLookup\\\\IpstackLookupTest\\:\\:\\$cacheDir has no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/IpstackLookupTest.php
@@ -19451,11 +19286,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\IpLookup\\\\MaxmindDownloadLookupTest\\:\\:testIpLookupSuccessful\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxmindDownloadLookupTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$auth of class Mautic\\\\CoreBundle\\\\IpLookup\\\\MaxmindDownloadLookup constructor expects null, mixed given\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxmindDownloadLookupTest.php
 
@@ -20377,11 +20207,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\DashboardBundle\\\\Model\\\\DashboardModel\\:\\:saveSnapshot\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/DashboardBundle/Model/DashboardModel.php
-
-		-
-			message: "#^Method Mautic\\\\DashboardBundle\\\\Model\\\\DashboardModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/DashboardBundle/Model/DashboardModel.php
 
@@ -21642,7 +21467,7 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128$#"
+			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128 on line 6$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
@@ -21725,16 +21550,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Tests/Helper/DynamicContentHelperTest.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Command\\\\ProcessEmailQueueCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Command/ProcessEmailQueueCommand.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Command/ProcessEmailQueueCommand.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Command\\\\ProcessFetchEmailCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Command/ProcessFetchEmailCommand.php
@@ -21761,11 +21576,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Controller\\\\AjaxController\\:\\:getEmailCountStatsAction\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Controller\\\\AjaxController\\:\\:sendTestEmailAction\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Controller/AjaxController.php
 
@@ -22165,11 +21975,6 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/PublicController.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Controller\\\\PublicController\\:\\:mailerCallbackAction\\(\\) has parameter \\$transport with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Controller\\\\PublicController\\:\\:persistFrequencyRuleFormData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Controller/PublicController.php
@@ -22265,29 +22070,9 @@ parameters:
 			path: app/bundles/EmailBundle/DataFixtures/ORM/LoadEmailData.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\DependencyInjection\\\\Compiler\\\\EmailTransportPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/DependencyInjection/Compiler/EmailTransportPass.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/DependencyInjection/Compiler/EmailTransportPass.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\DependencyInjection\\\\Compiler\\\\SpoolTransportPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/DependencyInjection/Compiler/SpoolTransportPass.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\DependencyInjection\\\\Compiler\\\\StatHelperPass\\:\\:process\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/DependencyInjection/Compiler/StatHelperPass.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\DependencyInjection\\\\Compiler\\\\SwiftmailerDynamicMailerPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/DependencyInjection/Compiler/SwiftmailerDynamicMailerPass.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\Copy\\:\\:getId\\(\\) should return int but returns string\\.$#"
@@ -22424,16 +22209,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:\\:clearVariants\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:\\:decodeAmpersands\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:\\:decodeAmpersands\\(\\) has parameter \\$content with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/Email.php
 
@@ -23167,7 +22942,7 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/StatDevice.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(Stat\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 22$#"
+			message: "#^PHPDoc tag @param has invalid value \\(Stat\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 22 on line 2$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/StatDevice.php
 
@@ -23785,7 +23560,7 @@ parameters:
 
 		-
 			message: "#^Argument of an invalid type int supplied for foreach, only iterables are supported\\.$#"
-			count: 2
+			count: 1
 			path: app/bundles/EmailBundle/EventListener/CampaignSubscriber.php
 
 		-
@@ -23800,7 +23575,7 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @var above foreach loop does not specify variable name\\.$#"
-			count: 2
+			count: 1
 			path: app/bundles/EmailBundle/EventListener/CampaignSubscriber.php
 
 		-
@@ -23945,11 +23720,6 @@ parameters:
 			path: app/bundles/EmailBundle/EventListener/EmailSubscriber.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\EmailSubscriber\\:\\:onTransportWebhook\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/EmailSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\EmailToUserSubscriber\\:\\:onEmailToUser\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/EmailToUserSubscriber.php
@@ -24048,21 +23818,6 @@ parameters:
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/MessageQueueSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\MomentumSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/MomentumSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\MomentumSubscriber\\:\\:onMomentumWebhookQueueProcessing\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/MomentumSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\MomentumSubscriber\\:\\:onMomentumWebhookRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/MomentumSubscriber.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -24396,16 +24151,6 @@ parameters:
 			path: app/bundles/EmailBundle/Form/Type/ConfigType.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Form\\\\Type\\\\ConfigType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Form/Type/ConfigType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Form\\\\Type\\\\ConfigType\\:\\:getTransportChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Form/Type/ConfigType.php
-
-		-
 			message: "#^Class Mautic\\\\EmailBundle\\\\Form\\\\Type\\\\DashboardBestHoursWidgetType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
 			count: 1
 			path: app/bundles/EmailBundle/Form/Type/DashboardBestHoursWidgetType.php
@@ -24641,11 +24386,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: "#^Cannot access property \\$leadIdHash on bool\\|Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 2
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
@@ -24726,11 +24466,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:checkIfTransportNeedsRestart\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:cleanName\\(\\) has parameter \\$name with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
@@ -24797,16 +24532,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:getLead\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:getMessageInstance\\(\\) should return bool\\|Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage but returns Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\Swift_Message\\|Swift_Message\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:getSampleMailer\\(\\) should return \\$this\\(Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\) but returns Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -25021,22 +24746,7 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:setReplyTo\\(\\) has parameter \\$addresses with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:setReplyTo\\(\\) has parameter \\$name with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:setReturnPath\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:setReturnPath\\(\\) has parameter \\$address with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -25111,13 +24821,8 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: "#^Parameter \\#1 \\$transport of class Swift_Mailer constructor expects Swift_Transport, bool given\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: "#^Parameter \\#2 \\$context of method Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:logError\\(\\) expects null, string given\\.$#"
-			count: 10
+			count: 9
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
@@ -25214,11 +24919,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:\\$mailer has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: "#^Property Mautic\\\\EmailBundle\\\\Helper\\\\MailHelper\\:\\:\\$metadata type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
@@ -25270,11 +24970,6 @@ parameters:
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: "#^Variable \\$failures in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
@@ -25498,11 +25193,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/UrlMatcher.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\MauticEmailBundle\\:\\:build\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MauticEmailBundle.php
-
-		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Entity\\\\VariantEntityInterface\\:\\:getChanges\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
@@ -25607,11 +25297,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\EmailModel\\:\\:getBuilderComponents\\(\\) has parameter \\$requestedComponents with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\EmailModel\\:\\:getBuilderComponents\\(\\) has parameter \\$withBC with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
@@ -26071,7 +25756,7 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128$#"
+			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128 on line 6$#"
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
@@ -26337,96 +26022,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportCallback\\:\\:updateStatDetails\\(\\) has parameter \\$dncReason with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Model/TransportCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$serviceId with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$showApiKey with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$showHost with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$showPassword with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$showPort with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$showUser with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:addTransport\\(\\) has parameter \\$translatableAlias with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:getServiceDoNotNeedPassword\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:getString\\(\\) has parameter \\$services with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:getTransportTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showAmazonRegion type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showApiKey type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showHost type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showPassword type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showPort type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$showUser type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Model\\\\TransportType\\:\\:\\$transportTypes type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Model/TransportType.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Accessor\\\\ConfigAccessor\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
@@ -26839,16 +26434,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
 
 		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Message\\:\\:\\$dsnMessage has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Message\\:\\:\\$dsnReport has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
-
-		-
 			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Message\\:\\:\\$fblMessage has no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
@@ -26900,11 +26485,6 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Message\\:\\:\\$textHtml has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Message\\:\\:\\$textPlain has no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Message.php
 
@@ -27037,16 +26617,6 @@ parameters:
 			message: "#^Property Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Bounce\\\\BouncedEmail\\:\\:\\$final \\(int\\) does not accept bool\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/BouncedEmail.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Bounce\\\\DsnParser\\:\\:parse\\(\\) has parameter \\$dsnMessage with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/DsnParser.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Bounce\\\\DsnParser\\:\\:parse\\(\\) has parameter \\$dsnReport with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Processor/Bounce/DsnParser.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Bounce\\\\DsnParser\\:\\:parse\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -27309,12 +26879,12 @@ parameters:
 			path: app/bundles/EmailBundle/Stats/FetchOptions/EmailStatOptions.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$this;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 65$#"
+			message: "#^PHPDoc tag @return has invalid value \\(\\$this;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 65 on line 4$#"
 			count: 2
 			path: app/bundles/EmailBundle/Stats/FetchOptions/EmailStatOptions.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\$this;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 66$#"
+			message: "#^PHPDoc tag @return has invalid value \\(\\$this;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 66 on line 4$#"
 			count: 1
 			path: app/bundles/EmailBundle/Stats/FetchOptions/EmailStatOptions.php
 
@@ -27453,997 +27023,12 @@ parameters:
 			path: app/bundles/EmailBundle/Stats/StatHelperContainer.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:getSnsPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:processBounce\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:processCallbackRequest\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:processJsonPayload\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:processJsonPayload\\(\\) has parameter \\$payload with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Amazon\\\\AmazonCallback\\:\\:processJsonPayload\\(\\) has parameter \\$type with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Amazon/AmazonCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Exception\\\\BatchQueueMaxException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Exception/BatchQueueMaxException.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Exception\\\\BatchQueueMaxException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Exception/BatchQueueMaxException.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:addAttachment\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:addAttachment\\(\\) has parameter \\$filePath with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:addMetadata\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:addMetadata\\(\\) has parameter \\$email with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:addMetadata\\(\\) has parameter \\$metadata with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:clearAttachments\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:clearMetadata\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:getAttachments\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:newInstance\\(\\) has invalid return type Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\Swift_Message\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:newInstance\\(\\) should return Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\Swift_Message but returns Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:\\$attachments type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Message\\\\MauticMessage\\:\\:\\$metadata type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Message/MauticMessage.php
-
-		-
-			message: "#^Left side of && is always false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:convertEventToDncReason\\(\\) has parameter \\$event with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:eventMappingToDncReason\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:getCommentsKeyForEvent\\(\\) has parameter \\$event with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:getDncComments\\(\\) has parameter \\$item with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:getHardBounces\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\CallbackEnum\\:\\:getSupportedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallback\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/MomentumCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallback\\:\\:processImmediateFeedback\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/MomentumCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallbackInterface\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/MomentumCallbackInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallbackInterface\\:\\:processImmediateFeedback\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/MomentumCallbackInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\ResponseItem\\:\\:__construct\\(\\) has parameter \\$item with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/ResponseItem.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\ResponseItem\\:\\:\\$dncReason \\(int\\) does not accept string\\|null\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/ResponseItem.php
-
-		-
-			message: "#^Class Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\ResponseItems implements generic interface Iterator but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Callback/ResponseItems.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Facade\\\\MomentumFacade\\:\\:getErrors\\(\\) has parameter \\$body with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Facade/MomentumFacade.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:buildSubstitutionData\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:extractCampaignId\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:extractCampaignId\\(\\) has parameter \\$metadataSample with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:getMetadata\\(\\) has parameter \\$email with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:getSubstitutionData\\(\\) has parameter \\$email with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:getSubstitutionData\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:\\$mauticTokens type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:\\$metadata type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:\\$substitutionKeys type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor\\:\\:\\$substitutionMergeVars type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Metadata/MetadataProcessor.php
-
-		-
-			message: "#^Parameter \\#1 \\$inlineCss of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\DTO\\\\TransmissionDTO\\\\ContentDTO\\:\\:setInlineCss\\(\\) expects string\\|null, Swift_Mime_Header given\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Service/SwiftMessageService.php
-
-		-
-			message: "#^Parameter \\#1 \\$message of class Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Metadata\\\\MetadataProcessor constructor expects Swift_Message, Swift_Mime_SimpleMessage given\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Service/SwiftMessageService.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageService\\:\\:\\$reservedKeys has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Service/SwiftMessageService.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Validator\\\\SwiftMessageValidator\\\\SwiftMessageValidator\\:\\:validate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Validator/SwiftMessageValidator/SwiftMessageValidator.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Momentum\\\\Validator\\\\SwiftMessageValidator\\\\SwiftMessageValidatorInterface\\:\\:validate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Momentum/Validator/SwiftMessageValidator/SwiftMessageValidatorInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnum\\:\\:convertEventToDncReason\\(\\) has parameter \\$event with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnum\\:\\:eventMappingToDncReason\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnum\\:\\:getSupportedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/CallbackEnum.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItem\\:\\:__construct\\(\\) has parameter \\$item with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/ResponseItem.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItem\\:\\:\\$dncReason \\(int\\) does not accept string\\|null\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/ResponseItem.php
-
-		-
-			message: "#^Class Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItems implements generic interface Iterator but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/ResponseItems.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\SendGridApiCallback\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Callback/SendGridApiCallback.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailAttachment\\:\\:addAttachmentsToMail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Mail/SendGridMailAttachment.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailMetadata\\:\\:addMetadataToMail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Mail/SendGridMailMetadata.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailPersonalization\\:\\:addPersonalizedDataToMail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/Mail/SendGridMailPersonalization.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiFacade\\:\\:send\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/SendGridApiFacade.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponse\\:\\:checkResponse\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SendGrid/SendGridApiResponse.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Sparkpost\\\\SparkpostFactoryInterface\\:\\:create\\(\\) has parameter \\$apiKey with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Sparkpost/SparkpostFactoryInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Sparkpost\\\\SparkpostFactoryInterface\\:\\:create\\(\\) has parameter \\$host with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Sparkpost/SparkpostFactoryInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SwiftmailerFacadeInterface\\:\\:send\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SwiftmailerFacadeInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SwiftmailerTransportFactory\\:\\:createTransport\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SwiftmailerTransportFactory.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\SwiftmailerTransportFactory\\:\\:createTransport\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/SwiftmailerTransportFactory.php
-
-		-
-			message: "#^Argument of an invalid type string supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:getAttachments\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:messageToArray\\(\\) has parameter \\$replace with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:messageToArray\\(\\) has parameter \\$search with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:messageToArray\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:registerPlugin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:setMauticFactory\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:stop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:throwException\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Parameter \\#1 \\$source of method Swift_Events_SimpleEventDispatcher\\:\\:createTransportExceptionEvent\\(\\) expects Swift_Transport, \\$this\\(Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\) given\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$ex of method Swift_Events_SimpleEventDispatcher\\:\\:createTransportExceptionEvent\\(\\) expects Swift_TransportException, Exception given\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:\\$standardHeaderKeys type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenArrayTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:getHeaders\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:handlePostResponse\\(\\) has parameter \\$curlInfo with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:handlePostResponse\\(\\) has parameter \\$response with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:handlePostResponse\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:post\\(\\) has parameter \\$settings with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:post\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:setPassword\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:setUsername\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenHttpTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:\\$message \\(Swift_Message\\) does not accept Swift_Mime_SimpleMessage\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Variable \\$curl in empty\\(\\) is never defined\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenHttpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenSmtpTransport\\:\\:getAttachments\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenSmtpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenSmtpTransport\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenSmtpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenSmtpTransport\\:\\:prepareMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenSmtpTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenSmtpTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenSmtpTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenSmtpTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport_AbstractSmtpTransport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AbstractTokenSmtpTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:createAmazonClient\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:getAmazonMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setDebug\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setDebug\\(\\) has parameter \\$debug with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setHandler\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setHandler\\(\\) has parameter \\$handler with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setPassword\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setPassword\\(\\) has parameter \\$password with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setPlainTextToMessage\\(\\) has parameter \\$text with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setRegion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setUsername\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:setUsername\\(\\) has parameter \\$username with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:triggerSendError\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:triggerSendError\\(\\) has parameter \\$failedRecipients with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:triggerSendError\\(\\) has parameter \\$reason with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:\\$message \\(Swift_Message\\) does not accept Swift_Mime_SimpleMessage\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:\\$handler has unknown class Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\Aws\\\\CommandInterface as its type\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonApiTransport\\:\\:\\$handler has unknown class Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\Psr\\\\Http\\\\Message\\\\RequestInterface as its type\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonTransport\\:\\:__construct\\(\\) has parameter \\$otherRegion with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonTransport\\:\\:__construct\\(\\) has parameter \\$region with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonTransport\\:\\:processBounce\\(\\) should return Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Bounce\\\\BouncedEmail but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AmazonTransport\\:\\:processUnsubscription\\(\\) should return Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Unsubscription\\\\UnsubscribedEmail but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$host$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$otherHost$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/AmazonTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\CallbackTransportInterface\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/CallbackTransportInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\ElasticemailTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/ElasticemailTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\ElasticemailTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/ElasticemailTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\ElasticemailTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport_AbstractSmtpTransport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/ElasticemailTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:__construct\\(\\) has parameter \\$sandboxMail with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:__construct\\(\\) has parameter \\$sandboxMode with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:setSandboxMail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:setSandboxMode\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MailjetTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport_AbstractSmtpTransport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MailjetTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:getHeaders\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:getHeaders\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:handlePostResponse\\(\\) has parameter \\$info with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:handlePostResponse\\(\\) has parameter \\$response with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:handlePostResponse\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MandrillTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MandrillTransport.php
-
-		-
-			message: "#^Call to function is_countable\\(\\) with array will always evaluate to true\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MomentumTransport\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MomentumTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MomentumTransport\\:\\:registerPlugin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MomentumTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\MomentumTransport\\:\\:stop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/MomentumTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\PepipostTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/PepipostTransport.php
-
-		-
-			message: "#^Parameter \\#1 \\$key of method Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:\\:get\\(\\) expects string, int given\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/PepipostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\PostmarkTransport\\:\\:__construct\\(\\) has parameter \\$security with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/PostmarkTransport.php
-
-		-
-			message: "#^Call to function is_countable\\(\\) with array will always evaluate to true\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridApiTransport\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridApiTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridApiTransport\\:\\:registerPlugin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridApiTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridApiTransport\\:\\:stop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridApiTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SendgridTransport\\:\\:__construct\\(\\) has parameter \\$security with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SendgridTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:checkTemplateIsValid\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:checkTemplateIsValid\\(\\) has parameter \\$sparkPostMessage with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:extractCampaignId\\(\\) has parameter \\$metadataSet with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:getErrorMessageFromResponseBody\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:getErrorMessageFromResponseBody\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:getSparkPostMessage\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByEmailAddress\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByEmailAddress\\(\\) has parameter \\$email with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByEmailAddress\\(\\) has parameter \\$event with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByHashId\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByHashId\\(\\) has parameter \\$event with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackByHashId\\(\\) has parameter \\$hashId with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processCallbackRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processImmediateSendFeedback\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processImmediateSendFeedback\\(\\) has parameter \\$message with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:processImmediateSendFeedback\\(\\) has parameter \\$response with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:setApiKey\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Offset 'substitution_data' on array\\{address\\: mixed, substitution_data\\: non\\-empty\\-array\\<string, mixed\\>\\|stdClass, metadata\\?\\: mixed\\} in empty\\(\\) always exists and is not falsy\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SparkpostTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:\\$message \\(Swift_Message\\) does not accept Swift_Mime_SimpleMessage\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SparkpostTransport.php
-
-		-
-			message: "#^Call to an undefined method Swift_Transport\\:\\:getBatchRecipientCount\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Call to an undefined method Swift_Transport\\:\\:getMaxBatchLimit\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SpoolTransport\\:\\:getBatchRecipientCount\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SpoolTransport\\:\\:getBatchRecipientCount\\(\\) has parameter \\$toBeAdded with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SpoolTransport\\:\\:getBatchRecipientCount\\(\\) has parameter \\$type with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\SpoolTransport\\:\\:getMaxBatchLimit\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/SpoolTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\TokenTransportInterface\\:\\:getMetadata\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Swiftmailer/Transport/TokenTransportInterface.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:testCommandWhenQueueIsDisabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Command\\\\ProcessEmailQueueCommandTest\\:\\:testCommandWhenQueueIsEnabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Command/ProcessEmailQueueCommandTest.php
-
-		-
 			message: """
 				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
 				2\\.0 to be removed in 3\\.0$#
 			"""
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Controller/AjaxControllerTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with string and array\\{john@api\\.test\\: null\\} will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Controller/Api/EmailApiControllerFunctionalTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with string and array\\{reply@api\\.test\\: null\\} will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Controller/Api/EmailApiControllerFunctionalTest.php
 
 		-
 			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, count\\(\\$variable\\)\\)\\.$#"
@@ -28554,11 +27139,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/EventListener/DetermineWinnerSubscriberTest.php
 
 		-
-			message: "#^Access to an undefined property PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Swift_Message\\:\\:\\$leadIdHash\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Tests/EventListener/EmailSubscriberTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\EmailToUserSubscriberTest\\:\\:testOnCampaignTriggerActionSendEmailToUserWithError\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/EventListener/EmailToUserSubscriberTest.php
@@ -28597,56 +27177,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MatchFilterForLeadTraitTestable\\:\\:matchFilterForLead\\(\\) has parameter \\$lead with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:testOnMomentumWebhookQueueProcessingForMomentumTransport\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:testOnMomentumWebhookQueueProcessingForMomentumTransportIfRequestNotFounc\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:testOnMomentumWebhookQueueProcessingForNonMomentumTransport\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:testOnMomentumWebhookRequestWhenQueueIsDisabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:testOnMomentumWebhookRequestWhenQueueIsEnabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:\\$loggerMock has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:\\$momentumCallbackMock has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:\\$momentumSubscriber has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:\\$queueServiceMock has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\MomentumSubscriberTest\\:\\:\\$requestStorageHelperMock has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MomentumSubscriberTest.php
 
 		-
 			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\EventListener\\\\ReportSubscriberTest\\:\\:\\$queryBuilder \\(Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\.$#"
@@ -28797,26 +27327,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/EmailValidatorTest.php
 
 		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\EmailValidatorTest\\:\\:\\$dispatcher has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/EmailValidatorTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\EmailValidatorTest\\:\\:\\$emailValidator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/EmailValidatorTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\EmailValidatorTest\\:\\:\\$event has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/EmailValidatorTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\EmailValidatorTest\\:\\:\\$translator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/EmailValidatorTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\EventListener\\\\EmailValidationSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/EventListener/EmailValidationSubscriber.php
@@ -28827,26 +27337,11 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/EventListener/EmailValidationSubscriber.php
 
 		-
-			message: "#^Call to an undefined method Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Spool\\\\DelegatingSpool\\:\\:expects\\(\\)\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with true will always evaluate to true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNull\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
 			message: """
 				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
 				2\\.0 to be removed in 3\\.0$#
 			"""
-			count: 5
+			count: 2
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
 		-
@@ -28870,22 +27365,12 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:mockEmptyMailHelper\\(\\) has parameter \\$useSmtp with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testBatchIsEnabledWithBcTokenInterface\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testBatchMode\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
@@ -28900,42 +27385,7 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testGlobalHeadersAreIgnoredIfEmailEntityIsSet\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testGlobalHeadersAreSet\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testMailAsOwnerWithEncodedCharactersInName\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testQueueModeIsReset\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testQueueModeThrowsExceptionWhenBatchLimitHit\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testQueuedEmailFromOverride\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testQueuedOwnerAsMailer\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
@@ -28951,16 +27401,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testStandardOwnerAsMailer\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testThatTokenizationIsDisabledIfTransportDoesnotSupportTokenization\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:testThatTokenizationIsEnabledIfTransportSupportsTokenization\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
 
@@ -29013,11 +27453,6 @@ parameters:
 			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\MailHelperTest\\:\\:\\$contacts type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/MailHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\PlainTextMessageHelperTest\\:\\:testGetPlainTextMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/PlainTextMessageHelperTest.php
 
 		-
 			message: """
@@ -29086,67 +27521,7 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/RequestStorageHelperTest.php
 
 		-
-			message: "#^Call to function is_array\\(\\) with array will always evaluate to true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Instanceof between \\*NEVER\\* and Countable will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:__construct\\(\\) has parameter \\$maxRecipients with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:__construct\\(\\) has parameter \\$numberToFail with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:getFromAddresses\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:getFromNames\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:getMetadatas\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:send\\(\\) should return int but returns true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\AbstractTokenArrayTransport\\:\\:\\$message \\(Swift_Message\\) does not accept Swift_Mime_SimpleMessage\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$fromAddresses has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$fromNames has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$maxRecipients has no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
 
@@ -29154,44 +27529,6 @@ parameters:
 			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$metadatas has no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$numberToFail has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BatchTransport\\:\\:\\$validate has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BatchTransport.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with array will always evaluate to true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: """
-				#^Class Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport implements deprecated interface Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\InterfaceTokenTransport\\:
-				2\\.12\\.0 to be removed in 3\\.0; use TokenTransportInterface instead$#
-			"""
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Instanceof between \\*NEVER\\* and Countable will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:__construct\\(\\) has parameter \\$maxRecipients with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:__construct\\(\\) has parameter \\$numberToFail with no type specified\\.$#"
@@ -29214,37 +27551,7 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
 
 		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:registerPlugin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:send\\(\\) should return int but returns true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:stop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Parameter \\#2 \\$failedRecipients \\(null\\) of method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:send\\(\\) should be compatible with parameter \\$failedRecipients \\(array\\<string\\>\\) of method Swift_Transport\\:\\:send\\(\\)$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
 			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:\\$fromAddresses has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:\\$maxRecipients has no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
 
@@ -29277,31 +27584,6 @@ parameters:
 			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\BcInterfaceTokenTransport\\:\\:\\$validate is never read, only written\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\SmtpTransport\\:\\:registerPlugin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/SmtpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\SmtpTransport\\:\\:send\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/SmtpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\SmtpTransport\\:\\:start\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/SmtpTransport.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\Transport\\\\SmtpTransport\\:\\:stop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Helper/Transport/SmtpTransport.php
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Helper\\\\UrlMatcherTest\\:\\:testFTPSchemeMatch\\(\\) has no return type specified\\.$#"
@@ -29447,11 +27729,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/Model/SendEmailToContactTest.php
 
 		-
-			message: "#^Dead catch \\- Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Exception\\\\BatchQueueMaxException is never thrown in the try block\\.$#"
-			count: 4
-			path: app/bundles/EmailBundle/Tests/Model/SendEmailToContactTest.php
-
-		-
 			message: """
 				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
 				2\\.0 to be removed in 3\\.0$#
@@ -29513,56 +27790,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\SendEmailToUserTest\\:\\:testSendEmailWithNoError\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Model/SendEmailToUserTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testAmazonService\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testDoNotNeedLogin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testDoNotNeedPassword\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testDoNotNeedRegion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testGetTransportTypes\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testMailjetService\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testRequiresApiKey\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testRequiresLogin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testRequiresPassword\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Model\\\\TransportTypeTest\\:\\:testSmtpService\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/TransportTypeTest.php
 
 		-
 			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Accessor\\\\ConfigAccessor\\:\\:getFolder\\(\\) references an invalid method\\.$#"
@@ -29950,16 +28177,6 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/BounceTest.php
 
 		-
-			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\BounceProcessorInterface\\:\\:processBounce\\(\\) references an interface\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/BounceTest.php
-
-		-
-			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\BounceProcessorInterface\\:\\:processBounce\\(\\) references an invalid method\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/BounceTest.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\MonitoredEmail\\\\Processor\\\\BounceTest\\:\\:testContactIsFoundFromMessageAndDncRecordAdded\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/BounceTest.php
@@ -30027,11 +28244,6 @@ parameters:
 		-
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Mautic\\\\\\\\EmailBundle\\\\\\\\MonitoredEmail\\\\\\\\Processor\\\\\\\\Reply\\\\\\\\RepliedEmail' and Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Processor\\\\Reply\\\\RepliedEmail will always evaluate to true\\.$#"
 			count: 2
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/Reply/ParserTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\MonitoredEmail\\\\Processor\\\\Reply\\\\ParserTest\\:\\:testExceptionIsThrownWithHashNotFound\\(\\) has no return type specified\\.$#"
-			count: 1
 			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/Reply/ParserTest.php
 
 		-
@@ -30137,16 +28349,6 @@ parameters:
 		-
 			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\MonitoredEmail\\\\Search\\\\Result\\:\\:setStat\\(\\) references an invalid method\\.$#"
 			count: 2
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/UnsubscribeTest.php
-
-		-
-			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\UnsubscriptionProcessorInterface\\:\\:processUnsubscription\\(\\) references an interface\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/UnsubscribeTest.php
-
-		-
-			message: "#^@covers value \\\\Mautic\\\\EmailBundle\\\\Swiftmailer\\\\Transport\\\\UnsubscriptionProcessorInterface\\:\\:processUnsubscription\\(\\) references an invalid method\\.$#"
-			count: 1
 			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/UnsubscribeTest.php
 
 		-
@@ -30288,414 +28490,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Stat\\\\StatHelperTest\\:\\:testStatsAreCreatedAndDeleted\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Stat/StatHelperTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallbackTest\\:\\:getRequestWithPayload\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Callback/MomentumCallbackTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Callback\\\\MomentumCallbackTest\\:\\:testWebhookPayloadIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Callback/MomentumCallbackTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:dataTransformToTransmission\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:geTransformToTransmissionComplexData\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:geTransformToTransmissionComplexDataWithEmailName\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:geTransformToTransmissionComplexDataWithUtmTag\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:testTransformToTransmission\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Momentum\\\\Service\\\\SwiftMessageServiceTest\\:\\:\\$translatorInterfaceMock is never read, only written\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Momentum/Service/SwiftMessageServiceTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with 1 and string\\|null will always evaluate to false\\.$#"
-			count: 2
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with 2 and string\\|null will always evaluate to false\\.$#"
-			count: 3
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:notSupportedEventsProvider\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:supportedEventsProvider\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:testConvertEventToDncReason\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:testNotSupportedEvents\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:testNotSupportedEvents\\(\\) has parameter \\$event with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:testSupportedEvents\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\CallbackEnumTest\\:\\:testSupportedEvents\\(\\) has parameter \\$event with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/CallbackEnumTest.php
-
-		-
-			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNull\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemTest\\:\\:testFullResponseItem\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemTest\\:\\:testResponseItemWithoutEmail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemTest\\:\\:testResponseItemWithoutReason\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemsTest\\:\\:checkResponseItem\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemsTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemsTest\\:\\:checkResponseItem\\(\\) has parameter \\$DncReason with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemsTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemsTest\\:\\:checkResponseItem\\(\\) has parameter \\$email with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemsTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemsTest\\:\\:checkResponseItem\\(\\) has parameter \\$reason with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemsTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Callback\\\\ResponseItemsTest\\:\\:testResponseItems\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Callback/ResponseItemsTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailAttachmentTest\\:\\:testNoAttachment\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailAttachmentTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailBaseTest\\:\\:contentTypeProvider\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailBaseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailBaseTest\\:\\:testEmptyPlainTextMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailBaseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailBaseTest\\:\\:testHtmlMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailBaseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailBaseTest\\:\\:testHtmlMessage\\(\\) has parameter \\$contentType with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailBaseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailBaseTest\\:\\:testPlainTextMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailBaseTest.php
-
-		-
-			message: """
-				#^Instantiation of deprecated class Swift_Mime_Headers_OpenDKIMHeader\\:
-				since SwiftMailer 6\\.1\\.0; use Swift_Signers_DKIMSigner instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailMetadataTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailMetadataTest\\:\\:testBaseMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailMetadataTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailPersonalizationTest\\:\\:testNotMauticMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailPersonalizationTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\Mail\\\\SendGridMailPersonalizationTest\\:\\:testPersonalization\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/Mail/SendGridMailPersonalizationTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiFacadeTest\\:\\:testBadLogin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiFacadeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiFacadeTest\\:\\:testBadRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiFacadeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiFacadeTest\\:\\:testRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiFacadeTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiMessageTest\\:\\:testGetMail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiMessageTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponseTest\\:\\:successfulResponseProvider\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiResponseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponseTest\\:\\:testBadLogin\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiResponseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponseTest\\:\\:testBadRequest\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiResponseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponseTest\\:\\:testSuccessfulResponse\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiResponseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SendGrid\\\\SendGridApiResponseTest\\:\\:testSuccessfulResponse\\(\\) has parameter \\$code with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SendGrid/SendGridApiResponseTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testDelegateMessageWillReturnIntEvenIfTransportWillNot\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testEmailIsQueuedIfSpoolingIsEnabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testEmailIsSentImmediatelyIfSpoolingIsDisabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testThatTokenizationIsDisabledIfFileSpoolIsEnabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testThatTokenizationIsDisabledIfRealTransposrtDoesNotImplementTokenTransportInterface\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\Spool\\\\DelegatingSpoolTest\\:\\:testThatTokenizationIsEnabledIfFileSpoolIsDisabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/Spool/DelegatingSpoolTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SwiftmailerTransportFactoryTest\\:\\:testExceptionIsThrownIfServiceNotFound\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SwiftmailerTransportFactoryTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SwiftmailerTransportFactoryTest\\:\\:testServiceIsFoundAndReturned\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SwiftmailerTransportFactoryTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Swiftmailer\\\\SwiftmailerTransportFactoryTest\\:\\:testSmtpTransportIsReturnedIfServiceNotUsed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Swiftmailer/SwiftmailerTransportFactoryTest.php
-
-		-
-			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\Response&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\:\\:\\$code\\.$#"
-			count: 4
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:testAmazonSend\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:testAmazonStart\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:testGetAmazonMessageBatch\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$amazonMock has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$amazonTransport has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$headers has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$logger has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$request has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\AmazonApiTransportTest\\:\\:\\$request is never read, only written\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/AmazonApiTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:getRequestWithPayload\\(\\) has parameter \\$status with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:testAbuseReportIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:testBounceReportIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:testErrorReportIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:testSpamReportIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:testUnsubscribedIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:\\$logger has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:\\$translator has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Property Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\ElasticemailTransportTest\\:\\:\\$transportCallback has no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/ElasticemailTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\MailjetTransportTest\\:\\:testWebhookPayloadIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/MailjetTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\MandrillTransportTest\\:\\:testWebhookPayloadIsProcessed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/MandrillTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SparkpostTransportMessageTest\\:\\:testCcAndBccFields\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SparkpostTransportMessageTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SpoolTransportTest\\:\\:testFailedEventIsDispatched\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SpoolTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SpoolTransportTest\\:\\:testSpooledEventIsDispatched\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SpoolTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SpoolTransportTest\\:\\:testSuccessEventIsDispatched\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SpoolTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SpoolTransportTest\\:\\:testThatSupportsTokenizationMethodReturnsFalseIfTokenizationIsDisabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SpoolTransportTest.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Tests\\\\Transport\\\\SpoolTransportTest\\:\\:testThatSupportsTokenizationMethodReturnsTrueIfTokenizationIsEnabled\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Transport/SpoolTransportTest.php
 
 		-
 			message: "#^Parameter \\#1 \\$emailsInString of method Mautic\\\\EmailBundle\\\\Validator\\\\MultipleEmailsValidValidator\\:\\:validate\\(\\) expects string, null given\\.$#"
@@ -31129,11 +28923,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/Field.php
 
 		-
-			message: "#^Method Mautic\\\\FormBundle\\\\Entity\\\\Field\\:\\:convertToArray\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Entity/Field.php
-
-		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Entity\\\\Field\\:\\:getChanges\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Entity/Field.php
@@ -31275,11 +29064,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Entity\\\\Form\\:\\:determineValidationGroups\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Entity/Form.php
-
-		-
-			message: "#^Method Mautic\\\\FormBundle\\\\Entity\\\\Form\\:\\:generateFormName\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Entity/Form.php
 
@@ -32709,6 +30493,11 @@ parameters:
 			path: app/bundles/FormBundle/Helper/FormFieldHelper.php
 
 		-
+			message: "#^Strict comparison using \\=\\=\\= between 'boolean' and 'string' will always evaluate to false\\.$#"
+			count: 1
+			path: app/bundles/FormBundle/Helper/FormFieldHelper.php
+
+		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Helper\\\\FormUploader\\:\\:deleteAllFilesOfFormField\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Helper/FormUploader.php
@@ -32814,16 +30603,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/FieldModel.php
 
 		-
-			message: "#^Method Mautic\\\\FormBundle\\\\Model\\\\FieldModel\\:\\:generateAlias\\(\\) has parameter \\$aliases with no type specified\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Model/FieldModel.php
-
-		-
-			message: "#^Method Mautic\\\\FormBundle\\\\Model\\\\FieldModel\\:\\:generateAlias\\(\\) has parameter \\$label with no type specified\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Model/FieldModel.php
-
-		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Model\\\\FieldModel\\:\\:getEntity\\(\\) has parameter \\$id with no type specified\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Model/FieldModel.php
@@ -32845,11 +30624,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Model\\\\FieldModel\\:\\:getSessionFields\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Model/FieldModel.php
-
-		-
-			message: "#^Method Mautic\\\\FormBundle\\\\Model\\\\FieldModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Model/FieldModel.php
 
@@ -34110,26 +31884,6 @@ parameters:
 			message: "#^Property Mautic\\\\InstallBundle\\\\Tests\\\\Install\\\\InstallServiceTest\\:\\:\\$validator has no type specified\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/Install/InstallServiceTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:set\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
 
 		-
 			message: "#^Call to an undefined method Mautic\\\\IntegrationsBundle\\\\Auth\\\\Provider\\\\AuthCredentialsInterface\\:\\:getApiKey\\(\\)\\.$#"
@@ -37098,16 +34852,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/BatchSegmentController.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Controller\\\\BatchSegmentController\\:\\:\\$actionModel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Controller/BatchSegmentController.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Controller\\\\BatchSegmentController\\:\\:\\$segmentModel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Controller/BatchSegmentController.php
-
-		-
 			message: "#^Call to function is_array\\(\\) with array will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Controller/CompanyController.php
@@ -38436,6 +36180,11 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Company.php
 
 		-
+			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Company\\:\\:__set\\(\\) with return type void returns \\$this\\(Mautic\\\\LeadBundle\\\\Entity\\\\Company\\) but should not return anything\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/Company.php
+
+		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Company\\:\\:addUpdatedField\\(\\) has parameter \\$alias with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Company.php
@@ -39508,6 +37257,11 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\:\\:__set\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/Lead.php
+
+		-
+			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\:\\:__set\\(\\) with return type void returns \\$this\\(Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\) but should not return anything\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
@@ -41645,11 +39399,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Tag.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Entity\\\\Tag\\:\\:\\$tag \\(string\\) does not accept Mautic\\\\LeadBundle\\\\Entity\\\\Tag\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Tag.php
-
-		-
 			message: """
 				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
 				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
@@ -42040,7 +39789,7 @@ parameters:
 			path: app/bundles/LeadBundle/Event/LeadChangeCompanyEvent.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(Company/Company\\)\\: Unexpected token \"/Company\", expected TOKEN_HORIZONTAL_WS at offset 26$#"
+			message: "#^PHPDoc tag @return has invalid value \\(Company/Company\\)\\: Unexpected token \"/Company\", expected TOKEN_HORIZONTAL_WS at offset 26 on line 2$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/LeadChangeCompanyEvent.php
 
@@ -42832,7 +40581,7 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/FormSubscriber.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(LeadModel\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 27$#"
+			message: "#^PHPDoc tag @param has invalid value \\(LeadModel\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 27 on line 2$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/FormSubscriber.php
 
@@ -46722,11 +44471,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/NoteModel.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Model\\\\NoteModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Model/NoteModel.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Model\\\\SegmentActionModel\\:\\:addContacts\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/SegmentActionModel.php
@@ -47070,27 +44814,12 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthLast.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthLast.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Month\\\\DateMonthNext\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthNext.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthNext.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Month\\\\DateMonthThis\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthThis.php
-
-		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Month/DateMonthThis.php
 
@@ -47155,27 +44884,12 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekLast.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekLast.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Week\\\\DateWeekNext\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekNext.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekNext.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Week\\\\DateWeekThis\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekThis.php
-
-		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Week/DateWeekThis.php
 
@@ -47190,27 +44904,12 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearLast.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearLast.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Year\\\\DateYearNext\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearNext.php
 
 		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearNext.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Decorator\\\\Date\\\\Year\\\\DateYearThis\\:\\:modifyBaseDate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearThis.php
-
-		-
-			message: "#^Parameter \\#2 \\$fromFormat of method Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper\\:\\:setDateTime\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Year/DateYearThis.php
 
@@ -48053,21 +45752,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\Api\\\\TagApiControllerFunctionalTest\\:\\:testWhitespaceBeforeAndAfterNameNotCreatingDuplicates\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Controller/Api/TagApiControllerFunctionalTest.php
-
-		-
-			message: "#^Call to method saveEntity\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\CompanyModel\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/CompanyControllerTest.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$model contains unknown class Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\CompanyModel\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/CompanyControllerTest.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\CompanyControllerTest\\:\\:\\$id has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/CompanyControllerTest.php
 
 		-
 			message: """
@@ -50113,11 +47797,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Other/DateAnniversaryTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$datetime of class DateTime constructor expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Other/DateAnniversaryTest.php
-
-		-
 			message: "#^Parameter \\#2 \\$fromFormat of class Mautic\\\\CoreBundle\\\\Helper\\\\DateTimeHelper constructor expects string, null given\\.$#"
 			count: 2
 			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Other/DateAnniversaryTest.php
@@ -50938,16 +48617,6 @@ parameters:
 			"""
 			count: 1
 			path: app/bundles/MarketplaceBundle/Tests/Functional/Controller/AjaxControllerTest.php
-
-		-
-			message: "#^Service \"GuzzleHttp\\\\Handler\\\\MockHandler\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/MarketplaceBundle/Tests/Functional/Controller/DetailControllerTest.php
-
-		-
-			message: "#^Service \"GuzzleHttp\\\\Handler\\\\MockHandler\" is not registered in the container\\.$#"
-			count: 2
-			path: app/bundles/MarketplaceBundle/Tests/Functional/Controller/ListControllerTest.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -54412,7 +52081,7 @@ parameters:
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128$#"
+			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$parentEntity, TranslationEntityInterface \\$entity\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 128 on line 6$#"
 			count: 1
 			path: app/bundles/PageBundle/Model/PageModel.php
 
@@ -60655,17 +58324,12 @@ parameters:
 			path: app/bundles/ReportBundle/Model/ReportModel.php
 
 		-
-			message: "#^Method Mautic\\\\ReportBundle\\\\Model\\\\ReportModel\\:\\:setSession\\(\\) has no return type specified\\.$#"
+			message: "#^PHPDoc tag @property has invalid value \\(definitions\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 60 on line 3$#"
 			count: 1
 			path: app/bundles/ReportBundle/Model/ReportModel.php
 
 		-
-			message: "#^PHPDoc tag @property has invalid value \\(definitions\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 60$#"
-			count: 1
-			path: app/bundles/ReportBundle/Model/ReportModel.php
-
-		-
-			message: "#^PHPDoc tag @property has invalid value \\(filterList\\)\\: Unexpected token \"\\\\n     \\* \", expected variable at offset 31$#"
+			message: "#^PHPDoc tag @property has invalid value \\(filterList\\)\\: Unexpected token \"\\\\n     \\* \", expected variable at offset 31 on line 2$#"
 			count: 1
 			path: app/bundles/ReportBundle/Model/ReportModel.php
 
@@ -63837,7 +61501,7 @@ parameters:
 			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
 
 		-
-			message: "#^PHPDoc tag @throws has invalid value \\(\\\\Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 325$#"
+			message: "#^PHPDoc tag @throws has invalid value \\(\\\\Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException;\\)\\: Unexpected token \";\", expected TOKEN_HORIZONTAL_WS at offset 325 on line 9$#"
 			count: 1
 			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
 
@@ -64001,14 +61665,6 @@ parameters:
 			message: "#^Method Mautic\\\\UserBundle\\\\Controller\\\\SecurityController\\:\\:ssoLoginCheckAction\\(\\) has parameter \\$integration with no type specified\\.$#"
 			count: 1
 			path: app/bundles/UserBundle/Controller/SecurityController.php
-
-		-
-			message: """
-				#^Call to deprecated method get\\(\\) of class Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\AbstractController\\:
-				since Symfony 5\\.4, use method or constructor injection in your controller instead$#
-			"""
-			count: 1
-			path: app/bundles/UserBundle/Controller/UserController.php
 
 		-
 			message: """
@@ -64245,11 +61901,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\UserBundle\\\\Entity\\\\User\\:\\:determineValidationGroups\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/UserBundle/Entity/User.php
-
-		-
-			message: "#^Method Mautic\\\\UserBundle\\\\Entity\\\\User\\:\\:eraseCredentials\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/UserBundle/Entity/User.php
 
@@ -66106,11 +63757,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Http/Client.php
 
 		-
-			message: "#^Parameter \\#3 \\$key of function hash_hmac expects string, null given\\.$#"
-			count: 1
-			path: app/bundles/WebhookBundle/Http/Client.php
-
-		-
 			message: "#^Instanceof between Mautic\\\\WebhookBundle\\\\Entity\\\\Webhook and Mautic\\\\WebhookBundle\\\\Entity\\\\Webhook will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
@@ -66251,11 +63897,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
 
 		-
-			message: "#^Parameter \\#3 \\$secret of method Mautic\\\\WebhookBundle\\\\Http\\\\Client\\:\\:post\\(\\) expects null, string given\\.$#"
-			count: 1
-			path: app/bundles/WebhookBundle/Model/WebhookModel.php
-
-		-
 			message: "#^Property Mautic\\\\WebhookBundle\\\\Model\\\\WebhookModel\\:\\:\\$webhookQueueIdList type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
@@ -66383,11 +64024,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Tests\\\\Functional\\\\WebhookFunctionalTest\\:\\:createContacts\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/WebhookBundle/Tests/Functional/WebhookFunctionalTest.php
-
-		-
-			message: "#^Method Mautic\\\\WebhookBundle\\\\Tests\\\\Functional\\\\WebhookFunctionalTest\\:\\:testWebhookWorkflowWithCommandProcess\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Tests/Functional/WebhookFunctionalTest.php
 
@@ -66600,61 +64236,6 @@ parameters:
 		-
 			message: "#^Anonymous class extends @final class Doctrine\\\\ORM\\\\EntityManager\\.$#"
 			count: 2
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Method class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:119\\:\\:saveEntity\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Method class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:139\\:\\:saveEntity\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Method class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:34\\:\\:saveEntity\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Method class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:49\\:\\:saveEntity\\(\\) should return int but return statement is missing\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:119\\:\\:\\$saveEntityCallCount has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:139\\:\\:\\$saveEntityCallCount has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:162\\:\\:\\$grapesJsBuilderRepository has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:193\\:\\:\\$emailRepository has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:34\\:\\:\\$saveEntityCallCount has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:49\\:\\:\\$saveEntityCallCount has no type specified\\.$#"
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
-
-		-
-			message: "#^Property class@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest\\.php\\:67\\:\\:\\$grapesJsBuilderRepository has no type specified\\.$#"
-			count: 1
 			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
 
 		-
@@ -67122,7 +64703,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Api/ConnectwiseApi.php
 
 		-
-			message: "#^PHPDoc tag @method has invalid value \\(createLead\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 45$#"
+			message: "#^PHPDoc tag @method has invalid value \\(createLead\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 45 on line 4$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Api/CrmApi.php
 
@@ -68245,7 +65826,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
-			message: "#^PHPDoc tag @method has invalid value \\(\\\\MauticPlugin\\\\MauticCrmBundle\\\\Api\\\\ConnectwiseApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 76$#"
+			message: "#^PHPDoc tag @method has invalid value \\(\\\\MauticPlugin\\\\MauticCrmBundle\\\\Api\\\\ConnectwiseApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 76 on line 2$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
@@ -69127,7 +66708,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
 		-
-			message: "#^PHPDoc tag @method has invalid value \\(HubspotApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 38$#"
+			message: "#^PHPDoc tag @method has invalid value \\(HubspotApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 38 on line 2$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/HubspotIntegration.php
 
@@ -70360,7 +67941,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: "#^PHPDoc tag @method has invalid value \\(SalesforceApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 76$#"
+			message: "#^PHPDoc tag @method has invalid value \\(SalesforceApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 76 on line 4$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
@@ -70965,17 +68546,17 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 112$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 112 on line 4$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 158$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 158 on line 4$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 160$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string\\)\\: Unexpected token \"\\\\n     \\*\", expected variable at offset 160 on line 4$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
@@ -71443,7 +69024,7 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
 
 		-
-			message: "#^PHPDoc tag @method has invalid value \\(ZohoApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 35$#"
+			message: "#^PHPDoc tag @method has invalid value \\(ZohoApi getApiHelper\\)\\: Unexpected token \"\\\\n \", expected '\\(' at offset 35 on line 2$#"
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/ZohoIntegration.php
 
@@ -73509,14 +71090,14 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_API.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(string \\(optional\\) \\- timeout\\)\\: Unexpected token \"\\(\", expected variable at offset 451$#"
+			message: "#^PHPDoc tag @param has invalid value \\(string \\(optional\\) \\- timeout\\)\\: Unexpected token \"\\(\", expected variable at offset 451 on line 11$#"
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_API.php
 
 		-
 			message: """
 				#^PHPDoc tag @param has invalid value \\(string \\- Search Term \\(Could be an email address or a phone number,
-				  depending on the specified search type\\)\\)\\: Unexpected token "\\-", expected variable at offset 195$#
+				  depending on the specified search type\\)\\)\\: Unexpected token "\\-", expected variable at offset 195 on line 7$#
 			"""
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_API.php
@@ -73524,7 +71105,7 @@ parameters:
 		-
 			message: """
 				#^PHPDoc tag @param has invalid value \\(string \\- Search Type \\(Specify the API search method to use\\.
-				  E\\.g\\. email \\-\\- tested with email and phone\\)\\)\\: Unexpected token "\\-", expected variable at offset 325$#
+				  E\\.g\\. email \\-\\- tested with email and phone\\)\\)\\: Unexpected token "\\-", expected variable at offset 325 on line 9$#
 			"""
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_API.php
@@ -74955,7 +72536,7 @@ parameters:
 			path: plugins/MauticSocialBundle/Helper/TwitterCommandHelper.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\(\\$firstName, \\$lastName\\)\\)\\: Unexpected token \"\\(\", expected TOKEN_HORIZONTAL_WS at offset 212$#"
+			message: "#^PHPDoc tag @return has invalid value \\(array\\(\\$firstName, \\$lastName\\)\\)\\: Unexpected token \"\\(\", expected TOKEN_HORIZONTAL_WS at offset 212 on line 6$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Helper/TwitterCommandHelper.php
 
