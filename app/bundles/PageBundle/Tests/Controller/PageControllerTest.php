@@ -95,6 +95,7 @@ class PageControllerTest extends MauticMysqlTestCase
           WHERE `lead_id` = :leadId
           AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
         );
+
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
     }

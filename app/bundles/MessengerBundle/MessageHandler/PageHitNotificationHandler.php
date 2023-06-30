@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\MessengerBundle\Exceptions\InvalidPayloadException;
 use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
 use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
-use Mautic\MessengerBundle\MauticMessengerBundle;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -33,14 +32,14 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             $parsed = $this->parseMessage($message);
             $this->pageModel->processPageHit(...$parsed);
         } catch (InvalidPayloadException $payloadException) {
-            $this->logger->error(MauticMessengerBundle::LOG_PREFIX.' Invalid payload #'.$message->getHitId().' '.$payloadException->getMessage());
+            $this->logger->error('Invalid payload #'.$message->getHitId().' '.$payloadException->getMessage());
 
             throw $payloadException;
         } catch (\Exception $exception) {
-            $this->logger->error(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), (array) $exception);
-            throw new MauticMessengerException(MauticMessengerBundle::LOG_PREFIX.$exception->getMessage(), 400, $exception);
+            $this->logger->error($exception->getMessage(), (array) $exception);
+            throw new MauticMessengerException($exception->getMessage(), 400, $exception);
         }
-        $this->logger->info(MauticMessengerBundle::LOG_PREFIX.'processed page hit #'.$message->getHitId());
+        $this->logger->info('processed page hit #'.$message->getHitId());
     }
 
     /** @return iterable<string, mixed> */
@@ -66,13 +65,13 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
                     : $this->pageRepository->find($message->getPageId());
             } catch (\Exception $exception) {
                 $this->logger->error(
-                    sprintf('%sInvalid page/redirect, exception. #%s', MauticMessengerBundle::LOG_PREFIX, $message->getPageId()), ['message' => $message]);
+                    sprintf('Invalid page/redirect, exception. #%s', $message->getPageId()), ['message' => $message]);
                 throw $exception;
             }
 
             if (null === $pageObject) {
                 $this->logger->error(
-                    sprintf('%sInvalid page/redirect, id not found. #%s', MauticMessengerBundle::LOG_PREFIX, $message->getPageId())
+                    sprintf('Invalid page/redirect, id not found. #%s', $message->getPageId())
                 );
                 throw new InvalidPayloadException('Missing required information', ['message' => $message]);
             }
