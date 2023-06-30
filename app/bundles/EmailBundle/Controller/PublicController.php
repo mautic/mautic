@@ -33,7 +33,6 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    private MessageBusInterface $messageBus;
     private LoggerInterface $logger;
 
     /**
