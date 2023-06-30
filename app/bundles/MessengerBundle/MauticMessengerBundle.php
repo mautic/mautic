@@ -9,8 +9,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticMessengerBundle extends Bundle
 {
-    public const LOG_PREFIX = 'messenger: ';
-
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

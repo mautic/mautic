@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\EmailBundle\Form\DataTransformer;
+namespace Mautic\ConfigBundle\Form\DataTransformer;
 
 use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,8 +16,12 @@ class DsnTransformer implements DataTransformerInterface
 {
     private const PASSWORD_MASK = '🔒';
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private EscapeTransformer $escapeTransformer)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private EscapeTransformer $escapeTransformer,
+        private string $configKey,
+        private bool $allowEmpty
+    ) {
     }
 
     /**
@@ -50,6 +54,10 @@ class DsnTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value): string
     {
+        if ($this->allowEmpty && !array_filter($value)) {
+            return '';
+        }
+
         // unescape the values as they are escaped by the escape transformer applied to the child elements
         $value = $this->escapeTransformer->transform($value);
 
@@ -64,7 +72,7 @@ class DsnTransformer implements DataTransformerInterface
         );
 
         if (self::PASSWORD_MASK === $dsn->getPassword()) {
-            $previousDsn = Dsn::fromString($this->coreParametersHelper->get('mailer_dsn'));
+            $previousDsn = Dsn::fromString($this->coreParametersHelper->get($this->configKey));
             $dsn         = $dsn->setPassword($previousDsn->getPassword());
         }
 
