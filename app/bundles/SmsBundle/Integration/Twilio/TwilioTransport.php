@@ -6,6 +6,7 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use Psr\Log\LoggerInterface;
 use Twilio\Exceptions\ConfigurationException;
@@ -19,9 +20,6 @@ class TwilioTransport implements TransportInterface
     private LoggerInterface $logger;
 
     private Client $client;
-
-    /** @phpstan-ignore-next-line */
-    private string $messagingServiceSid;
 
     /**
      * TwilioTransport constructor.
@@ -39,6 +37,27 @@ class TwilioTransport implements TransportInterface
      */
     public function sendSms(Lead $lead, $content)
     {
+        return $this->sendMessage($lead, $content);
+    }
+
+    /**
+     * @param array<mixed> $media
+     *
+     * @return bool|string
+     */
+    public function sendMms(Lead $lead, string $content, array $media)
+    {
+        return $this->sendMessage($lead, $content, $media);
+    }
+
+    /**
+     * @param string       $content
+     * @param array<mixed> $media
+     *
+     * @return bool|string
+     */
+    private function sendMessage(Lead $lead, $content, array $media = [])
+    {
         $number = $lead->getLeadPhoneNumber();
 
         if (null === $number) {
@@ -46,24 +65,12 @@ class TwilioTransport implements TransportInterface
         }
 
         try {
+            $messagingServiceSid = $this->configuration->getMessagingServiceSid();
             $this->configureClient();
 
-<<<<<<< HEAD
-=======
-            $payload = [
-                'messagingServiceSid' => $this->messagingServiceSid,
-                'body'                => $content,
-            ];
-            if (!empty($media)) {
-                $payload['mediaUrl'] = $media;
-            }
->>>>>>> 6eae533a18 (replace sender number to messaging service sid)
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
-                [
-                    'from' => $this->sendingPhoneNumber,
-                    'body' => $content,
-                ]
+                $this->createPayload($messagingServiceSid, $content, $media)
             );
 
             return true;
@@ -108,6 +115,24 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
+     * @param mixed[] $media
+     *
+     * @return mixed[]
+     */
+    private function createPayload(string $messagingServiceSid, string $content, array $media): array
+    {
+        $payload = [
+            'messagingServiceSid' => $messagingServiceSid,
+            'body'                => $content,
+        ];
+        if (!empty($media)) {
+            $payload['mediaUrl'] = $media;
+        }
+
+        return $payload;
+    }
+
+    /**
      * @throws ConfigurationException
      */
     private function configureClient()
@@ -117,7 +142,6 @@ class TwilioTransport implements TransportInterface
             return;
         }
 
-        $this->messagingServiceSid = $this->configuration->getMessagingServiceSid();
         $this->client              = new Client(
             $this->configuration->getAccountSid(),
             $this->configuration->getAuthToken()
