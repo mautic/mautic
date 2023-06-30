@@ -20,9 +20,6 @@ class ParameterLoaderTest extends TestCase
         $this->assertEquals('https://language-packs.mautic.com/', $parameterBag->get('translations_fetch_url'));
         $this->assertEquals('https://language-packs.mautic.com/', $_ENV['MAUTIC_TRANSLATIONS_FETCH_URL']);
 
-        $this->assertEquals('foobar.com', $parameterBag->get('mailer_dsn'));
-        $this->assertEquals('foobar.com', $_ENV['MAUTIC_MAILER_DSN']);
-
         $this->assertEquals('-1 day', $parameterBag->get('default_daterange_filter'));
         $this->assertEquals('-1 day', $_ENV['MAUTIC_DEFAULT_DATERANGE_FILTER']);
 

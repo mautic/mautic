@@ -77,29 +77,20 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'failure_transport' => 'failed_default',
+        'failure_transport' => 'failed',
         'transports'        => [
-            'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
-                ],
+            'email' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
-                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
-                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
-                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
-                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
-            'failed_default' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
-                ],
-            ],
+            'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email_transport',
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
         ],
     ],
 
@@ -132,7 +123,6 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
     'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
