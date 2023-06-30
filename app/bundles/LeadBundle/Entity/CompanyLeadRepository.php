@@ -50,7 +50,7 @@ class CompanyLeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null, $onlyPrimary = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
