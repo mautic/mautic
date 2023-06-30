@@ -15,11 +15,20 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    private Configuration $configuration;
+    /**
+     * @var Configuration
+     */
+    private $configuration;
 
-    private LoggerInterface $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    private Client $client;
+    /**
+     * @var Client
+     */
+    private $client;
 
     /**
      * TwilioTransport constructor.
