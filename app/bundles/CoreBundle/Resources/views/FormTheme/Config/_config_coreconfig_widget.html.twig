@@ -105,6 +105,7 @@
           {% endif %}
 
           {%- if form.shortener_service is defined %}
+              <hr class="text-muted" />
               <div class="row">
                   <div class="col-md-6">
                       {{ form_label(form.shortener_service) }}
@@ -122,6 +123,7 @@
           {% endif %}
 
           {% if fields.transliterate_page_title or fields.load_froala_assets is defined %}
+            <hr class="text-muted" />
             <div class="row">
                 {%- if form.transliterate_page_title is defined %}<div class="col-md-6">{{ form_row(form.transliterate_page_title) }}</div>{% endif %}
                 {%- if form.load_froala_assets is defined %}

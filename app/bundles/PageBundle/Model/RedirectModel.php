@@ -8,8 +8,8 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
@@ -23,8 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RedirectModel extends FormModel
 {
-    private Shortener $shortener;
-
     /**
      * RedirectModel constructor.
      */
