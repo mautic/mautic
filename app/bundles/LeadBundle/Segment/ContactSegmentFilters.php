@@ -34,7 +34,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
      *
      * @return ContactSegmentFilter
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->contactSegmentFilters[$this->position];
     }
@@ -44,7 +44,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
      *
      * @see  http://php.net/manual/en/iterator.next.php
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -56,7 +56,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
      *
      * @return int
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -65,10 +65,8 @@ class ContactSegmentFilters implements \Iterator, \Countable
      * Checks if current position is valid.
      *
      * @see  http://php.net/manual/en/iterator.valid.php
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->contactSegmentFilters[$this->position]);
     }
@@ -78,7 +76,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
      *
      * @see  http://php.net/manual/en/iterator.rewind.php
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -87,10 +85,8 @@ class ContactSegmentFilters implements \Iterator, \Countable
      * Count elements of an object.
      *
      * @see  http://php.net/manual/en/countable.count.php
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->contactSegmentFilters);
     }

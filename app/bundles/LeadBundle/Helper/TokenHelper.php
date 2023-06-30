@@ -72,9 +72,6 @@ class TokenHelper
     }
 
     /**
-     * @param $alias
-     * @param $defaultValue
-     *
      * @return mixed
      */
     private static function getTokenValue(array $lead, $alias, $defaultValue)
@@ -128,8 +125,6 @@ class TokenHelper
     }
 
     /**
-     * @param $match
-     *
      * @return string
      */
     private static function getTokenDefaultValue($match)
@@ -143,8 +138,6 @@ class TokenHelper
     }
 
     /**
-     * @param $match
-     *
      * @return mixed
      */
     private static function getFieldAlias($match)

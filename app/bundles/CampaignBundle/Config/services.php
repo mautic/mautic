@@ -24,4 +24,8 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.campaign.model.campaign', \Mautic\CampaignBundle\Model\CampaignModel::class);
+    $services->alias('mautic.campaign.model.event', \Mautic\CampaignBundle\Model\EventModel::class);
+    $services->alias('mautic.campaign.model.event_log', \Mautic\CampaignBundle\Model\EventLogModel::class);
+    $services->alias('mautic.campaign.model.summary', \Mautic\CampaignBundle\Model\SummaryModel::class);
 };

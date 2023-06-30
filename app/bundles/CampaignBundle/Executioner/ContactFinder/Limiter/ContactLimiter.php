@@ -227,8 +227,6 @@ class ContactLimiter
     }
 
     /**
-     * @param $reduction
-     *
      * @return $this
      *
      * @throws \Exception

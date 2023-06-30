@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Command;
 
-use Exception;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 
 class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCleanupMaintenanceCommand(): void
     {

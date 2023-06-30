@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-use InvalidArgumentException;
-
 class PreUpdateCheckResult
 {
     public bool $success;
@@ -26,7 +24,7 @@ class PreUpdateCheckResult
 
         foreach ($errors as $error) {
             if (!($error instanceof PreUpdateCheckError)) {
-                throw new InvalidArgumentException('Error must be of type PreUpdateCheckError');
+                throw new \InvalidArgumentException('Error must be of type PreUpdateCheckError');
             }
         }
 

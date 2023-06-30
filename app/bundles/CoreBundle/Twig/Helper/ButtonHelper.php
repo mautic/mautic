@@ -269,7 +269,7 @@ final class ButtonHelper
      */
     public function reset(Request $request, $buttonCount, $groupType = self::TYPE_GROUP, $item = null)
     {
-        //@escopecz: I think there is a possible bug here
+        // @escopecz: I think there is a possible bug here
         $this->location       = $buttonCount;
         $this->groupType      = $groupType;
         $this->buttonCount    = 0;
@@ -302,7 +302,7 @@ final class ButtonHelper
     {
         $buttons = '';
 
-        //Wrap links in a tag
+        // Wrap links in a tag
         if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";

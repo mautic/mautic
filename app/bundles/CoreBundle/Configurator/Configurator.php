@@ -241,7 +241,7 @@ class Configurator
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '\''.addcslashes($value, '\\\'').'\'';
+                $string .= '\''.addcslashes((string) $value, '\\\'').'\'';
             }
 
             --$counter;

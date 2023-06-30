@@ -34,12 +34,12 @@ class SourceController extends CommonFormController
             ];
         }
 
-        //set the sourceType key for sources
+        // set the sourceType key for sources
         if (!in_array($sourceType, $this->supportedSourceTypes)) {
             return $this->modalAccessDenied();
         }
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(
                 [
@@ -64,7 +64,7 @@ class SourceController extends CommonFormController
             ]
         );
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -98,7 +98,7 @@ class SourceController extends CommonFormController
                 $passthroughVars['sourceType'] = $sourceType;
             }
 
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -120,8 +120,6 @@ class SourceController extends CommonFormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return Response
      */
     public function editAction(Request $request, $objectId)
@@ -147,7 +145,7 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(
                 [
@@ -172,13 +170,13 @@ class SourceController extends CommonFormController
             ]
         );
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //save the properties to session
+                    // save the properties to session
                     $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
                     $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $modifiedSources);
                 } else {
@@ -207,7 +205,7 @@ class SourceController extends CommonFormController
                 $passthroughVars['sourceType'] = $sourceType;
             }
 
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -231,8 +229,6 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
@@ -241,7 +237,7 @@ class SourceController extends CommonFormController
         $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
         $sourceType      = $request->get('sourceType');
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(
                 [

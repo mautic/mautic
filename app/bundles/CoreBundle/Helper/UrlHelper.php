@@ -37,8 +37,6 @@ class UrlHelper
     }
 
     /**
-     * @param $rel
-     *
      * @return string
      */
     public static function rel2abs($rel)

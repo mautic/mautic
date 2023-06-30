@@ -31,9 +31,6 @@ trait FilterTrait
         $this->connection = $connection;
     }
 
-    /**
-     * @param $eventName
-     */
     public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
     {
         $data    = $event->getData();
@@ -206,7 +203,7 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
                 $customOptions['choices']                   = $options[$choiceKey];
                 $customOptions['choice_translation_domain'] = false;
-                $customOptions['multiple']                  = (in_array($operator, ['in', '!in']));
+                $customOptions['multiple']                  = in_array($operator, ['in', '!in']);
 
                 if ($customOptions['multiple']) {
                     array_unshift($customOptions['choices'], ['' => '']);
@@ -287,7 +284,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $choices;
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
-            break;
+                break;
             case 'lookup':
                 $attr = array_merge(
                     $attr,

@@ -17,9 +17,6 @@ class TokenHelper
     }
 
     /**
-     * @param $content
-     * @param $clickthrough
-     *
      * @return array
      */
     public function findAssetTokens($content, $clickthrough = [])

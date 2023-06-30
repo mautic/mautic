@@ -66,8 +66,6 @@ class FocusController extends AbstractStandardFormController
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function viewAction(Request $request, $objectId)
@@ -110,8 +108,6 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      *
      * @throws \Exception
@@ -161,8 +157,6 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     protected function getPostActionRedirectArguments(array $args, $action)

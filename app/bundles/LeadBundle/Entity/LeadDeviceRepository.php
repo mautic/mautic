@@ -27,8 +27,6 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -36,7 +34,6 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param      $lead
      * @param null $deviceNames
      * @param null $deviceBrands
      * @param null $deviceModels
@@ -108,7 +105,7 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        //get totals
+        // get totals
         $device = $sq->execute()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
@@ -169,9 +166,6 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

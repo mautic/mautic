@@ -13,7 +13,7 @@ return [
             ],
             'mautic.queue.helper.rabbitmq_consumer' => [
                 'class'     => \Mautic\QueueBundle\Helper\RabbitMqConsumer::class,
-                'arguments' => 'mautic.queue.service',
+                'arguments' => ['mautic.queue.service'],
             ],
         ],
     ],

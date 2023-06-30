@@ -11,7 +11,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
@@ -76,10 +75,30 @@ class PageModelTest extends PageTestAbstract
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
+    public function testUrlTitleFallbacksToPageTitleWhenNotInQuery(): void
+    {
+        $providedTitle = '你好，世界';
+        $expectedTitle = 'ni hao, shi jie';
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $ipAddress     = new IpAddress();
+        $pageModel     = $this->getPageModel();
+
+        $page->setTitle($providedTitle);
+        $hit->setIpAddress($ipAddress);
+        $hit->setQuery([]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame($expectedTitle, $hit->getUrlTitle());
+    }
+
     public function testCleanQueryWhenCalledReturnsSafeAndValidData()
     {
         $pageModel           = $this->getPageModel();
-        $pageModelReflection = new ReflectionClass(get_class($pageModel));
+        $pageModelReflection = new \ReflectionClass(get_class($pageModel));
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
         $res = $cleanQueryMethod->invokeArgs($pageModel, [

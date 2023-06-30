@@ -97,23 +97,6 @@
               </div>
           {% endif %}
 
-          {%- if form.shortener_service is defined %}
-          <div class="row">
-                <div class="col-md-6">
-                  {{ form_label(form.shortener_service) }}
-                  {% if form.shortener_service.vars.choices|length > 0 %}
-                      {{ form_widget(form.shortener_service) }}
-                  {% else %}
-                      <div class="row">
-                          <div class="col-xs-12">
-                              {{ 'mautic.core.config.form.shortener.empty'|trans }}
-                          </div>
-                      </div>
-                  {% endif %}
-              </div>
-          </div>
-          {% endif %}
-
           {% if fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />
             <div class="row">
@@ -121,10 +104,32 @@
             </div>
           {% endif %}
 
-          {% if fields.transliterate_page_title %}
-            <hr class="text-muted" />
+          {%- if form.shortener_service is defined %}
+              <div class="row">
+                  <div class="col-md-6">
+                      {{ form_label(form.shortener_service) }}
+                      {% if form.shortener_service.vars.choices|length > 0 %}
+                          {{ form_widget(form.shortener_service) }}
+                      {% else %}
+                          <div class="row">
+                              <div class="col-xs-12">
+                                  {{ 'mautic.core.config.form.shortener.empty'|trans }}
+                              </div>
+                          </div>
+                      {% endif %}
+                  </div>
+              </div>
+          {% endif %}
+
+          {% if fields.transliterate_page_title or fields.load_froala_assets is defined %}
             <div class="row">
                 {%- if form.transliterate_page_title is defined %}<div class="col-md-6">{{ form_row(form.transliterate_page_title) }}</div>{% endif %}
+                {%- if form.load_froala_assets is defined %}
+                    <div class="col-md-6">
+                        {{ form_row(form.load_froala_assets) }}
+                        <div class="alert alert-danger" role="alert">{{ 'mautic.core.config.load.froala.assets.warning'|trans }}</div>
+                    </div>
+                {% endif %}
             </div>
           {% endif %}
       </div>
@@ -159,13 +164,13 @@
               {%- if form.update_stability is defined %}<div class="col-md-6">{{ form_row(form.update_stability) }}</div>{% endif %}
               {%- if form.composer_updates is defined %}
                 <div class="col-md-6">
-                  {{ form_row(form.composer_updates) }}
-                  <span style="color:red">
-                    {{ 'mautic.core.config.form.update.composer.warning'|trans({
-                          '%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
-                          '%url_end%': '</a>'
-                    })|raw }}
-                  </span>
+                    {{ form_row(form.composer_updates) }}
+                    <div class="alert alert-danger" role="alert">
+                        {{ 'mautic.core.config.form.update.composer.warning'|trans({
+                            '%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
+                            '%url_end%': '</a>'
+                        })|raw }}
+                    </div>
                 </div>
               {% endif %}
           </div>
