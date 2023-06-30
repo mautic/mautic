@@ -63,21 +63,6 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
     });
 };
 
-Mautic.sendTestEmail = function() {
-    mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');
-
-    Mautic.ajaxActionRequest('email:sendTestEmail', {}, function(response) {
-        var theClass = (response.success) ? 'has-success' : 'has-error';
-        var theMessage = response.message;
-        mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);
-        mQuery('#mailerTestButtonContainer .help-block .status-msg').html(theMessage);
-        mQuery('#mailerTestButtonContainer .fa-spinner').addClass('hide');
-    });
-};
-
-Mautic.disableSendTestEmailButton = function() {
-    mQuery('#mailerTestButtonContainer .help-block .status-msg').html('');
-    mQuery('#mailerTestButtonContainer .help-block .save-config-msg').removeClass('hide');
-    mQuery('#config_emailconfig_mailer_test_send_button').prop('disabled', true).addClass('disabled');
-
+Mautic.disableSendTestEmailButton = function(element) {
+    mQuery(element).closest('.tab-pane').find('.config-dsn-test-container').each(function () {Mautic.configDnsTestDisable(this)});
 };
