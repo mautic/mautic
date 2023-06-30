@@ -57,7 +57,6 @@ class RedirectModelTest extends PageTestAbstract
             ->willReturn($url);
 
         $model = new RedirectModel(
-            $urlHelper,
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(CorePermissions::class),
             $dispatcher,
