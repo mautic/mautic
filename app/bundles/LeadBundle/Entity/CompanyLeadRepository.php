@@ -50,7 +50,7 @@ class CompanyLeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null, $onlyPrimary = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -66,7 +66,13 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        if ($onlyPrimary) {
+            $q->andWhere(
+                $q->expr()->eq('cl.is_primary', true)
+            );
+        }
+
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
