@@ -27,7 +27,6 @@ class RedirectModel extends FormModel
      * RedirectModel constructor.
      */
     public function __construct(
-        UrlHelper $urlHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -38,8 +37,6 @@ class RedirectModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         private Shortener $shortener
     ) {
-        $this->urlHelper = $urlHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

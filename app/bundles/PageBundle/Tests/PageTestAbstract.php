@@ -194,7 +194,6 @@ class PageTestAbstract extends TestCase
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->setConstructorArgs([
-                $urlHelper,
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
                 $this->createMock(EventDispatcherInterface::class),
