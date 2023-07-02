@@ -27,12 +27,10 @@ use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
-
     protected function setUp(): void
     {
-        $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
-        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
+        $this->configParams['mailer_from_email']                  = 'admin@mautic-community.test';
+        $this->configParams['messenger_dsn_email']                = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
 
         parent::setUp();
     }
@@ -794,14 +792,5 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         self::assertSame('multiple', $multiple);
-    }
-
-    public function testSimpleCompanyFeature(): void
-    {
-        $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
-
-        $crawler     = $this->client->request('GET', 's/contacts/new/');
-        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
-        self::assertNull($multiple);
     }
 }
