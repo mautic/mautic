@@ -32,7 +32,7 @@ class ClickthroughHelper
      */
     public function decode(?string $string, bool $urlDecode = true): array
     {
-        $raw     = $urlDecode ? urldecode($string) : $string;
+        $raw     = $urlDecode ? rawurldecode($string) : $string;
         $decoded = base64_decode($raw);
 
         if (empty($decoded)) {
