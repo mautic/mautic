@@ -96,42 +96,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.point.model.point' => [
-                'class'     => \Mautic\PointBundle\Model\PointModel::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.factory',
-                    'mautic.tracker.contact',
-                    'mautic.point.model.group',
-                ],
-            ],
-            'mautic.point.model.group' => [
-                'class'     => \Mautic\PointBundle\Model\PointGroupModel::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.point.model.triggerevent',
-                    'mautic.factory',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.point.model.triggerevent' => [
-                'class' => \Mautic\PointBundle\Model\TriggerEventModel::class,
-            ],
-            'mautic.point.model.trigger' => [
-                'class'     => \Mautic\PointBundle\Model\TriggerModel::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.point.model.triggerevent',
-                    'mautic.factory',
-                    'mautic.tracker.contact',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.point.repository.lead_point_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
