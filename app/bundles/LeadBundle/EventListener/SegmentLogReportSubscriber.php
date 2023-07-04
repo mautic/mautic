@@ -88,13 +88,13 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_event_log', 'log_removed', $this->generateLeftJoinCondition('log_removed', 'removed').' AND log_removed.object_id = log_added.object_id ');
 
         $qb->andWhere(
-            $qb->expr()->orX(
+            $qb->expr()->or(
                 $qb->expr()->isNotNull('log_added.date_added'),
                 $qb->expr()->isNotNull('log_removed.date_added')
             )
         );
-        $qb->setParameter(':dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
-        $qb->setParameter(':dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
 
         if (!$event->hasGroupBy()) {
             $qb->groupBy('l.id,log_added.object_id');

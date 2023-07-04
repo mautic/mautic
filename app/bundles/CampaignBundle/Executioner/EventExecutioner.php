@@ -277,7 +277,6 @@ class EventExecutioner
     }
 
     /**
-     * @param      $reason
      * @param bool $isInactiveEvent
      */
     public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false)
@@ -511,7 +510,7 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function persistSummaries(): void

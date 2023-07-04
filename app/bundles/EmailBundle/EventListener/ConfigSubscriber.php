@@ -45,13 +45,6 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigBeforeSave(ConfigEvent $event)
     {
-        $event->unsetIfEmpty(
-            [
-                'mailer_password',
-                'mailer_api_key',
-            ]
-        );
-
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost

@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
 
             $formType = $monitoringModel->getFormByType($type);
 
@@ -36,7 +36,7 @@ class AjaxController extends CommonAjaxController
             $form = $formFactory->create($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
-                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.twig',
+                '@MauticSocial/FormTheme/'.$type.'_widget.html.twig',
                 ['form' => $form->createView()]
             );
 

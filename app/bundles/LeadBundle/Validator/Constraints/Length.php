@@ -4,10 +4,7 @@ namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length as SymfonyLength;
 
-/**
- * @Annotation
- * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
- */
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
 class Length extends SymfonyLength
 {
     /**

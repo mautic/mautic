@@ -57,13 +57,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'mautic.dynamicContent.model.dynamicContent' => [
-                'class'     => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
-                'arguments' => [
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.dynamicContent.repository.stat' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,

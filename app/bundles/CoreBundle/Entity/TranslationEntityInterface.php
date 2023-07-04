@@ -12,7 +12,7 @@ interface TranslationEntityInterface
     /**
      * Get translation parent.
      *
-     * @return TranslationEntityInterface
+     * @return mixed
      */
     public function getTranslationParent();
 

@@ -11,8 +11,7 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
      */
     protected function configure()
     {
-        $this->setName('social:monitor:twitter:hashtags')
-            ->setDescription('Looks at our monitoring records and finds hashtags');
+        $this->setName('social:monitor:twitter:hashtags');
 
         parent::configure();
     }
@@ -53,4 +52,5 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
     {
         return 'twitter';
     }
+    protected static $defaultDescription = 'Looks at our monitoring records and finds hashtags';
 }

@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,9 +22,9 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     private TranslatorInterface $translator;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
@@ -32,7 +33,6 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:maintenance:cleanup')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -67,7 +67,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $daysOld       = $input->getOption('days-old');
@@ -76,7 +76,7 @@ EOT
         $gdpr          = $input->getOption('gdpr');
         if (empty($daysOld) && empty($gdpr)) {
             // Safety catch; bail
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         if (!empty($gdpr)) {
@@ -94,7 +94,7 @@ EOT
             if (!$helper->ask($input, $output, $question)) {
                 $this->completeRun();
 
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -125,6 +125,7 @@ EOT
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

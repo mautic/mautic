@@ -21,7 +21,7 @@ class Copy
     private $dateCreated;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $body;
 
@@ -40,7 +40,7 @@ class Copy
             ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->length(32)
             ->build();
 
@@ -55,8 +55,6 @@ class Copy
     }
 
     /**
-     * @param $id
-     *
      * @return $this
      */
     public function setId($id)

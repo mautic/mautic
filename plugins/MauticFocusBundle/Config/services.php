@@ -19,4 +19,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.focus.model.focus', \MauticPlugin\MauticFocusBundle\Model\FocusModel::class);
 };

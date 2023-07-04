@@ -58,7 +58,7 @@ class MenuRenderer implements RendererInterface
             $this->matcher->clear();
         }
 
-        //render html
+        // render html
         $html = $this->twig->render($options['template'], [
             'item'    => $item,
             'options' => $options,

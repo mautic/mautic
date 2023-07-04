@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncDataExchange\Internal\ObjectHelper;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO as OrderFieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -33,7 +32,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
         $userModel = self::$container->get('mautic.user.model.user');
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
-        $now       = new DateTime();
+        $now       = new \DateTime();
 
         $company1 = new Company();
         $company1->setDateAdded($now);
@@ -67,7 +66,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
 
     private function buildObjectChangeDAO(Company $company, string $name, string $value): ObjectChangeDAO
     {
-        $objectChangeDAO = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, $company->getId(), SyncObject\Company::NAME, $company->getId(), new DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, $company->getId(), SyncObject\Company::NAME, $company->getId(), new \DateTime());
         $objectChangeDAO->addField(new OrderFieldDAO($name, new NormalizedValueDAO(NormalizedValueDAO::PHONE_TYPE, $value)));
 
         return $objectChangeDAO;
