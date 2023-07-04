@@ -78,11 +78,11 @@ class PointModel extends CommonFormModel
         CoreParametersHelper $coreParametersHelper,
         PointGroupModel $pointGroupModel
     ) {
-        $this->requestStack   = $requestStack;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
-        $this->mauticFactory  = $mauticFactory;
-        $this->contactTracker = $contactTracker;
+        $this->requestStack       = $requestStack;
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->leadModel          = $leadModel;
+        $this->mauticFactory      = $mauticFactory;
+        $this->contactTracker     = $contactTracker;
         $this->pointGroupModel    = $pointGroupModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
