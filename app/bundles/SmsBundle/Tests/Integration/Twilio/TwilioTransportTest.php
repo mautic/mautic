@@ -12,7 +12,6 @@ use Monolog\Logger;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class TwilioTransportTest extends TestCase
 {
@@ -44,7 +43,7 @@ class TwilioTransportTest extends TestCase
 
     public function testCreatePayload(): void
     {
-        $reflection = new ReflectionClass(get_class($this->twilioTransport));
+        $reflection = new \ReflectionClass(get_class($this->twilioTransport));
         $method     = $reflection->getMethod('createPayload');
         $method->setAccessible(true);
 

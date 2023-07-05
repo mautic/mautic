@@ -36,7 +36,6 @@ class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
 
         $integrationRepository = $this->em->getRepository(Integration::class);
-        \assert($integrationRepository instanceof IntegrationRepository);
 
         $integrationConfig = $integrationRepository->findOneBy(['name' => $integration->getName()]);
         \assert($integrationConfig instanceof Integration);

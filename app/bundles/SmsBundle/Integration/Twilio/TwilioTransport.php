@@ -102,7 +102,6 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
-     *
      * @return mixed[]
      */
     private function createPayload(string $messagingServiceSid, string $content): array

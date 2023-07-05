@@ -72,7 +72,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('password', $this->getConfiguration()->getAuthToken());
     }
 
-    public function testConfigurationExceptionThrownIfNotPublished()
+    public function testConfigurationExceptionThrownIfNotPublished(): void
     {
         $this->expectException(ConfigurationException::class);
 
