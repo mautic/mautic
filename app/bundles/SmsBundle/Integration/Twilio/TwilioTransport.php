@@ -6,7 +6,6 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use Psr\Log\LoggerInterface;
 use Twilio\Exceptions\ConfigurationException;
@@ -50,22 +49,11 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
-     * @param array<mixed> $media
-     *
-     * @return bool|string
-     */
-    public function sendMms(Lead $lead, string $content, array $media)
-    {
-        return $this->sendMessage($lead, $content, $media);
-    }
-
-    /**
      * @param string       $content
-     * @param array<mixed> $media
      *
      * @return bool|string
      */
-    private function sendMessage(Lead $lead, $content, array $media = [])
+    private function sendMessage(Lead $lead, $content)
     {
         $number = $lead->getLeadPhoneNumber();
 
@@ -79,7 +67,7 @@ class TwilioTransport implements TransportInterface
 
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
-                $this->createPayload($messagingServiceSid, $content, $media)
+                $this->createPayload($messagingServiceSid, $content)
             );
 
             return true;
@@ -124,19 +112,15 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
-     * @param mixed[] $media
      *
      * @return mixed[]
      */
-    private function createPayload(string $messagingServiceSid, string $content, array $media): array
+    private function createPayload(string $messagingServiceSid, string $content): array
     {
         $payload = [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
-        if (!empty($media)) {
-            $payload['mediaUrl'] = $media;
-        }
 
         return $payload;
     }
