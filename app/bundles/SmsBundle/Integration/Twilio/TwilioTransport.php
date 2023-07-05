@@ -125,7 +125,7 @@ class TwilioTransport implements TransportInterface
             return;
         }
 
-        $this->client              = new Client(
+        $this->client = new Client(
             $this->configuration->getAccountSid(),
             $this->configuration->getAuthToken()
         );

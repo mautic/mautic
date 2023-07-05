@@ -36,7 +36,7 @@ class TwilioTransportTest extends TestCase
         $lead = new Lead();
         $lead->setMobile('123456');
         $this->logger->expects($this->once())
-            ->method('addWarning')
+            ->method('warning')
             ->with('mautic.sms.transport.twilio.not_configured');
 
         $this->twilioTransport->sendSms($lead, 'some_content');
