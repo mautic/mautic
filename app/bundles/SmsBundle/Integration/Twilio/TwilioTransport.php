@@ -45,16 +45,6 @@ class TwilioTransport implements TransportInterface
      */
     public function sendSms(Lead $lead, $content)
     {
-        return $this->sendMessage($lead, $content);
-    }
-
-    /**
-     * @param string       $content
-     *
-     * @return bool|string
-     */
-    private function sendMessage(Lead $lead, $content)
-    {
         $number = $lead->getLeadPhoneNumber();
 
         if (null === $number) {
