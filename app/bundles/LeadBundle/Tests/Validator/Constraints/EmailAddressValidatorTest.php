@@ -42,6 +42,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
         yield [null, 0];
         yield ['', 0];
         yield ['test@test.com', 0];
+        yield ['tést@test.com', 0];
         yield ['testtest.com', 1];
         yield ['test@testcom', 1];
         yield ['test@test@.com', 1];
