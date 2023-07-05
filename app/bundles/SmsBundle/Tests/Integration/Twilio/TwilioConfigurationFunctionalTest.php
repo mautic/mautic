@@ -7,7 +7,6 @@ namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
