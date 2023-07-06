@@ -785,7 +785,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             }, 500);
         });
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
-        mQuery('#leadfield_properties').html('');
+        // mQuery('#leadfield_properties').html('');
     }
 
     if (selectedVal == 'time') {

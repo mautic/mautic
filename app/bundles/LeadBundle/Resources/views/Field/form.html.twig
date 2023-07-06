@@ -131,16 +131,19 @@
       {{ include('@MauticLead/Field/properties_number.html.twig') }}
       {{ include('@MauticLead/Field/properties_boolean.html.twig') }}
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'select',
       }) }}
 
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'multiselect',
       }) }}
 
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'lookup',
       }) }}
