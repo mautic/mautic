@@ -736,7 +736,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
     let isMultiselect = selectedVal === 'multiselect' ? true : false;
     if (selectedVal === 'multiselect') {
         // Use select
-        selectedVal = 'select';
+        // selectedVal = 'select';
     }
 
     if (mQuery('#field-templates .' + selectedVal).length) {
@@ -785,7 +785,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             }, 500);
         });
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
-        // mQuery('#leadfield_properties').html('');
+        mQuery('#leadfield_properties').html('');
     }
 
     if (selectedVal == 'time') {
