@@ -226,7 +226,7 @@
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
 
-  {% for listValue, listLabel in list %}
+  {% for listValue, listLabel in list|default([]) %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
     {% set checkboxBrackets = ('checkbox' == type) ? '[]' : '' %}
     {% set inputAttributes = inputAttributes|merge({
