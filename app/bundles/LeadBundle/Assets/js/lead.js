@@ -736,7 +736,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
     let isMultiselect = selectedVal === 'multiselect' ? true : false;
     if (selectedVal === 'multiselect') {
         // Use select
-        // selectedVal = 'select';
+        selectedVal = 'select';
     }
 
     if (mQuery('#field-templates .' + selectedVal).length) {

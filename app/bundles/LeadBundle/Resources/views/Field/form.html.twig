@@ -67,6 +67,7 @@
                             {{ include('@MauticLead/Field/properties_select.html.twig', {
                                 'form': form.properties,
                                 'selectTemplate': selectTemplate,
+                                'type': 'select',
                             }) }}
                         {% elseif 'lookup' == type %}
                             {{ include('@MauticLead/Field/properties_select.html.twig', {
