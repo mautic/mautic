@@ -52,7 +52,7 @@ class RedirectModelTest extends PageTestAbstract
         $clickthrough = ['foo' => 'bar'];
 
         $router = $this->createMock(Router::class);
-        $router->expects($this->exactly(2))
+        $router->expects($this->exactly(1))
             ->method('generate')
             ->willReturn($url);
 
@@ -78,7 +78,8 @@ class RedirectModelTest extends PageTestAbstract
                 $event->setInClickthrough('bar', 'foo');
             }
         );
+
         $url = $model->generateRedirectUrl($redirect, $clickthrough);
-        $this->assertEquals('https://mautic.org?ct=YToyOntzOjM6ImZvbyI7czozOiJiYXIiO3M6MzoiYmFyIjtzOjM6ImZvbyI7fQ%3D%3D', $url);
+        $this->assertEquals('https://mautic.org', $url);
     }
 }

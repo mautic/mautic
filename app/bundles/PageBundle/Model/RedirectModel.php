@@ -61,44 +61,42 @@ class RedirectModel extends FormModel
         return $this->getRepository()->findOneBy(['redirectId' => $identifier]);
     }
 
-    /**
-     * Generate a Mautic redirect/passthrough URL.
-     *
-     * @param array $clickthrough
-     * @param bool  $shortenUrl
-     * @param array $utmTags
-     *
-     * @return string
-     */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false, $utmTags = [])
-    {
-        if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
-            $event = new RedirectGenerationEvent($redirect, $clickthrough);
-            $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
+        /**
+         * Generate a Mautic redirect/passthrough URL.
+         *
+         * @param array $clickthrough
+         * @param bool  $shortenUrl
+         * @param array $utmTags
+         *
+         * @return string
+         */
+        public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false, $utmTags = [])
+        {
+            if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
+                $event = new RedirectGenerationEvent($redirect, $clickthrough);
+                $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
 
-            $clickthrough = $event->getClickthrough();
+                $clickthrough = $event->getClickthrough();
+            }
+
+            if (!empty($utmTags)) {
+                $utmTags                                     = array_filter($utmTags);
+                !empty($utmTags) && $clickthrough['utmTags'] = $this->getUtmTagsForUrl($utmTags);
+            }
+            $url = $this->buildUrl(
+                'mautic_url_redirect',
+                [
+                    'redirectId' => $redirect->getRedirectId(),
+                    'ct'         => $this->encodeArrayForUrl($clickthrough),
+                ],
+            );
+
+            if ($shortenUrl) {
+                $url = $this->urlHelper->buildShortUrl($url);
+            }
+
+            return $url;
         }
-
-        if (!empty($utmTags)) {
-            $utmTags                                     = array_filter($utmTags);
-            !empty($utmTags) && $clickthrough['utmTags'] = $this->getUtmTagsForUrl($utmTags);
-        }
-
-        $url = $this->buildUrl(
-            'mautic_url_redirect',
-            [
-                'redirectId' => $redirect->getRedirectId(),
-            ],
-            true,
-            $clickthrough
-        );
-
-        if ($shortenUrl) {
-            $url = $this->urlHelper->buildShortUrl($url);
-        }
-
-        return $url;
-    }
 
     /**
      * Generate UTMs params for url.

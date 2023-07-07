@@ -24,7 +24,6 @@ trait ClickthroughHelperBCTrait
      * Encode an array of strings to append to a URL.
      *
      * @depreacated use the `encode` method
-     *
      * @depreacated
      *
      * @return string
@@ -39,7 +38,6 @@ trait ClickthroughHelperBCTrait
      *
      * @depreacated use the `decode` method
      *
-     * @param      $string
      * @param bool $urlDecode
      *
      * @return array
