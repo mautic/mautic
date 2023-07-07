@@ -9,8 +9,10 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -185,5 +187,39 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new CompanyEvent($company);
         $dispatcher->dispatch($event, LeadEvents::COMPANY_POST_SAVE);
         $dispatcher->dispatch($event, LeadEvents::COMPANY_POST_DELETE);
+    }
+
+    public function testOnSegmentChangeWithArrayContact(): void
+    {
+        $changeEvent = $this->createMock(ListChangeEvent::class);
+
+        $contact = ['id' => 1];
+
+        $changeEvent->method('getLeads')->willReturn([$contact]);
+        $changeEvent->method('getLead')->willReturn(null);
+        $changeEvent->method('wasAdded')->willReturn(true);
+
+        $leadModel    = $this->createMock(LeadModel::class);
+        $webhookModel = $this->createMock(WebhookModel::class);
+
+        $leadModel->expects($this->once())
+            ->method('getEntity')
+            ->with($this->equalTo($contact['id']))
+            ->willReturn($contact);
+
+        $webhookModel->expects($this->once())
+            ->method('queueWebhooksByType')
+            ->with(
+                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
+                $this->equalTo([
+                    'contact'  => $contact,
+                    'segment'  => $changeEvent->getList(),
+                    'action'   => 'added',
+                ])
+            );
+
+        $example = new WebhookSubscriber($webhookModel, $leadModel);
+
+        $example->onSegmentChange($changeEvent);
     }
 }
