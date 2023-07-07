@@ -43,8 +43,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $contactId
-     *
      * @return array
      */
     public function getContactPendingEvents($contactId, $type)
@@ -98,7 +96,6 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events by parent.
      *
-     * @param      $parentId
      * @param null $decisionPath
      * @param null $eventType
      *
@@ -132,8 +129,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
-     *
      * @return array
      */
     public function getCampaignEvents($campaignId)
@@ -197,8 +192,6 @@ class EventRepository extends CommonRepository
 
     /**
      * Null event parents in preparation for deleI'lting a campaign.
-     *
-     * @param $campaignId
      */
     public function nullEventParents($campaignId)
     {
@@ -211,8 +204,6 @@ class EventRepository extends CommonRepository
 
     /**
      * Null event parents in preparation for deleting events from a campaign.
-     *
-     * @param $events
      */
     public function nullEventRelationships($events)
     {
@@ -223,7 +214,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('parent_id', $events)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -245,7 +236,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param        $channel
      * @param null   $campaignId
      * @param string $eventType
      */
@@ -275,8 +265,6 @@ class EventRepository extends CommonRepository
     /**
      * Get an array of events that have been triggered by this lead.
      *
-     * @param $leadId
-     *
      * @return array
      */
     public function getLeadTriggeredEvents($leadId)
@@ -287,7 +275,7 @@ class EventRepository extends CommonRepository
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
 
         $results = $q->getQuery()->getArrayResult();

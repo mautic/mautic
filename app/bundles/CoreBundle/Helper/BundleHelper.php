@@ -44,7 +44,6 @@ class BundleHelper
     /**
      * Gets an array of a specific bundle's config settings.
      *
-     * @param        $bundleName
      * @param string $configKey
      * @param bool   $includePlugins
      *

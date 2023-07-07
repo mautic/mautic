@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -11,10 +12,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -36,10 +40,13 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -97,11 +104,6 @@ class PageModel extends FormModel
     protected $queueService;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -130,7 +132,14 @@ class PageModel extends FormModel
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper
+        ContactRequestHelper $contactRequestHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -143,13 +152,11 @@ class PageModel extends FormModel
         $this->companyModel         = $companyModel;
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->contactRequestHelper = $contactRequestHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @param $catInUrl
-     */
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
@@ -205,9 +212,9 @@ class PageModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
-            //make sure alias is not already taken
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
@@ -227,7 +234,7 @@ class PageModel extends FormModel
         // Set the author for new pages
         $isNew = $entity->isNew();
         if (!$isNew) {
-            //increase the revision
+            // increase the revision
             $revision = $entity->getRevision();
             ++$revision;
             $entity->setRevision($revision);
@@ -390,15 +397,13 @@ class PageModel extends FormModel
     /**
      * Generates slug string.
      *
-     * @param $entity
-     *
      * @return string
      */
     public function generateSlug($entity)
     {
         $pageSlug = $entity->getAlias();
 
-        //should the url include the category
+        // should the url include the category
         if ($this->catInUrl) {
             $category = $entity->getCategory();
             $catSlug  = (!empty($category))
@@ -410,7 +415,7 @@ class PageModel extends FormModel
         $parent = $entity->getTranslationParent();
         $slugs  = [];
         if ($parent) {
-            //multiple languages so tack on the language
+            // multiple languages so tack on the language
             $slugs[] = $entity->getLanguage();
         }
 
@@ -495,7 +500,7 @@ class PageModel extends FormModel
         }
 
         $hit = new Hit();
-        $hit->setDateHit(new \Datetime());
+        $hit->setDateHit(new \DateTime());
         $hit->setIpAddress($this->ipLookupHelper->getIpAddress());
 
         // Set info from request
@@ -522,7 +527,7 @@ class PageModel extends FormModel
             }
         }
 
-        //save hit to the cookie to use to update the exit time
+        // save hit to the cookie to use to update the exit time
         if ($hit) {
             $this->cookieHelper->setCookie(
                 name: 'mautic_referer_id',
@@ -609,15 +614,15 @@ class PageModel extends FormModel
         if (isset($query['page_language'])) {
             $hit->setPageLanguage($query['page_language']);
         }
-        if (isset($query['page_title'])) {
+
+        if ($pageTitle = $query['page_title'] ?? ($page instanceof Page ? $page->getTitle() : false)) {
             // Transliterate page titles.
             if ($this->coreParametersHelper->get('transliterate_page_title')) {
-                $safeTitle = InputHelper::transliterate($query['page_title']);
-                $hit->setUrlTitle($safeTitle);
-                $query['page_title'] = $safeTitle;
-            } else {
-                $hit->setUrlTitle($query['page_title']);
+                $pageTitle = InputHelper::transliterate($pageTitle);
             }
+
+            $query['page_title'] = $pageTitle;
+            $hit->setUrlTitle($pageTitle);
         }
 
         $hit->setQuery($query);
@@ -637,7 +642,7 @@ class PageModel extends FormModel
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
-                //this is not a new session so update the last hit if applicable with the date/time the user left
+                // this is not a new session so update the last hit if applicable with the date/time the user left
                 $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
         }
@@ -684,7 +689,7 @@ class PageModel extends FormModel
             }
         }
 
-        //glean info from the IP address
+        // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
@@ -703,13 +708,13 @@ class PageModel extends FormModel
 
         $this->setUtmTags($hit, $lead);
 
-        //get a list of the languages the user prefers
+        // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
                 if (($pos = strpos(';q=', $l)) !== false) {
-                    //remove weights
+                    // remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
             }
@@ -771,11 +776,10 @@ class PageModel extends FormModel
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param string|null  $tokenFilter
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
+    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -941,7 +945,7 @@ class PageModel extends FormModel
             ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
-            ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
+            ->setParameter('date_to', $dateTo->format('Y-m-d 23:59:59'));
         $q->groupBy('ds.device');
 
         $results = $q->execute()->fetchAllAssociative();
@@ -1034,12 +1038,15 @@ class PageModel extends FormModel
     {
         $query             = [];
         $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
-        parse_str($urlQuery, $urlQueryArray);
 
-        foreach ($urlQueryArray as $key => $value) {
-            if (is_string($value)) {
-                $key         = strtolower($key);
-                $query[$key] = urldecode($value);
+        if (is_string($urlQuery)) {
+            parse_str($urlQuery, $urlQueryArray);
+
+            foreach ($urlQueryArray as $key => $value) {
+                if (is_string($value)) {
+                    $key         = strtolower($key);
+                    $query[$key] = urldecode($value);
+                }
             }
         }
 
@@ -1094,9 +1101,6 @@ class PageModel extends FormModel
         }
     }
 
-    /**
-     * @param $page
-     */
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
         // Only save the lead and dispatch events if needed
@@ -1120,8 +1124,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param $page
-     *
      * @return mixed|string
      */
     private function getPageUrl(Request $request, $page)
@@ -1132,7 +1134,7 @@ class PageModel extends FormModel
         }
 
         if ($page instanceof Redirect) {
-            //use the configured redirect URL
+            // use the configured redirect URL
             return $page->getUrl();
         }
 

@@ -214,18 +214,8 @@ JS;
         );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl(
-            'node_modules/jquery/dist/jquery.js',
-            null,
-            null,
-            true
-        );
-        $froogaloop2       = $this->assetsHelper->getUrl(
-            'node_modules/vimeo-froogaloop2/javascript/froogaloop.min.js',
-            null,
-            null,
-            true
-        );
+        $jQueryUrl       = $this->assetsHelper->getUrl('media/js/jquery.min.js', null, null, true);
+        $froogaloop2     = $this->assetsHelper->getUrl('media/js/froogaloop.min.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -259,6 +249,37 @@ b.media.removeEventListener("click",b.clickToPlayPauseCallback),e=!1}},g={},h=["
 JS;
 
         $js = <<<JS
+MauticJS.convertIframesToVideos = function() {
+    var iframes = document.querySelectorAll("iframe[data-form-id][data-gate-time]");
+    iframes.forEach(function(iframe) {
+        var formId = iframe.getAttribute("data-form-id");
+        var gateTime = iframe.getAttribute("data-gate-time");
+        var video = document.createElement("video");
+        video.width = iframe.width;
+        video.height = iframe.height;
+        video.controls = true;
+        var type = "video/mp4";
+        var src = iframe.src;
+        if (src.includes("youtube.com") || src.includes("youtu.be")) {
+            type = "video/youtube";
+            src = src.replace("https://www.youtube.com/embed/", "https://youtu.be/");
+        }
+        else if (src.includes("vimeo.com")) {
+            type = "video/vimeo";
+            const videoId = src.split("/").pop().split("?")[0];
+            src = 'https://vimeo.com/' + videoId;
+        }
+        var source = document.createElement("source");
+        source.src = src;
+        source.type = type;
+        video.appendChild(source);
+        video.dataset.formId = formId;
+        video.dataset.gateTime = gateTime;
+        iframe.replaceWith(video);
+    });
+};
+
+
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
  
@@ -477,7 +498,7 @@ MauticJS.processGatedVideos = function (videoElements) {
         }
     });
 }
-
+MauticJS.documentReady(MauticJS.convertIframesToVideos);
 MauticJS.documentReady(MauticJS.initGatedVideo);
 JS;
         $event->appendJs($js, 'Mautic Gated Videos');

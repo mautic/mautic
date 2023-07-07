@@ -123,8 +123,6 @@ class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @param $channel
-     *
      * @return bool
      */
     public function checkContext($channel)

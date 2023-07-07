@@ -158,8 +158,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -302,7 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param                                     $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
      *
      * @return Campaign
@@ -469,8 +466,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Add lead.
-     *
-     * @param $key
      *
      * @return Campaign
      */

@@ -146,8 +146,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @param $data
      */
     public function prepareResponseForExtraction($data)
     {
@@ -972,7 +970,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             }
         }
 
-        //create lead records, including deleted on Zoho side (last_sync = null)
+        // create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $totalToCreate, $params['start'], $params['end']);
 
@@ -1135,22 +1133,16 @@ class ZohoIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @param $fields
-     * @param $sfRecord
-     * @param $config
-     * @param $objectFields
-     */
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
-        //check if update blank fields is selected
+        // check if update blank fields is selected
         if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0]) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently
                 }
                 if ('null' === $sfField && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
-                    //map to mautic field
+                    // map to mautic field
                     $fields[$fieldName] = $objectFields['create'][$fieldName];
                 }
             }
@@ -1243,9 +1235,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @param $fields
-     *
      * @return array
      */
     private function parseZohoRecord($data, $fields)
@@ -1295,7 +1284,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $fieldsToUpdate
      * @param array $objects
      *
      * @return array

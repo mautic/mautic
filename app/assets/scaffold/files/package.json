@@ -28,11 +28,15 @@
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
     "jvectormap-next": "^3.1.1",
+    "modernizr": "^3.12.0",
     "moment": "^2.29.4",
     "mousetrap": "^1.6.5",
     "multiselect": "^0.9.12",
     "shufflejs": "^5.4.1",
     "typeahead.js": "^0.11.1",
     "vimeo-froogaloop2": "^0.1.1"
+  },
+  "scripts": {
+    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js"
   }
 }

@@ -225,7 +225,7 @@ class Notification extends FormEntity
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
                 if ('list' == $type) {
-                    $validator = $context->getValidator();
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
                         [
@@ -255,8 +255,6 @@ class Notification extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -285,10 +283,6 @@ class Notification extends FormEntity
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -362,8 +356,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $category
-     *
      * @return $this
      */
     public function setCategory($category)
@@ -467,8 +459,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $readCount
-     *
      * @return $this
      */
     public function setReadCount($readCount)
@@ -487,8 +477,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $language
-     *
      * @return $this
      */
     public function setLanguage($language)
@@ -508,8 +496,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $publishDown
-     *
      * @return $this
      */
     public function setPublishDown($publishDown)
@@ -529,8 +515,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $publishUp
-     *
      * @return $this
      */
     public function setPublishUp($publishUp)
@@ -550,8 +534,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)

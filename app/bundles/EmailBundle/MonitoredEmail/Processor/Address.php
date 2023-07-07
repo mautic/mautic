@@ -34,8 +34,6 @@ class Address
     }
 
     /**
-     * @param $address
-     *
      * @return string|null
      */
     public static function parseAddressForStatHash($address)

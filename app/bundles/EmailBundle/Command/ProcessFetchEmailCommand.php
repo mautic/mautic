@@ -47,7 +47,6 @@ class ProcessFetchEmailCommand extends Command
                     'mautic:emails:fetch',
                 ]
             )
-            ->setDescription('Fetch and process monitored email.')
             ->addOption('--message-limit', '-m', InputOption::VALUE_OPTIONAL, 'Limit number of messages to process at a time.')
             ->setHelp(
                 <<<'EOT'
@@ -72,6 +71,7 @@ EOT
             $output->writeln($log);
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch and process monitored email.';
 }

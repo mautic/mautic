@@ -57,11 +57,11 @@ abstract class AbstractPermissions
         list($name, $level) = $this->getSynonym($name, $level);
 
         if (empty($level)) {
-            //verify permission name only
+            // verify permission name only
             return isset($this->permissions[$name]);
         }
 
-        //verify permission name and level as well
+        // verify permission name and level as well
         return isset($this->permissions[$name][$level]);
     }
 
@@ -120,16 +120,16 @@ abstract class AbstractPermissions
                     foreach ($permissions[$bundle] as $details) {
                         $permName    = $details['name'];
                         $permBitwise = $details['bitwise'];
-                        //ensure the permission still exists
+                        // ensure the permission still exists
                         if ($this->isSupported($permName)) {
                             $levels = $this->permissions[$permName];
-                            //ensure that at least keys exist
+                            // ensure that at least keys exist
                             $permissionLevels[$bundle][$permName] = [];
-                            //$permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
+                            // $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
                             foreach ($levels as $levelName => $levelBit) {
-                                //compare bit against levels to see if it is a match
+                                // compare bit against levels to see if it is a match
                                 if ($levelBit & $permBitwise) {
-                                    //bitwise compares so add the level
+                                    // bitwise compares so add the level
                                     $permissionLevels[$bundle][$permName][] = $levelName;
                                     continue;
                                 }
@@ -204,12 +204,12 @@ abstract class AbstractPermissions
         list($name, $level) = $this->getSynonym($name, $level);
 
         if (!isset($userPermissions[$name])) {
-            //the user doesn't have implicit access
+            // the user doesn't have implicit access
             return false;
         } elseif ($this->permissions[$name]['full'] & $userPermissions[$name]) {
             return true;
         } else {
-            //otherwise test for specific level
+            // otherwise test for specific level
             $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
 
             return ($result) ? true : false;
@@ -217,7 +217,6 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param      $allPermissions
      * @param bool $isSecondRound
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
@@ -261,7 +260,7 @@ abstract class AbstractPermissions
             $hasViewAccess = (!$hasViewAccess && (in_array('view', $perms) || in_array('viewown', $perms)));
         }
 
-        //check categories for view permissions and add it if the user has view access to the other permissions
+        // check categories for view permissions and add it if the user has view access to the other permissions
         if (isset($this->permissions['categories']) && $hasViewAccess && (!isset($permissions['categories']) || !in_array('view', $permissions['categories']))) {
             $permissions['categories'][] = 'view';
         }
@@ -284,17 +283,17 @@ abstract class AbstractPermissions
 
             if (in_array('full', $perms)) {
                 if (1 === count($perms)) {
-                    //full is the only permission so count as 1
+                    // full is the only permission so count as 1
                     if (!empty($data[$level]) && in_array('full', $data[$level])) {
                         ++$totalGranted;
                     }
                 } else {
-                    //remove full from total count
+                    // remove full from total count
                     --$totalAvailable;
                     if (!empty($data[$level]) && in_array('full', $data[$level])) {
-                        //user has full access so sum perms minus full
+                        // user has full access so sum perms minus full
                         $totalGranted += count($perms) - 1;
-                        //move on to the next level
+                        // move on to the next level
                         continue;
                     }
                 }

@@ -45,10 +45,10 @@ interface ThemeHelperInterface
      * @param string      $newName
      * @param string|null $newDirName if not set then it will be generated from the $newName param
      *
+     * @return void
+     *
      * @throws FileExistsException
      * @throws FileNotFoundException
-     *
-     * @return void
      */
     public function copy($theme, $newName, $newDirName = null);
 
@@ -56,19 +56,19 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param string $newName
      *
+     * @return void
+     *
      * @throws FileNotFoundException
      * @throws FileExistsException
-     *
-     * @return void
      */
     public function rename($theme, $newName);
 
     /**
      * @param string $theme
      *
-     * @throws FileNotFoundException
-     *
      * @return void
+     *
+     * @throws FileNotFoundException
      */
     public function delete($theme);
 

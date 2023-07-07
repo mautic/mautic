@@ -68,10 +68,10 @@ class WebhookKillNotificator
         $subject = $this->translator->trans('mautic.webhook.stopped');
         $reason  = $this->translator->trans($reason);
         $htmlUrl = '<a href="'.$this->router->generate(
-                'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhook->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
+            'mautic_webhook_action',
+            ['objectAction' => 'view', 'objectId' => $webhook->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
 
         $details = $this->translator->trans(
             'mautic.webhook.stopped.details',

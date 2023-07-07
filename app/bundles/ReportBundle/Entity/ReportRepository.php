@@ -47,7 +47,7 @@ class ReportRepository extends CommonRepository
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {

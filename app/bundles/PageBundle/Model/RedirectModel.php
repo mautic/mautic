@@ -2,12 +2,20 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\PageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Redirect>
@@ -22,9 +30,20 @@ class RedirectModel extends FormModel
     /**
      * RedirectModel constructor.
      */
-    public function __construct(UrlHelper $urlHelper)
-    {
+    public function __construct(
+        UrlHelper $urlHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->urlHelper = $urlHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): RedirectRepository
@@ -35,8 +54,6 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param $identifier
-     *
      * @return Redirect|null
      */
     public function getRedirectById($identifier)
@@ -103,8 +120,6 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param $url
-     *
      * @return Redirect|null
      */
     public function getRedirectByUrl($url)
@@ -169,8 +184,6 @@ class RedirectModel extends FormModel
 
     /**
      * Create a Redirect entity for URL.
-     *
-     * @param $url
      *
      * @return Redirect
      */

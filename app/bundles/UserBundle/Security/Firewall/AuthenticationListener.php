@@ -111,7 +111,7 @@ final class AuthenticationListener
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null): Response
     {
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
+            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUserIdentifier()));
         }
 
         $session = $request->getSession();

@@ -6,7 +6,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -14,6 +17,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -99,7 +103,11 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),
             $this->createMock(RequestStack::class),
-            $this->createMock(ManagerRegistry::class)
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(ModelFactory::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+            $this->createMock(MauticFactory::class)
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
@@ -111,7 +119,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class)) extends CommonApiController {
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class), $this->createMock(MauticFactory::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

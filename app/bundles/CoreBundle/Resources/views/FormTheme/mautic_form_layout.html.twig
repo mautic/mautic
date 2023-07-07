@@ -216,6 +216,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {{ form_label(form, label) }}
         {{ form_widget(form) }}
         {{ form_errors(form) }}
+        {{ form_help(form) }}
     </div>
  </div>
 {% endblock form_row %}
@@ -233,6 +234,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% if form.vars.errors|length > 0 %}
 <div class="has-error pa-10">
     {{ form_errors(form) }}
+</div>
+{% endif %}
+{% if form.vars.help|length > 0 %}
+<div class="pa-10">
+    {{ form_help(form) }}
 </div>
 {% endif %}
 {% endblock form_start %}

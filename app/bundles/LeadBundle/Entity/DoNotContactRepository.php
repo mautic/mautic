@@ -139,7 +139,6 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param       $channel
      * @param array $contacts Array of contacts to filter by
      *
      * @return array

@@ -48,8 +48,6 @@ class Mapper
     }
 
     /**
-     * @param $object
-     *
      * @return $this
      */
     public function setObject($object)
@@ -138,8 +136,6 @@ class Mapper
     }
 
     /**
-     * @param $fieldName
-     *
      * @return mixed
      */
     private function getField($fieldName)

@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -163,7 +162,7 @@ class Notification
     }
 
     /**
-     * @param DateTime|null $dateAdded
+     * @param \DateTime|null $dateAdded
      */
     public function setDateAdded($dateAdded)
     {

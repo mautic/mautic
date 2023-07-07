@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class ProfileController.
@@ -19,14 +19,14 @@ class ProfileController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder)
+    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
-        //get current user
+        // get current user
         $me    = $this->get('security.token_storage')->getToken()->getUser();
         /** @var UserModel $model */
         $model = $this->getModel('user');
 
-        //set some permissions
+        // set some permissions
         $permissions = [
             'apiAccess' => ($this->coreParametersHelper->get('api_enabled')) ?
                 $this->security->isGranted('api:access:full')
@@ -42,14 +42,14 @@ class ProfileController extends FormController
 
         $overrides = [];
 
-        //make sure this user has access to edit privileged fields
+        // make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
             if ('apiAccess' == $permName) {
                 continue;
             }
 
             if (!$hasAccess) {
-                //set the value to its original
+                // set the value to its original
                 switch ($permName) {
                     case 'editName':
                         $overrides['firstName'] = $me->getFirstName();
@@ -140,15 +140,15 @@ class ProfileController extends FormController
             }
         }
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         $submitted = $request->getSession()->get('formProcessed', 0);
         if ('POST' === $request->getMethod() && !$submitted) {
             $request->getSession()->set('formProcessed', 1);
 
-            //check to see if the password needs to be rehashed
+            // check to see if the password needs to be rehashed
             $formUser              = $request->request->get('user') ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            $overrides['password'] = $model->checkNewPassword($me, $hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
@@ -156,10 +156,10 @@ class ProfileController extends FormController
                         $me->$func($v);
                     }
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($me);
 
-                    //check if the user's locale has been downloaded already, fetch it if not
+                    // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
@@ -206,7 +206,7 @@ class ProfileController extends FormController
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],
-                            'flashes' => [ //success
+                            'flashes' => [ // success
                                 [
                                     'type' => 'notice',
                                     'msg'  => 'mautic.user.account.notice.updated',
