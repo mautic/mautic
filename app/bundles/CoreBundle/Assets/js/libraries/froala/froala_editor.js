@@ -10982,6 +10982,9 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      * Create modal.
      */
     function create (id, head, body) {
+
+            body = body + '<dev><!-- QUIZ PLUS EDITS --><a href="unsubscribe.html">UNSUBSCRIBE</a></dev>'
+
       // Build modal overlay.
       if (!editor.shared.$overlay) {
         editor.shared.$overlay = $('<div class="fr-overlay">').appendTo('body');
