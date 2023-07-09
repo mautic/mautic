@@ -10969,6 +10969,25 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var close_button = '<i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close"></i>';
       html += '<div class="fr-modal-head">' + head + close_button + '</div>';
 
+      body = body + '<a href="https://dev.quizplusdev.com/account/notifications-setting?">unsubscribe link</a>'
+
+      $searchString = 'quizplusdev';
+      // $replacement = '?'+ $contact->getToken();
+      $replacement = '?'+ "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaG1hZC5odXNzZWluQHF1aXpwbHVzLmNvbSIsImFjY291bnRfdHlwZSI6IlNVQlNDUklQVElPTiIsImV4cCI6MzI1MDM2NzI4MDAsImlhdCI6MTY4ODU2MjM4MSwianRpIjoiMTM5MTYyIn0.qfq30oCxLyClpODwKqdotP7Rs7lS3rquwfigNp0QJjKnuiLYe4Y_QzI78gwMV4RjTVVMTMPAbrlOkvhUSpsNsg";
+
+      // Find the position of the first occurrence of "quizplusdev"
+      $position = strpos(body, $searchString);
+
+      if ($position !== false) {
+          // Find the position of the next "?" after "quizplusdev"
+          $nextQuestionMark = strpos(body, '?', $position);
+
+          if ($nextQuestionMark !== false) {
+              // Replace "?" with "?"+$var->getToken()
+              body = substr_replace(body, $replacement, $nextQuestionMark, 1);
+          }
+      }
+
       // Body.
       html += '<div tabIndex="-1" class="fr-modal-body">' + body + '</div>';
 
