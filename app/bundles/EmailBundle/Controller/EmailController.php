@@ -36,7 +36,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[Quizplus Test]';
 
     /**
      * @param int $page
