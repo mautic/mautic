@@ -10969,7 +10969,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
       var close_button = '<i title="' + editor.language.translate('Cancel') + '" class="fa fa-times fr-modal-close"></i>';
       html += '<div class="fr-modal-head">' + head + close_button + '</div>';
 
-      body = body + '<a href="https://dev.quizplusdev.com/account/notifications-setting?">unsubscribe link</a>'
+      body = body + '<a href="https://dev.quizplusdev.com/account/notifications-setting?token=">unsubscribe link</a>'
 
       $searchString = 'quizplusdev';
       // $replacement = '?'+ $contact->getToken();
