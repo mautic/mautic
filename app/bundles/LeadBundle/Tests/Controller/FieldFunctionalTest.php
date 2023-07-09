@@ -22,7 +22,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($field);
 
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
-        $columns     = $this->connection->getSchemaManager()->listTableColumns("{$tablePrefix}leads");
+        $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertEquals(ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, $columns[$field->getAlias()]->getLength());
     }
 
@@ -33,7 +33,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($field);
 
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
-        $columns     = $this->connection->getSchemaManager()->listTableColumns("{$tablePrefix}leads");
+        $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }
 
