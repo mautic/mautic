@@ -48,7 +48,7 @@ class PointSubscriberTest extends TestCase
                     'description' => 'mautic.page.point.action.urlhit_descr',
                     'callback'    => ['Mautic\PageBundle\Helper\PointActionHelper', 'validateUrlHit'],
                     'formType'    => 'Mautic\PageBundle\Form\Type\PointActionUrlHitType',
-                    'formTheme'   => 'MauticPageBundle:FormTheme\Point',
+                    'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
                 ],
             ]
         );
