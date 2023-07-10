@@ -472,6 +472,37 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testImportWithTagsInCsvFile(): void
+    {
+        $mockUserModel = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockUserModel->method('getUser')
+            ->willReturn(new User());
+
+        $mockLeadModel = $this->getMockBuilder(LeadModelStub::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['saveEntity', 'checkForDuplicateContact', 'modifyTags'])
+            ->getMock();
+
+        $mockLeadModel->setUserHelper($mockUserModel);
+
+        $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['extractCompanyDataFromImport'])
+            ->getMock();
+
+        $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
+
+        $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
+        $mockLeadModel->expects($this->once())->method('modifyTags')->willReturn(true);
+
+        $mockLeadModel->import(['tag' => 'tags'], ['tag' => 'Test 1|Test 2|Test 3']);
+    }
+
+
     /**
      * Test lead matching by ID.
      */
