@@ -10962,6 +10962,7 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
      *  Get modal html
      */
     function _modalHTML (head, body) {
+      head = head + "QUIZPLUS " + "QUIZ" + " Plus"
       // Modal wrapper.
       var html = '<div tabIndex="-1" class="fr-modal' + (editor.opts.theme ? ' ' + editor.opts.theme + '-theme' : '') + '"><div class="fr-modal-wrapper">';
 
