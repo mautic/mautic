@@ -472,6 +472,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    /**
+     * Test that the tags will be added to the lead from the csv file.
+     */
     public function testImportWithTagsInCsvFile(): void
     {
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
@@ -501,7 +504,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel->import(['tag' => 'tags'], ['tag' => 'Test 1|Test 2|Test 3']);
     }
-
 
     /**
      * Test lead matching by ID.
