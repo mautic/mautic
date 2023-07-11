@@ -1149,8 +1149,12 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        // set the mapped fields
-        $this->leadModel->setFieldValues($lead, $data, false, true, true);
+        try {
+            // set the mapped fields
+            $this->leadModel->setFieldValues($lead, $data, false, true, true);
+        } catch (\Exception $e) {
+            $this->logger->debug('FORM: Assigning field value error: '.$e->getMessage());
+        }
 
         // last active time
         $lead->setLastActive(new \DateTime());
