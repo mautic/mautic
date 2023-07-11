@@ -9212,6 +9212,11 @@ parameters:
 			path: app/bundles/ChannelBundle/Form/Type/MessageType.php
 
 		-
+			message: "#^Cannot assign offset 'label' to string\\.$#"
+			count: 1
+			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
+
+		-
 			message: "#^Method Mautic\\\\ChannelBundle\\\\Helper\\\\ChannelListHelper\\:\\:getChannelLabel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
@@ -9233,6 +9238,11 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\ChannelBundle\\\\Helper\\\\ChannelListHelper\\:\\:getFeatureChannels\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
+
+		-
+			message: "#^Offset 'label' on string in isset\\(\\) does not exist\\.$#"
 			count: 1
 			path: app/bundles/ChannelBundle/Helper/ChannelListHelper.php
 
@@ -38749,6 +38759,16 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:checkLeadOwner\\(\\) should return array\\|false but returns bool\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/LeadRepository.php
+
+		-
+			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:defaultPrepareDbalFieldsForSave\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: app/bundles/LeadBundle/Entity/LeadRepository.php
+
+		-
+			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:defaultPrepareDbalFieldsForSave\\(\\) has parameter \\$fields with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
