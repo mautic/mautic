@@ -24,16 +24,20 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $dispatcher;
 
+    private LeadModel|\PHPUnit\Framework\MockObject\MockObject $leadModel;
+
+    private WebhookModel|\PHPUnit\Framework\MockObject\MockObject $mockModel;
+
     protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
+        $this->mockModel  = $this->createMock(WebhookModel::class);
+        $this->leadModel  = $this->createMock(LeadModel::class);
     }
 
     public function testNewContactEventIsFiredWhenIdentified()
     {
-        $mockModel  = $this->createMock(WebhookModel::class);
-
-        $mockModel->expects($this->once())
+        $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
@@ -43,7 +47,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -56,9 +60,9 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified()
     {
-        $mockModel  = $this->createMock(WebhookModel::class);
+        $this->mockModel  = $this->createMock(WebhookModel::class);
 
-        $mockModel->expects($this->once())
+        $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
@@ -68,7 +72,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -82,12 +86,12 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testWebhookIsNotDeliveredIfContactIsAVisitor()
     {
-        $mockModel  = $this->createMock(WebhookModel::class);
+        $this->mockModel  = $this->createMock(WebhookModel::class);
 
-        $mockModel->expects($this->exactly(0))
+        $this->mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -101,14 +105,14 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testChannelChangeIsPickedUpByWebhook()
     {
-        $mockModel = $this->getMockBuilder(WebhookModel::class)
+        $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $lead    = new Lead();
         $channel = 'email';
 
-        $mockModel->expects($this->exactly(1))
+        $this->mockModel->expects($this->exactly(1))
             ->method('queueWebhooksByType')
             ->with(
                 LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
@@ -129,7 +133,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -142,14 +146,14 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testLeadCompanyChangeIsPickedUpByWebhook()
     {
-        $mockModel = $this->getMockBuilder(WebhookModel::class)
+        $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $lead    = new Lead();
         $company = new Company();
 
-        $mockModel->expects($this->exactly(1))
+        $this->mockModel->expects($this->exactly(1))
             ->method('queueWebhooksByType')
             ->with(
                 LeadEvents::LEAD_COMPANY_CHANGE,
@@ -162,7 +166,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -172,13 +176,13 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCompanySaveAndDelete()
     {
-        $dispatcher = new EventDispatcher();
-        $mockModel  = $this->createMock(WebhookModel::class);
+        $dispatcher       = new EventDispatcher();
+        $this->mockModel  = $this->createMock(WebhookModel::class);
 
-        $mockModel->expects($this->exactly(2))
+        $this->mockModel->expects($this->exactly(2))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
