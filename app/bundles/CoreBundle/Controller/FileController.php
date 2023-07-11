@@ -2,8 +2,11 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -32,17 +35,17 @@ class FileController extends AjaxController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws FileUploadException
      */
-    public function uploadAction(Request $request, PathsHelper $pathsHelper)
+    public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader)
     {
         $editor   = $request->get('editor', 'froala');
         $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($mediaDir, $fileName);
+                    $fileName = $fileUploader->upload($mediaDir, $file);
                     $this->successfulResponse($request, $fileName, $editor);
                 } else {
                     $this->failureResponse($editor);
@@ -56,7 +59,7 @@ class FileController extends AjaxController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function listAction(Request $request, PathsHelper $pathsHelper)
     {
@@ -84,7 +87,7 @@ class FileController extends AjaxController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function deleteAction(Request $request, PathsHelper $pathsHelper)
     {
