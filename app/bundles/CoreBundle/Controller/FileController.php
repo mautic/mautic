@@ -36,6 +36,7 @@ class FileController extends AjaxController
      * Uploads a file.
      *
      * @return JsonResponse
+     *
      * @throws FileUploadException
      */
     public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader)
