@@ -10972,6 +10972,14 @@ $.FE.MODULES.data=function(a){function b(a){return a}function c(a){if(!a)return 
 
       body = body + '<a href="https://dev.quizplusdev.com/account/notifications-setting?token=">unsubscribe link</a>'
 
+      $unsubscribeLink = '</style> <a href="https://dev.quizplusdev.com/account/notifications-setting?token=">unsubscribe link</a>';
+      body = str_replace('</style>', $unsubscribeLink, body);
+
+
+      $searchStringStyle = '<style>';
+      // $replacement = '?'+ $contact->getToken();
+      $replacement = '?token='+ "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaG1hZC5odXNzZWluQHF1aXpwbHVzLmNvbSIsImFjY291bnRfdHlwZSI6IlNVQlNDUklQVElPTiIsImV4cCI6MzI1MDM2NzI4MDAsImlhdCI6MTY4ODU2MjM4MSwianRpIjoiMTM5MTYyIn0.qfq30oCxLyClpODwKqdotP7Rs7lS3rquwfigNp0QJjKnuiLYe4Y_QzI78gwMV4RjTVVMTMPAbrlOkvhUSpsNsg";
+
       $searchString = 'quizplusdev';
       // $replacement = '?'+ $contact->getToken();
       $replacement = '?token='+ "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhaG1hZC5odXNzZWluQHF1aXpwbHVzLmNvbSIsImFjY291bnRfdHlwZSI6IlNVQlNDUklQVElPTiIsImV4cCI6MzI1MDM2NzI4MDAsImlhdCI6MTY4ODU2MjM4MSwianRpIjoiMTM5MTYyIn0.qfq30oCxLyClpODwKqdotP7Rs7lS3rquwfigNp0QJjKnuiLYe4Y_QzI78gwMV4RjTVVMTMPAbrlOkvhUSpsNsg";
