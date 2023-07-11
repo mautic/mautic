@@ -165,6 +165,12 @@ class FormSubscriber implements EventSubscriberInterface
                 )
             );
         }
+
+        // Add the owner and stage fields to the form
+        if ('lead' === $object) {
+            $event->appendField(new FieldCrate('owner', 'Owner\'s email', 'email', []));
+            $event->appendField(new FieldCrate('stage', 'Stage', 'text', []));
+        }
     }
 
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void

@@ -210,7 +210,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
     {
-        $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
+        $leadFields = $this->leadFieldModel->getFieldListWithProperties(false, true);
 
         // everything matches up so let's save the results
         $submission = new Submission();
