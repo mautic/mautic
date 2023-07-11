@@ -30,8 +30,6 @@ class TokenHelper
     }
 
     /**
-     * @param $content
-     *
      * @return array
      */
     public function findFormTokens($content)
@@ -56,10 +54,10 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
                         '';
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $tokens[$token] = $formHtml;

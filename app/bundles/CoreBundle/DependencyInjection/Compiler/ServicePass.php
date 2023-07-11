@@ -44,6 +44,7 @@ final class ServicePass implements CompilerPassInterface
                             break;
                         case 'models':
                             $defaultTag = 'mautic.model';
+                            @trigger_error('Setting "models" in config is deprecated. Convert to using autowiring.', E_USER_DEPRECATED);
                             break;
                         case 'permissions':
                             $defaultTag = 'mautic.permissions';
@@ -142,10 +143,6 @@ final class ServicePass implements CompilerPassInterface
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
-
-                                if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
-                                }
                             }
                         } else {
                             $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
@@ -157,10 +154,6 @@ final class ServicePass implements CompilerPassInterface
                                 }
 
                                 $definition->addTag($tag, $tagArguments);
-
-                                if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
-                                }
                             }
 
                             if ('events' == $type) {

@@ -28,7 +28,7 @@ class ActionController extends CommonFormController
         $session = $request->getSession();
 
         if ('POST' == $method) {
-            $formAction = $request->request->get('formaction');
+            $formAction = $request->request->all()['formaction'] ?? [];
             $actionType = $formAction['type'];
             $formId     = $formAction['formId'];
         } else {
@@ -40,7 +40,7 @@ class ActionController extends CommonFormController
             ];
         }
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$actionType ||
             !$request->isXmlHttpRequest() ||
             !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
@@ -48,7 +48,7 @@ class ActionController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        //fire the form builder event
+        // fire the form builder event
         $formModel = $this->getModel('form.form');
         \assert($formModel instanceof FormModel);
         $customComponents = $formModel->getCustomComponents();
@@ -60,22 +60,22 @@ class ActionController extends CommonFormController
         $form->get('formId')->setData($formId);
         $formAction['settings'] = $customComponents['actions'][$actionType];
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
 
-                    //save the properties to session
+                    // save the properties to session
                     $actions          = $session->get('mautic.form.'.$formId.'.actions.modified', []);
                     $formData         = $form->getData();
                     $formAction       = array_merge($formAction, $formData);
                     $formAction['id'] = $keyId;
                     if (empty($formAction['name'])) {
-                        //set it to the event default
+                        // set it to the event default
                         $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
                     }
                     $actions[$keyId] = $formAction;
@@ -109,7 +109,7 @@ class ActionController extends CommonFormController
         ];
 
         if (!empty($keyId)) {
-            //prevent undefined errors
+            // prevent undefined errors
             $entity     = new Action();
             $blank      = $entity->convertToArray();
             $formAction = array_merge($blank, $formAction);
@@ -126,7 +126,7 @@ class ActionController extends CommonFormController
         }
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -150,7 +150,7 @@ class ActionController extends CommonFormController
     {
         $session    = $request->getSession();
         $method     = $request->getMethod();
-        $formaction = $request->request->get('formaction', []);
+        $formaction = $request->request->get('formaction') ?? [];
         $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
@@ -164,7 +164,7 @@ class ActionController extends CommonFormController
             $customComponents       = $formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
-            //ajax only for form fields
+            // ajax only for form fields
             if (!$actionType ||
                 !$request->isXmlHttpRequest() ||
                 !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
@@ -179,39 +179,39 @@ class ActionController extends CommonFormController
             ]);
             $form->get('formId')->setData($formId);
 
-            //Check for a submitted form and process it
+            // Check for a submitted form and process it
             if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
 
-                        //form is valid so process the data
+                        // form is valid so process the data
 
-                        //save the properties to session
+                        // save the properties to session
                         $session  = $request->getSession();
                         $actions  = $session->get('mautic.form.'.$formId.'.actions.modified');
                         $formData = $form->getData();
-                        //overwrite with updated data
+                        // overwrite with updated data
                         $formAction = array_merge($actions[$objectId], $formData);
                         if (empty($formAction['name'])) {
-                            //set it to the event default
+                            // set it to the event default
                             $formAction['name'] = $this->translator->trans($formAction['settings']['label']);
                         }
                         $actions[$objectId] = $formAction;
                         $session->set('mautic.form.'.$formId.'.actions.modified', $actions);
 
-                        //generate HTML for the field
+                        // generate HTML for the field
                         $keyId = $objectId;
 
-                        //take note if this is a submit button or not
+                        // take note if this is a submit button or not
                         if ('button' == $actionType) {
                             $submits = $session->get('mautic.formactions.submits', []);
                             if ('submit' == $formAction['properties']['type'] && !in_array($keyId, $submits)) {
-                                //button type updated to submit
+                                // button type updated to submit
                                 $submits[] = $keyId;
                                 $session->set('mautic.formactions.submits', $submits);
                             } elseif ('submit' != $formAction['properties']['type'] && in_array($keyId, $submits)) {
-                                //button type updated to something other than submit
+                                // button type updated to something other than submit
                                 $key = array_search($keyId, $submits);
                                 unset($submits[$key]);
                                 $session->set('mautic.formactions.submits', $submits);
@@ -244,7 +244,7 @@ class ActionController extends CommonFormController
             if (!empty($keyId)) {
                 $passthroughVars['actionId'] = $keyId;
 
-                //prevent undefined errors
+                // prevent undefined errors
                 $entity     = new Action();
                 $blank      = $entity->convertToArray();
                 $formAction = array_merge($blank, $formAction);
@@ -259,7 +259,7 @@ class ActionController extends CommonFormController
             }
 
             if ($closeModal) {
-                //just close the modal
+                // just close the modal
                 $passthroughVars['closeModal'] = 1;
 
                 return new JsonResponse($passthroughVars);
@@ -278,8 +278,6 @@ class ActionController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
      * @return JsonResponse
      */
     public function deleteAction(Request $request, $objectId)
@@ -289,7 +287,7 @@ class ActionController extends CommonFormController
         $actions = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', []);
 
-        //ajax only for form fields
+        // ajax only for form fields
         if (!$request->isXmlHttpRequest() ||
             !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
@@ -298,13 +296,13 @@ class ActionController extends CommonFormController
 
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
         if ('POST' == $request->getMethod() && null !== $formAction) {
-            //add the field to the delete list
+            // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
                 $session->set('mautic.form.'.$formId.'.actions.deleted', $delete);
             }
 
-            //take note if this is a submit button or not
+            // take note if this is a submit button or not
             if ('button' == $formAction['type']) {
                 $submits    = $session->get('mautic.formactions.submits', []);
                 $properties = $formAction['properties'];

@@ -78,7 +78,7 @@ class EventScheduler
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
+    public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact)
     {
         $contacts = new ArrayCollection([$contact]);
 
@@ -88,7 +88,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -116,7 +116,7 @@ class EventScheduler
         $this->scheduleEventForContacts($event, $config, $executionDate, $contacts, $isInactiveEvent);
     }
 
-    public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
+    public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn)
     {
         $log->setTriggerDate($toBeExecutedOn);
         $this->eventLogger->persistLog($log);
@@ -130,7 +130,7 @@ class EventScheduler
     /**
      * @param ArrayCollection|LeadEventLog[] $logs
      */
-    public function rescheduleLogs(ArrayCollection $logs, \DateTime $toBeExecutedOn)
+    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn)
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn);
@@ -178,11 +178,11 @@ class EventScheduler
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
@@ -214,7 +214,7 @@ class EventScheduler
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */
@@ -248,7 +248,7 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $lastActiveDate)
+    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate)
     {
         $eventExecutionDates = [];
 
@@ -259,7 +259,7 @@ class EventScheduler
 
         uasort(
             $eventExecutionDates,
-            function (\DateTime $a, \DateTime $b) {
+            function (\DateTimeInterface $a, \DateTimeInterface $b) {
                 if ($a === $b) {
                     return 0;
                 }
@@ -271,7 +271,7 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now): \DateTime
+    public function getExecutionDateForInactivity(\DateTimeInterface $eventExecutionDate, \DateTimeInterface $earliestExecutionDate, \DateTimeInterface $now): \DateTimeInterface
     {
         if ($eventExecutionDate->getTimestamp() === $earliestExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now
@@ -281,7 +281,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now): bool
+    public function shouldSchedule(\DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin
@@ -294,7 +294,7 @@ class EventScheduler
         return $executionDate > $now;
     }
 
-    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
+    public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
         if (null !== $event) {
             if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
@@ -309,7 +309,7 @@ class EventScheduler
     /**
      * @throws NotSchedulableException
      */
-    public function validateAndScheduleEventForContacts(Event $event, \DateTime $executionDateTime, ArrayCollection $contacts, \DateTime $comparedFromDateTime)
+    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, ArrayCollection $contacts, \DateTimeInterface $comparedFromDateTime)
     {
         if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $this->logger->debug(
@@ -371,7 +371,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         foreach ($contacts as $contact) {
             // Create the entry
@@ -383,7 +383,7 @@ class EventScheduler
             // Add it to the queue to persist to the DB
             $this->eventLogger->queueToPersist($log);
 
-            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+            // lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
                 .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')

@@ -55,12 +55,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'marketplace.model.package' => [
-                'class'     => \Mautic\MarketplaceBundle\Model\PackageModel::class,
-                'arguments' => ['marketplace.api.connection', 'marketplace.service.allowlist'],
-            ],
-        ],
         'other' => [
             'marketplace.service.plugin_collector' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\PluginCollector::class,

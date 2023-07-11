@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Factory;
 
-use function assert;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -70,8 +69,6 @@ class MauticFactory
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
-     *
      * @return AbstractCommonModel<object>
      *
      * @throws \InvalidArgumentException
@@ -119,7 +116,7 @@ class MauticFactory
     public function getEntityManager()
     {
         $manager = $this->doctrine->getManager();
-        assert($manager instanceof EntityManager);
+        \assert($manager instanceof EntityManager);
 
         return $manager;
     }
@@ -183,7 +180,7 @@ class MauticFactory
     {
         $request = $this->requestStack->getCurrentRequest();
         if (empty($request)) {
-            //likely in a test as the request is not populated for outside the container
+            // likely in a test as the request is not populated for outside the container
             $request      = Request::createFromGlobals();
             $requestStack = new RequestStack();
             $requestStack->push($request);
@@ -195,7 +192,6 @@ class MauticFactory
     /**
      * Retrieves a Mautic parameter.
      *
-     * @param       $id
      * @param mixed $default
      *
      * @return bool|mixed
@@ -310,7 +306,7 @@ class MauticFactory
     }
 
     /**
-     * Returns MailHelper wrapper for Swift_Message via $helper->message.
+     * Returns MailHelper wrapper for Email via $helper->message.
      *
      * @param bool $cleanSlate False to preserve current settings, i.e. to process batched emails
      *
@@ -372,8 +368,6 @@ class MauticFactory
     /**
      * Get a mautic helper service.
      *
-     * @param $helper
-     *
      * @return object
      */
     public function getHelper($helper)
@@ -429,7 +423,6 @@ class MauticFactory
     /**
      * Gets an array of a specific bundle's config settings.
      *
-     * @param        $bundleName
      * @param string $configKey
      * @param bool   $includePlugins
      *
@@ -443,8 +436,6 @@ class MauticFactory
     }
 
     /**
-     * @param $service
-     *
      * @return bool
      */
     public function serviceExists($service)
@@ -453,8 +444,6 @@ class MauticFactory
     }
 
     /**
-     * @param $service
-     *
      * @return bool
      */
     public function get($service)

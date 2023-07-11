@@ -108,9 +108,6 @@ final class SlotsHelper
 
     /**
      * Appends a slot value if already set.
-     *
-     * @param $name
-     * @param $content
      */
     public function append(string $name, string $content): void
     {

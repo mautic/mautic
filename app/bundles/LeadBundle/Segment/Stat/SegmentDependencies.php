@@ -52,8 +52,6 @@ class SegmentDependencies
     }
 
     /**
-     * @param $segmentId
-     *
      * @return array
      */
     public function getChannelsIds($segmentId)

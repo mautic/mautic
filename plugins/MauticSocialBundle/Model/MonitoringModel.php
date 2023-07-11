@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
@@ -55,8 +54,6 @@ class MonitoringModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Monitoring|null
      */
     public function getEntity($id = null)
@@ -66,11 +63,6 @@ class MonitoringModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -118,7 +110,7 @@ class MonitoringModel extends FormModel
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {
-            //increase the revision
+            // increase the revision
             $revision = $monitoringEntity->getRevision();
             ++$revision;
             $monitoringEntity->setRevision($revision);
@@ -132,7 +124,7 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * @return EntityRepository<Monitoring>
+     * @return \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
      */
     public function getRepository()
     {

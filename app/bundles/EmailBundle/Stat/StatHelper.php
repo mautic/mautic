@@ -33,9 +33,6 @@ class StatHelper
         $this->repo = $statRepository;
     }
 
-    /**
-     * @param $emailAddress
-     */
     public function storeStat(Stat $stat, $emailAddress)
     {
         $this->repo->saveEntity($stat);
@@ -44,7 +41,7 @@ class StatHelper
         $this->stats[$emailAddress] = new Reference($stat);
 
         // clear stat from doctrine memory
-        $this->repo->clear();
+        $this->repo->detachEntity($stat);
     }
 
     public function deletePending()
@@ -60,8 +57,6 @@ class StatHelper
     }
 
     /**
-     * @param $emailAddress
-     *
      * @return Reference
      *
      * @throws StatNotFoundException

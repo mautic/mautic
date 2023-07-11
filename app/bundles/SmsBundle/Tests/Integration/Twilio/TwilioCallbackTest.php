@@ -5,7 +5,7 @@ namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -33,13 +33,13 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
+        $inputBag         = new InputBag([
+          'AccountSid' => '123',
+          'From'       => '',
+        ]);
 
-        $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'], ['From'])
-            ->willReturn('123', '');
+        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -48,13 +48,14 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
+        $inputBag         = new InputBag([
+          'AccountSid' => '123',
+          'From'       => '321',
+          'Body'       => '',
+        ]);
 
-        $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'], ['From'], ['Body'])
-            ->willReturn('123', '321', '');
+        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -63,28 +64,29 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
+        $inputBag         = new InputBag([
+          'AccountSid' => '321',
+        ]);
 
-        $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'])
-            ->willReturn('321');
+        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
 
     public function testMessageIsReturned()
     {
-        $parameterBag = $this->createMock(ParameterBag::class);
         $request      = $this->createMock(Request::class);
         $request->method('get')
             ->willReturn('Hello');
-        $request->request = $parameterBag;
 
-        $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'], ['From'], ['Body'])
-            ->willReturn('123', '321', 'Hello');
+        $inputBag = new InputBag([
+          'AccountSid' => '123',
+          'From'       => '321',
+          'Body'       => 'Hello',
+        ]);
+
+        $request->request = $inputBag;
 
         $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
     }

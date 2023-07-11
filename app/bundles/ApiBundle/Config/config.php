@@ -85,21 +85,9 @@ return [
                 ],
             ],
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
-            'jms_serializer.metadata.annotation_driver'               => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
-            'jms_serializer.metadata.api_metadata_driver'             => [
-                'class' => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
-            ],
-            'mautic.validator.oauthcallback' => [
+            'mautic.validator.oauthcallback'                          => [
                 'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
                 'tag'   => 'validator.constraint_validator',
-            ],
-        ],
-        'models' => [
-            'mautic.api.model.client' => [
-                'class'     => 'Mautic\ApiBundle\Model\ClientModel',
-                'arguments' => [
-                    'request_stack',
-                ],
             ],
         ],
     ],

@@ -89,6 +89,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
+                    'mautic.lead.repository.lead',
                 ],
             ],
             'mautic.sms.broadcast.query' => [
@@ -96,18 +97,6 @@ return [
                 'arguments'    => [
                     'doctrine.orm.entity_manager',
                     'mautic.sms.model.sms',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.sms.model.sms' => [
-                'class'     => 'Mautic\SmsBundle\Model\SmsModel',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.lead.model.lead',
-                    'mautic.channel.model.queue',
-                    'mautic.sms.transport_chain',
-                    'mautic.helper.cache_storage',
                 ],
             ],
         ],

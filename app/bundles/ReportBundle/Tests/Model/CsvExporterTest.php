@@ -17,35 +17,67 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     public const TIMEONLYFORMAT          = 'g:i a';
 
-    public function testExport()
-    {
-        $translator = $this->createMock(TranslatorInterface::class);
+    private CsvExporter $csvExporter;
 
-        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+    private string|false $tmpFile;
+
+    /**
+     * @var false|resource
+     */
+    private $file;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private mixed $translator;
+
+    private FormatterHelper $formatterHelperMock;
+
+    public function setUp(): void
+    {
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->with('mautic.report.report.groupby.totals')
+            ->willReturn('Totals');
+        $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
 
         $dateHelperMock =new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             self::DATEONLYFORMAT,
             self::TIMEONLYFORMAT,
-            $translator,
-           $coreParametersHelperMock
+            $this->translator,
+            $coreParametersHelperMock
         );
 
-        $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
+        $this->formatterHelperMock = new FormatterHelper($dateHelperMock, $this->translator);
 
+        $this->csvExporter = new CsvExporter($this->formatterHelperMock, $coreParametersHelperMock, $this->translator);
+        $this->tmpFile     = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
+        $this->file        = fopen($this->tmpFile, 'w');
+
+        parent::setUp();
+    }
+
+    public function tearDown(): void
+    {
+        if (is_resource($this->file)) {
+            fclose($this->file);
+        }
+
+        if (file_exists($this->tmpFile)) {
+            unlink($this->tmpFile);
+        }
+    }
+
+    public function testExport()
+    {
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
+        $this->csvExporter->export($reportDataResult, $this->file);
 
-        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock);
-
-        $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
-        $file    = fopen($tmpFile, 'w');
-
-        $csvExporter->export($reportDataResult, $file);
-
-        fclose($file);
-
-        $result = array_map('str_getcsv', file($tmpFile));
+        fclose($this->file);
+        $result = array_map('str_getcsv', file($this->tmpFile));
 
         $expected = [
             [
@@ -148,9 +180,58 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         }
 
         $this->assertSame($expected, $result);
+    }
 
-        if (file_exists($tmpFile)) {
-            unlink($tmpFile);
-        }
+    public function testExportWithAggregatedColumns(): void
+    {
+        $fixtureAggregatedColumns = Fixtures::getValidReportResultWithAggregatedColumns();
+        $reportDataResult         = new ReportDataResult($fixtureAggregatedColumns);
+
+        $this->csvExporter->export($reportDataResult, $this->file);
+
+        fclose($this->file);
+        $result = array_map('str_getcsv', file($this->tmpFile));
+
+        $expectedHeaders                                  = ['ID', 'Name', 'SUM Read', 'AVG Read', 'COUNT Contact ID'];
+        $expectedTotals                                   = $reportDataResult->getTotalsToExport($this->formatterHelperMock);
+        $expectedTotals[array_key_first($expectedTotals)] = $this->translator->trans('mautic.report.report.groupby.totals');
+        $expectedData                                     = $reportDataResult->getData();
+
+        $this->assertCount(4, $result);
+        $this->assertSame($expectedHeaders, $result[0]);
+        $this->assertSame(array_values($expectedData[0]), array_values($result[1]));
+        $this->assertSame(array_values($expectedData[1]), array_values($result[2]));
+        $this->assertSame(array_values($expectedTotals), array_values($result[3]));
+    }
+
+    public function testPutTotals(): void
+    {
+        $fixtureAggregatedColumns = Fixtures::getValidReportResultWithAggregatedColumns();
+        $reportDataResult         = new ReportDataResult($fixtureAggregatedColumns);
+        $expected                 = $reportDataResult->getTotalsToExport($this->formatterHelperMock);
+
+        $this->csvExporter->putTotals($expected, $this->file);
+        fclose($this->file);
+
+        $result = array_map('str_getcsv', file($this->tmpFile));
+
+        $this->assertCount(1, $result);
+        $this->assertSame('Totals', $result[0][0]);
+        $this->assertSame(array_slice(array_values($expected), 1), array_slice(array_values($result[0]), 1));
+    }
+
+    public function testPutHeader(): void
+    {
+        $fixtureAggregatedColumns = Fixtures::getValidReportResultWithAggregatedColumns();
+        $reportDataResult         = new ReportDataResult($fixtureAggregatedColumns);
+        $expected                 = $reportDataResult->getHeaders();
+
+        $this->csvExporter->putHeader($reportDataResult, $this->file);
+        fclose($this->file);
+
+        $result = array_map('str_getcsv', file($this->tmpFile));
+
+        $this->assertCount(1, $result);
+        $this->assertSame(array_values($expected), array_values($result[0]));
     }
 }

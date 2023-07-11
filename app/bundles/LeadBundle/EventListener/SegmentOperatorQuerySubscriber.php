@@ -69,7 +69,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         if (!$event->operatorIsOneOf(
             'neq',
             'notLike',
-            'notBetween', //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
+            'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             'notIn'
         )) {
             return;
@@ -121,9 +121,9 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'lt',
             'lte',
             'in',
-            'between', //Used only for date with week combination (EQUAL [this week, next week, last week])
+            'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
             'regexp',
-            'notRegexp' //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            'notRegexp' // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
         )) {
             return;
         }

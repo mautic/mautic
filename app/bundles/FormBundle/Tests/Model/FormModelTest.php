@@ -8,7 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
@@ -25,8 +28,10 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 class FormModelTest extends \PHPUnit\Framework\TestCase
@@ -141,7 +146,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $this->formRepository],
+                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
                     ]
                 )
             );
@@ -158,12 +163,16 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
-            $this->mappedObjectCollector
+            $this->mappedObjectCollector,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
-
-        $this->formModel->setDispatcher($this->dispatcher);
-        $this->formModel->setTranslator($this->translator);
-        $this->formModel->setEntityManager($this->entityManager);
     }
 
     public function testSetFields(): void

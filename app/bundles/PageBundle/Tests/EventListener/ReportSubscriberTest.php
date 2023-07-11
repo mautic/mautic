@@ -2,10 +2,9 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
-use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -251,13 +250,13 @@ class ReportSubscriberTest extends TestCase
             ->onlyMethods(['expr', 'execute'])
             ->getMock();
 
-        $mockStmt = $this->getMockBuilder(PDOStatement::class)
+        $mockStmt = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAll'])
+            ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
 
         $mockStmt->expects($this->exactly(2))
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn(
                 [
                     [
@@ -311,8 +310,8 @@ class ReportSubscriberTest extends TestCase
         $graphOptions = [
             'chartQuery' => $mockChartQuery,
             'translator' => $this->translator,
-            'dateFrom'   => new DateTime(),
-            'dateTo'     => new DateTime(),
+            'dateFrom'   => new \DateTime(),
+            'dateTo'     => new \DateTime(),
         ];
 
         $mockEvent->expects($this->once())
@@ -352,8 +351,8 @@ class ReportSubscriberTest extends TestCase
             ->willReturn(
                 [
                     [
-                        'from'  => new DateTime(),
-                        'till'  => new DateTime(),
+                        'from'  => new \DateTime(),
+                        'till'  => new \DateTime(),
                         'label' => 'My Chart',
                     ],
                 ]

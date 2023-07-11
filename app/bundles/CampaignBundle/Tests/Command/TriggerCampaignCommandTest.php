@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
@@ -39,7 +35,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -86,7 +82,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -111,7 +107,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(25, $stats);
 
         // Now let's simulate email opens
@@ -205,7 +202,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -251,7 +248,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -276,7 +274,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(1, $stats);
 
         // Now let's simulate email opens
@@ -410,7 +409,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -435,7 +435,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
         // Now let's simulate email opens
@@ -562,13 +562,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignInfiniteLoop(): void
     {
         $campaignMemberRepo = $this->em->getRepository(Lead::class);
-        \assert($campaignMemberRepo instanceof LeadRepository);
 
         $segmentMemberRepo = $this->em->getRepository(ListLead::class);
-        \assert($segmentMemberRepo instanceof ListLeadRepository);
 
         $campaignRepo = $this->em->getRepository(Campaign::class);
-        \assert($campaignRepo instanceof CampaignRepository);
 
         // Clear the campaign and segment members as those are manually_added.
         $campaignMemberRepo->deleteEntities($campaignMemberRepo->findAll());
@@ -588,7 +585,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $john);
         $this->createCampaignLead($campaign, $jane, true); // Manually removed.
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaign);
+        $this->em->detach($campaignRepo);
 
         $tStart = microtime(true);
 
@@ -600,7 +598,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSegmentCacheCount(): void
     {
@@ -622,7 +620,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $tagCounts = [];
         foreach ($tags as $tag) {

@@ -2,18 +2,14 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use AppKernel;
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
-use Exception;
-use LogicException;
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Psr\Cache\CacheItemPoolInterface;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -43,7 +39,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function setUp(): void
     {
@@ -79,7 +75,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->beforeTearDown();
 
         if (!$this->setUpInvoked) {
-            throw new LogicException('You omitted invoking parent::setUp(). This may lead to side effects.');
+            throw new \LogicException('You omitted invoking parent::setUp(). This may lead to side effects.');
         }
 
         $isTransactionActive = $this->connection->isTransactionActive();
@@ -116,7 +112,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         if ($this->useCleanupRollback && isset($this->client)) {
-            throw new LogicException('You cannot re-create the client when a transaction rollback for cleanup is enabled. Turn it off using $useCleanupRollback property or avoid re-creating a client.');
+            throw new \LogicException('You cannot re-create the client when a transaction rollback for cleanup is enabled. Turn it off using $useCleanupRollback property or avoid re-creating a client.');
         }
 
         self::ensureKernelShutdown();
@@ -136,11 +132,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->query(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $connection->executeQuery(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
-    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
+    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): KernelBrowser
     {
         // turn off rollback cleanup as this client creates a separate DB connection
         $this->useCleanupRollback = false;
@@ -158,32 +154,30 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function truncateTables(string ...$tables): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
-            $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+            $this->connection->executeQuery("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
         }
     }
 
     /**
-     * @param $file
-     *
-     * @throws Exception
+     * @throws \Exception
      */
     private function applySqlFromFile($file)
     {
         $connection = $this->connection;
         $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
         $envVars    = [
-            'MYSQL_PWD'      => $connection->getPassword(),
-            'db_host'        => $connection->getHost(),
-            'db_port'        => $connection->getPort(),
-            'db_user'        => $connection->getUsername(),
-            'db_name'        => $connection->getDatabase(),
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
             'db_backup_file' => $file,
         ];
 
@@ -192,14 +186,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         // executes after the command finishes
         if (!$process->isSuccessful()) {
-            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
+            throw new \Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
     /**
      * Reset each test using a SQL file if possible to prevent from having to run the fixtures over and over.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function prepareDatabase()
     {
@@ -228,7 +222,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function installDatabase()
     {
@@ -239,13 +233,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function createDatabase()
     {
         $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
         $this->runCommand('doctrine:database:create');
         $this->runCommand('doctrine:schema:create');
+        $this->runCommand('doctrine:migration:sync-metadata-storage');
     }
 
     private function generateResetDatabaseSql(string $file): void
@@ -254,15 +249,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content .= 'SET unique_checks=0;'.PHP_EOL;
         $content .= 'SET FOREIGN_KEY_CHECKS=0;'.PHP_EOL;
 
-        $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getDatabase()])
-            ->fetchAll(FetchMode::COLUMN);
+        $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getParams()['dbname']])
+            ->fetchFirstColumn();
 
         foreach ($tables as $table) {
             $content .= sprintf('DELETE FROM %s;'.PHP_EOL, $table);
         }
 
-        $password = ($this->connection->getPassword()) ? " -p{$this->connection->getPassword()}" : '';
-        $command  = "mysqldump --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getHost()} -P{$this->connection->getPort()} -u{$this->connection->getUsername()}$password {$this->connection->getDatabase()} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
+        $password = ($this->connection->getParams()['password']) ? " -p{$this->connection->getParams()['password']}" : '';
+        $command  = "mysqldump --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
 
         $content .= shell_exec($command);
         $content .= 'COMMIT;'.PHP_EOL;
@@ -273,18 +268,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
         $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
         $envVars    = [
-            'MYSQL_PWD'      => $connection->getPassword(),
-            'db_host'        => $connection->getHost(),
-            'db_port'        => $connection->getPort(),
-            'db_user'        => $connection->getUsername(),
-            'db_name'        => $connection->getDatabase(),
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
             'db_backup_file' => $sqlDumpFile,
         ];
 
@@ -296,7 +291,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             if (file_exists($sqlDumpFile)) {
                 unlink($sqlDumpFile);
             }
-            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
+            throw new \Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
@@ -315,19 +310,19 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getSqlFilePath(string $name): string
     {
-        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getDatabase());
+        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
     }
 
     private function resetCustomFields(): bool
     {
         $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAll(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
 
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
-                $this->connection->exec(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (Exception $e) {
+                $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
+            } catch (\Exception $e) {
             }
         }
 
@@ -343,7 +338,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         if (!copy($path, $path.'.backup')) {
-            throw new RuntimeException(sprintf('Unable to copy file %s => %s', $path, $path.'.backup'));
+            throw new \RuntimeException(sprintf('Unable to copy file %s => %s', $path, $path.'.backup'));
         }
     }
 
@@ -352,13 +347,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $path = $this->getLocalConfigFile();
 
         if (!rename($path.'.backup', $path)) {
-            throw new RuntimeException(sprintf('Unable to move file %s => %s', $path.'.backup', $path));
+            throw new \RuntimeException(sprintf('Unable to move file %s => %s', $path.'.backup', $path));
         }
     }
 
     private function getLocalConfigFile(): string
     {
-        /** @var AppKernel $kernel */
+        /** @var \AppKernel $kernel */
         $kernel = static::$kernel;
 
         return $kernel->getLocalConfigFile();
@@ -366,17 +361,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $this->connection->exec("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
+        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
     }
 
     private function wasRollbackSuccessful(): bool
     {
-        return false === $this->connection->fetchColumn("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
+        return false === $this->connection->fetchOne("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
     }
 
     private function getTablePrefix(): string
     {
-        return self::$container->getParameter('mautic.db_table_prefix');
+        return (string) self::$container->getParameter('mautic.db_table_prefix');
     }
 
     private function isDatabasePrepared(): bool
@@ -394,5 +389,21 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider = self::$container->get('mautic.cache.provider');
         \assert($cacheProvider instanceof CacheItemPoolInterface);
         $cacheProvider->clear();
+    }
+
+    /**
+     * Helper method to ensure booleans are strings in HTTP payloads.
+     *
+     * this ensures the payload is compatible with a change in Symfony 5.2
+     *
+     * @see https://github.com/symfony/browser-kit/commit/1d033e7dccc9978dd7a2bde778d06ebbbf196392
+     */
+    protected function generateTypeSafePayload(mixed $payload): mixed
+    {
+        array_walk_recursive($payload, function (&$value) {
+            $value = is_bool($value) ? ($value ? '1' : '0') : $value;
+        });
+
+        return $payload;
     }
 }

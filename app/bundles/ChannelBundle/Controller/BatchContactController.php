@@ -2,15 +2,23 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ChannelBundle\Model\ChannelActionModel;
 use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
@@ -30,16 +38,24 @@ class BatchContactController extends AbstractFormController
     private $contactModel;
 
     public function __construct(
-        CorePermissions $security,
-        UserHelper $userHelper,
         ChannelActionModel $channelActionModel,
         FrequencyActionModel $frequencyActionModel,
-        LeadModel $leadModel
+        LeadModel $leadModel,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
     ) {
         $this->channelActionModel   = $channelActionModel;
         $this->frequencyActionModel = $frequencyActionModel;
         $this->contactModel         = $leadModel;
-        parent::__construct($security, $userHelper);
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**

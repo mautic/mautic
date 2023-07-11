@@ -39,7 +39,6 @@ class BodyParser
     /**
      * @todo - refactor to get rid of the if/else statements
      *
-     * @param        $body
      * @param string $knownEmail
      *
      * @return array
@@ -410,12 +409,12 @@ class BodyParser
             $result['rule_no']  = '0166';
             $result['email']    = $match[1];
 
-        /*
-        * rule: mailbox full;
-        * sample:
-        * name@domain.com
-        * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
-        */
+            /*
+            * rule: mailbox full;
+            * sample:
+            * name@domain.com
+            * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
+            */
         } elseif (preg_match("/\s<(\S+@\S+\w)>\sMailbox.*full/i", $body, $match)) {
             $result['rule_cat'] = Category::FULL;
             $result['rule_no']  = '0166';
