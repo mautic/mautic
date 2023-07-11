@@ -1121,6 +1121,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             $leadCount         = count($leads);
 
+            foreach ($leads as &$lead) {
+                $leadEntity = $this->leadModel->getEntity($lead['id']);
+                $lead       = array_merge($lead, $leadEntity->getProfileFields('normalizedValue'));
+            }
+            unset($lead);
+
             while ($leadCount) {
                 $sentCount += $leadCount;
 

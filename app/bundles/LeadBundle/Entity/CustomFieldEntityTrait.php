@@ -220,7 +220,7 @@ trait CustomFieldEntityTrait
      *
      * @return array
      */
-    public function getProfileFields()
+    public function getProfileFields(string $value = 'value')
     {
         if (isset($this->fields['core'])) {
             $fieldValues = [
@@ -233,7 +233,7 @@ trait CustomFieldEntityTrait
                 }
 
                 foreach ($fields as $alias => $field) {
-                    $fieldValues[$alias] = $field['value'];
+                    $fieldValues[$alias] = $field[$value];
                 }
             }
 

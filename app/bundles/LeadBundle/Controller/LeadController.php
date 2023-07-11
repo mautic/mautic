@@ -1359,7 +1359,7 @@ class LeadController extends FormController
             return $this->modalAccessDenied();
         }
 
-        $leadFields       = $lead->getProfileFields();
+        $leadFields       = $lead->getProfileFields('normalizedValue');
         $leadFields['id'] = $lead->getId();
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];

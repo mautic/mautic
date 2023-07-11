@@ -280,7 +280,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $credentialArray = [];
 
         foreach ($contacts as $logId => $contact) {
-            $leadCredentials                      = $contact->getProfileFields();
+            $leadCredentials                      = $contact->getProfileFields('normalizedValue');
             $leadCredentials['primaryIdentifier'] = $contact->getPrimaryIdentifier();
             // Set owner_id to support the "Owner is mailer" feature
             if ($contact->getOwner()) {
