@@ -41,7 +41,7 @@ class PreAuthorizationEventListener
     public function onPreAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($user = $this->getUser($event)) {
-            //check to see if user has api access
+            // check to see if user has api access
             if (!$this->mauticSecurity->isGranted('api:access:full')) {
                 throw new AccessDeniedException($this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'));
             }
@@ -69,6 +69,6 @@ class PreAuthorizationEventListener
      */
     protected function getUser(PreAuthorizationEvent $event)
     {
-        return $this->em->getRepository('MauticUserBundle:User')->findOneByUsername($event->getUser()->getUsername());
+        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUsername());
     }
 }

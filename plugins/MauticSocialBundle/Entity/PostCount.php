@@ -16,7 +16,7 @@ class PostCount
     private $id;
 
     /**
-     * @var Monitoring
+     * @var Monitoring|null
      */
     private $monitor;
 
@@ -105,8 +105,6 @@ class PostCount
     }
 
     /**
-     * @param $postDate
-     *
      * @return $this
      */
     public function setPostDate($postDate)

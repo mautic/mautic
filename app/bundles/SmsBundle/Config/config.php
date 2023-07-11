@@ -100,18 +100,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'mautic.sms.model.sms' => [
-                'class'     => 'Mautic\SmsBundle\Model\SmsModel',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.lead.model.lead',
-                    'mautic.channel.model.queue',
-                    'mautic.sms.transport_chain',
-                    'mautic.helper.cache_storage',
-                ],
-            ],
-        ],
         'integrations' => [
             'mautic.integration.twilio' => [
                 'class'     => \Mautic\SmsBundle\Integration\TwilioIntegration::class,

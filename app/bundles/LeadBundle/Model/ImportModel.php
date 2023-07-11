@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -9,8 +11,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
@@ -22,7 +27,10 @@ use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -68,7 +76,14 @@ class ImportModel extends FormModel
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         CoreParametersHelper $config,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
@@ -76,6 +91,8 @@ class ImportModel extends FormModel
         $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
         $this->companyModel      = $companyModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }
 
     /**
@@ -161,7 +178,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed'),
                     'fa-download',
                     null,
-                    $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -258,7 +275,7 @@ class ImportModel extends FormModel
                 $this->translator->trans('mautic.lead.import.completed'),
                 'fa-download',
                 null,
-                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
             );
         }
     }
@@ -272,9 +289,6 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress, $limit = 0)
     {
-        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', '1');
-
         try {
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
@@ -428,8 +442,7 @@ class ImportModel extends FormModel
      * If it is less, generate empty values for the rest of the missing values.
      * If it is more, return true.
      *
-     * @param array &$data
-     * @param int   $headerCount
+     * @param int $headerCount
      *
      * @return bool
      */
@@ -573,7 +586,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Import');
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Import::class);
     }
 
     /**
@@ -581,7 +594,7 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
     }
 
     /**
@@ -619,8 +632,6 @@ class ImportModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -634,11 +645,6 @@ class ImportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

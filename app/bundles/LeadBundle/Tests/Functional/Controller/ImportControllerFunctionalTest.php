@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
@@ -133,7 +132,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(): Import
     {
-        $now    = new DateTime();
+        $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);

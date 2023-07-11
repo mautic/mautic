@@ -101,7 +101,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $limitToForms = $event->getConfig()['forms'];
 
-        //check against selected forms
+        // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
             return $event->setResult(false);
         }

@@ -34,9 +34,6 @@ class EventDispatcher
         );
     }
 
-    /**
-     * @param $action
-     */
     public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
     {
         $this->dispatcher->dispatch(

@@ -2,13 +2,10 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use function assert;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\NotificationBundle\Entity\Notification;
-use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +16,7 @@ class AppCallbackController extends CommonController
     {
         $requestBody = json_decode($request->getContent(), true);
         $contactRepo = $em->getRepository(Lead::class);
-        assert($contactRepo instanceof LeadRepository);
+
         $matchData   = [
             'email' => $requestBody['email'],
         ];
@@ -46,13 +43,13 @@ class AppCallbackController extends CommonController
         if (array_key_exists('stat', $requestBody)) {
             $stat             = $requestBody['stat'];
             $notificationRepo = $em->getRepository(Notification::class);
-            assert($notificationRepo instanceof NotificationRepository);
+
             $notification     = $notificationRepo->getEntity($stat['notification_id']);
 
             if (null !== $notification) {
                 $statCreated       = true;
                 $notificationModel = $this->getModel('notification');
-                assert($notificationModel instanceof NotificationModel);
+                \assert($notificationModel instanceof NotificationModel);
                 $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }

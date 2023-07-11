@@ -33,6 +33,9 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
             $translator
         );
 
+        $emailModel->method('buildUrl')->willReturn('https://some.url');
+        $translator->method('trans')->willReturn('some translation');
+
         $coreParametersHelper->method('get')->willReturnCallback(function ($key) {
             if ('locale' === $key) {
                 return 'default_locale';

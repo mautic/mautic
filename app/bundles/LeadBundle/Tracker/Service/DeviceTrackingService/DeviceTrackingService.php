@@ -140,7 +140,6 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     {
         $this->cookieHelper->deleteCookie('mautic_device_id');
         $this->cookieHelper->deleteCookie('mtc_id');
-        $this->cookieHelper->deleteCookie('mtc_sid');
     }
 
     private function getTrackedIdentifier(): ?string
@@ -181,6 +180,5 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
         // Mainly for landing pages so that JS has the same access as 3rd party tracking code
         $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null, sameSite: Cookie::SAMESITE_NONE);
-        $this->cookieHelper->setCookie('mtc_sid', $device->getTrackingId(), null, sameSite: Cookie::SAMESITE_NONE);
     }
 }

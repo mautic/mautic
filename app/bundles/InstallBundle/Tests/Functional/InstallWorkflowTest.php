@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  * MAUTIC_INSTALLER which breaks other tests.
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class InstallWorkflowTest extends MauticMysqlTestCase
@@ -72,11 +72,11 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $submitButton = $crawler->selectButton('install_doctrine_step[buttons][next]');
         $form         = $submitButton->form();
 
-        $form['install_doctrine_step[host]']->setValue($this->connection->getHost());
-        $form['install_doctrine_step[port]']->setValue($this->connection->getPort());
-        $form['install_doctrine_step[name]']->setValue($this->connection->getDatabase());
-        $form['install_doctrine_step[user]']->setValue($this->connection->getUsername());
-        $form['install_doctrine_step[password]']->setValue($this->connection->getPassword());
+        $form['install_doctrine_step[host]']->setValue($this->connection->getParams()['host']);
+        $form['install_doctrine_step[port]']->setValue((string) $this->connection->getParams()['port']);
+        $form['install_doctrine_step[name]']->setValue($this->connection->getParams()['dbname']);
+        $form['install_doctrine_step[user]']->setValue($this->connection->getParams()['user']);
+        $form['install_doctrine_step[password]']->setValue($this->connection->getParams()['password']);
         $form['install_doctrine_step[backup_tables]']->setValue('0');
 
         $crawler = $this->client->submit($form);
@@ -100,7 +100,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
 
         // Assert that the fixtures were loaded
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         \assert($emailField instanceof LeadField);

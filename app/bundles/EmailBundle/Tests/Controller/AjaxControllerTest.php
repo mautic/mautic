@@ -5,14 +5,22 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class AjaxControllerTest extends \PHPUnit\Framework\TestCase
@@ -57,13 +65,34 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->sessionMock      = $this->createMock(Session::class);
-        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $this->containerMock    = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
+
         $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
-        $this->controller       = new AjaxController($this->managerRegistry);
-        $this->controller->setModelFactory($this->modelFactoryMock);
+        $doctrine               = $this->createMock(ManagerRegistry::class);
+        $factory                = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
+        $userHelper             = $this->createMock(UserHelper::class);
+        $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
+        $dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $translator             = $this->createMock(Translator::class);
+        $flashBag               = $this->createMock(FlashBag::class);
+        $requestStack           = new RequestStack();
+        $security               = $this->createMock(CorePermissions::class);
+
+        $this->controller = new AjaxController(
+            $this->managerRegistry,
+            $factory,
+            $this->modelFactoryMock,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $security
+        );
         $this->controller->setContainer($this->containerMock);
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);

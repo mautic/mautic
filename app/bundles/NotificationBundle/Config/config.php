@@ -40,14 +40,6 @@ return [
                 'alias' => 'notification_api',
             ],
         ],
-        'models' => [
-            'mautic.notification.model.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Model\NotificationModel',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.notification.repository.stat' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
@@ -184,9 +176,9 @@ return [
             ],
         ],
     ],
-    //'categories' => [
+    // 'categories' => [
     //    'notification' => null
-    //],
+    // ],
     'parameters' => [
         'notification_enabled'                        => false,
         'notification_landing_page_enabled'           => true,

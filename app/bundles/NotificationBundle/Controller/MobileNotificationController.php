@@ -29,7 +29,7 @@ class MobileNotificationController extends FormController
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'notification:mobile_notifications:viewown',
@@ -51,7 +51,7 @@ class MobileNotificationController extends FormController
 
         $session = $request->getSession();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.mobile_notification.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -92,7 +92,7 @@ class MobileNotificationController extends FormController
 
         $count = count($notifications);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -142,8 +142,6 @@ class MobileNotificationController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
@@ -154,11 +152,11 @@ class MobileNotificationController extends FormController
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $model->getEntity($objectId);
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.mobile_notification.page', 1);
 
         if (null === $notification) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
 
             return $this->postActionRedirect(
@@ -269,7 +267,7 @@ class MobileNotificationController extends FormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // set the page we came from
         $page         = $session->get('mautic.mobile_notification.page', 1);
         $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
         $notification = $request->request->get('notification') ?? [];
@@ -284,12 +282,12 @@ class MobileNotificationController extends FormController
         // create the form
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
                     $this->addFlashMessage(
@@ -315,7 +313,7 @@ class MobileNotificationController extends FormController
                         $returnUrl = $this->generateUrl('mautic_mobile_notification_action', $viewParameters);
                         $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
+                        // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $integrationHelper, $entity->getId(), true);
                     }
                 }
@@ -323,7 +321,7 @@ class MobileNotificationController extends FormController
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_mobile_notification_index', $viewParameters);
                 $template       = 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction';
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.mobile_notification.'.$entity->getId().'.content');
             }
 
@@ -384,7 +382,6 @@ class MobileNotificationController extends FormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
@@ -399,7 +396,7 @@ class MobileNotificationController extends FormController
         $session = $request->getSession();
         $page    = $session->get('mautic.mobile_notification.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
 
         $postActionVars = [
@@ -412,7 +409,7 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        //not found
+        // not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -436,11 +433,11 @@ class MobileNotificationController extends FormController
         ) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'notification');
         }
 
-        //Create the form
+        // Create the form
         $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $notification = $request->request->get('notification') ?? [];
         $updateSelect = 'POST' === $method
@@ -449,12 +446,12 @@ class MobileNotificationController extends FormController
 
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
@@ -474,9 +471,9 @@ class MobileNotificationController extends FormController
                     );
                 }
             } else {
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.mobile_notification.'.$objectId.'.content');
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
 
@@ -519,7 +516,7 @@ class MobileNotificationController extends FormController
                 );
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -553,8 +550,6 @@ class MobileNotificationController extends FormController
     /**
      * Clone an entity.
      *
-     * @param $objectId
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
@@ -585,8 +580,6 @@ class MobileNotificationController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @param $objectId
      *
      * @return Response
      */
@@ -638,7 +631,7 @@ class MobileNotificationController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -714,7 +707,7 @@ class MobileNotificationController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -727,8 +720,6 @@ class MobileNotificationController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return JsonResponse|Response
      */
     public function previewAction($objectId)
@@ -748,7 +739,6 @@ class MobileNotificationController extends FormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

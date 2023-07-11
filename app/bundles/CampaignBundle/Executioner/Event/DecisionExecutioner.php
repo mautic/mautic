@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use function assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -72,7 +71,7 @@ class DecisionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
-        assert($config instanceof DecisionAccessor);
+        \assert($config instanceof DecisionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
         $failedLogs        = [];
 

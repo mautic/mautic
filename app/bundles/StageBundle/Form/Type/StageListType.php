@@ -34,7 +34,7 @@ class StageListType extends AbstractType
             $this->choices[$choice->getName()] = $choice->getId();
         }
 
-        //sort by language
+        // sort by language
         ksort($this->choices);
     }
 

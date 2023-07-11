@@ -32,7 +32,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $this
             ->setName('mautic:segments:update')
             ->setAliases(['mautic:segments:rebuild'])
-            ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption(
                 '--batch-limit',
                 '-b',
@@ -74,7 +73,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -87,7 +86,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 1;
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
 
             $this->rebuildSegment($list, $batch, $max, $output);
@@ -120,7 +119,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     private function rebuildSegment(LeadList $segment, int $batch, int $max, OutputInterface $output): void
@@ -142,4 +141,5 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
+    protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }
