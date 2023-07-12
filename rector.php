@@ -17,7 +17,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/*.less.php',
             __DIR__.'/*.inc.php',
             __DIR__.'/*.js.php',
-            \Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
+            \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
                 __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
                 __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
             ],
@@ -69,7 +69,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
-    $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
+    $rectorConfig->rule(\Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
 
     $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
         \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
