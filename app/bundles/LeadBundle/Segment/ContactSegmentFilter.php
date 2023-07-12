@@ -125,7 +125,7 @@ class ContactSegmentFilter
         if (method_exists($this->filterDecorator, 'getForeignContactColumn')) {
             return $this->filterDecorator->getForeignContactColumn($this->contactSegmentFilterCrate);
         } else {
-            return null;
+            return 'lead_id';
         }
     }
 
