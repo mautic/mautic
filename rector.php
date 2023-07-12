@@ -104,7 +104,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ],
     ]);
 
-    $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
-        DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
-    ]);
+    // This rule stopped existing :shrug:
+    // $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
+    //     DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
+    // ]);
 };
