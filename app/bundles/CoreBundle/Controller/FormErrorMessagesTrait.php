@@ -82,7 +82,7 @@ trait FormErrorMessagesTrait
             return null;
         }
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             return null;
         }
 
