@@ -66,30 +66,30 @@ EOT
         $userId      = (int) $input->getOption('user');
 
         if ($leadFieldId) {
-            return $this->addColumn($leadFieldId, $userId, $input, $output) ? Command::SUCCESS : Command::FAILURE;
+            return $this->addColumn($leadFieldId, $userId, $input, $output);
         }
 
-        return $this->addAllMissingColumns($input, $output) ? Command::SUCCESS : Command::FAILURE;
+        return $this->addAllMissingColumns($input, $output);
     }
 
-    private function addAllMissingColumns(InputInterface $input, OutputInterface $output): bool
+    private function addAllMissingColumns(InputInterface $input, OutputInterface $output): int
     {
-        $hasNoErrors = true;
+        $hasNoErrors = Command::SUCCESS;
         while ($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
             if (!$this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output)) {
-                $hasNoErrors = false;
+                $hasNoErrors = Command::FAILURE;
             }
         }
 
         return $hasNoErrors;
     }
 
-    private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): bool
+    private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): int
     {
         $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
 
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {
-            return true;
+            return Command::SUCCESS;
         }
 
         try {
@@ -97,41 +97,41 @@ EOT
         } catch (LeadFieldWasNotFoundException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
-            return false;
+            return Command::FAILURE;
         } catch (ColumnAlreadyCreatedException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
 
-            return true;
+            return Command::SUCCESS;
         } catch (AbortColumnCreateException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
 
-            return true;
+            return Command::SUCCESS;
         } catch (CustomFieldLimitException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return false;
+            return Command::FAILURE;
         } catch (DriverException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return false;
+            return Command::FAILURE;
         } catch (SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return false;
+            return Command::FAILURE;
         } catch (\Doctrine\DBAL\Exception $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return false;
+            return Command::FAILURE;
         } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return false;
+            return Command::FAILURE;
         }
 
         $output->writeln('');
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
         $this->completeRun();
 
-        return true;
+        return Command::SUCCESS;
     }
 }
