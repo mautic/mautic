@@ -1061,6 +1061,16 @@ class FieldModel extends FormModel
                 'properties'   => [],
                 'isPublished'  => true,
             ],
+            'ownerbyid' => [
+                'label'        => 'Owner\'s id',
+                'alias'        => 'ownerbyid',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
             'stage' => [
                 'label'        => 'Stage',
                 'alias'        => 'stage',
