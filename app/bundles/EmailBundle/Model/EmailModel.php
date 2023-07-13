@@ -471,13 +471,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @throws OptimisticLockException
      */
     public function hitEmail(
-        $stat,
+        Stat|string|null $stat,
         ?Request $request,
-        $viaBrowser = false,
-        $activeRequest = true,
-        \DateTime $hitDateTime = null,
+        bool $viaBrowser = false,
+        bool $activeRequest = true,
+        \DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false
-    ) {
+    ): void {
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
         }
