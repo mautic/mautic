@@ -1,39 +1,6 @@
 <?php
 
 return [
-    'services'   => [
-        'other' => [
-            \Mautic\MessengerBundle\MessageHandler\PageHitNotificationHandler::class  => [
-                'class'         => \Mautic\MessengerBundle\MessageHandler\PageHitNotificationHandler::class,
-                'tag'           => 'messenger.message_handler',
-                'tagArguments'  => ['bus' => 'messenger.bus.hit'],
-                'arguments'     => [
-                    'mautic.page.repository.page',
-                    'mautic.page.repository.hit',
-                    'mautic.lead.repository.lead',
-                    'logger',
-                    'mautic.page.repository.redirect',
-                    'mautic.page.model.page',
-                ],
-            ],
-            \Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler::class => [
-                'class'         => \Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler::class,
-                'tag'           => 'messenger.message_handler',
-                'tagArguments'  => ['bus' => 'messenger.bus.hit'],
-                'autoconfigure' => false,
-                'arguments'     => [
-                    'mautic.email.model.email',
-                    'logger',
-                ],
-            ],
-            \Mautic\MessengerBundle\Middleware\SynchronousExtrasMiddleware::class => [
-                'class'     => \Mautic\MessengerBundle\Middleware\SynchronousExtrasMiddleware::class,
-                'arguments' => [
-                    'messenger.senders_locator',
-                ],
-            ],
-        ],
-    ],
     'parameters' => [
         'messenger_dsn_email'                  => 'sync://', // sync means no queue
         'messenger_dsn_failed'                 => null, // failed transport is optional
