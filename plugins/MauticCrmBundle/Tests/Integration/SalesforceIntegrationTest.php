@@ -455,7 +455,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
-        $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
+        $sf->pushLeadToCampaign($lead, 1, ['Lead' => [1]]);
     }
 
     public function testPushCompany()
