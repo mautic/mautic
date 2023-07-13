@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Helper;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
@@ -72,13 +71,13 @@ class IpLookupHelper
     }
 
     /**
-     * Guess the IP address from current session or give request.
+     * Guess the IP address from current session.
      *
      * @return string
      */
-    public function getIpAddressFromRequest(HttpRequest $request = null)
+    public function getIpAddressFromRequest()
     {
-        $request ??= $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         if (null !== $request) {
             $ipHolders = [
@@ -217,6 +216,8 @@ class IpLookupHelper
 
     /**
      * Validates if an IP address if valid.
+     *
+     * @return mixed
      */
     public function ipIsValid($ip)
     {

@@ -18,7 +18,6 @@ class MauticCoreExtension extends Extension
         'Entity',
         'Event',
         'Exception',
-        'Message',
         'Migration',
         'Migrations',
         'Security',

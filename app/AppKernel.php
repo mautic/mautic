@@ -26,8 +26,6 @@ class AppKernel extends Kernel
     private $parameterLoader;
 
     /**
-     * Constructor.
-     *
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
      *
