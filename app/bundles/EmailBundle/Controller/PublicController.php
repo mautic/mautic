@@ -88,9 +88,6 @@ class PublicController extends CommonFormController
         return $this->notFound();
     }
 
-    /**
-     * @return Response
-     */
     public function trackingImageAction(
         Request $request,
         MessageBusInterface $messageBus,
@@ -219,8 +216,8 @@ class PublicController extends CommonFormController
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
-                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
+                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"')
+                        || false !== strpos($html, BuilderSubscriber::saveprefsRegex);
                     if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
@@ -685,9 +682,6 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    /**
-     * @return mixed
-     */
     private function createLead($email, $repo)
     {
         $model = $this->getModel('lead.lead');
@@ -703,9 +697,6 @@ class PublicController extends CommonFormController
         return $repo->getLeadByEmail($email);
     }
 
-    /**
-     * @return mixed
-     */
     public function getUnsubscribeMessage($idHash, $model, $stat, $translator)
     {
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);

@@ -35,31 +35,27 @@ class PageHitNotificationHandlerTest extends TestCase
             ->expects($this->once())
             ->method('find')
             ->with($hitId)
-            ->willReturn($hitObject)
-        ;
+            ->willReturn($hitObject);
 
         $pageRepoMock = $this->createMock(PageRepository::class);
         $pageRepoMock->expects($this->once())
             ->method('find')
             ->with($pageId)
-            ->willReturn($pageObject)
-        ;
+            ->willReturn($pageObject);
 
         $redirectRepoMock = $this->createMock(RedirectRepository::class);
         $redirectRepoMock
             ->expects($this->never())
             ->method('find')
             ->with($redirectId)
-            ->willReturn($redirectObject)
-        ;
+            ->willReturn($redirectObject);
 
         $leadRepoMock = $this->createMock(LeadRepository::class);
         $leadRepoMock
             ->expects($this->once())
             ->method('find')
             ->with($leadId)
-            ->willReturn($leadObject)
-        ;
+            ->willReturn($leadObject);
 
         $request = new Request();
         $request->query->set('testMe', 'I am here');
@@ -69,8 +65,7 @@ class PageHitNotificationHandlerTest extends TestCase
         $pageModelMock
             ->expects($this->exactly(1))
             ->method('processPageHit')
-            ->with($hitObject, $pageObject, $request, $leadObject, false, false)
-        ;
+            ->with($hitObject, $pageObject, $request, $leadObject, false, false);
 
         $message = new PageHitNotification($hitId, $pageId, $request, $leadId, false, false);
 

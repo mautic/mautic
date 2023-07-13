@@ -21,8 +21,14 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class PageHitNotificationHandler implements MessageSubscriberInterface
 {
-    public function __construct(private PageRepository $pageRepository, private HitRepository $hitRepository, private LeadRepository $leadRepository, private LoggerInterface $logger, private RedirectRepository $redirectRepository, private PageModel $pageModel)
-    {
+    public function __construct(
+        private PageRepository $pageRepository,
+        private HitRepository $hitRepository,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger,
+        private RedirectRepository $redirectRepository,
+        private PageModel $pageModel
+    ) {
     }
 
     /** @throws MauticMessengerException */
@@ -97,7 +103,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             'lead'                   => $lead,
             'trackingNewlyGenerated' => $message->isNew(),
             'activeRequest'          => false,
-            'hitDate'                => new \DateTime((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
+            'hitDate'                => new \DateTimeImmutable((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
         ];
     }
 }

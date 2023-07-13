@@ -738,8 +738,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->exactly(1))
             ->method('getUnitOfWork')
-            ->willReturn($unitOfWork)
-        ;
+            ->willReturn($unitOfWork);
 
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');

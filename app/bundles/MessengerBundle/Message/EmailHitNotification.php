@@ -17,7 +17,7 @@ class EmailHitNotification implements RequestStatusInterface
         Request $request,
         \DateTimeInterface $eventTime = null
     ) {
-        $this->setEventTime($eventTime ?? new \DateTime());
+        $this->setEventTime($eventTime ?? new \DateTimeImmutable());
         $this->setRequest($request);
     }
 

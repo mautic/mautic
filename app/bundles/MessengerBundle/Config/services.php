@@ -20,8 +20,7 @@ return function (ContainerConfigurator $configurator) {
     $services
         ->instanceof(MessageSubscriberInterface::class)
         // services whose classes are instances of CustomInterface will be tagged automatically
-        ->tag('messenger.message_handler', ['bus' => 'messenger.bus.hit'])
-    ;
+        ->tag('messenger.message_handler', ['bus' => 'messenger.bus.hit']);
 
     $services->alias(TransportFactory::class, 'messenger.transport_factory');
     $services->alias(SendersLocatorInterface::class, 'messenger.senders_locator');

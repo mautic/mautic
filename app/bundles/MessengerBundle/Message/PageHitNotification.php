@@ -26,7 +26,7 @@ class PageHitNotification
         private ?int $leadId,
         private bool $isNew,
         private bool $isRedirect,
-        \DateTime $eventTime = null
+        \DateTimeInterface $eventTime = null
     ) {
         $this->setRequest($request);
         $this->setEventTime($eventTime);
