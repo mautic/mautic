@@ -33,8 +33,6 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    private LoggerInterface $logger;
-
     /**
      * @return Response
      */

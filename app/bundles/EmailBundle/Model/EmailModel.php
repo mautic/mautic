@@ -45,6 +45,7 @@ use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -253,7 +254,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Email $entity
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $type = $entity->getEmailType();
         if (empty($type)) {
@@ -463,15 +464,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param ?Stat|string $stat
-     * @param Request      $request
      * @param bool         $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
-     * @param bool         $viaBrowser
      *
      * @throws ORMException
      * @throws OptimisticLockException
      */
     public function hitEmail(
-        Stat|string|null $stat,
+        $stat,
         ?Request $request,
         bool $viaBrowser = false,
         bool $activeRequest = true,
@@ -568,7 +567,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             // As the entity might be cached, present in EM, but not attached, we need to reload it
             if (UnitOfWork::STATE_DETACHED === $this->em->getUnitOfWork()->getEntityState($trackedDevice)) {
-                $trackedDevice = $this->em->merge($trackedDevice);
+                $trackedDevice = $this->em->getRepository(LeadDevice::class)->find($trackedDevice->getId());
             }
 
             $emailOpenStat = new StatDevice();
