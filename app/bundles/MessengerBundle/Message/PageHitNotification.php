@@ -7,7 +7,7 @@ namespace Mautic\MessengerBundle\Message;
 use Mautic\MessengerBundle\Message\Traits\MessageRequestTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageHitNotification
+final class PageHitNotification
 {
     use MessageRequestTrait;
 
