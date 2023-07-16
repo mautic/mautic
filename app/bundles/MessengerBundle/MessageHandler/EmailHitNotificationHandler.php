@@ -8,7 +8,6 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
-use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
@@ -21,7 +20,6 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
     {
     }
 
-    /** @throws MauticMessengerException */
     public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void
     {
         $hitDateTime = (new DateTimeHelper($message->getEventTime()))->getDateTime();
@@ -30,7 +28,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
             $this->logger->debug('Processing email hit notification, statId '.$message->getStatId());
             $this->emailModel->hitEmail(
                 $message->getStatId(),
-                MessengerRequestFactory::fromArray($message->getRequest()),
+                $message->getRequest(),
                 false,
                 $message->isSynchronousRequest(),
                 $hitDateTime,
@@ -40,8 +38,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
             throw new RecoverableMessageHandlingException($lockException->getMessage());
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), (array) $exception);
-            printf("Failed email hit #%s with %s\n", $message->getStatId(), $exception->getMessage());
-            throw new MauticMessengerException($exception->getMessage(), 400, $exception);
+            throw $exception;
         }
     }
 

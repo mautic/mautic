@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Middleware;
 
-use Mautic\MessengerBundle\MauticMessengerRoutes;
+use Mautic\MessengerBundle\MauticMessengerTransports;
 use Mautic\MessengerBundle\Message\Interfaces\RequestStatusInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
@@ -24,7 +24,7 @@ class SynchronousExtrasMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $sender = key(iterator_to_array($this->sendersLocator->getSenders($envelope)));
-        if (MauticMessengerRoutes::SYNC !== $sender || !$envelope->getMessage() instanceof RequestStatusInterface) {
+        if (MauticMessengerTransports::SYNC !== $sender || !$envelope->getMessage() instanceof RequestStatusInterface) {
             return $stack->next()->handle($envelope, $stack);
         }
 

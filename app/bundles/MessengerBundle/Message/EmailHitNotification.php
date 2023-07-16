@@ -14,11 +14,10 @@ class EmailHitNotification implements RequestStatusInterface
 
     public function __construct(
         private string $statId,
-        Request $request,
+        private Request $request,
         \DateTimeInterface $eventTime = null
     ) {
         $this->setEventTime($eventTime ?? new \DateTimeImmutable());
-        $this->setRequest($request);
     }
 
     public function getStatId(): string

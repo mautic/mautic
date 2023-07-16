@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\MessengerBundle\Serializer\MauticMessengerSerializer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
@@ -16,11 +17,12 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\MessengerBundle\\', '../')
         ->exclude('../{Config,Tests,Message}');
 
-    // this config only applies to the services created by this file
     $services
         ->instanceof(MessageSubscriberInterface::class)
         // services whose classes are instances of CustomInterface will be tagged automatically
         ->tag('messenger.message_handler', ['bus' => 'messenger.bus.hit']);
+
+    $services->set('messenger.transport.jms_serializer', MauticMessengerSerializer::class);
 
     $services->alias(TransportFactory::class, 'messenger.transport_factory');
     $services->alias(SendersLocatorInterface::class, 'messenger.senders_locator');

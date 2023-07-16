@@ -38,17 +38,18 @@ I believe the best place to configure the messenger is `app/config/config_local.
 $container->loadFromExtension('framework', [
     'messenger' => [
         'routing'   => [
-            \Mautic\MessengerBundle\Message\PageHitNotification::class  => \Mautic\MessengerBundle\MauticMessengerRoutes::SYNC,
-            \Mautic\MessengerBundle\Message\EmailHitNotification::class => \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT,
+            \Mautic\MessengerBundle\Message\PageHitNotification::class  => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
+            \Mautic\MessengerBundle\Message\EmailHitNotification::class => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
         ],
         'failure_transport' => 'failed', // Define other than default if you wish
         'transports' => [
             'failed' => [
                 'dsn' => 'doctrine://default?queue_name=failed',
             ],
-            \Mautic\MessengerBundle\MauticMessengerRoutes::SYNC      => 'sync://',
-            \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT => [
+            \Mautic\MessengerBundle\MauticMessengerTransports::SYNC      => 'sync://',
+            \Mautic\MessengerBundle\MauticMessengerTransports::HIT => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'serializer'     => 'messenger.transport.jms_serializer',
                 'options'        => [
                     'heartbeat'  => 1,
                     'persistent' => true,
@@ -56,11 +57,11 @@ $container->loadFromExtension('framework', [
                     'exchange'   => [
                         'name'                        => 'mautic',
                         'type'                        => 'direct',
-                        'default_publish_routing_key' => \Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT,
+                        'default_publish_routing_key' => 'hit',
                     ],
                     'queues'     => [
                         'email_hit' => [
-                            'binding_keys' => [\Mautic\MessengerBundle\MauticMessengerRoutes::EMAIL_HIT],
+                            'binding_keys' => ['hit'],
                             'arguments'    => [
                                 'x-expires' => 60 * 60 * 24 * 21 * 1000, // queue ttl without consumer using it
                             ],

@@ -11,24 +11,15 @@ final class PageHitNotification
 {
     use MessageRequestTrait;
 
-    /**
-     * @var array<string,mixed>
-     */
-    private array $request;
-
-    /**
-     * @param array<string,mixed>|Request $request
-     */
     public function __construct(
         private int $hitId,
         private ?int $pageId,
-        array|Request $request,
+        private Request $request,
         private ?int $leadId,
         private bool $isNew,
         private bool $isRedirect,
         \DateTimeInterface $eventTime = null
     ) {
-        $this->setRequest($request);
         $this->setEventTime($eventTime);
     }
 

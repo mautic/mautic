@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message\Traits;
 
-use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\Request;
 
 trait MessageRequestTrait
 {
     private string $eventTime; // The ISO-8601 date
-    /**
-     * @var array<string,mixed>
-     */
-    private array $request; //  Simplified interpretation of symfony request
+    /** @Serializer\Type(Symfony\Component\HttpFoundation\Request) */
+    private Request $request; //  Simplified interpretation of symfony request
     private bool $isSynchronous = false;
 
     /** @return string The ISO-8601 date */
@@ -24,7 +22,7 @@ trait MessageRequestTrait
 
     public function setEventTime(\DateTimeInterface $eventTime = null): self
     {
-        $eventTime ??= (new \DateTime())->format('c');
+        $eventTime ??= (new \DateTimeImmutable())->format('c');
 
         $this->eventTime = $eventTime instanceof \DateTimeInterface
             ? $eventTime->format('c')
@@ -33,27 +31,9 @@ trait MessageRequestTrait
         return $this;
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    public function getRequest(): array
+    public function getRequest(): Request
     {
         return $this->request;
-    }
-
-    public function getRequestObject(): Request
-    {
-        return MessengerRequestFactory::fromArray($this->request);
-    }
-
-    /**
-     * @param array<string,mixed>|Request $request
-     */
-    public function setRequest(array|Request $request): self
-    {
-        $this->request = $request instanceof Request ? MessengerRequestFactory::toArray($request) : $request;
-
-        return $this;
     }
 
     public function setIsSynchronousRequest(bool $isSynchronous = true): self

@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\MessengerBundle\Exceptions\InvalidPayloadException;
 use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
-use Mautic\MessengerBundle\Factory\MessengerRequestFactory;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -99,7 +98,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
         return [
             'hit'                    => $hit,
             'page'                   => $pageObject,
-            'request'                => MessengerRequestFactory::fromArray($message->getRequest()),
+            'request'                => $message->getRequest(),
             'lead'                   => $lead,
             'trackingNewlyGenerated' => $message->isNew(),
             'activeRequest'          => false,
