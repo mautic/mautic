@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Serializer;
 
@@ -24,23 +26,24 @@ final class MauticMessengerSerializer implements SerializerInterface
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        $body = $encodedEnvelope['body'];
+        $body    = $encodedEnvelope['body'];
         $headers = $encodedEnvelope['headers'];
 
         $data = json_decode($body, true);
 
-        if (!is_array($data) || count($data) !== 1) {
+        if (!is_array($data) || 1 !== count($data)) {
             throw new \InvalidArgumentException('Invalid payload');
         }
 
         [$messageClassName, $message] = [array_key_first($data), array_values($data)[0]];
-        $message = $this->serializer->deserialize($message, $messageClassName, 'json');
+        $message                      = $this->serializer->deserialize($message, $messageClassName, 'json');
 
         // in case of redelivery, unserialize any stamps
         $stamps = [];
         if (isset($headers['stamps'])) {
             $stamps = unserialize($headers['stamps']);
         }
+
         return new Envelope($message, $stamps);
     }
 
@@ -59,13 +62,11 @@ final class MauticMessengerSerializer implements SerializerInterface
         }
 
         return [
-            'body' => json_encode($data),
+            'body'    => json_encode($data),
             'headers' => [
                 // store stamps as a header - to be read in decode()
-                'stamps' => serialize($allStamps)
+                'stamps' => serialize($allStamps),
             ],
         ];
     }
-
-
 }

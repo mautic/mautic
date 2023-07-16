@@ -79,7 +79,7 @@ $container->loadFromExtension('framework', [
     ],
     'messenger'            => [
         'failure_transport' => 'failed',
-        'serializer' => [
+        'serializer'        => [
             'default_serializer' => 'messenger.transport.native_php_serializer',
         ],
         'buses' => [
@@ -100,9 +100,9 @@ $container->loadFromExtension('framework', [
             MauticMessengerTransports::FAILED => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
             MauticMessengerTransports::SYNC   => 'sync://',
             MauticMessengerTransports::HIT    => [
-                'dsn' => 'sync://',
+                'dsn'        => 'sync://',
                 'serializer' => 'messenger.transport.jms_serializer',   // Smaller payload
-            ]
+            ],
         ],
         'routing' => [
             \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => MauticMessengerTransports::EMAIL,

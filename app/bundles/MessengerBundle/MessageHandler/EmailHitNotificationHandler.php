@@ -7,7 +7,6 @@ namespace Mautic\MessengerBundle\MessageHandler;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;

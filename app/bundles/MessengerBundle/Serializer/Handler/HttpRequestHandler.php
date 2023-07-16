@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Serializer\Handler;
 
-use JMS\Serializer\Handler\SubscribingHandlerInterface;
-use JMS\Serializer\GraphNavigator;
-use JMS\Serializer\JsonSerializationVisitor;
-use JMS\Serializer\JsonDeserializationVisitor;
 use JMS\Serializer\Context;
+use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\Handler\SubscribingHandlerInterface;
+use JMS\Serializer\JsonDeserializationVisitor;
+use JMS\Serializer\JsonSerializationVisitor;
 use Symfony\Component\HttpFoundation\Request;
 
 class HttpRequestHandler implements SubscribingHandlerInterface
@@ -16,15 +18,15 @@ class HttpRequestHandler implements SubscribingHandlerInterface
         return [
             [
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
-                'format' => 'json',
-                'type' => Request::class,
-                'method' => 'serializeRequestToString',
+                'format'    => 'json',
+                'type'      => Request::class,
+                'method'    => 'serializeRequestToString',
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
-                'format' => 'json',
-                'type' => Request::class,
-                'method' => 'deserializeStringToRequest',
+                'format'    => 'json',
+                'type'      => Request::class,
+                'method'    => 'deserializeStringToRequest',
             ],
         ];
     }
