@@ -90,12 +90,11 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
         $leadEventLogs = $this->connection->fetchAllAssociative('
-          SELECT `id`, `action`, `lead_id`
+          SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
           AND `bundle` = "page" AND `object` = "page";', ['leadId' => $leadId]
         );
-
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
     }
