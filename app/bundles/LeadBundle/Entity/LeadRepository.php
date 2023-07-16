@@ -1031,7 +1031,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return void
      */
-    public function updateLastActive($leadId)
+    public function updateLastActive($leadId, ?DateTime $lastActiveDate = null)
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1039,7 +1039,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return;
         }
 
-        $dt     = new DateTimeHelper();
+        $dt     = new DateTimeHelper($lastActiveDate ?? '');
         $fields = ['last_active' => $dt->toUtcString()];
 
         $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);

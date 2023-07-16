@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "1a89d213220e309fd7323fd43c1938fc2963cf52"
+                "reference": "dc29a0c1df61b9473c8bb59416dad795a17f4a05"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5869,6 +5869,7 @@
                 "ramsey/uuid": "^4.7",
                 "simshaun/recurr": "^5.0",
                 "stack/builder": "^1.0",
+                "symfony/amqp-messenger": "^5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",

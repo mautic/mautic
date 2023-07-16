@@ -98,12 +98,7 @@ class PageModel extends FormModel
      */
     protected $dateTimeHelper;
 
-    /**
-     * @var QueueService
-     */
-    protected $queueService;
-
-    /**
+     /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -746,13 +741,6 @@ class PageModel extends FormModel
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
 
-        if ($lead->getLastActive() != $leadLastActive) {
-            $this->logger->addError(
-                'HIT: Listener updated last active to event time',
-                ['context' => json_encode(new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique))]
-            );
-        }
-
         if (null !== $hitDate) {
             if (null === $leadLastActive || $leadLastActive < $hitDate) {
                 $data = [
@@ -768,7 +756,7 @@ class PageModel extends FormModel
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
                     $this->logger->error(
-                        'HIT: Failed to update event time due to '.$e->getMessage(),
+                        'Failed to update event time due to '.$e->getMessage(),
                         ['context' => $data]
                     );
                 }
