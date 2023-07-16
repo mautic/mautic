@@ -527,11 +527,11 @@ class PageModel extends FormModel
 
         $message = new PageHitNotification(
             $hit->getId(),
-            $page?->getId(),
             $request,
-            $lead->getId(),
             $this->deviceTracker->wasDeviceChanged(),
-            $page instanceof Redirect
+            $page instanceof Redirect,
+            $page?->getId(),
+            $lead->getId()
         );
 
         try {

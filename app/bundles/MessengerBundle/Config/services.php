@@ -14,12 +14,12 @@ return function (ContainerConfigurator $configurator) {
         ->autowire()
         ->autoconfigure();
 
-    $services->load('Mautic\\MessengerBundle\\', '../')
+    $services
+        ->load('Mautic\\MessengerBundle\\', '../')
         ->exclude('../{Config,Tests,Message}');
 
     $services
         ->instanceof(MessageSubscriberInterface::class)
-        // services whose classes are instances of CustomInterface will be tagged automatically
         ->tag('messenger.message_handler', ['bus' => 'messenger.bus.hit']);
 
     $services->set('messenger.transport.jms_serializer', MauticMessengerSerializer::class);

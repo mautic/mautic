@@ -67,7 +67,7 @@ class PageHitNotificationHandlerTest extends TestCase
             ->method('processPageHit')
             ->with($hitObject, $pageObject, $request, $leadObject, false, false);
 
-        $message = new PageHitNotification($hitId, $pageId, $request, $leadId, false, false);
+        $message = new PageHitNotification($hitId, $request, false, false, $pageId, $leadId);
 
         /** @var MockObject|LoggerInterface $loggerMock */
         $loggerMock = $this->createMock(LoggerInterface::class);

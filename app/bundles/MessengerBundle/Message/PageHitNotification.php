@@ -13,12 +13,12 @@ final class PageHitNotification
 
     public function __construct(
         private int $hitId,
-        private ?int $pageId,
         private Request $request,
-        private ?int $leadId,
         private bool $isNew,
         private bool $isRedirect,
-        \DateTimeInterface $eventTime = null
+        private ?int $pageId = null,
+        private ?int $leadId = null,
+        ?\DateTimeInterface $eventTime = null
     ) {
         $this->setEventTime($eventTime);
     }

@@ -13,7 +13,7 @@ class PageHitNotificationTest extends TestCase
         $request = new Request();
         $request->query->set('testMe', 'Hit me once');
 
-        $message = new PageHitNotification(78, 3, $request, 100, false, false);
+        $message = new PageHitNotification(78, $request, false, false, 3, 1);
 
         $this->assertArrayHasKey('testMe', $message->getRequest()->query->all());
         $this->assertEquals($request, $message->getRequest());
