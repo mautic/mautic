@@ -15,7 +15,7 @@ class EmailHitNotificationTest extends TestCase
 
         $message = new EmailHitNotification('statid', $request);
 
-        $this->assertArrayHasKey('testMe', $message->getRequest()['query']);
-        $this->assertEquals($request, $message->getRequestObject());
+        $this->assertArrayHasKey('testMe', $message->getRequest()->query->all());
+        $this->assertEquals($request, $message->getRequest());
     }
 }

@@ -15,7 +15,7 @@ class PageHitNotificationTest extends TestCase
 
         $message = new PageHitNotification(78, 3, $request, 100, false, false);
 
-        $this->assertArrayHasKey('testMe', $message->getRequest()['query']);
-        $this->assertEquals($request, $message->getRequestObject());
+        $this->assertArrayHasKey('testMe', $message->getRequest()->query->all());
+        $this->assertEquals($request, $message->getRequest());
     }
 }

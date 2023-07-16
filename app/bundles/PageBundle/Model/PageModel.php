@@ -557,7 +557,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTime $hitDate = null
+        \DateTimeInterface $hitDate = null
     ) {
         //  There is somewhere sometimes, modified the last_active; as a temporary fix we will prevent it by tracking it
         /** @var ?DateTimeInterface $leadLastActive */
