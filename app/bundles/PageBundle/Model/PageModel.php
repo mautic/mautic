@@ -554,10 +554,7 @@ class PageModel extends FormModel
         bool $activeRequest = true,
         \DateTimeInterface $hitDate = null
     ) {
-        //  There is somewhere sometimes, modified the last_active; as a temporary fix we will prevent it by tracking it
-        /** @var ?DateTimeInterface $leadLastActive */
         $leadLastActive = $lead->getLastActive();
-
         if (MAUTIC_ENV === 'dev') {
             dump('processing : '.$lead->getId(), 'last active: ', $lead->getLastActive(), 'event:', $hitDate);
         }

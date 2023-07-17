@@ -1031,7 +1031,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return void
      */
-    public function updateLastActive($leadId, ?DateTime $lastActiveDate = null)
+    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null)
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:

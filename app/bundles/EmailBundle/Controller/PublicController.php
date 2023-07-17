@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
@@ -98,7 +99,10 @@ class PublicController extends CommonFormController
             $messageBus->dispatch(new EmailHitNotification($idHash, $request));
         } catch (\Exception $exception) {
             $logger->error($exception->getMessage(), ['idHash' => $idHash]);
-            $this->getModel('email')->hitEmail($idHash, $request);
+            $emailModel = $this->getModel('email');
+            assert($emailModel instanceof EmailModel);
+
+            $emailModel->hitEmail($idHash, $request);
         }
 
         return TrackingPixelHelper::getResponse($request);
@@ -682,7 +686,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead($email, $repo)
+    private function createLead($email, $repo): Lead
     {
         $model = $this->getModel('lead.lead');
         \assert($model instanceof LeadModel);
@@ -697,7 +701,7 @@ class PublicController extends CommonFormController
         return $repo->getLeadByEmail($email);
     }
 
-    public function getUnsubscribeMessage($idHash, $model, $stat, $translator)
+    public function getUnsubscribeMessage($idHash, $model, $stat, $translator): string
     {
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 

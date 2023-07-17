@@ -59,6 +59,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -363,7 +364,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -463,7 +464,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param ?Stat|string $stat
+     * @param Stat|string|null $stat The null is just for BC reasons, should be Stat|string
      * @param bool         $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
      *
      * @throws ORMException
@@ -477,6 +478,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         \DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ): void {
+        if ($stat === null) {
+            trigger_deprecation('mautic/mautic', '5.0', 'Using hitEmail with null $stat is deprecated, use "%s" instead.',);
+        }
+
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
         }
@@ -1857,7 +1862,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getBestHours($column, \DateTime $dateFrom, \DateTime $dateTo, array $filter = [], $canViewOthers = true, $timeFormat = 24
+    public function getBestHours(
+        $column,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        array $filter = [],
+        $canViewOthers = true,
+        $timeFormat = 24
     ) {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
