@@ -706,7 +706,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     Mautic.renderCharts(container);
-    Mautic.initMap(container, 'markers');
     Mautic.stopIconSpinPostEvent();
 
     //stop loading bar

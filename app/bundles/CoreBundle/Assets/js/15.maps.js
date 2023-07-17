@@ -37,7 +37,13 @@ class MauticMap {
                 normalizeFunction: 'polynomial',
             }]
         },
-
+        onRegionOver: () => {
+            document.body.style.cursor = 'pointer';
+        },
+        onRegionOut: () =>
+        {
+            document.body.style.cursor = 'default';
+        }
     }
 
     constructor(wrapper, typeKey = 'regions' ) {
@@ -50,12 +56,14 @@ class MauticMap {
         this.statUnit = this.getStatUnitFromItem(this.map);
 
         this.settings.onRegionTipShow = (event, label, index) => {
-            const value = this.mapData[index];
+            if (this.mapData) {
+                const value = this.mapData[index];
 
-            if (value > 0) {
-                const tooltip = `<b>${label.html()}</b></br>${value} ${this.statUnit}${(value > 1) ? 's' : ''}`;
-                label.text(tooltip);
-             }
+                if (value > 0) {
+                    const tooltip = `<b>${label.html()}</b></br>${value} ${this.statUnit}${(value > 1) ? 's' : ''}`;
+                    label.html(tooltip);
+                }
+            }
         }
 
         if (this.legendEnabled) {
@@ -131,12 +139,15 @@ class MauticMap {
      * Destroy a jVector map
      */
     destroyMap() {
-        if (this.map) {
-            const mapObj = this.scope.vectorMap('get', 'mapObject');
-            mapObj.removeAllMarkers();
-            mapObj.remove();
-            this.scope.empty();
-            this.scope.removeClass('map-rendered');
+        if (this.map.length) {
+            const mapObj = this.map.vectorMap('get', 'mapObject');
+
+            if (mapObj) {
+                mapObj.removeAllMarkers();
+                mapObj.remove();
+                this.map.empty();
+                this.map.removeClass('map-rendered');
+            }
         }
     };
 
