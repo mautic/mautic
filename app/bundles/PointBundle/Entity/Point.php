@@ -391,7 +391,7 @@ class Point extends FormEntity
         return $this->group;
     }
 
-    public function setGroup(?Group $group = null): void
+    public function setGroup(?Group $group): void
     {
         $this->group = $group;
     }

@@ -385,7 +385,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('groupScores', 'Mautic\PointBundle\Entity\GroupContactScore')
+        $builder->createOneToMany('groupScores', GroupContactScore::class)
             ->mappedBy('contact')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -892,7 +892,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip, Group $group = null)
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -1996,7 +1996,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return ArrayCollection<int,GroupContactScore>
      */
-    public function getGroupScores()
+    public function getGroupScores(): Collection
     {
         return $this->groupScores;
     }

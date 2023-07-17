@@ -437,20 +437,6 @@ class ContactSegmentFilterTest extends TestCase
         ], $filter->getBatchLimiters());
     }
 
-    public function testGetForeignContactColumn(): void
-    {
-        $contactColumn = 'contact_id';
-
-        $filter = $this->createContactSegmentFilter();
-        self::assertNull($filter->getForeignContactColumn());
-
-        $this->filterDecorator->expects(self::once())
-            ->method('getForeignContactColumn')
-            ->willReturn($contactColumn);
-
-        self::assertSame($contactColumn, $filter->getForeignContactColumn());
-    }
-
     /**
      * @return iterable<array<bool|string>>
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -17,6 +18,13 @@ class GroupContactScore extends CommonEntity
     private Group $group;
     private int $score;
 
+    public function __construct()
+    {
+        $this->contact = new Lead();
+        $this->group   = new Group();
+        $this->score   = 0;
+    }
+
     /**
      * @param ORM\ClassMetadata<GroupContactScore> $metadata
      */
@@ -25,16 +33,16 @@ class GroupContactScore extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\GroupContactScoreRepository');
+            ->setCustomRepositoryClass(GroupContactScoreRepository::class);
 
         $builder->addContact(false, 'CASCADE', true, 'group_score');
 
-        $builder->createManyToOne('group', 'Mautic\PointBundle\Entity\Group')
+        $builder->createManyToOne('group', Group::class)
             ->isPrimaryKey()
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->createField('score', 'integer')
+        $builder->createField('score', Types::INTEGER)
             ->build();
     }
 

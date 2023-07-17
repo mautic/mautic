@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
-class CustomMappedDecorator extends BaseDecorator
+class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorForeignInterface
 {
     /**
      * @var ContactSegmentFilterDictionary
@@ -97,17 +97,15 @@ class CustomMappedDecorator extends BaseDecorator
 
     /**
      * Get foreign table field used in JOIN condition.
-     *
-     * @return string
      */
-    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
         } catch (FilterNotFoundException $e) {
-            return parent::getForeignContactColumn($contactSegmentFilterCrate);
+            return 'lead_id';
         }
     }
 }

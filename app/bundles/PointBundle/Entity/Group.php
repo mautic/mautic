@@ -12,20 +12,9 @@ class Group extends FormEntity
 {
     public const TABLE_NAME = 'point_groups';
 
-    /**
-     * @var int
-     */
-    private $id = null;
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var string|null
-     */
-    private $description;
+    private ?int $id             = null;
+    private ?string $name        = '';
+    private ?string $description = '';
 
     /**
      * @param ORM\ClassMetadata<Group> $metadata
@@ -35,7 +24,7 @@ class Group extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\GroupRepository');
+            ->setCustomRepositoryClass(GroupRepository::class);
 
         $builder->addIdColumns();
     }
@@ -47,20 +36,12 @@ class Group extends FormEntity
         ]));
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $description
-     *
-     * @return self
-     */
-    public function setDescription($description)
+    public function setDescription(string $description): self
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -68,20 +49,12 @@ class Group extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return self
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -89,10 +62,7 @@ class Group extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }

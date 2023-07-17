@@ -15,11 +15,8 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class CampaignEventPointType extends AbstractType
 {
-    private TypeOperatorProviderInterface $typeOperatorProvider;
-
-    public function __construct(TypeOperatorProviderInterface $typeOperatorProvider)
+    public function __construct(private TypeOperatorProviderInterface $typeOperatorProvider)
     {
-        $this->typeOperatorProvider = $typeOperatorProvider;
     }
 
     /**
@@ -69,13 +66,5 @@ class CampaignEventPointType extends AbstractType
             'by_reference'     => false,
             'return_entity'    => false,
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'campaignevent_point';
     }
 }
