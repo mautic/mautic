@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -12,15 +13,18 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -47,10 +51,13 @@ use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -146,11 +153,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $contactTracker;
 
     /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    /**
      * @var DNC
      */
     private $doNotContact;
@@ -177,8 +179,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions,
-        Connection $connection
+        CorePermissions $security,
+        Connection $connection,
+        EntityManagerInterface $em,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -196,8 +205,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
-        $this->corePermissions          = $corePermissions;
         $this->connection               = $connection;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -566,7 +576,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '', $withBC = true)
+    public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
@@ -916,7 +926,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
-        $fetchOptions->setCanViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
+        $fetchOptions->setCanViewOthers($this->security->isGranted('email:emails:viewother'));
         $fetchOptions->setUnit($chart->getUnit());
 
         $chart->setDataset(
