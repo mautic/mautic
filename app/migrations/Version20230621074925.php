@@ -5,42 +5,63 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Exception\SkipMigration;
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 
-final class Version20230621074925 extends AbstractMauticMigration
+final class Version20230621074925 extends PreUpAssertionMigration
 {
-    /**
-     * @throws SkipMigration
-     */
-    public function preUp(Schema $schema): void
-    {
-        $shouldRunMigration = !$schema->hasTable($this->generateTableName(Group::TABLE_NAME));
+    private string $groupTableName;
+    private string $contactScoreTableName;
+    private string $contactTableName;
+    private string $pointsTableName;
+    private string $pointTriggersTableName;
+    private string $leadPointsChangeLogTableName;
+    private string $contactScoreContactFk;
+    private string $contactScoreGroupFk;
+    private string $pointsGroupFk;
+    private string $pointTriggersGroupFk;
+    private string $leadPointsChangeLogGroupFk;
 
-        if (!$shouldRunMigration) {
-            throw new SkipMigration('Schema includes this migration');
-        }
+    private function initTableNames(): void
+    {
+        $this->groupTableName               = $this->generateTableName(Group::TABLE_NAME);
+        $this->contactScoreTableName        = $this->generateTableName(GroupContactScore::TABLE_NAME);
+        $this->contactTableName             = $this->generateTableName('leads');
+        $this->pointsTableName              = $this->generateTableName('points');
+        $this->pointTriggersTableName       = $this->generateTableName('point_triggers');
+        $this->leadPointsChangeLogTableName = $this->generateTableName('lead_points_change_log');
+
+        $this->contactScoreContactFk      = $this->generatePropertyName($this->contactScoreTableName, 'fk', ['contact_id']);
+        $this->contactScoreGroupFk        = $this->generatePropertyName($this->contactScoreTableName, 'fk', ['group_id']);
+        $this->pointsGroupFk              = $this->generatePropertyName($this->pointsTableName, 'fk', ['group_id']);
+        $this->pointTriggersGroupFk       = $this->generatePropertyName($this->pointTriggersTableName, 'fk', ['group_id']);
+        $this->leadPointsChangeLogGroupFk = $this->generatePropertyName($this->leadPointsChangeLogTableName, 'fk', ['group_id']);
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $this->initTableNames();
+
+        $this->assertTableDoesNotExist($this->groupTableName);
+        $this->assertTableDoesNotExist($this->contactScoreTableName);
+
+        $this->assertColumnDoesNotExist($this->pointsTableName, 'group_id');
+        $this->assertColumnDoesNotExist($this->pointTriggersTableName, 'group_id');
+        $this->assertColumnDoesNotExist($this->leadPointsChangeLogTableName, 'group_id');
+
+        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreContactFk);
+        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreGroupFk);
+        $this->assertIndexDoesNotExist($this->pointsTableName, $this->pointsGroupFk);
+        $this->assertIndexDoesNotExist($this->pointTriggersTableName, $this->pointTriggersGroupFk);
+        $this->assertIndexDoesNotExist($this->leadPointsChangeLogTableName, $this->leadPointsChangeLogGroupFk);
     }
 
     public function up(Schema $schema): void
     {
-        $groupTableName               = $this->generateTableName(Group::TABLE_NAME);
-        $contactScoreTableName        = $this->generateTableName(GroupContactScore::TABLE_NAME);
-        $contactTableName             = $this->generateTableName('leads');
-        $pointsTableName              = $this->generateTableName('points');
-        $pointTriggersTableName       = $this->generateTableName('point_triggers');
-        $leadPointsChangeLogTableName = $this->generateTableName('lead_points_change_log');
+        $this->initTableNames();
 
-        $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
-        $contactScoreGroupFk   = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
-
-        $pointsGroupFk              = $this->generatePropertyName($pointsTableName, 'fk', ['group_id']);
-        $pointTriggersGroupFk       = $this->generatePropertyName($pointTriggersTableName, 'fk', ['group_id']);
-        $leadPointsChangeLogGroupFk = $this->generatePropertyName($leadPointsChangeLogTableName, 'fk', ['group_id']);
-
-        $this->addSql("CREATE TABLE `{$groupTableName}`
+        $this->addSql("CREATE TABLE `{$this->groupTableName}`
 (
     `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
     `is_published`        TINYINT(1)                  NOT NULL,
@@ -61,7 +82,7 @@ final class Version20230621074925 extends AbstractMauticMigration
   ENGINE = InnoDB
   ROW_FORMAT = DYNAMIC;");
 
-        $this->addSql("CREATE TABLE `{$contactScoreTableName}`
+        $this->addSql("CREATE TABLE `{$this->contactScoreTableName}`
 (
     `contact_id`          BIGINT UNSIGNED NOT NULL,
     `group_id`           INT UNSIGNED    NOT NULL,
@@ -72,50 +93,61 @@ final class Version20230621074925 extends AbstractMauticMigration
   ENGINE = InnoDB
   ROW_FORMAT = DYNAMIC;");
 
-        $this->addSql("ALTER TABLE `{$pointsTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
-        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
-        $this->addSql("ALTER TABLE `{$leadPointsChangeLogTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
+        $this->addSql("ALTER TABLE `{$this->pointsTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
+        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
+        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
 
-        $this->addSql("ALTER TABLE `{$contactScoreTableName}` ADD CONSTRAINT `{$contactScoreContactFk}` FOREIGN KEY (`contact_id`) REFERENCES `{$contactTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$contactScoreTableName}` ADD CONSTRAINT `{$contactScoreGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$groupTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` ADD CONSTRAINT `{$this->contactScoreContactFk}` FOREIGN KEY (`contact_id`) REFERENCES `{$this->contactTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` ADD CONSTRAINT `{$this->contactScoreGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
 
-        $this->addSql("ALTER TABLE `{$pointsTableName}` ADD CONSTRAINT `{$pointsGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$groupTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` ADD CONSTRAINT `{$pointTriggersGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$groupTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$leadPointsChangeLogTableName}` ADD CONSTRAINT `{$leadPointsChangeLogGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$groupTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$this->pointsTableName}` ADD CONSTRAINT `{$this->pointsGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` ADD CONSTRAINT `{$this->pointTriggersGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` ADD CONSTRAINT `{$this->leadPointsChangeLogGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
     }
 
     public function down(Schema $schema): void
     {
-        $pointsTableName              = $this->generateTableName('points');
-        $pointTriggersTableName       = $this->generateTableName('point_triggers');
-        $groupTableName               = $this->generateTableName(Group::TABLE_NAME);
-        $contactScoreTableName        = $this->generateTableName(GroupContactScore::TABLE_NAME);
-        $leadPointsChangeLogTableName = $this->generateTableName('lead_points_change_log');
+        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
+        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
 
-        $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
-        $contactScoreGroupFk   = $this->generatePropertyName($contactScoreTableName, 'fk', ['group_id']);
+        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
+        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
+        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
 
-        $pointsGroupFk              = $this->generatePropertyName($pointsTableName, 'fk', ['group_id']);
-        $pointTriggersGroupFk       = $this->generatePropertyName($pointTriggersTableName, 'fk', ['group_id']);
-        $leadPointsChangeLogGroupFk = $this->generatePropertyName($leadPointsChangeLogTableName, 'fk', ['group_id']);
+        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
+        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
+        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
 
-        $this->addSql("ALTER TABLE `{$contactScoreTableName}` DROP FOREIGN KEY `{$contactScoreContactFk}`");
-        $this->addSql("ALTER TABLE `{$contactScoreTableName}` DROP FOREIGN KEY `{$contactScoreGroupFk}`");
-
-        $this->addSql("ALTER TABLE `{$pointsTableName}` DROP FOREIGN KEY `{$pointsGroupFk}`");
-        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` DROP FOREIGN KEY `{$pointTriggersGroupFk}`");
-        $this->addSql("ALTER TABLE `{$leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$leadPointsChangeLogGroupFk}`");
-
-        $this->addSql("ALTER TABLE `{$pointsTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$leadPointsChangeLogTableName}` DROP group_id");
-
-        $this->addSql("DROP TABLE {$contactScoreTableName}");
-        $this->addSql("DROP TABLE {$groupTableName}");
+        $this->addSql("DROP TABLE {$this->contactScoreTableName}");
+        $this->addSql("DROP TABLE {$this->groupTableName}");
     }
 
     private function generateTableName(string $tableName): string
     {
         return "{$this->prefix}$tableName";
+    }
+
+    private function assertTableDoesNotExist(string $tableName): void
+    {
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->hasTable("{$tableName}"),
+            "Table {$tableName} already exists"
+        );
+    }
+
+    private function assertColumnDoesNotExist(string $tableName, string $columnName): void
+    {
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasColumn($columnName),
+            "Column {$tableName}.{$columnName} already exists"
+        );
+    }
+
+    private function assertIndexDoesNotExist(string $tableName, string $indexName): void
+    {
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasIndex($indexName),
+            "Index {$indexName} already exists in {$tableName} table"
+        );
     }
 }

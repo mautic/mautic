@@ -97,9 +97,7 @@
                         </span>
                     </td>
                     <td class="visible-md visible-lg">
-                        {% set group = item.group %}
-                        {% set groupName = group.name|default('mautic.point.group.form.nogroup'|trans) %}
-                        {{ groupName }}
+                        {{ item.group.name|default('mautic.point.group.form.nogroup'|trans) }}
                     </td>
                     <td>{{ item.points }}</td>
                     <td class="visible-md visible-lg">{{ item.id }}</td>

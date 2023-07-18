@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Group;
 
-class GroupEvent extends CommonEvent
+final class GroupEvent
 {
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Group &$group, $isNew = false)
+    private Group $entity;
+
+    public function __construct(Group $group)
     {
-        $this->entity = &$group;
-        $this->isNew  = $isNew;
+        $this->entity = $group;
     }
 
-    /**
-     * Returns the Group entity.
-     *
-     * @return Group
-     */
-    public function getGroup()
+    public function getGroup(): Group
     {
         return $this->entity;
     }
 
-    /**
-     * Sets the Group entity.
-     */
     public function setGroup(Group $group): void
     {
         $this->entity = $group;

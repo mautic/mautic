@@ -3,6 +3,7 @@
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -42,7 +43,7 @@ class TriggerEventRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getPublishedByGroupScore($groupScores)
+    public function getPublishedByGroupScore(Collection $groupScores)
     {
         if ($groupScores->isEmpty()) {
             return [];

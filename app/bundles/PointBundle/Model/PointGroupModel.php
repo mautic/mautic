@@ -108,10 +108,8 @@ class PointGroupModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new Events\GroupEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
+                $event = new Events\GroupEvent($entity);
             }
-
             $this->dispatcher->dispatch($event, $name);
 
             return $event;

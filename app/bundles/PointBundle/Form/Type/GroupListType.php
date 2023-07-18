@@ -17,20 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class GroupListType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var GroupRepository
-     */
-    private $repo;
-
-    public function __construct(EntityManager $em, GroupRepository $repo)
+    public function __construct(private EntityManager $em, private GroupRepository $repo)
     {
-        $this->em         = $em;
-        $this->repo       = $repo;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -61,18 +49,7 @@ class GroupListType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'group';
-    }
-
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
