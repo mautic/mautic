@@ -107,6 +107,8 @@ final class Version20230621074925 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
+        $this->initTableNames();
+
         $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
         $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
 
