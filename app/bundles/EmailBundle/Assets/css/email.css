@@ -31,6 +31,6 @@
 
 #emailGraphStats .spinner,
 #reads-map-container .spinner{
-    padding-top: 50px;
     text-align: center;
+    font-size: 32px;
 }

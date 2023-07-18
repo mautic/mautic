@@ -222,39 +222,43 @@
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
-              <div class="va-m">
-                  {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                      'dateRangeForm': dateRangeForm,
-                      'class': 'pull-right',
-                  }) }}
+              <div class="stats-menu pl-md mt-lg">
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs">
+                      <li class="active">
+                          <a href="#stats-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.email.thead.stats'|trans }}
+                          </a>
+                      </li>
+                      <li >
+                          <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                              {{ 'mautic.email.thead.maps'|trans }}
+                          </a>
+                      </li>
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <div class="date-range">
+                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                          'dateRangeForm': dateRangeForm,
+                      }) }}
+                  </div>
               </div>
 
-              <!-- tabs controls -->
-              <ul class="nav nav-tabs pr-md pl-md mt-lg">
-                  <li class="active">
-                      <a href="#stats-container" role="tab" data-toggle="tab">
-                          {{ 'mautic.email.thead.stats'|trans }}
-                      </a>
-                  </li>
-                  <li >
-                      <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
-                          {{ 'mautic.email.thead.maps'|trans }}
-                      </a>
-                  </li>
-              </ul>
-              <!--/ tabs controls -->
-
-              <div class="tab-content bg-white pa-md mb-lg shd-sm">
+              <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
                       <div id="emailGraphStats"
-                           data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                           data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                      >
                           <div class="spinner">
                               <i class="fa fa-spin fa-spinner"></i>
                           </div>
                       </div>
 
                   </div>
-                  <div class="tab-pane  bdr-w-0" id="reads-map-container" data-map-url="{{ path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                  <div class="tab-pane bdr-w-0" id="reads-map-container"
+                       data-map-url="{{ path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                  >
                       <div class="spinner">
                           <i class="fa fa-spin fa-spinner"></i>
                       </div>

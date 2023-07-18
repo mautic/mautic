@@ -73,7 +73,7 @@ class EmailMapStatsController extends AbstractController
             '@MauticCore/Helper/map.html.twig',
             [
                 'data'           => $results['read']['data'],
-                'height'         => 400,
+                'height'         => 315,
                 'optionsEnabled' => true,
                 'optionsTitle'   => 'Choose stats:',
                 'options'        => [

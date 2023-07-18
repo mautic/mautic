@@ -82,6 +82,16 @@
   }
 }
 */
+
+.stats-menu__content.tab-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stats-menu__content.tab-content > .tab-pane {
+  width: 100%;
+}
 // Pills
 // -------------------------
 .nav-pills {
@@ -91,3 +101,21 @@
     }
   }
 }
+
+.stats-menu {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+
+  && .date-range {
+    padding: 5px;
+    background-color: #ffffff;
+    border-top-left-radius: 3px;
+  }
+
+  && + div {
+    min-height: 410px;
+  }
+}
+
+

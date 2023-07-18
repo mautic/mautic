@@ -1748,8 +1748,29 @@ ul.dropdown-menu-form {
   }
 }
 */
+.stats-menu__content.tab-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.stats-menu__content.tab-content > .tab-pane {
+  width: 100%;
+}
 .nav-pills > li + li {
   margin-left: 5px;
+}
+.stats-menu {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+.stats-menu.stats-menu .date-range {
+  padding: 5px;
+  background-color: #ffffff;
+  border-top-left-radius: 3px;
+}
+.stats-menu.stats-menu + div {
+  min-height: 410px;
 }
 .notes {
   overflow: hidden;
@@ -4580,6 +4601,7 @@ a.inline-token .text-muted {
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
+  pointer-events: none;
 }
 .jvectormap-legend-cnt {
   right: auto;
