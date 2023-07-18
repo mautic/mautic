@@ -249,6 +249,37 @@ b.media.removeEventListener("click",b.clickToPlayPauseCallback),e=!1}},g={},h=["
 JS;
 
         $js = <<<JS
+MauticJS.convertIframesToVideos = function() {
+    var iframes = document.querySelectorAll("iframe[data-form-id][data-gate-time]");
+    iframes.forEach(function(iframe) {
+        var formId = iframe.getAttribute("data-form-id");
+        var gateTime = iframe.getAttribute("data-gate-time");
+        var video = document.createElement("video");
+        video.width = iframe.width;
+        video.height = iframe.height;
+        video.controls = true;
+        var type = "video/mp4";
+        var src = iframe.src;
+        if (src.includes("youtube.com") || src.includes("youtu.be")) {
+            type = "video/youtube";
+            src = src.replace("https://www.youtube.com/embed/", "https://youtu.be/");
+        }
+        else if (src.includes("vimeo.com")) {
+            type = "video/vimeo";
+            const videoId = src.split("/").pop().split("?")[0];
+            src = 'https://vimeo.com/' + videoId;
+        }
+        var source = document.createElement("source");
+        source.src = src;
+        source.type = type;
+        video.appendChild(source);
+        video.dataset.formId = formId;
+        video.dataset.gateTime = gateTime;
+        iframe.replaceWith(video);
+    });
+};
+
+
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
  
@@ -467,7 +498,7 @@ MauticJS.processGatedVideos = function (videoElements) {
         }
     });
 }
-
+MauticJS.documentReady(MauticJS.convertIframesToVideos);
 MauticJS.documentReady(MauticJS.initGatedVideo);
 JS;
         $event->appendJs($js, 'Mautic Gated Videos');
@@ -480,19 +511,32 @@ JS;
         $lead   = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
-            $gaUserId      = ($lead && $lead->getId()) ? 'ga(\'set\', \'userId\', '.$lead->getId().');' : '';
-            $gaAnonymizeIp = $this->trackingHelper->getAnonymizeIp() ? 'ga(\'set\', \'anonymizeIp\', true);' : '';
+            $gtagSettings = [];
+
+            if ($this->trackingHelper->getAnonymizeIp()) {
+                $gtagSettings['anonymize_ip'] = true;
+            }
+
+            if ($lead && $lead->getId()) {
+                $gtagSettings['user_id'] = $lead->getId();
+            }
+
+            if (count($gtagSettings) > 0) {
+                $gtagSettings = ', '.json_encode($gtagSettings);
+            } else {
+                $gtagSettings = '';
+            }
 
             $js .= <<<JS
-            dataLayer = window.dataLayer ? window.dataLayer : [];
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', '{$id}', 'auto');
-  {$gaAnonymizeIp}
-  {$gaUserId}
-  ga('send', 'pageview');
+a = document.createElement('script');
+a.async = 1;
+a.src = 'https://www.googletagmanager.com/gtag/js?id={$id}';
+document.getElementsByTagName('head')[0].appendChild(a);
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '{$id}'{$gtagSettings});
 JS;
         }
 
@@ -550,16 +594,17 @@ MauticJS.setTrackedEvents = function(events) {
                 }
                 
                 if (typeof ga  !== 'undefined' && typeof events.google_analytics !== 'undefined') {
-                 var e = events.google_analytics; 
-                     for(var i = 0; i < e.length; i++) {
-                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
-                             	ga('send', {
-                                    hitType: 'event',
-                                    eventCategory: e[i]['category'],
-                                    eventAction: e[i]['action'],
-                                    eventLabel: e[i]['label'],
-			                     });
-                     }
+                    var e = events.google_analytics; 
+                    for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' ) {
+                            ga('send', {
+                                hitType: 'event',
+                                eventCategory: e[i]['category'],
+                                eventAction: e[i]['action'],
+                                eventLabel: e[i]['label'],
+                            });
+                        }
+                    }
                 }        
                 
                 if (typeof events.focus_item !== 'undefined') {

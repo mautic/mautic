@@ -139,20 +139,22 @@ class InputHelper
                     if (array_key_exists($k, $mask)) {
                         if (is_array($mask[$k])) {
                             $useMask = $mask[$k];
-                        } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
+                        } elseif (method_exists(__CLASS__, $mask[$k])) {
                             $useMask = $mask[$k];
                         }
                     } elseif (is_array($v)) {
                         // Likely a collection so use the same mask
                         $useMask = $mask;
                     }
-                } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+                } elseif (method_exists(__CLASS__, $mask)) {
                     $useMask = $mask;
                 }
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif ('filter' == $useMask) {
+                } elseif (null === $v) {
+                    $v = $v;
+                } elseif ('filter' === $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
                 } else {
                     $v = self::$useMask($v, $urldecode);
@@ -160,7 +162,9 @@ class InputHelper
             }
 
             return $value;
-        } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+        } elseif (null === $value) {
+            return $value;
+        } elseif (is_string($mask) && method_exists(__CLASS__, $mask)) {
             return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);

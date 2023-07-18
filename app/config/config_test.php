@@ -44,13 +44,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -58,10 +51,6 @@ $container->setParameter('mautic.famework.csrf_protection', true);
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
     'intercept_redirects' => false,
-]);
-
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
 ]);
 
 $connectionSettings = [

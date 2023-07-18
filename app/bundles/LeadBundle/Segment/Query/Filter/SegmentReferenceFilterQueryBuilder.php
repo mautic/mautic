@@ -118,7 +118,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         if (count($orLogic)) {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), CompositeExpression::TYPE_AND);
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), $filter->getGlue());
         }
 
         return $queryBuilder;

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Event;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -101,7 +102,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     public function getEntityManager()
     {

@@ -306,7 +306,7 @@ class MauticFactory
     }
 
     /**
-     * Returns MailHelper wrapper for Swift_Message via $helper->message.
+     * Returns MailHelper wrapper for Email via $helper->message.
      *
      * @param bool $cleanSlate False to preserve current settings, i.e. to process batched emails
      *
