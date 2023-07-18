@@ -52,7 +52,7 @@ class PageSubscriber implements EventSubscriberInterface
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
-            //click trigger condition
+            // click trigger condition
             $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();

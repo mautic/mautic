@@ -12,8 +12,6 @@ class PointActionHelper
 {
     /**
      * @param MauticFactory $factory
-     * @param               $eventDetails
-     * @param               $action
      *
      * @return bool
      */
@@ -25,7 +23,7 @@ class PointActionHelper
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel               = $factory->getModel('page');
             list($parent, $children) = $pageHit->getVariants();
-            //use the parent (self or configured parent)
+            // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
@@ -37,7 +35,7 @@ class PointActionHelper
         }
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            //no points change
+            // no points change
             return false;
         }
 
@@ -46,8 +44,6 @@ class PointActionHelper
 
     /**
      * @param MauticFactory $factory
-     * @param               $eventDetails
-     * @param               $action
      *
      * @return bool
      */
@@ -58,7 +54,7 @@ class PointActionHelper
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
 
         if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
-            //no points change
+            // no points change
             return false;
         }
 

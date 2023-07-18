@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use DateInterval;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
@@ -490,7 +489,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
                         $buildTime  = explode(':', gmdate('H:i:s', (int) $segment->getLastBuiltTime()));
                         $timeString = $this->dateHelper->formatRange(
-                            new DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
+                            new \DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
                         );
 
                         $row        = [

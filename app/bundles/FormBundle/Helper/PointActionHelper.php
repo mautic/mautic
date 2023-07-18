@@ -8,9 +8,6 @@ namespace Mautic\FormBundle\Helper;
 class PointActionHelper
 {
     /**
-     * @param $eventDetails
-     * @param $action
-     *
      * @return int
      */
     public static function validateFormSubmit($eventDetails, $action)
@@ -20,7 +17,7 @@ class PointActionHelper
         $limitToForms = $action['properties']['forms'];
 
         if (!empty($limitToForms) && !in_array($formId, $limitToForms)) {
-            //no points change
+            // no points change
             return false;
         }
 

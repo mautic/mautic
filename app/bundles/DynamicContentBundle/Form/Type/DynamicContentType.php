@@ -6,7 +6,6 @@ use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -112,7 +111,6 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
                 'description',
@@ -123,7 +121,7 @@ class DynamicContentType extends AbstractType
                     'attr'       => ['class' => 'form-control'],
                     'required'   => false,
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);

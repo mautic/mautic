@@ -46,8 +46,6 @@ class ObjectMappingDAO
      * @param string $integrationField
      * @param string $direction
      * @param bool   $isRequired
-     *
-     * @return ObjectMappingDAO
      */
     public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): self
     {

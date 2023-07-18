@@ -24,8 +24,6 @@ class MessageQueueProcessEvent extends CommonEvent
     }
 
     /**
-     * @param $channel
-     *
      * @return bool
      */
     public function checkContext($channel)

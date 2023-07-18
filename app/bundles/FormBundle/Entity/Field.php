@@ -214,8 +214,6 @@ class Field
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -584,8 +582,6 @@ class Field
     }
 
     /**
-     * @param $containerAttributes
-     *
      * @return $this
      */
     public function setContainerAttributes($containerAttributes)
@@ -596,9 +592,9 @@ class Field
     }
 
     /**
-     * @return array
+     * @return array<string,mixed>
      */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

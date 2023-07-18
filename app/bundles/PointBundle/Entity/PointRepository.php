@@ -46,7 +46,7 @@ class PointRepository extends CommonRepository
             ->select('partial p.{id, type, name, delta, repeatable, properties}')
             ->setParameter('type', $type);
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q);
         $expr->add($q->expr()->eq('p.type', ':type'));
 
@@ -68,7 +68,7 @@ class PointRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('p.type', ':type'),
@@ -100,7 +100,7 @@ class PointRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('x.lead_id', (int) $leadId)

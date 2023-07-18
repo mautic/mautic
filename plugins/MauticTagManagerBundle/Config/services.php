@@ -19,4 +19,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\MauticTagManagerBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.tagmanager.model.tag', \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class);
 };

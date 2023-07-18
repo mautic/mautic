@@ -62,17 +62,11 @@ final class FormAdjustmentEvent extends Event
         return $this->operator;
     }
 
-    /**
-     * @param string ...$operators
-     */
     public function operatorIsOneOf(string ...$operators): bool
     {
         return in_array($this->getOperator(), $operators);
     }
 
-    /**
-     * @param string ...$fieldTypes
-     */
     public function fieldTypeIsOneOf(string ...$fieldTypes): bool
     {
         return in_array($this->getFieldType(), $fieldTypes);

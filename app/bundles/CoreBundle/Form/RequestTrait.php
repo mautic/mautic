@@ -174,7 +174,7 @@ trait RequestTrait
             case 'boolean':
                 $fieldData[$leadField['alias']] = InputHelper::boolean($fieldData[$leadField['alias']]);
                 break;
-            // Ensure date/time entries match what symfony expects
+                // Ensure date/time entries match what symfony expects
             case 'datetime':
             case 'date':
             case 'time':

@@ -402,8 +402,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -856,8 +854,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set by the repository method when points are updated and requeried directly on the DB side.
-     *
-     * @param $points
      */
     public function setActualPoints($points)
     {
@@ -881,11 +877,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Creates a points change entry.
-     *
-     * @param $type
-     * @param $name
-     * @param $action
-     * @param $pointChanges
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
     {
@@ -920,14 +911,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Creates a points change entry.
-     *
-     * @param $stage
-     * @param $name
-     * @param $action
      */
     public function stageChangeLogEntry($stage, $name, $action)
     {
-        //create a new points change event
+        // create a new points change event
         $event = new StagesChangeLog();
         $event->setStage($stage);
         $event->setEventName($name);
@@ -976,9 +963,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param      $type
-     * @param      $name
-     * @param      $action
      * @param null $company
      */
     public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
@@ -1022,7 +1006,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param      $identifier
      * @param bool $enabled
      * @param bool $mobile
      *
@@ -1131,8 +1114,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set internal storage.
-     *
-     * @param $internal
      */
     public function setInternal($internal)
     {
@@ -1151,8 +1132,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set social cache.
-     *
-     * @param $cache
      */
     public function setSocialCache($cache)
     {
@@ -1361,8 +1340,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set tags.
      *
-     * @param $tags
-     *
      * @return $this
      */
     public function setTags($tags)
@@ -1384,8 +1361,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set utm tags.
-     *
-     * @param $utmTags
      *
      * @return $this
      */

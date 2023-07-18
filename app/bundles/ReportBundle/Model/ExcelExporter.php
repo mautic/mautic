@@ -54,7 +54,7 @@ class ExcelExporter
             $headersRow = $reportDataResult->getHeaders();
             $this->putHeader($headersRow, $objPHPExcelSheet);
 
-            //build the data rows
+            // build the data rows
             foreach ($reportData as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
@@ -63,14 +63,14 @@ class ExcelExporter
                     $row[]     = $formatted;
                 }
 
-                //write the row
+                // write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-                //free memory
+                // free memory
                 unset($row, $reportData['data'][$count]);
             }
 
-            //Add totals to export
+            // Add totals to export
             $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
             if (!empty($totalsRow)) {
                 $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);

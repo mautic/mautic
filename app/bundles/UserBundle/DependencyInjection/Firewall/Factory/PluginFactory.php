@@ -10,12 +10,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class PluginFactory implements SecurityFactoryInterface
 {
-    /**
-     * @param $id
-     * @param $config
-     * @param $userProvider
-     * @param $defaultEntryPoint
-     */
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.mautic.'.$id;

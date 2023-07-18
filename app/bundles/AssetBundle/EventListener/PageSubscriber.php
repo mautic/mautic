@@ -25,7 +25,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $assetDownloads = [
                 'group'    => 'mautic.asset.abtest.criteria',
                 'label'    => 'mautic.asset.abtest.criteria.downloads',

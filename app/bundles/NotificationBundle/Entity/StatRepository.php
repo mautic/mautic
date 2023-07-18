@@ -11,8 +11,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class StatRepository extends CommonRepository
 {
     /**
-     * @param $trackingHash
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -37,7 +35,6 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param      $notificationId
      * @param null $listId
      *
      * @return array
@@ -57,7 +54,7 @@ class StatRepository extends CommonRepository
 
         $result = $q->execute()->fetchAllAssociative();
 
-        //index by lead
+        // index by lead
         $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
@@ -238,7 +235,7 @@ class StatRepository extends CommonRepository
             );
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('s.date_read', $q->expr()->literal($dt->toUtcString()))
@@ -246,7 +243,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('s.notification_id');
 
-        //get a total number of sent notifications first
+        // get a total number of sent notifications first
         $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
@@ -260,9 +257,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -275,8 +269,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
     public function deleteStat($id)
     {

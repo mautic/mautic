@@ -2,20 +2,29 @@
 
 namespace Mautic\ChannelBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Message>
+ *
  * @implements AjaxLookupModelInterface<Message>
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
@@ -37,10 +46,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     /**
      * MessageModel constructor.
      */
-    public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel)
+    public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->channelListHelper = $channelListHelper;
         $this->campaignModel     = $campaignModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -148,7 +159,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -181,8 +191,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -191,8 +199,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -201,7 +207,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      * @param null $channel
@@ -225,7 +230,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $messageId
      * @param null $dateFrom
      * @param null $dateTo
      *
@@ -241,9 +245,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get the channel name from the database.
      *
-     * @param int    $id
-     * @param string $entityName
-     * @param string $nameColumn
+     * @template T of object
+     *
+     * @param int             $id
+     * @param class-string<T> $entityName
+     * @param string          $nameColumn
      *
      * @return string|null
      */

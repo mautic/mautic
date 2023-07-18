@@ -60,7 +60,6 @@ class RedirectRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      */

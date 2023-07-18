@@ -96,7 +96,7 @@ class TokenHelperTest extends TestCase
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
             ->with(
-            'focus:items:viewown',
+                'focus:items:viewown',
                 'focus:items:viewother',
                 $focusItem->getCreatedBy()
             )

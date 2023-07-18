@@ -13,6 +13,7 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Form/DataTransformer/DsnTransformer.php',
     ];
 
     $services->load('Mautic\\ConfigBundle\\', '../')

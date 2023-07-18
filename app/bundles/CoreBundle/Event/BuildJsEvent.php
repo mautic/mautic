@@ -33,7 +33,7 @@ class BuildJsEvent extends Event
      */
     public function getJs()
     {
-        return $this->debugMode ? $this->js : \JSMin::minify($this->js);
+        return $this->debugMode ? $this->js : \JSMin\JSMin::minify($this->js);
     }
 
     /**
