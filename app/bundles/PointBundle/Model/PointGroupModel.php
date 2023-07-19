@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
-use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
@@ -25,11 +24,6 @@ class PointGroupModel extends CommonFormModel
     public function getRepository(): GroupRepository
     {
         return $this->em->getRepository(Group::class);
-    }
-
-    public function getContactScoreRepository(): GroupContactScoreRepository
-    {
-        return $this->em->getRepository(GroupContactScore::class);
     }
 
     public function getPermissionBase(): string
@@ -120,12 +114,14 @@ class PointGroupModel extends CommonFormModel
 
     public function adjustPoints(Lead $contact, Group $group, int $points, string $operator = Lead::POINTS_ADD): Lead
     {
-        $contactScore = $this->getContactScoreRepository()->findOneBy(['contact' => $contact, 'group' => $group]);
+        $contactScore = $contact->getGroupScore($group);
+
         if (empty($contactScore)) {
             $contactScore = new GroupContactScore();
             $contactScore->setContact($contact);
             $contactScore->setGroup($group);
             $contactScore->setScore(0);
+            $contact->addGroupScore($contactScore);
         }
         $oldScore = $contactScore->getScore();
         $newScore = $oldScore;

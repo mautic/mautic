@@ -2001,6 +2001,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->groupScores;
     }
 
+    public function getGroupScore(Group $group): ?GroupContactScore
+    {
+        foreach ($this->groupScores as $groupScore) {
+            if ($groupScore->getGroup() === $group) {
+                return $groupScore;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param ArrayCollection<int,GroupContactScore> $groupScores
      */
