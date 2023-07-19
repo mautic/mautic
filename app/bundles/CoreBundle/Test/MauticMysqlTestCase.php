@@ -80,7 +80,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $isTransactionActive = $this->connection->isTransactionActive();
 
-        if ($isTransactionActive) {
+        if ($isTransactionActive && $this->useCleanupRollback) {
             $this->insertRollbackCheckData();
             $this->connection->rollback();
         }
