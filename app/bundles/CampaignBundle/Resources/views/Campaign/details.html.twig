@@ -86,37 +86,52 @@
             <!--/ campaign detail collapseable toggler -->
 
             {{ customContent('left.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
-            <!-- some stats -->
-            <div class="pa-md">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="panel">
-                            <div class="panel-body box-layout">
-                                <div class="col-md-3 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-line-chart"></span>
-                                        {{ 'mautic.campaign.stats'|trans }}
-                                    </h5>
-                                </div>
-                                <div class="col-md-9 va-m">
-                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                                      'dateRangeForm': dateRangeForm,
-                                      'class':  'pull-right',
-                                    }) -}}
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{- include('@MauticCore/Helper/chart.html.twig', {
-                                    'chartData': stats,
-                                    'chartType': 'line',
-                                    'chartHeight': 300
-                                  }) -}}
-                            </div>
-                        </div>
+            {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
+            {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
+
+            <div class="stats-menu pl-md mt-lg">
+                <!-- tabs controls -->
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#stats-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.email.thead.stats'|trans }}
+                        </a>
+                    </li>
+                    <li >
+                        <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                            {{ 'mautic.email.thead.maps'|trans }}
+                        </a>
+                    </li>
+                </ul>
+                <!--/ tabs controls -->
+
+                <div class="date-range">
+                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                        'dateRangeForm': dateRangeForm,
+                    }) }}
+                </div>
+            </div>
+
+            <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+                <div class="tab-pane active bdr-w-0" id="stats-container">
+                    <div id="emailGraphStats"
+                    >
+                        {{- include('@MauticCore/Helper/chart.html.twig', {
+                            'chartData': stats,
+                            'chartType': 'line',
+                            'chartHeight': 300
+                        }) -}}
+                    </div>
+
+                </div>
+                <div class="tab-pane bdr-w-0" id="reads-map-container"
+                     data-map-url="{{ path('mautic_campaign_map_stats', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                >
+                    <div class="spinner">
+                        <i class="fa fa-spin fa-spinner"></i>
                     </div>
                 </div>
             </div>
-            <!--/ stats -->
 
             {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
 

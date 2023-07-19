@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -21,6 +22,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -117,7 +120,7 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     * @return LeadEventLogRepository
      */
     public function getCampaignLeadEventLogRepository()
     {
@@ -827,5 +830,31 @@ class CampaignModel extends CommonFormModel
         }
 
         return $ids;
+    }
+
+    public function getEmailListCountryStats($campaign, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    {
+        $options = [
+            'groupBy' => 'l.country',
+            'columns' => ['l.country'],
+        ];
+        if (!$campaign instanceof Campaign) {
+            $campaign = $this->getEntity($campaign);
+        }
+
+        $eventsEmailsSend     = $campaign->getEmailSendEvents();
+        $eventsIds            = $eventsEmailsSend->getKeys();
+
+        if (!empty($eventsIds)) {
+            /** @var StatRepository $statRepo */
+            $statRepo = $this->em->getRepository(Stat::class);
+            $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+            $readStats         = $statRepo->getReadCountCampaign($query, $eventsIds, $options);
+        } else {
+            $readStats = [];
+        }
+
+        return $readStats;
     }
 }

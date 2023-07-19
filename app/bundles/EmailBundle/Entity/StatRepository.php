@@ -764,4 +764,59 @@ class StatRepository extends CommonRepository
 
         return $contacts;
     }
+
+    public function getReadCountCampaign(ChartQuery $chartQuery, array $eventIds, array $options = [])
+    {
+        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $leadAlias     = 'l'; // leads
+        $statsAlias    = 's'; // email_stats
+        $subQueryAlias = 'sq'; // sub query
+        $cutAlias      = 'cut'; // channel_url_trackables
+        $pageHitsAlias = 'ph'; // page_hits
+
+        // use sub query to get page hits for and unique page hits selected contacts
+        $subQueryBuilder->select(
+            "COUNT({$pageHitsAlias}.id) AS hits",
+            "{$cutAlias}.channel_id",
+            "{$pageHitsAlias}.lead_id"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
+            ->join(
+                $cutAlias,
+                MAUTIC_TABLE_PREFIX.'page_hits',
+                $pageHitsAlias,
+                "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
+            )
+            ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
+            ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
+
+        // main query
+        $queryBuilder->select(
+            "{$leadAlias}.country AS `country`",
+            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
+            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_count`",
+        )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->rightJoin(
+                $statsAlias,
+                MAUTIC_TABLE_PREFIX.'leads',
+                $leadAlias,
+                "{$statsAlias}.lead_id=l.id"
+            )->leftJoin(
+                $statsAlias,
+                "({$subQueryBuilder->getSQL()})",
+                $subQueryAlias,
+                "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
+            )->andWhere($queryBuilder->expr()->in('s.source_id', $eventIds))
+            ->andWhere('s.source = :source')
+            ->andWhere('s.is_read = :true')
+            ->setParameter('true', true, 'boolean')
+            ->setParameter('source', 'campaign.event')
+            ->groupBy("{$leadAlias}.country");
+
+        $chartQuery->applyDateFilters($queryBuilder, 'date_sent', 's');
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
 }
