@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
@@ -832,29 +833,22 @@ class CampaignModel extends CommonFormModel
         return $ids;
     }
 
-    public function getEmailListCountryStats($campaign, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    /**
+     * @throws Exception
+     */
+    public function getEmailsCountryStats(Campaign $campaign, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
     {
-        $options = [
-            'groupBy' => 'l.country',
-            'columns' => ['l.country'],
-        ];
-        if (!$campaign instanceof Campaign) {
-            $campaign = $this->getEntity($campaign);
-        }
-
         $eventsEmailsSend     = $campaign->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
 
-        if (!empty($eventsIds)) {
-            /** @var StatRepository $statRepo */
-            $statRepo = $this->em->getRepository(Stat::class);
-            $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-
-            $readStats         = $statRepo->getReadCountCampaign($query, $eventsIds, $options);
-        } else {
-            $readStats = [];
+        if (empty($eventsIds)) {
+            return [];
         }
 
-        return $readStats;
+        /** @var StatRepository $statRepo */
+        $statRepo = $this->em->getRepository(Stat::class);
+        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        return $statRepo->getStatsGroupByCountry($query, $eventsIds, 'campaign');
     }
 }

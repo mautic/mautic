@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -29,6 +30,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -49,6 +51,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
@@ -221,11 +225,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Mautic\EmailBundle\Entity\StatRepository
+     * @return StatRepository
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -703,40 +707,22 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
     }
 
-    public function getEmailListCountryStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    /**
+     * @throws Exception
+     */
+    public function getEmailCountryStats(Email $email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
     {
-        $options = [
-            'groupBy' => 'l.country',
-            'columns' => ['l.country'],
-        ];
-        if (!$email instanceof Email) {
-            $email = $this->getEntity($email);
-        }
-
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
-        $lists     = $email->getLists();
-        $listCount = count($lists);
-
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
-
-        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
-        $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-
-        if ($listCount > 1) {
-            $readStats         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true, $options);
-            $clickStats        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT ph.lead_id', $options);
-        } else {
-            $readStats  = $statRepo->getReadCount($emailIds, null, $query, false, $options);
-            $clickStats = $trackableRepo->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id', $options);
+        if (empty($emailIds)) {
+            return [];
         }
 
-        return [
-            'read'    => $readStats,
-            'clicked' => $clickStats,
-        ];
+        /** @var StatRepository $statRepo */
+        $statRepo      = $this->em->getRepository(Stat::class);
+        $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        return $statRepo->getStatsGroupByCountry($query, $emailIds);
     }
 
     /**
@@ -767,14 +753,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        /** @var StatRepository $statRepo */
+        $statRepo = $this->em->getRepository(Stat::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
 
-        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        /** @var TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository(Trackable::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 

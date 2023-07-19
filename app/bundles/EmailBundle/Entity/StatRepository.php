@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -217,13 +218,12 @@ class StatRepository extends CommonRepository
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
      * @param bool                           $combined
-     * @param array                          $options
      *
      * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false, $options = [])
+    public function getReadCount($emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
     {
-        return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined, $options);
+        return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
 
     /**
@@ -246,7 +246,7 @@ class StatRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false, array $options = [])
+    public function getStatusCount($column, $emailIds = null, $listId = null, ChartQuery $chartQuery = null, $combined = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -302,18 +302,6 @@ class StatRepository extends CommonRepository
                 ->setParameter('true', true, 'boolean');
         }
 
-        if (isset($options['groupBy'])) {
-            $q->add('groupBy', $options['groupBy'], true);
-        }
-
-        if (isset($options['columns'])) {
-            $q->addSelect(...$options['columns']);
-        }
-
-        if (isset($options['columns']) && in_array('l.country', $options['columns'])) {
-            $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 's.lead_id = l.id');
-        }
-
         if ($chartQuery) {
             $chartQuery->applyDateFilters($q, 'date_sent', 's');
         }
@@ -330,11 +318,7 @@ class StatRepository extends CommonRepository
             return $byList;
         }
 
-        if (isset($options['columns'])) {
-            return $results;
-        } else {
-            return (isset($results[0])) ? $results[0]['count'] : 0;
-        }
+        return (isset($results[0])) ? $results[0]['count'] : 0;
     }
 
     /**
@@ -765,7 +749,10 @@ class StatRepository extends CommonRepository
         return $contacts;
     }
 
-    public function getReadCountCampaign(ChartQuery $chartQuery, array $eventIds, array $options = [])
+    /**
+     * @throws Exception
+     */
+    public function getStatsGroupByCountry(ChartQuery $chartQuery, array $entityIds, string $sourceType = 'email'): array
     {
         $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -808,12 +795,24 @@ class StatRepository extends CommonRepository
                 "({$subQueryBuilder->getSQL()})",
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
-            )->andWhere($queryBuilder->expr()->in('s.source_id', $eventIds))
-            ->andWhere('s.source = :source')
+            )
             ->andWhere('s.is_read = :true')
             ->setParameter('true', true, 'boolean')
-            ->setParameter('source', 'campaign.event')
             ->groupBy("{$leadAlias}.country");
+
+        switch ($sourceType) {
+            case 'campaign':
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->in('s.source_id', $entityIds)
+                )->andWhere('s.source = :source')
+                    ->setParameter('source', 'campaign.event');
+                break;
+            case 'email':
+            default:
+                $queryBuilder->andWhere(
+                    $queryBuilder->expr()->in('s.email_id', $entityIds)
+                );
+        }
 
         $chartQuery->applyDateFilters($queryBuilder, 'date_sent', 's');
 
