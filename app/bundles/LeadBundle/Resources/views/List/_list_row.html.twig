@@ -45,7 +45,8 @@
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
             {% endif %}
-            {% if item.isGlobal %}<i class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
             {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
