@@ -224,7 +224,7 @@
     }) %}
     <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>
   {% endif %}
-  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|raw }}</span>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   {% for listValue, listLabel in list %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
