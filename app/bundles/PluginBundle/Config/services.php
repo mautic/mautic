@@ -21,4 +21,7 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.plugin.model.plugin', \Mautic\PluginBundle\Model\PluginModel::class);
+    $services->alias('mautic.plugin.model.integration_entity', \Mautic\PluginBundle\Model\IntegrationEntityModel::class);
 };

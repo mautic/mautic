@@ -248,18 +248,6 @@ return [
                     '%mautic.saml_idp_default_role%',
                 ],
             ],
-        ],
-        'models' => [
-            'mautic.user.model.role' => [
-                'class' => 'Mautic\UserBundle\Model\RoleModel',
-            ],
-            'mautic.user.model.user' => [
-                'class'     => 'Mautic\UserBundle\Model\UserModel',
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'mautic.user.model.user_token_service',
-                ],
-            ],
             'mautic.user.model.user_token_service' => [
                 'class'     => \Mautic\UserBundle\Model\UserToken\UserTokenService::class,
                 'arguments' => [

@@ -19,4 +19,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.notification.model.notification', \Mautic\NotificationBundle\Model\NotificationModel::class);
 };

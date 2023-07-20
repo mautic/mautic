@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
@@ -17,7 +18,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -52,10 +56,13 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Tightenco\Collect\Support\Collection;
 
@@ -126,11 +133,6 @@ class LeadModel extends FormModel
     protected $channelListHelper;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var UserProvider
      */
     protected $userProvider;
@@ -198,7 +200,14 @@ class LeadModel extends FormModel
         UserProvider $userProvider,
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
-        IpAddressModel $ipAddressModel
+        IpAddressModel $ipAddressModel,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->requestStack         = $requestStack;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -210,12 +219,13 @@ class LeadModel extends FormModel
         $this->formFactory          = $formFactory;
         $this->categoryModel        = $categoryModel;
         $this->channelListHelper    = $channelListHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->emailValidator       = $emailValidator;
         $this->userProvider         = $userProvider;
         $this->contactTracker       = $contactTracker;
         $this->deviceTracker        = $deviceTracker;
         $this->ipAddressModel       = $ipAddressModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**

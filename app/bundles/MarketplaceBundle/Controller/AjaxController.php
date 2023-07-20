@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,8 +58,8 @@ class AjaxController extends CommonAjaxController
         try {
             $installResult = $this->composer->install($packageName);
 
-            if (0 !== $installResult->exitCode) {
-                $this->installError(new \Exception($installResult->output));
+            if (Command::SUCCESS !== $installResult->exitCode) {
+                return $this->installError(new \Exception($installResult->output));
             }
         } catch (\Exception $e) {
             return $this->installError($e);

@@ -40,16 +40,6 @@ return [
         ],
     ],
     'services' => [
-        'models' => [
-            'mautic.dashboard.model.dashboard' => [
-                'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                    'symfony.filesystem',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.dashboard.widget' => [
                 'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,

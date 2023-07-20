@@ -3,9 +3,14 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -23,8 +28,11 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -471,7 +479,15 @@ class FieldModel extends FormModel
         LeadFieldRepository $leadFieldRepository,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         FieldList $fieldList,
-        LeadFieldSaver $leadFieldSaver
+        LeadFieldSaver $leadFieldSaver,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->columnSchemaHelper         = $columnSchemaHelper;
         $this->leadListModel              = $leadListModel;
@@ -481,6 +497,8 @@ class FieldModel extends FormModel
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
         $this->fieldList                  = $fieldList;
         $this->leadFieldSaver             = $leadFieldSaver;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadFieldRepository
