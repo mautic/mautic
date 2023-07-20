@@ -30,7 +30,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
     ) {
     }
 
-    /** @throws MauticMessengerException */
+    /** @throws InvalidPayloadException */
     public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
     {
         try {
@@ -38,11 +38,10 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             $this->pageModel->processPageHit(...$parsed);
         } catch (InvalidPayloadException $payloadException) {
             $this->logger->error('Invalid payload #'.$message->getHitId().' '.$payloadException->getMessage());
-
             throw $payloadException;
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage(), (array) $exception);
-            throw new MauticMessengerException($exception->getMessage(), 400, $exception);
+            throw $exception;
         }
         $this->logger->info('processed page hit #'.$message->getHitId());
     }
@@ -70,7 +69,9 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
                     : $this->pageRepository->find($message->getPageId());
             } catch (\Exception $exception) {
                 $this->logger->error(
-                    sprintf('Invalid page/redirect, exception. #%s', $message->getPageId()), ['message' => $message]);
+                    sprintf('Invalid page/redirect, exception. #%s', $message->getPageId()),
+                    ['message' => $message]
+                );
                 throw $exception;
             }
 

@@ -41,42 +41,6 @@ $container->loadFromExtension('framework', [
             \Mautic\MessengerBundle\Message\PageHitNotification::class  => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
             \Mautic\MessengerBundle\Message\EmailHitNotification::class => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
         ],
-        'failure_transport' => 'failed', // Define other than default if you wish
-        'transports' => [
-            'failed' => [
-                'dsn' => 'doctrine://default?queue_name=failed',
-            ],
-            \Mautic\MessengerBundle\MauticMessengerTransports::SYNC      => 'sync://',
-            \Mautic\MessengerBundle\MauticMessengerTransports::HIT => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'serializer'     => 'messenger.transport.jms_serializer',
-                'options'        => [
-                    'heartbeat'  => 1,
-                    'persistent' => true,
-                    'vhost'      => '/',
-                    'exchange'   => [
-                        'name'                        => 'mautic',
-                        'type'                        => 'direct',
-                        'default_publish_routing_key' => 'hit',
-                    ],
-                    'queues'     => [
-                        'email_hit' => [
-                            'binding_keys' => ['hit'],
-                            'arguments'    => [
-                                'x-expires' => 60 * 60 * 24 * 21 * 1000, // queue ttl without consumer using it
-                            ],
-                        ],
-                    ],
-                ],
-                'serializer'     => 'messenger.transport.native_php_serializer',
-                'retry_strategy' => [
-                    'max_retries' => 3,
-                    'delay'       => 500,
-                    'multiplier'  => 3,
-                    'max_delay'   => 0,
-                ],
-            ],
-        ],
     ],
 ]);
 ```
