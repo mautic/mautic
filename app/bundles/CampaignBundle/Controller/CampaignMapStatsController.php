@@ -2,23 +2,39 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\AbstractMapController;
+use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Symfony\Component\HttpFoundation\Request;
 
-class CampaignMapStatsController extends AbstractMapController
+/**
+ * @extends AbstractCountryMapController<CampaignModel>
+ */
+class CampaignMapStatsController extends AbstractCountryMapController
 {
+    protected const MAP_OPTIONS = [
+        'read_count' => [
+            'label' => 'mautic.email.stat.read',
+        ],
+        'clicked_through_count'=> [
+            'label' => 'mautic.email.clicked',
+        ],
+    ];
+
     public function __construct(CampaignModel $model)
     {
         $this->model = $model;
     }
 
-    protected function getEntity($objectId): ?Campaign
-    {
-        return $this->model->getEntity($objectId);
-    }
-
-    protected function getData($request, $entity, $dateFromObject, $dateToObject): array
+    /**
+     * @param Campaign $entity
+     *
+     * @return array<int, array<string, int|string>>
+     *
+     * @throws Exception
+     */
+    protected function getData(Request $request, $entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
         return $this->model->getEmailsCountryStats(
             $entity,

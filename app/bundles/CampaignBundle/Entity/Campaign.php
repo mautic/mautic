@@ -48,7 +48,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, Event>
      */
     private $events;
 
@@ -300,8 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -398,9 +396,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<int, Event>
      */
-    public function getEmailSendEvents()
+    public function getEmailSendEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
         $events   = $this->getEvents()->matching($criteria);

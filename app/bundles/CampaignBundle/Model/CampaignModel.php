@@ -834,6 +834,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @return array<int, array<string, int|string>>
+     *
      * @throws Exception
      */
     public function getEmailsCountryStats(Campaign $campaign, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
@@ -849,6 +851,6 @@ class CampaignModel extends CommonFormModel
         $statRepo = $this->em->getRepository(Stat::class);
         $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        return $statRepo->getStatsGroupByCountry($query, $eventsIds, 'campaign');
+        return $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
     }
 }
