@@ -89,6 +89,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
+                    'mautic.lead.repository.lead',
                 ],
             ],
             'mautic.sms.broadcast.query' => [
@@ -96,18 +97,6 @@ return [
                 'arguments'    => [
                     'doctrine.orm.entity_manager',
                     'mautic.sms.model.sms',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.sms.model.sms' => [
-                'class'     => 'Mautic\SmsBundle\Model\SmsModel',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.lead.model.lead',
-                    'mautic.channel.model.queue',
-                    'mautic.sms.transport_chain',
-                    'mautic.helper.cache_storage',
                 ],
             ],
         ],
@@ -206,12 +195,12 @@ return [
         ],
     ],
     'parameters' => [
-        'sms_enabled'              => false,
-        'sms_username'             => null,
-        'sms_password'             => null,
-        'sms_sending_phone_number' => null,
-        'sms_frequency_number'     => 0,
-        'sms_frequency_time'       => 'DAY',
-        'sms_transport'            => 'mautic.sms.twilio.transport',
+        'sms_enabled'               => false,
+        'sms_username'              => null,
+        'sms_password'              => null,
+        'sms_messaging_service_sid' => null,
+        'sms_frequency_number'      => 0,
+        'sms_frequency_time'        => 'DAY',
+        'sms_transport'             => 'mautic.sms.twilio.transport',
     ],
 ];

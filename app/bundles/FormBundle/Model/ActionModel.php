@@ -19,7 +19,7 @@ class ActionModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Action');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
     }
 
     /**

@@ -39,7 +39,6 @@ jobs:
             matrix:
                 config:
                     - core-lib
-                    - plugin-citrix
                     - plugin-clearbit
                     - plugin-cloudstorage
                     - plugin-crm

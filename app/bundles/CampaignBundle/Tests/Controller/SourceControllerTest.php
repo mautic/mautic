@@ -25,7 +25,8 @@ class SourceControllerTest extends MauticMysqlTestCase
         $this->em->persist($form2);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($form1);
+        $this->em->detach($form2);
 
         $this->client->request('GET', '/s/campaigns/sources/new/random_object_id?sourceType=forms', [], [], $this->createAjaxHeaders());
         $clientResponse  = $this->client->getResponse();

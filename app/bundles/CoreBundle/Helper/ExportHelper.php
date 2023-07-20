@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use ArrayIterator;
-use Iterator;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -14,7 +12,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -58,7 +55,7 @@ class ExportHelper
     public function exportDataAs($data, string $type, string $filename): StreamedResponse
     {
         if (is_array($data)) {
-            $data = new ArrayIterator($data);
+            $data = new \ArrayIterator($data);
         }
 
         if (!$data->valid()) {
@@ -89,13 +86,13 @@ class ExportHelper
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
     }
 
-    public function zipFile(string $filePath): string
+    public function zipFile(string $filePath, string $fileName): string
     {
         $zipFilePath = str_replace('.csv', '.zip', $filePath);
-        $zipArchive  = new ZipArchive();
+        $zipArchive  = new \ZipArchive();
 
-        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
-            $zipArchive->addFile($filePath, 'contacts_export.csv');
+        if (true === $zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, $fileName);
             $zipArchive->close();
             $this->filePathResolver->delete($filePath);
 
@@ -105,7 +102,7 @@ class ExportHelper
         throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
-    private function exportAsExcel(Iterator $data, string $filename): StreamedResponse
+    private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
 
@@ -127,7 +124,7 @@ class ExportHelper
         return $response;
     }
 
-    private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
+    private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setTitle($filename);
@@ -149,7 +146,7 @@ class ExportHelper
         return $spreadsheet;
     }
 
-    private function exportAsCsv(Iterator $data, string $filename): StreamedResponse
+    private function exportAsCsv(\Iterator $data, string $filename): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
         $objWriter   = new Csv($spreadsheet);
@@ -173,9 +170,9 @@ class ExportHelper
     }
 
     /**
-     * @param Iterator<mixed> $data
+     * @param \Iterator<mixed> $data
      */
-    private function exportAsCsvIntoFile(Iterator $data, string $fileName): string
+    private function exportAsCsvIntoFile(\Iterator $data, string $fileName): string
     {
         $filePath  = $this->getValidContactExportFileName($fileName);
         $handler   = @fopen($filePath, 'ab+');

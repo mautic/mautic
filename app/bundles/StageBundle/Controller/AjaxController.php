@@ -25,7 +25,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             /** @var \Mautic\StageBundle\Model\StageModel $model */
             $model   = $this->getModel('stage');
             $actions = $model->getStageActions();

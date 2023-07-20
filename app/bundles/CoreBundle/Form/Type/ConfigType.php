@@ -437,14 +437,14 @@ class ConfigType extends AbstractType
                 'choices' => [
                     'mautic.core.daterange.0days'                                                                 => 'midnight',
                     'mautic.core.daterange.1days'                                                                 => '-24 hours',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])                      => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])                      => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])                      => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1])                     => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2])                     => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3])                     => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])                      => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])                      => '-2 years',
                 ],
                 'expanded'          => false,
                 'multiple'          => false,
@@ -599,19 +599,32 @@ class ConfigType extends AbstractType
                 ],
                 'required' => false,
             ]
-            );
+        );
 
         $builder->add(
-          'transliterate_page_title',
-          YesNoButtonGroupType::class,
-          [
-            'label' => 'mautic.core.config.form.transliterate.page.title',
-            'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
-            'attr'  => [
-              'class'   => 'form-control',
-              'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
-            ],
-          ]
+            'transliterate_page_title',
+            YesNoButtonGroupType::class,
+            [
+              'label' => 'mautic.core.config.form.transliterate.page.title',
+              'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
+              'attr'  => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
+              ],
+            ]
+        );
+
+        $builder->add(
+            'load_froala_assets',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.load.froala.assets',
+                'data'  => (array_key_exists('load_froala_assets', $options['data']) && !empty($options['data']['load_froala_assets'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.load.froala.assets.tooltip',
+                ],
+            ]
         );
 
         $builder->add(

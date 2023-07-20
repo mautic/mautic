@@ -20,9 +20,6 @@ class IP2LocationAPILookup extends AbstractRemoteDataLookup
         return "api.ip2location.com/?ip={$this->ip}&key={$this->auth}&package=WS9&format=json";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         try {
@@ -33,7 +30,7 @@ class IP2LocationAPILookup extends AbstractRemoteDataLookup
                 $this->city      = $record->city_name;
                 $this->latitude  = $record->latitude;
                 $this->longitude = $record->longitude;
-                //$this->timezone  = $record->location->timeZone;
+                // $this->timezone  = $record->location->timeZone;
                 $this->zipcode = $record->zip_code;
             }
         } catch (\Exception $exception) {

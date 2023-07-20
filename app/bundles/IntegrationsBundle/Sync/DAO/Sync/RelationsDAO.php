@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use Countable;
-use Iterator;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
-class RelationsDAO implements Iterator, Countable
+class RelationsDAO implements \Iterator, \Countable
 {
     /**
      * @var RelationDAO[]

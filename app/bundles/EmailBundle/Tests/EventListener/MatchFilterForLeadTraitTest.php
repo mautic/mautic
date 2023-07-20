@@ -10,11 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
 {
-    private $lead = [
+    /** @var mixed[] */
+    private array $lead = [
         'id'     => 1,
         'custom' => 'my custom text',
     ];
 
+    /** @var mixed[] */
     private $filter = [
         0 => [
             'display' => null,
@@ -47,6 +49,15 @@ class MatchFilterForLeadTraitTest extends TestCase
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
+    public function testDWCContactWithRegex(): void
+    {
+        $this->lead['custom']        = '04249';
+        $this->filter[0]['operator'] = 'regexp';
+        $this->filter[0]['filter']   = '(13357|04249|20363)';
+
+        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
     public function testDWCContactEndWidth(): void
     {
         $this->filter[0]['operator'] = 'endsWith';
@@ -74,7 +85,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @dataProvider dateMatchTestProvider
      */
-    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect)
+    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
             [

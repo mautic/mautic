@@ -13,6 +13,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
+     *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords()
      */
     public function testMultiplePagesOfRecordsAreFetched()
@@ -49,6 +50,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
+     *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers()
      */
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched()

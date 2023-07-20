@@ -16,7 +16,6 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Returns paginator with failed rows.
      *
-     * @param        $importId
      * @param string $bundle
      * @param string $object
      *
@@ -30,8 +29,6 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Returns paginator with specific type of rows.
      *
-     * @param        $objectId
-     * @param        $action
      * @param string $bundle
      * @param string $object
      *

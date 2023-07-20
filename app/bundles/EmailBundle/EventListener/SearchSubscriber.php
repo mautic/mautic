@@ -87,13 +87,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($emails as $email) {
                     $emailResults[] = $this->twig->render(
-                        '@MauticEmail/SubscribedEvents\Search/global.html.twig',
+                        '@MauticEmail/SubscribedEvents/Search/global.html.twig',
                         ['email' => $email]
                     );
                 }
                 if (count($emails) > 5) {
                     $emailResults[] = $this->twig->render(
-                        '@MauticEmail/SubscribedEvents\Search/global.html.twig',
+                        '@MauticEmail/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

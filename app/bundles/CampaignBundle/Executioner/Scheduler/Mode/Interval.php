@@ -68,7 +68,7 @@ class Interval implements ScheduleModeInterface
                 .$compareFromDateTime->format(self::LOG_DATE_FORMAT).' and thus returning '.$comparedToDateTime->format(self::LOG_DATE_FORMAT)
             );
 
-            //the event is to be scheduled based on the time interval
+            // the event is to be scheduled based on the time interval
             return $comparedToDateTime;
         }
 
@@ -181,8 +181,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @return \DateTimeInterface
      */
     private function getGroupExecutionDateTime(
@@ -244,8 +242,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @return \DateTimeInterface
      */
     private function getExecutionDateTimeFromHour(Lead $contact, \DateTimeInterface $hour, $eventId, \DateTimeInterface $compareFromDateTime)
@@ -289,8 +285,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @return \DateTimeInterface
      */
     private function getExecutionDateTimeBetweenHours(

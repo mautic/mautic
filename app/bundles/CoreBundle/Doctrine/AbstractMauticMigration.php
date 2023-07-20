@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Doctrine;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
@@ -38,7 +37,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected $platform;
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws AbortMigration
      */
     public function up(Schema $schema): void
@@ -66,7 +65,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * {@inheritdoc}
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function setContainer(ContainerInterface $container = null)
     {
@@ -77,10 +76,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     /**
      * Finds/creates the local name for constraints and indexes.
-     *
-     * @param $table
-     * @param $type
-     * @param $suffix
      *
      * @return string
      */
@@ -154,9 +149,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate the  name for the property.
      *
-     * @param $table
-     * @param $type
-     *
      * @return string
      */
     protected function generatePropertyName($table, $type, array $columnNames)
@@ -177,8 +169,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     /**
      * Generate index and foreign constraint.
-     *
-     * @param $table
      *
      * @return array [idx, fk]
      */

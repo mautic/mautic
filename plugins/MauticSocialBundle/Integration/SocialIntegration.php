@@ -115,7 +115,7 @@ abstract class SocialIntegration extends AbstractIntegration
             if (empty($available) || !is_array($available)) {
                 return [];
             }
-            //create social profile fields
+            // create social profile fields
             $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
@@ -244,8 +244,6 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * Returns notes specific to sections of the integration form (if applicable).
      *
-     * @param $section
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)
@@ -265,8 +263,6 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * Get the access token from session or socialCache.
-     *
-     * @param $socialCache
      *
      * @return array|mixed|null
      */

@@ -150,7 +150,7 @@ class PageType extends AbstractType
         $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('sessionId', HiddenType::class);
 
-        //Custom field for redirect URL
+        // Custom field for redirect URL
         $this->model->getRepository()->setCurrentUser($this->user);
 
         $redirectUrlDataOptions = '';
@@ -159,7 +159,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -264,16 +264,16 @@ class PageType extends AbstractType
         );
 
         $builder->add(
-          'redirectType',
-          RedirectListType::class,
-          [
-              'feature' => 'page',
-              'attr'    => [
-                  'class'   => 'form-control',
-                  'tooltip' => 'mautic.page.form.redirecttype.help',
-              ],
-              'placeholder' => 'mautic.page.form.redirecttype.none',
-          ]
+            'redirectType',
+            RedirectListType::class,
+            [
+                'feature' => 'page',
+                'attr'    => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.page.form.redirecttype.help',
+                ],
+                'placeholder' => 'mautic.page.form.redirecttype.none',
+            ]
         );
 
         $builder->add(
@@ -311,7 +311,7 @@ class PageType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,

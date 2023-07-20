@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO;
 
-use DateTimeInterface;
-
 class DateRange
 {
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
     private $fromDate;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
     private $toDate;
 
-    public function __construct(?DateTimeInterface $fromDate, ?DateTimeInterface $toDate)
+    public function __construct(?\DateTimeInterface $fromDate, ?\DateTimeInterface $toDate)
     {
         $this->fromDate = $fromDate;
         $this->toDate   = $toDate;

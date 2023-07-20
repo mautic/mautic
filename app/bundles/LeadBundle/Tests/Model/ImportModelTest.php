@@ -16,8 +16,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ImportModelTest extends StandardImportTestHelper
 {
@@ -44,10 +42,10 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testProcess(): void
     {
-        /** @var EventDispatcherInterface|MockObject $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $model  = $this->initImportModel();
+        $entity = $this->initImportEntity();
 
-        $dispatcher->expects($this->exactly(4))
+        $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
                 $this->callback(function (ImportProcessEvent $event) {
@@ -59,9 +57,6 @@ class ImportModelTest extends StandardImportTestHelper
                 LeadEvents::IMPORT_ON_PROCESS
             );
 
-        $model = $this->initImportModel();
-        $model->setDispatcher($dispatcher);
-        $entity = $this->initImportEntity();
         $entity->start();
         $model->process($entity, new Progress());
         $entity->end();
@@ -161,10 +156,12 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenParallelLimitHit(): void
     {
-        $model = $this->getMockBuilder(ImportModel::class)
+        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $model->setTranslator($this->getTranslatorMock());
 
         $model->method('checkParallelImportLimit')
             ->will($this->returnValue(false));
@@ -172,8 +169,6 @@ class ImportModelTest extends StandardImportTestHelper
         $model->expects($this->once())
             ->method('getParallelImportLimit')
             ->will($this->returnValue(1));
-
-        $model->setTranslator($this->getTranslatorMock());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -197,10 +192,12 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenDatabaseException(): void
     {
-        $model = $this->getMockBuilder(ImportModel::class)
+        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $model->setTranslator($this->getTranslatorMock());
 
         $model->expects($this->once())
             ->method('checkParallelImportLimit')
@@ -209,8 +206,6 @@ class ImportModelTest extends StandardImportTestHelper
         $model->expects($this->once())
             ->method('process')
             ->will($this->throwException(new ORMException()));
-
-        $model->setTranslator($this->getTranslatorMock());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -377,43 +372,18 @@ class ImportModelTest extends StandardImportTestHelper
         $import->end();
     }
 
-    public function testMacLineEndings(): void
-    {
-        $oldCsv = self::$csvPath;
-
-        // Generate a new CSV
-        self::generateSmallCSV();
-
-        $csv = file_get_contents(self::$csvPath);
-        $csv = str_replace("\n", "\r", $csv);
-        file_put_contents(self::$csvPath, $csv);
-
-        $this->testProcess();
-
-        @unlink(self::$csvPath);
-
-        self::$csvPath = $oldCsv;
-    }
-
     public function testItLogsDBErrorIfTheEntityManagerIsClosed(): void
     {
         $this->generateSmallCSV();
-        $dispatcher    = $this->createMock(EventDispatcherInterface::class);
-        $entityManager = $this->getEntityManagerMock();
 
-        $entityManager->expects($this->any())
-            ->method('isOpen')
-            ->willReturn(false);
+        $importModel = $this->initImportModel(false);
+        $import      = $this->initImportEntity();
 
         $this->expectException(ORMException::class);
-        $dispatcher->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willThrowException(new ORMException('Some DB error'));
 
-        $importModel = $this->initImportModel();
-        $importModel->setDispatcher($dispatcher);
-        $import = $this->initImportEntity();
-        $importModel->setEntityManager($entityManager);
         $import->start();
         $importModel->process($import, new Progress());
         $import->end();

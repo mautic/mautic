@@ -66,7 +66,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $permissions = $this->security->isGranted(['form:forms:viewown', 'form:forms:viewother'], 'RETURN_ARRAY');
         if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
-            //only show own forms if the user does not have permission to view others
+            // only show own forms if the user does not have permission to view others
             if (!$permissions['form:forms:viewother']) {
                 $filter['force'] = [
                     ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->userHelper->getUser()->getId()],
@@ -83,13 +83,13 @@ class SearchSubscriber implements EventSubscriberInterface
                 $formResults = [];
                 foreach ($forms as $form) {
                     $formResults[] = $this->twig->render(
-                        '@MauticForm/SubscribedEvents\Search/global.html.twig',
+                        '@MauticForm/SubscribedEvents/Search/global.html.twig',
                         ['form' => $form[0]]
                     );
                 }
                 if (count($forms) > 5) {
                     $formResults[] = $this->twig->render(
-                        '@MauticForm/SubscribedEvents\Search/global.html.twig',
+                        '@MauticForm/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
