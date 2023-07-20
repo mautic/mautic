@@ -741,10 +741,12 @@ class StatRepository extends CommonRepository
         if ('lead' === $sourceType) {
             $subQueryBuilder->andWhere("{$pageHitsAlias}.lead_id in (:contacts)")
                 ->setParameter('contacts', $entityIds, ArrayParameterType::INTEGER);
+
+            $queryBuilder->addSelect("{$leadAlias}.id AS `lead_id`");
         }
 
         // main query
-        $queryBuilder->select(
+        $queryBuilder->addSelect(
             "COUNT({$statsAlias}.id) AS `sent_count`",
             "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
             "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
@@ -762,8 +764,7 @@ class StatRepository extends CommonRepository
             );
 
         if ('lead' === $sourceType) {
-            $queryBuilder->addSelect("{$leadAlias}.id AS `lead_id`")
-                ->andWhere("{$leadAlias}.id in (:contacts)")
+            $queryBuilder->andWhere("{$leadAlias}.id in (:contacts)")
                 ->setParameter('contacts', $entityIds, ArrayParameterType::INTEGER)
                 ->groupBy("{$leadAlias}.id");
         } else {
