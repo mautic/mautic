@@ -317,6 +317,33 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('clonesegment2', $rows[1]->getAlias());
     }
 
+    public function testSegmentFilterIcon(): void
+    {
+        // Save segment.
+        $filters   = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+        $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $this->saveSegment('Lead List 2', 'lead-list-2');
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(2, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
     public function testSegmentWarningIcon(): void
     {
         $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
