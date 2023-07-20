@@ -98,7 +98,7 @@ class PageModel extends FormModel
      */
     protected $dateTimeHelper;
 
-     /**
+    /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -553,8 +553,7 @@ class PageModel extends FormModel
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
         \DateTimeInterface $hitDate = null
-    ): void
-    {
+    ): void {
         $leadLastActive = $lead->getLastActive();
 
         // Store Page/Redirect association

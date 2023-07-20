@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\MessageHandler;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\MessengerBundle\Exceptions\InvalidPayloadException;
-use Mautic\MessengerBundle\Exceptions\MauticMessengerException;
 use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MessengerBundle\MessageHandler;
 
 use Doctrine\ORM\OptimisticLockException;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Psr\Log\LoggerInterface;

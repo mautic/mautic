@@ -464,8 +464,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Stat|string|null $stat The null is just for BC reasons, should be Stat|string
-     * @param bool         $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
+     * @param Stat|string|null $stat                    The null is just for BC reasons, should be Stat|string
+     * @param bool             $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
      *
      * @throws ORMException
      * @throws OptimisticLockException
@@ -478,8 +478,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         \DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ): void {
-        if ($stat === null) {
-            trigger_deprecation('mautic/mautic', '5.0', 'Using hitEmail with null $stat is deprecated, use "%s" instead.',);
+        if (null === $stat) {
+            trigger_deprecation('mautic/mautic', '5.0', 'Using hitEmail with null $stat is deprecated, use "%s" instead.');
         }
 
         if (!$stat instanceof Stat) {
