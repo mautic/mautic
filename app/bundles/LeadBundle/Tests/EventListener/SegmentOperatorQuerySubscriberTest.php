@@ -264,7 +264,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('orX');
+            ->method('or');
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNull')
@@ -320,7 +320,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('andX');
+            ->method('and');
 
         $this->expressionBuilder->expects($this->once())
             ->method('regexp')

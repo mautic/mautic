@@ -317,7 +317,7 @@ class ContactSegmentService
         try {
             $start = microtime(true);
 
-            $result = $qb->execute()->fetchAssociative();
+            $result = $qb->executeQuery()->fetchAssociative();
 
             $end = microtime(true) - $start;
 
@@ -347,7 +347,7 @@ class ContactSegmentService
     {
         try {
             $start  = microtime(true);
-            $result = $qb->execute()->fetchAllAssociative();
+            $result = $qb->executeQuery()->fetchAllAssociative();
 
             $end = microtime(true) - $start;
 

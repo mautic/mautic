@@ -170,7 +170,7 @@ class ContactSegmentQueryBuilder
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $tableAlias      = $this->generateRandomParameterName();
 
-        $existsQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
+        $existsQueryBuilder = $queryBuilder->createQueryBuilder();
 
         $existsQueryBuilder
             ->select('null')

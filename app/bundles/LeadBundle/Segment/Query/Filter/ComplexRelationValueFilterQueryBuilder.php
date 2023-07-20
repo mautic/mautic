@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Exception;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
