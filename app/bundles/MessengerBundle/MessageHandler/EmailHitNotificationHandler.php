@@ -21,8 +21,6 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
 
     public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void
     {
-        $hitDateTime = (new DateTimeHelper($message->getEventTime()))->getDateTime();
-
         try {
             $this->logger->debug('Processing email hit notification, statId '.$message->getStatId());
             $this->emailModel->hitEmail(
@@ -30,7 +28,7 @@ class EmailHitNotificationHandler implements MessageSubscriberInterface
                 $message->getRequest(),
                 false,
                 $message->isSynchronousRequest(),
-                $hitDateTime,
+                $message->getEventTime(),
                 true
             );
         } catch (OptimisticLockException $lockException) {

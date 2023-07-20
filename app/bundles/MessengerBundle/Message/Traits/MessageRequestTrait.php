@@ -4,29 +4,24 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Message\Traits;
 
-use JMS\Serializer\Annotation as Serializer;
+use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 trait MessageRequestTrait
 {
-    private string $eventTime; // The ISO-8601 date
+    private ?DateTimeInterface $eventTime = null; // The ISO-8601 date
     /** @Serializer\Type(Symfony\Component\HttpFoundation\Request) */
     private Request $request; //  Simplified interpretation of symfony request
     private bool $isSynchronous = false;
 
-    /** @return string The ISO-8601 date */
-    public function getEventTime(): string
+    public function getEventTime(): ?DateTimeInterface
     {
         return $this->eventTime;
     }
 
-    public function setEventTime(\DateTimeInterface $eventTime = null): self
+    public function setEventTime(DateTimeInterface $eventTime = null): self
     {
-        $eventTime ??= (new \DateTimeImmutable())->format('c');
-
-        $this->eventTime = $eventTime instanceof \DateTimeInterface
-            ? $eventTime->format('c')
-            : $eventTime;
+        $this->eventTime = $eventTime;
 
         return $this;
     }

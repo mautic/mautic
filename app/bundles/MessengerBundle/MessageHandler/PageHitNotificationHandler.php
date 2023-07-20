@@ -103,7 +103,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             'lead'                   => $lead,
             'trackingNewlyGenerated' => $message->isNew(),
             'activeRequest'          => false,
-            'hitDate'                => new \DateTimeImmutable((new DateTimeHelper($message->getEventTime(), 'c'))->toLocalString()),
+            'hitDate'                => $message->getEventTime(),
         ];
     }
 }
