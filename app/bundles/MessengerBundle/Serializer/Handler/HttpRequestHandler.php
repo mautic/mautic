@@ -20,23 +20,23 @@ class HttpRequestHandler implements SubscribingHandlerInterface
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format'    => 'json',
                 'type'      => Request::class,
-                'method'    => 'serializeRequestToString',
+                'method'    => 'serializeRequestToArray',
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format'    => 'json',
                 'type'      => Request::class,
-                'method'    => 'deserializeStringToRequest',
+                'method'    => 'deserializeArrayToRequest',
             ],
         ];
     }
 
-    public function serializeRequestToString(JsonSerializationVisitor $visitor, Request $request, array $type, Context $context)
+    public function serializeRequestToArray(JsonSerializationVisitor $visitor, Request $request, array $type, Context $context): array
     {
         return self::toArray($request);
     }
 
-    public function deserializeStringToRequest(JsonDeserializationVisitor $visitor, $requestAsArray, array $type, Context $context)
+    public function deserializeArrayToRequest(JsonDeserializationVisitor $visitor, $requestAsArray, array $type, Context $context): Request
     {
         return self::fromArray($requestAsArray);
     }

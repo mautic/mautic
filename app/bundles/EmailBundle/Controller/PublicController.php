@@ -623,11 +623,10 @@ class PublicController extends CommonFormController
             $lead = $repo->getLeadByEmail($email);
             if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
+                if (null === $lead) {
+                    continue;
+                }
             }
-
-            if (null === $lead) {
-                continue;
-            } // lead was not created
 
             $idHash = hash('crc32', $email.$query['body']);
             $idHash = substr($idHash.$idHash, 0, 13); // 13 bytes length
@@ -686,7 +685,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead($email, $repo): Lead
+    private function createLead($email, $repo): ?Lead
     {
         $model = $this->getModel('lead.lead');
         \assert($model instanceof LeadModel);

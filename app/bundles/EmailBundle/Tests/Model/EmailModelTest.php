@@ -730,9 +730,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function getEntityState($entity, $assume = null): bool
+            public function getEntityState($entity, $assume = null): int
             {
-                return true;
+                return UnitOfWork::STATE_DETACHED;
             }
         };
 

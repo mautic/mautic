@@ -7,6 +7,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\UnitOfWork;
+use Exception;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -467,8 +468,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param Stat|string|null $stat                    The null is just for BC reasons, should be Stat|string
      * @param bool             $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
      *
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws OptimisticLockException|Exception
      */
     public function hitEmail(
         $stat,
@@ -522,7 +522,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             if ($email && $lead) {
                 try {
                     $this->getRepository()->upCount($email->getId(), 'read', 1, $email->isVariant());
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     error_log($exception);
                 }
             }
@@ -586,7 +586,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->flushAndCatch();
             }
 
-            if ($updateLastActive ?? false) { // We need to perform the update after all is saved
+            if ($hitDateTime!==null && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
@@ -1357,7 +1357,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                  array assetAttachments Array of optional Asset IDs to attach
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @return array|bool|string|null
      */
     public function sendEmail(Email $email, $leads, $options = [])
     {
@@ -1555,7 +1555,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 try {
                     $this->getRepository()->upCount($emailId, 'sent', $count, $emailSettings[$emailId]['isVariant']);
                     break;
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     error_log($exception);
                 }
                 --$strikes;
