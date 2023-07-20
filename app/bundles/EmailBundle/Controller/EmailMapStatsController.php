@@ -2,35 +2,47 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractMapController;
+use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\HttpFoundation\Request;
 
-class EmailMapStatsController extends AbstractMapController
+/**
+ * @extends AbstractCountryMapController<EmailModel>
+ */
+class EmailMapStatsController extends AbstractCountryMapController
 {
+    protected const MAP_OPTIONS = [
+        'read_count' => [
+            'label' => 'mautic.email.stat.read',
+        ],
+        'clicked_through_count'=> [
+            'label' => 'mautic.email.clicked',
+        ],
+    ];
+
     public function __construct(EmailModel $model)
     {
         $this->model = $model;
     }
 
-    protected function getEntity($objectId): ?Email
-    {
-        return $this->model->getEntity($objectId);
-    }
-
-    protected function getData($request, $entity, $dateFromObject, $dateToObject): array
+    /**
+     * @param Email $entity
+     *
+     * @return array<int, array<string, int|string>>
+     *
+     * @throws Exception
+     */
+    protected function getData(Request $request, $entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
         // get A/B test information
-        [$parent, $children] = $entity->getVariants();
+        $parent = $entity->getVariantParent();
 
-        // get related translations
-        [$translationParent, $translationChildren] = $entity->getTranslations();
+        // get translation parent
+        $translationParent = $entity->getTranslationParent();
 
-        if ($chartStatsSource = $request->query->get('stats', false)) {
-            $includeVariants = ('all' === $chartStatsSource);
-        } else {
-            $includeVariants = (($entity->isVariant() && $parent === $entity) || ($entity->isTranslation() && $translationParent === $entity));
-        }
+        $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
 
         return $this->model->getEmailCountryStats(
             $entity,

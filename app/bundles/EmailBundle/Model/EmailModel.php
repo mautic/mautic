@@ -708,9 +708,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @return array<int, array<string, int|string>>
+     *
      * @throws Exception
      */
-    public function getEmailCountryStats(Email $email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
+    public function getEmailCountryStats(Email $email, bool $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
     {
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
@@ -722,7 +724,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $statRepo      = $this->em->getRepository(Stat::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        return $statRepo->getStatsGroupByCountry($query, $emailIds);
+        return $statRepo->getStatsSummaryByCountry($query, $emailIds);
     }
 
     /**
