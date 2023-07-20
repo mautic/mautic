@@ -553,11 +553,9 @@ class PageModel extends FormModel
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
         \DateTimeInterface $hitDate = null
-    ) {
+    ): void
+    {
         $leadLastActive = $lead->getLastActive();
-        if (MAUTIC_ENV === 'dev') {
-            dump('processing : '.$lead->getId(), 'last active: ', $lead->getLastActive(), 'event:', $hitDate);
-        }
 
         // Store Page/Redirect association
         if ($page) {
@@ -686,7 +684,7 @@ class PageModel extends FormModel
             }
         }
 
-        // clean info from the IP address
+        // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
@@ -740,18 +738,18 @@ class PageModel extends FormModel
 
         if (null !== $hitDate) {
             if (null === $leadLastActive || $leadLastActive < $hitDate) {
-                $data = [
-                    'unique'             => ($isUnique ? 'true' : 'false'),
-                    'lead'               => $lead->getId(),
-                    'page'               => $page?->getId(),
-                    'hit'                => $hit->getId(),
-                    'lastActiveOriginal' => $leadLastActive,
-                    'newLastActive'      => $hitDate,
-                ];
-
                 try {
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
+                    $data = [
+                        'unique'             => ($isUnique ? 'true' : 'false'),
+                        'lead'               => $lead->getId(),
+                        'page'               => $page?->getId(),
+                        'hit'                => $hit->getId(),
+                        'lastActiveOriginal' => $leadLastActive,
+                        'newLastActive'      => $hitDate,
+                    ];
+
                     $this->logger->error(
                         'Failed to update event time due to '.$e->getMessage(),
                         ['context' => $data]
