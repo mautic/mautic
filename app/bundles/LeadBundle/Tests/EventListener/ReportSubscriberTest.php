@@ -280,7 +280,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'decision' => [
                             'email.click' => [
                               'label'                  => 'Clicks email',
-                              'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
+                              'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                               'eventName'              => 'mautic.email.on_campaign_trigger_decision',
                               'formType'               => "Mautic\EmailBundle\Form\Type\EmailClickDecisionType",
                               'connectionRestrictions' => [
