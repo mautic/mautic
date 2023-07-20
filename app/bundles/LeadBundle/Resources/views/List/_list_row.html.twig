@@ -5,7 +5,10 @@
 {% set now = dateTimeGetUtcDateTime() %}
 {% set hoursSinceLastBuilt = null %}
 {% if item.lastBuiltDate is not null %}
-    {% set hoursSinceLastBuilt = now.diff(item.lastBuiltDate).format('%h') %}
+    {% set lastBuiltDate = date(item.lastBuiltDate.timestamp) %}
+    {% set now = date() %}
+    {% set diffInSeconds = now.timestamp - lastBuiltDate.timestamp %}
+    {% set hoursSinceLastBuilt = diffInSeconds / 3600 | round %}
 {% endif %}
 {% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
 <tr>
