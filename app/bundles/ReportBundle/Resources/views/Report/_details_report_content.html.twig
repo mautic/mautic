@@ -59,7 +59,15 @@
                                             {%- set closeLink = false -%}
                                             {% if columns[key].link is defined and row[columns[key].alias] is defined and row[columns[key].alias] is not empty %}
                                                 {%- set closeLink = true -%}
-                                                <a href="{{ path(columns[key].link, {'objectAction': 'view', 'objectId': row[columns[key].alias]}) }}" class="label label-success">
+                                                {% if columns[key].linkParameters is defined %}
+                                                    {% set parameters = {} %}
+                                                    {% for k,v in columns[key].linkParameters %}
+                                                        {% set parameters = parameters|merge({ (k) : (v is same as "%alias%" ? row[columns[key].alias] : v)}) %}
+                                                    {% endfor %}
+                                                    <a href="{{ path(columns[key].link, parameters) }}" {{ parameters.objectId is defined ? 'class="label label-success"' : '' }}>
+                                                {% else %}
+                                                    <a href="{{ path(columns[key].link, {'objectAction': 'view', 'objectId': row[columns[key].alias]}) }}" class="label label-success">
+                                                {% endif %}
                                             {% endif %}
                                             {%- set cellType = columns[key].type -%}
                                             {%- set cellVal = row[columns[key].alias] -%}
