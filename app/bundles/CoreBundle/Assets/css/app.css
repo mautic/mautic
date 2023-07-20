@@ -4565,15 +4565,14 @@ a.inline-token .text-muted {
 .map-options__item.active,
 .map-options__item.active:hover {
   color: #fff;
-  background-color: #35b5b9;
+  background-color: #3a7e6f;
 }
 .map-options__item:focus,
 .map-options__item.focus,
 .map-options__item:active,
-.map-options__item.active.focus,
-.map-options__item:hover {
+.map-options__item.active.focus {
   color: #fff;
-  background-color: #35b5b9;
+  background-color: #3a7e6f;
 }
 .jvectormap-zoomin,
 .jvectormap-zoomout {
@@ -4582,14 +4581,14 @@ a.inline-token .text-muted {
   line-height: 30px;
   left: 10px;
   padding: 0;
-  background-color: #4e5e9e;
+  background-color: #5bc0de;
   border-radius: 4px;
   box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.04), 0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 6px 12px 0 rgba(0, 0, 0, 0.16);
   font-size: 20px;
 }
 .jvectormap-zoomin:hover,
 .jvectormap-zoomout:hover {
-  background-color: #2c355a;
+  background-color: #2390b0;
 }
 .jvectormap-zoomin {
   top: 16px;

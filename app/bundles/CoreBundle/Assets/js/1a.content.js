@@ -732,9 +732,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     const map = Mautic.initMap(scope, 'regions');
                 });
             }
-
-
-            //Mautic.loadMap
         }, false));
     }
 };
