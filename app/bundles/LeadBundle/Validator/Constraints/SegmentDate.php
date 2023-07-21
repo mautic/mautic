@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 
 class SegmentDate extends Constraint
 {
-    public $message;
+    public string $message;
 
     public function validatedBy()
     {

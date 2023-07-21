@@ -417,7 +417,6 @@ return [
             \Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class => [
                 'class'     => \Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class,
                 'arguments' => [
-                    'request_stack',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'translator',
                 ],
