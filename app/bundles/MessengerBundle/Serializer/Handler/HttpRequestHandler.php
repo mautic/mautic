@@ -19,39 +19,40 @@ class HttpRequestHandler implements SubscribingHandlerInterface
         return [
             [
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
-                'format' => 'json',
-                'type' => Request::class,
-                'method' => 'serializeRequestToArray',
+                'format'    => 'json',
+                'type'      => Request::class,
+                'method'    => 'serializeRequestToArray',
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
-                'format' => 'json',
-                'type' => Request::class,
-                'method' => 'deserializeArrayToRequest',
+                'format'    => 'json',
+                'type'      => Request::class,
+                'method'    => 'deserializeArrayToRequest',
             ],
         ];
     }
 
     /**
      * @param array<string> $type
+     *
      * @return array<string,array<string>|mixed>
      */
     public function serializeRequestToArray(JsonSerializationVisitor $visitor, Request $request, array $type, Context $context): array
     {
         return array_filter([
             'attributes' => $request->attributes->all(),
-            'request' => $request->request->all(),
-            'query' => $request->query->all(),
-            'cookies' => $request->cookies->all(),
-            'files' => $request->files->all(),
-            'server' => $request->server->all(),
-            'headers' => $request->headers->all(),
+            'request'    => $request->request->all(),
+            'query'      => $request->query->all(),
+            'cookies'    => $request->cookies->all(),
+            'files'      => $request->files->all(),
+            'server'     => $request->server->all(),
+            'headers'    => $request->headers->all(),
         ]);
     }
 
     /**
      * @param array<string,mixed> $requestAsArray
-     * @param array<string> $type
+     * @param array<string>       $type
      */
     public function deserializeArrayToRequest(JsonDeserializationVisitor $visitor, array $requestAsArray, array $type, Context $context): Request
     {

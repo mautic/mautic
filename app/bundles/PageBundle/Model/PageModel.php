@@ -541,21 +541,17 @@ class PageModel extends FormModel
     /**
      * Process page hit.
      *
-     * @param Page|Redirect $page
-     *
      * @throws \Exception
      */
     public function processPageHit(
-        Hit                $hit,
-        Redirect|Page      $page,
-        Request            $request,
-        Lead               $lead,
-        bool               $trackingNewlyGenerated,
-        bool               $activeRequest = true,
+        Hit $hit,
+        Redirect|Page $page,
+        Request $request,
+        Lead $lead,
+        bool $trackingNewlyGenerated,
+        bool $activeRequest = true,
         \DateTimeInterface $hitDate = null
     ): void {
-        $leadLastActive = $lead->getLastActive();
-
         // Store Page/Redirect association
         if ($page) {
             if ($page instanceof Page) {
@@ -736,7 +732,7 @@ class PageModel extends FormModel
         }
 
         if (null !== $hitDate) {
-            if (null === $leadLastActive || $leadLastActive < $hitDate) {
+            if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
                 } catch (\Exception $e) {
@@ -745,13 +741,13 @@ class PageModel extends FormModel
                         'lead'               => $lead->getId(),
                         'page'               => $page->getId(),
                         'hit'                => $hit->getId(),
-                        'lastActiveOriginal' => $leadLastActive,
+                        'lastActiveOriginal' => $lead->getLastActive(),
                         'newLastActive'      => $hitDate,
                     ];
 
                     $this->logger->error(
                         'Failed to update event time due to '.$e->getMessage(),
-                        ['context' => $data]
+                        ['context' => $data, 'exception' => (array) $e]
                     );
                 }
             }
