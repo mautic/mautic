@@ -819,7 +819,7 @@
             var s = document.createElement('link');
             s.rel = "stylesheet"
             s.type = "text/css"
-            s.href = Core.debug() ? Core.getMauticBaseUrl() + 'app/assets/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
+            s.href = Core.debug() ? Core.getMauticBaseUrl() + 'media/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
             document.head.appendChild(s);
             if (Core.debug()) console.log(s);
         };
