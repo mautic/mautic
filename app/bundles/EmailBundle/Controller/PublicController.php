@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -220,9 +221,7 @@ class PublicController extends CommonFormController
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"')
-                        || false !== strpos($html, BuilderSubscriber::saveprefsRegex);
-                    if ($savePrefsPresent) {
+                    if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         $params     = array_merge(
@@ -657,7 +656,7 @@ class PublicController extends CommonFormController
         return TrackingPixelHelper::getResponse($request); // send gif
     }
 
-    private function addStat(MailHelper $mailer, $lead, $email, $query, $idHash)
+    private function addStat(MailHelper $mailer, $lead, $email, $query, $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead

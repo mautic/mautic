@@ -479,15 +479,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         \DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ): void {
-        if (null === $stat) {
-            trigger_deprecation('mautic/mautic', '5.0', 'Using hitEmail with null $stat is deprecated, use "%s" instead.');
-        }
-
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
         }
 
         if (!$stat) {
+            trigger_deprecation('mautic/mautic', '5.0', 'Calls to hitEmail without a stat are deprecated');
+
             return;
         }
 
