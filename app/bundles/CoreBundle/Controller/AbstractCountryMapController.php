@@ -94,7 +94,7 @@ abstract class AbstractCountryMapController extends AbstractController
                     '%total'       => $mappedData['total'] ?? 0,
                     '%withCountry' => $mappedData['totalWithCountry'] ?? 0,
                 ]),
-                'unit'       => 'Read',
+                'unit'       => $value['unit'],
             ];
         }
 

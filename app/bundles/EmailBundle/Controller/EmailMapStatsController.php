@@ -16,9 +16,11 @@ class EmailMapStatsController extends AbstractCountryMapController
     protected const MAP_OPTIONS = [
         'read_count' => [
             'label' => 'mautic.email.stat.read',
+            'unit'  => 'Read',
         ],
         'clicked_through_count'=> [
             'label' => 'mautic.email.clicked',
+            'unit'  => 'Click',
         ],
     ];
 
