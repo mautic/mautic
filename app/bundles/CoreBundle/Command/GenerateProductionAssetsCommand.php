@@ -58,8 +58,6 @@ EOT
 
         $assetsDir = $this->pathsHelper->getAssetsPath();
 
-        $this->moveExtraLibraries($nodeModulesDir, $assetsDir);
-
         // Minify Mautic Form SDK
         file_put_contents(
             $assetsDir.'/js/mautic-form-tmp.js',
@@ -84,10 +82,10 @@ EOT
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
-            'js/ckeditor4/ckeditor.js',
-            'js/ckeditor4/adapters/jquery.js',
-            'js/jquery.min.js',
-            'js/froogaloop.min.js',
+            'js/vendor/ckeditor4/ckeditor.js',
+            'js/vendor/ckeditor4/adapters/jquery.js',
+            'js/vendor/jquery/jquery.min.js',
+            'js/vendor/vimeo-froogaloop2/froogaloop.min.js',
         ];
 
         foreach ($productionAssets as $relativePath) {
@@ -111,14 +109,5 @@ EOT
         $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
     }
 
-    /**
-     * Following libraries are loaded by public, not administration related features so those cannot be built into one JS file.
-     */
-    private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
-    {
-        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
-        $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
-        $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
-    }
     protected static $defaultDescription = 'Combines and minifies asset files into single production files';
 }
