@@ -433,13 +433,12 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Page|Redirect $page
-     * @param string|int    $code
-     * @param array         $query
+     * @param string|int $code
+     * @param array      $query
      *
      * @throws \Exception
      */
-    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -525,7 +524,7 @@ class PageModel extends FormModel
             $request,
             $this->deviceTracker->wasDeviceChanged(),
             $page instanceof Redirect,
-            $page->getId(),
+            $page?->getId(),
             $lead->getId()
         );
 
@@ -545,7 +544,7 @@ class PageModel extends FormModel
      */
     public function processPageHit(
         Hit $hit,
-        Redirect|Page $page,
+        Redirect|Page|null $page,
         Request $request,
         Lead $lead,
         bool $trackingNewlyGenerated,
