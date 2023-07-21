@@ -25,7 +25,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 
-        $exclusionQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $exclusionQueryBuilder = $queryBuilder->createQueryBuilder();
         $exclusionQueryBuilder
             ->select($exclusionAlias.'.id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $exclusionAlias)
@@ -40,7 +40,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
                 )
             );
 
-        $sessionQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $sessionQueryBuilder = $queryBuilder->createQueryBuilder();
         $sessionQueryBuilder
             ->select('count(id)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $pageHitsAlias)

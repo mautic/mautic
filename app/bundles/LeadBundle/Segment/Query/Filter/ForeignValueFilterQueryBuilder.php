@@ -35,7 +35,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
+        $subQueryBuilder = $queryBuilder->createQueryBuilder();
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));

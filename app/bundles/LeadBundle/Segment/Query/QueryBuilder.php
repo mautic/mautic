@@ -21,6 +21,15 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private $logicStack = [];
 
+    private Connection $connection;
+
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+
+        parent::__construct($connection);
+    }
+
     /**
      * Gets an ExpressionBuilder used for object-oriented construction of query expressions.
      * This producer method is intended for convenient inline usage. Example:.
@@ -49,6 +58,34 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
+     * Sets a query parameter for the query being constructed.
+     *
+     * <code>
+     *     $qb = $conn->createQueryBuilder()
+     *         ->select('u')
+     *         ->from('users', 'u')
+     *         ->where('u.id = :user_id')
+     *         ->setParameter(':user_id', 1);
+     * </code>
+     *
+     * @param string|int  $key   the parameter position or name
+     * @param mixed       $value the parameter value
+     * @param string|null $type  one of the PDO::PARAM_* constants
+     *
+     * @return $this this QueryBuilder instance
+     */
+    public function setParameter($key, $value, $type = null)
+    {
+        if (str_starts_with($key, ':')) {
+            // For consistency sake, remove the :
+            $key = substr($key, 1);
+            @\trigger_error('Using query key with ":" is deprecated. Use key without ":" instead.', \E_USER_DEPRECATED);
+        }
+
+        return parent::setParameter($key, $value, $type);
+    }
+
+    /**
      * @return bool
      */
     public function getJoinCondition($alias)
@@ -72,26 +109,26 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function addJoinCondition($alias, $expr)
     {
-        $result = $parts = $this->getQueryPart('join');
+        $parts = $this->getQueryPart('join');
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
-                if ($join['joinAlias'] == $alias) {
-                    $this->add('join', [$tbl => [
+                if ($join['joinAlias'] !== $alias) {
+                    continue;
+                }
+
+                $parts[$tbl][$key] = array_merge(
+                    $join,
+                    [
                         'joinType'      => $join['joinType'],
                         'joinTable'     => $join['joinTable'],
                         'joinAlias'     => $join['joinAlias'],
                         'joinCondition' => $join['joinCondition'].' and ('.$expr.')',
-                    ]]);
-                    $inserted                            = true;
-                    continue;
-                } else {
-                    $this->add('join', [$tbl => [
-                        'joinType'      => $join['joinType'],
-                        'joinTable'     => $join['joinTable'],
-                        'joinAlias'     => $join['joinAlias'],
-                        'joinCondition' => $join['joinCondition'],
-                    ]]);
-                }
+                    ]
+                );
+                $this->add('join', $parts);
+                $inserted = true;
+
+                break;
             }
         }
 
@@ -214,7 +251,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function getTableAliases()
     {
-        $queryParts = $this->getQueryParts('join');
+        $queryParts = $this->getQueryParts();
         $tables     = array_reduce($queryParts['from'], function ($result, $item) {
             $result[$item['table']] = $item['alias'];
 
@@ -262,9 +299,9 @@ class QueryBuilder extends BaseQueryBuilder
                 $val = "'$val'";
             } elseif (is_array($val)) {
                 if (Connection::PARAM_STR_ARRAY === $this->getParameterType($key)) {
-                    $val = array_map(fn ($value) => "'$value'", $val);
+                    $val = array_map(static fn ($value) => "'$value'", $val);
                 }
-                $val = join(', ', $val);
+                $val = implode(', ', $val);
             }
             $sql = str_replace(":{$key}", $val, $sql);
         }
@@ -357,13 +394,10 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function createQueryBuilder(Connection $connection = null)
+    public function createQueryBuilder(Connection $connection = null): QueryBuilder
     {
         if (null === $connection) {
-            $connection = $this->getConnection();
+            $connection = $this->connection;
         }
 
         return new self($connection);
