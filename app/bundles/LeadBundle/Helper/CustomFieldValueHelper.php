@@ -118,11 +118,9 @@ class CustomFieldValueHelper
     }
 
     /**
-     * @param $fields
-     *
-     * @return array
+     * @param array<string, string> $fields
      */
-    public static function anonimizationFields($fields): array
+    public static function anonimizationFields(array $fields): array
     {
         $email       = $fields['core']['email']['value'] ?? null;
         $pos         = strpos($email, '@');

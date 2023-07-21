@@ -68,5 +68,5 @@ interface CustomFieldEntityInterface
      *
      * @return mixed
      */
-    public function getAnonimizationProfileFields();
+    public function getAnonimizationProfileFields(): mixed;
 }

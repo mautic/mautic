@@ -50,7 +50,6 @@ class ReportModel extends FormModel
 
     protected mixed $defaultPageLimit;
 
-    protected TemplatingHelper $templatingHelper;
     /**
      * @var Environment
      */
@@ -673,7 +672,7 @@ class ReportModel extends FormModel
 
             foreach ($lead as $key => $field) {
                 $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
-                $field = html_entity_decode($field, ENT_QUOTES);
+                $field             = html_entity_decode($field, ENT_QUOTES);
                 if (isset($options['notAnonymize']) && false === $options['notAnonymize']) {
                     if ('firstname' === $key || 'lastname' === $key || 'userip' === $key || 'ip_address' === $key) {
                         $data[$keys][$key] = '*';
