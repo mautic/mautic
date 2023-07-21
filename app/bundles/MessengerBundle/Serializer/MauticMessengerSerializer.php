@@ -8,6 +8,7 @@ use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use Mautic\MessengerBundle\Serializer\Handler\HttpRequestHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class MauticMessengerSerializer implements SerializerInterface
@@ -24,6 +25,10 @@ final class MauticMessengerSerializer implements SerializerInterface
             ->build();
     }
 
+    /**
+     * @param array<string,array<StampInterface>|array<string>|string> $encodedEnvelope
+     * @return Envelope
+     */
     public function decode(array $encodedEnvelope): Envelope
     {
         $body    = $encodedEnvelope['body'];
@@ -47,6 +52,9 @@ final class MauticMessengerSerializer implements SerializerInterface
         return new Envelope($message, $stamps);
     }
 
+    /**
+     * @return array<string,array<StampInterface>|array<string>|string>
+     */
     public function encode(Envelope $envelope): array
     {
         // this is called if a message is redelivered for "retry"

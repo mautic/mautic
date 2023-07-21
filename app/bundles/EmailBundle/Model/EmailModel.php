@@ -363,9 +363,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      *
+     * @return FormInterface<object>
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -1357,7 +1358,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
      *                  array assetAttachments Array of optional Asset IDs to attach
      *
-     * @return array|bool|string|null
+     * @return string[]|bool|string|null
      */
     public function sendEmail(Email $email, $leads, $options = [])
     {
@@ -1579,6 +1580,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param array     $lead
      * @param bool      $saveStat
      *
+     * @return bool|string[]
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendEmailToUser(
@@ -2238,8 +2240,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param array $tokens
      * @param array $assetAttachments
+     * @param array<string>|Lead|null $leadFields
      * @param bool  $saveStat
      *
+     * @return bool|string[]
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendSampleEmailToUser($email, $users, $leadFields = null, $tokens = [], $assetAttachments = [], $saveStat = true)

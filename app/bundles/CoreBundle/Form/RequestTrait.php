@@ -17,16 +17,19 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
     /**
+     * @param FormInterface<object> $form
      * @param array<mixed> $params
      * @param array<mixed> $masks
      * @param array<mixed> $fields
+     * @throws \Exception
      */
-    protected function prepareParametersFromRequest(Form $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {
