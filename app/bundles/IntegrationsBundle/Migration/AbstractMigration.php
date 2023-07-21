@@ -41,7 +41,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void
     {
@@ -55,7 +55,7 @@ abstract class AbstractMigration implements MigrationInterface
 
         foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
-            $stmt->execute();
+            $stmt->executeStatement();
         }
     }
 

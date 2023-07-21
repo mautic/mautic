@@ -17,7 +17,7 @@ class StatsCollectionHelper
 {
     use FilterTrait;
 
-    const GENERAL_STAT_PREFIX = 'email';
+    public const GENERAL_STAT_PREFIX = 'email';
 
     /**
      * @var StatHelperContainer
@@ -106,8 +106,6 @@ class StatsCollectionHelper
 
     /**
      * Generate stats from Mautic's raw data.
-     *
-     * @param $statName
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */

@@ -16,14 +16,14 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
  */
 class ExpressionBuilder
 {
-    const EQ      = '=';
-    const NEQ     = '<>';
-    const LT      = '<';
-    const LTE     = '<=';
-    const GT      = '>';
-    const GTE     = '>=';
-    const REGEXP  = 'REGEXP';
-    const BETWEEN = 'BETWEEN';
+    public const EQ      = '=';
+    public const NEQ     = '<>';
+    public const LT      = '<';
+    public const LTE     = '<=';
+    public const GT      = '>';
+    public const GTE     = '>=';
+    public const REGEXP  = 'REGEXP';
+    public const BETWEEN = 'BETWEEN';
 
     /**
      * The DBAL Connection.
@@ -105,12 +105,9 @@ class ExpressionBuilder
     /**
      * Creates a between comparison expression.
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function between($x, $arr)
     {
@@ -131,12 +128,9 @@ class ExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function notBetween($x, $arr)
     {
@@ -390,8 +384,6 @@ class ExpressionBuilder
     /**
      * Puts argument into EXISTS mysql function.
      *
-     * @param $input
-     *
      * @return string
      */
     public function exists($input)
@@ -401,8 +393,6 @@ class ExpressionBuilder
 
     /**
      * Puts argument into NOT EXISTS mysql function.
-     *
-     * @param $input
      *
      * @return string
      */

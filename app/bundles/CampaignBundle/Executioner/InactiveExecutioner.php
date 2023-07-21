@@ -81,6 +81,8 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $helper;
 
+    protected ?\DateTime $now = null;
+
     /**
      * InactiveExecutioner constructor.
      */
@@ -231,7 +233,7 @@ class InactiveExecutioner implements ExecutionerInterface
     private function executeEvents()
     {
         // Use the same timestamp across all contacts processed
-        $now = new \DateTime();
+        $now = $this->now ?? new \DateTime();
 
         /** @var Event $decisionEvent */
         foreach ($this->decisions as $decisionEvent) {
@@ -269,7 +271,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     }
 
                     // Clear contacts from memory
-                    $this->inactiveContactFinder->clear();
+                    $this->inactiveContactFinder->clear($contacts);
 
                     if ($this->limiter->getContactId()) {
                         // No use making another call
@@ -298,7 +300,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTime $earliestLastActiveDateTime)
+    private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime)
     {
         $events              = clone $events;
         $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);

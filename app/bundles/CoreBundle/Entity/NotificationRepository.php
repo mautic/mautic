@@ -3,14 +3,12 @@
 namespace Mautic\CoreBundle\Entity;
 
 /**
- * NotificationRepository.
+ * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -31,8 +29,6 @@ class NotificationRepository extends CommonRepository
 
     /**
      * Mark user notifications as read.
-     *
-     * @param $userId
      */
     public function markAllReadForUser($userId)
     {
@@ -42,9 +38,8 @@ class NotificationRepository extends CommonRepository
     /**
      * Clear notifications for a user.
      *
-     * @param      $userId
-     * @param null $id     Clears all if empty
-     * @param null $limit  Clears a set number
+     * @param null $id    Clears all if empty
+     * @param null $limit Clears a set number
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
@@ -71,7 +66,7 @@ class NotificationRepository extends CommonRepository
 
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
-                $this->getEntityManager()->getConnection()->executeUpdate(
+                $this->getEntityManager()->getConnection()->executeStatement(
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {
@@ -100,7 +95,6 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param      $userId
      * @param null $afterId
      * @param bool $includeRead
      * @param null $type
@@ -136,12 +130,32 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.dateAdded', 'DESC');
+            ->orderBy('n.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
 
         if ($limit) {
             $qb->setMaxResults($limit);
         }
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    public function isDuplicate(int $userId, string $deduplicate, \DateTime $from): bool
+    {
+        $qb = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder();
+
+        $qb->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'notifications')
+            ->where('user_id = :userId')
+            ->andWhere('deduplicate = :deduplicate')
+            ->andWhere('date_added >= :from')
+            ->setParameter('userId', $userId)
+            ->setParameter('deduplicate', $deduplicate)
+            ->setParameter('from', $from->format('Y-m-d H:i:s'))
+            ->setMaxResults(1);
+
+        return (bool) $qb->execute()
+            ->fetchOne();
     }
 }

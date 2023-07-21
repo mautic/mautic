@@ -15,9 +15,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Campaign.
- */
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
     /**
@@ -31,42 +28,42 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
      */
     private $forms;
 
@@ -76,13 +73,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var bool
+     * @var int
      */
-    private $allowRestart = false;
+    private $allowRestart = 0;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -107,7 +101,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaigns')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\CampaignRepository');
+            ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
 
@@ -115,7 +109,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
         $builder->addCategory();
 
-        $builder->createOneToMany('events', 'Event')
+        $builder->createOneToMany('events', Event::class)
             ->setIndexBy('id')
             ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('campaign')
@@ -123,20 +117,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('leads', 'Lead')
-            ->setIndexBy('id')
+        $builder->createOneToMany('leads', Lead::class)
             ->mappedBy('campaign')
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('campaign_leadlist_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToMany('forms', 'Mautic\FormBundle\Entity\Form')
+        $builder->createManyToMany('forms', Form::class)
             ->setJoinTable('campaign_form_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('form_id', 'id', false, false, 'CASCADE')
@@ -165,8 +158,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -309,7 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param                                     $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
      *
      * @return Campaign
@@ -425,7 +415,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -435,7 +425,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Campaign
      */
@@ -450,7 +440,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -476,8 +466,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Add lead.
-     *
-     * @param $key
      *
      * @return Campaign
      */
@@ -592,7 +580,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function getAllowRestart()
     {
-        return $this->allowRestart;
+        return (bool) $this->allowRestart;
     }
 
     /**
@@ -612,7 +600,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         $this->isChanged('allowRestart', $allowRestart);
 
-        $this->allowRestart = $allowRestart;
+        $this->allowRestart = (int) $allowRestart;
 
         return $this;
     }

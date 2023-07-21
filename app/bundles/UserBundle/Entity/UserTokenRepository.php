@@ -5,7 +5,7 @@ namespace Mautic\UserBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class UserTokenRepository.
+ * @extends CommonRepository<UserToken>
  */
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {
@@ -66,7 +66,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
 
         return (int) $qb
             ->where('ut.expiration <= :current_datetime')
-            ->setParameter(':current_datetime', new \DateTime())
+            ->setParameter('current_datetime', new \DateTime())
             ->getQuery()
             ->execute();
     }

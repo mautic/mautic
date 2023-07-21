@@ -19,6 +19,8 @@ abstract class AbstractCampaignTest extends MauticMysqlTestCase
 {
     protected function saveSomeCampaignLeadEventLogs(bool $emulatePendingCount = false): Campaign
     {
+        $relativeDate = date('Y-m-d', strtotime('-1 month'));
+
         /** @var LeadEventLogRepository $leadEventLogRepo */
         $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
 
@@ -61,28 +63,28 @@ abstract class AbstractCampaignTest extends MauticMysqlTestCase
         $leadEventLogA->setCampaign($campaign);
         $leadEventLogA->setEvent($eventA);
         $leadEventLogA->setLead($contactA);
-        $leadEventLogA->setDateTriggered(new \DateTime('2020-11-21 16:34:00', new \DateTimeZone('UTC')));
+        $leadEventLogA->setDateTriggered(new \DateTime($relativeDate.' 16:34:00', new \DateTimeZone('UTC')));
         $leadEventLogA->setRotation(0);
 
         $leadEventLogB = new LeadEventLog();
         $leadEventLogB->setCampaign($campaign);
         $leadEventLogB->setEvent($eventA);
         $leadEventLogB->setLead($contactB);
-        $leadEventLogB->setDateTriggered(new \DateTime('2020-11-21 16:54:00', new \DateTimeZone('UTC')));
+        $leadEventLogB->setDateTriggered(new \DateTime($relativeDate.' 16:54:00', new \DateTimeZone('UTC')));
         $leadEventLogB->setRotation(0);
 
         $leadEventLogC = new LeadEventLog();
         $leadEventLogC->setCampaign($campaign);
         $leadEventLogC->setEvent($eventB);
         $leadEventLogC->setLead($contactA);
-        $leadEventLogC->setDateTriggered(new \DateTime('2020-11-21 16:55:00', new \DateTimeZone('UTC')));
+        $leadEventLogC->setDateTriggered(new \DateTime($relativeDate.' 16:55:00', new \DateTimeZone('UTC')));
         $leadEventLogC->setRotation(0);
 
         $leadEventLogD = new LeadEventLog();
         $leadEventLogD->setCampaign($campaign);
         $leadEventLogD->setEvent($eventB);
         $leadEventLogD->setLead($contactB);
-        $leadEventLogD->setDateTriggered(new \DateTime('2020-11-21 17:04:00', new \DateTimeZone('UTC')));
+        $leadEventLogD->setDateTriggered(new \DateTime($relativeDate.' 17:04:00', new \DateTimeZone('UTC')));
         $leadEventLogD->setRotation(0);
 
         $leadEventLogRepo->saveEntities([$leadEventLogA, $leadEventLogB, $leadEventLogC, $leadEventLogD]);
@@ -90,14 +92,14 @@ abstract class AbstractCampaignTest extends MauticMysqlTestCase
         $campaignLeadsA = new CampaignLeads();
         $campaignLeadsA->setLead($contactA);
         $campaignLeadsA->setCampaign($campaign);
-        $campaignLeadsA->setDateAdded(new \DateTime('2020-11-21'));
+        $campaignLeadsA->setDateAdded(new \DateTime($relativeDate));
         $campaignLeadsA->setRotation(0);
         $campaignLeadsA->setManuallyRemoved(false);
 
         $campaignLeadsB = new CampaignLeads();
         $campaignLeadsB->setLead($contactB);
         $campaignLeadsB->setCampaign($campaign);
-        $campaignLeadsB->setDateAdded(new \DateTime('2020-11-21'));
+        $campaignLeadsB->setDateAdded(new \DateTime($relativeDate));
         $campaignLeadsB->setRotation(0);
         $campaignLeadsB->setManuallyRemoved(false);
 
@@ -111,14 +113,14 @@ abstract class AbstractCampaignTest extends MauticMysqlTestCase
             $leadEventLogD->setCampaign($campaign);
             $leadEventLogD->setEvent($eventA);
             $leadEventLogD->setLead($contactC);
-            $leadEventLogD->setDateTriggered(new \DateTime('2020-11-21 16:34:00', new \DateTimeZone('UTC')));
+            $leadEventLogD->setDateTriggered(new \DateTime($relativeDate.' 16:34:00', new \DateTimeZone('UTC')));
             $leadEventLogD->setRotation(0);
             $leadEventLogRepo->saveEntity($leadEventLogD);
 
             $campaignLeadsC = new CampaignLeads();
             $campaignLeadsC->setLead($contactC);
             $campaignLeadsC->setCampaign($campaign);
-            $campaignLeadsC->setDateAdded(new \DateTime('2020-11-21'));
+            $campaignLeadsC->setDateAdded(new \DateTime($relativeDate));
             $campaignLeadsC->setRotation(0);
             $campaignLeadsC->setManuallyRemoved(true);
             $campaignLeadsRepo->saveEntity($campaignLeadsC);

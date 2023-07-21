@@ -80,14 +80,6 @@ class TableOrderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
-    {
-        return 'table_order';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

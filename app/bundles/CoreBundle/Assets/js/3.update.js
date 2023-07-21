@@ -7,7 +7,7 @@
  * @param state
  */
 Mautic.processUpdate = function (container, step, state) {
-    // Edge case but do it anyway, remove the /index_dev.php from mauticBaseUrl to make sure we can always correctly call the standalone upgrader
+
     var baseUrl = mauticBasePath + '/';
 
     switch (step) {

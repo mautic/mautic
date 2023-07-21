@@ -17,12 +17,12 @@ class CompositeExpression implements \Countable
     /**
      * Constant that represents an AND composite expression.
      */
-    const TYPE_AND = 'AND';
+    public const TYPE_AND = 'AND';
 
     /**
      * Constant that represents an OR composite expression.
      */
-    const TYPE_OR  = 'OR';
+    public const TYPE_OR  = 'OR';
 
     /**
      * The instance type of composite expression.
@@ -83,10 +83,8 @@ class CompositeExpression implements \Countable
 
     /**
      * Retrieves the amount of expressions on composite expression.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->parts);
     }

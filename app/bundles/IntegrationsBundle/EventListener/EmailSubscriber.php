@@ -83,8 +83,8 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $mappedObjectTokens = new MappedIntegrationObjectTokenEvent();
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT,
-            $mappedObjectTokens
+            $mappedObjectTokens,
+            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT
         );
 
         foreach ($mappedObjectTokens->getTokens() as $integration => $t) {
@@ -125,7 +125,7 @@ class EmailSubscriber implements EventSubscriberInterface
                     $token->getObjectName()
                 );
 
-                $url = $token->getBaseURL().'/'.$integrationObject['integration_object_id'];
+                $url  = $token->getBaseURL().'/'.$integrationObject['integration_object_id'];
                 $link = "<a href=\"{$url}\" >".$token->getLinkText().'</a>';
                 $event->addToken($token->getToken(), $link);
             } catch (EntityNotFoundException $e) {

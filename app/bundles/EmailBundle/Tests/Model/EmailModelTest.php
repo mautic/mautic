@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\ChannelBundle\Entity\MessageRepository;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -47,14 +47,21 @@ use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
-    const SEGMENT_A = 'segment A';
+    public const SEGMENT_A = 'segment A';
 
-    const SEGMENT_B = 'segment B';
+    public const SEGMENT_B = 'segment B';
+
+    /**
+     * @var Connection|MockObject
+     */
+    private $connection;
 
     /**
      * @var MockObject|IpLookupHelper
@@ -196,6 +203,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private $statsCollectionHelper;
 
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
+    private MockObject $eventDispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -227,6 +239,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
+        $this->connection               = $this->createMock(Connection::class);
+        $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -245,12 +259,16 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection,
+            $this->entityManager,
+            $this->eventDispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
-
-        $this->emailModel->setTranslator($this->translator);
-        $this->emailModel->setEntityManager($this->entityManager);
-        $this->emailModel->setSecurity($this->corePermissions);
     }
 
     /**
@@ -353,9 +371,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
                     ]
                 )
             );
@@ -491,9 +509,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
                     ]
                 )
             );
@@ -553,9 +571,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
                     ]
                 )
             );
@@ -589,10 +607,10 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $this->emailRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticChannelBundle:MessageQueue', $this->createMock(MessageRepository::class)],
+                        [\Mautic\EmailBundle\Entity\Email::class, $this->emailRepository],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
+                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
                     ]
                 )
             );
@@ -607,10 +625,18 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $messageModel = new MessageQueueModel($this->leadModel, $this->companyModel, $coreParametersHelper);
-        $messageModel->setEntityManager($this->entityManager);
-        $messageModel->setUserHelper($this->userHelper);
-        $messageModel->setDispatcher($this->createMock(EventDispatcher::class));
+        $messageModel = new MessageQueueModel(
+            $this->leadModel,
+            $this->companyModel,
+            $coreParametersHelper,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->eventDispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->userHelper,
+            $this->createMock(LoggerInterface::class)
+        );
 
         $emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -629,11 +655,16 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection,
+            $this->entityManager,
+            $this->eventDispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
-
-        $emailModel->setTranslator($this->translator);
-        $emailModel->setEntityManager($this->entityManager);
 
         $this->emailEntity->method('getId')
             ->will($this->returnValue(1));
@@ -696,14 +727,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
-        $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
-
         $this->emailModel->hitEmail($stat, $request);
     }
 
     public function testGetLookupResultsWithNameIsKey(): void
     {
-        $this->emailModel->setUserHelper($this->userHelper);
         $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->emailRepository);
@@ -736,7 +764,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLookupResultsWithWithDefaultOptions(): void
     {
-        $this->emailModel->setUserHelper($this->userHelper);
         $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->emailRepository);
@@ -807,9 +834,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                        ['MauticLeadBundle:DoNotContact', $doNotContactRepo],
-                        ['MauticPageBundle:Trackable', $trackableRepo],
+                        [\Mautic\EmailBundle\Entity\Stat::class, $this->statRepository],
+                        [\Mautic\LeadBundle\Entity\DoNotContact::class, $doNotContactRepo],
+                        [\Mautic\PageBundle\Entity\Trackable::class, $trackableRepo],
                     ]
                 )
             );
@@ -853,7 +880,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $mockConnection = $dbalMock->getMockConnection();
 
         $this->entityManager->method('getConnection')->willReturn($mockConnection);
-        $this->emailModel->setEntityManager($this->entityManager);
 
         $chartData = $this->emailModel->getBestHours(
             'date_read',
@@ -870,16 +896,12 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
         $email->setEmailType('list');
         $email->addTranslationChild($child = new Email());
-        $userHelper  = $this->createMock(UserHelper::class);
-        $this->emailModel->setUserHelper($userHelper);
-        $dispatcher = new EventDispatcher();
         $listener   = function (EmailEvent $event) use ($child) {
             $isChild = $event->getEmail() === $child;
             $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
         };
-        $dispatcher->addListener(EmailEvents::EMAIL_PRE_SAVE, $listener);
-        $dispatcher->addListener(EmailEvents::EMAIL_POST_SAVE, $listener);
-        $this->emailModel->setDispatcher($dispatcher);
+        $this->eventDispatcher->addListener(EmailEvents::EMAIL_PRE_SAVE, $listener);
+        $this->eventDispatcher->addListener(EmailEvents::EMAIL_POST_SAVE, $listener);
         $emailRepository = $this->createMock(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);

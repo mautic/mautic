@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FormRepository.
+ * @extends CommonRepository<Form>
  */
 class FormRepository extends CommonRepository
 {
@@ -15,10 +15,10 @@ class FormRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+        // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
-            ->from('MauticFormBundle:Submission', 'fs')
+            ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
             ->where('fs.form = f');
 
         $q = $this->createQueryBuilder('f');
@@ -94,7 +94,7 @@ class FormRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $parameters      = [];
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
@@ -121,8 +121,8 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
-                    ->from('MauticFormBundle:Submission', 's')
-                    ->leftJoin('MauticFormBundle:Form', 'f2',
+                    ->from(\Mautic\FormBundle\Entity\Submission::class, 's')
+                    ->leftJoin(\Mautic\FormBundle\Entity\Form::class, 'f2',
                         Join::WITH,
                         $sq->expr()->eq('s.form', 'f2')
                     )
@@ -187,7 +187,7 @@ class FormRepository extends CommonRepository
             $query->setMaxResults((int) $options['limit']);
         }
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -201,6 +201,14 @@ class FormRepository extends CommonRepository
     public function getResultsTableName($formId, $formAlias)
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
+    }
+
+    public function getFormTableIdViaResults(string $resultsTableName): ?string
+    {
+        $regexp = '/.*'.MAUTIC_TABLE_PREFIX.'form_results_([0-9]+)_(.*)/i';
+        preg_match($regexp, $resultsTableName, $matches);
+
+        return $matches[1] ?? null;
     }
 
     /**

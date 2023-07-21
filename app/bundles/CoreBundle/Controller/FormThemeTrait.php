@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 
@@ -21,20 +20,17 @@ trait FormThemeTrait
     {
         $formView = $form->createView();
 
-        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
-        if ($templating instanceof DelegatingEngine) {
-            $templating = $templating->getEngine($template);
-        }
+        $twig = $this->get('twig');
 
         // Extract form theme from options if applicable
         $fieldThemes = [];
-        $findThemes  = function ($form, $formView) use ($templating, &$findThemes, &$fieldThemes) {
+        $findThemes  = function ($form, $formView) use ($twig, &$findThemes, &$fieldThemes) {
             /** @var Form $field */
             foreach ($form as $name => $field) {
                 $fieldView = $formView[$name];
                 if ($theme = $field->getConfig()->getOption('default_theme')) {
                     $fieldThemes[] = $theme;
-                    $templating->get('form')->setTheme($fieldView, $theme);
+                    $twig->get('form')->setTheme($fieldView, $theme);
                 }
 
                 if ($field->count()) {
@@ -45,11 +41,10 @@ trait FormThemeTrait
 
         $findThemes($form, $formView);
 
-        $themes   = (array) $themes;
-        $themes[] = 'MauticCoreBundle:FormTheme\Custom';
-        $themes   = array_values(array_unique(array_merge($themes, $fieldThemes)));
+        $themes = (array) $themes;
+        $themes = array_values(array_unique(array_merge($themes, $fieldThemes)));
 
-        $templating->get('form')->setTheme($formView, $themes);
+        $twig->get('form')->setTheme($formView, $themes);
 
         return $formView;
     }

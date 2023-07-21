@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class DetermineWinnerEvent extends Event
 {
@@ -71,7 +71,7 @@ class DetermineWinnerEvent extends Event
      * } $abTestResults The following parameters are available:
      * - (required) winners - Array of IDs of the winners (empty array in case of a tie)
      * - (optional) support - Data passed to the view defined by supportTemplate below in order to render visual support for the winners (such as a graph, etc)
-     * - (optional) supportTemplate - View notation to render content for the A/B stats modal. For example, `HelloWorldBundle:SubscribedEvents\AbTest:graph.html.php`
+     * - (optional) supportTemplate - View notation to render content for the A/B stats modal. For example, `HelloWorldBundle:SubscribedEvents\AbTest:graph.html.twig`
      */
     public function setAbTestResults(array $abTestResults): void
     {

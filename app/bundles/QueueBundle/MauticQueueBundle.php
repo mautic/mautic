@@ -7,7 +7,7 @@ use Mautic\QueueBundle\Queue\QueueProtocol;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticQueueBundle extends Bundle
@@ -31,7 +31,7 @@ class MauticQueueBundle extends Bundle
         }
 
         if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
-            $container->addCompilerPass(new RegisterPartsPass());
+            $container->addCompilerPass(new RegisterPartsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         }
 
         if (file_exists(__DIR__.'/Config/'.$this->queueProtocol.'.php')) {
@@ -39,7 +39,7 @@ class MauticQueueBundle extends Bundle
         }
     }
 
-    public function getContainerExtension(): ?Extension
+    public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->extension) {
             $this->extension = $this->createContainerExtension();
@@ -48,7 +48,7 @@ class MauticQueueBundle extends Bundle
         return $this->extension;
     }
 
-    protected function createContainerExtension(): ?Extension
+    protected function createContainerExtension(): ?ExtensionInterface
     {
         if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
             return new OldSoundRabbitMqExtension();
@@ -58,6 +58,6 @@ class MauticQueueBundle extends Bundle
             return new LeezyPheanstalkExtension();
         }
 
-        return null;
+        return parent::createContainerExtension();
     }
 }

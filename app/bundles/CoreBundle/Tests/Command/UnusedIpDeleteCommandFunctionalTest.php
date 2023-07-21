@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Command;
 
-use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -12,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 class UnusedIpDeleteCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testUnusedIpDeleteCommand(): void
     {

@@ -58,64 +58,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.channel.campaignbundle.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.channel.model.message',
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.event_collector',
-                    'monolog.logger.mautic',
-                    'translator',
-                ],
-            ],
-            'mautic.channel.channelbundle.subscriber' => [
-                'class'     => \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.channel.channelbundle.lead.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'router',
-                    'mautic.channel.repository.message_queue',
-                ],
-            ],
-            'mautic.channel.reportbundle.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                    'router',
-                ],
-            ],
-            'mautic.channel.button.subscriber' => [
-                'class'     => \Mautic\ChannelBundle\EventListener\ButtonSubscriber::class,
-                'arguments' => [
-                    'router',
-                    'translator',
-                ],
-            ],
-        ],
-        'forms' => [
-            \Mautic\ChannelBundle\Form\Type\MessageType::class => [
-                'class'       => \Mautic\ChannelBundle\Form\Type\MessageType::class,
-                'methodCalls' => [
-                    'setSecurity' => ['mautic.security'],
-                ],
-                'arguments' => [
-                    'mautic.channel.model.message',
-                ],
-            ],
-            'mautic.form.type.message_list' => [
-                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
-            ],
-            'mautic.form.type.message_send' => [
-                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
-                'arguments' => ['router', 'mautic.channel.model.message'],
-            ],
-        ],
         'helpers' => [
             'mautic.channel.helper.channel_list' => [
                 'class'     => \Mautic\ChannelBundle\Helper\ChannelListHelper::class,
@@ -126,63 +68,11 @@ return [
                 'alias' => 'channel',
             ],
         ],
-        'models' => [
-            'mautic.channel.model.message' => [
-                'class'     => \Mautic\ChannelBundle\Model\MessageModel::class,
-                'arguments' => [
-                    'mautic.channel.helper.channel_list',
-                    'mautic.campaign.model.campaign',
-                ],
-            ],
-            'mautic.channel.model.queue' => [
-                'class'     => 'Mautic\ChannelBundle\Model\MessageQueueModel',
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.channel.model.channel.action' => [
-                'class'     => \Mautic\ChannelBundle\Model\ChannelActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.dnc',
-                    'translator',
-                ],
-            ],
-            'mautic.channel.model.frequency.action' => [
-                'class'     => \Mautic\ChannelBundle\Model\FrequencyActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.repository.frequency_rule',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.channel.repository.message_queue' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
-            ],
-        ],
-        'commands' => [
-            'mautic.channel.command.process_marketing_messages_queue' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\ChannelBundle\Command\ProcessMarketingMessagesQueueCommand::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.channel.model.queue',
-                    'mautic.helper.paths',
-                ],
-            ],
-            'mautic.channel.command.send_channel_broadcast' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\ChannelBundle\Command\SendChannelBroadcastCommand::class,
-                'arguments' => [
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.helper.paths',
-                ],
+                'arguments' => [\Mautic\ChannelBundle\Entity\MessageQueue::class],
             ],
         ],
     ],

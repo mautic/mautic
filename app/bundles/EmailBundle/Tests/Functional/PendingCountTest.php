@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -33,7 +32,7 @@ final class PendingCountTest extends MauticMysqlTestCase
         $segmentRef = new ListLead();
         $segmentRef->setLead($contact);
         $segmentRef->setList($segment);
-        $segmentRef->setDateAdded(new DateTime());
+        $segmentRef->setDateAdded(new \DateTime());
 
         $email = new Email();
         $email->setName('Email A');
@@ -45,7 +44,7 @@ final class PendingCountTest extends MauticMysqlTestCase
         $emailStat->setEmail($email);
         $emailStat->setLead(null);
         $emailStat->setEmailAddress('deleted@contact.email');
-        $emailStat->setDateSent(new DateTime());
+        $emailStat->setDateSent(new \DateTime());
 
         $this->em->persist($segment);
         $this->em->persist($contact);
@@ -55,7 +54,7 @@ final class PendingCountTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // The counts are loaded via ajax call after the email list page loads, so checking the ajax request instead of the HTML.
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
 
         Assert::assertSame(
             '{"id":'.$email->getId().',"pending":"1 Pending","queued":0,"sentCount":"0 Sent","readCount":"0 Read","readPercent":"0% Read"}',

@@ -3,8 +3,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use DOMDocument;
-use DOMXPath;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -23,7 +21,6 @@ use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -35,6 +32,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -64,9 +62,9 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var BuilderTokenHelperFactory
@@ -84,13 +82,13 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $titleRegex          = '{pagetitle}';
     private $descriptionRegex    = '{pagemetadescription}';
 
-    const segmentListRegex  = '{segmentlist}';
-    const categoryListRegex = '{categorylist}';
-    const channelfrequency  = '{channelfrequency}';
-    const preferredchannel  = '{preferredchannel}';
-    const saveprefsRegex    = '{saveprefsbutton}';
-    const successmessage    = '{successmessage}';
-    const identifierToken   = '{leadidentifier}';
+    public const segmentListRegex  = '{segmentlist}';
+    public const categoryListRegex = '{categorylist}';
+    public const channelfrequency  = '{channelfrequency}';
+    public const preferredchannel  = '{preferredchannel}';
+    public const saveprefsRegex    = '{saveprefsbutton}';
+    public const successmessage    = '{successmessage}';
+    public const identifierToken   = '{leadidentifier}';
 
     /**
      * BuilderSubscriber constructor.
@@ -103,7 +101,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         BuilderTokenHelperFactory $builderTokenHelperFactory,
         TranslatorInterface $translator,
         Connection $connection,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
@@ -112,7 +110,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;
         $this->translator                = $translator;
         $this->connection                = $connection;
-        $this->templating                = $templating;
+        $this->twig                      = $twig;
     }
 
     /**
@@ -137,7 +135,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
@@ -158,7 +156,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $expr           = $this->connection->getExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -192,7 +190,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'text',
                 $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
-                'MauticCoreBundle:Slots:text.html.php',
+                '@MauticCore/Slots/text.html.twig',
                 SlotTextType::class,
                 1000
             );
@@ -200,7 +198,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'image',
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
-                'MauticCoreBundle:Slots:image.html.php',
+                '@MauticCore/Slots/image.html.twig',
                 SlotImageType::class,
                 900
             );
@@ -208,7 +206,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'imagecard',
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
-                'MauticCoreBundle:Slots:imagecard.html.php',
+                '@MauticCore/Slots/imagecard.html.twig',
                 SlotImageCardType::class,
                 870
             );
@@ -216,7 +214,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'imagecaption',
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
-                'MauticCoreBundle:Slots:imagecaption.html.php',
+                '@MauticCore/Slots/imagecaption.html.twig',
                 SlotImageCaptionType::class,
                 850
             );
@@ -224,7 +222,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'button',
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
-                'MauticCoreBundle:Slots:button.html.php',
+                '@MauticCore/Slots/button.html.twig',
                 SlotButtonType::class,
                 800
             );
@@ -232,7 +230,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'socialshare',
                 $this->translator->trans('mautic.core.slot.label.socialshare'),
                 'share-alt',
-                'MauticCoreBundle:Slots:socialshare.html.php',
+                '@MauticCore/Slots/socialshare.html.twig',
                 SlotSocialShareType::class,
                 700
             );
@@ -240,7 +238,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'socialfollow',
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
-                'MauticCoreBundle:Slots:socialfollow.html.php',
+                '@MauticCore/Slots/socialfollow.html.twig',
                 SlotSocialFollowType::class,
                 600
             );
@@ -249,7 +247,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'segmentlist',
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
                     'list-alt',
-                    'MauticCoreBundle:Slots:segmentlist.html.php',
+                    '@MauticCore/Slots/segmentlist.html.twig',
                     SlotSegmentListType::class,
                     590
                 );
@@ -257,7 +255,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'categorylist',
                     $this->translator->trans('mautic.core.slot.label.categorylist'),
                     'bookmark-o',
-                    'MauticCoreBundle:Slots:categorylist.html.php',
+                    '@MauticCore/Slots/categorylist.html.twig',
                     SlotCategoryListType::class,
                     580
                 );
@@ -265,7 +263,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'preferredchannel',
                     $this->translator->trans('mautic.core.slot.label.preferredchannel'),
                     'envelope-o',
-                    'MauticCoreBundle:Slots:preferredchannel.html.php',
+                    '@MauticCore/Slots/preferredchannel.html.twig',
                     SlotPreferredChannelType::class,
                     570
                 );
@@ -273,7 +271,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'channelfrequency',
                     $this->translator->trans('mautic.core.slot.label.channelfrequency'),
                     'calendar',
-                    'MauticCoreBundle:Slots:channelfrequency.html.php',
+                    '@MauticCore/Slots/channelfrequency.html.twig',
                     SlotChannelFrequencyType::class,
                     560
                 );
@@ -281,7 +279,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'saveprefsbutton',
                     $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
                     'floppy-o',
-                    'MauticCoreBundle:Slots:saveprefsbutton.html.php',
+                    '@MauticCore/Slots/saveprefsbutton.html.twig',
                     SlotSavePrefsButtonType::class,
                     540
                 );
@@ -290,7 +288,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     'successmessage',
                     $this->translator->trans('mautic.core.slot.label.successmessage'),
                     'check',
-                    'MauticCoreBundle:Slots:successmessage.html.php',
+                    '@MauticCore/Slots/successmessage.html.twig',
                     SlotSuccessMessageType::class,
                     540
                 );
@@ -299,7 +297,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'codemode',
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
-                'MauticCoreBundle:Slots:codemode.html.php',
+                '@MauticCore/Slots/codemode.html.twig',
                 SlotCodeModeType::class,
                 500
             );
@@ -307,7 +305,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'separator',
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
-                'MauticCoreBundle:Slots:separator.html.php',
+                '@MauticCore/Slots/separator.html.twig',
                 SlotSeparatorType::class,
                 400
             );
@@ -315,7 +313,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'gatedvideo',
                 $this->translator->trans('mautic.core.slot.label.gatedvideo'),
                 'video-camera',
-                'MauticCoreBundle:Slots:gatedvideo.html.php',
+                '@MauticCore/Slots/gatedvideo.html.twig',
                 GatedVideoType::class,
                 300
             );
@@ -323,7 +321,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'dwc',
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'sticky-note-o',
-                'MauticCoreBundle:Slots:dwc.html.php',
+                '@MauticCore/Slots/dwc.html.twig',
                 SlotDwcType::class,
                 200
             );
@@ -334,7 +332,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'one-column',
                 $this->translator->trans('mautic.core.slot.label.onecolumn'),
                 'file-text-o',
-                'MauticCoreBundle:Sections:one-column.html.php',
+                '@MauticCore/Sections/one-column.html.twig',
                 null,
                 1000
             );
@@ -342,7 +340,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'two-column',
                 $this->translator->trans('mautic.core.slot.label.twocolumns'),
                 'columns',
-                'MauticCoreBundle:Sections:two-column.html.php',
+                '@MauticCore/Sections/two-column.html.twig',
                 null,
                 900
             );
@@ -350,7 +348,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'three-column',
                 $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
-                'MauticCoreBundle:Sections:three-column.html.php',
+                '@MauticCore/Sections/three-column.html.twig',
                 null,
                 800
             );
@@ -384,9 +382,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         if ($page->getIsPreferenceCenter()) {
             // replace slots
             if (count($params)) {
-                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-                $xpath = new DOMXPath($dom);
+                $xpath = new \DOMXPath($dom);
 
                 $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
@@ -463,9 +461,9 @@ class BuilderSubscriber implements EventSubscriberInterface
             }
             // add form before first block of prefs center
             if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
-                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-                $xpath      = new DOMXPath($dom);
+                $xpath      = new \DOMXPath($dom);
                 // If use slots
                 $divContent = $xpath->query('//*[@data-prefs-center="1"]');
                 if (!$divContent->length) {
@@ -526,8 +524,8 @@ class BuilderSubscriber implements EventSubscriberInterface
             }
             $content .= "</div>\n";
 
-            //load the css into the header by calling the sharebtn_css view
-            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+            // load the css into the header by calling the sharebtn_css view
+            $this->twig->render('@MauticPage/SubscribedEvents/PageToken/sharebtn_css.html.twig');
         }
 
         return $content;
@@ -552,7 +550,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/segmentlist.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -568,7 +566,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/categorylist.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -584,7 +582,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/preferredchannel.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -600,7 +598,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/channelfrequency.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -616,7 +614,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/saveprefsbutton.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -632,7 +630,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class=\"pref-successmessage\">\n";
-            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/successmessage.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -641,8 +639,6 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * Renders the HTML for the language bar for a given page.
-     *
-     * @param $page
      *
      * @return string
      */
@@ -654,18 +650,18 @@ class BuilderSubscriber implements EventSubscriberInterface
             $parent   = $page->getTranslationParent();
             $children = $page->getTranslationChildren();
 
-            //check to see if this page is grouped with another
+            // check to see if this page is grouped with another
             if (empty($parent) && empty($children)) {
                 return;
             }
 
             $related = [];
 
-            //get a list of associated pages/languages
+            // get a list of associated pages/languages
             if (!empty($parent)) {
                 $children = $parent->getTranslationChildren();
             } else {
-                $parent = $page; //parent is self
+                $parent = $page; // parent is self
             }
 
             if (!empty($children)) {
@@ -693,7 +689,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 }
             }
 
-            //sort by language
+            // sort by language
             uasort(
                 $related,
                 function ($a, $b) {
@@ -705,7 +701,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->twig->render('@MauticPage/SubscribedEvents/PageToken/langbar.html.twig', ['pages' => $related]);
         }
 
         return $langbar;

@@ -6,9 +6,9 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class ObjectMappingDAO
 {
-    const SYNC_TO_MAUTIC       = 'mautic';
-    const SYNC_TO_INTEGRATION  = 'integration';
-    const SYNC_BIDIRECTIONALLY = 'bidirectional';
+    public const SYNC_TO_MAUTIC       = 'mautic';
+    public const SYNC_TO_INTEGRATION  = 'integration';
+    public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
     /**
      * @var string
@@ -46,8 +46,6 @@ class ObjectMappingDAO
      * @param string $integrationField
      * @param string $direction
      * @param bool   $isRequired
-     *
-     * @return ObjectMappingDAO
      */
     public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): self
     {

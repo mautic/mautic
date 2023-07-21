@@ -2,8 +2,8 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
@@ -41,9 +41,6 @@ class MonitoredEmailEvent extends Event
     /**
      * Insert a folder to configure.
      *
-     * @param        $bundleKey
-     * @param        $folderKey
-     * @param        $label
      * @param string $default
      */
     public function addFolder($bundleKey, $folderKey, $label, $default = '')
@@ -58,10 +55,6 @@ class MonitoredEmailEvent extends Event
 
     /**
      * Get the value set for a specific bundle/folder.
-     *
-     * @param $bundleKey
-     * @param $folderKey
-     * @param $default
      *
      * @return string
      */

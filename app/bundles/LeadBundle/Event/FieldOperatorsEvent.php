@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event that collects operators for a specific field.

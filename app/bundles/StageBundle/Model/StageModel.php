@@ -2,45 +2,51 @@
 
 namespace Mautic\StageBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class StageModel.
+ * @extends CommonFormModel<Stage>
  */
 class StageModel extends CommonFormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
     /**
      * @var LeadModel
      */
     protected $leadModel;
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    public function __construct(LeadModel $leadModel, Session $session, UserHelper $userHelper)
-    {
-        $this->session    = $session;
+    public function __construct(
+        LeadModel $leadModel,
+        UserHelper $userHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->leadModel  = $leadModel;
-        $this->userHelper = $userHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -50,7 +56,7 @@ class StageModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticStageBundle:Stage');
+        return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
     }
 
     /**
@@ -66,7 +72,7 @@ class StageModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -126,7 +132,7 @@ class StageModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -144,10 +150,10 @@ class StageModel extends CommonFormModel
         static $actions;
 
         if (empty($actions)) {
-            //build them
+            // build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(StageEvents::STAGE_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);
             $actions['actions'] = $event->getActions();
             $actions['list']    = $event->getActionList();
             $actions['choices'] = $event->getActionChoices();

@@ -2,8 +2,8 @@
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerBuilderEvent extends Event
@@ -31,7 +31,7 @@ class TriggerBuilderEvent extends Event
      *                      'label'           => (required) what to display in the list
      *                      'description'     => (optional) short description of event
      *                      'template'        => (optional) template to use for the action's HTML in the point builder
-     *                      i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                      i.e AcmeMyBundle:PointAction:theaction.html.twig
      *                      'formType'        => (optional) name of the form type SERVICE for the action
      *                      'formTypeOptions' => (optional) array of options to pass to formType
      *                      'callback'        => (required) callback function that will be passed when the action is triggered
@@ -48,15 +48,15 @@ class TriggerBuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['group', 'label'],
             ['callback'],
             $event
         );
 
-        //Support for old way with callback and new event based system
-        //Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
+        // Support for old way with callback and new event based system
+        // Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
         if (!array_key_exists('callback', $event) && !array_key_exists('eventName', $event)) {
             throw new InvalidArgumentException("One of the 'callback' or 'eventName' has to be provided. Use 'eventName' for new code");
         }

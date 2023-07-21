@@ -14,17 +14,14 @@ class AjaxController extends CommonAjaxController
     /**
      * This method produces HTTP request checking headers which are blocking availability for iframe inheritance for other pages.
      */
-    protected function checkIframeAvailabilityAction(Request $request): JsonResponse
+    public function checkIframeAvailabilityAction(Request $request, IframeAvailabilityChecker $availabilityChecker): JsonResponse
     {
-        $url = $request->request->get('website');
-
-        /** @var IframeAvailabilityChecker $availabilityChecker */
-        $availabilityChecker = $this->get('mautic.focus.helper.iframe_availability_checker');
+        $url = $request->query->get('website');
 
         return $availabilityChecker->check($url, $request->getScheme());
     }
 
-    protected function generatePreviewAction(Request $request): JsonResponse
+    public function generatePreviewAction(Request $request): JsonResponse
     {
         $responseContent  = ['html' => '', 'style' => ''];
         $focus            = $request->request->all();

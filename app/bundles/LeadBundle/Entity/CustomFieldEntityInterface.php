@@ -10,16 +10,12 @@ interface CustomFieldEntityInterface
     /**
      * Set fields.
      *
-     * @param $fields
-     *
      * @return mixed
      */
     public function setFields($fields);
 
     /**
      * Get fields.
-     *
-     * @param $fields
      *
      * @return mixed
      */
@@ -28,8 +24,6 @@ interface CustomFieldEntityInterface
     /**
      * Update field value.
      *
-     * @param        $alias
-     * @param        $value
      * @param string $oldValue
      *
      * @return mixed
@@ -46,7 +40,6 @@ interface CustomFieldEntityInterface
     /**
      * Get a field value (should include those in updated fields).
      *
-     * @param      $field
      * @param null $group
      *
      * @return mixed

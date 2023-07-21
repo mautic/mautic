@@ -37,7 +37,7 @@ class FormFieldConditionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['values' => 'string']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['values' => 'clean']));
 
         $choices = [];
         if (!empty($options['parent'])) {

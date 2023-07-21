@@ -85,7 +85,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param Lead[] $contacts
-     * @param        $action
      */
     private function writeEntries(array $contacts, Campaign $campaign, $action)
     {
@@ -113,6 +112,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
     }
 }

@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 class FileHelper
 {
-    const BYTES_TO_MEGABYTES_RATIO = 1048576;
+    public const BYTES_TO_MEGABYTES_RATIO = 1048576;
 
     public static function convertBytesToMegabytes($b)
     {
@@ -48,7 +48,7 @@ class FileHelper
         $sSuffix = substr($sSize, -1);
         $iValue  = (int) substr($sSize, 0, -1);
 
-        //missing breaks are important
+        // missing breaks are important
         switch (strtoupper($sSuffix)) {
             case 'P':
                 $iValue *= 1024;

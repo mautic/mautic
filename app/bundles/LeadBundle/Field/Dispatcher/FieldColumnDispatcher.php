@@ -37,7 +37,7 @@ class FieldColumnDispatcher
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
         $event                     = new AddColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch(LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN);
 
         if ($shouldProcessInBackground) {
             throw new AbortColumnCreateException('Column change will be processed in background job');

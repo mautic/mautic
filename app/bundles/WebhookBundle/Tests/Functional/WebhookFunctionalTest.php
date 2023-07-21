@@ -2,8 +2,8 @@
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
+use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Http\Mock\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
@@ -13,14 +13,17 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->setUpSymfony(
             $this->configParams +
             [
@@ -34,32 +37,30 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * Clean up after the tests.
      */
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
     }
 
-    public function testWebhookWorkflowWithCommandProcess()
+    public function testWebhookWorkflowWithCommandProcess(): void
     {
-        $httpClient                        = new class() extends Client {
-            public int $sendRequestCounter = 0;
+        $sendRequestCounter = 0;
 
-            public function sendRequest(RequestInterface $request): ResponseInterface
-            {
+        $handlerStack = static::getContainer()->get(MockHandler::class);
+
+        // One resource is going to be found in the Transifex project:
+        $handlerStack->append(
+            function (RequestInterface $request) use (&$sendRequestCounter) {
                 Assert::assertSame('://whatever.url', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
                 Assert::assertCount(3, $jsonPayload['mautic.lead_post_save_new']);
                 Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
 
-                ++$this->sendRequestCounter;
+                ++$sendRequestCounter;
 
-                return new GuzzleResponse(200);
+                return new GuzzleResponse(Response::HTTP_OK);
             }
-        };
-
-        self::$container->set('mautic.guzzle.client', $httpClient);
+        );
 
         /** @var WebhookQueueRepository $webhookQueueRepository */
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
@@ -78,7 +79,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         // The queue should be processed now.
         Assert::assertSame(0, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
-        Assert::assertSame(1, $httpClient->sendRequestCounter);
+        Assert::assertSame(1, $sendRequestCounter);
     }
 
     private function createWebhook(): Webhook

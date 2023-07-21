@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Controller\Package;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,26 +26,30 @@ class ListController extends CommonController
 {
     private PluginCollector $pluginCollector;
 
-    private RequestStack $requestStack;
-
     private RouteProvider $routeProvider;
-
-    private CorePermissions $corePermissions;
 
     private Config $config;
 
     public function __construct(
         PluginCollector $pluginCollector,
-        RequestStack $requestStack,
         RouteProvider $routeProvider,
-        CorePermissions $corePermissions,
-        Config $config
+        ManagerRegistry $doctrine,
+        Config $config,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
     ) {
         $this->pluginCollector = $pluginCollector;
-        $this->requestStack    = $requestStack;
         $this->routeProvider   = $routeProvider;
-        $this->corePermissions = $corePermissions;
         $this->config          = $config;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function listAction(int $page = 1): Response
@@ -46,11 +58,11 @@ class ListController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             return $this->accessDenied();
         }
 
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->getCurrentRequest();
         $search  = InputHelper::clean($request->get('search', ''));
         $limit   = (int) $request->get('limit', 30);
         $route   = $this->routeProvider->buildListRoute($page);
@@ -67,7 +79,7 @@ class ListController extends CommonController
                     'tmpl'              => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:list.html.php',
+                'contentTemplate' => '@Marketplace/Package/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'route'         => $route,

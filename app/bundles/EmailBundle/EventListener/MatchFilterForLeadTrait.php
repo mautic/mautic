@@ -22,11 +22,17 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (0 === strpos((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
-            if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
-                continue;
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'], $lead)) {
+                    continue;
+                }
             }
 
             /*
@@ -94,12 +100,6 @@ trait MatchFilterForLeadTrait
                 case 'select':
                     if (!is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
-                    }
-                    break;
-                default:
-                    if (is_numeric($leadVal)) {
-                        $leadVal   = (int) $leadVal;
-                        $filterVal = (int) $filterVal;
                     }
                     break;
             }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
@@ -78,7 +78,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
             $output->writeln("<info>++</info> adding generated column <comment>{$generatedColumn->getColumnName()}</comment>");
             $output->writeln("<comment>-></comment> {$generatedColumn->getAlterTableSql()}");
 
-            $this->connection->query($generatedColumn->getAlterTableSql());
+            $this->connection->executeQuery($generatedColumn->getAlterTableSql());
 
             $duration = (string) $stopwatch->stop($generatedColumn->getColumnName());
             $output->writeln("<info>++</info> generated column added ({$duration})");

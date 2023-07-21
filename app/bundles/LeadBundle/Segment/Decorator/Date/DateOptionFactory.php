@@ -69,9 +69,9 @@ class DateOptionFactory
             case 'birthday':
             case 'anniversary':
             case $timeframe && (
-                    false !== strpos($timeframe, 'anniversary') ||
-                    false !== strpos($timeframe, 'birthday')
-                ):
+                false !== strpos($timeframe, 'anniversary') ||
+                false !== strpos($timeframe, 'birthday')
+            ):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);
@@ -98,10 +98,10 @@ class DateOptionFactory
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (
-                    false !== strpos($timeframe[0], '-') || // -5 days
-                    false !== strpos($timeframe[0], '+') || // +5 days
-                    false !== strpos($timeframe, ' ago')    // 5 days ago
-                ):
+                false !== strpos($timeframe[0], '-') || // -5 days
+                false !== strpos($timeframe[0], '+') || // +5 days
+                false !== strpos($timeframe, ' ago')    // 5 days ago
+            ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);

@@ -22,7 +22,7 @@ class StagesChangeLog
     private $lead;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 
@@ -37,7 +37,7 @@ class StagesChangeLog
     private $actionName;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -143,7 +143,7 @@ class StagesChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

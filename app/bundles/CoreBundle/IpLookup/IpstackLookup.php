@@ -24,9 +24,6 @@ class IpstackLookup extends AbstractRemoteDataLookup
         return 'http://api.ipstack.com/'.$this->ip.'?access_key='.$this->auth.'&output=json&legacy=1';
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

@@ -1,0 +1,7 @@
+{#
+  Variables
+    - form
+#}
+
+{% set attr = form.vars.attr|merge({'data-submit-callback': 'leadBatchSubmit'}) %}
+{{ form(form, {'attr': attr}) }}

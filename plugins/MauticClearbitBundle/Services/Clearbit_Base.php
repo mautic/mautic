@@ -7,8 +7,8 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
  */
 class Clearbit_Base
 {
-    const REQUEST_LATENCY = 0.2;
-    const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
+    public const REQUEST_LATENCY = 0.2;
+    public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
     private $_next_req_time;
 
@@ -87,14 +87,14 @@ class Clearbit_Base
         $fullUrl = $this->_baseUri.$this->_version.$this->_resourceUri.
             '?'.http_build_query($params);
 
-        //open connection
+        // open connection
         $connection = curl_init($fullUrl);
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
         curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->_apiKey]);
 
-        //execute request
+        // execute request
         $resp = curl_exec($connection);
 
         list($response_headers, $this->response_json) = explode("\r\n\r\n", $resp, 2);

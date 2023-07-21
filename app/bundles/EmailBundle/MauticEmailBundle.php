@@ -1,29 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle;
 
-use Mautic\EmailBundle\DependencyInjection\Compiler\EmailTransportPass;
-use Mautic\EmailBundle\DependencyInjection\Compiler\SpoolTransportPass;
 use Mautic\EmailBundle\DependencyInjection\Compiler\StatHelperPass;
-use Mautic\EmailBundle\DependencyInjection\Compiler\SwiftmailerDynamicMailerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MauticEmailBundle.
- */
 class MauticEmailBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        parent::build($container);
-
-        $container->addCompilerPass(new SpoolTransportPass());
-        $container->addCompilerPass(new EmailTransportPass());
-        $container->addCompilerPass(new SwiftmailerDynamicMailerPass());
-        $container->addCompilerPass(new StatHelperPass());
+        $container->addCompilerPass(new StatHelperPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

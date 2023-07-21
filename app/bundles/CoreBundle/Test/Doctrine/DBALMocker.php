@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -98,7 +98,7 @@ class DBALMocker
                 ->method('getReference')
                 ->willReturnCallback(function () {
                     switch (func_get_arg(0)) {
-                        case 'MauticLeadBundle:Lead':
+                        case \Mautic\LeadBundle\Entity\Lead::class:
                             $entity = new Lead();
                             break;
                     }
@@ -241,23 +241,20 @@ class DBALMocker
 
     public function getMockResultStatement()
     {
-        $mock = $this->testCase->getMockBuilder(ResultStatement::class)
+        $mock = $this->testCase->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
             ->setMethods([
-                'closeCursor',
+                'fetchNumeric',
+                'fetchAssociative',
+                'fetchOne',
+                'fetchAllNumeric',
+                'fetchAllAssociative',
+                'fetchFirstColumn',
+                'rowCount',
                 'columnCount',
-                'setFetchMode',
-                'fetch',
-                'fetchAll',
-                'fetchColumn',
+                'free',
             ])
             ->getMock();
-
-        $mock->method('closeCursor')
-            ->willReturn(true);
-
-        $mock->method('setFetchMode')
-            ->willReturn(true);
 
         $mock->method('columnCount')
             ->willReturnCallback(function () {
@@ -269,11 +266,11 @@ class DBALMocker
             });
 
         $mock->expects($this->testCase->any())
-            ->method('fetchAll')
+            ->method('fetchOne')
             ->willReturn($this->queryResponse);
 
         $mock->expects($this->testCase->any())
-            ->method('fetch')
+            ->method('fetchAllAssociative')
             ->willReturn($this->queryResponse);
 
         return $mock;

@@ -2,25 +2,26 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class AbstractCommonModel
+/**
+ * @template T of object
+ */
+abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -35,7 +36,7 @@ abstract class AbstractCommonModel
     protected $dispatcher;
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
     protected $router;
 
@@ -50,7 +51,7 @@ abstract class AbstractCommonModel
     protected $userHelper;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -59,49 +60,15 @@ abstract class AbstractCommonModel
      */
     protected $coreParametersHelper;
 
-    public function setEntityManager(EntityManager $em)
+    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->em = $em;
-    }
-
-    public function setSecurity(CorePermissions $security)
-    {
-        $this->security = $security;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function setRouter(Router $router)
-    {
-        $this->router = $router;
-    }
-
-    public function setTranslator(Translator $translator)
-    {
-        $this->translator = $translator;
-    }
-
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Initialize the user parameter for use in locking procedures.
-     */
-    public function setUserHelper(UserHelper $userHelper)
-    {
-        $this->userHelper = $userHelper;
-    }
-
-    /**
-     * Initialize the CoreParameters parameter.
-     */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
-    {
+        $this->em                   = $em;
+        $this->security             = $security;
+        $this->dispatcher           = $dispatcher;
+        $this->router               = $router;
+        $this->translator           = $translator;
+        $this->userHelper           = $userHelper;
+        $this->logger               = $mauticLogger;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -124,20 +91,20 @@ abstract class AbstractCommonModel
     {
         $repo = $this->getRepository();
 
-        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : [];
+        return $repo->getSearchCommands();
     }
 
     /**
      * Retrieve the repository for an entity.
      *
-     * @return \Mautic\CoreBundle\Entity\CommonRepository|bool
+     * @return CommonRepository<T>
      */
     public function getRepository()
     {
         static $commonRepo;
 
         if (null === $commonRepo) {
-            $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+            $commonRepo = $this->em->getRepository(FormEntity::class);
         }
 
         return $commonRepo;
@@ -162,17 +129,13 @@ abstract class AbstractCommonModel
      */
     public function getEntities(array $args = [])
     {
-        //set the translator
+        // set the translator
         $repo = $this->getRepository();
 
-        if ($repo instanceof CommonRepository) {
-            $repo->setTranslator($this->translator);
-            $repo->setCurrentUser($this->userHelper->getUser());
+        $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
-            return $repo->getEntities($args);
-        }
-
-        return [];
+        return $repo->getEntities($args);
     }
 
     /**
@@ -199,8 +162,6 @@ abstract class AbstractCommonModel
     /**
      * Encode an array to append to a URL.
      *
-     * @param $array
-     *
      * @return string
      */
     public function encodeArrayForUrl($array)
@@ -211,7 +172,6 @@ abstract class AbstractCommonModel
     /**
      * Decode a string appended to URL into an array.
      *
-     * @param      $string
      * @param bool $urlDecode
      *
      * @return mixed
@@ -222,15 +182,13 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param       $route
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
-     * @param array $utmTags
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
@@ -316,5 +274,15 @@ abstract class AbstractCommonModel
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
+    }
+
+    /**
+     * @phpstan-param class-string<T> $class
+     *
+     * @return CommonRepository<T>
+     */
+    protected function getServiceRepository(string $class)
+    {
+        return $this->em->getRepository($class);
     }
 }

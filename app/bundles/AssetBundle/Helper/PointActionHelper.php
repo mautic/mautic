@@ -8,9 +8,6 @@ namespace Mautic\AssetBundle\Helper;
 class PointActionHelper
 {
     /**
-     * @param $eventDetails
-     * @param $action
-     *
      * @return bool
      */
     public static function validateAssetDownload($eventDetails, $action)
@@ -19,7 +16,7 @@ class PointActionHelper
         $limitToAssets = $action['properties']['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            //no points change
+            // no points change
             return false;
         }
 

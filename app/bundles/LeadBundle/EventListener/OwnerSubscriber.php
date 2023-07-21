@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -32,6 +31,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private $owners;
 
+    public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
+
     /**
      * OwnerSubscriber constructor.
      */
@@ -55,11 +56,9 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $event->addToken($this->buildToken('email'), $this->buildLabel('email'));
-        $event->addToken($this->buildToken('firstname'), $this->buildLabel('firstname'));
-        $event->addToken($this->buildToken('lastname'), $this->buildLabel('lastname'));
-        $event->addToken($this->buildToken('position'), $this->buildLabel('position'));
-        $event->addToken($this->buildToken('signature'), $this->buildLabel('signature'));
+        foreach (self::onwerColumns as $ownerAlias) {
+            $event->addToken($this->buildToken($ownerAlias), $this->buildLabel($ownerAlias));
+        }
     }
 
     public function onEmailDisplay(EmailSendEvent $event)
@@ -98,14 +97,17 @@ class OwnerSubscriber implements EventSubscriberInterface
         if (!$owner) {
             return $this->getEmptyTokens();
         }
+        $tokens          = [];
+        $combinedContent = $event->getCombinedContent();
+        foreach (self::onwerColumns as $ownerColumn) {
+            $token = $this->buildToken($ownerColumn);
+            if (false !== strpos($combinedContent, $token)) {
+                $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
+                $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
+            }
+        }
 
-        return [
-            $this->buildToken('email')       => ArrayHelper::getValue('email', $owner),
-            $this->buildToken('firstname')   => ArrayHelper::getValue('first_name', $owner),
-            $this->buildToken('lastname')    => ArrayHelper::getValue('last_name', $owner),
-            $this->buildToken('position')    => ArrayHelper::getValue('position', $owner),
-            $this->buildToken('signature')   => nl2br(ArrayHelper::getValue('signature', $owner)),
-        ];
+        return $tokens;
     }
 
     /**
@@ -115,13 +117,13 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getEmptyTokens()
     {
-        return [
-            $this->buildToken('email')       => '',
-            $this->buildToken('firstname')   => '',
-            $this->buildToken('lastname')    => '',
-            $this->buildToken('position')    => '',
-            $this->buildToken('signature')   => '',
-        ];
+        $tokens = [];
+
+        foreach (self::onwerColumns as $ownerColumn) {
+            $tokens[$this->buildToken($ownerColumn)] = '';
+        }
+
+        return $tokens;
     }
 
     /**
@@ -131,13 +133,13 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getFakeTokens()
     {
-        return [
-            $this->buildToken('email')       => '['.$this->buildLabel('email').']',
-            $this->buildToken('firstname')   => '['.$this->buildLabel('firstname').']',
-            $this->buildToken('lastname')    => '['.$this->buildLabel('lastname').']',
-            $this->buildToken('position')    => '['.$this->buildLabel('position').']',
-            $this->buildToken('signature')   => '['.$this->buildLabel('signature').']',
-        ];
+        $tokens = [];
+
+        foreach (self::onwerColumns as $ownerColumn) {
+            $tokens[$this->buildToken($ownerColumn)] = '['.$this->buildLabel($ownerColumn).']';
+        }
+
+        return $tokens;
     }
 
     /**
@@ -169,8 +171,6 @@ class OwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $ownerId
-     *
      * @return array|null
      */
     private function getOwner($ownerId)

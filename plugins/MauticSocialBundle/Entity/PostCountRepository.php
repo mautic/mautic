@@ -5,6 +5,9 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
+/**
+ * @extends CommonRepository<PostCount>
+ */
 class PostCountRepository extends CommonRepository
 {
     /**

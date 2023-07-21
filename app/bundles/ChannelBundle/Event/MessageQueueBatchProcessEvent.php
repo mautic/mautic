@@ -2,7 +2,7 @@
 
 namespace Mautic\ChannelBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MessageQueueBatchProcessEvent extends Event
 {
@@ -14,9 +14,6 @@ class MessageQueueBatchProcessEvent extends Event
 
     /**
      * MessageQueueBatchProcessEvent constructor.
-     *
-     * @param $channel
-     * @param $channelId
      */
     public function __construct(array $messages, $channel, $channelId)
     {
@@ -26,8 +23,6 @@ class MessageQueueBatchProcessEvent extends Event
     }
 
     /**
-     * @param $channel
-     *
      * @return bool
      */
     public function checkContext($channel)

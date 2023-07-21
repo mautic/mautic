@@ -17,7 +17,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const MONITOR_PRE_SAVE = 'mautic.monitor_pre_save';
+    public const MONITOR_PRE_SAVE = 'mautic.monitor_pre_save';
 
     /**
      * The mautic.monitor_post_save event is dispatched right after a monitor is persisted.
@@ -27,7 +27,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const MONITOR_POST_SAVE = 'mautic.monitor_post_save';
+    public const MONITOR_POST_SAVE = 'mautic.monitor_post_save';
 
     /**
      * The mautic.monitor_pre_delete event is dispatched before a monitor item is deleted.
@@ -37,7 +37,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const MONITOR_PRE_DELETE = 'mautic.monitor_pre_delete';
+    public const MONITOR_PRE_DELETE = 'mautic.monitor_pre_delete';
 
     /**
      * The mautic.monitor_post_delete event is dispatched after a monitor is deleted.
@@ -47,7 +47,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const MONITOR_POST_DELETE = 'mautic.monitor_post_delete';
+    public const MONITOR_POST_DELETE = 'mautic.monitor_post_delete';
 
     /**
      * The mautic.monitor_post_process event is dispatched after a monitor is processed passing along the data gleaned.
@@ -57,7 +57,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const MONITOR_POST_PROCESS = 'mautic.monitor_post_process';
+    public const MONITOR_POST_PROCESS = 'mautic.monitor_post_process';
 
     /**
      * The mautic.tweet_pre_save event is dispatched right before a tweet is persisted.
@@ -67,7 +67,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const TWEET_PRE_SAVE = 'mautic.tweet_pre_save';
+    public const TWEET_PRE_SAVE = 'mautic.tweet_pre_save';
 
     /**
      * The mautic.tweet_post_save event is dispatched right after a tweet is persisted.
@@ -77,7 +77,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const TWEET_POST_SAVE = 'mautic.tweet_post_save';
+    public const TWEET_POST_SAVE = 'mautic.tweet_post_save';
 
     /**
      * The mautic.tweet_pre_delete event is dispatched before a tweet item is deleted.
@@ -87,7 +87,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const TWEET_PRE_DELETE = 'mautic.tweet_pre_delete';
+    public const TWEET_PRE_DELETE = 'mautic.tweet_pre_delete';
 
     /**
      * The mautic.tweet_post_delete event is dispatched after a tweet is deleted.
@@ -97,7 +97,7 @@ final class SocialEvents
      *
      * @var string
      */
-    const TWEET_POST_DELETE = 'mautic.tweet_post_delete';
+    public const TWEET_POST_DELETE = 'mautic.tweet_post_delete';
 
     /**
      * The mautic.social.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -107,5 +107,5 @@ final class SocialEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.social.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.social.on_campaign_trigger_action';
 }

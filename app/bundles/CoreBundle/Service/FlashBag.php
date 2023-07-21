@@ -12,9 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FlashBag
 {
-    const LEVEL_ERROR     = 'error';
-    const LEVEL_WARNING   = 'warning';
-    const LEVEL_NOTICE    = 'notice';
+    public const LEVEL_ERROR     = 'error';
+    public const LEVEL_WARNING   = 'warning';
+    public const LEVEL_NOTICE    = 'notice';
 
     /**
      * @var Session
@@ -58,7 +58,7 @@ class FlashBag
     public function add($message, $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
         if (false === $domain) {
-            //message is already translated
+            // message is already translated
             $translatedMessage = $message;
         } else {
             if (isset($messageVars['pluralCount']) && empty($messageVars['%count%'])) {
@@ -83,7 +83,7 @@ class FlashBag
                     break;
             }
 
-            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
+            // If the user has not interacted with the browser for the last 30 seconds, consider the message unread
             $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);
             $isRead     = $lastActive > 30 ? 0 : 1;
 

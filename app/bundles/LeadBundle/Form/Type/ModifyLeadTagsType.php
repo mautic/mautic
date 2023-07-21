@@ -52,12 +52,4 @@ class ModifyLeadTagsType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'modify_lead_tags';
-    }
 }

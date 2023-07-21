@@ -33,7 +33,6 @@ class UpdateDoNotSellListCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:donotsell:download')
-            ->setDescription('Fetch remote do not sell list from MaxMind')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
@@ -46,7 +45,7 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->maxMindDoNotSellDownloadHelper->downloadRemoteDataStore()) {
             $output->writeln('<info>'.$this->translator->trans('mautic.core.success').'</info>');
@@ -56,19 +55,20 @@ EOT
 
             if ($remoteUrl && $localPath) {
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.do_not_sell.remote_fetch_error',
-                        [
-                            '%remoteUrl%' => $remoteUrl,
-                            '%localPath%' => $localPath,
-                        ]
-                    ).'</error>');
+                    'mautic.core.do_not_sell.remote_fetch_error',
+                    [
+                        '%remoteUrl%' => $remoteUrl,
+                        '%localPath%' => $localPath,
+                    ]
+                ).'</error>');
             } else {
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.do_not_sell.remote_fetch_error_generic'
-                    ).'</error>');
+                    'mautic.core.do_not_sell.remote_fetch_error_generic'
+                ).'</error>');
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch remote do not sell list from MaxMind';
 }

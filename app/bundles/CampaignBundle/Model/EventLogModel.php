@@ -2,14 +2,26 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @extends AbstractCommonModel<LeadEventLog>
+ */
 class EventLogModel extends AbstractCommonModel
 {
     protected EventModel $eventModel;
@@ -24,22 +36,29 @@ class EventLogModel extends AbstractCommonModel
         EventModel $eventModel,
         CampaignModel $campaignModel,
         IpLookupHelper $ipLookupHelper,
-        EventScheduler $eventScheduler
+        EventScheduler $eventScheduler,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->eventModel     = $eventModel;
         $this->campaignModel  = $campaignModel;
         $this->ipLookupHelper = $ipLookupHelper;
         $this->eventScheduler = $eventScheduler;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $result = $this->em->getRepository(LeadEventLog::class);
+
+        return $result;
     }
 
     /**

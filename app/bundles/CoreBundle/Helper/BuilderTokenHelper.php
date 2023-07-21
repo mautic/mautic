@@ -25,6 +25,9 @@ class BuilderTokenHelper
     protected $langVar;
     protected $bundleName;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         CorePermissions $security,
         ModelFactory $modelFactory,
@@ -67,9 +70,9 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @throws \BadMethodCallException
-     *
      * @return array|void
+     *
+     * @throws \BadMethodCallException
      */
     public function getTokens(
         $tokenRegex,
@@ -82,7 +85,7 @@ class BuilderTokenHelper
             throw new \BadMethodCallException('You must call the "'.get_class($this).'::configure()" method first.');
         }
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             $this->permissionSet,
             'RETURN_ARRAY'
@@ -99,18 +102,15 @@ class BuilderTokenHelper
         }
 
         $exprBuilder = $this->connection->getExpressionBuilder();
-        if (null == $expr) {
-            $expr = $exprBuilder->andX();
-        }
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
-            $expr->add(
+            $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
         }
 
         if (!empty($filter)) {
-            $expr->add(
+            $expr = $expr->with(
                 $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 
@@ -142,10 +142,6 @@ class BuilderTokenHelper
 
     /**
      * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param $token
-     * @param $description
-     * @param $forPregReplace
      *
      * @return string
      */

@@ -6,14 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS = 'company';
 
     /**
      * @var int
@@ -21,12 +23,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $score = 0;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -89,7 +91,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -129,8 +131,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -162,6 +162,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
     }
 
     public static function getDefaultIdentifierFields(): array

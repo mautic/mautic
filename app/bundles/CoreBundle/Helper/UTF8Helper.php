@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Helper;
 
 class UTF8Helper
 {
-    const ICONV_TRANSLIT = 'TRANSLIT';
-    const ICONV_IGNORE   = 'IGNORE';
-    const WITHOUT_ICONV  = '';
+    public const ICONV_TRANSLIT = 'TRANSLIT';
+    public const ICONV_IGNORE   = 'IGNORE';
+    public const WITHOUT_ICONV  = '';
 
     protected static $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",
@@ -142,46 +142,46 @@ class UTF8Helper
         $buf = '';
         for ($i = 0; $i < $max; ++$i) {
             $c1 = $text[$i];
-            if ($c1 >= "\xc0") { //Should be converted to UTF8, if it's not UTF8 already
+            if ($c1 >= "\xc0") { // Should be converted to UTF8, if it's not UTF8 already
                 $c2 = $i + 1 >= $max ? "\x00" : $text[$i + 1];
                 $c3 = $i + 2 >= $max ? "\x00" : $text[$i + 2];
                 $c4 = $i + 3 >= $max ? "\x00" : $text[$i + 3];
-                if ($c1 >= "\xc0" & $c1 <= "\xdf") { //looks like 2 bytes UTF8
-                    if ($c2 >= "\x80" && $c2 <= "\xbf") { //yeah, almost sure it's UTF8 already
+                if ($c1 >= "\xc0" & $c1 <= "\xdf") { // looks like 2 bytes UTF8
+                    if ($c2 >= "\x80" && $c2 <= "\xbf") { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2;
                         ++$i;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } elseif ($c1 >= "\xe0" & $c1 <= "\xef") { //looks like 3 bytes UTF8
-                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf") { //yeah, almost sure it's UTF8 already
+                } elseif ($c1 >= "\xe0" & $c1 <= "\xef") { // looks like 3 bytes UTF8
+                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf") { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2.$c3;
                         $i = $i + 2;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } elseif ($c1 >= "\xf0" & $c1 <= "\xf7") { //looks like 4 bytes UTF8
+                } elseif ($c1 >= "\xf0" & $c1 <= "\xf7") { // looks like 4 bytes UTF8
                     if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf" && $c4 >= "\x80"
                         && $c4 <= "\xbf"
-                    ) { //yeah, almost sure it's UTF8 already
+                    ) { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2.$c3.$c4;
                         $i = $i + 3;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } else { //doesn't look like UTF8, but should be converted
+                } else { // doesn't look like UTF8, but should be converted
                     $cc1 = (chr(ord($c1) / 64) | "\xc0");
                     $cc2 = (($c1 & "\x3f") | "\x80");
                     $buf .= $cc1.$cc2;
                 }
             } elseif ("\x80" == ($c1 & "\xc0")) { // needs conversion
-                if (isset(self::$win1252ToUtf8[ord($c1)])) { //found in Windows-1252 special cases
+                if (isset(self::$win1252ToUtf8[ord($c1)])) { // found in Windows-1252 special cases
                     $buf .= self::$win1252ToUtf8[ord($c1)];
                 } else {
                     $cc1 = (chr(ord($c1) / 64) | "\xc0");
@@ -251,7 +251,7 @@ class UTF8Helper
 
     public static function removeBOM($str = '')
     {
-        if (substr($str, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
+        if (substr($str, 0, 3) == pack('CCC', 0xEF, 0xBB, 0xBF)) {
             $str = substr($str, 3);
         }
 

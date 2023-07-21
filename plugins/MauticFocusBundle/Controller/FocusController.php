@@ -4,10 +4,12 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,7 +19,7 @@ class FocusController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
-        return 'MauticFocusBundle:Focus';
+        return '@MauticFocus/Focus';
     }
 
     /**
@@ -33,9 +35,9 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
@@ -43,9 +45,9 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        return parent::newStandard();
+        return parent::newStandard($request);
     }
 
     /**
@@ -56,21 +58,19 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, $objectId)
     {
-        return parent::viewStandard($objectId, 'focus', 'plugin.focus');
+        return parent::viewStandard($request, $objectId, 'focus', 'plugin.focus');
     }
 
     /**
@@ -80,9 +80,9 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
-        return parent::cloneStandard($objectId);
+        return parent::cloneStandard($request, $objectId);
     }
 
     /**
@@ -92,9 +92,9 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
@@ -102,14 +102,12 @@ class FocusController extends AbstractStandardFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 
     /**
-     * @param $action
-     *
      * @return array
      *
      * @throws \Exception
@@ -121,8 +119,8 @@ class FocusController extends AbstractStandardFormController
             $item = $args['viewParameters']['item'];
 
             // For line graphs in the view
-            $dateRangeValues = $this->request->get('daterange', []);
-            $dateRangeForm   = $this->get('form.factory')->create(
+            $dateRangeValues = $this->getCurrentRequest()->get('daterange', []);
+            $dateRangeForm   = $this->formFactory->create(
                 DateRangeType::class,
                 $dateRangeValues,
                 [
@@ -148,8 +146,10 @@ class FocusController extends AbstractStandardFormController
             $args['viewParameters']['stats']         = $stats;
             $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
 
-            if ('link' == $item->getType()) {
-                $args['viewParameters']['trackables'] = $this->getModel('page.trackable')->getTrackableList('focus', $item->getId());
+            if ('link' === $item->getType()) {
+                $trackableModel = $this->getModel('page.trackable');
+                \assert($trackableModel instanceof TrackableModel);
+                $args['viewParameters']['trackables'] = $trackableModel->getTrackableList('focus', $item->getId());
             }
         }
 
@@ -157,16 +157,14 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $focus        = $this->request->request->get('focus', []);
-        $updateSelect = 'POST' === $this->request->getMethod()
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
-            : $this->request->get('updateSelect', false);
+            : $this->getCurrentRequest()->get('updateSelect', false);
 
         if ($updateSelect) {
             switch ($action) {
@@ -194,10 +192,10 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $focus        = $this->request->request->get('focus', []);
-        $updateSelect = 'POST' === $this->request->getMethod()
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
-            : $this->request->get('updateSelect', false);
+            : $this->getCurrentRequest()->get('updateSelect', false);
 
         if ($updateSelect) {
             return ['update_select' => $updateSelect];

@@ -62,7 +62,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
-    public function testLandingPageTracking()
+    public function testLandingPageTracking(): void
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
@@ -70,25 +70,26 @@ class PageControllerTest extends MauticMysqlTestCase
             'title'        => 'Page:Page:LandingPageTracking',
             'alias'        => 'page-page-landingPageTracking',
             'template'     => 'blank',
+            'custom_html'  => 'some content',
             'hits'         => 0,
             'unique_hits'  => 0,
             'variant_hits' => 0,
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeads = $this->connection->fetchAll($sql);
+        $newLeads = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
-        $leadEventLogs = $this->connection->fetchAll('
+        $leadEventLogs = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -115,7 +116,7 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
@@ -123,10 +124,10 @@ class PageControllerTest extends MauticMysqlTestCase
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeadsAfterFirstVisit = $this->connection->fetchAll($sql);
+        $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
-        $eventLogsAfterFirstVisit = $this->connection->fetchAll('
+        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -136,7 +137,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $eventLogsAfterSecondVisit = $this->connection->fetchAll('
+        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -156,28 +157,25 @@ class PageControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', "{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), 'page not found');
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        if (Response::HTTP_OK === $clientResponse->getStatusCode()) {
-            $allUtmTags    = $this->em->getRepository(UtmTag::class)->getEntities();
-            $this->assertNotCount(0, $allUtmTags);
+        $allUtmTags = $this->em->getRepository(UtmTag::class)->getEntities();
+        $this->assertNotCount(0, $allUtmTags);
 
-            foreach ($allUtmTags as $utmTag) {
-                $this->assertSame('linkedin', $utmTag->getUtmSource(), 'utm_source does not match');
-                $this->assertSame('social', $utmTag->getUtmMedium(), 'utm_medium does not match');
-                $this->assertSame('mautic', $utmTag->getUtmCampaign(), 'utm_campaign does not match');
-                $this->assertSame(strval($timestamp), $utmTag->getUtmContent(), 'utm_content does not match');
-            }
+        foreach ($allUtmTags as $utmTag) {
+            $this->assertSame('linkedin', $utmTag->getUtmSource(), 'utm_source does not match');
+            $this->assertSame('social', $utmTag->getUtmMedium(), 'utm_medium does not match');
+            $this->assertSame('mautic', $utmTag->getUtmCampaign(), 'utm_campaign does not match');
+            $this->assertSame(strval($timestamp), $utmTag->getUtmContent(), 'utm_content does not match');
         }
     }
 
     /**
      * Create a page for testing.
      */
-    protected function createTestPage($pageParams=[]): Page
+    protected function createTestPage($pageParams = []): Page
     {
-        $page = new Page();
-
+        $page        = new Page();
         $title       = $pageParams['title'] ?? 'Page:Page:LandingPageTracking';
         $alias       = $pageParams['alias'] ?? 'page-page-landingPageTracking';
         $isPublished = $pageParams['isPublished'] ?? true;
@@ -187,6 +185,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $page->setAlias($alias);
         $page->setIsPublished($isPublished);
         $page->setTemplate($template);
+        $page->setCustomHtml('some content');
 
         $this->em->persist($page);
         $this->em->flush();

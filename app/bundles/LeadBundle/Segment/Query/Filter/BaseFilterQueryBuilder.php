@@ -51,7 +51,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         }
 
         $event = new SegmentOperatorQueryBuilderEvent($queryBuilder, $filter, $filter->getParameterHolder($parameters));
-        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE);
 
         if (!$event->wasOperatorHandled()) {
             throw new \Exception('Dunno how to handle operator "'.$filter->getOperator().'"');

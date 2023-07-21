@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -15,11 +18,12 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ListModelTest extends TestCase
 {
@@ -52,7 +56,7 @@ class ListModelTest extends TestCase
     {
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherInterfaceMock->method('dispatch');
-        $loggerMock                   = $this->createMock(Logger::class);
+        $loggerMock                   = $this->createMock(LoggerInterface::class);
         $translatorMock               = $this->createMock(Translator::class);
         $this->leadListRepositoryMock = $this->createMock(LeadListRepository::class);
 
@@ -73,12 +77,15 @@ class ListModelTest extends TestCase
             $this->contactSegmentServiceMock,
             $segmentChartQueryFactoryMock,
             $requestStackMock,
-            $this->segmentCountCacheHelper
+            $this->segmentCountCacheHelper,
+            $entityManagerMock,
+            $this->createMock(CorePermissions::class),
+            $eventDispatcherInterfaceMock,
+            $this->createMock(UrlGeneratorInterface::class),
+            $translatorMock,
+            $this->createMock(UserHelper::class),
+            $loggerMock
         );
-        $this->model->setDispatcher($eventDispatcherInterfaceMock);
-        $this->model->setLogger($loggerMock);
-        $this->model->setTranslator($translatorMock);
-        $this->model->setEntityManager($entityManagerMock);
     }
 
     /**
@@ -95,16 +102,29 @@ class ListModelTest extends TestCase
 
     private function prepareMockForTestGetSourcesLists(array $getLookupResultsReturn): void
     {
-        $coreParametersHelper     = $this->getMockBuilder(CoreParametersHelper::class)->disableOriginalConstructor()->getMock();
-        $leadSegment              = $this->getMockBuilder(ContactSegmentService::class)->disableOriginalConstructor()->getMock();
-        $segmentChartQueryFactory = $this->getMockBuilder(SegmentChartQueryFactory::class)->disableOriginalConstructor()->getMock();
-        $requestStack             = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
-        $categoryModel            = $this->getMockBuilder(CategoryModel::class)->disableOriginalConstructor()->getMock();
+        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $leadSegment              = $this->createMock(ContactSegmentService::class);
+        $segmentChartQueryFactory = $this->createMock(SegmentChartQueryFactory::class);
+        $requestStack             = $this->createMock(RequestStack::class);
+        $categoryModel            = $this->createMock(CategoryModel::class);
         $categoryModel->expects($this->once())->method('getLookupResults')->willReturn($getLookupResultsReturn);
         $segmentCountCacheHelperMock = $this->createMock(SegmentCountCacheHelper::class);
 
         $mockListModel = $this->getMockBuilder(ListModel::class)
-            ->setConstructorArgs([$categoryModel, $coreParametersHelper, $leadSegment, $segmentChartQueryFactory, $requestStack, $segmentCountCacheHelperMock])
+            ->setConstructorArgs([
+                $categoryModel,
+                $coreParametersHelper,
+                $leadSegment,
+                $segmentChartQueryFactory,
+                $requestStack,
+                $segmentCountCacheHelperMock,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class)])
             ->addMethods([])
             ->getMock();
 

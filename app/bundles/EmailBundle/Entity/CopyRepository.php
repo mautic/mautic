@@ -6,6 +6,9 @@ use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
+/**
+ * @extends CommonRepository<Copy>
+ */
 class CopyRepository extends CommonRepository
 {
     /**
@@ -73,7 +76,7 @@ class CopyRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

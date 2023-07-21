@@ -31,7 +31,6 @@ class PushLeadActivityCommand extends Command
                     'mautic:integration:pushactivity',
                 ]
             )
-            ->setDescription('Push lead activity to integration.')
             ->addOption(
                 '--integration',
                 '-i',
@@ -57,7 +56,7 @@ class PushLeadActivityCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $integration = $input->getOption('integration');
         $startDate   = $input->getOption('start-date');
@@ -90,6 +89,7 @@ class PushLeadActivityCommand extends Command
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Push lead activity to integration.';
 }

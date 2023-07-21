@@ -25,7 +25,6 @@ class ConsumeQueueCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:queue:process')
-            ->setDescription('Process queues')
             ->addOption(
                 '--queue-name',
                 '-i',
@@ -51,37 +50,38 @@ class ConsumeQueueCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->queueService->isQueueEnabled()) {
             $output->writeLn('You have not configured mautic to use queue mode, nothing will be processed');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $queueName = $input->getOption('queue-name');
         if (empty($queueName)) {
             $output->writeLn('You did not provide a valid queue name');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $messages = $input->getOption('messages');
         if (0 > $messages) {
             $output->writeLn('You did not provide a valid number of messages. It should be null or greater than 0');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $timeout = $input->getOption('timeout');
         if (0 > $timeout) {
             $output->writeLn('You did not provide a valid number of seconds. It should be null or greater than 0');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $this->queueService->consumeFromQueue($queueName, $messages, $timeout);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Process queues';
 }

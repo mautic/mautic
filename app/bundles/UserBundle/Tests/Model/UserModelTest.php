@@ -3,16 +3,20 @@
 namespace Mautic\UserBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -56,7 +60,7 @@ class UserModelTest extends TestCase
     private $userTokenService;
 
     /**
-     * @var MockObject&Logger
+     * @var MockObject&LoggerInterface
      */
     private $logger;
 
@@ -69,13 +73,20 @@ class UserModelTest extends TestCase
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
         $this->userToken        = $this->createMock(UserToken::class);
-        $this->logger           = $this->createMock(Logger::class);
+        $this->logger           = $this->createMock(LoggerInterface::class);
 
-        $this->userModel = new UserModel($this->mailHelper, $this->userTokenService);
-        $this->userModel->setEntityManager($this->entityManager);
-        $this->userModel->setRouter($this->router);
-        $this->userModel->setTranslator($this->translator);
-        $this->userModel->setLogger($this->logger);
+        $this->userModel = new UserModel(
+            $this->mailHelper,
+            $this->userTokenService,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->router,
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->logger,
+            $this->createMock(CoreParametersHelper::class)
+        );
     }
 
     public function testThatItSendsResetPasswordEmailAndRouterGetsCalledWithCorrectParamters(): void
@@ -118,7 +129,7 @@ class UserModelTest extends TestCase
             ->willThrowException(new \Exception($errorMessage));
 
         $this->logger->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with($errorMessage);
 
         $this->userModel->sendResetEmail($this->user);

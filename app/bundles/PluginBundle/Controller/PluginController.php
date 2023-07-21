@@ -2,17 +2,21 @@
 
 namespace Mautic\PluginBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Facade\ReloadFacade;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,9 +27,9 @@ class PluginController extends FormController
     /**
      * @return JsonResponse|Response
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
@@ -48,8 +52,8 @@ class PluginController extends FormController
             ]
         );
 
-        $session      = $this->get('session');
-        $pluginFilter = $this->request->get('plugin', $session->get('mautic.integrations.filter', ''));
+        $session      = $request->getSession();
+        $pluginFilter = $request->get('plugin', $session->get('mautic.integrations.filter', ''));
 
         $session->set('mautic.integrations.filter', $pluginFilter);
 
@@ -89,7 +93,7 @@ class PluginController extends FormController
             ];
         }
 
-        //sort by name
+        // sort by name
         uksort(
             $integrations,
             function ($a, $b) {
@@ -97,7 +101,7 @@ class PluginController extends FormController
             }
         );
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         if (!empty($pluginFilter)) {
             foreach ($plugins as $plugin) {
@@ -117,7 +121,7 @@ class PluginController extends FormController
                     'pluginFilter' => ($pluginFilter) ? ['id' => $pluginId, 'name' => $pluginName] : false,
                     'plugins'      => $plugins,
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.php',
+                'contentTemplate' => '@MauticPlugin/Integration/grid.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -132,18 +136,18 @@ class PluginController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function configAction($name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
-        if (!empty($this->request->get('activeTab'))) {
-            $activeTab = $this->request->get('activeTab');
+        if (!empty($request->get('activeTab'))) {
+            $activeTab = $request->get('activeTab');
         }
 
-        $session   = $this->get('session');
+        $session   = $request->getSession();
 
-        $integrationDetailsPost = $this->request->request->get('integration_details', [], true);
+        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -153,7 +157,7 @@ class PluginController extends FormController
 
         // Verify that the requested integration exists
         if (empty($integrationObject)) {
-            throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
+            throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 
         $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
@@ -184,7 +188,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' == $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -192,7 +196,6 @@ class PluginController extends FormController
                 $valid                  = $this->isFormValid($form);
 
                 if ($authorize || $valid) {
-                    $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
 
                     if (isset($form['apiKeys'])) {
@@ -229,7 +232,7 @@ class PluginController extends FormController
 
                                         $form->get('featureSettings')->get('leadFields')->addError(
                                             new FormError(
-                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                                $this->translator->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
                                             )
                                         );
                                     }
@@ -239,7 +242,7 @@ class PluginController extends FormController
 
                                         $form->get('featureSettings')->get('companyFields')->addError(
                                             new FormError(
-                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                                $this->translator->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
                                             )
                                         );
                                     }
@@ -247,18 +250,18 @@ class PluginController extends FormController
                             }
                         }
                     } else {
-                        //make sure they aren't overwritten because of API connection issues
+                        // make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
                     if ($valid || $authorize) {
-                        $dispatcher = $this->get('event_dispatcher');
-                        $this->get('monolog.logger.mautic')->info('Dispatching integration config save event.');
+                        $dispatcher = $this->dispatcher;
+                        $mauticLogger->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $this->get('monolog.logger.mautic')->info('Event dispatcher has integration config save listeners.');
+                            $mauticLogger->info('Event dispatcher has integration config save listeners.');
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+                            $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
                         }
@@ -268,14 +271,14 @@ class PluginController extends FormController
                     }
 
                     if ($authorize) {
-                        //redirect to the oauth URL
+                        // redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
-                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
                                 $integrationObject->getAuthLoginUrl()
-                            )
+                            ),
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
                         );
                         $oauthUrl = $event->getAuthUrl();
 
@@ -299,7 +302,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                        'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
                     ]
                 );
             }
@@ -307,13 +310,15 @@ class PluginController extends FormController
 
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
-        $default     = 'MauticPluginBundle:FormTheme\Integration';
-        $themes      = [$default];
+        $themes      = [
+            '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+        ];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
-        } elseif ($objectTheme !== $default) {
+        } elseif (is_string($objectTheme)) {
             $themes[] = $objectTheme;
         }
+        $themes = array_unique($themes);
 
         $formSettings = $integrationObject->getFormSettings();
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
@@ -338,32 +343,31 @@ class PluginController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'form'         => $form->createView(),
                     'description'  => $integrationObject->getDescription(),
                     'formSettings' => $formSettings,
                     'formNotes'    => $formNotes,
                     'callbackUrl'  => $callbackUrl,
                     'activeTab'    => $activeTab,
+                    'formThemes'   => $themes,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                    'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
                 ],
             ]
         );
     }
 
     /**
-     * @param $name
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function infoAction($name)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
@@ -391,7 +395,7 @@ class PluginController extends FormController
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.php',
+                'contentTemplate' => '@MauticPlugin/Integration/info.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -404,20 +408,20 @@ class PluginController extends FormController
     /**
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function reloadAction()
+    public function reloadAction(Request $request, ReloadFacade $reloadFacade)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
-        $this->addFlash(
-            $this->get('mautic.plugin.facade.reload')->reloadPlugins()
+        $this->addFlashMessage(
+            $reloadFacade->reloadPlugins()
         );
 
         $viewParameters = [
-            'page' => $this->get('session')->get('mautic.plugin.page'),
+            'page' => $request->getSession()->get('mautic.plugin.page'),
         ];
 
         // Refresh the index contents

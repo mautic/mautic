@@ -134,7 +134,6 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
                     $this->callback(
                         function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
                             $this->assertSame($contact, $event->getContact());
@@ -146,9 +145,9 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
-                    ],
+                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
+                ],
                 [
-                    DynamicContentEvents::TOKEN_REPLACEMENT,
                     $this->callback(
                         function (TokenReplacementEvent $event) use ($contact, $slot) {
                             $this->assertSame($contact, $event->getLead());
@@ -157,6 +156,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    DynamicContentEvents::TOKEN_REPLACEMENT,
                 ]
             );
 
@@ -194,7 +194,6 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
                     $this->callback(
                         function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
                             $this->assertSame($contact, $event->getContact());
@@ -205,6 +204,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
                 ]
             );
 
@@ -241,7 +241,6 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    DynamicContentEvents::TOKEN_REPLACEMENT,
                     $this->callback(
                         function (TokenReplacementEvent $event) use ($contact, $slot) {
                             $this->assertSame($contact, $event->getLead());
@@ -250,6 +249,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    DynamicContentEvents::TOKEN_REPLACEMENT,
                 ]
             );
 

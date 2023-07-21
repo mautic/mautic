@@ -2,25 +2,40 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class LeadApiController.
- *
- * @property LeadModel $model
+ * @extends CommonApiController<Lead>
  */
 class LeadApiController extends CommonApiController
 {
@@ -28,17 +43,39 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
-    const MODEL_ID = 'lead.lead';
+    public const MODEL_ID = 'lead.lead';
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var LeadModel|null
+     */
+    protected $model = null;
+
+    private DoNotContactModel $doNotContactModel;
+
+    private ContactMerger $contactMerger;
+
+    private UserHelper $userHelper;
+
+    private IpLookupHelper $ipLookupHelper;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel(self::MODEL_ID);
+        $this->doNotContactModel = $doNotContactModel;
+        $this->contactMerger     = $contactMerger;
+        $this->userHelper        = $userHelper;
+        $this->ipLookupHelper    = $ipLookupHelper;
+
+        $leadModel = $modelFactory->getModel(self::MODEL_ID);
+        \assert($leadModel instanceof LeadModel);
+        $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+
         $this->setCleaningRules();
-        parent::initialize($event);
     }
 
     /**
@@ -46,9 +83,9 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getOwnersAction()
+    public function getOwnersAction(Request $request)
     {
-        if (!$this->get('mautic.security')->isGranted(
+        if (!$this->security->isGranted(
             ['lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'],
             'MATCH_ONE'
         )
@@ -56,9 +93,9 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter  = $this->request->query->get('filter', null);
-        $limit   = $this->request->query->get('limit', null);
-        $start   = $this->request->query->get('start', null);
+        $filter  = $request->query->get('filter', null);
+        $limit   = $request->query->get('limit', null);
+        $start   = $request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);
@@ -74,7 +111,7 @@ class LeadApiController extends CommonApiController
      */
     public function getFieldsAction()
     {
-        if (!$this->get('mautic.security')->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
+        if (!$this->security->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -103,11 +140,9 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getNotesAction($id)
+    public function getNotesAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -115,16 +150,16 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
 
         $results = $this->getModel('lead.note')->getEntities(
             [
-                'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'start'  => $request->query->get('start', 0),
+                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
-                    'string' => $this->request->query->get('search', ''),
+                    'string' => $request->query->get('search', ''),
                     'force'  => [
                         [
                             'column' => 'n.lead',
@@ -133,8 +168,8 @@ class LeadApiController extends CommonApiController
                         ],
                     ],
                 ],
-                'orderBy'    => $this->request->query->get('orderBy', 'n.dateAdded'),
-                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+                'orderBy'    => $request->query->get('orderBy', 'n.dateAdded'),
+                'orderByDir' => $request->query->get('orderByDir', 'DESC'),
             ]
         );
 
@@ -157,11 +192,9 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of devices on a specific lead.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getDevicesAction($id)
+    public function getDevicesAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -169,16 +202,16 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
 
         $results = $this->getModel('lead.device')->getEntities(
             [
-                'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'start'  => $request->query->get('start', 0),
+                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
-                    'string' => $this->request->query->get('search', ''),
+                    'string' => $request->query->get('search', ''),
                     'force'  => [
                         [
                             'column' => 'd.lead',
@@ -187,8 +220,8 @@ class LeadApiController extends CommonApiController
                         ],
                     ],
                 ],
-                'orderBy'    => $this->request->query->get('orderBy', 'd.dateAdded'),
-                'orderByDir' => $this->request->query->get('orderByDir', 'DESC'),
+                'orderBy'    => $request->query->get('orderBy', 'd.dateAdded'),
+                'orderByDir' => $request->query->get('orderByDir', 'DESC'),
             ]
         );
 
@@ -211,15 +244,13 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getListsAction($id)
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -251,8 +282,6 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getCompaniesAction($id)
@@ -263,7 +292,7 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+        if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
             return $this->accessDenied();
         }
 
@@ -283,15 +312,13 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of campaigns the lead is part of.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getCampaignsAction($id)
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
+            if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
 
@@ -330,11 +357,9 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @param $id
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getActivityAction($id)
+    public function getActivityAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -346,7 +371,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        return $this->getAllActivityAction($entity);
+        return $this->getAllActivityAction($request, $entity);
     }
 
     /**
@@ -354,7 +379,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAllActivityAction($lead = null)
+    public function getAllActivityAction(Request $request, $lead = null)
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers = $this->security->isGranted('lead:leads:viewother');
@@ -363,10 +388,10 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
-        $limit   = (int) $this->request->get('limit', 25);
-        $page    = (int) $this->request->get('page', 1);
-        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($request->get('filters', [])));
+        $limit   = (int) $request->get('limit', 25);
+        $page    = (int) $request->get('page', 1);
+        $order   = InputHelper::clean($request->get('order', ['timestamp', 'DESC']));
 
         [$events, $serializerGroups] = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
@@ -380,12 +405,9 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @param $id
-     * @param $channel
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function addDncAction($id, $channel)
+    public function addDncAction(Request $request, $id, $channel)
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -397,27 +419,26 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $channelId = (int) $this->request->request->get('channelId');
+        $channelId = (int) $request->request->get('channelId');
         if ($channelId) {
             $channel = [$channel => $channelId];
         }
 
         // If no reason is set, default to 3 (manual)
-        $reason = (int) $this->request->request->get('reason', DoNotContact::MANUAL);
+        $reason = (int) $request->request->get('reason', DoNotContact::MANUAL);
 
         // If a reason is set, but it's empty or 0, show an error.
         if (0 === $reason) {
             return $this->returnError(
                 'Invalid reason code given',
                 Response::HTTP_BAD_REQUEST,
-                'Reason code needs to be an integer and higher than 0.'
+                ['Reason code needs to be an integer and higher than 0.']
             );
         }
 
-        $comments = InputHelper::clean($this->request->request->get('comments'));
+        $comments = InputHelper::clean($request->request->get('comments'));
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
-        $doNotContact = $this->get('mautic.lead.model.dnc');
+        $doNotContact = $this->doNotContactModel;
         $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
 
@@ -427,15 +448,11 @@ class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      *
-     * @param $id
-     * @param $channel
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function removeDncAction($id, $channel)
     {
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
-        $doNotContact = $this->get('mautic.lead.model.dnc');
+        $doNotContact = $this->doNotContactModel;
 
         $entity = $this->model->getEntity((int) $id);
 
@@ -461,9 +478,9 @@ class LeadApiController extends CommonApiController
     /**
      * Add/Remove a UTM Tagset to/from the contact.
      *
-     * @param int       $id
-     * @param string    $method
-     * @param array/int $data
+     * @param int              $id
+     * @param string           $method
+     * @param array<mixed>|int $data
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -507,9 +524,9 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function addUtmTagsAction($id)
+    public function addUtmTagsAction(Request $request, $id)
     {
-        return $this->applyUtmTagsAction($id, 'addUTMTags', $this->request->request->all());
+        return $this->applyUtmTagsAction($id, 'addUTMTags', $request->request->all());
     }
 
     /**
@@ -538,17 +555,27 @@ class LeadApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         // Unset the tags from params to avoid a validation error
         if (isset($parameters['tags'])) {
             unset($parameters['tags']);
         }
 
+        // keep existing tags
         if (count($entity->getTags()) > 0) {
             foreach ($entity->getTags() as $tag) {
                 $parameters['tags'][] = $tag->getId();
             }
+        }
+
+        // keep existing owner if it is not set or should be reset to null
+        if (!array_key_exists('owner', $parameters) && $entity->getOwner()) {
+            $parameters['owner'] = $entity->getOwner()->getId();
+        }
+        // keep existing stage if it is not set or should be reset to null
+        if (!array_key_exists('stage', $parameters) && $entity->getStage()) {
+            $parameters['stage'] = $entity->getStage()->getId();
         }
 
         return $parameters;
@@ -559,7 +586,6 @@ class LeadApiController extends CommonApiController
      *
      * @param Lead   $entity
      * @param array  $parameters
-     * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -567,7 +593,17 @@ class LeadApiController extends CommonApiController
         if ('edit' === $action) {
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+            $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
+            $contactMerger  = $this->contactMerger;
+
+            if ($entity->getId() && $existingEntity->getId()) {
+                try {
+                    $entity = $contactMerger->merge($entity, $existingEntity);
+                } catch (SameContactException $exception) {
+                }
+            } elseif ($existingEntity->getId()) {
+                $entity = $existingEntity;
+            }
         }
 
         $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
@@ -576,7 +612,7 @@ class LeadApiController extends CommonApiController
             'lead',
             $manipulatorObject,
             null,
-            $this->get('mautic.helper.user')->getUser()->getName()
+            $this->userHelper->getUser()->getName()
         ));
 
         if (isset($parameters['companies'])) {
@@ -600,9 +636,10 @@ class LeadApiController extends CommonApiController
             $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
         }
 
-        //Since the request can be from 3rd party, check for an IP address if included
+        // Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
-            $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
+            $ipAddress = $this->ipLookupHelper->getIpAddress($this->entityRequestParameters['ipAddress']);
+            \assert($ipAddress instanceof IpAddress);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
@@ -626,8 +663,7 @@ class LeadApiController extends CommonApiController
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
-                /** @var DoNotContactModel $doNotContact */
-                $doNotContact = $this->get('mautic.lead.model.dnc');
+                $doNotContact = $this->doNotContactModel;
 
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
                     if (!empty($entity->getId())) {
@@ -649,7 +685,7 @@ class LeadApiController extends CommonApiController
             $viewParameters = [];
             $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
 
-            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+            if (true !== $frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 
@@ -663,7 +699,7 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $isPostOrPatch = 'POST' === $this->request->getMethod() || 'PATCH' === $this->request->getMethod();
+        $isPostOrPatch = 'POST' === $this->requestStack->getCurrentRequest()->getMethod() || 'PATCH' === $this->requestStack->getCurrentRequest()->getMethod();
         $this->setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch);
     }
 
@@ -688,7 +724,7 @@ class LeadApiController extends CommonApiController
      */
     protected function isFormValid(Form $form, array $data = null)
     {
-        $form->submit($data, 'PATCH' !== $this->request->getMethod());
+        $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 
         return $form->isSubmitted() && $form->isValid();
     }

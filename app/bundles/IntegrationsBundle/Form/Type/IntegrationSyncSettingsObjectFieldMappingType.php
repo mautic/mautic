@@ -41,12 +41,8 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationFields = $options['integrationFields'];
-
-        /** @var ConfigFormSyncInterface $integrationObject */
         $integrationObject = $options['integrationObject'];
-        if (!$integrationObject instanceof ConfigFormSyncInterface) {
-            throw new InvalidFormOptionException('integrationObject must be an instance of ConfigFormSyncInterface');
-        }
+        \assert($integrationObject instanceof ConfigFormSyncInterface);
 
         $objectName = $options['object'];
         foreach ($integrationFields as $fieldName => $fieldInfo) {

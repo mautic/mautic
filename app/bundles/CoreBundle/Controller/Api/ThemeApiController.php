@@ -2,37 +2,62 @@
 
 namespace Mautic\CoreBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class ThemeApiController.
+ * @extends CommonApiController<object>
  */
 class ThemeApiController extends CommonApiController
 {
     /**
-     * @var Mautic\CoreBundle\Helper\ThemeHelper
+     * @var ThemeHelper
      */
     protected $themeHelper;
 
-    public function initialize(FilterControllerEvent $event)
-    {
-        $this->themeHelper = $this->container->get('mautic.helper.theme');
-
-        parent::initialize($event);
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        ThemeHelper $themeHelper,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
+        $this->themeHelper = $themeHelper;
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Accepts the zip file and installs the theme from it.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, PathsHelper $pathsHelper)
     {
         if (!$this->security->isGranted('core:themes:create')) {
             return $this->accessDenied();
@@ -55,7 +80,7 @@ class ThemeApiController extends CommonApiController
         } else {
             $fileName  = InputHelper::filename($themeZip->getClientOriginalName());
             $themeName = basename($fileName, '.zip');
-            $dir       = $this->get('mautic.helper.paths')->getSystemPath('themes', true);
+            $dir       = $pathsHelper->getSystemPath('themes', true);
 
             if (!empty($themeZip)) {
                 try {
@@ -83,7 +108,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme dir name
      *
-     * @return BinaryFileResponse
+     * @return Response
      */
     public function getAction($theme)
     {
@@ -115,7 +140,7 @@ class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction()
     {
@@ -139,7 +164,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction($theme)
     {

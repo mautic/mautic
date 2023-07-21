@@ -158,7 +158,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
-        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+        $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
         $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getCompany()->deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
     }
 
@@ -207,6 +207,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($objectId, $objectType, $changedFields);
         $this->fieldChangeRepo->saveEntities($toPersist);
 
-        $this->fieldChangeRepo->clear();
+        $this->fieldChangeRepo->deleteEntities($toPersist);
     }
 }

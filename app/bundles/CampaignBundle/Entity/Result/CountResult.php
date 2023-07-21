@@ -21,10 +21,6 @@ class CountResult
 
     /**
      * CountResult constructor.
-     *
-     * @param $count
-     * @param $minId
-     * @param $maxId
      */
     public function __construct($count, $minId, $maxId)
     {

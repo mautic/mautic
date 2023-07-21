@@ -27,16 +27,16 @@ class ReloadCommand extends Command
                     'mautic:plugins:install',
                     'mautic:plugins:update',
                 ]
-            )
-            ->setDescription('Installs, updates, enable and/or disable plugins.');
+            );
 
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeLn($this->reloadFacade->reloadPlugins());
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';
 }

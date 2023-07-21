@@ -169,12 +169,4 @@ class BuilderSectionType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'builder_section';
-    }
 }

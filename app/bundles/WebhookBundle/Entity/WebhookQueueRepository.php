@@ -4,6 +4,9 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<WebhookQueue>
+ */
 class WebhookQueueRepository extends CommonRepository
 {
     /**
@@ -47,6 +50,6 @@ class WebhookQueueRepository extends CommonRepository
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

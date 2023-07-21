@@ -4,16 +4,13 @@ namespace Mautic\PluginBundle\Helper;
 
 class Cleaner
 {
-    const FIELD_TYPE_STRING   = 'string';
-    const FIELD_TYPE_BOOL     = 'boolean';
-    const FIELD_TYPE_NUMBER   = 'number';
-    const FIELD_TYPE_DATETIME = 'datetime';
-    const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_DATETIME = 'datetime';
+    public const FIELD_TYPE_DATE     = 'date';
 
     /**
-     * @param $value
-     * @param $fieldType
-     *
      * @return bool|float|string
      */
     public static function clean($value, $fieldType = self::FIELD_TYPE_STRING)

@@ -2,15 +2,15 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
-use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -28,7 +28,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
     private $kernel;
 
     /**
-     * @var MockObject|MigrationsMigrateDoctrineCommand
+     * @var MockObject|MigrateCommand
      */
     private $migrateCommand;
 
@@ -53,7 +53,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
             ->method('getBundles')
             ->willReturn([]);
 
-        $this->migrateCommand = $this->createMock(MigrationsMigrateDoctrineCommand::class);
+        $this->migrateCommand = $this->createMock(MigrateCommand::class);
         $this->migrateCommand->method('isEnabled')
             ->willReturn(true);
         $this->migrateCommand->method('getName')
@@ -113,12 +113,14 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -136,12 +138,14 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 

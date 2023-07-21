@@ -199,7 +199,7 @@ class LeadType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -209,13 +209,5 @@ class LeadType extends AbstractType
         );
 
         $resolver->setRequired(['fields', 'isShortForm']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'lead';
     }
 }

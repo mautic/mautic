@@ -20,7 +20,7 @@ class Event
     private $webhook;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\WebhookQueue>
      */
     private $queues;
 
@@ -64,8 +64,6 @@ class Event
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

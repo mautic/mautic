@@ -65,7 +65,7 @@ class SmsHelper
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
         /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
 
         $args = [
             'filter' => [

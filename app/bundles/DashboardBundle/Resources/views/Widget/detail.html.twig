@@ -1,0 +1,52 @@
+<div class="card" style="height: {{ widget.height|default('310') - 10 }}px;">
+    <div class="card-header">
+        <h4>{{ widget.name|purify }}</h4>
+        {% if widget.id %}
+            <div class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-ellipsis-v"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
+                            data-toggle="ajaxmodal"
+                            data-target="#MauticSharedModal"
+                            data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
+                            <i class="fa fa-pencil"></i> Edit
+                        </a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li  class="dropdown-header">
+                        {{ 'mautic.dashboard.widget.load.time'|trans({'%time%': (widget.loadTime * 1000)|round(1)}) }}
+                    </li>
+                    <li  class="dropdown-header">
+                        {% if widget.isCached %}
+                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
+                        {% else %}
+                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
+                        {% endif %}
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li>
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
+                            data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
+                            class="remove-widget">
+                            <i class="fa fa-remove"></i> Remove
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if widget.errorMessage %}
+            <div class="alert alert-danger" role="alert">
+                {{ widget.errorMessage|trans }}
+            </div>
+        {% elseif widget.template %}
+            <!-- start: {{ widget.template }} -->
+            {{ include(widget.template, widget.templateData) }}
+            <!-- end: {{ widget.template }} -->
+        {% endif %}
+    </div>
+</div>

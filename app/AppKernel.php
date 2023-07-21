@@ -4,6 +4,7 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,14 +39,14 @@ class AppKernel extends Kernel
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
         defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
-        /**
+        /*
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
          * installed yet, we don't have a database to connect to, causing automatic database platform
          * detection to fail. We use the MAUTIC_DB_SERVER_VERSION constant to temporarily set a server_version
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getRootDir(), false);
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
             define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
@@ -63,9 +64,9 @@ class AppKernel extends Kernel
             if (false === strpos($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
-                //check to see if the .htaccess file exists or if not running under apache
+                // check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
-                    || !file_exists(__DIR__.'../.htaccess')
+                    || !file_exists($this->getProjectDir().'/.htaccess')
                     && false === strpos(
                         $base,
                         'index'
@@ -104,14 +105,13 @@ class AppKernel extends Kernel
         return parent::handle($request, $type, $catch);
     }
 
-    public function registerBundles(): array
+    public function registerBundles(): iterable
     {
         $bundles = [
             // Symfony/Core Bundles
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
@@ -126,11 +126,11 @@ class AppKernel extends Kernel
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
+            new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
-            new Mautic\CalendarBundle\MauticCalendarBundle(),
             new Mautic\CampaignBundle\MauticCampaignBundle(),
             new Mautic\CategoryBundle\MauticCategoryBundle(),
             new Mautic\ChannelBundle\MauticChannelBundle(),
@@ -144,6 +144,7 @@ class AppKernel extends Kernel
             new Mautic\IntegrationsBundle\IntegrationsBundle(),
             new Mautic\LeadBundle\MauticLeadBundle(),
             new Mautic\MarketplaceBundle\MarketplaceBundle(),
+            new Mautic\MessengerBundle\MauticMessengerBundle(),
             new Mautic\NotificationBundle\MauticNotificationBundle(),
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
@@ -169,7 +170,7 @@ class AppKernel extends Kernel
         }
 
         // dynamically register Mautic Plugin Bundles
-        $searchPath = dirname(__DIR__).'/plugins';
+        $searchPath = $this->getProjectDir().'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -181,7 +182,7 @@ class AppKernel extends Kernel
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
-            $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
+            $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
             if (class_exists($class)) {
                 $plugin = new $class();
 
@@ -201,7 +202,6 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
             $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
@@ -212,11 +212,17 @@ class AppKernel extends Kernel
         }
 
         // Check for local bundle inclusion
-        if (file_exists(__DIR__.'/config/bundles_local.php')) {
-            include __DIR__.'/config/bundles_local.php';
+        if (file_exists($this->getProjectDir().'/app/config/bundles_local.php')) {
+            include $this->getProjectDir().'/app/config/bundles_local.php';
         }
 
         return $bundles;
+    }
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->registerForAutoconfiguration(\Mautic\CoreBundle\Model\MauticModelInterface::class)
+            ->addTag(\Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
     }
 
     /**
@@ -231,10 +237,16 @@ class AppKernel extends Kernel
         // load parameters with defaults into the environment
         $parameterLoader = $this->getParameterLoader();
         $parameterLoader->loadIntoEnvironment();
-
         if (!defined('MAUTIC_TABLE_PREFIX')) {
-            //set the table prefix before boot
-            define('MAUTIC_TABLE_PREFIX', $parameterLoader->getLocalParameterBag()->get('db_table_prefix', ''));
+            // Set the table prefix before boot.
+            // Firstly look into environment variables.
+            $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
+            // Secondly look into the local.php file.
+            if (empty($prefix)) {
+                $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');
+            }
+
+            define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
         // init bundles
@@ -257,7 +269,7 @@ class AppKernel extends Kernel
      */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
+        $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
@@ -276,17 +288,12 @@ class AppKernel extends Kernel
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
             $dbDriver        = $localParameters->get('db_driver');
-            $mailerFromName  = $localParameters->get('mailer_from_name');
+            $siteUrl         = $localParameters->get('site_url');
 
-            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
+            $this->installed = !empty($dbDriver) && !empty($siteUrl);
         }
 
         return $this->installed;
-    }
-
-    public function getRootDir(): string
-    {
-        return __DIR__;
     }
 
     public function getProjectDir(): string
@@ -304,19 +311,19 @@ class AppKernel extends Kernel
         if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
             $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
 
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $cachePath.$envFolder);
+            return str_replace('%kernel.project_dir%', $this->getProjectDir(), $cachePath.$envFolder);
         }
 
-        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
+        return $this->getProjectDir().'/var/cache/'.$this->getEnvironment();
     }
 
     public function getLogDir(): string
     {
         if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $logPath);
+            return str_replace('%kernel.project_dir%', $this->getProjectDir(), $logPath);
         }
 
-        return dirname(__DIR__).'/var/logs';
+        return $this->getProjectDir().'/var/logs';
     }
 
     /**
@@ -324,9 +331,7 @@ class AppKernel extends Kernel
      */
     public function getLocalConfigFile(): string
     {
-        $root = $this->getRootDir();
-
-        return ParameterLoader::getLocalConfigFile($root);
+        return ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app');
     }
 
     private function getParameterLoader(): ParameterLoader

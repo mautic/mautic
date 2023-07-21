@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 
 interface ThemeHelperInterface
 {
@@ -26,7 +26,7 @@ interface ThemeHelperInterface
     /**
      * @param string $themeName
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
@@ -45,10 +45,10 @@ interface ThemeHelperInterface
      * @param string      $newName
      * @param string|null $newDirName if not set then it will be generated from the $newName param
      *
+     * @return void
+     *
      * @throws FileExistsException
      * @throws FileNotFoundException
-     *
-     * @return void
      */
     public function copy($theme, $newName, $newDirName = null);
 
@@ -56,19 +56,19 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param string $newName
      *
+     * @return void
+     *
      * @throws FileNotFoundException
      * @throws FileExistsException
-     *
-     * @return void
      */
     public function rename($theme, $newName);
 
     /**
      * @param string $theme
      *
-     * @throws FileNotFoundException
-     *
      * @return void
+     *
+     * @throws FileNotFoundException
      */
     public function delete($theme);
 
@@ -100,7 +100,7 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param bool   $throwException
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws FileNotFoundException
      * @throws BadConfigurationException

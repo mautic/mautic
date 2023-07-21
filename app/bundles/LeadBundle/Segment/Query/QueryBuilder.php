@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -28,16 +29,16 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /*
      * The query types.
      */
-    const SELECT = 0;
-    const DELETE = 1;
-    const UPDATE = 2;
-    const INSERT = 3;
+    public const SELECT = 0;
+    public const DELETE = 1;
+    public const UPDATE = 2;
+    public const INSERT = 3;
 
     /*
      * The builder states.
      */
-    const STATE_DIRTY = 0;
-    const STATE_CLEAN = 1;
+    public const STATE_DIRTY = 0;
+    public const STATE_CLEAN = 1;
 
     /**
      * The DBAL Connection.
@@ -200,20 +201,17 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * Executes this query using the bound parameters and their types.
      *
-     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
-     * for insert, update and delete statements.
+     * @return Result|int|string
      *
-     * @return \Doctrine\DBAL\Driver\Statement|int
-     *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function execute()
     {
-        if (self::SELECT == $this->type) {
+        if (self::SELECT === $this->type) {
             return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
-        } else {
-            return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
         }
+
+        return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
     }
 
     /**
@@ -228,7 +226,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      *
      * @return string the SQL query string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getSQL()
     {
@@ -1101,9 +1099,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $queryPartName
-     * @param $value
-     *
      * @return $this
      */
     public function setQueryPart($queryPartName, $value)
@@ -1134,7 +1129,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function getSQLForSelect()
     {
@@ -1248,7 +1243,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function __toString()
     {
@@ -1327,8 +1322,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $fromAlias
-     *
      * @return string
      *
      * @throws QueryException
@@ -1344,7 +1337,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 }
                 $sql .= ' '.strtoupper($join['joinType'])
                     .' JOIN '.$join['joinTable'].' '.$join['joinAlias']
-                    .' ON '.($join['joinCondition']);
+                    .' ON '.$join['joinCondition'];
                 $knownAliases[$join['joinAlias']] = true;
             }
 
@@ -1381,8 +1374,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $alias
-     *
      * @return bool
      */
     public function getJoinCondition($alias)
@@ -1399,9 +1390,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
     /**
      * Add AND condition to existing table alias.
-     *
-     * @param $alias
-     * @param $expr
      *
      * @return $this
      *
@@ -1430,9 +1418,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $alias
-     * @param $expr
-     *
      * @return $this
      */
     public function replaceJoinCondition($alias, $expr)
@@ -1450,9 +1435,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $parameters
-     * @param $filterParameters
-     *
      * @return QueryBuilder
      */
     public function setParametersPairs($parameters, $filterParameters)
@@ -1516,14 +1498,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function guessPrimaryLeadContactIdColumn()
     {
         $parts     = $this->getQueryParts();
-
         $leadTable = $parts['from'][0]['alias'];
-        if (!isset($parts['join'][$leadTable])) {
-            return $leadTable.'.id';
+
+        if ('orp' === $leadTable) {
+            return 'orp.lead_id';
         }
 
-        if ('orp' == $leadTable) {
-            return 'orp.lead_id';
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
         }
 
         $joins     = $parts['join'][$leadTable];
@@ -1564,8 +1546,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $table
-     *
      * @return bool
      */
     public function isJoinTable($table)
@@ -1586,7 +1566,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return mixed|string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDebugOutput()
     {
@@ -1635,8 +1615,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $expression
-     *
      * @return $this
      */
     private function addLogicStack($expression)
@@ -1649,9 +1627,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
-     *
-     * @param $expression
-     * @param $glue
      */
     public function addLogic($expression, $glue)
     {

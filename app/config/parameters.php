@@ -1,9 +1,9 @@
 <?php
 
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 include __DIR__.'/paths_helper.php';
 
-//load default parameters from bundle files
+// load default parameters from bundle files
 $core    = $container->getParameter('mautic.bundles');
 $plugins = $container->getParameter('mautic.plugin.bundles');
 

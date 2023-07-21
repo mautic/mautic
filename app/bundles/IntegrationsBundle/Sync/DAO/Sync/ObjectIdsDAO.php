@@ -33,8 +33,6 @@ class ObjectIdsDAO
      * Simply put, an array of object types and IDs separated by colon.
      *
      * @param string[] $cliOptions
-     *
-     * @return ObjectIdsDAO
      */
     public static function createFromCliOptions(array $cliOptions): self
     {
