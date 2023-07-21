@@ -233,9 +233,6 @@ jobs:
           cp ../.github/ci-files/composer.json ./
           composer install
 
-          # install NPM packages
-          npm install
-
           # test if console works by generating assets for next step
           php ./bin/console mautic:assets:generate
 
