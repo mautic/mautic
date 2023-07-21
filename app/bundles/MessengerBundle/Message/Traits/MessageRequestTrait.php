@@ -8,9 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 trait MessageRequestTrait
 {
-    private ?\DateTimeInterface $eventTime = null; // The ISO-8601 date
-    /** @Serializer\Type(Symfony\Component\HttpFoundation\Request) */
-    private Request $request; //  Simplified interpretation of symfony request
+    private ?\DateTimeInterface $eventTime = null;
+    private Request $request;
     private bool $isSynchronous = false;
 
     public function getEventTime(): ?\DateTimeInterface
