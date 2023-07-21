@@ -197,7 +197,9 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $changeEvent = $this->createMock(ListChangeEvent::class);
 
-        $contact = ['id' => 1];
+        $contact       = ['id' => 1];
+        $contactEntity = new Lead();
+        $contactEntity->setId($contact['id']);
 
         $changeEvent->method('getLeads')->willReturn([$contact]);
         $changeEvent->method('getLead')->willReturn(null);
@@ -209,14 +211,14 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $leadModel->expects($this->once())
             ->method('getEntity')
             ->with($this->equalTo($contact['id']))
-            ->willReturn($contact);
+            ->willReturn($contactEntity);
 
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
                 $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
                 $this->equalTo([
-                    'contact'  => $contact,
+                    'contact'  => $contactEntity,
                     'segment'  => $changeEvent->getList(),
                     'action'   => 'added',
                 ])
