@@ -716,10 +716,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     {
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 
-        if (empty($emailIds)) {
-            return [];
-        }
-
         /** @var StatRepository $statRepo */
         $statRepo      = $this->em->getRepository(Stat::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
