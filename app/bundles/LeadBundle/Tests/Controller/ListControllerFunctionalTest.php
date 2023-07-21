@@ -371,4 +371,31 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
+
+    public function testWarningOnInvalidDateField(): void
+    {
+        $segment = $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => 'Today',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ]
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('Date field filter value Today is invalid', $this->client->getResponse()->getContent());
+    }
 }
