@@ -48,9 +48,9 @@ class EmailMapStatsController extends AbstractCountryMapController
 
         return $this->model->getEmailCountryStats(
             $entity,
-            $includeVariants,
             $dateFromObject,
-            $dateToObject
+            $dateToObject,
+            $includeVariants,
         );
     }
 }

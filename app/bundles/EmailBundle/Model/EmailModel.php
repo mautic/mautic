@@ -712,7 +712,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws Exception
      */
-    public function getEmailCountryStats(Email $email, bool $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
+    public function getEmailCountryStats(Email $email, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
     {
         $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
 

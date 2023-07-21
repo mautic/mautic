@@ -783,10 +783,7 @@ class StatRepository extends CommonRepository
                         ->setParameter('emails', $entityIds, ArrayParameterType::INTEGER);
             }
 
-            $queryBuilder->andWhere("{$statsAlias}.is_read = :true")
-                ->setParameter('true', true, 'boolean')
-                ->groupBy("{$leadAlias}.country");
-
+            $queryBuilder->groupBy("{$leadAlias}.country");
             $chartQuery->applyDateFilters($queryBuilder, 'date_sent', $statsAlias);
         }
 
