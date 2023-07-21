@@ -5,86 +5,23 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\PageBundle\Entity\HitRepository;
-use Mautic\PageBundle\Entity\PageRepository;
-use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event as Events;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
-
-    /**
-     * @var PageRepository
-     */
-    private $pageRepository;
-
-    /**
-     * @var RedirectRepository
-     */
-    private $redirectRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $contactRepository;
-
     public function __construct(
-        AssetsHelper $assetsHelper,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        PageModel $pageModel,
-        LoggerInterface $logger,
-        HitRepository $hitRepository,
-        PageRepository $pageRepository,
-        RedirectRepository $redirectRepository,
-        LeadRepository $contactRepository
+        private AssetsHelper $assetsHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
     ) {
-        $this->assetsHelper       = $assetsHelper;
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->auditLogModel      = $auditLogModel;
-        $this->pageModel          = $pageModel;
-        $this->logger             = $logger;
-        $this->hitRepository      = $hitRepository;
-        $this->pageRepository     = $pageRepository;
-        $this->redirectRepository = $redirectRepository;
-        $this->contactRepository  = $contactRepository;
     }
 
-    public static function getSubscribedEvents()
+    /**
+     * @return array<string, array<int, string|int>>
+     */
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
@@ -96,7 +33,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPagePostSave(Events\PageEvent $event)
+    public function onPagePostSave(Events\PageEvent $event): void
     {
         $page = $event->getPage();
         if ($details = $event->getChanges()) {
@@ -115,7 +52,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onPageDelete(Events\PageEvent $event)
+    public function onPageDelete(Events\PageEvent $event): void
     {
         $page = $event->getPage();
         $log  = [
@@ -135,7 +72,7 @@ class PageSubscriber implements EventSubscriberInterface
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
      */
-    public function onPageDisplay(Events\PageDisplayEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
 

@@ -11,12 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
-use Mautic\PageBundle\Entity\PageRepository;
-use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
-use Mautic\PageBundle\Model\PageModel;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
@@ -48,11 +44,7 @@ class PageSubscriberTest extends TestCase
         $assetsHelperMock   = new AssetsHelper($packagesMock, $coreParametersHelper);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
-        $pageModelMock      = $this->createMock(PageModel::class);
-        $logger             = $this->createMock(Logger::class);
         $hitRepository      = $this->createMock(HitRepository::class);
-        $pageRepository     = $this->createMock(PageRepository::class);
-        $redirectRepository = $this->createMock(RedirectRepository::class);
         $contactRepository  = $this->createMock(LeadRepository::class);
         $hitMock            = $this->createMock(Hit::class);
         $leadMock           = $this->createMock(Lead::class);
@@ -68,22 +60,16 @@ class PageSubscriberTest extends TestCase
         return new PageSubscriber(
             $assetsHelperMock,
             $ipLookupHelperMock,
-            $auditLogModelMock,
-            $pageModelMock,
-            $logger,
-            $hitRepository,
-            $pageRepository,
-            $redirectRepository,
-            $contactRepository
+            $auditLogModelMock
         );
     }
 
     /**
      * Get non empty payload, having a Request and non-null entity IDs.
      *
-     * @return array
+     * @return array<string, bool|int|MockObject>
      */
-    protected function getNonEmptyPayload()
+    protected function getNonEmptyPayload(): array
     {
         $requestMock = $this->createMock(Request::class);
 
@@ -99,9 +85,9 @@ class PageSubscriberTest extends TestCase
     /**
      * Get empty payload with all null entity IDs.
      *
-     * @return array
+     * @return array<string, null>
      */
-    protected function getEmptyPayload()
+    protected function getEmptyPayload(): array
     {
         return array_fill_keys(['request', 'isNew', 'hitId', 'pageId', 'leadId'], null);
     }
