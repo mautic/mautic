@@ -71,6 +71,10 @@ class UserMapper implements UsernameMapperInterface
         $attributes = [];
 
         foreach ($this->attributes as $key => $attributeName) {
+            if (!$attributeName) {
+                continue;
+            }
+
             foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                 $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
                 if ($attribute && $attribute->getFirstAttributeValue()) {

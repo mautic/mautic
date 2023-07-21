@@ -6,8 +6,10 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Entity\Field;
@@ -36,6 +38,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -232,14 +235,16 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             new FieldValueTransformer($this->router),
             $this->dateHelper,
             $this->contactTracker,
-            $this->contactMerger
+            $this->contactMerger,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->userHelper,
+            $this->mockLogger,
+            $this->createMock(CoreParametersHelper::class)
         );
-
-        $this->submissionModel->setDispatcher($this->dispatcher);
-        $this->submissionModel->setTranslator($this->translator);
-        $this->submissionModel->setEntityManager($this->entityManager);
-        $this->submissionModel->setUserHelper($this->userHelper);
-        $this->submissionModel->setLogger($this->mockLogger);
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
     }

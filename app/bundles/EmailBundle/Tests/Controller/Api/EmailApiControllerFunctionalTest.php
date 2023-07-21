@@ -337,6 +337,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test use owner as mailer:
         $email = $createEmail();
         $email->setUseOwnerAsMailer(true);
+        $email->setReplyToAddress(null);
         $this->em->persist($email);
         $this->em->flush();
         $emailId = $email->getId();
@@ -371,6 +372,33 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmailOwnerAsMailer();
+
+        // Test Custom Reply-To Address
+        $email->setReplyToAddress('reply@email.domain');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
+
+        $testCustomReplyTo = function (): void {
+            $message = $this->transport->sentMessage;
+            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
+            $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
+            $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
+            $this->assertSame([$message->getFrom()[0]->getAddress() => $message->getFrom()[0]->getName()], ['john@api.test' => 'John Doe']);
+            $this->assertSame([$message->getReplyTo()[0]->getAddress() => $message->getReplyTo()[0]->getName()], ['reply@email.domain' => '']);
+            $this->assertSame([$message->getBcc()[0]->getAddress() => $message->getBcc()[0]->getName()], ['bcc@api.test' => '']);
+        };
+
+        $testCustomReplyTo();
     }
 
     /**

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -12,7 +17,9 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 class FocusModelTest extends TestCase
@@ -71,9 +78,16 @@ class FocusModelTest extends TestCase
             $this->formModel,
             $this->trackableModel,
             $this->twig,
-            $this->dispatcher,
             $this->leadFieldModel,
             $this->contactTracker,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
         $focus = [
             'form' => 'xxx',
