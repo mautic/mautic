@@ -582,18 +582,30 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'link_shortener_enable_email',
+            'shortener_email_enable',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.core.config.form.link.shortener.enable_email',
-                'data'       => (array_key_exists('link_shortener_enable_email', $options['data']) && !empty($options['data']['link_shortener_enable_email'])),
+                'label'      => 'mautic.core.config.form.shortener.enable_email',
+                'data'       => (array_key_exists('shortener_email_enable', $options['data']) && !empty($options['data']['shortener_email_enable'])),
                 'attr'       => [
                     'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.link.shortener.enable_email.tooltip',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_email.tooltip',
                 ],
             ]
         );
 
+        $builder->add(
+            'shortener_sms_enable',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.shortener.enable_sms',
+                'data'       => (array_key_exists('shortener_sms_enable', $options['data']) && !empty($options['data']['shortener_sms_enable'])),
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_sms.tooltip',
+                ],
+            ]
+        );
         $builder->add(
             'max_entity_lock_time',
             NumberType::class,

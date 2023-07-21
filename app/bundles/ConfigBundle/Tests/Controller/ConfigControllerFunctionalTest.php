@@ -35,7 +35,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $url                         = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
         $trackIps                    = "%ip1%\n%ip2%\n%kernel.project_dir%";
         $googleAnalytics             = 'reveal pass: %mautic.db_password%';
-        $link_shortener_enable_email = '1';
+        $shortener_email_enable      = '1';
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -47,7 +47,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
-                'config[coreconfig][link_shortener_enable_email]' => $link_shortener_enable_email,
+                'config[coreconfig][shortener_email_enable]'      => $shortener_email_enable,
                 'config[coreconfig][do_not_track_ips]'            => $trackIps,
                 'config[pageconfig][google_analytics]'            => $googleAnalytics,
                 'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
@@ -68,7 +68,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_enable_email', $configParameters, 'Assert "link_shortener_enable_email" in: '.implode(',', array_keys($configParameters)));
+        Assert::assertArrayHasKey('shortener_email_enable', $configParameters, 'Assert "shortener_email_enable" in: '.implode(',', array_keys($configParameters)));
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(
             [
@@ -86,7 +86,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($link_shortener_enable_email, $form['config[coreconfig][link_shortener_enable_email]']->getValue());
+        Assert::assertEquals($shortener_email_enable, $form['config[coreconfig][shortener_email_enable]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
