@@ -300,6 +300,14 @@ class ReportSubscriber implements EventSubscriberInterface
                     'type'  => 'number' === $field->getType() ? 'int' : 'string',
                     'alias' => $field->getAlias(),
                 ];
+
+                if ('file' === $field->getType()) {
+                    $formResultsColumns[$index]['link']           = 'mautic_form_file_download_by_name';
+                    $formResultsColumns[$index]['linkParameters'] = [
+                        'fieldId'  => $field->getId(),
+                        'fileName' => '%alias%',
+                    ];
+                }
             }
         }
 
@@ -312,7 +320,7 @@ class ReportSubscriber implements EventSubscriberInterface
             'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
             'type'  => 'int',
             'link'  => 'mautic_form_action',
-            'alias' => 'submissionId',
+            'alias' => 'formResultId',
         ];
 
         return $formResultsColumns;

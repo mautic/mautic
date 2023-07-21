@@ -111,6 +111,7 @@
                       {{ form_label(form.shortener_service) }}
                       {% if form.shortener_service.vars.choices|length > 0 %}
                           {{ form_widget(form.shortener_service) }}
+                          {%- if form.link_shortener_enable_email is defined %}<div class="col-md-4">{{ form_row(form.link_shortener_enable_email) }}</div>{% endif %}
                       {% else %}
                           <div class="row">
                               <div class="col-xs-12">

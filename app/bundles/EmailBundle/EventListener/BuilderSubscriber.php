@@ -322,6 +322,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // If a link shortener URL is provided, and shortening is enabled for e-mail, use it for shortening URLs in e-mails
+        $shorten_url     = (null != $this->coreParametersHelper->get('link_shortener_url', null) ? true : false);
+        $shorten_enabled = $this->coreParametersHelper->get('link_shortener_enable_email', false);
+        $shorten         = $shorten_url && $shorten_enabled;
+
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
         if (!$email instanceof Email) {
@@ -338,9 +343,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shorten, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shorten, $utmTags);
 
             $event->addToken($token, $url);
         }
