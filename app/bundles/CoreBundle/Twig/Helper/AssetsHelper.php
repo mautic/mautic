@@ -497,7 +497,7 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base = 'media/js/vendor/ckeditor4/';
+        $base = 'app/assets/js/vendor/ckeditor4/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,

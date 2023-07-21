@@ -43,14 +43,6 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Check that the directory node_modules exists.
-        $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
-        if (!$this->filesystem->exists($nodeModulesDir)) {
-            $output->writeln('<error>'.$this->translator->trans("{$nodeModulesDir} does not exist. Execute `npm install` to generate it.").'</error>');
-
-            return Command::FAILURE;
-        }
-
         $this->installElFinderAssets();
 
         // Combine and minify bundle assets
@@ -82,10 +74,6 @@ EOT
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
-            'js/vendor/ckeditor4/ckeditor.js',
-            'js/vendor/ckeditor4/adapters/jquery.js',
-            'js/vendor/jquery/jquery.min.js',
-            'js/vendor/vimeo-froogaloop2/froogaloop.min.js',
         ];
 
         foreach ($productionAssets as $relativePath) {

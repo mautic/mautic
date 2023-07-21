@@ -214,8 +214,8 @@ JS;
         );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl('media/js/vendor/jquery/jquery.min.js', null, null, true);
-        $froogaloop2     = $this->assetsHelper->getUrl('media/js/vendor/vimeo-froogaloop2/froogaloop.min.js', null, null, true);
+        $jQueryUrl       = $this->assetsHelper->getUrl('app/assets/js/vendor/jquery/jquery.min.js', null, null, true);
+        $froogaloop2     = $this->assetsHelper->getUrl('app/assets/js/vendor/vimeo-froogaloop2/froogaloop.min.js', null, null, true);
 
         $mediaElementJs = <<<'JS'
 /*!
