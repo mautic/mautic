@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
+    "fs-extra": "^9.0.0",
     "grunt": "^1.6.1",
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
@@ -37,6 +38,6 @@
     "vimeo-froogaloop2": "^0.1.1"
   },
   "scripts": {
-    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js"
+    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js & node ./build/scripts/vendor-update.js"
   }
 }
