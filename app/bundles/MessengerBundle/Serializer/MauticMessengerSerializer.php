@@ -27,7 +27,6 @@ final class MauticMessengerSerializer implements SerializerInterface
 
     /**
      * @param array<string,array<StampInterface>|array<string>|string> $encodedEnvelope
-     * @return Envelope
      */
     public function decode(array $encodedEnvelope): Envelope
     {

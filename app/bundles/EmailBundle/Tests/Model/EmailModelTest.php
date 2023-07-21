@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\UnitOfWork;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -37,6 +36,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -53,6 +53,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @property LeadDeviceRepository|(LeadDeviceRepository&object&MockObject)|(LeadDeviceRepository&MockObject)|(object&MockObject)|MockObject $leadDeviceRepository
+ */
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     public const SEGMENT_A = 'segment A';
@@ -242,6 +245,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->connection               = $this->createMock(Connection::class);
         $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
+        $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -725,23 +729,72 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $unitOfWork = new class() extends UnitOfWork {
-            public function __construct()
-            {
-            }
-
-            public function getEntityState($entity, $assume = null): int
-            {
-                return UnitOfWork::STATE_DETACHED;
-            }
-        };
-
-        $this->entityManager->expects($this->exactly(1))
-            ->method('getUnitOfWork')
-            ->willReturn($unitOfWork);
-
         $this->entityManager->expects($this->exactly(2))
             ->method('flush');
+
+        $this->entityManager->expects($this->exactly(0))
+            ->method('getRepository')
+            ->with(LeadDevice::class)
+            ->willReturn($this->leadDeviceRepository);
+
+        $this->emailModel->hitEmail($stat, $request);
+    }
+
+    public function testHitEmailReloadsLeadDevice(): void
+    {
+        $contact       = new Lead();
+        $stat          = new Stat();
+        $request       = new Request();
+        $contactDevice = new LeadDevice();
+        $ipAddress     = new IpAddress();
+
+        $reflection = new \ReflectionClass($contactDevice);
+        $prop       = $reflection->getProperty('id');
+        $prop->setAccessible(true);
+        $prop->setValue($contactDevice, 1);
+
+        $stat->setLead($contact);
+
+        $this->ipLookupHelper->expects($this->once())
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
+
+        $this->deviceTrackerMock->expects($this->once())
+            ->method('createDeviceFromUserAgent')
+            ->with($contact)
+            ->willReturn($contactDevice);
+
+        $this->leadDeviceRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with($contactDevice->getId())
+            ->willReturn($contactDevice);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('persist')
+            ->withConsecutive(
+                [
+                    $this->callback(function ($statDevice) {
+                        $this->assertInstanceOf(Stat::class, $statDevice);
+
+                        return true;
+                    }),
+                ],
+                [
+                    $this->callback(function ($statDevice) use ($stat, $ipAddress) {
+                        $this->assertInstanceOf(StatDevice::class, $statDevice);
+                        $this->assertSame($stat, $statDevice->getStat());
+                        $this->assertSame($ipAddress, $statDevice->getIpAddress());
+
+                        return true;
+                    }),
+                ]
+            );
+
+        $this->entityManager->expects($this->exactly(1))
+            ->method('getRepository')
+            ->with(LeadDevice::class)
+            ->willReturn($this->leadDeviceRepository);
 
         $this->emailModel->hitEmail($stat, $request);
     }

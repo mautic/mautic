@@ -13,59 +13,55 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HttpRequestHandler implements SubscribingHandlerInterface
 {
+    /** @return array<int, array<int|string>> */
     public static function getSubscribingMethods(): array
     {
         return [
             [
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
-                'format'    => 'json',
-                'type'      => Request::class,
-                'method'    => 'serializeRequestToArray',
+                'format' => 'json',
+                'type' => Request::class,
+                'method' => 'serializeRequestToArray',
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
-                'format'    => 'json',
-                'type'      => Request::class,
-                'method'    => 'deserializeArrayToRequest',
+                'format' => 'json',
+                'type' => Request::class,
+                'method' => 'deserializeArrayToRequest',
             ],
         ];
     }
 
+    /**
+     * @param array<string> $type
+     * @return array<string,array<string>|mixed>
+     */
     public function serializeRequestToArray(JsonSerializationVisitor $visitor, Request $request, array $type, Context $context): array
-    {
-        return self::toArray($request);
-    }
-
-    public function deserializeArrayToRequest(JsonDeserializationVisitor $visitor, $requestAsArray, array $type, Context $context): Request
-    {
-        return self::fromArray($requestAsArray);
-    }
-
-    public static function toArray(Request $request): array
     {
         return array_filter([
             'attributes' => $request->attributes->all(),
-            'request'    => $request->request->all(),
-            'query'      => $request->query->all(),
-            'cookies'    => $request->cookies->all(),
-            'files'      => $request->files->all(),
-            'server'     => $request->server->all(),
-            'headers'    => $request->headers->all(),
+            'request' => $request->request->all(),
+            'query' => $request->query->all(),
+            'cookies' => $request->cookies->all(),
+            'files' => $request->files->all(),
+            'server' => $request->server->all(),
+            'headers' => $request->headers->all(),
         ]);
     }
 
     /**
-     * @param array<string,mixed> $request
+     * @param array<string,mixed> $requestAsArray
+     * @param array<string> $type
      */
-    public static function fromArray(array $request): Request
+    public function deserializeArrayToRequest(JsonDeserializationVisitor $visitor, array $requestAsArray, array $type, Context $context): Request
     {
         return new Request(
-            $request['query'] ?? [],
-            $request['request'] ?? [],
-            $request['attributes'] ?? [],
-            $request['cookies'] ?? [],
-            $request['files'] ?? [],
-            $request['server'] ?? []
+            $requestAsArray['query'] ?? [],
+            $requestAsArray['request'] ?? [],
+            $requestAsArray['attributes'] ?? [],
+            $requestAsArray['cookies'] ?? [],
+            $requestAsArray['files'] ?? [],
+            $requestAsArray['server'] ?? []
         );
     }
 }

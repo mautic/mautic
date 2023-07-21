@@ -24,9 +24,10 @@ trait RequestTrait
 {
     /**
      * @param FormInterface<object> $form
-     * @param array<mixed> $params
-     * @param array<mixed> $masks
-     * @param array<mixed> $fields
+     * @param array<mixed>          $params
+     * @param array<mixed>          $masks
+     * @param array<mixed>          $fields
+     *
      * @throws \Exception
      */
     protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void

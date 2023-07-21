@@ -525,7 +525,7 @@ class PageModel extends FormModel
             $request,
             $this->deviceTracker->wasDeviceChanged(),
             $page instanceof Redirect,
-            $page?->getId(),
+            $page->getId(),
             $lead->getId()
         );
 
@@ -546,12 +546,12 @@ class PageModel extends FormModel
      * @throws \Exception
      */
     public function processPageHit(
-        Hit $hit,
-        $page,
-        Request $request,
-        Lead $lead,
-        bool $trackingNewlyGenerated,
-        bool $activeRequest = true,
+        Hit                $hit,
+        Redirect|Page      $page,
+        Request            $request,
+        Lead               $lead,
+        bool               $trackingNewlyGenerated,
+        bool               $activeRequest = true,
         \DateTimeInterface $hitDate = null
     ): void {
         $leadLastActive = $lead->getLastActive();
@@ -743,7 +743,7 @@ class PageModel extends FormModel
                     $data = [
                         'unique'             => ($isUnique ? 'true' : 'false'),
                         'lead'               => $lead->getId(),
-                        'page'               => $page?->getId(),
+                        'page'               => $page->getId(),
                         'hit'                => $hit->getId(),
                         'lastActiveOriginal' => $leadLastActive,
                         'newLastActive'      => $hitDate,
