@@ -414,6 +414,15 @@ return [
                 'tag'   => 'validator.constraint_validator',
                 'alias' => 'segment_in_use',
             ],
+            \Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class => [
+                'class'     => \Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class,
+                'arguments' => [
+                    'request_stack',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'translator',
+                ],
+                'tag'       => 'validator.constraint_validator',
+            ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
