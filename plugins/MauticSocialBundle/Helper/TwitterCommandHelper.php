@@ -316,9 +316,7 @@ class TwitterCommandHelper
                 $leadEntity->setPreferredProfileImage('Twitter');
 
                 // save the lead now
-                if ($lastActive instanceof \DateTimeInterface) {
-                    $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
-                }
+                $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
 
                 try {
                     // save the lead entity
