@@ -171,7 +171,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 0;
+                return 1;
             }
 
             $this->updateCampaign($campaign);

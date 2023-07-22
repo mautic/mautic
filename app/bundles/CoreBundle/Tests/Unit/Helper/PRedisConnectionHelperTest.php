@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\PRedisConnectionHelper;
+use PHPUnit\Framework\Assert;
 
 class PRedisConnectionHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,9 +22,9 @@ class PRedisConnectionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
 
         // domain should be resolved and an array of ip addresses returned
-        $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://mautic.net:8888?test=car');
-        $this->assertIsArray($connInfo);
-        $this->assertGreaterThan(1, count($connInfo));
+        $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://bing.com:8888?test=car');
+        Assert::assertIsArray($connInfo);
+        Assert::assertGreaterThan(1, count($connInfo));
         foreach ($connInfo as $c) {
             $this->assertMatchesRegularExpression('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
             $this->assertEquals('tcp', $c['scheme']);

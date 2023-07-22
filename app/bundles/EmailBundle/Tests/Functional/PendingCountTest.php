@@ -55,7 +55,7 @@ final class PendingCountTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // The counts are loaded via ajax call after the email list page loads, so checking the ajax request instead of the HTML.
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
 
         Assert::assertSame(
             '{"id":'.$email->getId().',"pending":"1 Pending","queued":0,"sentCount":"0 Sent","readCount":"0 Read","readPercent":"0% Read"}',

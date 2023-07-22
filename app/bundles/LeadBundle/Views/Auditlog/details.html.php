@@ -50,7 +50,30 @@ switch ($type) {
             $text .= '<tr>';
             if (is_array($values)) {
                 if (count($values) >= 2) {
-                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
+                    $text .= "<td>{$view->escape($field)}</td>";
+                    if (isset($values['added']) || isset($values['removed'])) {
+                        if (isset($values['added'])) {
+                            $text .= "<td>{$view->escape($view['formatter']->normalizeStringValue($values['added'][0]))}</td>";
+                        } else {
+                            $text .= '<td>&nbsp;</td>';
+                        }
+                        if (isset($values['added'])) {
+                            $text .= "<td>{$view->escape($view['formatter']->normalizeStringValue($values['removed'][0]))}</td>";
+                        } else {
+                            $text .= '<td>&nbsp;</td>';
+                        }
+                    } elseif (isset($values[0]) || isset($values[1])) {
+                        if (isset($values[0])) {
+                            $text .= "<td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
+                        } else {
+                            $text .= '<td>&nbsp;</td>';
+                        }
+                        if (isset($values[1])) {
+                            $text .= "<td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td>";
+                        } else {
+                            $text .= '<td>&nbsp;</td>';
+                        }
+                    }
                 } else {
                     $v = '';
                     foreach ($values as $k => $value) {

@@ -120,7 +120,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getAttachmentsSizeAction(Request $request)
     {
-        $assets = $request->get('assets', [], true);
+        $assets = $request->query->get('assets', []);
         $size   = 0;
         if ($assets) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */
@@ -287,8 +287,8 @@ class AjaxController extends CommonAjaxController
         /** @var EmailModel $model */
         $model = $this->getModel('email');
 
-        $id  = $request->get('id');
-        $ids = $request->get('ids');
+        $id  = $request->query->get('id');
+        $ids = $request->query->get('ids');
 
         // Support for legacy calls
         if (!$ids && $id) {
