@@ -30,7 +30,7 @@ class Notification extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -40,7 +40,7 @@ class Notification extends FormEntity
     private $language = 'en';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $url;
 
@@ -55,7 +55,7 @@ class Notification extends FormEntity
     private $message;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $button;
 
@@ -65,12 +65,12 @@ class Notification extends FormEntity
     private $utmTags = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -85,22 +85,22 @@ class Notification extends FormEntity
     private $sentCount = 0;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\NotificationBundle\Entity\Stat>
      */
     private $stats;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $notificationType = 'template';
 
@@ -225,7 +225,7 @@ class Notification extends FormEntity
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
                 if ('list' == $type) {
-                    $validator = $context->getValidator();
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
                         [
@@ -255,8 +255,6 @@ class Notification extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -285,10 +283,6 @@ class Notification extends FormEntity
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -362,8 +356,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $category
-     *
      * @return $this
      */
     public function setCategory($category)
@@ -467,8 +459,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $readCount
-     *
      * @return $this
      */
     public function setReadCount($readCount)
@@ -487,8 +477,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $language
-     *
      * @return $this
      */
     public function setLanguage($language)
@@ -508,8 +496,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $publishDown
-     *
      * @return $this
      */
     public function setPublishDown($publishDown)
@@ -529,8 +515,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $publishUp
-     *
      * @return $this
      */
     public function setPublishUp($publishUp)
@@ -550,8 +534,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)

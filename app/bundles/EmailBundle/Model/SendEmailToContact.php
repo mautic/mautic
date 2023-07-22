@@ -6,10 +6,10 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\Reference;
 use Mautic\EmailBundle\Stat\StatHelper;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -194,7 +194,7 @@ class SendEmailToContact
 
         $this->mailer->setTokens($tokens);
         $this->mailer->setLead($contact);
-        $this->mailer->setIdHash(); //auto generates
+        $this->mailer->setIdHash(); // auto generates
 
         try {
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
@@ -223,7 +223,7 @@ class SendEmailToContact
             list($success, $errors) = $this->sendStandardEmail();
         }
 
-        //queue or send the message
+        // queue or send the message
         if (!$success) {
             unset($errors['failures']);
             $this->failContact(false, implode('; ', (array) $errors));
@@ -235,9 +235,6 @@ class SendEmailToContact
      */
     public function reset()
     {
-        [];
-        [];
-        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];
@@ -248,8 +245,6 @@ class SendEmailToContact
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];
-
-        $this->dncModel->clearEntities();
 
         $this->mailer->reset();
     }
@@ -310,9 +305,6 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    /**
-     * @param $sendFailures
-     */
     protected function processSendFailures($sendFailures)
     {
         $failedEmailAddresses = $sendFailures['failures'];
@@ -359,9 +351,6 @@ class SendEmailToContact
         }
     }
 
-    /**
-     * @param $email
-     */
     protected function createContactStatEntry($email)
     {
         ++$this->statBatchCounter;

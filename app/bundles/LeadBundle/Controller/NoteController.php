@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use function assert;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
@@ -17,8 +16,6 @@ class NoteController extends FormController
 
     /**
      * Generate's default list view.
-     *
-     * @param $leadId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -37,7 +34,7 @@ class NoteController extends FormController
 
         $session = $request->getSession();
 
-        //set limits
+        // set limits
         $limit = $session->get(
             'mautic.lead.'.$lead->getId().'.note.limit',
             $this->coreParametersHelper->get('default_pagelimit')
@@ -50,7 +47,7 @@ class NoteController extends FormController
         $search = $request->get('search', $session->get('mautic.lead.'.$lead->getId().'.note.filter', ''));
         $session->set('mautic.lead.'.$lead->getId().'.note.filter', $search);
 
-        //do some default filtering
+        // do some default filtering
         $orderBy    = $session->get('mautic.lead.'.$lead->getId().'.note.orderby', 'n.dateTime');
         $orderByDir = $session->get('mautic.lead.'.$lead->getId().'.note.orderbydir', 'DESC');
 
@@ -64,7 +61,7 @@ class NoteController extends FormController
         ];
 
         $tmpl     = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $noteType = InputHelper::clean($request->request->get('noteTypes', [], true));
+        $noteType = InputHelper::clean($request->request->get('noteTypes') ?? []);
         if (empty($noteType) && 'index' === $tmpl) {
             $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []);
         }
@@ -130,8 +127,6 @@ class NoteController extends FormController
     /**
      * Generate's new note and processes post data.
      *
-     * @param $leadId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request, $leadId)
@@ -141,12 +136,12 @@ class NoteController extends FormController
             return $lead;
         }
 
-        //retrieve the entity
+        // retrieve the entity
         $note = new LeadNote();
         $note->setLead($lead);
 
         $model = $this->getModel('lead.note');
-        assert($model instanceof NoteModel);
+        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -154,17 +149,17 @@ class NoteController extends FormController
                 'leadId'       => $leadId,
             ]
         );
-        //get the user form factory
+        // get the user form factory
         $form       = $model->createForm($note, $this->formFactory, $action);
         $closeModal = false;
         $valid      = false;
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($note);
                 }
             } else {
@@ -179,7 +174,7 @@ class NoteController extends FormController
         ];
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars = [
                 'closeModal'    => 1,
                 'mauticContent' => 'leadNote',
@@ -216,9 +211,6 @@ class NoteController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param $leadId
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $leadId, $objectId)
@@ -229,7 +221,7 @@ class NoteController extends FormController
         }
 
         $model = $this->getModel('lead.note');
-        assert($model instanceof NoteModel);
+        \assert($model instanceof NoteModel);
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
@@ -248,11 +240,11 @@ class NoteController extends FormController
         );
         $form = $model->createForm($note, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (Request::METHOD_POST === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($note);
                     $closeModal = true;
                 }
@@ -268,7 +260,7 @@ class NoteController extends FormController
         ];
 
         if ($closeModal) {
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             if ($valid && !$cancelled) {
@@ -303,8 +295,6 @@ class NoteController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
      * @return Response
      */
     public function deleteAction(Request $request, $leadId, $objectId)
@@ -314,7 +304,7 @@ class NoteController extends FormController
             return $lead;
         }
         $model = $this->getModel('lead.note');
-        assert($model instanceof NoteModel);
+        \assert($model instanceof NoteModel);
         $note = $model->getEntity($objectId);
 
         if (null === $note) {
@@ -342,7 +332,6 @@ class NoteController extends FormController
     /**
      * Executes an action defined in route.
      *
-     * @param     $objectAction
      * @param int $objectId
      * @param int $leadId
      *

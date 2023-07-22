@@ -98,7 +98,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
-                        'contentTemplate' => '@MauticAsset/SubscribedEvents\Timeline/index.html.twig',
+                        'contentTemplate' => '@MauticAsset/SubscribedEvents/Timeline/index.html.twig',
                         'contactId'       => $download['lead_id'],
                     ]
                 );

@@ -33,8 +33,6 @@ class Adder
     }
 
     /**
-     * @param $isManualAction
-     *
      * @return CampaignMember
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
@@ -91,9 +89,6 @@ class Adder
         $this->saveCampaignMember($campaignMember);
     }
 
-    /**
-     * @param $campaignMember
-     */
     private function saveCampaignMember($campaignMember)
     {
         $this->leadRepository->saveEntity($campaignMember);

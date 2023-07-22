@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
  */
 class FixedMockFileSessionStorage extends MockFileSessionStorage
 {
-    public function setId($id)
+    public function setId(string $id)
     {
         if ($this->id !== $id) {
             parent::setId($id);

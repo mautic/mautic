@@ -74,8 +74,8 @@ class SmsType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        //add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        // add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -97,14 +97,14 @@ class SmsType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
-        //add category
+        // add category
         $builder->add(
-             'category',
-             CategoryListType::class,
-             [
-                 'bundle' => 'sms',
-             ]
-         );
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'sms',
+            ]
+        );
 
         $builder->add(
             'language',

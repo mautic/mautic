@@ -3,10 +3,9 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -47,42 +46,42 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $subject;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $useOwnerAsMailer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $replyToAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $bccAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
@@ -97,34 +96,34 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $utmTags = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $plainText;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customHtml;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $emailType = 'template';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $publicPreview = 0;
+    private $publicPreview = false;
 
     /**
      * @var int
@@ -142,17 +141,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -167,17 +166,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form
+     * @var \Mautic\FormBundle\Entity\Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 
@@ -259,24 +258,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
-        $builder->addNullableField('subject', Type::TEXT);
-        $builder->addNullableField('fromAddress', Type::STRING, 'from_address');
-        $builder->addNullableField('fromName', Type::STRING, 'from_name');
-        $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
-        $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
-        $builder->addNullableField('useOwnerAsMailer', Type::BOOLEAN, 'use_owner_as_mailer');
-        $builder->addNullableField('template', Type::STRING);
-        $builder->addNullableField('content', Type::TARRAY);
-        $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
-        $builder->addNullableField('plainText', Type::TEXT, 'plain_text');
-        $builder->addNullableField('customHtml', Type::TEXT, 'custom_html');
-        $builder->addNullableField('emailType', Type::TEXT, 'email_type');
+        $builder->addNullableField('subject', Types::TEXT);
+        $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
+        $builder->addNullableField('fromName', Types::STRING, 'from_name');
+        $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
+        $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
+        $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
+        $builder->addNullableField('template', Types::STRING);
+        $builder->addNullableField('content', Types::ARRAY);
+        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
+        $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
+        $builder->addNullableField('emailType', Types::TEXT, 'email_type');
         $builder->addPublishDates();
-        $builder->addNamedField('readCount', Type::INTEGER, 'read_count');
-        $builder->addNamedField('sentCount', Type::INTEGER, 'sent_count');
-        $builder->addNamedField('variantSentCount', Type::INTEGER, 'variant_sent_count');
-        $builder->addNamedField('variantReadCount', Type::INTEGER, 'variant_read_count');
-        $builder->addField('revision', Type::INTEGER);
+        $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
+        $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
+        $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
+        $builder->addNamedField('variantReadCount', Types::INTEGER, 'variant_read_count');
+        $builder->addField('revision', Types::INTEGER);
         $builder->addCategory();
 
         $builder->createManyToMany('lists', LeadList::class)
@@ -313,9 +312,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->build();
 
-        $builder->addField('headers', 'json_array');
+        $builder->addField('headers', Types::JSON);
 
-        $builder->addNullableField('publicPreview', Type::BOOLEAN, 'public_preview');
+        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -367,11 +366,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
-                $type = $email->getEmailType();
+                $type              = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
                 if ('list' == $type && null == $translationParent) {
-                    $validator = $context->getValidator();
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
                         [
@@ -394,7 +393,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
                 if ($email->isVariant()) {
                     // Get a summation of weights
-                    $parent = $email->getVariantParent();
+                    $parent   = $email->getVariantParent();
                     $children = $parent ? $parent->getVariantChildren() : $email->getVariantChildren();
 
                     $total = 0;
@@ -415,8 +414,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -464,10 +461,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -493,8 +486,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      */
     public function setName($name)
@@ -543,8 +534,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $category
-     *
      * @return $this
      */
     public function setCategory($category)
@@ -564,14 +553,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $content
-     *
      * @return $this
      */
     public function setContent($content)
     {
         // Ensure safe emoji
-        $content = EmojiHelper::toShort($content);
+        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
 
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -607,8 +594,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $readCount
-     *
      * @return $this
      */
     public function setReadCount($readCount)
@@ -627,8 +612,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $revision
-     *
      * @return $this
      */
     public function setRevision($revision)
@@ -647,8 +630,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $sessionId
-     *
      * @return $this
      */
     public function setSessionId($sessionId)
@@ -667,8 +648,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $subject
-     *
      * @return $this
      */
     public function setSubject($subject)
@@ -792,8 +771,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $template
-     *
      * @return $this
      */
     public function setTemplate($template)
@@ -813,8 +790,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $publishDown
-     *
      * @return $this
      */
     public function setPublishDown($publishDown)
@@ -834,8 +809,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $publishUp
-     *
      * @return $this
      */
     public function setPublishUp($publishUp)
@@ -857,8 +830,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -877,8 +848,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $variantSentCount
-     *
      * @return $this
      */
     public function setVariantSentCount($variantSentCount)
@@ -889,7 +858,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     public function getLists()
     {
@@ -913,7 +882,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setLists(array $lists = [])
     {
-        $this->lists = $lists;
+        $this->lists = new ArrayCollection($lists);
 
         return $this;
     }
@@ -935,8 +904,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $plainText
-     *
      * @return $this
      */
     public function setPlainText($plainText)
@@ -955,8 +922,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $variantReadCount
-     *
      * @return $this
      */
     public function setVariantReadCount($variantReadCount)
@@ -983,8 +948,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param $customHtml
-     *
      * @return $this
      */
     public function setCustomHtml($customHtml)
@@ -1109,16 +1072,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function cleanUrlsInContent()
     {
-        $this->decodeAmpersands($this->plainText);
-        $this->decodeAmpersands($this->customHtml);
+        if (is_string($this->plainText)) {
+            $this->decodeAmpersands($this->plainText);
+        }
+
+        if (is_string($this->customHtml)) {
+            $this->decodeAmpersands($this->customHtml);
+        }
     }
 
     /**
      * Check all links in content and decode ampersands.
-     *
-     * @param $content
      */
-    private function decodeAmpersands(&$content)
+    private function decodeAmpersands(string &$content): void
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
@@ -1135,7 +1101,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getReadPercentage($includevariants = false)
     {
         if ($this->getSentCount($includevariants) > 0) {
-            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+            return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
         } else {
             return 0;
         }

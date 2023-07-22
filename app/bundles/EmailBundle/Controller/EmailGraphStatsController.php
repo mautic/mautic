@@ -43,17 +43,17 @@ class EmailGraphStatsController extends AbstractController
         $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         if (null === $email || !$security->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
-                $email->getCreatedBy()
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
         )) {
             throw new AccessDeniedHttpException();
         }
 
-        //get A/B test information
+        // get A/B test information
         [$parent, $children] = $email->getVariants();
 
-        //get related translations
+        // get related translations
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph

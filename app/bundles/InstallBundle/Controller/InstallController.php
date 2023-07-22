@@ -2,16 +2,25 @@
 
 namespace Mautic\InstallBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
@@ -20,10 +29,12 @@ class InstallController extends CommonController
 
     private InstallService $installer;
 
-    public function __construct(Configurator $configurator, InstallService $installer)
+    public function __construct(Configurator $configurator, InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
         $this->configurator = $configurator;
         $this->installer    = $installer;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -33,7 +44,7 @@ class InstallController extends CommonController
      *
      * @return JsonResponse|Response
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
     {
@@ -116,18 +127,6 @@ class InstallController extends CommonController
                         // Store the data to repopulate the form
                         unset($formData->password);
                         $session->set('mautic.installer.user', $formData);
-
-                        $complete = true;
-                        break;
-
-                    case InstallService::EMAIL_STEP:
-                        $emailParam = (array) $formData;
-                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
-
-                        if (!empty($messages)) {
-                            $this->handleInstallerErrors($form, $messages);
-                            break;
-                        }
 
                         $complete = true;
                         break;

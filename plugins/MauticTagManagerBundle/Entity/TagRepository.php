@@ -20,7 +20,7 @@ class TagRepository extends BaseTagRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -36,15 +36,13 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         return count($result);
     }
 
     /**
      * Get a count of leads that belong to the tag.
-     *
-     * @param $tagIds
      *
      * @return array
      */
@@ -55,7 +53,7 @@ class TagRepository extends BaseTagRepository
         $q->select('count(ltx.lead_id) as thecount, ltx.tag_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
-        $returnArray = (is_array($tagIds));
+        $returnArray = is_array($tagIds);
 
         if (!$returnArray) {
             $tagIds = [$tagIds];
@@ -66,7 +64,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

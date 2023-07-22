@@ -283,7 +283,7 @@ return [
                 ],
                 'alias' => 'version',
             ],
-            'mautic.helper.tiwg.security' => [
+            'mautic.helper.twig.security' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
@@ -542,15 +542,6 @@ return [
                 ],
             ],
             // Helpers
-            'mautic.helper.assetgeneration' => [
-                'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.bundle',
-                    'mautic.helper.paths',
-                    'mautic.helper.app_version',
-                ],
-            ],
             'mautic.helper.cookie' => [
                 'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
@@ -838,27 +829,6 @@ return [
                 'tag' => 'mautic.update_check',
             ],
         ],
-        'models' => [
-            'mautic.core.model.auditlog' => [
-                'class' => 'Mautic\CoreBundle\Model\AuditLogModel',
-            ],
-            'mautic.core.model.notification' => [
-                'class'     => 'Mautic\CoreBundle\Model\NotificationModel',
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.helper.update',
-                    'mautic.helper.core_parameters',
-                ],
-                'methodCalls' => [
-                    'setDisableUpdates' => [
-                        '%mautic.security.disableUpdates%',
-                    ],
-                ],
-            ],
-            'mautic.core.model.form' => [
-                'class' => 'Mautic\CoreBundle\Model\FormModel',
-            ],
-        ],
         'validator' => [
             'mautic.core.validator.file_upload' => [
                 'class'     => \Mautic\CoreBundle\Validator\FileUploadValidator::class,
@@ -945,8 +915,8 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
-        'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
-        'rememberme_lifetime'             => 31536000, //365 days in seconds
+        'rememberme_key'                  => '%mautic.secret_key%',
+        'rememberme_lifetime'             => 31536000, // 365 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,
@@ -1357,29 +1327,30 @@ return [
             'yoozBot',
             'zgrab',
         ],
-        'do_not_track_internal_ips' => [],
-        'track_private_ip_ranges'   => false,
-        'link_shortener_url'        => null,
-        'cached_data_timeout'       => 10,
-        'batch_sleep_time'          => 1,
-        'batch_campaign_sleep_time' => false,
-        'transliterate_page_title'  => false,
-        'cors_restrict_domains'     => true,
-        'cors_valid_domains'        => [],
-        'headers_sts'               => false,
-        'headers_sts_expire_time'   => 60,
-        'headers_sts_subdomains'    => false,
-        'headers_sts_preload'       => false,
-        'max_entity_lock_time'      => 0,
-        'default_daterange_filter'  => '-1 month',
-        'debug'                     => false,
-        'rss_notification_url'      => '',
-        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
-        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
-        'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
-        'install_source'            => 'Mautic',
-        'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
-        'editor_fonts'              => [
+        'do_not_track_internal_ips'   => [],
+        'track_private_ip_ranges'     => false,
+        'link_shortener_url'          => null,
+        'link_shortener_enable_email' => false,
+        'cached_data_timeout'         => 10,
+        'batch_sleep_time'            => 1,
+        'batch_campaign_sleep_time'   => false,
+        'transliterate_page_title'    => false,
+        'cors_restrict_domains'       => true,
+        'cors_valid_domains'          => [],
+        'headers_sts'                 => false,
+        'headers_sts_expire_time'     => 60,
+        'headers_sts_subdomains'      => false,
+        'headers_sts_preload'         => false,
+        'max_entity_lock_time'        => 0,
+        'default_daterange_filter'    => '-1 month',
+        'debug'                       => false,
+        'rss_notification_url'        => '',
+        'translations_list_url'       => 'https://language-packs.mautic.com/manifest.json',
+        'translations_fetch_url'      => 'https://language-packs.mautic.com/',
+        'stats_update_url'            => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
+        'install_source'              => 'Mautic',
+        'system_update_url'           => 'https://api.github.com/repos/mautic/mautic/releases',
+        'editor_fonts'                => [
             [
                 'name' => 'Arial',
                 'font' => 'Arial, Helvetica Neue, Helvetica, sans-serif',
@@ -1466,6 +1437,7 @@ return [
             ],
         ],
         'composer_updates'   => false,
+        'load_froala_assets' => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only' => false,
     ],
 ];

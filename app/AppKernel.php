@@ -64,7 +64,7 @@ class AppKernel extends Kernel
             if (false === strpos($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
-                //check to see if the .htaccess file exists or if not running under apache
+                // check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
                     || !file_exists($this->getProjectDir().'/.htaccess')
                     && false === strpos(
@@ -112,7 +112,6 @@ class AppKernel extends Kernel
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
@@ -183,7 +182,7 @@ class AppKernel extends Kernel
             $dirname  = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
-            $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
+            $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
             if (class_exists($class)) {
                 $plugin = new $class();
 
@@ -238,14 +237,12 @@ class AppKernel extends Kernel
         // load parameters with defaults into the environment
         $parameterLoader = $this->getParameterLoader();
         $parameterLoader->loadIntoEnvironment();
-
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             // Set the table prefix before boot.
             // Firstly look into environment variables.
-            $prefix = getenv('MAUTIC_TABLE_PREFIX');
-
+            $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
             // Secondly look into the local.php file.
-            if (false === $prefix) {
+            if (empty($prefix)) {
                 $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');
             }
 
@@ -291,9 +288,9 @@ class AppKernel extends Kernel
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
             $dbDriver        = $localParameters->get('db_driver');
-            $mailerFromName  = $localParameters->get('mailer_from_name');
+            $siteUrl         = $localParameters->get('site_url');
 
-            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
+            $this->installed = !empty($dbDriver) && !empty($siteUrl);
         }
 
         return $this->installed;

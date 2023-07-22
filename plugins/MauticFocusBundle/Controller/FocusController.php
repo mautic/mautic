@@ -66,8 +66,6 @@ class FocusController extends AbstractStandardFormController
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function viewAction(Request $request, $objectId)
@@ -110,8 +108,6 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      *
      * @throws \Exception
@@ -161,13 +157,11 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus', []);
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);
@@ -198,7 +192,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus', []);
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);

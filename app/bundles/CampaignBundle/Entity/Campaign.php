@@ -28,42 +28,42 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
      */
     private $forms;
 
@@ -73,9 +73,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var bool
+     * @var int
      */
-    private $allowRestart = false;
+    private $allowRestart = 0;
 
     public function __construct()
     {
@@ -118,7 +118,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->createOneToMany('leads', Lead::class)
-            ->setIndexBy('lead_id')
             ->mappedBy('campaign')
             ->fetchExtraLazy()
             ->build();
@@ -159,8 +158,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -303,7 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param                                     $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
      *
      * @return Campaign
@@ -419,7 +415,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -429,7 +425,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Campaign
      */
@@ -444,7 +440,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -470,8 +466,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Add lead.
-     *
-     * @param $key
      *
      * @return Campaign
      */
@@ -586,7 +580,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function getAllowRestart()
     {
-        return $this->allowRestart;
+        return (bool) $this->allowRestart;
     }
 
     /**
@@ -606,7 +600,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         $this->isChanged('allowRestart', $allowRestart);
 
-        $this->allowRestart = $allowRestart;
+        $this->allowRestart = (int) $allowRestart;
 
         return $this;
     }

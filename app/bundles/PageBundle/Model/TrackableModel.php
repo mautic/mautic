@@ -2,13 +2,22 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends AbstractCommonModel<Trackable>
@@ -61,10 +70,12 @@ class TrackableModel extends AbstractCommonModel
     /**
      * TrackableModel constructor.
      */
-    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
+    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->redirectModel       = $redirectModel;
         $this->leadFieldRepository = $leadFieldRepository;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -74,7 +85,7 @@ class TrackableModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Trackable');
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
     }
 
     /**
@@ -106,10 +117,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Return a channel Trackable entity by URL.
      *
-     * @param $url
-     * @param $channel
-     * @param $channelId
-     *
      * @return Trackable|null
      */
     public function getTrackableByUrl($url, $channel, $channelId)
@@ -134,11 +141,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Get Trackable entities by an array of URLs.
      *
-     * @param $urls
-     * @param $channel
-     * @param $channelId
-     *
-     * @return array
+     * @return array<Trackable>
      */
     public function getTrackablesByUrls($urls, $channel, $channelId)
     {
@@ -154,8 +157,12 @@ class TrackableModel extends AbstractCommonModel
 
         $newRedirects  = [];
         $newTrackables = [];
-        $return        = [];
-        $byUrl         = [];
+
+        /** @var array<Trackable> $return */
+        $return = [];
+
+        /** @var array<string, Trackable> $byUrl */
+        $byUrl = [];
 
         /** @var Trackable $trackable */
         foreach ($trackables as $trackable) {
@@ -197,9 +204,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Get a list of URLs that are tracked by a specific channel.
      *
-     * @param $channel
-     * @param $channelId
-     *
      * @return mixed
      */
     public function getTrackableList($channel, $channelId)
@@ -233,7 +237,7 @@ class TrackableModel extends AbstractCommonModel
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
      *                                      or & for URLs tracked that include query parameters
      *
-     * @return array[mixed $content, array $trackables]
+     * @return array{0: mixed, 1: array<int|string, Redirect|Trackable>}
      */
     public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true)
     {
@@ -265,7 +269,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Converts array of Trackable or Redirect entities into {trackable} tokens.
      *
-     * @return array
+     * @param array<string, Trackable|Redirect> $entities
+     *
+     * @return array<string, Redirect|Trackable>
      */
     protected function createTrackingTokens(array $entities)
     {
@@ -326,8 +332,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param $content
-     *
      * @return array
      */
     protected function extractTrackablesFromContent($content)
@@ -361,7 +365,7 @@ class TrackableModel extends AbstractCommonModel
         libxml_use_internal_errors($libxmlPreviousState);
         $links = $dom->getElementsByTagName('a');
 
-        $xpath = new \DOMXpath($dom);
+        $xpath = new \DOMXPath($dom);
         $maps  = $xpath->query('//map/area');
 
         return array_merge($this->extractTrackables($links), $this->extractTrackables($maps));
@@ -395,10 +399,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Create a Trackable entity.
-     *
-     * @param $url
-     * @param $channel
-     * @param $channelId
      *
      * @return Trackable
      */
@@ -487,8 +487,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Determines if a URL/token is in the do not track list.
      *
-     * @param $url
-     *
      * @return bool
      */
     protected function isInDoNotTrack($url)
@@ -506,7 +504,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validates that a token is trackable as a URL.
      *
-     * @param      $token
      * @param null $tokenizedHost
      *
      * @return bool
@@ -544,7 +541,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param      $url
      * @param bool $forceScheme
      *
      * @return bool
@@ -608,9 +604,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Group query parameters into those that have tokens and those that do not.
      *
-     * @param $query
-     *
-     * @return array[$tokenizedParams[], $untokenizedParams[]]
+     * @return array<array<string, mixed>> [$tokenizedParams[], $untokenizedParams[]]
      */
     protected function parseTokenizedQuery($query)
     {
@@ -639,11 +633,7 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param $trackableUrls
-     * @param $channel
-     * @param $channelId
-     *
-     * @return array
+     * @return array<string, Trackable|Redirect>
      */
     protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId)
     {
@@ -657,8 +647,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param $parts
-     *
      * @return string
      */
     protected function httpBuildUrl($parts)
@@ -822,8 +810,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param $token
-     *
      * @return bool
      */
     private function isContactFieldToken($token)
@@ -832,9 +818,7 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param $content
-     * @param $channel
-     * @param $channelId
+     * @param array<int, Redirect|Trackable> $trackableTokens
      *
      * @return string
      */

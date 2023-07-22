@@ -11,7 +11,6 @@ class WebhookRepository extends CommonRepository
 {
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -22,7 +21,6 @@ class WebhookRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */

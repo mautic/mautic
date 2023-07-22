@@ -8,8 +8,6 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class ContactDeduper
 {
@@ -107,61 +105,6 @@ class ContactDeduper
 
             $loser = $winner;
         }
-    }
-
-    /**
-     * @deprecated Use the other methods in this service to compose what you need. See DeduplicateCommand for an example.
-     *
-     * @param bool $mergeNewerIntoOlder
-     *
-     * @return int
-     */
-    public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
-    {
-        $lastContactId             = 0;
-        $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
-        $progress                  = null;
-
-        if ($output) {
-            $progress = new ProgressBar($output, $totalContacts);
-        }
-
-        $dupCount = 0;
-        while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
-            $lastContactId = $contact->getId();
-            $fields        = $contact->getProfileFields();
-            $duplicates    = $this->checkForDuplicateContacts($fields, $mergeNewerIntoOlder);
-
-            if ($progress) {
-                $progress->advance();
-            }
-
-            // Were duplicates found?
-            if (count($duplicates) > 1) {
-                $loser = reset($duplicates);
-                while ($winner = next($duplicates)) {
-                    try {
-                        $this->contactMerger->merge($winner, $loser);
-
-                        ++$dupCount;
-
-                        if ($progress) {
-                            // Advance the progress bar for the deleted contacts that are no longer in the total count
-                            $progress->advance();
-                        }
-                    } catch (SameContactException $exception) {
-                    }
-
-                    $loser = $winner;
-                }
-            }
-
-            // Clear all entities in memory for RAM control
-            $this->leadRepository->clear();
-            gc_collect_cycles();
-        }
-
-        return $dupCount;
     }
 
     /**

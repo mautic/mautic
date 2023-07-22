@@ -25,14 +25,14 @@ abstract class AbstractChart
     /**
      * Date from.
      *
-     * @var \DateTime
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateFrom;
 
     /**
      * Date to.
      *
-     * @var \DateTime
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateTo;
 
@@ -128,10 +128,12 @@ abstract class AbstractChart
     /**
      * Sets the clones of the date range and validates it.
      */
-    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
     {
         $this->timezone = $dateFrom->getTimezone();
+        /** @var \DateTime $dateFrom */
         $this->dateFrom = clone $dateFrom;
+        /** @var \DateTime $dateTo */
         $this->dateTo   = clone $dateTo;
 
         // a diff of two identical dates returns 0, but we expect 24 hours
@@ -171,11 +173,11 @@ abstract class AbstractChart
     {
         switch ($this->unit) {
             case 's':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%s'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%s');
                 ++$amount;
                 break;
             case 'i':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%i'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%i');
                 ++$amount;
                 break;
             case 'd':

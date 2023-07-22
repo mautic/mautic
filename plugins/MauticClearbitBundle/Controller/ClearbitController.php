@@ -24,7 +24,7 @@ class ClearbitController extends FormController
     public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
         if ('POST' === $request->getMethod()) {
-            $data     = $request->request->get('clearbit_lookup', [], true);
+            $data     = $request->request->all()['clearbit_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -121,9 +121,9 @@ class ClearbitController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         if ('GET' === $request->getMethod()) {
-            $data = $request->query->get('clearbit_batch_lookup', [], true);
+            $data = $request->query->all()['clearbit_batch_lookup'] ?? [];
         } else {
-            $data = $request->request->get('clearbit_batch_lookup', [], true);
+            $data = $request->request->all()['clearbit_batch_lookup'] ?? [];
         }
 
         $entities = [];
@@ -157,10 +157,10 @@ class ClearbitController extends FormController
             /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess(
-                        'lead:leads:editown',
-                        'lead:leads:editother',
-                        $lead->getPermissionUser()
-                    )
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                )
                     && $lead->getEmail()
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();
@@ -236,10 +236,10 @@ class ClearbitController extends FormController
                             $lookupHelper->lookupContact($lead, $notify);
                         } catch (\Exception $ex) {
                             $this->addFlashMessage(
-                                    $ex->getMessage(),
-                                    [],
-                                    'error'
-                                );
+                                $ex->getMessage(),
+                                [],
+                                'error'
+                            );
                             --$count;
                         }
                     }
@@ -247,11 +247,11 @@ class ClearbitController extends FormController
 
                 if ($count) {
                     $this->addFlashMessage(
-                            'mautic.lead.batch_leads_affected',
-                            [
-                                '%count%'     => $count,
-                            ]
-                        );
+                        'mautic.lead.batch_leads_affected',
+                        [
+                            '%count%'     => $count,
+                        ]
+                    );
                 }
 
                 return new JsonResponse(
@@ -278,7 +278,7 @@ class ClearbitController extends FormController
     public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
         if ('POST' === $request->getMethod()) {
-            $data     = $request->request->get('clearbit_lookup', [], true);
+            $data     = $request->request->all()['clearbit_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -374,9 +374,9 @@ class ClearbitController extends FormController
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
         if ('GET' === $request->getMethod()) {
-            $data = $request->query->get('clearbit_batch_lookup', [], true);
+            $data = $request->query->all()['clearbit_batch_lookup'] ?? [];
         } else {
-            $data = $request->request->get('clearbit_batch_lookup', [], true);
+            $data = $request->request->all()['clearbit_batch_lookup'] ?? [];
         }
 
         $entities = [];

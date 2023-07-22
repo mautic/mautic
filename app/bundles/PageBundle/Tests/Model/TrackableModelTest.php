@@ -2,6 +2,11 @@
 
 namespace Mautic\PageBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
@@ -9,6 +14,9 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TrackableModelTest extends TestCase
 {
@@ -27,7 +35,18 @@ class TrackableModelTest extends TestCase
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
@@ -75,7 +94,18 @@ class TrackableModelTest extends TestCase
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
@@ -117,6 +147,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithStandardQuery(?bool $useMap): void
@@ -163,6 +194,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithoutQuery(?bool $useMap): void
@@ -209,6 +241,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithTokenizedQuery(?bool $useMap): void
@@ -462,7 +495,7 @@ class TrackableModelTest extends TestCase
             1
         );
 
-        $this->assertTrue((false !== strpos($content, $url)), $content);
+        $this->assertTrue(false !== strpos($content, $url), $content);
     }
 
     /**
@@ -475,6 +508,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testTokenAsHostIsConvertedToTrackableToken(?bool $useMap): void
@@ -516,6 +550,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     *
      * @dataProvider trackMapProvider
      */
     public function testUrlsWithSameBaseAreReplacedCorrectly(?bool $useMap): void
@@ -603,6 +638,7 @@ TEXT;
         // Has a URL so has one trackable
         reset($trackables);
         $token = key($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
@@ -642,6 +678,7 @@ TEXT;
         // Has a URL so has one trackable
         reset($trackables);
         $token = key($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
@@ -668,7 +705,18 @@ TEXT;
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
@@ -697,8 +745,6 @@ TEXT;
     }
 
     /**
-     * @param $url
-     *
      * @return Trackable
      */
     protected function getTrackableEntity($url)
