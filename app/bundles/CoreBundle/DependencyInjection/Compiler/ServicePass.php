@@ -44,6 +44,7 @@ final class ServicePass implements CompilerPassInterface
                             break;
                         case 'models':
                             $defaultTag = 'mautic.model';
+                            @trigger_error('Setting "models" in config is deprecated. Convert to using autowiring.', E_USER_DEPRECATED);
                             break;
                         case 'permissions':
                             $defaultTag = 'mautic.permissions';

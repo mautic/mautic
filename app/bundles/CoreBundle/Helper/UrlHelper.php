@@ -273,7 +273,7 @@ class UrlHelper
 
             if ($parsedQuery) {
                 $encodedQuery = http_build_query($parsedQuery);
-                $url          = str_replace($query, $encodedQuery, $url);
+                $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
 

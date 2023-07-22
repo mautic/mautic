@@ -14,7 +14,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -52,7 +52,7 @@ class ContactTracker
     private $trackedContact;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -89,7 +89,7 @@ class ContactTracker
         ContactTrackingServiceInterface $contactTrackingService,
         DeviceTracker $deviceTracker,
         CorePermissions $security,
-        Logger $logger,
+        LoggerInterface $mauticLogger,
         IpLookupHelper $ipLookupHelper,
         RequestStack $requestStack,
         CoreParametersHelper $coreParametersHelper,
@@ -100,7 +100,7 @@ class ContactTracker
         $this->contactTrackingService = $contactTrackingService;
         $this->deviceTracker          = $deviceTracker;
         $this->security               = $security;
-        $this->logger                 = $logger;
+        $this->logger                 = $mauticLogger;
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->requestStack           = $requestStack;
         $this->coreParametersHelper   = $coreParametersHelper;
