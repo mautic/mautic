@@ -1,12 +1,18 @@
 import DynamicContentBlocks from './dynamicContent/dynamicContent.blocks';
 import ContentService from './content.service';
 import ButtonBlock from './buttonBlock';
+import BlocksMjml from './blocks/blocks.mjml';
 
 export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
   const blocks = bm.getAll();
 
   const mode = ContentService.getMode(editor);
+
+  if (mode === ContentService.modeEmailMjml) {
+    const blockMjml = new BlocksMjml(editor);
+    blockMjml.addBlocks();
+  }
 
   // a add button block for landing page
   if (mode === ContentService.modePageHtml) {
@@ -44,18 +50,27 @@ export default (editor, opts = {}) => {
   // MJML columns
   if (typeof bm.get('mj-1-column') !== 'undefined') {
     bm.get('mj-1-column').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.oneColumn'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-2-columns') !== 'undefined') {
     bm.get('mj-2-columns').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.twoColumn'),
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
 
   if (typeof bm.get('mj-3-columns') !== 'undefined') {
     bm.get('mj-3-columns').set({
+      label: Mautic.translate('grapesjsbuilder.components.names.threeColumn'),
+      category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
+    });
+  }
+
+  if (typeof bm.get('mj-37-columns') !== 'undefined') {
+    bm.get('mj-37-columns').set({
       category: Mautic.translate('grapesjsbuilder.categorySectionLabel'),
     });
   }
