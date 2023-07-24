@@ -445,7 +445,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 if (isset($join['l'])) {
                     $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
-                        if (str_contains($where, $item["joinAlias"].'.leadlist_id')) {
+                        if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
                             $queryBuilder->add('join', ['l' => $item], true);
                         }
                     }
