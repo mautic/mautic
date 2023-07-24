@@ -5,9 +5,14 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
@@ -16,26 +21,19 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class FocusController.
- */
 class FocusController extends AbstractStandardFormController
 {
     private CacheProvider $cacheProvider;
 
-    public function __construct(
-        CorePermissions $security,
-        UserHelper $userHelper,
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $managerRegistry,
-        CacheProvider $cacheProvider,
-    ) {
+    public function __construct(CacheProvider $cacheProvider, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    {
         $this->cacheProvider = $cacheProvider;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $managerRegistry);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getTemplateBase(): string

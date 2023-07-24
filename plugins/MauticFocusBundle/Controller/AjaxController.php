@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -13,15 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    private CacheProvider $cacheProvider;
-
-    public function __construct(ManagerRegistry $doctrine, CacheProvider $cacheProvider)
-    {
-        $this->cacheProvider = $cacheProvider;
-
-        parent::__construct($doctrine);
-    }
-
     /**
      * This method produces HTTP request checking headers which are blocking availability for iframe inheritance for other pages.
      */
@@ -52,7 +42,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($responseContent);
     }
 
-    public function getViewsCountAction(Request $request): JsonResponse
+    public function getViewsCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
@@ -64,7 +54,7 @@ class AjaxController extends CommonAjaxController
         }
 
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
-        $cacheItem    = $this->cacheProvider->getItem('focus.viewsCount.'.$focusId);
+        $cacheItem    = $cacheProvider->getItem('focus.viewsCount.'.$focusId);
 
         if ($cacheItem->isHit()) {
             $cacheItemValue   = $cacheItem->get();
@@ -89,7 +79,7 @@ class AjaxController extends CommonAjaxController
             ]);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
-            $this->cacheProvider->save($cacheItem);
+            $cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
@@ -99,7 +89,7 @@ class AjaxController extends CommonAjaxController
         ]);
     }
 
-    public function getClickThroughCountAction(Request $request): JsonResponse
+    public function getClickThroughCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
@@ -111,7 +101,7 @@ class AjaxController extends CommonAjaxController
         }
 
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
-        $cacheItem    = $this->cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
+        $cacheItem    = $cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
 
         if ($cacheItem->isHit()) {
             $clickThroughCount = $cacheItem->get();
@@ -130,7 +120,7 @@ class AjaxController extends CommonAjaxController
             $cacheItem->set($clickThroughCount);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);
-            $this->cacheProvider->save($cacheItem);
+            $cacheProvider->save($cacheItem);
         }
 
         return $this->sendJsonResponse([
