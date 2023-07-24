@@ -105,8 +105,6 @@ class PostCount
     }
 
     /**
-     * @param $postDate
-     *
      * @return $this
      */
     public function setPostDate($postDate)

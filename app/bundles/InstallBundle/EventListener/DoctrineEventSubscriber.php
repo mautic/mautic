@@ -46,7 +46,7 @@ class DoctrineEventSubscriber implements EventSubscriber
             if ('leads' === $tableName) {
                 // Add an attribution index
                 $table->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
-                //Add date added and country index
+                // Add date added and country index
                 $table->addIndex(['date_added', 'country'], 'date_added_country_index');
             } else {
                 $table->addIndex(['companyname', 'companyemail'], 'company_filter');

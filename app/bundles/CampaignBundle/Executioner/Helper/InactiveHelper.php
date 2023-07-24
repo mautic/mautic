@@ -147,8 +147,6 @@ class InactiveHelper
     }
 
     /**
-     * @param $decisionId
-     *
      * @return ArrayCollection
      */
     public function getCollectionByDecisionId($decisionId)
@@ -182,8 +180,6 @@ class InactiveHelper
     }
 
     /**
-     * @param $lastActiveEventId
-     *
      * @return array|ArrayCollection
      */
     private function getLastActiveDates($lastActiveEventId, array $contactIds)

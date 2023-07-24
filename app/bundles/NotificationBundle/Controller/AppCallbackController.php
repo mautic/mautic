@@ -2,7 +2,6 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use function assert;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
@@ -50,7 +49,7 @@ class AppCallbackController extends CommonController
             if (null !== $notification) {
                 $statCreated       = true;
                 $notificationModel = $this->getModel('notification');
-                assert($notificationModel instanceof NotificationModel);
+                \assert($notificationModel instanceof NotificationModel);
                 $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }

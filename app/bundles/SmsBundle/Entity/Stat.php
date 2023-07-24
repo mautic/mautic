@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -127,13 +128,11 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->addField('details', 'json');
+        $builder->addField('details', Types::JSON);
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

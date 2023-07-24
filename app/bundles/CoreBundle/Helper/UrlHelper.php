@@ -21,8 +21,6 @@ class UrlHelper
     /**
      * Shorten a URL.
      *
-     * @param $url
-     *
      * @return mixed
      */
     public function buildShortUrl($url)
@@ -82,8 +80,6 @@ class UrlHelper
     }
 
     /**
-     * @param $rel
-     *
      * @return string
      */
     public static function rel2abs($rel)
@@ -277,7 +273,7 @@ class UrlHelper
 
             if ($parsedQuery) {
                 $encodedQuery = http_build_query($parsedQuery);
-                $url          = str_replace($query, $encodedQuery, $url);
+                $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
 

@@ -69,17 +69,17 @@ class AjaxController extends CommonController
         Request $request,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
-        //process ajax actions
+        // process ajax actions
         $action     = $request->get('action');
         $bundleName = null;
         if (empty($action)) {
-            //check POST
+            // check POST
             $action = $request->request->get('action');
         }
 
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (false !== strpos($action, ':')) {
-                //call the specified bundle's ajax action
+                // call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
 
@@ -120,7 +120,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param      $action
      * @param null $bundle
      *
      * @return Response
@@ -207,9 +206,9 @@ class AjaxController extends CommonController
         $dataArray   = [];
         $dupChecker  = [];
         foreach ($allCommands as $commands) {
-            //@todo if/when figure out a way for typeahead dynamic headers
-            //$header = $translator->trans($header);
-            //$dataArray[$header] = array();
+            // @todo if/when figure out a way for typeahead dynamic headers
+            // $header = $translator->trans($header);
+            // $dataArray[$header] = array();
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
@@ -232,9 +231,9 @@ class AjaxController extends CommonController
                     }
                 }
             }
-            //sort($dataArray[$header]);
+            // sort($dataArray[$header]);
         }
-        //ksort($dataArray);
+        // ksort($dataArray);
         sort($dataArray);
 
         return $this->sendJsonResponse($dataArray);
@@ -286,7 +285,7 @@ class AjaxController extends CommonController
             if ($hasPermission) {
                 try {
                     $dataArray['success'] = 1;
-                    //toggle permission state
+                    // toggle permission state
                     if ($customToggle) {
                         $accessor = PropertyAccess::createPropertyAccessor();
                         $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
@@ -302,7 +301,7 @@ class AjaxController extends CommonController
                         $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
                         $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
 
-                        //get updated icon HTML
+                        // get updated icon HTML
                         $html = $this->renderView(
                             '@MauticCore/Helper/publishstatus_icon.html.twig',
                             [
@@ -350,7 +349,7 @@ class AjaxController extends CommonController
         if (method_exists($entity, 'getCheckedOutBy')) {
             $checkedOut = $entity->getCheckedOutBy();
             if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
-                //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                // entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
@@ -635,9 +634,9 @@ class AjaxController extends CommonController
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans(
-                    'mautic.core.update.error',
-                    ['%error%' => $translator->trans('mautic.core.update.error_performing_migration')]
-                ).' <a href="'.$this->generateUrl('mautic_core_update_schema', ['update' => 1])
+                'mautic.core.update.error',
+                ['%error%' => $translator->trans('mautic.core.update.error_performing_migration')]
+            ).' <a href="'.$this->generateUrl('mautic_core_update_schema', ['update' => 1])
                 .'" class="btn btn-primary btn-xs" data-toggle="ajax">'.$translator->trans('mautic.core.retry').'</a>';
 
             // A way to keep the upgrade from failing if the session is lost after

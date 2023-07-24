@@ -191,7 +191,7 @@ class ContactSegmentFilterCrate
             $operator = ('=' === $operator) === $this->getFilter() ? 'notEmpty' : 'empty';
         }
 
-        if ('=' === $operator && is_array($this->getFilter())) { //Fix for old segments which can have stored = instead on in operator
+        if ('=' === $operator && is_array($this->getFilter())) { // Fix for old segments which can have stored = instead on in operator
             $operator = 'in';
         }
 

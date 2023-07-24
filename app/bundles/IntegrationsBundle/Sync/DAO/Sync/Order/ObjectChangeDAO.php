@@ -81,9 +81,6 @@ class ObjectChangeDAO
         return $this->integration;
     }
 
-    /**
-     * @return ObjectChangeDAO
-     */
     public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): self
     {
         $this->fields[$fieldDAO->getName()]                = $fieldDAO;

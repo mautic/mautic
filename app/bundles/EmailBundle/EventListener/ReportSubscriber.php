@@ -539,7 +539,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
-                        (($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0))
+                        ($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0)
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.unsubscribed'),

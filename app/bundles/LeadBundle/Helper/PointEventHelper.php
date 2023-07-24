@@ -8,10 +8,6 @@ namespace Mautic\LeadBundle\Helper;
 class PointEventHelper
 {
     /**
-     * @param $event
-     * @param $factory
-     * @param $lead
-     *
      * @return bool
      */
     public static function changeLists($event, $factory, $lead)

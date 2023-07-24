@@ -286,8 +286,6 @@ class Event implements ChannelInterface
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -622,8 +620,6 @@ class Event implements ChannelInterface
     /**
      * Get log for a contact and a rotation.
      *
-     * @param $rotation
-     *
      * @return LeadEventLog|null
      */
     public function getLogByContactAndRotation(Contact $contact, $rotation)
@@ -695,8 +691,6 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @param $type
-     *
      * @return ArrayCollection
      */
     public function getChildrenByType($type)
@@ -707,8 +701,6 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @param $type
-     *
      * @return ArrayCollection
      */
     public function getChildrenByEventType($type)
@@ -839,8 +831,6 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @param $eventType
-     *
      * @return $this
      */
     public function setEventType($eventType)

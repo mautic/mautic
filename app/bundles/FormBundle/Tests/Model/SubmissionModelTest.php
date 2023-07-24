@@ -6,8 +6,10 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Entity\Field;
@@ -33,12 +35,10 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -175,7 +175,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $submissionModel;
 
     /**
-     * @var ReflectionClass<SubmissionModel>
+     * @var \ReflectionClass<SubmissionModel>
      */
     private $submissionModelReflection;
 
@@ -216,6 +216,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
 
+        $this->fieldHelper->method('getFieldFilter')->willReturn('string');
+
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->twigMock,
@@ -233,16 +235,18 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             new FieldValueTransformer($this->router),
             $this->dateHelper,
             $this->contactTracker,
-            $this->contactMerger
+            $this->contactMerger,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->userHelper,
+            $this->mockLogger,
+            $this->createMock(CoreParametersHelper::class)
         );
 
-        $this->submissionModel->setDispatcher($this->dispatcher);
-        $this->submissionModel->setTranslator($this->translator);
-        $this->submissionModel->setEntityManager($this->entityManager);
-        $this->submissionModel->setUserHelper($this->userHelper);
-        $this->submissionModel->setLogger($this->mockLogger);
-
-        $this->submissionModelReflection = new ReflectionClass($this->submissionModel);
+        $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
     }
 
     public function testSaveSubmission(): void
@@ -476,9 +480,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function getAccessibleReflectionMethod(string $name): ReflectionMethod
+    public function getAccessibleReflectionMethod(string $name): \ReflectionMethod
     {
         $method = $this->submissionModelReflection->getMethod($name);
         $method->setAccessible(true);
@@ -505,7 +509,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         try {
             $getExportHeaderRef = $this->getAccessibleReflectionMethod('getExportHeader');
             $header             = $getExportHeaderRef->invokeArgs($this->submissionModel, [$form, $viewOnlyFields]);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -523,7 +527,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $getExportHeaderForPageRef = $this->getAccessibleReflectionMethod('getExportHeaderForPage');
             $header1                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, []);
             $header2                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, ['xlsx']);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -542,7 +546,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         try {
             $putCsvExportRowRef = $this->getAccessibleReflectionMethod('putCsvExportRow');
             $putCsvExportRowRef->invokeArgs($this->submissionModel, [$handle, $header]);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -584,7 +588,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         try {
             $getExportRowRef = $this->getAccessibleReflectionMethod('getExportRow');
             $result          = $getExportRowRef->invokeArgs($this->submissionModel, [$fixture, $viewOnlyFields]);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -617,7 +621,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $getExportRowForPageRef = $this->getAccessibleReflectionMethod('getExportRowForPage');
             $row1                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture]);
             $row2                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture, 'xlsx']);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             $this->fail($e->getMessage());
         }
 

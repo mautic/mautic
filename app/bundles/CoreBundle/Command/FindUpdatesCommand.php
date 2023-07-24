@@ -27,13 +27,12 @@ class FindUpdatesCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:update:find')
-            ->setDescription('Fetches updates for Mautic')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 
 <info>php %command.full_name%</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -49,6 +48,7 @@ EOT
             $output->writeln($this->translator->trans('mautic.core.updater.cli.update'));
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetches updates for Mautic';
 }

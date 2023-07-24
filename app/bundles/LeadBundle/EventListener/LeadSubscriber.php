@@ -120,8 +120,8 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
-        //Because there is an event within an event, there is a risk that something will trigger a loop which
-        //needs to be prevented
+        // Because there is an event within an event, there is a risk that something will trigger a loop which
+        // needs to be prevented
         static $preventLoop = [];
 
         $lead = $event->getLead();
@@ -150,7 +150,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
                 // Date identified entry
                 if (isset($details['dateIdentified'])) {
-                    //log the day lead was identified
+                    // log the day lead was identified
                     $log = [
                         'bundle'    => 'lead',
                         'object'    => 'lead',
@@ -379,10 +379,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $lead = $event->getLead();
@@ -421,10 +417,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
@@ -454,10 +446,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
@@ -489,10 +477,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $utmRepo = $this->entityManager->getRepository(UtmTag::class);
@@ -506,54 +490,50 @@ class LeadSubscriber implements EventSubscriberInterface
                 $icon = 'fa-tag';
                 if (isset($utmTag['utm_medium'])) {
                     switch (strtolower($utmTag['utm_medium'])) {
-                            case 'social':
-                            case 'socialmedia':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
-                                break;
-                            case 'email':
-                            case 'newsletter':
-                                $icon = 'fa-envelope-o';
-                                break;
-                            case 'banner':
-                            case 'ad':
-                                $icon = 'fa-bullseye';
-                                break;
-                            case 'cpc':
-                                $icon = 'fa-money';
-                                break;
-                            case 'location':
-                                $icon = 'fa-map-marker';
-                                break;
-                            case 'device':
-                                $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
-                                break;
-                        }
+                        case 'social':
+                        case 'socialmedia':
+                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
+                            break;
+                        case 'email':
+                        case 'newsletter':
+                            $icon = 'fa-envelope-o';
+                            break;
+                        case 'banner':
+                        case 'ad':
+                            $icon = 'fa-bullseye';
+                            break;
+                        case 'cpc':
+                            $icon = 'fa-money';
+                            break;
+                        case 'location':
+                            $icon = 'fa-map-marker';
+                            break;
+                        case 'device':
+                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
+                            break;
+                    }
                 }
                 $event->addEvent(
-                        [
-                            'event'      => $eventTypeKey,
-                            'eventType'  => $eventTypeName,
-                            'eventId'    => $eventTypeKey.$utmTag['id'],
-                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
-                            'timestamp'  => $utmTag['date_added'],
-                            'icon'       => $icon,
-                            'extra'      => [
-                                'utmtags' => $utmTag,
-                            ],
-                            'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/utmadded.html.twig',
-                            'contactId'       => $utmTag['lead_id'],
-                        ]
-                    );
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventType'  => $eventTypeName,
+                        'eventId'    => $eventTypeKey.$utmTag['id'],
+                        'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
+                        'timestamp'  => $utmTag['date_added'],
+                        'icon'       => $icon,
+                        'extra'      => [
+                            'utmtags' => $utmTag,
+                        ],
+                        'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/utmadded.html.twig',
+                        'contactId'       => $utmTag['lead_id'],
+                    ]
+                );
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
@@ -621,10 +601,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         /** @var LeadEventLogRepository */
@@ -654,38 +630,34 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
                 $eventLabel = $this->translator->trans('mautic.lead.import.contact.action.'.$import['action'], ['%name%' => $eventLabel]);
                 $event->addEvent(
-                        [
-                            'event'      => $eventTypeKey,
-                            'eventId'    => $eventTypeKey.$import['id'],
-                            'eventType'  => $eventTypeName,
-                            'eventLabel' => !empty($import['object_id']) ? [
-                                'label' => $eventLabel,
-                                'href'  => $this->router->generate(
-                                    'mautic_import_action',
-                                    [
-                                        'objectAction' => 'view',
-                                        'object'       => 'contacts',
-                                        'objectId'     => $import['object_id'],
-                                    ]
-                                ),
-                            ] : $eventLabel,
-                            'timestamp'       => $import['date_added'],
-                            'icon'            => 'fa-download',
-                            'extra'           => $import,
-                            'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/import.html.twig',
-                            'contactId'       => $import['lead_id'],
-                        ]
-                    );
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$import['id'],
+                        'eventType'  => $eventTypeName,
+                        'eventLabel' => !empty($import['object_id']) ? [
+                            'label' => $eventLabel,
+                            'href'  => $this->router->generate(
+                                'mautic_import_action',
+                                [
+                                    'objectAction' => 'view',
+                                    'object'       => 'contacts',
+                                    'objectId'     => $import['object_id'],
+                                ]
+                            ),
+                        ] : $eventLabel,
+                        'timestamp'       => $import['date_added'],
+                        'icon'            => 'fa-download',
+                        'extra'           => $import,
+                        'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/import.html.twig',
+                        'contactId'       => $import['lead_id'],
+                    ]
+                );
             }
         } else {
             // Purposively not including this
         }
     }
 
-    /**
-     * @param $eventTypeKey
-     * @param $eventTypeName
-     */
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         /** @var LeadEventLogRepository */
