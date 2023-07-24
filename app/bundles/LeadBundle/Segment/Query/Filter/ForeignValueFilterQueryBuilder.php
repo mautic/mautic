@@ -38,7 +38,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
+        $subQueryBuilder = $queryBuilder->createQueryBuilder();
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
@@ -81,7 +81,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
 
-                $expression = $subQueryBuilder->expr()->orX(
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
@@ -95,7 +95,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->select('NULL')->from($filter->getTable(), $tableAlias)
                     ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
 
-                $expression = $subQueryBuilder->expr()->orX(
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
                 );
