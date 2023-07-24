@@ -443,16 +443,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
                 if (isset($join['l'])) {
+                    $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
-                        switch ($item['joinType']) {
-                            case 'left':
-                                $queryBuilder->leftJoin('l', $item['joinTable'], $item['joinAlias'], $item['joinCondition']);
-                                break;
-                            case 'right':
-                                $queryBuilder->rightJoin('l', $item['joinTable'], $item['joinAlias'], $item['joinCondition']);
-                                break;
-                            default:
-                                $queryBuilder->join('l', $item['joinTable'], $item['joinAlias'], $item['joinCondition']);
+                        if (str_contains($where, $item["joinAlias"].'.leadlist_id')) {
+                            $queryBuilder->add('join', ['l' => $item], true);
                         }
                     }
                 }
