@@ -777,7 +777,6 @@ class StatRepository extends CommonRepository
                         ->setParameter('source', 'campaign.event');
                     break;
                 case 'email':
-                default:
                     $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
                         ->andWhere("{$statsAlias}.email_id in (:emails)")
                         ->setParameter('emails', $entityIds, ArrayParameterType::INTEGER);

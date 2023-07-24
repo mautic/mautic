@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Intl\Countries;
@@ -30,7 +31,7 @@ abstract class AbstractCountryMapController extends AbstractController
      *
      * @return array<int, array<string, int|string>>
      */
-    abstract protected function getData(Request $request, $entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
+    abstract public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
 
     /**
      * @param array<string, int> $legendValues
@@ -44,7 +45,6 @@ abstract class AbstractCountryMapController extends AbstractController
      * @throws \Exception
      */
     public function viewAction(
-        Request $request,
         CorePermissions $security,
         int $objectId,
         string $dateFrom = '',
@@ -60,7 +60,7 @@ abstract class AbstractCountryMapController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getData($request, $entity, new \DateTime($dateFrom), new \DateTime($dateTo));
+        $statsCountries = $this->getData($entity, new \DateTime($dateFrom), new \DateTime($dateTo));
         $mapData        = self::buildMapData($statsCountries);
 
         return $this->render(
@@ -88,7 +88,7 @@ abstract class AbstractCountryMapController extends AbstractController
             $mappedData = empty($statsCountries) ? [] : self::mapCountries($statsCountries, $key);
 
             $result[] = [
-                'data'       => $mappedData['data'],
+                'data'       => $mappedData['data'] ?? [],
                 'label'      => $value['label'],
                 'legendText' => self::getOptionLegendText([
                     '%total'       => $mappedData['total'] ?? 0,
@@ -123,7 +123,7 @@ abstract class AbstractCountryMapController extends AbstractController
                 $countryCode                   = $countries[$countryName];
 
                 if (!empty($s[$countKey])) {
-                    $results['data'][$countryCode] = $s[$countKey];
+                    $results['data'][$countryCode] = (int) $s[$countKey];
                 }
 
                 $results['totalWithCountry'] += $s[$countKey];

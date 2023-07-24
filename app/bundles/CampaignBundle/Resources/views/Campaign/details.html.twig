@@ -97,7 +97,7 @@
                             {{ 'mautic.campaign.stats'|trans }}
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
                             {{ 'mautic.email.thead.maps'|trans }}
                         </a>
@@ -114,8 +114,7 @@
 
             <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
-                    <div id="emailGraphStats"
-                    >
+                    <div id="emailGraphStats">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData': stats,
                             'chartType': 'line',

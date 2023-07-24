@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Controller;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @extends AbstractCountryMapController<EmailModel>
@@ -36,7 +37,7 @@ class EmailMapStatsController extends AbstractCountryMapController
      *
      * @throws Exception
      */
-    protected function getData(Request $request, $entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();

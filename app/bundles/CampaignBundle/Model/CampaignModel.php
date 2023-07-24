@@ -838,7 +838,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws Exception
      */
-    public function getEmailsCountryStats(Campaign $campaign, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
+    public function getEmailsCountryStats(Campaign $campaign, \DateTime $dateFrom, \DateTime $dateTo): array
     {
         $eventsEmailsSend     = $campaign->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();

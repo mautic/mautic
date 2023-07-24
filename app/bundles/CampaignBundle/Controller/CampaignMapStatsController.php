@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AbstractCountryMapController;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @extends AbstractCountryMapController<CampaignModel>
@@ -36,7 +37,7 @@ class CampaignMapStatsController extends AbstractCountryMapController
      *
      * @throws Exception
      */
-    protected function getData(Request $request, $entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
         return $this->model->getEmailsCountryStats(
             $entity,
