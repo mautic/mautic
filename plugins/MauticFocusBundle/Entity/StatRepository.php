@@ -55,7 +55,7 @@ class StatRepository extends CommonRepository
             ->setParameter('id', $id)
             ->setParameter('type', Stat::TYPE_NOTIFICATION);
 
-        return (int) $q->execute()->fetchOne();
+        return (int) $q->executeQuery()->fetchOne();
     }
 
     public function getUniqueViewsCount(int $id): int
@@ -74,7 +74,7 @@ class StatRepository extends CommonRepository
             ->setParameter('id', $id)
             ->setParameter('type', Stat::TYPE_NOTIFICATION);
 
-        return (int) $q->execute()->fetchOne();
+        return (int) $q->executeQuery()->fetchOne();
     }
 
     public function getClickThroughCount(int $id): int
@@ -93,6 +93,6 @@ class StatRepository extends CommonRepository
             ->setParameter('id', $id)
             ->setParameter('type', Stat::TYPE_CLICK);
 
-        return (int) $q->execute()->fetchOne();
+        return (int) $q->executeQuery()->fetchOne();
     }
 }
