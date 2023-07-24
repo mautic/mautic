@@ -1,5 +1,6 @@
 import ContentService from '../content.service';
 import MjmlService from '../mjml/mjml.service';
+import EditorFontsService from '../editorFonts/editorFonts.service';
 
 export default class ButtonCloseCommands {
   static closeEditorPageHtml(editor) {
@@ -8,13 +9,14 @@ export default class ButtonCloseCommands {
     }
 
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
-
     const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
-    const htmlCode = ContentService.serializeHtmlDocument(htmlDocument);
+    let htmlString = ContentService.serializeHtmlDocument(htmlDocument);
 
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode);
+    if (mauticEditorFonts) {
+      htmlString = EditorFontsService.addFontLinksToHtml(htmlString);
+    }
 
-    // Reset HTML
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlString); // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
   }
 
@@ -23,14 +25,16 @@ export default class ButtonCloseCommands {
       throw new Error('No email-HTML editor');
     }
 
-    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
+    editor.runCommand('preset-mautic:dynamic-content-components-to-tokens'); // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
 
     // Getting HTML with CSS inline (only available for "grapesjs-preset-newsletter"):
-    const htmlCode = ContentService.getEditorHtmlContent(editor);
+    let html = ContentService.getEditorHtmlContent(editor);
 
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode);
+    if (mauticEditorFonts) {
+      html = EditorFontsService.addFontLinksToHtml(html);
+    }
 
-    // Reset HTML
+    ButtonCloseCommands.returnContentToTextarea(editor, html); // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
   }
 
@@ -38,18 +42,20 @@ export default class ButtonCloseCommands {
     if (!editor) {
       throw new Error('No email-MJML editor');
     }
+
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
+    let htmlCode = MjmlService.getEditorHtmlContent(editor);
+    const mjmlCode = MjmlService.getEditorMjmlContent(editor); // Update textarea for save
 
-    const htmlCode = MjmlService.getEditorHtmlContent(editor);
-    const mjmlCode = MjmlService.getEditorMjmlContent(editor);
-
-    // Update textarea for save
     if (!htmlCode || !mjmlCode) {
       throw new Error('Could not generate html from MJML');
     }
-    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
 
-    // Reset HTML
+    if (mauticEditorFonts) {
+      htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
+    }
+
+    ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode); // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
   }
 
