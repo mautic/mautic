@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "62dbf5f375f82bd356395b5bac389a8ef30eea71"
+                "reference": "d5134fde9b89d4611672ad1a7b5a5994ab6e239b"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5923,10 +5923,13 @@
                     "file-mapping": {
                         "[project-root]/.env": "assets/scaffold/files/.env",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
+                        "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
+                        "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
