@@ -92,6 +92,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Deprecated cookie `mtc_sid` removed.
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
+    * Removed onlyForBC themes: coffee, Mauve, nature
 
 # Dependency injection improvements
 
