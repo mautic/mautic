@@ -36,7 +36,7 @@ class MockHttpClientTest extends MauticMysqlTestCase
         Assert::assertSame('{"get_method": true}', $response->getContent());
 
         $mockHttpClient = self::getContainer()->get('http_client');
-        $response = $mockHttpClient->request(Request::METHOD_POST, 'https://example.com/post');
+        $response       = $mockHttpClient->request(Request::METHOD_POST, 'https://example.com/post');
         Assert::assertSame('{"post_method": true}', $response->getContent());
     }
 }
