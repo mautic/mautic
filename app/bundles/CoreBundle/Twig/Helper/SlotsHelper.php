@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 /**
- * final class SlotsHelper.
+ * @deprecated to be removed in 6.0
  */
 final class SlotsHelper
 {

@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class SlotType.
+ * @deprecated to be removed in 6.0
  */
 class SlotType extends AbstractType
 {

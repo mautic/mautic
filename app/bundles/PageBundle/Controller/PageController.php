@@ -984,6 +984,8 @@ class PageController extends FormController
      *
      * @param array $slots
      * @param Page  $entity
+     *
+     * @deprecated to be removed in 6.0
      */
     private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
     {

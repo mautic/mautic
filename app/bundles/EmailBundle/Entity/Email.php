@@ -87,6 +87,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var array
+     *
+     * @deprecated to be removed in 6.0
      */
     private $content = [];
 
@@ -546,6 +548,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @return array
+     *
+     * @deprecated to be removed in 6.0
      */
     public function getContent()
     {
@@ -554,6 +558,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @return $this
+     *
+     * @deprecated to be removed in 6.0
      */
     public function setContent($content)
     {

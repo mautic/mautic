@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class BuilderSectionType.
+ * @deprecated to be removed in 6.0
  */
 class BuilderSectionType extends AbstractType
 {

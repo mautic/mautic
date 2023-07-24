@@ -96,6 +96,8 @@ final class ThemeHelper
      * @param string $type
      *
      * @return array<string, mixed>
+     *
+     * @deprecated to be removed in 6.0
      */
     public function getSlots($type)
     {
