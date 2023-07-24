@@ -166,7 +166,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    private function emulateClick(Lead $lead, Email $email, string $url, int $hits, int $uniqueHits): void
+    private function emulateClick(Lead $lead, Email $email, int $hits, int $uniqueHits): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setIpAddress('127.0.0.1');
@@ -175,7 +175,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $redirect = new Redirect();
         $redirect->setRedirectId(uniqid());
-        $redirect->setUrl($url);
+        $redirect->setUrl('https://example.com');
         $redirect->setHits($hits);
         $redirect->setUniqueHits($uniqueHits);
         $this->em->persist($redirect);
@@ -209,7 +209,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testGetEmailCountryStatsSingleEmail(): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel   = self::getContainer()->get('mautic.email.model.email');
+        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
         $dateFrom     = new \DateTime('2023-07-21');
         $dateTo       = new \DateTime('2023-07-24');
         $leadsPayload = [
@@ -267,15 +267,14 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             if ($l['read'] && $l['click']) {
                 $hits       = rand(1, 5);
                 $uniqueHits = rand(1, $hits);
-                $this->emulateClick($lead, $email, 'https://example.com', $hits, $uniqueHits);
+                $this->emulateClick($lead, $email, $hits, $uniqueHits);
             }
         }
-        $email->getRelatedEntityIds();
         $this->em->flush();
         $results = $emailModel->getEmailCountryStats($email, $dateFrom, $dateTo);
 
-        self::assertCount(3, $results);
-        self::assertSame([
+        $this->assertCount(3, $results);
+        $this->assertSame([
             [
                 'sent_count'            => '1',
                 'read_count'            => '1',
