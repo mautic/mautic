@@ -100,8 +100,9 @@
           {% if fields.link_shortener_url is defined or fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />
             <div class="row">
-                {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
-                {%- if form.max_entity_lock_time is defined %}<div class="col-md-6">{{ form_row(form.max_entity_lock_time) }}</div>{% endif %}
+                {%- if form.link_shortener_url is defined %}<div class="col-md-4">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
+                {%- if form.link_shortener_enable_email is defined %}<div class="col-md-4">{{ form_row(form.link_shortener_enable_email) }}</div>{% endif %}
+                {%- if form.max_entity_lock_time is defined %}<div class="col-md-4">{{ form_row(form.max_entity_lock_time) }}</div>{% endif %}
             </div>
           {% endif %}
 

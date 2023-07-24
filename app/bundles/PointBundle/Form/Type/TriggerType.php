@@ -102,6 +102,17 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
+            'group',
+            GroupListType::class,
+            [
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.group.form.group_descr',
+                ],
+            ]
+        );
+
+        $builder->add(
             'triggerExistingLeads',
             YesNoButtonGroupType::class,
             [

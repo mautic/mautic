@@ -3,12 +3,16 @@
 namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
@@ -22,9 +26,11 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 /**
@@ -110,11 +116,6 @@ class WebhookModel extends FormModel
     private $httpClient;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * Timestamp when the webhook processing starts.
      *
      * @var float
@@ -125,12 +126,19 @@ class WebhookModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
         Client $httpClient,
-        EventDispatcherInterface $eventDispatcher
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
         $this->httpClient        = $httpClient;
-        $this->eventDispatcher   = $eventDispatcher;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -408,7 +416,7 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
 
         $event = new WebhookEvent($webhook, false, $reason);
-        $this->eventDispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
+        $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
     }
 
     /**

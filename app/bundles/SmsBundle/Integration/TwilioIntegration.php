@@ -67,15 +67,15 @@ class TwilioIntegration extends AbstractIntegration
     {
         if ('features' == $formArea) {
             $builder->add(
-                'sending_phone_number',
+                'messaging_service_sid',
                 TextType::class,
                 [
-                    'label'      => 'mautic.sms.config.form.sms.sending_phone_number',
+                    'label'      => 'mautic.sms.config.form.sms.messaging_service_sid',
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
+                        'tooltip' => 'mautic.sms.config.form.sms.messaging_service_sid.tooltip',
                     ],
                 ]
             );

@@ -29,6 +29,7 @@ class UserMapperTest extends TestCase
                 'email'     => 'EmailAddress',
                 'firstname' => 'FirstName',
                 'lastname'  => 'LastName',
+                'username'  => null,
             ]
         );
 
@@ -44,10 +45,14 @@ class UserMapperTest extends TestCase
         $lastnameAttribute->method('getFirstAttributeValue')
             ->willReturn('Smith');
 
+        $defaultAttribute = $this->createMock(Attribute::class);
+        $defaultAttribute->method('getFirstAttributeValue')
+            ->willReturn('default');
+
         $statement = $this->createMock(AttributeStatement::class);
         $statement->method('getFirstAttributeByName')
             ->willReturnCallback(
-                function ($attributeName) use ($emailAttribute, $firstnameAttribute, $lastnameAttribute) {
+                function ($attributeName) use ($emailAttribute, $firstnameAttribute, $lastnameAttribute, $defaultAttribute) {
                     switch ($attributeName) {
                         case 'EmailAddress':
                             return $emailAttribute;
@@ -56,7 +61,7 @@ class UserMapperTest extends TestCase
                         case 'LastName':
                             return $lastnameAttribute;
                         default:
-                            return null;
+                            return $defaultAttribute;
                     }
                 }
             );
