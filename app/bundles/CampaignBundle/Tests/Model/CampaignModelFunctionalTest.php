@@ -149,16 +149,16 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
                 'country'               => '',
             ],
             [
-                'sent_count'            => '12',
-                'read_count'            => '8',
-                'clicked_through_count' => '4',
-                'country'               => 'Spain',
-            ],
-            [
                 'sent_count'            => '8',
                 'read_count'            => '8',
                 'clicked_through_count' => '4',
                 'country'               => 'Poland',
+            ],
+            [
+                'sent_count'            => '12',
+                'read_count'            => '8',
+                'clicked_through_count' => '4',
+                'country'               => 'Spain',
             ],
         ], $results);
     }
