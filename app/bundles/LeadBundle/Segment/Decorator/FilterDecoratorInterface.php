@@ -62,7 +62,7 @@ interface FilterDecoratorInterface
      * Returns a special where condition which is needed to be added to QueryBuilder (like email_stats.is_read = 1 for 'Read emails')
      * Returns null if no special condition is needed.
      *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 }

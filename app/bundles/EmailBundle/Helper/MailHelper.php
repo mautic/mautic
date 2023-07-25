@@ -710,7 +710,7 @@ class MailHelper
         }
 
         // Parts (plaintext)
-        $textBody     = $message->getTextBody();
+        $textBody     = $message->getTextBody() ?? '';
         $bodyReplaced = str_ireplace($search, $replace, $textBody);
         if ($textBody != $bodyReplaced) {
             $textBody = strip_tags($bodyReplaced);

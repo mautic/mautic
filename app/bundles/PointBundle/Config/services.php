@@ -23,4 +23,5 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.point.model.point', \Mautic\PointBundle\Model\PointModel::class);
     $services->alias('mautic.point.model.triggerevent', \Mautic\PointBundle\Model\TriggerEventModel::class);
     $services->alias('mautic.point.model.trigger', \Mautic\PointBundle\Model\TriggerModel::class);
+    $services->alias('mautic.point.model.group', \Mautic\PointBundle\Model\PointGroupModel::class);
 };
