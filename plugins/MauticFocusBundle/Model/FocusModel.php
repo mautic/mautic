@@ -192,18 +192,7 @@ class FocusModel extends FormModel
 
             $url = '';
             if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
-                $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focusArray['properties']['content']['link_url'],
-                    'focus',
-                    $focusArray['id']
-                );
-
-                $url = $this->trackableModel->generateTrackableUrl(
-                    $trackable,
-                    ['channel' => ['focus', $focusArray['id']]],
-                    false,
-                    $focus->getUtmTags()
-                );
+                $url = $focusArray['properties']['content']['link_url'];
             }
 
             $javascript = $this->twig->render(
