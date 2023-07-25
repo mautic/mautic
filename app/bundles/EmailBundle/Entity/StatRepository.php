@@ -304,7 +304,11 @@ class StatRepository extends CommonRepository
         }
 
         if ($chartQuery) {
-            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+            if ('is_read' === $column) {
+                $chartQuery->applyDateFilters($q, 'date_read', 's');
+            } else {
+                $chartQuery->applyDateFilters($q, 'date_sent', 's');
+            }
         }
 
         $results = $q->execute()->fetchAllAssociative();
