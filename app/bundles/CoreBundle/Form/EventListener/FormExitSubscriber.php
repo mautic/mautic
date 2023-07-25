@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvents;
 class FormExitSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var \Mautic\CoreBundle\Model\CommonModel
+     * @var string
      */
     private $model;
 
@@ -23,8 +23,8 @@ class FormExitSubscriber implements EventSubscriberInterface
     private $options;
 
     /**
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param array                                $options
+     * @param string $model
+     * @param array  $options
      */
     public function __construct($model, $options = [])
     {

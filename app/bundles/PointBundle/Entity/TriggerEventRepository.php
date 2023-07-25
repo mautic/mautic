@@ -2,6 +2,8 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -31,6 +33,45 @@ class TriggerEventRepository extends CommonRepository
         );
 
         $q->where($expr);
+        $q->andWhere('r.group IS NULL');
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     *
+     * @return mixed[]
+     */
+    public function getPublishedByGroupScore(Collection $groupScores)
+    {
+        if ($groupScores->isEmpty()) {
+            return [];
+        }
+
+        $q = $this->createQueryBuilder('a')
+            ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}, partial pl.{id, name}')
+            ->leftJoin('a.trigger', 'r')
+            ->leftJoin('r.group', 'pl')
+            ->orderBy('a.order');
+
+        // make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'r');
+
+        $groupsExpr = $q->expr()->orX();
+        /** @var GroupContactScore $score */
+        foreach ($groupScores as $score) {
+            $groupsExpr->add(
+                $q->expr()->andX(
+                    $q->expr()->eq('pl.id', $score->getGroup()->getId()),
+                    $q->expr()->lte('r.points', $score->getScore())
+                )
+            );
+        }
+
+        $q->where($expr);
+        $q->andWhere($groupsExpr);
+        $q->andWhere('r.group IS NOT NULL');
 
         return $q->getQuery()->getArrayResult();
     }

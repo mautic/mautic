@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -12,15 +13,18 @@ use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -47,10 +51,13 @@ use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -146,11 +153,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $contactTracker;
 
     /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    /**
      * @var DNC
      */
     private $doNotContact;
@@ -177,8 +179,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions,
-        Connection $connection
+        CorePermissions $security,
+        Connection $connection,
+        EntityManagerInterface $em,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -196,8 +205,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
-        $this->corePermissions          = $corePermissions;
         $this->connection               = $connection;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -916,7 +926,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
-        $fetchOptions->setCanViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
+        $fetchOptions->setCanViewOthers($this->security->isGranted('email:emails:viewother'));
         $fetchOptions->setUnit($chart->getUnit());
 
         $chart->setDataset(
@@ -1040,8 +1050,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Send an email to lead lists.
      *
      * @param array           $lists
-     * @param int             $limit
-     * @param bool            $batch        True to process and batch all pending leads
+     * @param int|null        $limit
+     * @param int|null        $batch        True to process and batch all pending leads
      * @param OutputInterface $output
      * @param int             $minContactId
      * @param int             $maxContactId
@@ -1052,7 +1062,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         Email $email,
         $lists = null,
         $limit = null,
-        $batch = false,
+        $batch = null,
         OutputInterface $output = null,
         $minContactId = null,
         $maxContactId = null,
@@ -1108,16 +1118,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $batch ?: $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             $leadCount         = count($leads);
 
             while ($leadCount) {
-                $sentCount += $leadCount;
-
-                if (!$batch && null != $limit) {
+                if (null != $limit) {
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
+
+                    // recalculate
+                    if ($limit < 0) {
+                        $leads     = array_slice($leads, 0, $limit);
+                        $leadCount = count($leads);
+                        $limit     = 0;
+                    }
                 }
+
+                $sentCount += $leadCount;
 
                 $listErrors = $this->sendEmail($email, $leads, $options);
 
@@ -1130,6 +1147,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $failedRecipientsByList[$options['listId']] = $listErrors;
                 }
 
+                if (null !== $limit && 0 == $limit) {
+                    break;
+                }
+
                 if ($batch) {
                     if ($progress) {
                         $progressCounter += $leadCount;
@@ -1137,7 +1158,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     // Get the next batch of leads
-                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $batch, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
                     $leadCount = count($leads);
                 } else {
                     $leadCount = 0;

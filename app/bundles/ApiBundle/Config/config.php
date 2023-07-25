@@ -90,14 +90,6 @@ return [
                 'tag'   => 'validator.constraint_validator',
             ],
         ],
-        'models' => [
-            'mautic.api.model.client' => [
-                'class'     => 'Mautic\ApiBundle\Model\ClientModel',
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-        ],
     ],
 
     'parameters' => [

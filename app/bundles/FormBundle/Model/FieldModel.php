@@ -2,15 +2,25 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -18,24 +28,24 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
     /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
 
-    public function __construct(LeadFieldModel $leadFieldModel)
+    public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {
         $this->leadFieldModel = $leadFieldModel;
+        $this->requestStack   = $requestStack;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    private function getSession(): SessionInterface
     {
-        $this->session = $session;
+        return $this->requestStack->getSession();
     }
 
     /**
@@ -104,8 +114,8 @@ class FieldModel extends CommonFormModel
      */
     public function getSessionFields($formId)
     {
-        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', []);
-        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', []);
+        $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
+        $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         return array_diff_key($fields, array_flip($remove));
     }
