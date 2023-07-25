@@ -17,8 +17,6 @@ class HandlerContainer
     }
 
     /**
-     * @param $transportName
-     *
      * @return CallbackInterface
      *
      * @throws CallbackHandlerNotFound

@@ -6,8 +6,8 @@ class SchedulerEnum
 {
     public const UNIT_NOW     = 'NOW';
     public const UNIT_DAILY   = 'DAILY';
-    public const UNIT_WEEKLY  = 'WEEKLY'; //Defined in report.js too
-    public const UNIT_MONTHLY = 'MONTHLY'; //Defined in report.js too
+    public const UNIT_WEEKLY  = 'WEEKLY'; // Defined in report.js too
+    public const UNIT_MONTHLY = 'MONTHLY'; // Defined in report.js too
 
     public const DAY_MO        = 'MO';
     public const DAY_TU        = 'TU';

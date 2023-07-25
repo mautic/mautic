@@ -91,9 +91,6 @@ class InformationChangeRequestDAO
         return $this->possibleChangeDateTime;
     }
 
-    /**
-     * @return InformationChangeRequestDAO
-     */
     public function setPossibleChangeDateTime(?\DateTimeInterface $possibleChangeDateTime = null): self
     {
         $this->possibleChangeDateTime = $possibleChangeDateTime;
@@ -106,9 +103,6 @@ class InformationChangeRequestDAO
         return $this->certainChangeDateTime;
     }
 
-    /**
-     * @return InformationChangeRequestDAO
-     */
     public function setCertainChangeDateTime(?\DateTimeInterface $certainChangeDateTime = null): self
     {
         $this->certainChangeDateTime = $certainChangeDateTime;

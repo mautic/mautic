@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Type;
 
 class ExampleClassWithPrivateProperty
@@ -44,7 +44,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->arrayType = Type::getType(self::MAUTIC_ARRAY_TYPE_NAME);
 
-        $this->platform = new MySqlPlatform();
+        $this->platform = new MySQLPlatform();
     }
 
     public function testGivenSimpleArrayWhenConvertsToDatabaseValueThenGetEncodedData(): void

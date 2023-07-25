@@ -28,7 +28,6 @@ trait FormFieldTrait
     }
 
     /**
-     * @param      $formId
      * @param bool $asTokens
      *
      * @return array

@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -150,7 +150,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilder->expects($this->once())
             ->method('execute')
-            ->willThrowException(new UniqueConstraintViolationException('', $this->createMock(DriverException::class)));
+            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

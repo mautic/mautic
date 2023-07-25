@@ -189,8 +189,6 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $mailboxes
-     *
      * @return array
      */
     protected function getConfigs($mailboxes)

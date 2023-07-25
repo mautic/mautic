@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -96,10 +95,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param $action
-     */
-    private function writeEntries(array $contacts, LeadList $segment, $action, DateTime $date = null)
+    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null)
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];

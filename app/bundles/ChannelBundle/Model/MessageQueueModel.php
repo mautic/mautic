@@ -2,16 +2,23 @@
 
 namespace Mautic\ChannelBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -32,16 +39,12 @@ class MessageQueueModel extends FormModel
      */
     protected $companyModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper)
+    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
         $this->leadModel            = $leadModel;
         $this->companyModel         = $companyModel;
-        $this->coreParametersHelper = $coreParametersHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -53,8 +56,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param        $channel
-     * @param        $channelId
      * @param null   $campaignEventId
      * @param int    $attempts
      * @param int    $priority
@@ -209,8 +210,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param $queue
-     *
      * @return int
      */
     public function processMessageQueue($queue)
@@ -297,7 +296,7 @@ class MessageQueueModel extends FormModel
             } // otherwise assume the listener did something such as rescheduling the message
         }
 
-        //add listener
+        // add listener
         $this->saveEntities($queue);
 
         return $counter;
@@ -336,7 +335,6 @@ class MessageQueueModel extends FormModel
     /**
      * @deprecated to be removed in 3.0; use reschedule method instead
      *
-     * @param        $message
      * @param string $rescheduleInterval
      * @param null   $leadId
      * @param null   $channel
@@ -351,7 +349,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param       $channel
      * @param array $channelIds
      */
     public function getQueuedChannelCount($channel, $channelIds = [])
@@ -361,11 +358,6 @@ class MessageQueueModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

@@ -76,8 +76,6 @@ class TagRepository extends CommonRepository
     /**
      * Check Lead tags by Ids.
      *
-     * @param $tags
-     *
      * @return bool
      */
     public function checkLeadByTags(Lead $lead, $tags)

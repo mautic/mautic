@@ -226,8 +226,6 @@ class VideoHit
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -729,8 +727,6 @@ class VideoHit
     }
 
     /**
-     * @param $timeWatched
-     *
      * @return VideoHit
      */
     public function setTimeWatched($timeWatched)

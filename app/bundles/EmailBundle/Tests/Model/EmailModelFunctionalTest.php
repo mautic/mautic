@@ -16,6 +16,11 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['leads']);
+    }
+
     public function testSendEmailToListsInThreads(): void
     {
         $contacts = $this->generateContacts(23);
@@ -25,11 +30,11 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $emailModel                                             =  self::$container->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
-        $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
+        $this->assertEquals($sentCount, 8);
+        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 8);
     }
 
@@ -86,6 +91,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Email');
         $email->setSubject('Email Subject');
+        $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
         $email->setIsPublished(true);
@@ -96,44 +102,70 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void
+    public function testSendEmailToLists(): void
     {
-        $segment        = new LeadList();
-        $segmentName    = 'Test_segment';
-        $segment->setName($segmentName);
-        $segment->setPublicName($segmentName);
-        $segment->setAlias($segmentName);
-        $this->em->persist($segment);
+        $contacts = $this->generateContacts(10);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment($contacts, $segment);
+        $email = $this->createEmail($segment);
 
-        $emailName        = 'Test';
-        $customHtmlParent = 'test EN';
-        $parentEmail      = new Email();
-        $parentEmail->setName($emailName);
-        $parentEmail->setSubject($emailName);
-        $parentEmail->setCustomHTML($customHtmlParent);
-        $parentEmail->setEmailType('template');
-        $parentEmail->setLanguage('en');
-        $this->em->persist($parentEmail);
+        $emailModel                                             =  self::$container->get('mautic.email.model.email');
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
+        $this->assertEquals($sentCount, 4);
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
+        $this->assertEquals($sentCount, 3);
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 2);
+        $this->assertEquals($sentCount, 2);
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 4);
+        $this->assertEquals($sentCount, 1);
 
-        $customHtmlChildren = 'test FR';
-        $childrenEmail      = clone $parentEmail;
-        $childrenEmail->setLanguage('fr');
-        $childrenEmail->setCustomHTML($customHtmlChildren);
-        $childrenEmail->setTranslationParent($parentEmail);
-        $this->em->persist($parentEmail);
+        $email                                                  = $this->createEmail($segment);
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment]);
+        $this->assertEquals($sentCount, 10);
 
-        $this->em->detach($segment);
-        $this->em->detach($parentEmail);
-        $this->em->detach($childrenEmail);
-
-        /** @var EmailModel $emailModel */
-        $emailModel = self::$container->get('mautic.email.model.email');
-        $parentEmail->setName('Test change');
-        $emailModel->saveEntity($parentEmail);
-
-        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
-        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
+        $email                                                  = $this->createEmail($segment);
+        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], null, 2);
+        $this->assertEquals($sentCount, 10);
     }
+
+   public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void
+   {
+       $segment        = new LeadList();
+       $segmentName    = 'Test_segment';
+       $segment->setName($segmentName);
+       $segment->setPublicName($segmentName);
+       $segment->setAlias($segmentName);
+       $this->em->persist($segment);
+
+       $emailName        = 'Test';
+       $customHtmlParent = 'test EN';
+       $parentEmail      = new Email();
+       $parentEmail->setName($emailName);
+       $parentEmail->setSubject($emailName);
+       $parentEmail->setCustomHTML($customHtmlParent);
+       $parentEmail->setEmailType('template');
+       $parentEmail->setLanguage('en');
+       $this->em->persist($parentEmail);
+
+       $customHtmlChildren = 'test FR';
+       $childrenEmail      = clone $parentEmail;
+       $childrenEmail->setLanguage('fr');
+       $childrenEmail->setCustomHTML($customHtmlChildren);
+       $childrenEmail->setTranslationParent($parentEmail);
+       $this->em->persist($parentEmail);
+
+       $this->em->detach($segment);
+       $this->em->detach($parentEmail);
+       $this->em->detach($childrenEmail);
+
+       /** @var EmailModel $emailModel */
+       $emailModel = self::$container->get('mautic.email.model.email');
+       $parentEmail->setName('Test change');
+       $emailModel->saveEntity($parentEmail);
+
+       self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
+       self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
+   }
 
     public function testGetDeliveredCount(): void
     {

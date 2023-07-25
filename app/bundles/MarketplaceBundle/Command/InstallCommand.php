@@ -2,8 +2,6 @@
 
 namespace Mautic\MarketplaceBundle\Command;
 
-use Exception;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
@@ -29,7 +27,6 @@ class InstallCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME);
-        $this->setDescription('Installs a plugin that is available at Packagist.org');
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
         $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
 
@@ -45,14 +42,14 @@ class InstallCommand extends Command
             $package = $this->packageModel->getPackageDetail($packageName);
         } catch (ApiException $e) {
             if (404 === $e->getCode()) {
-                throw new InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
+                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
             } else {
-                throw new Exception('Error while trying to get package details: '.$e->getMessage());
+                throw new \Exception('Error while trying to get package details: '.$e->getMessage());
             }
         }
 
         if (empty($package->packageBase->type) || 'mautic-plugin' !== $package->packageBase->type) {
-            throw new Exception('Package type is not mautic-plugin. Cannot install this plugin.');
+            throw new \Exception('Package type is not mautic-plugin. Cannot install this plugin.');
         }
 
         if ($dryRun) {
@@ -77,6 +74,7 @@ class InstallCommand extends Command
 
         $output->writeln('All done! '.$input->getArgument('package').' has successfully been installed.');
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';
 }

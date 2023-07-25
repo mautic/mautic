@@ -198,7 +198,7 @@
                                 </div>
                                 {% if attribute(item, 'getDescription') is defined and item.getDescription() %}
                                     <div class="text-muted mt-4">
-                                        <small>{{ item.getDescription() }}</small>
+                                        <small>{{ item.getDescription()|purify }}</small>
                                     </div>
                                 {% endif %}
                             </td>

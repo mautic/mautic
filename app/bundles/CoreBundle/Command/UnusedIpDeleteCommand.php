@@ -28,7 +28,6 @@ class UnusedIpDeleteCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
-            ->setDescription('Deletes IP addresses that are not used in any other database table')
             ->addOption(
                 '--limit',
                 '-l',
@@ -49,21 +48,22 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
-            $limit       = $input->getOption('limit');
+            $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (\Doctrine\DBAL\Exception $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
             $this->completeRun();
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Deletes IP addresses that are not used in any other database table';
 }

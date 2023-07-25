@@ -22,7 +22,7 @@ class DbalPass implements CompilerPassInterface
         if ($container->hasDefinition($id)) {
             $container
                 ->getDefinition($id)
-                ->addMethodCall('setResultCacheImpl', [new Reference('doctrine.orm.default_result_cache')]);
+                ->addMethodCall('setResultCache', [new Reference('doctrine.orm.default_result_cache')]);
         }
     }
 }

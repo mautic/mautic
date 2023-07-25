@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Exception;
-use PDO;
 
 /**
  * @extends CommonRepository<IpAddress>
@@ -86,8 +85,8 @@ class IpAddressRepository extends CommonRepository
             LIMIT :limit
 SQL;
 
-        $params = [':limit' => $limit];
-        $types  = [':limit' => PDO::PARAM_INT];
+        $params = ['limit' => $limit];
+        $types  = ['limit' => \PDO::PARAM_INT];
 
         return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }

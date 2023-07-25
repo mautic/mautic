@@ -64,7 +64,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        //Add trigger
+        // Add trigger
         $pageHitTrigger = [
             'label'          => 'mautic.page.campaign.event.pagehit',
             'description'    => 'mautic.page.campaign.event.pagehit_descr',
@@ -75,7 +75,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
 
-        //Add trigger
+        // Add trigger
         $deviceHitTrigger = [
             'label'          => 'mautic.page.campaign.event.devicehit',
             'description'    => 'mautic.page.campaign.event.devicehit_descr',
@@ -185,7 +185,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         // Check Landing Pages
         if ($pageHit instanceof Page) {
             list($parent, $children) = $pageHit->getVariants();
-            //use the parent (self or configured parent)
+            // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;

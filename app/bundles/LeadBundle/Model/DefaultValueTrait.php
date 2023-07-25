@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 trait DefaultValueTrait
 {
     /**
-     * @param        $entity
      * @param string $object
      */
     protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, $object = 'lead')

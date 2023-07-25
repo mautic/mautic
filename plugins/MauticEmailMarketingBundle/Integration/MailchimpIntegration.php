@@ -142,7 +142,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param       $lead
      * @param array $config
      *
      * @return bool

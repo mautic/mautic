@@ -127,7 +127,7 @@ class IpLookupHelper
         }
 
         if (empty($ip) || !$this->ipIsValid($ip)) {
-            //assume local as the ip is empty
+            // assume local as the ip is empty
             $ip = '127.0.0.1';
         }
 
@@ -217,8 +217,6 @@ class IpLookupHelper
     /**
      * Validates if an IP address if valid.
      *
-     * @param $ip
-     *
      * @return mixed
      */
     public function ipIsValid($ip)
@@ -232,9 +230,6 @@ class IpLookupHelper
         );
     }
 
-    /**
-     * @param $ip
-     */
     protected function getClientIpFromProxyList($ip)
     {
         // Proxies are included

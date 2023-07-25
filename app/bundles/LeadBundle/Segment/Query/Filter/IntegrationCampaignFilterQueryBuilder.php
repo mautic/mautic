@@ -35,7 +35,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias.'.internal_entity_id = '.$leadsTableAlias.'.id'
         );
 
-        $expression = $queryBuilder->expr()->andX(
+        $expression = $queryBuilder->expr()->and(
             $queryBuilder->expr()->eq($tableAlias.'.integration', ":$integrationNameParameter"),
             $queryBuilder->expr()->eq($tableAlias.'.integration_entity_id', ":$campaignIdParameter")
         );

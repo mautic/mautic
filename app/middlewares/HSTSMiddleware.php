@@ -34,7 +34,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $response = $this->app->handle($request, $type, $catch);
 
-        //Do not include the header in the sub-request response
+        // Do not include the header in the sub-request response
         if (self::MASTER_REQUEST !== $type) {
             return $response;
         }

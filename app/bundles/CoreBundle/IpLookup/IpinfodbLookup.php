@@ -20,9 +20,6 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
         return "http://api.ipinfodb.com/v3/ip-city/?key={$this->auth}&format=json&ip={$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

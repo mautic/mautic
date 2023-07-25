@@ -27,8 +27,6 @@ interface CustomFieldRepositoryInterface
     /**
      * Get the base DBAL query builder for entities.
      *
-     * @param $order
-     *
      * @return OrmQueryBuilder
      */
     public function getEntitiesOrmQueryBuilder($order);

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
-use DateTime;
-use DateTimeInterface;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Exception\UnexpectedValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
@@ -14,7 +12,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var DateTimeInterface
+     * @var \DateTimeInterface
      */
     private $syncDateTime;
 
@@ -86,7 +84,7 @@ class OrderDAO
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
+    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
     {
         $this->syncDateTime    = $syncDateTime;
         $this->isFirstTimeSync = $isFirstTimeSync;
@@ -94,9 +92,6 @@ class OrderDAO
         $this->options         = $options;
     }
 
-    /**
-     * @return OrderDAO
-     */
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
@@ -158,10 +153,10 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        ?DateTimeInterface $objectModifiedDate = null
+        ?\DateTimeInterface $objectModifiedDate = null
     ): void {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new DateTime();
+            $objectModifiedDate = new \DateTime();
         }
 
         $objectMapping = new ObjectMapping();
@@ -195,10 +190,10 @@ class OrderDAO
     /**
      * Update the last sync date of an existing mapping.
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?DateTimeInterface $objectModifiedDate = null): void
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new DateTime();
+            $objectModifiedDate = new \DateTime();
         }
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
@@ -304,9 +299,9 @@ class OrderDAO
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getSyncDateTime(): DateTimeInterface
+    public function getSyncDateTime(): \DateTimeInterface
     {
         return $this->syncDateTime;
     }

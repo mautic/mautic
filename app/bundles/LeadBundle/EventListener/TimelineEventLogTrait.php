@@ -19,9 +19,6 @@ trait TimelineEventLogTrait
     private $eventLogRepository;
 
     /**
-     * @param      $eventType
-     * @param      $eventTypeName
-     * @param      $icon
      * @param null $bundle
      * @param null $object
      * @param null $action
@@ -78,8 +75,6 @@ trait TimelineEventLogTrait
     }
 
     /**
-     * @param $eventType
-     *
      * @return string
      */
     private function getSourceName(array $log, $eventType)

@@ -90,58 +90,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.page.model.page' => [
-                'class'     => \Mautic\PageBundle\Model\PageModel::class,
-                'arguments' => [
-                    'mautic.helper.cookie',
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.field',
-                    'mautic.page.model.redirect',
-                    'mautic.page.model.trackable',
-                    'mautic.queue.service',
-                    'mautic.lead.model.company',
-                    'mautic.tracker.device',
-                    'mautic.tracker.contact',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.helper.contact_request_helper',
-                ],
-                'methodCalls' => [
-                    'setCatInUrl' => [
-                        '%mautic.cat_in_page_url%',
-                    ],
-                ],
-            ],
-            'mautic.page.model.redirect' => [
-                'class'     => 'Mautic\PageBundle\Model\RedirectModel',
-                'arguments' => [
-                    'mautic.helper.url',
-                ],
-            ],
-            'mautic.page.model.trackable' => [
-                'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
-                'arguments' => [
-                    'mautic.page.model.redirect',
-                    'mautic.lead.repository.field',
-                ],
-            ],
-            'mautic.page.model.video' => [
-                'class'     => 'Mautic\PageBundle\Model\VideoModel',
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.page.model.tracking.404' => [
-                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.tracker.contact',
-                    'mautic.page.model.page',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.page.repository.hit' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
