@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Model;
+namespace MauticPlugin\MauticFocusBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -10,27 +10,14 @@ use Mautic\PageBundle\Entity\Hit;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\HttpFoundation\Request;
 
-class FocusModelFunctionalTest extends MauticMysqlTestCase
+class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewsCount(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = self::$container->get('mautic.focus.model.focus');
-        $focus      = $this->createFocus('popup');
-        $focusModel->saveEntity($focus);
-
-        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $this->createLead());
-        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $this->createLead());
-        $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $this->createLead());
-
-        $this->assertEquals(3, $focusModel->getViewsCount($focus));
-    }
-
-    public function testUniqueViewsCount(): void
-    {
-        /** @var FocusModel $focusModel */
-        $focusModel = self::$container->get('mautic.focus.model.focus');
+        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 
@@ -43,13 +30,20 @@ class FocusModelFunctionalTest extends MauticMysqlTestCase
         $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[0]);
         $focusModel->addStat($focus, Stat::TYPE_NOTIFICATION, null, $leads[1]);
 
-        $this->assertEquals(2, $focusModel->getUniqueViewsCount($focus));
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getViewsCount&focusId={$focus->getId()}", [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $this->assertSame([
+            'success'     => 1,
+            'views'       => 3,
+            'uniqueViews' => 2,
+        ], json_decode($response->getContent(), true));
     }
 
     public function testClickThroughCount(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = self::$container->get('mautic.focus.model.focus');
+        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 
@@ -60,7 +54,13 @@ class FocusModelFunctionalTest extends MauticMysqlTestCase
         $focusModel->addStat($focus, Stat::TYPE_CLICK, $this->createHit($lead1), $lead1);
         $focusModel->addStat($focus, Stat::TYPE_CLICK, $this->createHit($lead2), $lead2);
 
-        $this->assertEquals(2, $focusModel->getClickThroughCount($focus));
+        $this->client->request(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getClickThroughCount&focusId={$focus->getId()}", [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $this->assertSame([
+            'success'      => 1,
+            'clickThrough' => 2,
+        ], json_decode($response->getContent(), true));
     }
 
     private function createHit(Lead $lead): Hit
