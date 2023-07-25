@@ -63,20 +63,20 @@ EOT
 
         foreach (['mediaelementplayer', 'modal'] as $css_file) {
             file_put_contents(
-              $mediaDir.'/css/'.$css_file.'.min.css',
+                $mediaDir.'/css/'.$css_file.'.min.css',
                 (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/css/'.$css_file.'.css'])
             );
         }
 
         // Minify Mautic Form SDK
         file_put_contents(
-          $mediaDir.'/js/mautic-form-tmp.js',
+            $mediaDir.'/js/mautic-form-tmp.js',
             (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
         );
         // Fix the MauticSDK loader
         file_put_contents(
-          $mediaDir.'/js/mautic-form.js',
-          str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
+            $mediaDir.'/js/mautic-form.js',
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
         );
         // Remove temp file.
         unlink($mediaDir.'/js/mautic-form-tmp.js');
