@@ -56,30 +56,30 @@ EOT
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
-        $assetsDir = $this->pathsHelper->getSystemPath('media', true);
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
 
-        $this->moveExtraLibraries($nodeModulesDir, $assetsDir);
+        $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
         foreach (['mediaelementplayer', 'modal'] as $css_file) {
             file_put_contents(
-              $this->pathsHelper->getSystemPath('media', true).'/css/'.$css_file.'.min.css',
-                (new \Minify(new \Minify_Cache_Null()))->combine([$pathsHelper->getSystemPath('assets', true).'/css/'.$css_file.'.css'])
+              $mediaDir.'/css/'.$css_file.'.min.css',
+                (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/css/'.$css_file.'.css'])
             );
         }
 
         // Minify Mautic Form SDK
         file_put_contents(
-            $assetsDir.'/js/mautic-form-tmp.js',
+          $mediaDir.'/js/mautic-form-tmp.js',
             (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
         );
         // Fix the MauticSDK loader
         file_put_contents(
-            $assetsDir.'/js/mautic-form.js',
-            str_replace("'mautic-form-src.js'", "'mautic-form.js'",
-                file_get_contents($assetsDir.'/js/mautic-form-tmp.js'))
+          $mediaDir.'/js/mautic-form.js',
+          str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
         );
         // Remove temp file.
-        unlink($assetsDir.'/js/mautic-form-tmp.js');
+        unlink($mediaDir.'/js/mautic-form-tmp.js');
 
         // Check that the production assets were correctly generated.
         $productionAssets = [
@@ -98,7 +98,7 @@ EOT
         ];
 
         foreach ($productionAssets as $relativePath) {
-            $absolutePath = $assetsDir.'/'.$relativePath;
+            $absolutePath = $mediaDir.'/'.$relativePath;
             if (!$this->filesystem->exists($absolutePath)) {
                 $output->writeln('<error>The file '.$this->translator->trans("{$absolutePath} does not exist. Generating production assets was not sucessful.").'</error>');
 
