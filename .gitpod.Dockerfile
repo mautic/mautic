@@ -8,4 +8,4 @@ RUN curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /etc/
 RUN echo "deb [signed-by=/etc/apt/trusted.gpg.d/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list >/dev/null
 
 # Update package information and install DDEV
-RUN sudo apt update && sudo apt install -y ddev
+RUN sudo apt update && sudo apt install -y ddev=1.21.6
