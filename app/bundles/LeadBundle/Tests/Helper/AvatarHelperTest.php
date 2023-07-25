@@ -37,6 +37,8 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $root = realpath(__DIR__.'/../../../../../');
+
         /** @var Packages&MockObject $packagesMock */
         $packagesMock = $this->createMock(Packages::class);
 
@@ -47,6 +49,11 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelperMock  = $this->createMock(PathsHelper::class);
         $this->pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
+        $this->pathsHelperMock->method('getAssetsPath')
+          ->willReturn($root.'/app/assets');
+        $this->pathsHelperMock->method('getMediaPath')
+          ->willReturn($root.'/media');
+
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);
         $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
