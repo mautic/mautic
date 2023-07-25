@@ -115,10 +115,6 @@ class TokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param $token
-     * @param $value
-     */
     public function addToken($token, $value)
     {
         $this->tokens[$token] = $value;

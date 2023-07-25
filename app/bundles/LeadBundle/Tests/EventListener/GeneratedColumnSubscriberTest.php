@@ -28,17 +28,17 @@ class GeneratedColumnSubscriberTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $segmentModel = new class() extends ListModel {
-            public function __construct()
-            {
-            }
-        };
         $modelTranslator = $this->createMock(Translator::class);
         $modelTranslator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
-        $segmentModel->setTranslator($modelTranslator);
+
+        $segmentModel = new class($modelTranslator) extends ListModel {
+            public function __construct(Translator $translator)
+            {
+                $this->translator = $translator;
+            }
+        };
 
         $this->translator                = $this->createMock(TranslatorInterface::class);
         $this->generatedColumnSubscriber = new GeneratedColumnSubscriber($segmentModel, $this->translator);

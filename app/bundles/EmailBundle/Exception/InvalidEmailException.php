@@ -3,31 +3,19 @@
 namespace Mautic\EmailBundle\Exception;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
-use Throwable;
 
 class InvalidEmailException extends InvalidValueException
 {
-    /**
-     * @var string
-     */
-    protected $emailAddress;
+    protected string $emailAddress;
 
-    /**
-     * @param string $emailAddress
-     * @param string $message
-     * @param int    $code
-     */
-    public function __construct($emailAddress, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct(string $emailAddress, string $message = '', int $code = 0, \Throwable|null $previous = null)
     {
         $this->emailAddress = $emailAddress;
 
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return string
-     */
-    public function getEmailAddress()
+    public function getEmailAddress(): string
     {
         return $this->emailAddress;
     }

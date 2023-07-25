@@ -116,7 +116,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($this->goodFilePath, $doNotSellList->getListPath());
 
-        $goodData = (json_decode($this->goodData, true))['exclusions'];
+        $goodData = json_decode($this->goodData, true)['exclusions'];
         $this->assertEquals($goodData, $doNotSellList->getList());
     }
 }

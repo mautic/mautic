@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -192,7 +191,7 @@ class ContactObjectHelper implements ObjectHelperInterface
      * @param int $start
      * @param int $limit
      */
-    public function findObjectsBetweenDates(DateTimeInterface $from, DateTimeInterface $to, $start, $limit): array
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
@@ -342,8 +341,6 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param $value
-     *
      * @return int
      */
     private function getDoNotContactReason($value)

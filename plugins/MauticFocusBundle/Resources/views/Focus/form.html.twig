@@ -13,7 +13,6 @@
 {% endblock %}
 
 {% block content %}
-  {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
   {{ includeStylesheet('plugins/MauticFocusBundle/Assets/css/focus.css') }}
   {{ form_start(form) }}
     <!-- start: box layout -->
@@ -356,7 +355,7 @@
                             <div class="focus-hide visible-focus-type-form">
                                 <div class="col-sm-12" id="focusFormAlert" data-hide-on='{"focus_html_mode_0":"checked"}'>
                                     <div class="alert alert-info">
-                                        {{ 'mautic.focus.form_token.instructions'|trans|raw }}
+                                        {{ 'mautic.focus.form_token.instructions'|trans|purify }}
                                     </div>
                                 </div>
                                 {{ form_row(form.form) }}
@@ -380,4 +379,5 @@
     </div>
 
   {{ form_end(form) }}
+{{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
 {% endblock %}

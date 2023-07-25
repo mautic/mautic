@@ -59,7 +59,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $dateDecorator->method('getOperator')
             ->with()
-            ->willReturn('==<<'); //Test that value is really returned from Decorator
+            ->willReturn('==<<'); // Test that value is really returned from Decorator
 
         $filter        = [
             'operator' => '=<',

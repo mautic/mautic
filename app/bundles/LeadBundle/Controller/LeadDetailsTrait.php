@@ -123,9 +123,6 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param $a
-     * @param $b
-     *
      * @return int
      */
     private function cmp($a, $b)
@@ -378,8 +375,6 @@ trait LeadDetailsTrait
     /**
      * Get company graph for points and engagements.
      *
-     * @param $contacts
-     *
      * @return mixed
      */
     protected function getCompanyEngagementsForGraph($contacts)
@@ -418,9 +413,7 @@ trait LeadDetailsTrait
         );
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\Paginator;
 
-use ArrayIterator;
-use Countable;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use IteratorAggregate;
@@ -15,9 +13,10 @@ use IteratorAggregate;
  * Do not use it if the $query uses oneToMany/ManyToMany joins or other complex parts (use \Doctrine\ORM\Tools\Pagination\Paginator instead).
  *
  * @template T
+ *
  * @implements IteratorAggregate<mixed>
  */
-class SimplePaginator implements IteratorAggregate, Countable
+class SimplePaginator implements \IteratorAggregate, \Countable
 {
     /** @var Query<T> */
     private Query $query;
@@ -32,11 +31,11 @@ class SimplePaginator implements IteratorAggregate, Countable
     }
 
     /**
-     * @return iterable<mixed>
+     * @return \Traversable<mixed>
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
-        return new ArrayIterator($this->query->getResult());
+        return new \ArrayIterator($this->query->getResult());
     }
 
     public function count(): int

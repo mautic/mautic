@@ -174,8 +174,6 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -425,9 +423,6 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param $details
-     */
     public function addClickDetails($details)
     {
         $this->clickDetails[] = $details;

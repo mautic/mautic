@@ -104,8 +104,6 @@ class FrequencyRuleRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     *
      * @return array
      */
     public function getPreferredChannel($leadId)

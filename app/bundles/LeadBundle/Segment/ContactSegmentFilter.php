@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\DBAL\Schema\Column;
+use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -117,9 +118,16 @@ class ContactSegmentFilter
         return $this->filterDecorator->getTable($this->contactSegmentFilterCrate);
     }
 
+    public function getForeignContactColumn(): ?string
+    {
+        if ($this->filterDecorator instanceof ContactDecoratorForeignInterface) {
+            return $this->filterDecorator->getForeignContactColumn($this->contactSegmentFilterCrate);
+        } else {
+            return 'lead_id';
+        }
+    }
+
     /**
-     * @param $argument
-     *
      * @return mixed
      */
     public function getParameterHolder($argument)

@@ -2,8 +2,6 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use DateTime;
-
 /**
  * @extends CommonRepository<Notification>
  */
@@ -31,8 +29,6 @@ class NotificationRepository extends CommonRepository
 
     /**
      * Mark user notifications as read.
-     *
-     * @param $userId
      */
     public function markAllReadForUser($userId)
     {
@@ -42,9 +38,8 @@ class NotificationRepository extends CommonRepository
     /**
      * Clear notifications for a user.
      *
-     * @param      $userId
-     * @param null $id     Clears all if empty
-     * @param null $limit  Clears a set number
+     * @param null $id    Clears all if empty
+     * @param null $limit Clears a set number
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
@@ -100,7 +95,6 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param      $userId
      * @param null $afterId
      * @param bool $includeRead
      * @param null $type
@@ -145,7 +139,7 @@ class NotificationRepository extends CommonRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function isDuplicate(int $userId, string $deduplicate, DateTime $from): bool
+    public function isDuplicate(int $userId, string $deduplicate, \DateTime $from): bool
     {
         $qb = $this->getEntityManager()
             ->getConnection()
@@ -156,9 +150,9 @@ class NotificationRepository extends CommonRepository
             ->where('user_id = :userId')
             ->andWhere('deduplicate = :deduplicate')
             ->andWhere('date_added >= :from')
-            ->setParameter(':userId', $userId)
-            ->setParameter(':deduplicate', $deduplicate)
-            ->setParameter(':from', $from->format('Y-m-d H:i:s'))
+            ->setParameter('userId', $userId)
+            ->setParameter('deduplicate', $deduplicate)
+            ->setParameter('from', $from->format('Y-m-d H:i:s'))
             ->setMaxResults(1);
 
         return (bool) $qb->execute()
