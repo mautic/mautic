@@ -66,7 +66,6 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
         $this->subscriber         = new FormSubscriber(
-            $this->emailModel,
             $this->leadModel,
             $this->contactTracker,
             $this->ipLookupHelper,
