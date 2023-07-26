@@ -186,7 +186,7 @@ class CommonController extends Controller implements MauticController
             $args = [
                 'contentTemplate' => $args,
                 'passthroughVars' => [
-                    'mauticContent' => strtolower($this->request->get('bundle')),
+                    'mauticContent' => strtolower(InputHelper::alphanum($this->request->query->get('bundle'))),
                 ],
             ];
         }
@@ -203,7 +203,7 @@ class CommonController extends Controller implements MauticController
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];
             } else {
-                $mauticContent = strtolower($this->request->get('bundle'));
+                $mauticContent = strtolower(InputHelper::alphanum($this->request->query->get('bundle')));
             }
             $args['viewParameters']['mauticContent'] = $mauticContent;
         }

@@ -1,12 +1,19 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-unused-expressions */
 import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
+import 'grapesjs-plugin-ckeditor';
 
-let editor = grapesjs.init({
+
+const editor = grapesjs.init({
   fromElement: 1,
   container: '#gjs',
   height: '100%',
   avoidInlineStyle: false,
-  plugins: [],
+  plugins: ['gjs-plugin-ckeditor'],
+  pluginsOpts: {
+    'gjs-plugin-ckeditor': {}
+  }
 });
 
 // add custom fonts options on editor's font list

@@ -91,7 +91,7 @@ if ($view['security']->isGranted('campaign:campaigns:edit')) {
             'data-target' => '#MauticSharedModal',
             'data-header' => $view['translator']->trans(
                 'mautic.lead.lead.header.campaigns',
-                ['%name%' => $lead->getPrimaryIdentifier()]
+                ['%name%' => $view->escape($lead->getPrimaryIdentifier())]
             ),
             'data-footer' => 'false',
             'href'        => $view['router']->path(

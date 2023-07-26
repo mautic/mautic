@@ -56,20 +56,9 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         $inputDefinition->method('getOptions')
             ->willReturn([]);
 
-        $this->command = new ProcessEmailQueueCommand();
+        $this->command = new ProcessEmailQueueCommand($this->transport, $this->dispatcher, $this->coreParametersHelper);
         $this->command->setContainer($this->container);
         $this->command->setApplication($this->application);
-
-        $this->container->method('get')
-            ->withConsecutive(
-                ['event_dispatcher'],
-                ['mautic.helper.core_parameters'],
-                ['swiftmailer.transport.real']
-            )->willReturnOnConsecutiveCalls(
-                $this->dispatcher,
-                $this->coreParametersHelper,
-                $this->transport
-            );
     }
 
     public function testCommandWhenQueueIsDisabled()
@@ -102,18 +91,16 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         copy($tryAgainMessage, $tmpTryAgainMessageFile);
 
         $this->coreParametersHelper->method('get')
-            ->withConsecutive(['mailer_spool_type'])
-            ->willReturnOnConsecutiveCalls(true);
-
-        $this->container->method('getParameter')
             ->withConsecutive(
+                ['mailer_spool_type'],
                 ['mautic.mailer_spool_path'],
                 ['mautic.mailer_spool_msg_limit']
             )
-            ->will($this->onConsecutiveCalls(
+            ->willReturnOnConsecutiveCalls(
+                true,
                 $tmpSpoolDir,
                 10
-            ));
+            );
 
         $this->transport->expects($this->once())
             ->method('send')

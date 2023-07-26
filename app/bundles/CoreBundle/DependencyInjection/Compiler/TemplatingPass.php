@@ -48,6 +48,7 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')])
                 ->addMethodCall('setAssetHelper', [new Reference('mautic.helper.assetgeneration')])
                 ->addMethodCall('setBuilderIntegrationsHelper', [new Reference('mautic.integrations.helper.builder_integrations')])
+                ->addMethodCall('setInstallService', [new Reference('mautic.install.service')])
                 ->addMethodCall('setSiteUrl', ['%mautic.site_url%'])
                 ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION])
                 ->setPublic(true);

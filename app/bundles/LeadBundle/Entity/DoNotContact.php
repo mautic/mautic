@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class DoNotContact.
@@ -204,7 +205,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = $comments;
+        $this->comments = InputHelper::string($comments);
 
         return $this;
     }

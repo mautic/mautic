@@ -416,7 +416,7 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        $realTransport = $this->container->get('swiftmailer.transport.real');
+        $realTransport = $this->container->get('swiftmailer.mailer.default.transport.real');
 
         if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
             return $this->notFound();

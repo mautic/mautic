@@ -72,4 +72,23 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame($expectedLabels, $actualLabels);
     }
+
+    public function testLeadViewPreventsXSS(): void
+    {
+        $firstName = 'aaa" onmouseover=alert(1) a="';
+        $lead      = new Lead();
+        $lead->setFirstname($firstName);
+        $this->em->persist($lead);
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
+
+        $anchorTag  = $crawler->filter('#toolbar ul.dropdown-menu-right li')->first()->filter('a');
+        $mouseOver  = $anchorTag->attr('onmouseover');
+        $dataHeader = $anchorTag->attr('data-header');
+
+        Assert::assertNull($mouseOver);
+        Assert::assertSame(sprintf('Campaigns %s is part of', $firstName), $dataHeader);
+    }
 }

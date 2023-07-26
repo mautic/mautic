@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
@@ -68,6 +69,7 @@ class AssetsHelper
     protected $pathsHelper;
 
     protected BuilderIntegrationsHelper $builderIntegrationsHelper;
+    protected InstallService $installService;
 
     public function __construct(Packages $packages)
     {
@@ -460,19 +462,21 @@ class AssetsHelper
             }
         }
 
-        /**
-         * We want to enable JS consumers to simply query Mautic.getActiveBuilderName() so they can add logic based on the active builder.
-         * The $builderName variable is passed to the template so we can get that info on the JS-side.
-         */
-        try {
-            $builder     = $this->builderIntegrationsHelper->getBuilder('email');
-            $builderName = $builder->getName();
-        } catch (IntegrationNotFoundException $exception) {
-            // Assume legacy builder
-            $builderName = 'legacy';
-        }
+        if ($this->installService->checkIfInstalled()) {
+            /**
+             * We want to enable JS consumers to simply query Mautic.getActiveBuilderName() so they can add logic based on the active builder.
+             * The $builderName variable is passed to the template so we can get that info on the JS-side.
+             */
+            try {
+                $builder     = $this->builderIntegrationsHelper->getBuilder('email');
+                $builderName = $builder->getName();
+            } catch (IntegrationNotFoundException $exception) {
+                // Assume legacy builder
+                $builderName = 'legacy';
+            }
 
-        echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
+            echo '<script>Mautic.getActiveBuilderName = function() { return \''.$builderName.'\'; }</script>'."\n";
+        }
     }
 
     /**
@@ -752,6 +756,11 @@ class AssetsHelper
     public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    }
+
+    public function setInstallService(InstallService $installService)
+    {
+        $this->installService = $installService;
     }
 
     /**
