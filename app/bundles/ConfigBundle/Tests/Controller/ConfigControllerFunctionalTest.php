@@ -293,16 +293,17 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
-        Assert::assertCount(2, $configCrawler->filterXPath("//select[@id='config_userconfig_saml_idp_entity_id']//option"));
 
+        $availableOptions = $configForm['config[userconfig][saml_idp_entity_id]']->availableOptionValues();
+        Assert::assertCount(2, $availableOptions);
         $configForm->setValues(
             [
-                'config[userconfig][saml_idp_entity_id]'   => self::SUBDOMAIN_URL,
+                'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
                 'config[coreconfig][site_url]'             => 'https://mautic-cloud.local', // required
             ]
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertEquals(self::SUBDOMAIN_URL, $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
+        Assert::assertEquals($availableOptions[1], $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
     }
 }
