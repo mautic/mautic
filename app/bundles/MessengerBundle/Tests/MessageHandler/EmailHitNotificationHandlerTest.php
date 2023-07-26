@@ -2,7 +2,6 @@
 
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
-use _PHPStan_690619d82\Nette\InvalidArgumentException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -72,7 +71,7 @@ class EmailHitNotificationHandlerTest extends TestCase
         $emailModelMock
             ->expects($this->exactly(1))
             ->method('hitEmail')
-            ->willThrowException(new InvalidArgumentException('got my argument?'));
+            ->willThrowException(new \InvalidArgumentException('got my argument?'));
 
         /** @var MockObject|LoggerInterface $loggerMock */
         $loggerMock = $this->createMock(LoggerInterface::class);
@@ -81,7 +80,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 
         $message  = new EmailHitNotification($hitId, $request);
         $handler  = new EmailHitNotificationHandler($emailModelMock, $loggerMock);
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectErrorMessage('got my argument?');
         $handler->__invoke($message);
     }
