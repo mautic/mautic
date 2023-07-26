@@ -2,7 +2,6 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
@@ -83,7 +82,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
         $xml      = '';
         $isXml    = isset($response->getHeaders()['Content-Type']) && preg_grep('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
-            $doc                     = new DomDocument('1.0');
+            $doc                     = new \DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
             $doc->loadXML($response->getBody());

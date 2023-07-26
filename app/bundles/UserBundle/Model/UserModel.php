@@ -2,7 +2,12 @@
 
 namespace Mautic\UserBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -13,11 +18,13 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -37,16 +44,25 @@ class UserModel extends FormModel
 
     public function __construct(
         MailHelper $mailHelper,
-        UserTokenServiceInterface $userTokenService
+        UserTokenServiceInterface $userTokenService,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->mailHelper       = $mailHelper;
         $this->userTokenService = $userTokenService;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): UserRepository
     {
         $result = $this->em->getRepository(User::class);
-        \assert($result instanceof UserRepository);
 
         return $result;
     }
@@ -96,7 +112,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -105,8 +121,8 @@ class UserModel extends FormModel
         }
 
         if (!empty($submittedPassword)) {
-            //hash the clear password submitted via the form
-            return $encoder->encodePassword($entity, $submittedPassword);
+            // hash the clear password submitted via the form
+            return $hasher->hashPassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
@@ -141,9 +157,9 @@ class UserModel extends FormModel
         $entity = parent::getEntity($id);
 
         if ($entity) {
-            //add user's permissions
+            // add user's permissions
             $entity->setActivePermissions(
-                $this->em->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($entity->getRole())
+                $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
             );
         }
 
@@ -155,7 +171,7 @@ class UserModel extends FormModel
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [
@@ -238,11 +254,11 @@ class UserModel extends FormModel
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordEncoder $encoder, $newPassword)
+    public function resetPassword(User $user, UserPasswordHasher $hasher, $newPassword)
     {
-        $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
+        $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
 
-        $user->setPassword($encodedPassword);
+        $user->setPassword($hashedPassword);
         $this->saveEntity($user);
     }
 
@@ -340,7 +356,6 @@ class UserModel extends FormModel
     /**
      * Set user preference.
      *
-     * @param      $key
      * @param null $value
      * @param User $user
      */
@@ -361,7 +376,6 @@ class UserModel extends FormModel
     /**
      * Get user preference.
      *
-     * @param      $key
      * @param null $default
      * @param User $user
      */

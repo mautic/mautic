@@ -26,7 +26,7 @@ class Stage extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -46,12 +46,12 @@ class Stage extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\StageBundle\Entity\LeadStageLog>
      */
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
@@ -102,8 +102,6 @@ class Stage extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

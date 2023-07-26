@@ -102,8 +102,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Called by parent::getBuilderTokensAction().
      *
-     * @param $query
-     *
      * @return array
      */
     protected function getBuilderTokens($query)
@@ -111,6 +109,6 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
-        return $model->getBuilderComponents(null, ['tokens'], $query);
+        return $model->getBuilderComponents(null, ['tokens'], $query ?? '');
     }
 }

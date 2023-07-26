@@ -22,7 +22,6 @@ class IpLookupFactory
     }
 
     /**
-     * @param      $service
      * @param null $auth
      *
      * @return AbstractLookup|null

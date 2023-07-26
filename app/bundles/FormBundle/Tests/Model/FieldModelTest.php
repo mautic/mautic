@@ -4,8 +4,16 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FieldModelTest extends TestCase
 {
@@ -32,13 +40,23 @@ class FieldModelTest extends TestCase
             ->willReturn($platform);
 
         $leadFieldModel = $this->createMock(\Mautic\LeadBundle\Model\FieldModel::class);
-        $fieldModel     = new FieldModel($leadFieldModel);
+        $entityManager  = $this->createMock(EntityManager::class);
+        $fieldModel     = new FieldModel(
+            $leadFieldModel,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
+            $this->createMock(RequestStack::class),
+        );
 
-        $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())
             ->method('getConnection')
             ->willReturn($connection);
-        $fieldModel->setEntityManager($entityManager);
 
         $aliases = [
             'existed_alias',

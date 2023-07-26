@@ -36,7 +36,6 @@ class EmailValidator
      * Validate that an email is the correct format, doesn't have invalid characters, a MX record is associated with the domain, and
      * leverage integrations to validate.
      *
-     * @param $address
      * @param bool $doDnsCheck
      *
      * @throws InvalidEmailException
@@ -61,8 +60,6 @@ class EmailValidator
     /**
      * Validates that email is in an acceptable format.
      *
-     * @param $address
-     *
      * @returns bool
      */
     public function isValidFormat($address)
@@ -72,8 +69,6 @@ class EmailValidator
 
     /**
      * Validates that email does not have invalid characters.
-     *
-     * @param $address
      *
      * @returns bool
      */
@@ -87,8 +82,6 @@ class EmailValidator
     /**
      * Validates if the domain of an email.
      *
-     * @param $address
-     *
      * @returns bool
      */
     public function hasValidDomain($address)
@@ -100,8 +93,6 @@ class EmailValidator
 
     /**
      * Validate using 3rd party integrations.
-     *
-     * @param $address
      *
      * @throws InvalidEmailException
      */

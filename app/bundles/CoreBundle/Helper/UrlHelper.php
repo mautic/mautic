@@ -21,8 +21,6 @@ class UrlHelper
     /**
      * Shorten a URL.
      *
-     * @param $url
-     *
      * @return mixed
      */
     public function buildShortUrl($url)
@@ -82,8 +80,6 @@ class UrlHelper
     }
 
     /**
-     * @param $rel
-     *
      * @return string
      */
     public static function rel2abs($rel)
@@ -99,7 +95,6 @@ class UrlHelper
         $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
-        $base = str_replace('/index_dev.php', '', $base);
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
@@ -278,7 +273,7 @@ class UrlHelper
 
             if ($parsedQuery) {
                 $encodedQuery = http_build_query($parsedQuery);
-                $url          = str_replace($query, $encodedQuery, $url);
+                $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
 

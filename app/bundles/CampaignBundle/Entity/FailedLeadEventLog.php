@@ -22,7 +22,7 @@ class FailedLeadEventLog
     private $dateAdded;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $reason;
 
@@ -47,8 +47,6 @@ class FailedLeadEventLog
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

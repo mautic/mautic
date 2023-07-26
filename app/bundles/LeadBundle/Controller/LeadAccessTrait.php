@@ -14,7 +14,6 @@ trait LeadAccessTrait
      * Determines if the user has access to the lead the note is for.
      *
      * @param $lead
-     * @param $action
      * @param bool   $isPlugin
      * @param string $intgegration
      *
@@ -23,7 +22,7 @@ trait LeadAccessTrait
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
         if (!$leadId instanceof Lead) {
-            //make sure the user has view access to this lead
+            // make sure the user has view access to this lead
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity((int) $leadId);
         } else {
@@ -33,7 +32,7 @@ trait LeadAccessTrait
 
         if (null === $lead || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
-                //set the return URL
+                // set the return URL
                 $page      = $this->getCurrentRequest()->getSession()->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
                 $returnUrl = $this->generateUrl($isPlugin ? 'mautic_plugin_timeline_index' : 'mautic_contact_index', ['page' => $page]);
 
@@ -73,8 +72,6 @@ trait LeadAccessTrait
     /**
      * Returns leads the user has access to.
      *
-     * @param $action
-     *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function checkAllAccess($action, $limit)
@@ -82,7 +79,7 @@ trait LeadAccessTrait
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        //make sure the user has view access to leads
+        // make sure the user has view access to leads
         $repo = $model->getRepository();
 
         // order by lastactive, filter

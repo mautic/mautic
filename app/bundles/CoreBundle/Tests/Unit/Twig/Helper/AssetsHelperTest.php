@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use PHPUnit\Framework\Assert;
@@ -13,37 +14,52 @@ use Symfony\Component\Asset\Packages;
 
 class AssetsHelperTest extends TestCase
 {
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var PathsHelper|MockObject
+     */
+    private $pathsHelper;
+
+    private AssetsHelper $assetHelper;
+
+    protected function setUp(): void
+    {
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->assetHelper          = new AssetsHelper($this->createPackagesMock(), $this->coreParametersHelper);
+
+        $this->assetHelper->setPathsHelper($this->pathsHelper);
+    }
+
     public function testAssetContext(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-        $pathsHelper->method('getSystemPath')
+        $this->pathsHelper->method('getSystemPath')
             ->willReturn('');
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
-
-        $assetHelper->addStylesheet('/app.css');
-        $head = $assetHelper->getHeadDeclarations();
+        $this->assetHelper->addStylesheet('/app.css');
+        $head = $this->assetHelper->getHeadDeclarations();
 
         Assert::assertStringContainsString('app.css', $head);
 
-        $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
+        $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addStylesheet('/builder.css')
             ->setContext();
 
-        $head = $assetHelper->getHeadDeclarations();
+        $head = $this->assetHelper->getHeadDeclarations();
         Assert::assertStringNotContainsString('builder.css', $head);
 
-        $head = $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
+        $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
         Assert::assertStringContainsString('builder.css', $head);
         Assert::assertStringNotContainsString('app.css', $head);
 
-        $version = $this->setVersion($assetHelper);
+        $version = $this->setVersion($this->assetHelper);
 
-        $head = $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
+        $head = $this->assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
         Assert::assertStringContainsString('builder.css?v'.$version, $head);
         Assert::assertStringNotContainsString('app.css?v'.$version, $head);
@@ -51,123 +67,102 @@ class AssetsHelperTest extends TestCase
 
     public function testGetUrlWithAbsolutePath(): void
     {
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
+        Assert::assertEquals('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        Assert::assertEquals('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
 
-        Assert::assertEquals('http://some.absolute/path', $assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertEquals('https://some.absolute/path', $assetHelper->getUrl('https://some.absolute/path'));
+        $this->setVersion($this->assetHelper);
 
-        $this->setVersion($assetHelper);
-
-        Assert::assertEquals('http://some.absolute/path', $assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertEquals('https://some.absolute/path', $assetHelper->getUrl('https://some.absolute/path'));
+        Assert::assertEquals('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        Assert::assertEquals('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
     }
 
     public function testGetUrlWithRelativePath(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-
-        $pathsHelper->method('getSystemPath')
+        $this->pathsHelper->method('getSystemPath')
             ->willReturn('http://some.mautic');
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
+        $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path', $assetHelper->getUrl('some/path'));
+        Assert::assertEquals('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
-        $version = $this->setVersion($assetHelper);
+        $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $assetHelper->getUrl('some/path'));
+        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWhenMauticInSubFolder(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-
-        $pathsHelper->method('getSystemPath')
+        $this->pathsHelper->method('getSystemPath')
             ->willReturn('http://some.mautic/m');
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
+        $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertEquals('http://some.mautic/m/some/path', $assetHelper->getUrl('some/path'));
+        Assert::assertEquals('http://some.mautic/m/some/path', $this->assetHelper->getUrl('some/path'));
 
-        $version = $this->setVersion($assetHelper);
+        $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.mautic/m/some/path?v'.$version, $assetHelper->getUrl('some/path'));
+        Assert::assertEquals('http://some.mautic/m/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWithDevIndex(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-             ->disableOriginalConstructor()
-             ->getMock();
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturn('http://some.mautic/');
 
-        $pathsHelper->method('getSystemPath')
-            ->willReturn('http://some.mautic/index_dev.php/');
+        $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
+        Assert::assertEquals('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
-        Assert::assertEquals('http://some.mautic/some/path', $assetHelper->getUrl('some/path'));
+        $version = $this->setVersion($this->assetHelper);
 
-        $version = $this->setVersion($assetHelper);
-
-        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $assetHelper->getUrl('some/path'));
+        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithVersionAndExistingQueryPart(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $pathsHelper->method('getSystemPath')
+        $this->pathsHelper->method('getSystemPath')
             ->willReturn('/');
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
+        $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        $version = $this->setVersion($assetHelper);
+        $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('/path?some&amp;v'.$version, $assetHelper->getUrl('/path?some'));
-        Assert::assertEquals('/path?some=65&amp;v'.$version, $assetHelper->getUrl('/path?some=65'));
-        Assert::assertEquals('/path?v'.$version, $assetHelper->getUrl('/path?v'.$version));
+        Assert::assertEquals('/path?some&amp;v'.$version, $this->assetHelper->getUrl('/path?some'));
+        Assert::assertEquals('/path?some=65&amp;v'.$version, $this->assetHelper->getUrl('/path?some=65'));
+        Assert::assertEquals('/path?v'.$version, $this->assetHelper->getUrl('/path?v'.$version));
     }
 
     public function testGetCKEditorScripts(): void
     {
         $secretKey   = 'mautic';
         $version     = 1;
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setVersion($secretKey, $version);
+        $this->assetHelper->setVersion($secretKey, $version);
         $version = substr(hash('sha1', $secretKey.$version), 0, 8);
 
-        $reflectionObject = new \ReflectionObject($assetHelper);
+        $reflectionObject = new \ReflectionObject($this->assetHelper);
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
         $method->setAccessible(true);
-        $ckEditorScripts = $method->invokeArgs($assetHelper, []);
-        Assert::assertEquals(["app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v$version",
-            "app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v$version",
-        ], $ckEditorScripts);
+        $ckEditorScripts = $method->invokeArgs($this->assetHelper, []);
+        Assert::assertEquals(
+            [
+                "media/js/ckeditor4/ckeditor.js?v{$version}",
+                "media/js/ckeditor4/adapters/jquery.js?v{$version}",
+                "app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v{$version}",
+            ],
+            $ckEditorScripts
+        );
     }
 
     /**
-     * @return MockObject|Packages
+     * @return MockObject&Packages
      */
     private function createPackagesMock()
     {
-        $packagesMock = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&Packages $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
 
         $packagesMock->method('getUrl')
-            ->will($this->returnCallback(function (string $path) {
-                return $path;
-            }));
+            ->will($this->returnCallback(fn (string $path) => $path));
 
         return $packagesMock;
     }

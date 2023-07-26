@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test\Listeners;
 
-use InvalidArgumentException;
-use LogicException;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\TestSuite;
-use ReflectionMethod;
 
 /**
  * Lists tests that should be run in a separate process and throws an exception making the test suite fail.
@@ -57,12 +54,12 @@ class SeparateProcessListener implements TestListener
             fwrite(STDOUT, sprintf('Test "%s" must be run in a separate process as there were defined the following constants during the test execution: "%s".%s', $testName, implode(', ', $problematicConstants), PHP_EOL));
         }
 
-        throw new LogicException('There are tests that must be run in a separate process!');
+        throw new \LogicException('There are tests that must be run in a separate process!');
     }
 
     private function isTestRunInSeparateProcess(Test $test): bool
     {
-        $reflection = new ReflectionMethod($test, 'runInSeparateProcess');
+        $reflection = new \ReflectionMethod($test, 'runInSeparateProcess');
         $reflection->setAccessible(true);
 
         return $reflection->invoke($test);
@@ -84,7 +81,7 @@ class SeparateProcessListener implements TestListener
     private function trackProblematicTest(Test $test, array $problematicConstants): void
     {
         if (!$test instanceof TestCase) {
-            throw new InvalidArgumentException(sprintf('$test must be an instance of "%s".', TestCase::class));
+            throw new \InvalidArgumentException(sprintf('$test must be an instance of "%s".', TestCase::class));
         }
 
         $testName = sprintf('%s::%s', get_class($test), $test->getName());

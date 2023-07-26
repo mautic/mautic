@@ -26,9 +26,6 @@ class ExtremeIpLookup extends AbstractRemoteDataLookup
         return 'https://extreme-ip-lookup.com/json/'.$this->ip.$auth;
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response, true);

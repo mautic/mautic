@@ -14,7 +14,7 @@ class PushID
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -126,8 +126,6 @@ class PushID
     }
 
     /**
-     * @param $enabled
-     *
      * @return $this
      */
     public function setEnabled($enabled)

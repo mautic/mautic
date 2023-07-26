@@ -96,7 +96,7 @@
         <div class="pr-md pl-md pt-lg pb-lg">
             <div class="box-layout">
                 <div class="col-xs-10">
-                    <div class="text-muted">{{ packageDetail.packageBase.description|escape }}</div>
+                    <div class="text-muted">{{ packageDetail.packageBase.description|purify }}</div>
                 </div>
             </div>
         </div>
@@ -104,8 +104,18 @@
     {% endif %}
 
     <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</div>
+        </div>
+        <div class="panel-body">{{ 'marketplace.package.cli.install.descr'|trans({
+            '%vendor%' : packageDetail.packageBase.getVendorName(),
+            '%package%' : packageDetail.packageBase.getPackageName(),
+        })|purify }}</div>
+    </div>
+
+    <div class="panel">
     <div class="panel-heading">
-        <div class="panel-title">{% trans %}Latest Stable Version{% endtrans %}</div>
+        <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
     </div>
     <table class="table table-bordered table-striped mb-0">
         <tr>

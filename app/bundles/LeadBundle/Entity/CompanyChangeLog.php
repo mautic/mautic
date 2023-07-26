@@ -36,7 +36,7 @@ class CompanyChangeLog
     private $actionName;
 
     /**
-     * @var Company
+     * @var int
      */
     private $company;
 
@@ -161,7 +161,7 @@ class CompanyChangeLog
     /**
      * Set delta.
      *
-     * @param Company $company
+     * @param int $company
      *
      * @return CompanyChangeLog
      */
@@ -175,7 +175,7 @@ class CompanyChangeLog
     /**
      * Get company.
      *
-     * @return \Mautic\LeadBundle\Entity\Company
+     * @return int
      */
     public function getCompany()
     {

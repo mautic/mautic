@@ -50,8 +50,6 @@ class Lead
     }
 
     /**
-     * @param $dateAdded
-     *
      * @return $this
      */
     public function setDateAdded($dateAdded)
@@ -70,8 +68,6 @@ class Lead
     }
 
     /**
-     * @param $lead
-     *
      * @return $this
      */
     public function setLead($lead)
@@ -90,8 +86,6 @@ class Lead
     }
 
     /**
-     * @param $monitor
-     *
      * @return $this
      */
     public function setMonitor($monitor)

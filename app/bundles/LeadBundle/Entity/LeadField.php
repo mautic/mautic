@@ -36,12 +36,12 @@ class LeadField extends FormEntity
     private $type = 'text';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $group = 'core';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $defaultValue;
 
@@ -76,7 +76,7 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isUniqueIdentifer = false;
 
@@ -88,12 +88,12 @@ class LeadField extends FormEntity
     private $isUniqueIdentifier = false;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $order = 1;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $object = 'lead';
 
@@ -235,8 +235,6 @@ class LeadField extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

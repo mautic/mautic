@@ -14,8 +14,6 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param $dynamicContentId
-     *
      * @return array
      */
     public function getSentStats($dynamicContentId)
@@ -84,7 +82,7 @@ class StatRepository extends CommonRepository
             );
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('e.date_sent', $q->expr()->literal($dt->toUtcString()))
@@ -92,7 +90,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.dynamic_content_id');
 
-        //get a total number of sent DC stats first
+        // get a total number of sent DC stats first
         $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
@@ -137,9 +135,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -152,8 +147,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
     public function deleteStat($id)
     {
@@ -161,7 +154,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

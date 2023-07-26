@@ -3,8 +3,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use DOMDocument;
-use DOMXPath;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -137,7 +135,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
@@ -158,7 +156,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $expr           = $this->connection->getExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -384,9 +382,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         if ($page->getIsPreferenceCenter()) {
             // replace slots
             if (count($params)) {
-                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-                $xpath = new DOMXPath($dom);
+                $xpath = new \DOMXPath($dom);
 
                 $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
@@ -463,9 +461,9 @@ class BuilderSubscriber implements EventSubscriberInterface
             }
             // add form before first block of prefs center
             if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
-                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-                $xpath      = new DOMXPath($dom);
+                $xpath      = new \DOMXPath($dom);
                 // If use slots
                 $divContent = $xpath->query('//*[@data-prefs-center="1"]');
                 if (!$divContent->length) {
@@ -526,7 +524,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             }
             $content .= "</div>\n";
 
-            //load the css into the header by calling the sharebtn_css view
+            // load the css into the header by calling the sharebtn_css view
             $this->twig->render('@MauticPage/SubscribedEvents/PageToken/sharebtn_css.html.twig');
         }
 
@@ -642,8 +640,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Renders the HTML for the language bar for a given page.
      *
-     * @param $page
-     *
      * @return string
      */
     private function renderLanguageBar($page)
@@ -654,18 +650,18 @@ class BuilderSubscriber implements EventSubscriberInterface
             $parent   = $page->getTranslationParent();
             $children = $page->getTranslationChildren();
 
-            //check to see if this page is grouped with another
+            // check to see if this page is grouped with another
             if (empty($parent) && empty($children)) {
                 return;
             }
 
             $related = [];
 
-            //get a list of associated pages/languages
+            // get a list of associated pages/languages
             if (!empty($parent)) {
                 $children = $parent->getTranslationChildren();
             } else {
-                $parent = $page; //parent is self
+                $parent = $page; // parent is self
             }
 
             if (!empty($children)) {
@@ -693,7 +689,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 }
             }
 
-            //sort by language
+            // sort by language
             uasort(
                 $related,
                 function ($a, $b) {

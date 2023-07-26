@@ -18,7 +18,7 @@ class ColumnSchemaHelper
     protected $db;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected $sm;
 
@@ -57,7 +57,6 @@ class ColumnSchemaHelper
     /**
      * Set the table to be manipulated.
      *
-     * @param      $table
      * @param bool $addPrefix
      *
      * @return $this
@@ -68,10 +67,10 @@ class ColumnSchemaHelper
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
-        //make sure the table exists
+        // make sure the table exists
         $this->checkTableExists($this->tableName, true);
 
-        //use the to schema to get table details so that changes will be calculated
+        // use the to schema to get table details so that changes will be calculated
         $this->fromTable = $this->sm->listTableDetails($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
@@ -81,7 +80,7 @@ class ColumnSchemaHelper
     /**
      * Get the SchemaManager.
      *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager()
     {
@@ -119,7 +118,7 @@ class ColumnSchemaHelper
      */
     public function addColumns(array $columns)
     {
-        //ensure none of the columns exist before manipulating the schema
+        // ensure none of the columns exist before manipulating the schema
         foreach ($columns as $column) {
             if (empty($column['name'])) {
                 throw new SchemaException('Column is missing required name key.');
@@ -128,7 +127,7 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        //now add the columns
+        // now add the columns
         foreach ($columns as $column) {
             $this->addColumn($column, false);
         }
@@ -168,8 +167,6 @@ class ColumnSchemaHelper
     /**
      * Drops a column from table.
      *
-     * @param $columnName
-     *
      * @return $this
      */
     public function dropColumn($columnName)
@@ -186,7 +183,7 @@ class ColumnSchemaHelper
      */
     public function executeChanges()
     {
-        //create a table diff
+        // create a table diff
         $comparator = new Comparator();
         $diff       = $comparator->diffTable($this->fromTable, $this->toTable);
 
@@ -207,7 +204,7 @@ class ColumnSchemaHelper
      */
     public function checkColumnExists($column, $throwException = false)
     {
-        //check to ensure column doesn't exist
+        // check to ensure column doesn't exist
         if ($this->toTable->hasColumn($column)) {
             if ($throwException) {
                 throw new SchemaException("The column {$column} already exists in {$this->tableName}");
@@ -222,7 +219,6 @@ class ColumnSchemaHelper
     /**
      * Determine if a table exists.
      *
-     * @param            $table
      * @param bool|false $throwException
      *
      * @return bool
