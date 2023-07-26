@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private CONST SUBDOMAIN_URL = 'subdomain_url.com';
     /**
      * @var string
      */
@@ -24,6 +25,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->configParams['locale'] = 'en_US';
+        $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
 
@@ -284,5 +286,23 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+    }
+
+    public function testSSOSettingEntityId(): void
+    {
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
+        $configForm       = $configSaveButton->form();
+        Assert::assertCount(2, $configCrawler->filterXPath("//select[@id='config_userconfig_saml_idp_entity_id']//option"));
+
+        $configForm->setValues(
+            [
+                'config[userconfig][saml_idp_entity_id]'   => self::SUBDOMAIN_URL,
+                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertEquals(self::SUBDOMAIN_URL, $configForm['config[userconfig][saml_idp_entity_id]']->getValue());
     }
 }
