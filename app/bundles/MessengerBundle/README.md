@@ -26,8 +26,8 @@ Currently, 2 messages are defined.
  * [EmailHitNotification](app/bundles/MessengerBundle/Message/EmailHitNotification.php)
  * [PageHitNotification](app/bundles/MessengerBundle/Message/PageHitNotification.php)
 
-configuring transports:
-
+## Configuring transports
+> there is new serializer available, that uses JSON and has smaller payload than native php **'messenger.transport.jms_serializer'** that is recommended to use.
 ```php
 $container->loadFromExtension('framework', [
     'messenger' => [
@@ -54,7 +54,7 @@ $container->loadFromExtension('framework', [
                         'default_publish_routing_key' => 'hit',
                     ],
                     'queues'     => [
-                        'email_hit' => [
+                        'hits' => [
                             'binding_keys' => ['hit'],
                             'arguments'    => [
                                 'x-expires' => 60 * 60 * 24 * 21 * 1000, // queue ttl without consumer using it
