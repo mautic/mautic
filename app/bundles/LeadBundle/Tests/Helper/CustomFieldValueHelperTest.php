@@ -193,7 +193,7 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
             'email'     => '*@mautic.org',
         ];
 
-        $result = CustomFieldValueHelper::anonimizationFields($fields);
+        $result = CustomFieldValueHelper::anonymizationFields($fields);
         $this->assertEquals($expected, $result);
     }
 }

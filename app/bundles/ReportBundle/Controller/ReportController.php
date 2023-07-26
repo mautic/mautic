@@ -776,7 +776,7 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        $notAnonymize = $security->isGranted('lead:exports:notanonymize') ? true : false;
+        $notAnonymize = $security->isGranted('lead:exports:anonymize') ? true : false;
 
         $session  = $request->getSession();
         $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));

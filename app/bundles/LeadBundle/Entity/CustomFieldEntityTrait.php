@@ -240,17 +240,17 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get anonimization profile values.
+     * Get anonymization profile values.
      *
      * @return array
      */
-    public function getAnonimizationProfileFields(): array
+    public function getAnonymizationProfileFields(): array
     {
         if (isset($this->fields['core'])) {
             $fieldValues = [
                 'id' => $this->id,
             ];
-            $fieldValues += CustomFieldValueHelper::anonimizationFields($this->fields);
+            $fieldValues += CustomFieldValueHelper::anonymizationFields($this->fields);
 
             return array_merge($fieldValues, $this->updatedFields);
         } else {
