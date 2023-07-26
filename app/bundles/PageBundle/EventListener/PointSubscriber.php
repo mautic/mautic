@@ -66,10 +66,10 @@ class PointSubscriber implements EventSubscriberInterface
     {
         if ($event->getPage()) {
             // Mautic Landing Page was hit
-            $this->pointModel->triggerAction('page.hit', $event->getHit());
+            $this->pointModel->triggerAction('page.hit', $event->getHit(), null, $event->getLead());
         } else {
             // Mautic Tracking Pixel was hit
-            $this->pointModel->triggerAction('url.hit', $event->getHit());
+            $this->pointModel->triggerAction('url.hit', $event->getHit(), null, $event->getLead());
         }
     }
 }

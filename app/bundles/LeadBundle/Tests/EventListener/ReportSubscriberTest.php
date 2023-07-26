@@ -280,7 +280,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'decision' => [
                             'email.click' => [
                               'label'                  => 'Clicks email',
-                              'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
+                              'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                               'eventName'              => 'mautic.email.on_campaign_trigger_decision',
                               'formType'               => "Mautic\EmailBundle\Form\Type\EmailClickDecisionType",
                               'connectionRestrictions' => [
@@ -612,6 +612,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
                         ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
                         'i.ip_address' => [
                             'label' => '',
                             'type'  => 'string',
@@ -659,6 +669,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
+                        ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
                         ],
                     ],
                     'group' => 'contacts',
