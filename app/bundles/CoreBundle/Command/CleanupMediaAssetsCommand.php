@@ -23,7 +23,7 @@ class CleanupMediaAssetsCommand extends Command
     {
         $this->setName('mautic:assets:cleanup')
           ->setHelp(
-            <<<'EOT'
+              <<<'EOT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
 
 <info>php %command.full_name%</info>
@@ -35,7 +35,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $assetsPath = $this->pathsHelper->getAssetsPath();
-        $mediaPath = $this->pathsHelper->getMediaPath();
+        $mediaPath  = $this->pathsHelper->getMediaPath();
 
         $finder = new Finder();
         $finder->files()->in($assetsPath)->path(['images', 'dashboards'])->notName('.htaccess');
@@ -45,7 +45,7 @@ EOT
         foreach ($finder as $file) {
             $absoluteFilePath = $file->getRealPath();
             $relativeFilePath = $file->getRelativePathname();
-            $md5_source = md5_file($absoluteFilePath);
+            $md5_source       = md5_file($absoluteFilePath);
 
             $mediaOverride = $mediaPath.'/'.$relativeFilePath;
             if (file_exists($mediaOverride)) {
@@ -56,18 +56,18 @@ EOT
                 }
             }
         }
-        $output->writeln('<info>' . count($files_to_delete) . ' obsolete files found</info>');
+        $output->writeln('<info>'.count($files_to_delete).' obsolete files found</info>');
 
         if (count($files_to_delete)) {
             foreach ($files_to_delete as $file) {
-                $output->writeln('<comment> - ' . $file . '</comment>');
+                $output->writeln('<comment> - '.$file.'</comment>');
             }
-            $output->writeln("");
+            $output->writeln('');
 
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
-              '<question>delete files?</question> ', false
+                '<question>delete files?</question> ', false
             );
 
             if ($helper->ask($input, $output, $question)) {
@@ -76,6 +76,7 @@ EOT
                 }
             }
         }
+
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
     protected static $defaultDescription = 'Cleans up obsolete files in the media folder that are present in the app/assets folder';
