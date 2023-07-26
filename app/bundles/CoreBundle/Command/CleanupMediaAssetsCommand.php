@@ -2,29 +2,20 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * CLI Command to clean up obsolete files in the media folder.
  */
 class CleanupMediaAssetsCommand extends Command
 {
-    private PathsHelper $pathsHelper;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private PathsHelper $pathsHelper)
     {
-        $this->pathsHelper = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-
         parent::__construct();
     }
 
