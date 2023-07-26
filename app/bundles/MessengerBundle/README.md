@@ -28,25 +28,61 @@ Currently, 2 messages are defined.
 
 configuring transports:
 
-
-### Sample configuration
-I believe the best place to configure the messenger is `app/config/config_local.php` or your own bundle.
-
 ```php
-<?php # app/config/config_local.php
-
 $container->loadFromExtension('framework', [
     'messenger' => [
         'routing'   => [
             \Mautic\MessengerBundle\Message\PageHitNotification::class  => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
             \Mautic\MessengerBundle\Message\EmailHitNotification::class => \Mautic\MessengerBundle\MauticMessengerTransports::HIT,
         ],
+        'failure_transport' => 'failed', // Define other than default if you wish
+        'transports' => [
+            'failed' => [
+                'dsn' => 'doctrine://default?queue_name=failed',
+            ],
+            \Mautic\MessengerBundle\MauticMessengerTransports::SYNC      => 'sync://',
+            \Mautic\MessengerBundle\MauticMessengerTransports::HIT => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'serializer'     => 'messenger.transport.jms_serializer',
+                'options'        => [
+                    'heartbeat'  => 1,
+                    'persistent' => true,
+                    'vhost'      => '/',
+                    'exchange'   => [
+                        'name'                        => 'mautic',
+                        'type'                        => 'direct',
+                        'default_publish_routing_key' => 'hit',
+                    ],
+                    'queues'     => [
+                        'email_hit' => [
+                            'binding_keys' => ['hit'],
+                            'arguments'    => [
+                                'x-expires' => 60 * 60 * 24 * 21 * 1000, // queue ttl without consumer using it
+                            ],
+                        ],
+                    ],
+                ],
+                'serializer'     => 'messenger.transport.native_php_serializer',
+                'retry_strategy' => [
+                    'max_retries' => 3,
+                    'delay'       => 500,
+                    'multiplier'  => 3,
+                    'max_delay'   => 0,
+                ],
+            ],
+        ],
     ],
 ]);
 ```
+
 ## Usage
 
-to run consumer, simply 
+In order to run consumer, simply run: 
+
 ```shell
-sudo -uwww-data bin/console messenger:consume page_hit email_hit
+sudo -uwww-data bin/console messenger:consume hit
 ```
+
+> Where *hit* stands for your transport's name. In the example above; it is the value of `\Mautic\MessengerBundle\MauticMessengerTransports::HIT`
+
+

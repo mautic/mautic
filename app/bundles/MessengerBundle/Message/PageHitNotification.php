@@ -20,7 +20,7 @@ final class PageHitNotification
         private ?int $leadId = null,
         ?\DateTimeInterface $eventTime = null
     ) {
-        $this->setEventTime($eventTime);
+        $this->setEventTime($eventTime ?? new \DateTimeImmutable());
     }
 
     public function getHitId(): int

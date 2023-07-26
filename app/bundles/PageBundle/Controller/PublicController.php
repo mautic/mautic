@@ -290,7 +290,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        if ($tracking404Model->isTrackable()) {
+        if ($entity !== false && $tracking404Model->isTrackable()) {
             $tracking404Model->hitPage($entity, $request);
         }
 
