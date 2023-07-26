@@ -14,7 +14,7 @@ https://symfony.com/doc/current/messenger.html#routing-messages-to-a-transport
 
 By default, the transport is set to **synchronous**, meaning no AMQP/Doctrine or whatsoever is used and the request is handled directly and the message is marked as synchronous process if it implements **RequestStatusInterface**.
 
-[Currently defined routes](MauticMessengerRoutes.php) are SYNC, PAGE_HIT, EMAIL_HIT although in default configuration only the SYNC is used.
+[Currently defined routes](MauticMessengerRoutes.php) are EMAIL, FAILED, SYNC and HIT although in default configuration only the SYNC is used.
 
 > https://symfony.com/doc/5.4/messenger.html#routing-messages-to-a-transport
 
