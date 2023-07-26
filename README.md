@@ -12,7 +12,7 @@ Marketing automation has historically been difficult to implement within organis
 Open source means more than open code. Open source provides equality for all and a chance for everyone to improve.
 
 ![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
-
+ 
 Get Involved
 =============
 Before we tell you how to install and use Mautic, we like to shamelessly plug our awesome user and developer communities! Users, start [here][get-involved] for inspiration, or follow us on Twitter [@MauticCommunity][twitter] or Facebook [@MauticCommunity][facebook]. Once you’re familiar with using the software, maybe you will share your wisdom with others in our [Slack][slack] channel.
