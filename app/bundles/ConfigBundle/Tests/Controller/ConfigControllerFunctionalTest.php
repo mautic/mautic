@@ -6,6 +6,7 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
@@ -294,7 +295,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $configSaveButton = $configCrawler->selectButton('config[buttons][apply]');
         $configForm       = $configSaveButton->form();
 
-        $availableOptions = $configForm['config[userconfig][saml_idp_entity_id]']->availableOptionValues();
+        /** @var ChoiceFormField $entityIdField */
+        $entityIdField    = $configForm['config[userconfig][saml_idp_entity_id]'];
+        $availableOptions = $entityIdField->availableOptionValues();
         Assert::assertCount(2, $availableOptions);
         $configForm->setValues(
             [
