@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private CONST SUBDOMAIN_URL = 'subdomain_url.com';
+    private const SUBDOMAIN_URL = 'subdomain_url.com';
     /**
      * @var string
      */
@@ -24,7 +24,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             'kernel.project_dir',
         ];
 
-        $this->configParams['locale'] = 'en_US';
+        $this->configParams['locale']        = 'en_US';
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
@@ -298,7 +298,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $configForm->setValues(
             [
                 'config[userconfig][saml_idp_entity_id]'   => self::SUBDOMAIN_URL,
-                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+                'config[coreconfig][site_url]'             => 'https://mautic-cloud.local', // required
             ]
         );
         $this->client->submit($configForm);
