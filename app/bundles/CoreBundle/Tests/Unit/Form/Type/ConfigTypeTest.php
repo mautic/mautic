@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\Type\ConfigType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
@@ -58,16 +59,17 @@ class ConfigTypeTest extends TypeTestCase
 
     private function getConfigFormType()
     {
-        $translator      = $this->createMock(TranslatorInterface::class);
-        $languageHelper  = $this->createMock(LanguageHelper::class);
-        $ipLookupFactory = $this->createMock(IpLookupFactory::class);
-        $shortener       = $this->createMock(Shortener::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
+        $languageHelper             = $this->createMock(LanguageHelper::class);
+        $ipLookupFactory            = $this->createMock(IpLookupFactory::class);
+        $shortener                  = $this->createMock(Shortener::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
         $languageHelper->expects($this->any())
                        ->method('fetchLanguages')
                        ->willReturn(['en' => ['name'=>'English']]);
 
-        return new ConfigType($translator, $languageHelper, $ipLookupFactory, [], null, $shortener);
+        return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
 
     protected function getExtensions()

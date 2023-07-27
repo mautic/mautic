@@ -56,11 +56,6 @@ class ConfigType extends AbstractType
      */
     private $ipLookup;
 
-    /**
-     * @var array
-     */
-    private $ipLookupServices;
-
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
