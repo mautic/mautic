@@ -6,15 +6,13 @@ namespace Mautic\EmailBundle\Controller;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
-/**
- * @extends AbstractCountryMapController<EmailModel>
- */
 class EmailMapStatsController extends AbstractCountryMapController
 {
-    protected const MAP_OPTIONS = [
+    public const MAP_OPTIONS = [
         'read_count' => [
             'label' => 'mautic.email.stat.read',
             'unit'  => 'Read',
@@ -53,5 +51,22 @@ class EmailMapStatsController extends AbstractCountryMapController
             $dateToObject,
             $includeVariants,
         );
+    }
+
+    public function hasAccess(CorePermissions $security, $entity): bool
+    {
+        return !$security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $entity->getCreatedBy()
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getMapOptions(): array
+    {
+        return self::MAP_OPTIONS;
     }
 }

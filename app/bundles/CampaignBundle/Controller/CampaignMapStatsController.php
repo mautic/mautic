@@ -8,13 +8,11 @@ use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * @extends AbstractCountryMapController<CampaignModel>
- */
 class CampaignMapStatsController extends AbstractCountryMapController
 {
-    protected const MAP_OPTIONS = [
+    public const MAP_OPTIONS = [
         'read_count' => [
             'label' => 'mautic.email.stat.read',
             'unit'  => 'Read',
@@ -44,5 +42,22 @@ class CampaignMapStatsController extends AbstractCountryMapController
             $dateFromObject,
             $dateToObject
         );
+    }
+
+    public function hasAccess(CorePermissions $security, $entity): bool
+    {
+        return $security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $entity->getCreatedBy()
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getMapOptions(): array
+    {
+        return self::MAP_OPTIONS;
     }
 }

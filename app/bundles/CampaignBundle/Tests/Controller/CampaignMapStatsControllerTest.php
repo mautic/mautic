@@ -8,6 +8,8 @@ use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,11 +22,6 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 
     private CampaignMapStatsController $mapController;
 
-    /**
-     * @var \ReflectionClass<CampaignMapStatsController>
-     */
-    private \ReflectionClass $mapControllerReflection;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,7 +31,6 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 
         $this->campaignModelMock       = $this->createMock(CampaignModel::class);
         $this->mapController           = new CampaignMapStatsController($this->campaignModelMock);
-        $this->mapControllerReflection = new \ReflectionClass(CampaignMapStatsController::class);
     }
 
     /**
@@ -64,30 +60,23 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         ];
     }
 
-    /**
-     * @throws \ReflectionException
-     */
     public function testGetOptionLegendText(): void
     {
-        $method               = $this->mapControllerReflection->getMethod('getOptionLegendText');
-        $method->setAccessible(true);
         $legendValues = [
             '%total'       => 4,
             '%withCountry' => 2,
         ];
 
-        $this->assertEquals('Total: 4 (2 with country)', $method->invokeArgs($this->mapController, [$legendValues]));
+        $this->assertEquals('Total: 4 (2 with country)', MapHelper::getOptionLegendText(AbstractCountryMapController::LEGEND_TEXT, $legendValues));
     }
 
-    /**
-     * @throws \ReflectionException
-     */
     public function testBuildMapData(): void
     {
-        $method = $this->mapControllerReflection->getMethod('buildMapData');
-        $method->setAccessible(true);
-
-        $results = $method->invokeArgs($this->mapController, [$this->getStats()]);
+        $results = MapHelper::buildMapData(
+            $this->getStats(),
+            CampaignMapStatsController::MAP_OPTIONS,
+            AbstractCountryMapController::LEGEND_TEXT
+        );
 
         $this->assertCount(2, $results);
         $this->assertSame([
@@ -111,16 +100,10 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         ], $results[1]);
     }
 
-    /**
-     * @throws \ReflectionException
-     */
     public function testMapCountries(): void
     {
-        $method = $this->mapControllerReflection->getMethod('mapCountries');
-        $method->setAccessible(true);
-
-        $reads  = $method->invokeArgs($this->mapController, [$this->getStats(), 'read_count']);
-        $clicks = $method->invokeArgs($this->mapController, [$this->getStats(), 'clicked_through_count']);
+        $reads   = MapHelper::mapCountries($this->getStats(), 'read_count');
+        $clicks  = MapHelper::mapCountries($this->getStats(), 'clicked_through_count');
 
         $this->assertSame([
             'data' => [

@@ -1329,13 +1329,8 @@ blockquote > p:after {
   right: 3px !important;
 }
 .btn,
-.btn:active,
-.btn.focus,
-.btn:focus,
-.btn.active,
-.btn:active:focus,
-.btn.active:focus {
-  outline: 0 !important;
+.btn:active {
+  outline: 0;
 }
 .btn .fa {
   min-width: 13px;
@@ -4615,6 +4610,15 @@ a.inline-token .text-muted {
 }
 .jvectormap-legend .jvectormap-legend-inner {
   display: none;
+}
+.map-options__item.btn,
+.map-options__item.btn:active,
+.map-options__item.btn.focus,
+.map-options__item.btn:focus,
+.map-options__item.btn.active,
+.map-options__item.btn:active:focus,
+.map-options__item.btn.active:focus {
+  outline: 0 !important;
 }
 @media (min-width: 992px) {
   .modal-xl {
