@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class EmailMapStatsControllerTest extends MauticMysqlTestCase
 {
@@ -56,6 +57,7 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $email->setName('Test email 1');
         $email->setCreatedBy($user);
         $this->em->persist($email);
+        $this->em->flush();
 
         $this->corePermissionsMock->method('hasEntityAccess')
             ->with(
@@ -66,6 +68,12 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
             ->willReturn(false);
 
         $result = $this->mapController->hasAccess($this->corePermissionsMock, $email);
+
+        try {
+            $this->mapController->viewAction($this->corePermissionsMock, $email->getId(), '2023-07-20', '2023-07-27');
+        } catch (AccessDeniedHttpException|\Exception $e) {
+            $this->assertTrue($e instanceof AccessDeniedHttpException);
+        }
 
         $this->assertFalse($result);
     }
