@@ -13,9 +13,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\Point;
 
-/**
- * @runTestsInSeparateProcesses
- */
+
 class PointActionFunctionalTest extends MauticMysqlTestCase
 {
     public function testPointActionReadEmail(): void
@@ -68,6 +66,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
             $pointAction->setGroup($group);
         }
         $this->em->persist($pointAction);
+        $this->em->flush();
 
         return $pointAction;
     }
