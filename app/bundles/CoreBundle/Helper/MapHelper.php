@@ -18,7 +18,7 @@ class MapHelper
 
     /**
      * @param array<int, array<string, int|string>> $statsCountries
-     * @param array<string, array<string, string> $mapOptions
+     * @param array<string, array<string, string>>  $mapOptions
      *
      * @return array<int, array<string, mixed>>
      */

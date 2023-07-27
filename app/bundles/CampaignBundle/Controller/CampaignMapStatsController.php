@@ -10,6 +10,9 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
+/**
+ * @extends AbstractCountryMapController<CampaignModel>
+ */
 class CampaignMapStatsController extends AbstractCountryMapController
 {
     public const MAP_OPTIONS = [
@@ -44,6 +47,9 @@ class CampaignMapStatsController extends AbstractCountryMapController
         );
     }
 
+    /**
+     * @param Campaign $entity
+     */
     public function hasAccess(CorePermissions $security, $entity): bool
     {
         return $security->hasEntityAccess(
@@ -54,7 +60,7 @@ class CampaignMapStatsController extends AbstractCountryMapController
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string,array<string, string>>
      */
     public function getMapOptions(): array
     {

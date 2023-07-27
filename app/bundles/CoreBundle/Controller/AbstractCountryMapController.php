@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\MapHelper;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * @template S of object
+ */
 abstract class AbstractCountryMapController extends AbstractController
 {
     public const MAP_OPTIONS = [];
 
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    protected AbstractCommonModel $model;
+    /**
+     * @var S
+     */
+    protected $model;
 
     /**
      * @template T
@@ -27,6 +32,18 @@ abstract class AbstractCountryMapController extends AbstractController
      * @return array<int, array<string, int|string>>
      */
     abstract public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
+
+    /**
+     * @template T
+     *
+     * @param T $entity
+     */
+    abstract public function hasAccess(CorePermissions $security, $entity): bool;
+
+    /**
+     * @return array<string,array<string, string>>
+     */
+    abstract public function getMapOptions(): array;
 
     /**
      * @throws \Exception

@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
+/**
+ * @extends AbstractCountryMapController<EmailModel>
+ */
 class EmailMapStatsController extends AbstractCountryMapController
 {
     public const MAP_OPTIONS = [
@@ -63,7 +66,7 @@ class EmailMapStatsController extends AbstractCountryMapController
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, array<string, string>>
      */
     public function getMapOptions(): array
     {
