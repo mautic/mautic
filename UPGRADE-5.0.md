@@ -95,6 +95,13 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
     * Removed onlyForBC themes: coffee, Mauve, nature
 
+### QueueBundle removed in favor symfony's messenger, see: [readme](app/bundles/MessengerBundle/README.md)
+ * **Related configuration** is no longer valid. 
+ * **Events** removed without replacement: QueueEvents, Event\QueueConsumerEvent, Event\QueueEvent
+ * `QueueService` removed without replacement
+ * **Helper** removed `app/bundles/QueueBundle/Helper/QueueRequestHelper.php` in favor of serialization (reused)
+ * **Command** `mautic:queue:process` is no longer available, use messenger:consume instead
+
 # Dependency injection improvements
 
 Mautic 5 adds support for Symfony's [autowiring](https://symfony.com/doc/5.4/service_container/autowiring.html) and [autoconfigure](https://symfony.com/doc/4.4/service_container.html#the-autoconfigure-option) for services.
