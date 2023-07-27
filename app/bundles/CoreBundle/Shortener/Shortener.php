@@ -22,9 +22,9 @@ class Shortener
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function addService(string $id, ShortenerServiceInterface $shortener): void
+    public function addService(ShortenerServiceInterface $shortener): void
     {
-        $this->services[$id] = $shortener;
+        $this->services[get_class($shortener)] = $shortener;
     }
 
     public function getService(): ShortenerServiceInterface
