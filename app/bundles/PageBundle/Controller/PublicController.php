@@ -49,7 +49,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
-        /** @var Page $entity */
+        /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
