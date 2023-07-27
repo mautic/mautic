@@ -184,7 +184,6 @@ jobs:
           export SYMFONY_ENV=dev
           export APP_ENV=dev
           export APP_DEBUG=1
-          APP_ENV=test APP_DEBUG=1 bin/console       
           composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
@@ -234,19 +233,12 @@ jobs:
           cp ../.github/ci-files/composer.json ./
           composer install
 
-          # install NPM packages
-          npm install
-
-          # test if console works by generating assets for next step
-          php ./bin/console mautic:assets:generate
-
-          echo "All production assets were generated sucessfully."
-          
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
           test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
-
-          php ./bin/console cache:clear
+          
+          # test if console is executable
+          ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer update --lock --no-plugins --no-scripts 2> /dev/null
           git diff composer.lock > /tmp/diff_command_output.txt

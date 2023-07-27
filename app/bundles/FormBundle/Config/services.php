@@ -21,4 +21,10 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.form.model.action', \Mautic\FormBundle\Model\ActionModel::class);
+    $services->alias('mautic.form.model.field', \Mautic\FormBundle\Model\FieldModel::class);
+    $services->alias('mautic.form.model.form', \Mautic\FormBundle\Model\FormModel::class);
+    $services->alias('mautic.form.model.submission', \Mautic\FormBundle\Model\SubmissionModel::class);
+    $services->alias('mautic.form.model.submission_result_loader', \Mautic\FormBundle\Model\SubmissionResultLoader::class);
 };

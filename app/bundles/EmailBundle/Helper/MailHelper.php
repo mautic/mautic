@@ -317,7 +317,11 @@ class MailHelper
                     if (!empty($owner)) {
                         $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
                         $ownerSignature = $this->getContactOwnerSignature($owner);
-                        $this->setReplyTo($owner['email']);
+                        if (null !== $emailToSend->getReplyToAddress()) {
+                            $this->setReplyTo($emailToSend->getReplyToAddress());
+                        } else {
+                            $this->setReplyTo($owner['email']);
+                        }
                     } else {
                         $this->setFrom($this->systemFrom, null);
                         $this->setReplyTo($this->replyTo);
@@ -706,7 +710,7 @@ class MailHelper
         }
 
         // Parts (plaintext)
-        $textBody     = $message->getTextBody();
+        $textBody     = $message->getTextBody() ?? '';
         $bodyReplaced = str_ireplace($search, $replace, $textBody);
         if ($textBody != $bodyReplaced) {
             $textBody = strip_tags($bodyReplaced);

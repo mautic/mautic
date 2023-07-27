@@ -15,7 +15,7 @@ class Configuration
     /**
      * @var string
      */
-    private $sendingPhoneNumber;
+    private $messagingServiceSid;
 
     /**
      * @var string
@@ -40,11 +40,11 @@ class Configuration
      *
      * @throws ConfigurationException
      */
-    public function getSendingNumber()
+    public function getMessagingServiceSid()
     {
         $this->setConfiguration();
 
-        return $this->sendingPhoneNumber;
+        return $this->messagingServiceSid;
     }
 
     /**
@@ -86,8 +86,8 @@ class Configuration
             throw new ConfigurationException();
         }
 
-        $this->sendingPhoneNumber = $integration->getIntegrationSettings()->getFeatureSettings()['sending_phone_number'];
-        if (empty($this->sendingPhoneNumber)) {
+        $this->messagingServiceSid = $integration->getIntegrationSettings()->getFeatureSettings()['messaging_service_sid'];
+        if (empty($this->messagingServiceSid)) {
             throw new ConfigurationException();
         }
 

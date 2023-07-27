@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
@@ -78,7 +78,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $leadsTableAlias = $event->getLeadsTableAlias();
 
         $event->addExpression(
-            $event->getQueryBuilder()->expr()->orX(
+            $event->getQueryBuilder()->expr()->or(
                 $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
                     $leadsTableAlias.'.'.$event->getFilter()->getField(),
@@ -105,7 +105,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $expressions[] = $event->getQueryBuilder()->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
-        $event->addExpression($event->getQueryBuilder()->expr()->andX($expressions));
+        $event->addExpression($event->getQueryBuilder()->expr()->and(...$expressions));
         $event->stopPropagation();
     }
 

@@ -44,16 +44,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
-    'mailer' => [
-        'dsn' => 'null://null',
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -149,3 +139,6 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
 
 // HTTP client mock handler providing response queue
 $container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+
+$container->register('http_client', \Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);

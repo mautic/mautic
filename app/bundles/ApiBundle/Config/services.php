@@ -31,4 +31,6 @@ return function (ContainerConfigurator $configurator) {
         ->arg('$oAuth2Server', ref('fos_oauth_server.server'))
         ->arg('$clientManager', ref('fos_oauth_server.client_manager.default'))
     ;
+
+    $services->alias('mautic.api.model.client', \Mautic\ApiBundle\Model\ClientModel::class);
 };

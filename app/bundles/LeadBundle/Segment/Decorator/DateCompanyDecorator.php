@@ -79,7 +79,7 @@ class DateCompanyDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

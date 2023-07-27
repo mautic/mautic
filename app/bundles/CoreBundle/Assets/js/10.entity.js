@@ -136,8 +136,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             }
 
             if (typeof Mautic.liveSearchXhr !== 'undefined') {
-                //ensure current search request is aborted
-                Mautic['liveSearchXhr'].abort();
+                // ensure current search request is aborted
+                // with different statusText.
+                Mautic['liveSearchXhr'].abort('searchCompleted');
             }
 
             var btn = "button[data-livesearch-parent='" + elId + "']";
