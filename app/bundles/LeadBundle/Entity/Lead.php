@@ -13,6 +13,8 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -205,6 +207,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $frequencyRules;
 
+    /**
+     * @var ArrayCollection<int,GroupContactScore>
+     */
+    private $groupScores;
+
     private $primaryCompany;
 
     /**
@@ -225,6 +232,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
+        $this->groupScores      = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -373,6 +381,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setIndexBy('channel')
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('groupScores', GroupContactScore::class)
+            ->mappedBy('contact')
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
@@ -878,7 +892,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -894,6 +908,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
+        if ($group) {
+            $event->setGroup($group);
+        }
         $this->addPointsChangeLog($event);
     }
 
@@ -1977,16 +1994,41 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param bool $includePast
-     *
-     * @return array<string, array<int|string, array<int|string, int|string>|int|string|IpAddress>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
+     * @return ArrayCollection<int,GroupContactScore>
      */
-    public function getChanges($includePast = false)
+    public function getGroupScores(): Collection
     {
-        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
-            return $this->pastChanges;
+        return $this->groupScores;
+    }
+
+    public function getGroupScore(Group $group): ?GroupContactScore
+    {
+        foreach ($this->groupScores as $groupScore) {
+            if ($groupScore->getGroup() === $group) {
+                return $groupScore;
+            }
         }
 
-        return $this->changes;
+        return null;
+    }
+
+    /**
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     */
+    public function setGroupScores($groupScores): void
+    {
+        $this->groupScores = $groupScores;
+    }
+
+    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    {
+        $this->groupScores[] = $groupContactScore;
+
+        return $this;
+    }
+
+    public function removeGroupScore(GroupContactScore $groupContactScore): void
+    {
+        $this->groupScores->removeElement($groupContactScore);
     }
 }

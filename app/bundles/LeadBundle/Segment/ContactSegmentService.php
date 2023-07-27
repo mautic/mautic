@@ -152,7 +152,8 @@ class ContactSegmentService
         $distinct = is_array($join) && (0 < count($join)) ? 'DISTINCT ' : '';
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
-        $queryBuilder->setQueryPart('select', $select);
+        $queryBuilder->resetQueryPart('select');
+        $queryBuilder->select($select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -161,7 +162,7 @@ class ContactSegmentService
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->lte($leadsTableAlias.'.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime'])),
                     $queryBuilder->expr()->isNull($leadsTableAlias.'.date_added')
                 )
@@ -318,7 +319,7 @@ class ContactSegmentService
         try {
             $start = microtime(true);
 
-            $result = $qb->execute()->fetchAssociative();
+            $result = $qb->executeQuery()->fetchAssociative();
 
             $end = microtime(true) - $start;
 
@@ -348,7 +349,7 @@ class ContactSegmentService
     {
         try {
             $start  = microtime(true);
-            $result = $qb->execute()->fetchAllAssociative();
+            $result = $qb->executeQuery()->fetchAllAssociative();
 
             $end = microtime(true) - $start;
 
