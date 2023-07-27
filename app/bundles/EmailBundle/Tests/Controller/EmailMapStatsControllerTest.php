@@ -22,13 +22,9 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
 
     private EmailMapStatsController $mapController;
 
-    private CorePermissions $corePermissionsMock;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->corePermissionsMock = $this->createMock(CorePermissions::class);
-
         $this->emailModelMock = $this->createMock(EmailModel::class);
         $this->mapController  = new EmailMapStatsController($this->emailModelMock);
     }
@@ -38,6 +34,8 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
      */
     public function testHasAccess(): void
     {
+        $corePermissionsMock = $this->createMock(CorePermissions::class);
+
         $role = new Role();
         $role->setName('Example admin');
         $this->em->persist($role);
@@ -59,7 +57,7 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $this->corePermissionsMock->method('hasEntityAccess')
+        $corePermissionsMock->method('hasEntityAccess')
             ->with(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -67,10 +65,10 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
             )
             ->willReturn(false);
 
-        $result = $this->mapController->hasAccess($this->corePermissionsMock, $email);
+        $result = $this->mapController->hasAccess($corePermissionsMock, $email);
 
         try {
-            $this->mapController->viewAction($this->corePermissionsMock, $email->getId(), '2023-07-20', '2023-07-27');
+            $this->mapController->viewAction($corePermissionsMock, $email->getId(), '2023-07-20', '2023-07-27');
         } catch (AccessDeniedHttpException|\Exception $e) {
             $this->assertTrue($e instanceof AccessDeniedHttpException);
         }
