@@ -325,8 +325,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
         $email          = $event->getEmail();
         $emailId        = $email instanceof Email ? $email->getId() : null;
+        $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
-        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
