@@ -964,7 +964,6 @@ return [
             'mautic.helper.twig.default_avatar' => [
                 'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.paths',
                     'twig.helper.assets',
                 ],
                 'alias' => 'default_avatar',

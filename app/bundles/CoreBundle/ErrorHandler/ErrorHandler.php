@@ -499,6 +499,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
+                $mediaBase          = $assetPrefix.$base.$paths['media'];
+                $error['mediaBase'] = $mediaBase;
+
                 $assetBase          = $assetPrefix.$base.$paths['assets'];
                 $error['assetBase'] = $assetBase;
 

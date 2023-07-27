@@ -89,6 +89,36 @@ final class AssetsHelper
     }
 
     /**
+     * Returns the path to an asset that may be overridden in the media folder.
+     *
+     * This function is meant for assets that may be overridden in the media folder.
+     * This could be logo's, country flags, ...
+     * So to be able to override an asset, it has to exist in the assets folder.
+     *
+     * @param string     $path
+     * @param bool|false $absolute
+     *
+     * @return string|bool
+     */
+    public function getOverridableUrl($path, $absolute = false)
+    {
+        $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
+        $assetsPath = $this->pathsHelper->getSystemPath('assets', false);
+
+        if (!file_exists($this->pathsHelper->getAssetsPath().DIRECTORY_SEPARATOR.$path)) {
+            return false;
+        }
+
+        if (file_exists($this->pathsHelper->getMediaPath().DIRECTORY_SEPARATOR.$path)) {
+            $path = $mediaPath.DIRECTORY_SEPARATOR.$path;
+        } else {
+            $path = $assetsPath.DIRECTORY_SEPARATOR.$path;
+        }
+
+        return $this->getUrl($path, null, null, $absolute);
+    }
+
+    /**
      * Set asset url path.
      *
      * @param string      $path
@@ -674,13 +704,8 @@ final class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $flagPath = $this->pathsHelper->getSystemPath('assets', true).'/images/flags/';
-        $relpath  = $this->pathsHelper->getSystemPath('assets').'/images/flags/';
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = '';
-        if (file_exists($flagPath.$country.'.png')) {
-            $flagImg = $this->getUrl($relpath.$country.'.png');
-        }
+        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;
