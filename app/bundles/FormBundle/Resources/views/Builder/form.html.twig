@@ -68,7 +68,7 @@
                 
                 {%- if theme is empty -%}                    
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ f.type ~ '.html.twig', {
+                  {{- include(template, {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -77,8 +77,8 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
-                  {%- else -%}                    
-                  {{- include(template, {
+                  {%- else -%}
+                  {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
