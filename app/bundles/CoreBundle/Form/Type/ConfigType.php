@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
@@ -64,16 +65,15 @@ class ConfigType extends AbstractType
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        array $ipLookupServices,
         AbstractLookup $ipLookup = null,
-        Shortener $shortenerFactory
+        Shortener $shortenerFactory,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator          = $translator;
         $this->langHelper          = $langHelper;
         $this->ipLookupFactory     = $ipLookupFactory;
         $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->ipLookupServices    = $ipLookupServices;
         $this->shortenerFactory    = $shortenerFactory;
     }
 
@@ -768,8 +768,9 @@ class ConfigType extends AbstractType
 
     private function getIpServicesChoices(): array
     {
-        $choices = [];
-        foreach ($this->ipLookupServices as $name => $service) {
+        $choices          = [];
+        $ipLookupServices = $this->coreParametersHelper->get('ip_lookup_services') ?? [];
+        foreach ($ipLookupServices as $name => $service) {
             $choices[$service['display_name']] = $name;
         }
 

@@ -181,17 +181,6 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.coreconfig' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.language',
-                    'mautic.ip_lookup.factory',
-                    '%mautic.ip_lookup_services%',
-                    'mautic.ip_lookup',
-                    'mautic.shortener',
-                ],
-            ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
