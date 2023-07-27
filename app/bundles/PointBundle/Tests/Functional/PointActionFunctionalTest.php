@@ -13,6 +13,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\Point;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class PointActionFunctionalTest extends MauticMysqlTestCase
 {
     public function testPointActionReadEmail(): void
