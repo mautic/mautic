@@ -27,11 +27,9 @@ class Shortener
         $this->services[$id] = $shortener;
     }
 
-    public function getService(string $name = null): ShortenerServiceInterface
+    public function getService(): ShortenerServiceInterface
     {
-        if (!$name) {
-            $name = $this->coreParametersHelper->get(self::SHORTENER_SERVICE);
-        }
+        $name = $this->coreParametersHelper->get(self::SHORTENER_SERVICE);
 
         if (isset($this->services[$name])) {
             return $this->services[$name];
