@@ -290,7 +290,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        if ($entity !== false && $tracking404Model->isTrackable()) {
+        if (false !== $entity && $tracking404Model->isTrackable()) {
             $tracking404Model->hitPage($entity, $request);
         }
 
@@ -557,12 +557,12 @@ class PublicController extends CommonFormController
                     $options['slides'] = [
                         [
                             'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
                             'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
                             'captionheader'    => 'Caption 2',
                         ],
                     ];

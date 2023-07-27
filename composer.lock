@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "4d29a8a2a65529eadf1ed82e3859379894ccdb86"
+                "reference": "c0442e4c4fe84f634585a739320446f18600f161"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5936,15 +5936,6 @@
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
                         "[web-root]/translations/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
-                        "[web-root]/media/dashboards/alternative-default.json": "assets/scaffold/media/dashboards/alternative-default.json",
-                        "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
-                        "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
-                        "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
-                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
-                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
-                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
-                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
-                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
