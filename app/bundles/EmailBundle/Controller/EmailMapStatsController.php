@@ -56,9 +56,12 @@ class EmailMapStatsController extends AbstractCountryMapController
         );
     }
 
+    /**
+     * @param Email $entity
+     */
     public function hasAccess(CorePermissions $security, $entity): bool
     {
-        return !$security->hasEntityAccess(
+        return $security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $entity->getCreatedBy()
