@@ -20,7 +20,7 @@ class ShortenerServicePass implements CompilerPassInterface
 
         $storageDef = $container->findDefinition(Shortener::class);
         foreach ($container->findTaggedServiceIds('mautic.shortener.service') as $id => $tags) {
-            $storageDef->addMethodCall('addService', [$id, new Reference($id)]);
+            $storageDef->addMethodCall('addService', [new Reference($id)]);
         }
     }
 }
