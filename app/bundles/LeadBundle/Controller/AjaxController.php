@@ -314,62 +314,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Updates the timeline events and gets returns updated HTML.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function updateTimelineAction(Request $request)
-    {
-        $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
-        $search        = InputHelper::clean($request->request->get('search'));
-        $leadId        = (int) $request->request->get('leadId');
-
-        if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
-
-            if (null !== $lead) {
-                $session = $request->getSession();
-
-                $filter = [
-                    'search'        => $search,
-                    'includeEvents' => $includeEvents,
-                    'excludeEvents' => $excludeEvents,
-                ];
-
-                $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filter);
-
-                // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
-                $dispatcher = $this->dispatcher;
-                $event      = new LeadTimelineEvent($lead, $filter);
-                $dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
-
-                $events     = $event->getEvents();
-                $eventTypes = $event->getEventTypes();
-
-                $timeline = $this->renderView(
-                    '@MauticLead/Lead/history.html.twig',
-                    [
-                        'events'       => $events,
-                        'eventTypes'   => $eventTypes,
-                        'eventFilters' => $filter,
-                        'lead'         => $lead,
-                    ]
-                );
-
-                $dataArray['success']      = 1;
-                $dataArray['timeline']     = $timeline;
-                $dataArray['historyCount'] = count($events);
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function toggleLeadListAction(Request $request)
