@@ -80,11 +80,6 @@ Mautic.dashboardFilterPreventSubmit = function() {
         });
 };
 
-Mautic.dashboardOnUnload = function(id) {
-    // Trash initialized dashboard vars on app content change.
-    mQuery('.jvectormap-tip').remove();
-};
-
 Mautic.widgetOnLoad = function(container, response) {
     if (!response.widgetId) return;
     var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
@@ -108,7 +103,12 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
-    Mautic.initMap(widgetHtml, 'regions');
+
+    const map = widgetHtml.find('.vector-map').first();
+    if (map.length && !map.hasClass('map-rendered')) {
+        Mautic.initMap(widgetHtml, 'regions');
+    }
+
     Mautic.initWidgetRemoveEvents();
     Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
