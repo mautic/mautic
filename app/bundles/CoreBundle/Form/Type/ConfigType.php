@@ -561,7 +561,8 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_combine(array_keys($enabledServices), array_keys($enabledServices));
+        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+
         $builder->add(
             Shortener::SHORTENER_SERVICE,
             ChoiceType::class,
