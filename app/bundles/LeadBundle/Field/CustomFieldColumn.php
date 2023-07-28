@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldColumn
@@ -27,7 +27,7 @@ class CustomFieldColumn
     private $schemaDefinition;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -54,7 +54,7 @@ class CustomFieldColumn
     public function __construct(
         ColumnSchemaHelper $columnSchemaHelper,
         SchemaDefinition $schemaDefinition,
-        Logger $logger,
+        LoggerInterface $mauticLogger,
         LeadFieldSaver $leadFieldSaver,
         CustomFieldIndex $customFieldIndex,
         FieldColumnDispatcher $fieldColumnDispatcher,
@@ -62,7 +62,7 @@ class CustomFieldColumn
     ) {
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->schemaDefinition      = $schemaDefinition;
-        $this->logger                = $logger;
+        $this->logger                = $mauticLogger;
         $this->leadFieldSaver        = $leadFieldSaver;
         $this->customFieldIndex      = $customFieldIndex;
         $this->fieldColumnDispatcher = $fieldColumnDispatcher;
@@ -136,7 +136,7 @@ class CustomFieldColumn
         } catch (DriverException $e) {
             $this->logger->warning($e->getMessage());
 
-            if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
+            if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
                 throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
             }
 
@@ -144,7 +144,7 @@ class CustomFieldColumn
         }
 
         if ($saveLeadField) {
-            //$leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
+            // $leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
             $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 

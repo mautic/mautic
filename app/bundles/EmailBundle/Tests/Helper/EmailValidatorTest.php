@@ -7,24 +7,39 @@ use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
     private $dispatcher;
+
+    /**
+     * @var MockObject&EmailValidationEvent
+     */
     private $event;
-    private $emailValidator;
+
+    private EmailValidator $emailValidator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->event      = $this->createMock(EmailValidationEvent::class);
+
+        $this->translator->method('trans')->willReturn('some translation');
 
         $this->emailValidator = new EmailValidator($this->translator, $this->dispatcher);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
-use DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
@@ -72,6 +71,22 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('no', $result);
     }
 
+    public function testFloatFormat(): void
+    {
+        $result = $this->formatterHelper->_(1.55, 'float');
+
+        $this->assertEquals('1.5500', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
+    public function testIntFormat(): void
+    {
+        $result = $this->formatterHelper->_(10, 'int');
+
+        $this->assertSame('10', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
     /**
      * @dataProvider stringProvider
      *
@@ -106,8 +121,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
         // date object
         yield [
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
     }
 }

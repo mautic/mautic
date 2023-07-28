@@ -67,7 +67,7 @@ class RoleListType extends AbstractType
             $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by name
+        // sort by name
         ksort($choices);
 
         return $choices;

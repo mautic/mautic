@@ -44,12 +44,9 @@ class DsnParser
     /**
      * @todo - refactor to get rid of the if/else statements
      *
-     * @param $dsnMessage
-     * @param $dsnReport
-     *
      * @return array
      */
-    public function parse($dsnMessage, $dsnReport)
+    public function parse(string $dsnMessage, string $dsnReport)
     {
         // initialize the result array
         $result = [

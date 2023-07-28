@@ -48,16 +48,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.stage.model.stage' => [
-                'class'     => 'Mautic\StageBundle\Model\StageModel',
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'session',
-                    'mautic.helper.user',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.stage.repository.lead_stage_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,

@@ -20,4 +20,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('grapesjsbuilder.model', \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class);
 };

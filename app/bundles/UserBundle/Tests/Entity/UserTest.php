@@ -6,6 +6,16 @@ use Mautic\UserBundle\Entity\User;
 
 class UserTest extends \PHPUnit\Framework\TestCase
 {
+    public function testEraseCredentials(): void
+    {
+        $user = new User();
+        $user->setPlainPassword('test');
+        $user->setCurrentPassword('test');
+        $user->eraseCredentials();
+        $this->assertNull($user->getPlainPassword());
+        $this->assertNull($user->getCurrentPassword());
+    }
+
     public function testUserIsGuest()
     {
         $user = new User(true);

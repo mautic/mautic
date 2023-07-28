@@ -33,13 +33,13 @@ class SAMLSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
-        $route   = $request->attributes->get('_route');
-        $url     = $request->getRequestUri();
+        $route   = (string) $request->attributes->get('_route');
+        $url     = (string) $request->getRequestUri();
         if (false === strpos($route, 'lightsaml') && false === strpos($url, '/saml/')) {
             return;
         }

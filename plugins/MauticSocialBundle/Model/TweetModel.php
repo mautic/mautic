@@ -18,12 +18,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Tweet>
+ *
  * @implements AjaxLookupModelInterface<Tweet>
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -56,7 +56,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 unset($entities);
@@ -169,11 +169,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -215,7 +210,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository(): TweetRepository
     {
         $result = $this->em->getRepository(Tweet::class);
-        \assert($result instanceof TweetRepository);
 
         return $result;
     }
@@ -223,7 +217,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getStatRepository(): TweetStatRepository
     {
         $result = $this->em->getRepository(TweetStat::class);
-        \assert($result instanceof TweetStatRepository);
 
         return $result;
     }

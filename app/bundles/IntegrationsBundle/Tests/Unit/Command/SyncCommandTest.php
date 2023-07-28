@@ -62,6 +62,7 @@ class SyncCommandTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testExecuteWithSomeOptions(): void
@@ -89,6 +90,7 @@ class SyncCommandTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testExecuteWhenSyncThrowsException(): void

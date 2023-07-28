@@ -39,15 +39,15 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQb = $queryBuilder->createQueryBuilder($queryBuilder->getConnection());
-        $expr  = $subQb->expr()->andX(
+        $subQb = $queryBuilder->createQueryBuilder();
+        $expr  = $subQb->expr()->and(
             $subQb->expr()->isNotNull($tableAlias.'.redirect_id'),
             $subQb->expr()->isNotNull($tableAlias.'.lead_id'),
             $subQb->expr()->eq($tableAlias.'.source', $subQb->expr()->literal($filterChannel))
         );
 
         if ($this->isDateBased($filter->getField())) {
-            $expr->add(
+            $expr = $expr->with(
                 $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
             );
         }

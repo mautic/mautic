@@ -18,17 +18,17 @@ class IntegrationEntity extends CommonEntity
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integration;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integrationEntity;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integrationEntityId;
 
@@ -43,12 +43,12 @@ class IntegrationEntity extends CommonEntity
     private $lastSyncDate;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $internalEntity;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $internalEntityId;
 

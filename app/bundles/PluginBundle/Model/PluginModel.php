@@ -3,11 +3,18 @@
 namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Plugin;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Plugin>
@@ -20,20 +27,16 @@ class PluginModel extends FormModel
     protected $leadFieldModel;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var BundleHelper
      */
     private $bundleHelper;
 
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper)
+    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
         $this->leadFieldModel       = $leadFieldModel;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->bundleHelper         = $bundleHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -43,12 +46,12 @@ class PluginModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:Plugin');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
     }
 
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
     /**

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,7 +39,7 @@ trait RepositoryConfiguratorTrait
     private $connection;
 
     /**
-     * @var MockObject&Result<mixed>
+     * @var MockObject&Result
      */
     private $result;
 

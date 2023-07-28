@@ -40,7 +40,7 @@ class FormType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
-        //details
+        // details
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
@@ -64,7 +64,7 @@ class FormType extends AbstractType
             'required'   => false,
         ]);
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,

@@ -21,8 +21,6 @@ final class ReportHelper
     }
 
     /**
-     * @param $type
-     *
      * @return string
      */
     public function getReportBuilderFieldType($type)

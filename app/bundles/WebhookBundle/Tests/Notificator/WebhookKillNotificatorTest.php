@@ -82,7 +82,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
         $entityManagerMock->expects($this->once())
             ->method('getReference')
-            ->with('MauticUserBundle:User', $createdBy)
+            ->with(\Mautic\UserBundle\Entity\User::class, $createdBy)
             ->willReturn($owner);
 
         $notificationModelMock->expects($this->once())
@@ -188,8 +188,8 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->withConsecutive(
-                ['MauticUserBundle:User', $createdBy],
-                ['MauticUserBundle:User', $modifiedBy]
+                [\Mautic\UserBundle\Entity\User::class, $createdBy],
+                [\Mautic\UserBundle\Entity\User::class, $modifiedBy]
             )
             ->willReturnOnConsecutiveCalls($owner, $modifier);
 

@@ -51,7 +51,7 @@ class ActionType extends AbstractType
             'label' => false,
             'data'  => $properties,
             'attr'  => [
-                'data-formid' => $options['formId'], //sneaky way of feeding the formId without requiring the option
+                'data-formid' => $options['formId'], // sneaky way of feeding the formId without requiring the option
             ],
         ];
         if (isset($options['settings']['formTypeCleanMasks'])) {

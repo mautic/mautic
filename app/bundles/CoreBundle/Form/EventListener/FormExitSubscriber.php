@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvents;
 class FormExitSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var \Mautic\CoreBundle\Model\CommonModel
+     * @var string
      */
     private $model;
 
@@ -23,8 +23,8 @@ class FormExitSubscriber implements EventSubscriberInterface
     private $options;
 
     /**
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param array                                $options
+     * @param string $model
+     * @param array  $options
      */
     public function __construct($model, $options = [])
     {
@@ -44,7 +44,7 @@ class FormExitSubscriber implements EventSubscriberInterface
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
         if ($id && empty($this->options['ignore_formexit'])) {
-            //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
+            // add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();
 
             $form->add(

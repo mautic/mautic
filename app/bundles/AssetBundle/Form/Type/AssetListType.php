@@ -73,7 +73,7 @@ class AssetListType extends AbstractType
             $choices[$asset['language']][$asset['title']] = $asset['id'];
         }
 
-        //sort by language
+        // sort by language
         ksort($choices);
 
         return $choices;

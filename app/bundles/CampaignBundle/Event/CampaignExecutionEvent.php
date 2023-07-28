@@ -94,7 +94,7 @@ class CampaignExecutionEvent extends Event
     public function getLeadFields()
     {
         $lead         = $this->getLead();
-        $isLeadEntity = ($lead instanceof Lead);
+        $isLeadEntity = $lead instanceof Lead;
 
         // In case Lead is a scalar value:
         if (!$isLeadEntity && !is_array($lead)) {
