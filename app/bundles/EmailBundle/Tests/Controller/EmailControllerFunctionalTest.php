@@ -200,16 +200,13 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $variantSetting = Serializer::decode('a:2:{s:6:"weight";i:50;s:14:"winnerCriteria";s:14:"email.openrate";}');
         $parent->setVariantSettings($variantSetting);
         $parent->addList($segment);
+
         $this->em->persist($parent);
-
-        $children = clone $parent;
-        $children->setVariantParent($parent);
-        $children->setIsPublished(true);
-        $this->em->persist($children);
-
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+
+        $this->assertStringContainsString('Add A/B Test', $crawler->html());
     }
 
     /**
