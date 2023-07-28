@@ -206,7 +206,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $field->expects($this->once())
             ->method('getLabel')
             ->willReturn('Email');
-        $field->expects($this->exactly(2))
+        $field->expects($this->exactly(3))
             ->method('getType')
             ->willReturn('string');
 
