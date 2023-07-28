@@ -34,6 +34,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('includeStylesheet', [$this, 'includeStylesheet'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('getOverridableUrl', [$this, 'getOverridableUrl'], ['is_safe' => ['html']]),
             new TwigFunction('addAssetScript', [$this, 'addScript'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
@@ -127,6 +128,15 @@ class AssetExtension extends AbstractExtension
     public function getAssetUrl(string $path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
+    }
+
+    /**
+     * @param string     $path
+     * @param bool|false $absolute
+     */
+    public function getOverridableUrl($path, $absolute = false): string
+    {
+        return $this->assetsHelper->getOverridableUrl($path, $absolute);
     }
 
     public function getImagesPath(): string
