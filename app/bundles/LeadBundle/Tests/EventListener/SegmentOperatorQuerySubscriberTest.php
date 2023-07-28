@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -264,7 +264,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('orX');
+            ->method('or');
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNull')
@@ -320,7 +320,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
             );
 
         $this->expressionBuilder->expects($this->once())
-            ->method('andX');
+            ->method('and');
 
         $this->expressionBuilder->expects($this->once())
             ->method('regexp')
