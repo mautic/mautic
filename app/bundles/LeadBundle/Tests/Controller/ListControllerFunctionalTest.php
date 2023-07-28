@@ -396,6 +396,6 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringContainsString('Date field filter value Today is invalid', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Date field filter value &quot;Today&quot; is invalid', $this->client->getResponse()->getContent());
     }
 }
