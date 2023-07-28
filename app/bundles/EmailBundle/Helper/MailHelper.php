@@ -1120,8 +1120,11 @@ class MailHelper
     public function setReplyTo($addresses, $name = null)
     {
         try {
-            $name = $this->cleanName($name);
-            $this->message->replyTo(new Address($addresses, $name ?? ''));
+            $name      = $this->cleanName($name);
+            $addresses = (array) $addresses; // This will cast $addresses to an array
+            foreach ($addresses as $address) {
+                $this->message->replyTo(new Address($address, $name ?? ''));
+            }
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
         }
