@@ -2,107 +2,129 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Shortener;
+namespace Tests\Mautic\CoreBundle\Shortener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ShortenerTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|(CoreParametersHelper&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var CoreParametersHelper|MockObject
      */
-    private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private $coreParametersHelper;
 
-    private Shortener $shortener;
+    /**
+     * @var Shortener
+     */
+    private $shortener;
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->shortener            = new Shortener($this->coreParametersHelper);
+        $this->coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->shortener = new Shortener($this->coreParametersHelper);
     }
 
     public function testAddService(): void
     {
-        $serviceId = 'test_service';
-        $service   = $this->createMock(ShortenerServiceInterface::class);
+        /** @var ShortenerServiceInterface|MockObject $service */
+        $service = $this->createMock(ShortenerServiceInterface::class);
 
-        $this->shortener->addService($serviceId, $service);
+        $this->shortener->addService($service);
 
-        $services = $this->shortener->getServices();
-        $this->assertArrayHasKey($serviceId, $services);
-        $this->assertSame($service, $services[$serviceId]);
+        $this->assertSame([get_class($service) => $service], $this->shortener->getServices());
     }
 
-    public function testGetServiceWithInvalidName(): void
+    public function testGetService(): void
     {
-        $this->coreParametersHelper
-            ->method('get')
-            ->willReturn('non_existent_service');
+        /** @var ShortenerServiceInterface|MockObject $service */
+        $service = $this->createMock(ShortenerServiceInterface::class);
 
+        $this->coreParametersHelper
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn(get_class($service));
+
+        $this->shortener->addService($service);
+
+        $this->assertSame($service, $this->shortener->getService());
+    }
+
+    public function testGetServiceThrowsException(): void
+    {
         $this->expectException(\InvalidArgumentException::class);
+
         $this->shortener->getService();
     }
 
-    public function testGetServiceWithValidName(): void
+    public function testShortenUrl(): void
     {
-        $serviceId = 'test_service';
-        $service   = $this->createMock(ShortenerServiceInterface::class);
-        $this->shortener->addService($serviceId, $service);
+        $url      = 'http://example.com';
+        $shortUrl = 'http://exmpl.com';
+
+        /** @var ShortenerServiceInterface|MockObject $service */
+        $service = $this->createMock(ShortenerServiceInterface::class);
+        $service
+            ->expects($this->once())
+            ->method('shortenUrl')
+            ->with($url)
+            ->willReturn($shortUrl);
 
         $this->coreParametersHelper
+            ->expects($this->once())
             ->method('get')
-            ->willReturn($serviceId);
+            ->willReturn(get_class($service));
 
-        $result = $this->shortener->getService();
-        $this->assertSame($service, $result);
+        $this->shortener->addService($service);
+
+        $this->assertSame($shortUrl, $this->shortener->shortenUrl($url));
     }
 
     public function testGetEnabledServices(): void
     {
-        $enabledService = $this->createMock(ShortenerServiceInterface::class);
-        $enabledService->method('isEnabled')->willReturn(true);
+        $enabledService = new class() implements ShortenerServiceInterface {
+            public function shortenUrl(string $url): string
+            {
+                return 'shortUrl';
+            }
 
-        $disabledService = $this->createMock(ShortenerServiceInterface::class);
-        $disabledService->method('isEnabled')->willReturn(false);
+            public function isEnabled(): bool
+            {
+                return true;
+            }
 
-        $this->shortener->addService('enabled_service', $enabledService);
-        $this->shortener->addService('disabled_service', $disabledService);
+            public function getPublicName(): string
+            {
+                return 'enabledService';
+            }
+        };
 
-        $result = $this->shortener->getEnabledServices();
-        $this->assertCount(1, $result);
-        $this->assertContains($enabledService, $result);
-    }
+        $disabledService = new class() implements ShortenerServiceInterface {
+            public function shortenUrl(string $url): string
+            {
+                return 'shortUrl';
+            }
 
-    public function testShortenUrlWithInvalidService(): void
-    {
-        $url = 'https://example.com';
+            public function isEnabled(): bool
+            {
+                return false;
+            }
 
-        $this->coreParametersHelper
-            ->method('get')
-            ->willReturn('non_existent_service');
+            public function getPublicName(): string
+            {
+                return 'disabledService';
+            }
+        };
 
-        $result = $this->shortener->shortenUrl($url);
-        $this->assertSame($url, $result);
-    }
+        $this->shortener->addService($enabledService);
+        $this->shortener->addService($disabledService);
 
-    public function testShortenUrlWithValidService(): void
-    {
-        $url      = 'https://example.com';
-        $shortUrl = 'https://short.url';
-
-        $service = $this->createMock(ShortenerServiceInterface::class);
-        $service->method('shortenUrl')->willReturn($shortUrl);
-
-        $this->coreParametersHelper
-            ->method('get')
-            ->willReturn('test_service');
-
-        $this->shortener->addService('test_service', $service);
-
-        $result = $this->shortener->shortenUrl($url);
-        $this->assertSame($shortUrl, $result);
+        $this->assertSame([get_class($enabledService) => $enabledService], $this->shortener->getEnabledServices());
     }
 }
