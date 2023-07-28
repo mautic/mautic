@@ -779,17 +779,9 @@ class Form extends FormEntity
     /**
      * Generate a form name for HTML attributes.
      */
-    public function generateFormName()
+    public function generateFormName(): string
     {
-        $name = strtolower(
-            InputHelper::alphanum(
-                InputHelper::transliterate(
-                    $this->name
-                )
-            )
-        );
-
-        return (empty($name)) ? 'form-'.$this->id : $name;
+        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
     }
 
     /**

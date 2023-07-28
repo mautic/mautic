@@ -152,9 +152,9 @@ class FileApiController extends CommonApiController
     protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
     {
         try {
-            $possibleDirs = ['assets', 'images'];
-            $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, false, ['/']));
+            $possibleDirs = ['media', 'images'];
+            $dir          = InputHelper::alphanum($dir, true, null, ['_', '.']);
+            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, null, ['/']));
 
             // Dots in the dir name are slashes
             if (false !== strpos($dir, '.') && !$subdir) {
@@ -170,7 +170,7 @@ class FileApiController extends CommonApiController
 
             if ('images' === $dir) {
                 $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
-            } elseif ('assets' === $dir) {
+            } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
 

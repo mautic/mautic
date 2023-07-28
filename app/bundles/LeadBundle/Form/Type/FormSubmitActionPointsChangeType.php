@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\PointBundle\Form\Type\GroupListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -39,6 +40,18 @@ class FormSubmitActionPointsChangeType extends AbstractType
                 'data'       => $default,
             ]
         );
+
+        $builder->add('group', GroupListType::class, [
+            'label'            => 'mautic.lead.campaign.event.point_group',
+            'label_attr'       => ['class' => 'control-label'],
+            'attr'             => [
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
+            ],
+            'required'         => false,
+            'by_reference'     => false,
+            'return_entity'    => false,
+        ]);
     }
 
     /**

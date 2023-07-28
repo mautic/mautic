@@ -73,28 +73,24 @@ $container->loadFromExtension('framework', [
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'mailer'               => [
+        'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
+    ],
     'messenger'            => [
-        'default_bus' => 'email.bus',
-        'buses'       => [
-            'email.bus' => null,
-        ],
-        'transports'  => [
-            'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
-                ],
+        'failure_transport' => 'failed',
+        'transports'        => [
+            'email' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
-                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
-                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
-                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
-                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
+            'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            // TODO: Enable this line when you want to merge symfony/mailer
-            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
         ],
     ],
 
@@ -127,7 +123,7 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
+    'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
@@ -153,6 +149,7 @@ $container->loadFromExtension('doctrine', [
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
+                    \PDO::ATTR_STRINGIFY_FETCHES       => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
@@ -185,21 +182,6 @@ $container->loadFromExtension('doctrine_migrations', [
         ],
     ],
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
-]);
-
-// Swiftmailer Configuration
-$container->loadFromExtension('swiftmailer', [
-    'transport'  => '%mautic.mailer_transport%',
-    'host'       => '%mautic.mailer_host%',
-    'port'       => '%mautic.mailer_port%',
-    'username'   => '%mautic.mailer_user%',
-    'password'   => '%mautic.mailer_password%',
-    'encryption' => '%mautic.mailer_encryption%',
-    'auth_mode'  => '%mautic.mailer_auth_mode%',
-    'spool'      => [
-        'type' => 'service',
-        'id'   => 'mautic.transport.spool',
-    ],
 ]);
 
 // KnpMenu Configuration

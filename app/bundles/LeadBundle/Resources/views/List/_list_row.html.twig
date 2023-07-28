@@ -5,7 +5,10 @@
 {% set now = dateTimeGetUtcDateTime() %}
 {% set hoursSinceLastBuilt = null %}
 {% if item.lastBuiltDate is not null %}
-    {% set hoursSinceLastBuilt = now.diff(item.lastBuiltDate).format('%h') %}
+    {% set lastBuiltDate = date(item.lastBuiltDate.timestamp) %}
+    {% set now = date() %}
+    {% set diffInSeconds = now.timestamp - lastBuiltDate.timestamp %}
+    {% set hoursSinceLastBuilt = diffInSeconds / 3600 | round %}
 {% endif %}
 {% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
 <tr>
@@ -45,7 +48,8 @@
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
             {% endif %}
-            {% if item.isGlobal %}<i class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
             {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -10,7 +11,10 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -30,11 +34,14 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -48,11 +55,6 @@ class ListModel extends FormModel
      * @var CategoryModel
      */
     protected $categoryModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
 
     /**
      * @var ContactSegmentService
@@ -85,14 +87,22 @@ class ListModel extends FormModel
         ContactSegmentService $leadSegment,
         SegmentChartQueryFactory $segmentChartQueryFactory,
         RequestStack $requestStack,
-        SegmentCountCacheHelper $segmentCountCacheHelper
+        SegmentCountCacheHelper $segmentCountCacheHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->categoryModel            = $categoryModel;
-        $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
         $this->requestStack             = $requestStack;
         $this->segmentCountCacheHelper  = $segmentCountCacheHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -158,7 +168,7 @@ class ListModel extends FormModel
         if (empty($alias)) {
             $alias = $entity->getName();
         }
-        $alias = $this->cleanAlias($alias, '', false, '-');
+        $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
         $repo      = $this->getRepository();

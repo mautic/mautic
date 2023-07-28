@@ -18,11 +18,10 @@ class BuilderEvent extends Event
     protected $translator;
     protected $entity;
     protected $requested;
-    protected $tokenFilter;
     protected $tokenFilterText;
     protected $tokenFilterTarget;
 
-    public function __construct($translator, $entity = null, $requested = 'all', $tokenFilter = '')
+    public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
     {
         $this->translator        = $translator;
         $this->entity            = $entity;

@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -9,10 +10,14 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
@@ -46,9 +51,12 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Model\PageModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
@@ -155,7 +163,15 @@ class SubmissionModel extends CommonFormModel
         FieldValueTransformer $fieldValueTransformer,
         DateHelper $dateHelper,
         ContactTracker $contactTracker,
-        ContactMerger $contactMerger
+        ContactMerger $contactMerger,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->twig                   = $twig;
@@ -174,6 +190,8 @@ class SubmissionModel extends CommonFormModel
         $this->dateHelper             = $dateHelper;
         $this->contactTracker         = $contactTracker;
         $this->contactMerger          = $contactMerger;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
@@ -352,7 +370,7 @@ class SubmissionModel extends CommonFormModel
 
             // save the result
             if (false !== $f->getSaveResult()) {
-                $results['`'.$alias.'`'] = $value;
+                $results[$alias] = $value;
             }
         }
 

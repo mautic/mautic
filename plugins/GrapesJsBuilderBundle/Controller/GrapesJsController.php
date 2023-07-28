@@ -114,7 +114,7 @@ class GrapesJsController extends CommonController
         }
 
         // Replace short codes to emoji
-        $content = EmojiHelper::toEmoji($content, 'short');
+        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $renderedTemplate =  $this->renderView(
             $logicalName,
@@ -225,12 +225,12 @@ class GrapesJsController extends CommonController
                     $options['slides'] = [
                         [
                             'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
                             'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
                             'captionheader'    => 'Caption 2',
                         ],
                     ];

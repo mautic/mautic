@@ -19,4 +19,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.sms.model.sms', \Mautic\SmsBundle\Model\SmsModel::class);
 };

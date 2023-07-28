@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
@@ -16,7 +17,10 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -24,10 +28,13 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -85,11 +92,18 @@ class AssetModel extends FormModel
         CategoryModel $categoryModel,
         RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
-        CoreParametersHelper $coreParametersHelper,
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,
         DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
@@ -100,6 +114,8 @@ class AssetModel extends FormModel
         $this->deviceTrackingService  = $deviceTrackingService;
         $this->contactTracker         = $contactTracker;
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     /**
@@ -112,7 +128,7 @@ class AssetModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();

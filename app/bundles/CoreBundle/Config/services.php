@@ -30,7 +30,6 @@ return function (ContainerConfigurator $configurator) {
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
-        'Helper/Dsn/Dsn/DsnGenerator.php',
     ];
 
     $services->load('Mautic\\CoreBundle\\', '../')
@@ -54,4 +53,9 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.helper.assetgeneration', \Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
 
     $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
+
+    $services->get(\Mautic\CoreBundle\Model\NotificationModel::class)->call('setDisableUpdates', ['%mautic.security.disableUpdates%']);
+    $services->alias('mautic.core.model.auditlog', \Mautic\CoreBundle\Model\AuditLogModel::class);
+    $services->alias('mautic.core.model.notification', \Mautic\CoreBundle\Model\NotificationModel::class);
+    $services->alias('mautic.core.model.form', \Mautic\CoreBundle\Model\FormModel::class);
 };

@@ -2,15 +2,23 @@
 
 namespace Mautic\CategoryBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -26,9 +34,11 @@ class CategoryModel extends FormModel
     /**
      * CategoryModel constructor.
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->requestStack = $requestStack;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): CategoryRepository
@@ -67,7 +77,7 @@ class CategoryModel extends FormModel
         if (empty($alias)) {
             $alias = $entity->getTitle();
         }
-        $alias = $this->cleanAlias($alias, '', false, '-');
+        $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
         $repo      = $this->getRepository();

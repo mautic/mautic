@@ -254,7 +254,7 @@ class ExportHelperTest extends TestCase
         $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
 
-        $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath);
+        $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath, 'contacts_export.csv');
         Assert::assertFileExists($zipFilePath);
     }
 
