@@ -283,6 +283,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
+                if ($event->usesColumn(['pl.id', 'pl.name'])) {
+                    $qb->leftJoin('lp', MAUTIC_TABLE_PREFIX.'point_groups', 'pl', 'lp.group_id = pl.id');
+                }
+
                 break;
             case self::CONTEXT_CONTACT_FREQUENCYRULES:
                 $event->applyDateFilters($qb, 'date_added', 'lf');
@@ -438,8 +442,18 @@ class ReportSubscriber implements EventSubscriberInterface
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
+                $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
+
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+                if (isset($join['l'])) {
+                    $where = $queryBuilder->getQueryPart('where');
+                    foreach ($join['l'] as $item) {
+                        if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
+                            $queryBuilder->add('join', ['l' => $item], true);
+                        }
+                    }
+                }
             }
 
             switch ($g) {
@@ -708,6 +722,16 @@ class ReportSubscriber implements EventSubscriberInterface
                 'label'          => 'mautic.lead.report.points.date_added',
                 'type'           => 'datetime',
                 'groupByFormula' => 'DATE(lp.date_added)',
+            ],
+            'pl.id' => [
+                'alias'          => 'group_id',
+                'label'          => 'mautic.lead.report.points.group_id',
+                'type'           => 'int',
+            ],
+            'pl.name' => [
+                'alias'          => 'group_name',
+                'label'          => 'mautic.lead.report.points.group_name',
+                'type'           => 'string',
             ],
         ];
         $data = [

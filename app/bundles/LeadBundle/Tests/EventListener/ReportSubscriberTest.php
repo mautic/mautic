@@ -215,7 +215,30 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock->expects($this->any())
             ->method('getQueryPart')
-            ->willReturn([['alias' => 'lp']]);
+            ->willReturnCallback(function ($input) {
+                if ('join' === $input) {
+                    return [
+                        'lp' => [[
+                            'joinType'      => 'left',
+                            'joinTable'     => 'leads',
+                            'joinAlias'     => 'l',
+                            'joinCondition' => 'l.id = lp.lead_id',
+                        ]],
+                        'l' => [[
+                            'joinType'      => 'inner',
+                            'joinTable'     => 'lead_list_leads',
+                            'joinAlias'     => 's',
+                            'joinCondition' => 's.lead_id = l.id',
+                        ]],
+                    ];
+                }
+
+                if ('where' === $input) {
+                    return '(lp.date_added IS NULL OR (lp.date_added BETWEEN :dateFrom AND :dateTo)) AND (s.leadlist_id = :i3csleadlistid))';
+                }
+
+                return [['alias' => 'lp']];
+            });
 
         $this->queryBuilderMock->expects($this->any())
             ->method('from')
@@ -612,6 +635,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
                         ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
                         'i.ip_address' => [
                             'label' => '',
                             'type'  => 'string',
@@ -659,6 +692,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
+                        ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
                         ],
                     ],
                     'group' => 'contacts',

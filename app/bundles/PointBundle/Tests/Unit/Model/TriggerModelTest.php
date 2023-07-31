@@ -107,6 +107,12 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+
+        // reset private static property events in TriggerModel
+        $reflectionClass = new \ReflectionClass(TriggerModel::class);
+        $property        = $reflectionClass->getProperty('events');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
     }
 
     public function testTriggerEvent(): void
