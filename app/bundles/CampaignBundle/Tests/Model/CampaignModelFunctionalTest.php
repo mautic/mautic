@@ -137,7 +137,7 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $results = $model->getEmailsCountryStats($campaign, $dateFrom, $dateTo);
+        $results = $model->getEmailCountryStats($campaign, $dateFrom, $dateTo);
 
         $this->assertCount(4, $campaign->getEmailSendEvents());
         $this->assertCount(3, $results);

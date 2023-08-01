@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\MapModelInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -68,8 +69,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  * @extends FormModel<Email>
  *
  * @implements AjaxLookupModelInterface<Email>
+ * @implements MapModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModelInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -708,13 +710,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Email $entity
+     *
      * @return array<int, array<string, int|string>>
      *
      * @throws Exception
      */
-    public function getEmailCountryStats(Email $email, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
+    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
     {
-        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+        $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
         /** @var StatRepository $statRepo */
         $statRepo      = $this->em->getRepository(Stat::class);

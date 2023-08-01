@@ -40,7 +40,7 @@ class CampaignMapStatsController extends AbstractCountryMapController
      */
     public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
-        return $this->model->getEmailsCountryStats(
+        return $this->model->getEmailCountryStats(
             $entity,
             $dateFromObject,
             $dateToObject

@@ -8,7 +8,6 @@ use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -60,46 +59,6 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         ];
     }
 
-    public function testGetOptionLegendText(): void
-    {
-        $legendValues = [
-            '%total'       => 4,
-            '%withCountry' => 2,
-        ];
-
-        $this->assertEquals('Total: 4 (2 with country)', MapHelper::getOptionLegendText(AbstractCountryMapController::LEGEND_TEXT, $legendValues));
-    }
-
-    public function testBuildMapData(): void
-    {
-        $results = MapHelper::buildMapData(
-            $this->getStats(),
-            CampaignMapStatsController::MAP_OPTIONS,
-            AbstractCountryMapController::LEGEND_TEXT
-        );
-
-        $this->assertCount(2, $results);
-        $this->assertSame([
-            'data' => [
-                'ES' => 8,
-                'FI' => 8,
-            ],
-            'label'      => 'mautic.email.stat.read',
-            'legendText' => 'Total: 20 (16 with country)',
-            'unit'       => 'Read',
-        ], $results[0]);
-
-        $this->assertSame([
-            'data' => [
-                'ES' => 4,
-                'FI' => 4,
-            ],
-            'label'      => 'mautic.email.clicked',
-            'legendText' => 'Total: 12 (8 with country)',
-            'unit'       => 'Click',
-        ], $results[1]);
-    }
-
     public function testMapCountries(): void
     {
         $reads   = MapHelper::mapCountries($this->getStats(), 'read_count');
@@ -135,7 +94,7 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         $dateFrom = new \DateTime('2023-07-20');
         $dateTo   = new \DateTime('2023-07-25');
 
-        $this->campaignModelMock->method('getEmailsCountryStats')
+        $this->campaignModelMock->method('getEmailCountryStats')
             ->with($campaign, $dateFrom, $dateTo)
             ->willReturn($this->getStats());
 
