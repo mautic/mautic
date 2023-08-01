@@ -190,6 +190,8 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $field->setAlias('email');
         $field->setType('string');
         $field->setLabel('Email');
+        $field->setMappedObject('contact');
+        $field->setMappedField('email');
 
         $form = new Form();
         $form->addField('email', $field);
