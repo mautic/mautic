@@ -69,6 +69,8 @@ class Point extends FormEntity
      **/
     private $category;
 
+    private ?Group $group = null;
+
     public function __clone()
     {
         $this->id = null;
@@ -112,6 +114,10 @@ class Point extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -378,5 +384,15 @@ class Point extends FormEntity
     public function getRepeatable()
     {
         return $this->repeatable;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?Group $group): void
+    {
+        $this->group = $group;
     }
 }

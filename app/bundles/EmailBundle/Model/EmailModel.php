@@ -1046,12 +1046,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $queued;
     }
 
+    public function getDeliveredCount(Email $email, bool $includeVariants = false): int
+    {
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+
+        $statRepo = $this->getStatRepository();
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
+
+        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
+        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
+        $sentCount      = (int) $email->getSentCount($includeVariants);
+        $deliveredCount = $sentCount - $failedCount - $bouncedCount;
+
+        // we never want to display a negative number of delivered emails
+        return max($deliveredCount, 0);
+    }
+
     /**
      * Send an email to lead lists.
      *
      * @param array           $lists
-     * @param int             $limit
-     * @param bool            $batch        True to process and batch all pending leads
+     * @param int|null        $limit
+     * @param int|null        $batch        True to process and batch all pending leads
      * @param OutputInterface $output
      * @param int             $minContactId
      * @param int             $maxContactId
@@ -1062,7 +1080,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         Email $email,
         $lists = null,
         $limit = null,
-        $batch = false,
+        $batch = null,
         OutputInterface $output = null,
         $minContactId = null,
         $maxContactId = null,
@@ -1118,16 +1136,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $batch ?: $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             $leadCount         = count($leads);
 
             while ($leadCount) {
-                $sentCount += $leadCount;
-
-                if (!$batch && null != $limit) {
+                if (null != $limit) {
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
+
+                    // recalculate
+                    if ($limit < 0) {
+                        $leads     = array_slice($leads, 0, $limit);
+                        $leadCount = count($leads);
+                        $limit     = 0;
+                    }
                 }
+
+                $sentCount += $leadCount;
 
                 $listErrors = $this->sendEmail($email, $leads, $options);
 
@@ -1140,6 +1165,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $failedRecipientsByList[$options['listId']] = $listErrors;
                 }
 
+                if (null !== $limit && 0 == $limit) {
+                    break;
+                }
+
                 if ($batch) {
                     if ($progress) {
                         $progressCounter += $leadCount;
@@ -1147,7 +1176,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     // Get the next batch of leads
-                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $batch, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
                     $leadCount = count($leads);
                 } else {
                     $leadCount = 0;
