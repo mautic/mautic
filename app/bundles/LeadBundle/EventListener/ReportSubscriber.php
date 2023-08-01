@@ -448,8 +448,18 @@ class ReportSubscriber implements EventSubscriberInterface
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
+                $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
+
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+                if (isset($join['l'])) {
+                    $where = $queryBuilder->getQueryPart('where');
+                    foreach ($join['l'] as $item) {
+                        if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
+                            $queryBuilder->add('join', ['l' => $item], true);
+                        }
+                    }
+                }
             }
 
             switch ($g) {
