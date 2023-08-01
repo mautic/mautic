@@ -1393,6 +1393,12 @@ class LeadModel extends FormModel
         }
         unset($fieldData['ownerusername']);
 
+        if (!empty($fields['tags']) && !empty($data[$fields['tags']])) {
+            $leadTags = explode('|', $data[$fields['tags']]);
+            $this->modifyTags($lead, $leadTags, null, false);
+        }
+        unset($fieldData['tags']);
+
         if (null !== $owner) {
             $lead->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
         }
