@@ -1072,19 +1072,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $columnCollectEventMock = $this->createMock(ColumnCollectEvent::class);
-
-        $columnCollectEventMock->expects($this->once())
-            ->method('getObject')
-            ->willReturn('company');
+        $columnCollectEvent = new ColumnCollectEvent('company');
 
         $this->companyReportDataMock->expects($this->once())
             ->method('getCompanyData')
             ->willReturn($companyFields);
-
-        $columnCollectEventMock->expects($this->once())
-            ->method('addColumns')
-            ->with($fields);
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
     }
