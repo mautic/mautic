@@ -34,24 +34,6 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $fieldModelMock = $this->createMock(FieldModel::class);
         $fieldModelMock->method('getPublishedFieldArrays')->willReturn([]);
 
-        $this->reportModel = new ReportModel(
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(Environment::class),
-            new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
-            $fieldModelMock,
-            new ReportHelper($this->createMock(EventDispatcherInterface::class)),
-            $this->createMock(CsvExporter::class),
-            $this->createMock(ExcelExporter::class),
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(RequestStack::class)
-        );
-
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
