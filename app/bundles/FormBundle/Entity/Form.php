@@ -556,7 +556,7 @@ class Form extends FormEntity
             array_map(
                 function (Field $field) {
                     return [
-                        'idFormField'  => $field->getId(),
+                        'formFieldId'  => $field->getId(),
                         'mappedObject' => $field->getMappedObject(),
                         'mappedField'  => $field->getMappedField(),
                     ];
