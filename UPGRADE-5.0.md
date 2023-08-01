@@ -27,8 +27,9 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
       * `.env.$APP_ENV.local` uncommitted environment-specific overrides
     * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
     * Remove Custom shortener API URL from configuration (link_shortener_url variable) and remove `Mautic\CoreBundle\Helper\UrlHelper::buildShortUrl()` method. 
-      * A user reads the documentation to understand how to set it up in the configuration.
-      * As a developer, use the \Mautic\CoreBundle\Shortener\Shortener::class service instead.
+      * Add the new shortening service in Mautic 5. Reconfiguration is needed after migrating to Mautic 5.
+        * A user reads the documentation to understand how to set it up in the configuration.
+        * As a developer, use the \Mautic\CoreBundle\Shortener\Shortener::class service.
 * Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
