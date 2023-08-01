@@ -76,16 +76,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
-
-        $createReportHelper         = \Closure::bind(
-            function () {
-                return new ReportHelper(new EventDispatcher());
-            },
-            $this,
-            ReportHelper::class
-        );
-        $this->reportHelper         = $createReportHelper();
-
+        $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new ReportSubscriber(
