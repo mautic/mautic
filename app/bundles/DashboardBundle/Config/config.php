@@ -52,7 +52,7 @@ return [
         ],
     ],
     'parameters' => [
-        'dashboard_import_dir'      => '%kernel.project_dir%/media/dashboards',
-        'dashboard_import_user_dir' => null,
+        'dashboard_import_dir'      => '%kernel.project_dir%/app/assets/dashboards',
+        'dashboard_import_user_dir' => '%kernel.project_dir%/media/dashboards',
     ],
 ];
