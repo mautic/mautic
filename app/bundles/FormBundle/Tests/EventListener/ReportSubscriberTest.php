@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
@@ -19,6 +20,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -167,62 +169,41 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->assertCount(3, $setGraphs);
     }
 
+    public function testOnReportBuilderWithWrongContext(): void
+    {
+        $reportBuilderEvent = new ReportBuilderEvent(
+            $this->translator,
+            $this->createMock(ChannelListHelper::class),
+            'test',
+            [],
+            $this->reportHelper,
+            ''
+        );
+
+        $this->subscriber->onReportBuilder($reportBuilderEvent);
+
+        Assert::assertCount(0, $reportBuilderEvent->getTables());
+    }
+
     public function testOnReportBuilderAddsFormAndFormResultReports(): void
     {
-        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'checkContext',
-                'getStandardColumns',
-                'getCategoryColumns',
-                'addTable',
-            ])
-            ->getMock();
+        $reportBuilderEvent = new ReportBuilderEvent(
+            $this->translator,
+            $this->createMock(ChannelListHelper::class),
+            ReportSubscriber::CONTEXT_FORM_RESULT,
+            [],
+            $this->reportHelper,
+            ''
+        );
 
-        $mockEvent->expects($this->once())
-            ->method('getStandardColumns')
-            ->willReturn([]);
+        $field = new Field();
+        $field->setAlias('email');
+        $field->setType('string');
+        $field->setLabel('Email');
 
-        $mockEvent->expects($this->once())
-            ->method('getCategoryColumns')
-            ->willReturn([]);
-
-        $mockEvent->expects($this->exactly(3))
-            ->method('checkContext')
-            ->willReturnOnConsecutiveCalls(true, false, true);
-
-        $form = $this->getMockBuilder(Form::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'getFields',
-                'getMappedFieldValues',
-            ])
-            ->getMock();
-
-        $field = $this->createMock(Field::class);
-        $field->expects($this->exactly(2))
-            ->method('getAlias')
-            ->willReturn('email');
-        $field->expects($this->once())
-            ->method('getLabel')
-            ->willReturn('Email');
-        $field->expects($this->exactly(3))
-            ->method('getType')
-            ->willReturn('string');
-
-        $form->expects($this->once())
-            ->method('getFields')
-            ->willReturn(new ArrayCollection([$field]));
-
-        $form->expects($this->once())
-            ->method('getMappedFieldValues')
-            ->willReturn([
-                [
-                    'idFormFields' => 1,
-                    'mappedObject' => 'contact',
-                    'mappedField'  => 'email',
-                ],
-            ]);
+        $form = new Form();
+        $form->addField('email', $field);
+        $field->setForm($form);
 
         $this->formModel->expects($this->once())
             ->method('getRepository')
@@ -240,19 +221,13 @@ class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('getResultsTableName')
             ->willReturn('test');
 
-        $setTables = [];
+        $this->subscriber->onReportBuilder($reportBuilderEvent);
 
-        $mockEvent->expects($this->exactly(2))
-            ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
-                $args = func_get_args();
+        $tables = $reportBuilderEvent->getTables();
 
-                $setTables[] = $args;
-            });
-
-        $this->subscriber->onReportBuilder($mockEvent);
-
-        $this->assertCount(2, $setTables);
+        Assert::assertCount(2, $tables);
+        Assert::assertArrayHasKey('form.results.test', $tables);
+        Assert::assertCount(3, $tables['form.results.test']['columns']);
     }
 
     public function testOnReportGenerateFormsContext(): void

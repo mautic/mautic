@@ -37,17 +37,17 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         $form   = $this->createForm();
         $result = [
             [
-                'idFormField'  => null,
+                'formFieldId'  => null,
                 'mappedObject' => 'contact',
                 'mappedField'  => 'email',
             ],
             [
-                'idFormField'  => null,
+                'formFieldId'  => null,
                 'mappedObject' => 'company',
                 'mappedField'  => 'companyemail',
             ],
             [
-                'idFormField'  => null,
+                'formFieldId'  => null,
                 'mappedObject' => 'company',
                 'mappedField'  => 'companyname',
             ],

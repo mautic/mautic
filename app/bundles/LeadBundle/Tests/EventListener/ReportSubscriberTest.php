@@ -29,6 +29,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -1063,7 +1064,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $fields         = [
+        $columns        = [
             'comp.id'   => [
                 'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
@@ -1078,7 +1079,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getCompanyData')
             ->willReturn($companyFields);
 
-        $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
+
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
     }
 
     public function testOnReportColumnCollectForContact(): void
@@ -1096,7 +1099,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $fields           = [
+        $columns          = [
             'l.email'     => [
                 'label'   => '',
                 'type'    => 'string',
@@ -1115,24 +1118,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $columnCollectEventMock = $this->createMock(ColumnCollectEvent::class);
-
-        $columnCollectEventMock->expects($this->once())
-            ->method('getObject')
-            ->willReturn('contact');
-
-        $columnCollectEventMock->expects($this->once())
-            ->method('getProperties')
-            ->willReturn([]);
+        $columnCollectEvent = new ColumnCollectEvent('contact');
 
         $this->leadFieldModelMock->expects($this->once())
             ->method('getPublishedFieldArrays')
             ->willReturn($publishedFields);
 
-        $columnCollectEventMock->expects($this->once())
-            ->method('addColumns')
-            ->with($fields);
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
 
-        $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
     }
 }
