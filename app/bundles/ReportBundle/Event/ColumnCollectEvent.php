@@ -43,7 +43,7 @@ final class ColumnCollectEvent extends Event
     }
 
     /**
-     * @return array<string, string|int>
+     * @return array<string, array<string, mixed>>
      */
     public function getColumns(): array
     {

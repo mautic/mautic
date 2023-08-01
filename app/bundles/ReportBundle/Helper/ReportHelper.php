@@ -126,7 +126,7 @@ final class ReportHelper
     /**
      * @param array<string, mixed> $properties
      *
-     * @return array<string, string|int>
+     * @return array<string, array<string, mixed>>
      */
     public function getMappedObjectColumns(string $object, array $properties = []): array
     {
