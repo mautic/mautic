@@ -2,7 +2,6 @@
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
