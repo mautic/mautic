@@ -2,10 +2,13 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -193,6 +196,62 @@ trait LeadDetailsTrait
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
+    }
+
+    /**
+     * @return array<string, array<int, string|array>>
+     *
+     * @throws Exception
+     */
+    protected function getEmailDaysData(Lead $lead): array
+    {
+        $translator = $this->translator;
+
+        /** @var EmailModel $model */
+        $model       = $this->getModel('email');
+        $stats       = $model->getEmailDayStats($lead);
+
+        $chart  = new BarChart([
+            $translator->trans('mautic.core.date.monday'),
+            $translator->trans('mautic.core.date.tuesday'),
+            $translator->trans('mautic.core.date.wednesday'),
+            $translator->trans('mautic.core.date.thursday'),
+            $translator->trans('mautic.core.date.friday'),
+            $translator->trans('mautic.core.date.saturday'),
+            $translator->trans('mautic.core.date.sunday'),
+        ]);
+
+        $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
+        $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+
+        return $chart->render();
+    }
+
+    /**
+     * @return array<string, array<int, string|array>>
+     *
+     * @throws Exception
+     */
+    protected function getEmailHoursData(Lead $lead): array
+    {
+        $translator = $this->translator;
+
+        /** @var EmailModel $model */
+        $model       = $this->getModel('email');
+        $stats       = $model->getEmailTimeStats($lead);
+
+        $hoursRange = range(0, 23, 1);
+        $labels     = [];
+
+        foreach ($hoursRange as $r) {
+            $labels[] = sprintf('%02d:00', $r).'-'.sprintf('%02d:00', fmod($r + 1, 24));
+        }
+
+        $chart  = new BarChart($labels);
+        $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
+        $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+
+        return $chart->render();
     }
 
     /**

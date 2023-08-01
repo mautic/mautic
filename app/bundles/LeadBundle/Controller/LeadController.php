@@ -408,6 +408,8 @@ class LeadController extends FormController
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
+                    'emailDaysData'     => $this->getEmailDaysData($lead),
+                    'emailHoursData'    => $this->getEmailHoursData($lead),
                     'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'           => $leadDeviceRepository->getLeadDevices($lead),

@@ -3,9 +3,11 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -750,5 +752,148 @@ class StatRepository extends CommonRepository
         }
 
         return $contacts;
+    }
+
+    /**
+     * @return array<int, array<string, int|string>>
+     *
+     * @throws Exception
+     */
+    public function getEmailDayStats(Lead $lead): array
+    {
+        $queryBuilder        = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryReadBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQuerySentBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryDaysBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $statsAlias    = 'es'; // email_stats
+        $sentAlias     = 's';   // sent stats
+        $readAlias     = 'r';   // read stats
+        $daysAlias     = 'd';  // days
+
+        // Days sub-query
+        $daysQuery = '0 AS day';
+        for ($i = 1; $i < 7; ++$i) {
+            $daysQuery .= sprintf(' UNION ALL SELECT %d AS day', $i);
+        }
+        $subQueryDaysBuilder->addSelect($daysQuery);
+
+        // Read sub-query
+        $subQueryReadBuilder->select(
+            'WEEKDAY(date_read) AS read_day',
+            'count(id) AS read_count',
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->andWhere("$statsAlias.is_read = 1")
+            ->andWhere("$statsAlias.date_read IS NOT NULL")
+            ->andWhere("$statsAlias.lead_id = :lead")
+            ->groupBy('WEEKDAY(date_read)')
+            ->orderBy('WEEKDAY(date_read)');
+
+        // Sent sub-query
+        $subQuerySentBuilder->select(
+            'WEEKDAY(date_sent) AS sent_day',
+            'count(id) AS sent_count',
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->andWhere("$statsAlias.date_sent IS NOT NULL")
+            ->andWhere("$statsAlias.lead_id = :lead")
+            ->groupBy('WEEKDAY(date_sent)')
+            ->orderBy('WEEKDAY(date_sent)');
+
+        // Main query
+        $queryBuilder->addSelect(
+            "$daysAlias.day",
+            'IF(sent_count IS NULL, 0, sent_count) AS sent_count',
+            'IF(read_count IS NULL, 0, read_count) AS read_count'
+        )->from("({$subQueryDaysBuilder->getSQL()})", $daysAlias)
+            ->leftJoin(
+                $daysAlias,
+                "({$subQuerySentBuilder->getSQL()})",
+                $sentAlias,
+                "$sentAlias.sent_day = $daysAlias.day"
+            )
+            ->leftJoin(
+                $daysAlias,
+                "({$subQueryReadBuilder->getSQL()})",
+                $readAlias,
+                "$readAlias.read_day = $daysAlias.day "
+            )
+            ->orderBy('day')
+            ->setParameter('lead', $lead->getId());
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @return array<int, array<string, int|string>>
+     *
+     * @throws Exception
+     */
+    public function getEmailTimeStats(Lead $lead): array
+    {
+        $queryBuilder         = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryReadBuilder  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQuerySentBuilder  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryHoursBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $statsAlias    = 'es'; // email_stats
+        $sentAlias     = 's';   // sent stats
+        $readAlias     = 'r';   // read stats
+        $hoursAlias    = 'h';  // hours
+        $format        = '%H';
+
+        $hoursString = '00 AS hour';
+        for ($i = 1; $i < 24; ++$i) {
+            $hoursString .= sprintf(' UNION ALL SELECT %02d AS hour', $i);
+        }
+        $subQueryHoursBuilder->addSelect($hoursString);
+
+        // Read sub-query
+        $subQueryReadBuilder->select(
+            "TIME_FORMAT($statsAlias.date_read, '$format') as read_hour",
+            "COUNT($statsAlias.id) AS read_count"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->andWhere("$statsAlias.date_read IS NOT NULL")
+            ->andWhere("$statsAlias.lead_id = :lead")
+            ->groupBy('read_hour')
+            ->orderBy('read_hour', 'ASC')
+            ->setMaxResults(24);
+
+        // Sent sub-query
+        $subQuerySentBuilder->select(
+            "TIME_FORMAT($statsAlias.date_sent, '$format') as sent_hour",
+            "COUNT($statsAlias.id) AS sent_count"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->andWhere("$statsAlias.date_sent IS NOT NULL")
+            ->andWhere("$statsAlias.lead_id = :lead")
+            ->groupBy('sent_hour')
+            ->orderBy('sent_hour', 'ASC')
+            ->setMaxResults(24);
+
+        // Main query
+        $queryBuilder->addSelect(
+            "$hoursAlias.hour",
+            'IF(sent_count IS NULL, 0, sent_count) AS sent_count',
+            'IF(read_count IS NULL, 0, read_count) AS read_count'
+        )->from("({$subQueryHoursBuilder->getSQL()})", $hoursAlias)
+            ->leftJoin(
+                $hoursAlias,
+                "({$subQuerySentBuilder->getSQL()})",
+                $sentAlias,
+                "$sentAlias.sent_hour = $hoursAlias.hour"
+            )
+            ->leftJoin(
+                $hoursAlias,
+                "({$subQueryReadBuilder->getSQL()})",
+                $readAlias,
+                "$hoursAlias.hour = $readAlias.read_hour"
+            )
+            ->orderBy('hour')
+            ->setParameter('lead', $lead->getId());
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 }

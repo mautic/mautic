@@ -219,19 +219,44 @@
             <!--/ lead detail collapseable toggler -->
 
             {% if not isAnonymous %}
-                <div class="pa-md">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="panel">
-                                <div class="panel-body box-layout">
-                                    <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">{{ 'mautic.lead.field.header.engagements'|trans }}</h5>
-                                    </div>
-                                    <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
-                                    </div>
-                                </div>
-                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
+                <div class="stats-menu pl-md mt-lg">
+                    <!-- tabs controls -->
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#engagements" role="tab" data-toggle="tab">
+                                {{ 'mautic.lead.field.header.engagements'|trans }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#emails-read" role="tab" data-toggle="tab">
+                                {{ 'mautic.lead.field.header.email.time'|trans }}
+                            </a>
+                        </li>
+                    </ul>
+                    <!--/ tabs controls -->
+                </div>
+
+                <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+                    <div class="tab-pane active bdr-w-0" id="engagements">
+                        <div class="panel-body box-layout">
+                            <div class="col-xs-12 va-t text-right">
+                                <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                            </div>
+                        </div>
+                        {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
+                    </div>
+                    <div class="tab-pane bdr-w-0" id="emails-read">
+                        <div class="panel-body box-layout">
+                            <div class="col-xs-12 va-t text-right">
+                                <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="pt-0 pb-10 pr-15 col-xs-6">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': emailDaysData, 'chartType': 'bar', 'chartHeight': 250}) }}
+                            </div>
+                            <div class="pt-0 pb-10 col-xs-6">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': emailHoursData, 'chartType': 'bar', 'chartHeight': 250}) }}
                             </div>
                         </div>
                     </div>
