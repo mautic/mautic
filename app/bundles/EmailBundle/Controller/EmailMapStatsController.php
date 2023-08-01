@@ -69,9 +69,11 @@ class EmailMapStatsController extends AbstractCountryMapController
     }
 
     /**
+     * @param Email $entity
+     *
      * @return array<string, array<string, string>>
      */
-    public function getMapOptions(): array
+    public function getMapOptions($entity = null): array
     {
         return self::MAP_OPTIONS;
     }

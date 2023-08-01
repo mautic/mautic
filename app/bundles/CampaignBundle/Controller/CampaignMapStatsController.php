@@ -16,12 +16,16 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 class CampaignMapStatsController extends AbstractCountryMapController
 {
     public const MAP_OPTIONS = [
+        'contacts' => [
+            'label' => 'mautic.lead.leads',
+            'unit'  => 'Contact',
+        ],
         'read_count' => [
-            'label' => 'mautic.email.stat.read',
+            'label' => 'mautic.email.read',
             'unit'  => 'Read',
         ],
         'clicked_through_count'=> [
-            'label' => 'mautic.email.clicked',
+            'label' => 'mautic.email.click',
             'unit'  => 'Click',
         ],
     ];
@@ -40,11 +44,14 @@ class CampaignMapStatsController extends AbstractCountryMapController
      */
     public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
-        return $this->model->getEmailCountryStats(
+        $contacts = '';
+        $emails   = $this->model->getEmailCountryStats(
             $entity,
             $dateFromObject,
             $dateToObject
         );
+
+        return $emails;
     }
 
     /**
@@ -60,10 +67,16 @@ class CampaignMapStatsController extends AbstractCountryMapController
     }
 
     /**
+     * @param Campaign $entity
+     *
      * @return array<string,array<string, string>>
      */
-    public function getMapOptions(): array
+    public function getMapOptions($entity = null): array
     {
-        return self::MAP_OPTIONS;
+        if (!empty($entity) && $entity->getEmailSendEvents()->count() > 0) {
+            return self::MAP_OPTIONS;
+        } else {
+            return self::MAP_OPTIONS['contacts'];
+        }
     }
 }

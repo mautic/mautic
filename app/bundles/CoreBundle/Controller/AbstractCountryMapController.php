@@ -41,9 +41,13 @@ abstract class AbstractCountryMapController extends AbstractController
     abstract public function hasAccess(CorePermissions $security, $entity): bool;
 
     /**
+     * @template T
+     *
+     * @param T|null $entity
+     *
      * @return array<string,array<string, string>>
      */
-    abstract public function getMapOptions(): array;
+    abstract public function getMapOptions($entity = null): array;
 
     /**
      * @throws \Exception
@@ -61,7 +65,7 @@ abstract class AbstractCountryMapController extends AbstractController
         }
 
         $statsCountries = $this->getData($entity, new \DateTime($dateFrom), new \DateTime($dateTo));
-        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions(), self::LEGEND_TEXT);
+        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
 
         return $this->render(
             '@MauticCore/Helper/map.html.twig',
