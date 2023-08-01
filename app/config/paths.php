@@ -3,7 +3,8 @@
 $paths = [
     // customizable
     'themes'       => 'themes',
-    'assets'       => 'media',
+    'assets'       => 'app/assets',
+    'media'        => 'media',
     'asset_prefix' => '',
     'plugins'      => 'plugins',
     'translations' => 'translations',

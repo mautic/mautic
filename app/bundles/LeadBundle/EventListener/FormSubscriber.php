@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FieldCollectEvent;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -27,11 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
     /**
      * @param LeadModel
      */
@@ -52,19 +47,21 @@ class FormSubscriber implements EventSubscriberInterface
      */
     protected $leadFieldRepository;
 
+    private DoNotContact $doNotContact;
+
     public function __construct(
-        EmailModel $emailModel,
         LeadModel $leadModel,
         ContactTracker $contactTracker,
         IpLookupHelper $ipLookupHelper,
         LeadFieldRepository $leadFieldRepository,
-        private PointGroupModel $groupModel
+        private PointGroupModel $groupModel,
+        DoNotContact $doNotContact
     ) {
-        $this->emailModel          = $emailModel;
         $this->leadModel           = $leadModel;
         $this->contactTracker      = $contactTracker;
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->doNotContact        = $doNotContact;
     }
 
     /**
@@ -314,10 +311,8 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $formResults = $event->getResults();
-
-        if (isset($formResults['email']) && !empty($formResults['email'])) {
-            $this->emailModel->removeDoNotContact($formResults['email']);
+        if ($event->getLead()) {
+            $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
         }
     }
 }
