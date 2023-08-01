@@ -8,13 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ColumnCollectEvent extends Event
 {
-    private string $object;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private array $properties;
-
     /**
      * @var array<string, mixed>
      */
@@ -23,11 +16,9 @@ class ColumnCollectEvent extends Event
     /**
      * @param array<string, mixed> $properties
      */
-    public function __construct(string $object, array $properties = [])
+    public function __construct(private string $object, private array $properties = [])
     {
-        $this->object     = $object;
-        $this->properties = $properties;
-        $this->columns    = [];
+        $this->columns = [];
     }
 
     public function getObject(): string
