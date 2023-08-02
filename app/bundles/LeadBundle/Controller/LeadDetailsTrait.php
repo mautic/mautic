@@ -205,10 +205,10 @@ trait LeadDetailsTrait
      */
     protected function getEmailDaysData(Lead $lead): array
     {
-        $translator = $this->translator;
-
         /** @var EmailModel $model */
         $model       = $this->getModel('email');
+        $translator  = $this->translator;
+
         $stats       = $model->getEmailDayStats($lead);
 
         $chart  = new BarChart([
@@ -235,11 +235,11 @@ trait LeadDetailsTrait
      */
     protected function getEmailHoursData(Lead $lead): array
     {
-        $translator = $this->translator;
-
         /** @var EmailModel $model */
         $model       = $this->getModel('email');
-        $stats       = $model->getEmailTimeStats($lead);
+        $translator  = $this->translator;
+
+        $stats = $model->getEmailTimeStats($lead);
 
         $hoursRange = range(0, 23, 1);
         $labels     = [];

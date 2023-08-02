@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -393,6 +394,19 @@ class LeadController extends FormController
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
+        try {
+            $emailDaysData  = $this->getEmailDaysData($lead);
+            $emailHoursData = $this->getEmailHoursData($lead);
+        } catch (Exception $e) {
+            $emailDaysData = $emailHoursData = [];
+
+            $this->addFlashMessage(
+                'Failed to load email statistics charts',
+                [],
+                'error'
+            );
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -408,8 +422,8 @@ class LeadController extends FormController
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
-                    'emailDaysData'     => $this->getEmailDaysData($lead),
-                    'emailHoursData'    => $this->getEmailHoursData($lead),
+                    'emailDaysData'     => $emailDaysData,
+                    'emailHoursData'    => $emailHoursData,
                     'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'           => $leadDeviceRepository->getLeadDevices($lead),
