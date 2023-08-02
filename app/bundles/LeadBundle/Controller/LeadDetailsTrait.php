@@ -199,7 +199,7 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return array<string, array<int, string|array>>
+     * @return array<string, array<int, string|array<string, string|bool|array<int,string>>>>
      *
      * @throws Exception
      */
@@ -223,12 +223,13 @@ trait LeadDetailsTrait
 
         $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
         $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+        $chart->setDataset($translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
 
         return $chart->render();
     }
 
     /**
-     * @return array<string, array<int, string|array>>
+     * @return array<string, array<int, string|array<string, string|bool|array<int,string>>>>
      *
      * @throws Exception
      */
@@ -250,6 +251,7 @@ trait LeadDetailsTrait
         $chart  = new BarChart($labels);
         $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
         $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+        $chart->setDataset($translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
 
         return $chart->render();
     }

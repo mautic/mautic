@@ -762,13 +762,14 @@ class StatRepository extends CommonRepository
     public function getEmailDayStats(Lead $lead): array
     {
         $queryBuilder        = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryReadBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQuerySentBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryDaysBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $statsAlias    = 'es'; // email_stats
+        $cutAlias      = 'cut'; // channel_url_trackables
+        $pageHitsAlias = 'ph'; // page_hits
         $sentAlias     = 's';   // sent stats
         $readAlias     = 'r';   // read stats
+        $clickAlias    = 'c';      // clicks
         $daysAlias     = 'd';  // days
 
         // Days sub-query
@@ -778,44 +779,71 @@ class StatRepository extends CommonRepository
         }
         $subQueryDaysBuilder->addSelect($daysQuery);
 
-        // Read sub-query
-        $subQueryReadBuilder->select(
-            'WEEKDAY(date_read) AS read_day',
-            'count(id) AS read_count',
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
-            ->andWhere("$statsAlias.is_read = 1")
-            ->andWhere("$statsAlias.date_read IS NOT NULL")
-            ->andWhere("$statsAlias.lead_id = :lead")
-            ->groupBy('WEEKDAY(date_read)')
-            ->orderBy('WEEKDAY(date_read)');
-
-        // Sent sub-query
-        $subQuerySentBuilder->select(
-            'WEEKDAY(date_sent) AS sent_day',
-            'count(id) AS sent_count',
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
-            ->andWhere("$statsAlias.date_sent IS NOT NULL")
-            ->andWhere("$statsAlias.lead_id = :lead")
-            ->groupBy('WEEKDAY(date_sent)')
-            ->orderBy('WEEKDAY(date_sent)');
-
         // Main query
         $queryBuilder->addSelect(
             "$daysAlias.day",
             'IF(sent_count IS NULL, 0, sent_count) AS sent_count',
-            'IF(read_count IS NULL, 0, read_count) AS read_count'
+            'IF(read_count IS NULL, 0, read_count) AS read_count',
+            'IF(hit_count IS NULL, 0, hit_count) AS hit_count'
         )->from("({$subQueryDaysBuilder->getSQL()})", $daysAlias)
             ->leftJoin(
                 $daysAlias,
-                "({$subQuerySentBuilder->getSQL()})",
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        'WEEKDAY(date_hit) AS hit_day',
+                        'count(id) AS hit_count'
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
+                    ->join(
+                        $cutAlias,
+                        MAUTIC_TABLE_PREFIX.'page_hits',
+                        $pageHitsAlias,
+                        "$cutAlias.redirect_id = $pageHitsAlias.redirect_id AND $cutAlias.channel_id = $pageHitsAlias.source_id"
+                    )
+                    ->andWhere("$cutAlias.channel = 'email'")
+                    ->andWhere("$pageHitsAlias.source = 'email'")
+                    ->andWhere("$pageHitsAlias.lead_id = :lead")
+                    ->groupBy('hit_day')
+                    ->getSQL()
+                .')',
+                $clickAlias,
+                "$clickAlias.hit_day = $daysAlias.day"
+            )
+            ->leftJoin(
+                $daysAlias,
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        'WEEKDAY(date_sent) AS sent_day',
+                        'count(id) AS sent_count',
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+                    ->andWhere("$statsAlias.date_sent IS NOT NULL")
+                    ->andWhere("$statsAlias.lead_id = :lead")
+                    ->groupBy('sent_day')
+                    ->orderBy('sent_day')
+                    ->getSQL()
+                .')',
                 $sentAlias,
                 "$sentAlias.sent_day = $daysAlias.day"
             )
             ->leftJoin(
                 $daysAlias,
-                "({$subQueryReadBuilder->getSQL()})",
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        'WEEKDAY(date_read) AS read_day',
+                        'count(id) AS read_count',
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+                    ->andWhere("$statsAlias.is_read = 1")
+                    ->andWhere("$statsAlias.date_read IS NOT NULL")
+                    ->andWhere("$statsAlias.lead_id = :lead")
+                    ->groupBy('read_day')
+                    ->orderBy('read_day')
+                    ->getSQL()
+                .')',
                 $readAlias,
                 "$readAlias.read_day = $daysAlias.day "
             )
@@ -833,13 +861,14 @@ class StatRepository extends CommonRepository
     public function getEmailTimeStats(Lead $lead): array
     {
         $queryBuilder         = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryReadBuilder  = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQuerySentBuilder  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryHoursBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $statsAlias    = 'es'; // email_stats
+        $cutAlias      = 'cut'; // channel_url_trackables
+        $pageHitsAlias = 'ph'; // page_hits
         $sentAlias     = 's';   // sent stats
         $readAlias     = 'r';   // read stats
+        $clickAlias    = 'c';      // clicks
         $hoursAlias    = 'h';  // hours
         $format        = '%H';
 
@@ -849,47 +878,75 @@ class StatRepository extends CommonRepository
         }
         $subQueryHoursBuilder->addSelect($hoursString);
 
-        // Read sub-query
-        $subQueryReadBuilder->select(
-            "TIME_FORMAT($statsAlias.date_read, '$format') as read_hour",
-            "COUNT($statsAlias.id) AS read_count"
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
-            ->andWhere("$statsAlias.date_read IS NOT NULL")
-            ->andWhere("$statsAlias.lead_id = :lead")
-            ->groupBy('read_hour')
-            ->orderBy('read_hour', 'ASC')
-            ->setMaxResults(24);
-
-        // Sent sub-query
-        $subQuerySentBuilder->select(
-            "TIME_FORMAT($statsAlias.date_sent, '$format') as sent_hour",
-            "COUNT($statsAlias.id) AS sent_count"
-        )
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
-            ->andWhere("$statsAlias.date_sent IS NOT NULL")
-            ->andWhere("$statsAlias.lead_id = :lead")
-            ->groupBy('sent_hour')
-            ->orderBy('sent_hour', 'ASC')
-            ->setMaxResults(24);
-
         // Main query
         $queryBuilder->addSelect(
             "$hoursAlias.hour",
             'IF(sent_count IS NULL, 0, sent_count) AS sent_count',
-            'IF(read_count IS NULL, 0, read_count) AS read_count'
+            'IF(read_count IS NULL, 0, read_count) AS read_count',
+            'IF(hit_count IS NULL, 0, hit_count) AS hit_count'
         )->from("({$subQueryHoursBuilder->getSQL()})", $hoursAlias)
             ->leftJoin(
                 $hoursAlias,
-                "({$subQuerySentBuilder->getSQL()})",
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        "TIME_FORMAT(date_hit, '$format') AS hit_hour",
+                        'count(id) AS hit_count'
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
+                    ->join(
+                        $cutAlias,
+                        MAUTIC_TABLE_PREFIX.'page_hits',
+                        $pageHitsAlias,
+                        "$cutAlias.redirect_id = $pageHitsAlias.redirect_id AND $cutAlias.channel_id = $pageHitsAlias.source_id"
+                    )
+                    ->andWhere("$cutAlias.channel = 'email'")
+                    ->andWhere("$pageHitsAlias.source = 'email'")
+                    ->andWhere("$pageHitsAlias.lead_id = :lead")
+                    ->orderBy('hit_hour', 'ASC')
+                    ->groupBy('hit_hour')
+                    ->getSQL()
+                .')',
+                $clickAlias,
+                "$clickAlias.hit_hour = $hoursAlias.hour"
+            )
+            ->leftJoin(
+                $hoursAlias,
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        "TIME_FORMAT($statsAlias.date_sent, '$format') as sent_hour",
+                        "COUNT($statsAlias.id) AS sent_count"
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+                    ->andWhere("$statsAlias.date_sent IS NOT NULL")
+                    ->andWhere("$statsAlias.lead_id = :lead")
+                    ->groupBy('sent_hour')
+                    ->orderBy('sent_hour', 'ASC')
+                    ->setMaxResults(24)
+                    ->getSQL()
+                .')',
                 $sentAlias,
                 "$sentAlias.sent_hour = $hoursAlias.hour"
             )
             ->leftJoin(
                 $hoursAlias,
-                "({$subQueryReadBuilder->getSQL()})",
+                '('.
+                    $this->getEntityManager()->getConnection()->createQueryBuilder()
+                    ->select(
+                        "TIME_FORMAT($statsAlias.date_read, '$format') as read_hour",
+                        "COUNT($statsAlias.id) AS read_count"
+                    )
+                    ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+                    ->andWhere("$statsAlias.date_read IS NOT NULL")
+                    ->andWhere("$statsAlias.lead_id = :lead")
+                    ->groupBy('read_hour')
+                    ->orderBy('read_hour', 'ASC')
+                    ->setMaxResults(24)
+                    ->getSQL()
+                .')',
                 $readAlias,
-                "$hoursAlias.hour = $readAlias.read_hour"
+                "$readAlias.read_hour = $hoursAlias.hour"
             )
             ->orderBy('hour')
             ->setParameter('lead', $lead->getId());
