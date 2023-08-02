@@ -227,7 +227,7 @@
                                 {{ 'mautic.lead.field.header.engagements'|trans }}
                             </a>
                         </li>
-                        {% if emailDaysData is not empty and emailHoursData is not empty %}
+                        {% if emailHoursData is not empty and emailDaysData is not empty %}
                             <li>
                                 <a href="#emails-read" role="tab" data-toggle="tab">
                                     {{ 'mautic.lead.field.header.email.time'|trans }}
@@ -247,7 +247,7 @@
                         </div>
                         {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
                     </div>
-                    {% if emailDaysData is not empty and emailHoursData is not empty %}
+                    {% if emailHoursData is not empty and emailDaysData is not empty %}
                         <div class="tab-pane bdr-w-0" id="emails-read">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-12 va-t text-right">
