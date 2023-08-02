@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  * MAUTIC_INSTALLER which breaks other tests.
  *
  * @runTestsInSeparateProcesses
+ *
  * @preserveGlobalState disabled
  */
 class InstallWorkflowTest extends MauticMysqlTestCase
@@ -72,7 +73,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
 
         $form['install_doctrine_step[host]']->setValue($this->connection->getParams()['host']);
-        $form['install_doctrine_step[port]']->setValue($this->connection->getParams()['port']);
+        $form['install_doctrine_step[port]']->setValue((string) $this->connection->getParams()['port']);
         $form['install_doctrine_step[name]']->setValue($this->connection->getParams()['dbname']);
         $form['install_doctrine_step[user]']->setValue($this->connection->getParams()['user']);
         $form['install_doctrine_step[password]']->setValue($this->connection->getParams()['password']);

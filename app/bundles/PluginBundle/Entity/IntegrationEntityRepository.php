@@ -12,9 +12,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class IntegrationEntityRepository extends CommonRepository
 {
     /**
-     * @param                     $integration
-     * @param                     $integrationEntity
-     * @param                     $internalEntity
      * @param array<int>|int|null $internalEntityIds
      * @param null                $startDate
      * @param null                $endDate
@@ -108,10 +105,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param      $integration
-     * @param      $integrationEntity
-     * @param      $internalEntity
-     * @param      $internalEntityId
      * @param null $leadFields
      *
      * @return array
@@ -145,11 +138,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
-     * @param $integrationEntity
-     * @param $internalEntity
-     * @param $internalEntityIds
-     *
      * @return IntegrationEntity[]
      */
     public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
@@ -173,9 +161,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param              $integration
-     * @param              $internalEntity
-     * @param              $leadFields
      * @param int          $limit
      * @param null         $fromDate
      * @param null         $toDate
@@ -221,12 +206,12 @@ class IntegrationEntityRepository extends CommonRepository
             foreach ($integrationEntity as $key => $entity) {
                 if (null === $sub) {
                     $sub = CompositeExpression::or($q->expr()->eq('i.integration_entity', ':entity'.$key));
-                    $q->setParameter(':entity'.$key, $entity);
+                    $q->setParameter('entity'.$key, $entity);
                     continue;
                 }
 
                 $sub->with($q->expr()->eq('i.integration_entity', ':entity'.$key));
-                $q->setParameter(':entity'.$key, $entity);
+                $q->setParameter('entity'.$key, $entity);
             }
             $q->andWhere($sub);
         }
@@ -250,21 +235,21 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         $q->andWhere(
-                $q->expr()->and(
-                    $q->expr()->isNotNull('i.integration_entity_id'),
-                    $q->expr()->or(
-                        $q->expr()->and(
-                            $q->expr()->isNotNull('i.last_sync_date'),
-                            $q->expr()->gt('l.date_modified', 'i.last_sync_date')
-                        ),
-                        $q->expr()->and(
-                            $q->expr()->isNull('i.last_sync_date'),
-                            $q->expr()->isNotNull('l.date_modified'),
-                            $q->expr()->gt('l.date_modified', 'l.date_added')
-                        )
+            $q->expr()->and(
+                $q->expr()->isNotNull('i.integration_entity_id'),
+                $q->expr()->or(
+                    $q->expr()->and(
+                        $q->expr()->isNotNull('i.last_sync_date'),
+                        $q->expr()->gt('l.date_modified', 'i.last_sync_date')
+                    ),
+                    $q->expr()->and(
+                        $q->expr()->isNull('i.last_sync_date'),
+                        $q->expr()->isNotNull('l.date_modified'),
+                        $q->expr()->gt('l.date_modified', 'l.date_added')
                     )
                 )
-            );
+            )
+        );
 
         if ('lead' == $internalEntity) {
             $q->andWhere(
@@ -329,8 +314,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param      $integration
-     * @param      $leadFields
      * @param int  $limit
      * @param null $fromDate
      * @param null $toDate
@@ -436,11 +419,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $integration
-     * @param $integrationEntity
-     * @param $internalEntity
-     *
      * @return int
      */
     public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null)
@@ -449,10 +427,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $integration
-     * @param $integrationEntity
-     * @param $internalEntity
      * @param int|bool $limit
      *
      * @return array|int
@@ -519,10 +493,6 @@ class IntegrationEntityRepository extends CommonRepository
         return $results;
     }
 
-    /**
-     * @param $integration
-     * @param $internalEntityType
-     */
     public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -540,9 +510,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $internalEntity
-     * @param $leadId
-     *
      * @return array
      */
     public function findLeadsToDelete($internalEntity, $leadId)
@@ -558,10 +525,6 @@ class IntegrationEntityRepository extends CommonRepository
             ->execute();
     }
 
-    /**
-     * @param $internalEntity
-     * @param $leadId
-     */
     public function updateErrorLeads($internalEntity, $leadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()

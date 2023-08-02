@@ -22,6 +22,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<DynamicContent>
+ *
  * @implements AjaxLookupModelInterface<DynamicContent>
  */
 class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
@@ -94,7 +95,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -115,9 +115,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         return $formFactory->create(DynamicContentType::class, $entity, $options);
     }
 
-    /**
-     * @param $slot
-     */
     public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
@@ -196,11 +193,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -300,7 +292,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -325,7 +316,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;

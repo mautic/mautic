@@ -34,13 +34,13 @@ class FocusBundleExtension extends AbstractExtension
 
     public function compileLess(string $less): string
     {
-        require_once __DIR__.'/../../Include/lessc.inc.php';
+        $parser = new \Less_Parser();
 
-        return (new \lessc())->compile($less);
+        return $parser->parse($less)->getCss();
     }
 
     public function minifyCss(string $css): string
     {
-        return \Minify_CSS::minify($css);
+        return \Minify_CSSmin::minify($css);
     }
 }

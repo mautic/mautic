@@ -102,6 +102,17 @@ class PointType extends AbstractType
             );
         }
 
+        $builder->add(
+            'group',
+            GroupListType::class,
+            [
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.group.form.group_descr',
+                ],
+            ]
+        );
+
         if (!empty($options['data']) && $options['data'] instanceof Point) {
             $readonly = !$this->security->hasEntityAccess(
                 'point:points:publishown',

@@ -29,7 +29,7 @@ class SmsController extends FormController
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model = $this->getModel('sms');
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'sms:smses:viewown',
@@ -53,7 +53,7 @@ class SmsController extends FormController
 
         $session = $request->getSession();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -87,7 +87,7 @@ class SmsController extends FormController
 
         $count = count($smss);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -134,8 +134,6 @@ class SmsController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
@@ -146,11 +144,11 @@ class SmsController extends FormController
 
         /** @var \Mautic\SmsBundle\Entity\Sms $sms */
         $sms = $model->getEntity($objectId);
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
 
         if (null === $sms) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
 
             return $this->postActionRedirect([
@@ -260,7 +258,7 @@ class SmsController extends FormController
             return $this->accessDenied();
         }
 
-        //set the page we came from
+        // set the page we came from
         $page         = $session->get('mautic.sms.page', 1);
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
         $sms          = $request->request->get('sms') ?? [];
@@ -272,15 +270,15 @@ class SmsController extends FormController
             $entity->setSmsType('template');
         }
 
-        //create the form
+        // create the form
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
                     $this->addFlashMessage(
@@ -306,7 +304,7 @@ class SmsController extends FormController
                         $returnUrl = $this->generateUrl('mautic_sms_action', $viewParameters);
                         $template  = 'Mautic\SmsBundle\Controller\SmsController::viewAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
+                        // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
                     }
                 }
@@ -314,7 +312,7 @@ class SmsController extends FormController
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_sms_index', $viewParameters);
                 $template       = 'Mautic\SmsBundle\Controller\SmsController::indexAction';
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.sms.'.$entity->getId().'.content');
             }
 
@@ -372,7 +370,6 @@ class SmsController extends FormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
@@ -387,7 +384,7 @@ class SmsController extends FormController
         $session = $request->getSession();
         $page    = $session->get('mautic.sms.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
 
         $postActionVars = [
@@ -400,7 +397,7 @@ class SmsController extends FormController
             ],
         ];
 
-        //not found
+        // not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -424,11 +421,11 @@ class SmsController extends FormController
         ) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'sms');
         }
 
-        //Create the form
+        // Create the form
         $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $sms          = $request->request->get('sms') ?? [];
         $updateSelect = 'POST' === $method
@@ -437,12 +434,12 @@ class SmsController extends FormController
 
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage(
@@ -462,9 +459,9 @@ class SmsController extends FormController
                     );
                 }
             } else {
-                //clear any modified content
+                // clear any modified content
                 $session->remove('mautic.sms.'.$objectId.'.content');
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
 
@@ -508,7 +505,7 @@ class SmsController extends FormController
                 );
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -539,8 +536,6 @@ class SmsController extends FormController
     /**
      * Clone an entity.
      *
-     * @param $objectId
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
@@ -567,8 +562,6 @@ class SmsController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @param $objectId
      *
      * @return Response
      */
@@ -620,7 +613,7 @@ class SmsController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -694,7 +687,7 @@ class SmsController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -705,8 +698,6 @@ class SmsController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
      * @return JsonResponse|Response
      */
     public function previewAction($objectId)
@@ -729,7 +720,6 @@ class SmsController extends FormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

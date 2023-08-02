@@ -5,8 +5,6 @@ namespace Mautic\EmailBundle\Helper;
 class UrlMatcher
 {
     /**
-     * @param $urlToFind
-     *
      * @return bool
      */
     public static function hasMatch(array $urlsToCheckAgainst, $urlToFind)
@@ -25,8 +23,6 @@ class UrlMatcher
     }
 
     /**
-     * @param $url
-     *
      * @return mixed|string
      */
     private static function sanitizeUrl($url)

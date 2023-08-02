@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Helper;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -103,10 +102,10 @@ class InactiveHelperTest extends TestCase
         $this->eventLogRepository->expects($this->once())
             ->method('getDatesExecuted')
             ->willReturn(new ArrayCollection([
-                $leadNegative->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadNegative2->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadPositive->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadNegative3->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative2->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadPositive->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]));
 
         /** @var LeadEventLog&MockObject */
@@ -147,9 +146,9 @@ class InactiveHelperTest extends TestCase
 
         $this->scheduler->expects($this->any())
             ->method('getExecutionDateTime')
-            ->willReturn(DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
+            ->willReturn(\DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
 
-        $now      = DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
+        $now      = \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
         $contacts = new ArrayCollection([
             $leadNegative->getId()  => $leadNegative,
             $leadNegative2->getId() => $leadNegative2,

@@ -38,7 +38,7 @@ class ReloadHelper
 
         foreach ($installedPlugins as $plugin) {
             if (!isset($allPlugins[$plugin->getBundle()]) && !$plugin->getIsMissing()) {
-                //files are no longer found
+                // files are no longer found
                 $plugin->setIsMissing(true);
                 $disabledPlugins[$plugin->getBundle()] = $plugin;
             }
@@ -59,7 +59,7 @@ class ReloadHelper
 
         foreach ($installedPlugins as $plugin) {
             if (isset($allPlugins[$plugin->getBundle()]) && $plugin->getIsMissing()) {
-                //files are no longer found
+                // files are no longer found
                 $plugin->setIsMissing(false);
                 $enabledPlugins[$plugin->getBundle()] = $plugin;
             }
@@ -83,9 +83,9 @@ class ReloadHelper
                 $oldVersion   = $plugin->getVersion();
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
-                //compare versions to see if an update is necessary
+                // compare versions to see if an update is necessary
                 if (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion())) {
-                    //call the update callback
+                    // call the update callback
                     $callback = $pluginConfig['bundleClass'];
                     $metadata = isset($pluginMetadata[$pluginConfig['namespace']])
                         ? $pluginMetadata[$pluginConfig['namespace']] : null;

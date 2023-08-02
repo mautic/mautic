@@ -8,9 +8,6 @@ namespace Mautic\LeadBundle\Segment\Query;
 class QueryException extends \Doctrine\DBAL\Exception
 {
     /**
-     * @param $alias
-     * @param $registeredAliases
-     *
      * @return QueryException
      */
     public static function unknownAlias($alias, $registeredAliases)
@@ -21,9 +18,6 @@ class QueryException extends \Doctrine\DBAL\Exception
     }
 
     /**
-     * @param $alias
-     * @param $registeredAliases
-     *
      * @return QueryException
      */
     public static function nonUniqueAlias($alias, $registeredAliases)

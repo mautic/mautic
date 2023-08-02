@@ -33,7 +33,7 @@ class DatetimeToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        $datetime = new \Datetime($value->format($this->format));
+        $datetime = new \DateTime($value->format($this->format));
 
         return $datetime->format($this->format);
     }

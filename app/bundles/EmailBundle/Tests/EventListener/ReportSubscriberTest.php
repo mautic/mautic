@@ -269,7 +269,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnReportBuilderWithEmailSentContext(): void
     {
         $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper();
+        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())

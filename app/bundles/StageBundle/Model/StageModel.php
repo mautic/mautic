@@ -2,19 +2,25 @@
 
 namespace Mautic\StageBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Event\StageBuilderEvent;
 use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
 use Mautic\StageBundle\StageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -23,25 +29,24 @@ use Symfony\Contracts\EventDispatcher\Event;
 class StageModel extends CommonFormModel
 {
     /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
      * @var LeadModel
      */
     protected $leadModel;
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    public function __construct(LeadModel $leadModel, Session $session, UserHelper $userHelper)
-    {
-        $this->session    = $session;
+    public function __construct(
+        LeadModel $leadModel,
+        UserHelper $userHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->leadModel  = $leadModel;
-        $this->userHelper = $userHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -145,7 +150,7 @@ class StageModel extends CommonFormModel
         static $actions;
 
         if (empty($actions)) {
-            //build them
+            // build them
             $actions = [];
             $event   = new StageBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, StageEvents::STAGE_ON_BUILD);

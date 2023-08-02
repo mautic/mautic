@@ -317,9 +317,6 @@ class ObjectMapping
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function appendToInternalStorage($key, $value)

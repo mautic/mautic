@@ -32,8 +32,6 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param $contactId
-     *
      * @return array
      */
     public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields)

@@ -149,7 +149,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $query->expects(self::once())
             ->method('setParameter')
-            ->with(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->with('emails', $emails, Connection::PARAM_STR_ARRAY)
             ->willReturn($query);
         $query->expects(self::once())
             ->method('getArrayResult')

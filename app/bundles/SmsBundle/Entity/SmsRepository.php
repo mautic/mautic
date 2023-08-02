@@ -100,7 +100,6 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -113,7 +112,7 @@ class SmsRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -183,7 +182,6 @@ class SmsRepository extends CommonRepository
     /**
      * Up the click/sent counts.
      *
-     * @param        $id
      * @param string $type
      * @param int    $increaseBy
      */

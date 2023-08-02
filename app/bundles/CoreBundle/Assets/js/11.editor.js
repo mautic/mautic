@@ -12,6 +12,11 @@ Mautic.elfinderURL = mauticBaseUrl + 'elfinder';
  * Activate Froala options
  */
 Mautic.activateGlobalFroalaOptions = function() {
+
+    if (!mauticFroalaEnabled) {
+        return;
+    }
+
     Mautic.basicFroalaOptions = {
         enter: mQuery.FroalaEditor.ENTER_BR,
         imageUploadURL: Mautic.imageUploadURL,

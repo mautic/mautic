@@ -21,4 +21,7 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->alias(\Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class, \Mautic\UserBundle\Entity\UserTokenRepository::class);
+
+    $services->alias('mautic.user.model.role', \Mautic\UserBundle\Model\RoleModel::class);
+    $services->alias('mautic.user.model.user', \Mautic\UserBundle\Model\UserModel::class);
 };

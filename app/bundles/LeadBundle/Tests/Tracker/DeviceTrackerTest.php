@@ -45,15 +45,15 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $createCacheItem = \Closure::bind(
-          function ($key) {
-              $item = new CacheItem();
-              $item->key = $key;
-              $item->isHit = false;
+            function ($key) {
+                $item        = new CacheItem();
+                $item->key   = $key;
+                $item->isHit = false;
 
-              return $item;
-          },
-          $this,
-          CacheItem::class
+                return $item;
+            },
+            $this,
+            CacheItem::class
         );
 
         $cacheAdapter = $this->createMock(TagAwareAdapterInterface::class);

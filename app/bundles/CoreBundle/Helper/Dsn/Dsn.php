@@ -1,26 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper\Dsn;
 
-class Dsn
+final class Dsn
 {
-    private string $scheme;
-
-    private string $host;
-
-    private ?string $user;
-
-    private ?string $password;
-
-    private ?int $port;
-
-    /**
-     * Query string array to be added to DSN.
-     *
-     * @var array<string,string>
-     */
-    private array $options;
-
     private const ALLOWED_DSN_ARRAY = [
         'sync://' => ['sync', ''],
     ];
@@ -30,19 +15,21 @@ class Dsn
      *
      * @param string                $scheme   The DSN scheme (e.g. sync://)
      * @param string                $host     The DSN host (e.g. localhost)
-     * @param string                $user     The DSN user (e.g. root)
-     * @param string                $password The DSN password (e.g. root)
-     * @param int                   $port     The DSN port (e.g. 3306)
+     * @param string|null           $user     The DSN user (e.g. root)
+     * @param string|null           $password The DSN password (e.g. root)
+     * @param int|null              $port     The DSN port (e.g. 3306)
+     * @param string|null           $path     The DSN path (e.g. bucket/name/two)
      * @param array<string, string> $options  The DSN options (e.g. ['charset' => 'utf8'])
      */
-    public function __construct(string $scheme, string $host, string $user = null, string $password = null, int $port = null, array $options = [])
-    {
-        $this->scheme   = $scheme;
-        $this->host     = $host;
-        $this->user     = $user;
-        $this->password = $password;
-        $this->port     = $port;
-        $this->options  = $options;
+    public function __construct(
+        private string $scheme,
+        private string $host,
+        private ?string $user = null,
+        private ?string $password = null,
+        private ?int $port = null,
+        private ?string $path = null,
+        private array $options = [],
+    ) {
     }
 
     /**
@@ -55,7 +42,7 @@ class Dsn
     public static function fromString(string $dsn): self
     {
         if (array_key_exists($dsn, self::ALLOWED_DSN_ARRAY)) {
-            return new self(self::ALLOWED_DSN_ARRAY[$dsn][0], self::ALLOWED_DSN_ARRAY[$dsn][1]);
+            return new self(...self::ALLOWED_DSN_ARRAY[$dsn]);
         }
 
         if (false === $parsedDsn = parse_url($dsn)) {
@@ -70,20 +57,49 @@ class Dsn
             throw new \InvalidArgumentException(sprintf('The "%s" DSN must contain a host (use "default" by default).', $dsn));
         }
 
-        $options = [];
-        if (isset($parsedDsn['path'])) {
-            $options['path'] = trim($parsedDsn['path'], '/');
-        }
-
+        $host     = urldecode($parsedDsn['host']);
         $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $port     = $parsedDsn['port'] ?? null;
+        $port     = isset($parsedDsn['port']) ? (int) $parsedDsn['port'] : null;
+        $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
-        if (!empty($query)) {
-            $options = array_merge($options, $query);
+
+        return new self($parsedDsn['scheme'], $host, $user, $password, $port, $path, $query);
+    }
+
+    public function __toString(): string
+    {
+        $dsn = $this->scheme.'://';
+
+        if ($this->user) {
+            $dsn .= urlencode($this->user);
         }
 
-        return new self($parsedDsn['scheme'], $parsedDsn['host'], $user, $password, $port, $options);
+        if ($this->password) {
+            $dsn .= ':'.urlencode($this->password);
+        }
+
+        if ($this->user || $this->password) {
+            $dsn .= '@';
+        }
+
+        $dsn .= urlencode($this->host);
+
+        if ($this->port) {
+            $dsn .= ':'.$this->port;
+        }
+
+        if ($this->path) {
+            $dsn .= '/'.urlencode($this->path);
+        }
+
+        $query = http_build_query($this->options);
+
+        if ($query) {
+            $dsn .= '?'.$query;
+        }
+
+        return $dsn;
     }
 
     public function getScheme(): string
@@ -91,9 +107,25 @@ class Dsn
         return $this->scheme;
     }
 
+    public function setScheme(string $scheme): Dsn
+    {
+        $dsn         = clone $this;
+        $dsn->scheme = $scheme;
+
+        return $dsn;
+    }
+
     public function getHost(): string
     {
         return $this->host;
+    }
+
+    public function setHost(string $host): Dsn
+    {
+        $dsn       = clone $this;
+        $dsn->host = $host;
+
+        return $dsn;
     }
 
     public function getUser(): ?string
@@ -101,31 +133,74 @@ class Dsn
         return $this->user;
     }
 
+    public function setUser(?string $user): Dsn
+    {
+        $dsn       = clone $this;
+        $dsn->user = $user;
+
+        return $dsn;
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function getPort(int $default = null): ?int
+    public function setPassword(?string $password): self
     {
-        return $this->port ?? $default;
+        $dsn           = clone $this;
+        $dsn->password = $password;
+
+        return $dsn;
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed|null
-     */
-    public function getOption(string $key, $default = null)
+    public function getPort(): ?int
     {
-        return $this->options[$key] ?? $default;
+        return $this->port;
+    }
+
+    public function setPort(?int $port): Dsn
+    {
+        $dsn       = clone $this;
+        $dsn->port = $port;
+
+        return $dsn;
+    }
+
+    public function getOption(string $key): ?string
+    {
+        return $this->options[$key] ?? null;
     }
 
     /**
      * @return array<string, string>
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
+    }
+
+    /**
+     * @param array<string, string> $options
+     */
+    public function setOptions(array $options): Dsn
+    {
+        $dsn          = clone $this;
+        $dsn->options = $options;
+
+        return $dsn;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function setPath(?string $path): Dsn
+    {
+        $dsn       = clone $this;
+        $dsn->path = $path;
+
+        return $dsn;
     }
 }
