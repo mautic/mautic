@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\Trackable;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -164,4 +172,149 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function emulateEmailStat(Lead $lead, Email $email, bool $isRead, \DateTime $dateSent = null, \DateTime $dateRead = null): void
+    {
+        $stat = new Stat();
+        $stat->setEmailAddress('test@test.com');
+        $stat->setLead($lead);
+        $stat->setDateSent($dateSent ?? new \DateTime('2023-07-22'));
+        $stat->setDateRead($dateRead ?? new \DateTime('2023-07-22'));
+        $stat->setEmail($email);
+        $stat->setIsRead($isRead);
+        $this->em->persist($stat);
+        $this->em->flush();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function emulateClick(Lead $lead, Email $email, int $hits, int $uniqueHits, \DateTime $dateHit = null): void
+    {
+        $ipAddress = new IpAddress();
+        $ipAddress->setIpAddress('127.0.0.1');
+        $this->em->persist($ipAddress);
+        $this->em->flush();
+
+        $redirect = new Redirect();
+        $redirect->setRedirectId(uniqid());
+        $redirect->setUrl('https://example.com');
+        $redirect->setHits($hits);
+        $redirect->setUniqueHits($uniqueHits);
+        $this->em->persist($redirect);
+
+        $trackable = new Trackable();
+        $trackable->setChannelId($email->getId());
+        $trackable->setChannel('email');
+        $trackable->setHits($hits);
+        $trackable->setUniqueHits($uniqueHits);
+        $trackable->setRedirect($redirect);
+        $this->em->persist($trackable);
+
+        $pageHit = new Hit();
+        $pageHit->setRedirect($redirect);
+        $pageHit->setIpAddress($ipAddress);
+        $pageHit->setEmail($email);
+        $pageHit->setLead($lead);
+        $pageHit->setDateHit($dateHit ?? new \DateTime());
+        $pageHit->setCode(200);
+        $pageHit->setUrl($redirect->getUrl());
+        $pageHit->setTrackingId($redirect->getRedirectId());
+        $pageHit->setSource('email');
+        $pageHit->setSourceId($email->getId());
+        $this->em->persist($pageHit);
+        $this->em->flush();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public function testGetEmailDayStats(): void
+    {
+        /** @var EmailModel $emailModel */
+        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
+        $hits         = rand(1, 5);
+        $uniqueHits   = rand(1, $hits);
+
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $lead = new Lead();
+        $lead->setEmail('example@example.com');
+        $this->em->persist($lead);
+
+        $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
+        $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
+
+        $results = $emailModel->getEmailDayStats($lead);
+
+        $this->assertCount(7, $results);
+        $this->assertSame(
+            [0, 1, 2, 3, 4, 5, 6],
+            array_keys($results)
+        );
+        $this->assertSame(
+            ['day', 'sent_count', 'read_count', 'hit_count'],
+            array_keys($results[0])
+        );
+        $this->assertSame('1', $results[0]['sent_count']);
+        $this->assertSame('0', $results[0]['read_count']);
+        $this->assertSame('0', $results[0]['hit_count']);
+        $this->assertSame('0', $results[1]['sent_count']);
+        $this->assertSame('1', $results[1]['read_count']);
+        $this->assertSame('1', $results[3]['hit_count']);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws Exception
+     */
+    public function testGetEmailTimeStats(): void
+    {
+        /** @var EmailModel $emailModel */
+        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
+        $hits         = rand(1, 5);
+        $uniqueHits   = rand(1, $hits);
+
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $lead = new Lead();
+        $lead->setEmail('example@example.com');
+        $this->em->persist($lead);
+
+        $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
+        $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
+
+        $results = $emailModel->getEmailTimeStats($lead);
+
+        $this->assertCount(24, $results);
+        $this->assertSame(
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            array_keys($results)
+        );
+        $this->assertSame(
+            ['hour', 'sent_count', 'read_count', 'hit_count'],
+            array_keys($results[0])
+        );
+        $this->assertSame('12', $results[12]['hour']);
+        $this->assertSame('1', $results[12]['sent_count']);
+        $this->assertSame('0', $results[12]['read_count']);
+        $this->assertSame('0', $results[14]['hit_count']);
+        $this->assertSame('0', $results[14]['sent_count']);
+        $this->assertSame('1', $results[14]['read_count']);
+        $this->assertSame('1', $results[17]['hit_count']);
+    }
 }
