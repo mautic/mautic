@@ -66,8 +66,11 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $field = $fieldModel->getEntity($fieldId);
         unlink($fileName);
         unlink($formUploader->getCompleteFilePath($field, $fileName));
-        rmdir(str_replace(DIRECTORY_SEPARATOR.$fileName, '', $formUploader->getCompleteFilePath($field, $fileName)));
-        rmdir(str_replace(DIRECTORY_SEPARATOR.$formId.DIRECTORY_SEPARATOR.$fileName, '', $formUploader->getCompleteFilePath($field, $fileName)));
+
+        $folderPath = str_replace(DIRECTORY_SEPARATOR.$fileName, '', $formUploader->getCompleteFilePath($field, $fileName));
+        if (is_dir($folderPath)) {
+            rmdir($folderPath);
+        }
     }
 
     private function createFile(string $filename): void
