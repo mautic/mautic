@@ -167,6 +167,26 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
+    public function testGetContextEntity(): void
+    {
+        /** @var CampaignModel $model */
+        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
+
+        $campaign = new Campaign();
+        $campaign->setName('Test email');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $id     = $campaign->getId();
+        $result = $model->getContextEntity($id);
+
+        $this->assertSame($campaign, $result);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     private function emulateEmailStat(Lead $lead, Email $email, bool $isRead, int $sourceId): void
     {
         $stat = new Stat();

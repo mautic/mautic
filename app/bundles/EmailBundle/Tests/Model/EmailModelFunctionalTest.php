@@ -321,4 +321,24 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             ],
         ], $results);
     }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetContextEntity(): void
+    {
+        /** @var EmailModel $emailModel */
+        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
+
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $id     = $email->getId();
+        $result = $emailModel->getContextEntity($id);
+
+        $this->assertSame($email, $result);
+    }
 }
