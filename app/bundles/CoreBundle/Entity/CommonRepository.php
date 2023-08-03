@@ -695,11 +695,6 @@ class CommonRepository extends ServiceEntityRepository
         // Get the label column if necessary
         if (null == $labelColumn) {
             $labelColumn = $reflection->hasMethod('getTitle') ? 'title' : 'name';
-            if ($reflection->hasMethod('getTitle')) {
-                $labelColumn = 'title';
-            } else {
-                $labelColumn = 'name';
-            }
         }
 
         $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
