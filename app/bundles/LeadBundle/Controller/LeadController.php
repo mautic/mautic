@@ -393,19 +393,7 @@ class LeadController extends FormController
         \assert($leadNoteModel instanceof NoteModel);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
-
-        try {
-            $emailDaysData  = $this->getEmailDaysData($lead);
-            $emailHoursData = $this->getEmailHoursData($lead);
-        } catch (Exception $e) {
-            $emailDaysData = $emailHoursData = [];
-
-            $this->addFlashMessage(
-                'Failed to load email statistics charts',
-                [],
-                'error'
-            );
-        }
+        $emailTimeStats       = $this->getLeadEmailTimeStats($lead);
 
         return $this->delegateView(
             [
@@ -422,8 +410,8 @@ class LeadController extends FormController
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
-                    'emailDaysData'     => $emailDaysData,
-                    'emailHoursData'    => $emailHoursData,
+                    'emailDaysData'     => $emailTimeStats['days'] ?? [],
+                    'emailHoursData'    => $emailTimeStats['hours'] ?? [],
                     'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'           => $leadDeviceRepository->getLeadDevices($lead),
@@ -452,6 +440,27 @@ class LeadController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * @return array{}|array<string, array<string, array<int, array<string, array<int, string>|bool|string>|string>>>
+     */
+    public function getLeadEmailTimeStats(Lead $lead): array
+    {
+        $stats = [];
+
+        try {
+            $stats['days']  = $this->getEmailDaysData($lead);
+            $stats['hours'] = $this->getEmailHoursData($lead);
+        } catch (Exception $e) {
+            $this->addFlashMessage(
+                'Failed to load email statistics charts',
+                [],
+                'error'
+            );
+        }
+
+        return $stats;
     }
 
     /**

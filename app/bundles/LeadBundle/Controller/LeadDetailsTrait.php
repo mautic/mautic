@@ -199,7 +199,7 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return array<string, array<int, string|array<string, string|bool|array<int,string>>>>
+     * @return array<string, array<int, array<string, array<int, string>|bool|string>|string>>>
      *
      * @throws Exception
      */
@@ -229,7 +229,7 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return array<string, array<int, string|array<string, string|bool|array<int,string>>>>
+     * @return array<string, array<int, array<string, array<int, string>|bool|string>|string>>>
      *
      * @throws Exception
      */
