@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
- * @extends AbstractCountryMapController<CampaignModel>
+ * @extends AbstractCountryMapController<Campaign>
  */
 class CampaignMapStatsController extends AbstractCountryMapController
 {

@@ -843,7 +843,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @throws Exception
      */
-    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo): array
+    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
@@ -857,5 +857,15 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
         $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         return $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
+    }
+
+    /**
+     * Get context entity.
+     *
+     * @return Campaign|null
+     */
+    public function getContextEntity(int $id = null): ?object
+    {
+        return $this->getEntity($id);
     }
 }

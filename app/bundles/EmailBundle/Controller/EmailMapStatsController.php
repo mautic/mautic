@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * @extends AbstractCountryMapController<EmailModel>
+ * @extends AbstractCountryMapController<Email>
  */
 class EmailMapStatsController extends AbstractCountryMapController
 {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\MapHelper;
+use Mautic\CoreBundle\Model\MapModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +21,9 @@ abstract class AbstractCountryMapController extends AbstractController
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
     /**
-     * @var S
+     * @var MapModelInterface<S>
      */
-    protected $model;
+    protected MapModelInterface $model;
 
     /**
      * @template T
@@ -58,7 +59,7 @@ abstract class AbstractCountryMapController extends AbstractController
         string $dateFrom = '',
         string $dateTo = ''
     ): Response {
-        $entity = $this->model->getEntity($objectId);
+        $entity = $this->model->getContextEntity($objectId);
 
         if (empty($entity) || !$this->hasAccess($security, $entity)) {
             throw new AccessDeniedHttpException();

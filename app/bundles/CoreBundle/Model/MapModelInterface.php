@@ -20,5 +20,10 @@ interface MapModelInterface
      *
      * @throws Exception
      */
-    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo): array;
+    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array;
+
+    /**
+     * Get a specific entity.
+     */
+    public function getContextEntity(int $id = null): ?object;
 }
