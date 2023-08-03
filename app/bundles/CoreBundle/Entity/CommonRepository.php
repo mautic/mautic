@@ -710,7 +710,9 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         if (!empty($parameters)) {
-            $q->setParameters($parameters);
+            foreach ($parameters as $key => $value) {
+                $q->setParameter($key, $value, is_array($value) ? Connection::PARAM_STR_ARRAY : null);
+            }
         }
 
         // Published only
