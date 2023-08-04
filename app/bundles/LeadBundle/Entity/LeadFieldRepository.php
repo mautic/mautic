@@ -12,6 +12,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class LeadFieldRepository extends CommonRepository
 {
+    /**
+     * @var array<int|string, array<string,mixed>>|null
+     */
     private static ?array $fields;
 
     /**
