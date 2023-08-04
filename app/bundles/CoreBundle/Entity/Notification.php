@@ -52,7 +52,7 @@ class Notification
     /**
      * @var string|null
      */
-    protected $deduplicate;
+    protected $deduplicate = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
@@ -220,5 +220,10 @@ class Notification
     public function setDeduplicate(?string $deduplicate): void
     {
         $this->deduplicate = $deduplicate;
+    }
+
+    public function getDeduplicate(): ?string
+    {
+        return $this->deduplicate;
     }
 }

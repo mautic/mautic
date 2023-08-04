@@ -351,7 +351,6 @@ class SalesforceApi extends CrmApi
      * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
      *
      * @param string $queryUrl
-     * @param        $object
      *
      * @return mixed|string
      *

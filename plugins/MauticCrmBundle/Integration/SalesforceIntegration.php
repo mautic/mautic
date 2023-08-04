@@ -2,9 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use DateTime;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\ORMException;
 use Exception;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
@@ -14,7 +12,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\UserBundle\Entity\User;
@@ -25,7 +22,6 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFet
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -977,7 +973,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $type
      * @param bool   $preventUnreadDuplicates prevent unread duplicates
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function upsertUnreadAdminsNotification($header, $message, $type = 'error', $preventUnreadDuplicates = true)
     {
@@ -1010,7 +1006,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 $notification = clone $notificationTemplate;
-                $notification->setDateAdded(new DateTime());   // not sure what date to use
+                $notification->setDateAdded(new \DateTime());   // not sure what date to use
             }
 
             $persistEntities[] = $notification;
@@ -1028,7 +1024,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     private function getAdminUsers()
     {
         $userRepository = $this->getEntityManager()->getRepository(User::class);
-        $adminRole      = $this->getEntityManager()->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+        $adminRole      = $this->getEntityManager()->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
 
         return $userRepository->findBy(
             [
