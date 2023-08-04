@@ -845,6 +845,7 @@ return [
                     'setListLeadRepository' => [
                         '@mautic.lead.repository.list_lead',
                     ],
+                    'setInitiateFields' => [],
                 ],
             ],
             'mautic.lead.repository.list_lead' => [
