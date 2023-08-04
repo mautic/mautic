@@ -56,8 +56,6 @@ trait DynamicContentEntityTrait
     }
 
     /**
-     * @param $dynamicContent
-     *
      * @return $this
      */
     public function setDynamicContent($dynamicContent)

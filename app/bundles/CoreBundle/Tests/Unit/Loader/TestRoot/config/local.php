@@ -1,5 +1,5 @@
 <?php
 
 $parameters = [
-    'mailer_host' => 'foobar.com',
+    'mailer_dsn' => 'foobar.com',
 ];

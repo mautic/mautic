@@ -55,7 +55,6 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
 
         $filterMe = [
             'transifex_password' => 'dhjsakjfda',
-            'mailer_api_key'     => 'fsjkdah',
             'mailer_is_owner'    => 'lksajhd',
         ];
 

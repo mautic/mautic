@@ -21,7 +21,7 @@ class ConnectionWrapper extends Connection
         }
 
         $params['host']     = $dbParams['host'];
-        $params['port']     = $dbParams['port'];
+        $params['port']     = (int) $dbParams['port'];
         $params['dbname']   = $dbParams['name'];
         $params['user']     = $dbParams['user'];
         $params['password'] = $dbParams['password'];

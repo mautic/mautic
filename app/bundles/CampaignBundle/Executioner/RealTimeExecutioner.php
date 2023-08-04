@@ -236,8 +236,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param $type
-     *
      * @throws CampaignNotExecutableException
      */
     private function fetchCampaignData($type)

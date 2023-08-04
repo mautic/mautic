@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -30,44 +30,44 @@ class UtmTag
     private $query = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $referer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmCampaign;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmContent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmMedium;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmSource;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmTerm;
 
@@ -80,22 +80,20 @@ class UtmTag
         $builder->addId();
         $builder->addDateAdded();
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
-        $builder->addNullableField('query', Type::TARRAY);
-        $builder->addNullableField('referer', Type::TEXT);
-        $builder->addNullableField('remoteHost', Type::STRING, 'remote_host');
-        $builder->addNullableField('url', Type::TEXT);
-        $builder->addNullableField('userAgent', Type::TEXT, 'user_agent');
-        $builder->addNullableField('utmCampaign', Type::STRING, 'utm_campaign');
-        $builder->addNullableField('utmContent', Type::STRING, 'utm_content');
-        $builder->addNullableField('utmMedium', Type::STRING, 'utm_medium');
-        $builder->addNullableField('utmSource', Type::STRING, 'utm_source');
-        $builder->addNullableField('utmTerm', Type::STRING, 'utm_term');
+        $builder->addNullableField('query', Types::ARRAY);
+        $builder->addNullableField('referer', Types::TEXT);
+        $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');
+        $builder->addNullableField('url', Types::TEXT);
+        $builder->addNullableField('userAgent', Types::TEXT, 'user_agent');
+        $builder->addNullableField('utmCampaign', Types::STRING, 'utm_campaign');
+        $builder->addNullableField('utmContent', Types::STRING, 'utm_content');
+        $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
+        $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
+        $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

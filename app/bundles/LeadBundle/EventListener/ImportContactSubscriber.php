@@ -81,6 +81,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 'stage'          => 'mautic.lead.import.label.stage',
                 'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
                 'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+                'tags'           => 'mautic.lead.import.label.tags',
             ];
 
             // Add ID to lead fields to allow matching import contacts by identifier

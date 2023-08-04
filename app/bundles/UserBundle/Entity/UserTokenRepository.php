@@ -66,7 +66,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
 
         return (int) $qb
             ->where('ut.expiration <= :current_datetime')
-            ->setParameter(':current_datetime', new \DateTime())
+            ->setParameter('current_datetime', new \DateTime())
             ->getQuery()
             ->execute();
     }

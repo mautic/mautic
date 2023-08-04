@@ -31,8 +31,6 @@ abstract class AbstractNotificationApi
     abstract public function send(string $endpoint, array $data): ResponseInterface;
 
     /**
-     * @param $id
-     *
      * @return mixed
      */
     abstract public function sendNotification($id, Notification $notification);

@@ -46,9 +46,6 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      *
-     * @param $leadId
-     * @param $companyId
-     *
      * @return array
      */
     public function getCompaniesByLeadId($leadId, $companyId = null)
@@ -71,8 +68,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param $companyId
-     *
      * @return array
      */
     public function getCompanyLeads($companyId)
@@ -82,14 +77,12 @@ class CompanyLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
 
         $q->where($q->expr()->eq('cl.company_id', ':company'))
-            ->setParameter(':company', $companyId);
+            ->setParameter('company', $companyId);
 
         return $q->execute()->fetchAllAssociative();
     }
 
     /**
-     * @param $leadId
-     *
      * @return array
      */
     public function getLatestCompanyForLead($leadId)
@@ -108,18 +101,14 @@ class CompanyLeadRepository extends CommonRepository
         return !empty($result) ? $result[0] : [];
     }
 
-    /**
-     * @param $leadId
-     * @param $companyId
-     */
     public function getCompanyLeadEntity($leadId, $companyId)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->where(
-                    $qb->expr()->eq('cl.lead_id', ':leadId'),
-                    $qb->expr()->eq('cl.company_id', ':companyId')
+                $qb->expr()->eq('cl.lead_id', ':leadId'),
+                $qb->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 
@@ -153,14 +142,14 @@ class CompanyLeadRepository extends CommonRepository
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
-            ->setParameter(':companyId', $company->getId())
+            ->setParameter('companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
         $leadIds = $q->execute()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
             ->set('company', ':company')
-            ->setParameter(':company', $company->getName())
+            ->setParameter('company', $company->getName())
             ->where(
                 $q->expr()->in('id', $leadIds)
             )->execute();

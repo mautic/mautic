@@ -50,7 +50,7 @@
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0">{{ list.description }}</div>
+                        <div class="text-white dark-sm mb-0">{{ list.description|purify }}</div>
                     </div>
                 </div>
             </div>
@@ -159,7 +159,7 @@
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0 page-list"
                  id="contacts-container"
-                 data-target-url="{{ url('mautic_segment_contacts', {'objectId': list.id, 'page': app.session.get('mautic.segment.contact.page', 1)}) }}">
+                 data-target-url="{{ path('mautic_segment_contacts', {'objectId': list.id, 'page': app.session.get('mautic.segment.contact.page', 1)}) }}">
               <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
 

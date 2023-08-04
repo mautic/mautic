@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\PointBundle\Entity\Group;
 
 /**
  * Class PointsChangeLog.
@@ -11,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class PointsChangeLog
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -50,6 +51,8 @@ class PointsChangeLog
      */
     private $dateAdded;
 
+    private ?Group $group = null;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -78,6 +81,10 @@ class PointsChangeLog
 
         $builder->addField('delta', 'integer');
 
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
+
         $builder->addDateAdded();
     }
 
@@ -88,7 +95,7 @@ class PointsChangeLog
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -253,5 +260,15 @@ class PointsChangeLog
     public function getIpAddress()
     {
         return $this->ipAddress;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(Group $group): void
+    {
+        $this->group = $group;
     }
 }

@@ -2,17 +2,28 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Swift_Events_EventListener;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 
-class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Transport
+class BcInterfaceTokenTransport implements TransportInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
+    private $transports = []; // @phpstan-ignore-line
+
     private $fromAddresses = [];
-    private $metadatas     = [];
-    private $validate      = false;
-    private $maxRecipients;
+
+    private $metadatas = [];
+
+    private $validate = false;
+
     private $numberToFail;
+
     private $message;
 
     /**
@@ -20,96 +31,44 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
      *
      * @param bool $validate
      */
-    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
+    public function __construct($validate = false, $numberToFail = 1)
     {
-        $this->validate      = $validate;
-        $this->maxRecipients = $maxRecipients;
-        $this->numberToFail  = (int) $numberToFail;
+        $this->validate           = $validate;
+        $this->numberToFail       = (int) $numberToFail;
+        $this->transports['main'] = $this;
     }
 
-    /**
-     * @param null $failedRecipients
-     */
-    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
+        $address = null;
+        if ($message instanceof Email) {
+            $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        }
+
         $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
+        $this->fromAddresses[] = $address;
         $this->metadatas[]     = $this->getMetadata();
 
-        return true;
+        return null;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxBatchLimit()
-    {
-        return $this->maxRecipients;
-    }
-
-    /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
-    {
-        $to      = $message->getTo();
-        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
-
-        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFromAddresses()
+    public function getFromAddresses(): array
     {
         return $this->fromAddresses;
     }
 
-    /**
-     * @return array
-     */
-    public function getMetadatas()
+    public function getMetadatas(): array
     {
         return $this->metadatas;
     }
 
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : [];
     }
 
-    /**
-     * @return bool
-     */
-    public function isStarted()
+    public function __toString(): string
     {
-        return true;
-    }
-
-    public function stop()
-    {
-        // ignore
-    }
-
-    public function registerPlugin(Swift_Events_EventListener $plugin)
-    {
-        // ignore
-    }
-
-    public function start()
-    {
-        // ignore
-    }
-
-    /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
+        return 'BcInterface';
     }
 }

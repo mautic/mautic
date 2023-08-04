@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -58,7 +57,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws SegmentNotFoundException
      * @throws SegmentQueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
@@ -76,7 +75,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $exclusion = in_array($filter->getOperator(), ['notExists', 'notIn']);
 
             /** @var LeadList $contactSegment */
-            $contactSegment = $this->entityManager->getRepository('MauticLeadBundle:LeadList')->find($segmentId);
+            $contactSegment = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\LeadList::class)->find($segmentId);
             if (!$contactSegment) {
                 throw new SegmentNotFoundException(sprintf('Segment %d used in the filter does not exist anymore.', $segmentId));
             }
@@ -119,7 +118,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         if (count($orLogic)) {
-            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), CompositeExpression::TYPE_AND);
+            $queryBuilder->addLogic(new CompositeExpression(CompositeExpression::TYPE_OR, $orLogic), $filter->getGlue());
         }
 
         return $queryBuilder;

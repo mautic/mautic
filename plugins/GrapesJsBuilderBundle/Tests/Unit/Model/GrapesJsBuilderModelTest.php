@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -13,6 +16,9 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -32,7 +38,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         };
 
         $emailRepository                = new class() extends EmailRepository {
-            public $saveEntityCallCount = 0;
+            public int $saveEntityCallCount = 0;
 
             public function __construct()
             {
@@ -41,13 +47,15 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             public function saveEntity($entity, $flush = true)
             {
                 ++$this->saveEntityCallCount;
+
+                return 0;
             }
         };
 
         $emailModel = $this->getEmailModel($emailRepository);
 
         $grapesJsBuilderRepository      = new class() extends GrapesJsBuilderRepository {
-            public $saveEntityCallCount = 0;
+            public int $saveEntityCallCount = 0;
 
             public function __construct()
             {
@@ -61,11 +69,13 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             public function saveEntity($entity, $flush = true)
             {
                 ++$this->saveEntityCallCount;
+
+                return 0;
             }
         };
 
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
-            private $grapesJsBuilderRepository;
+            private GrapesJsBuilderRepository $grapesJsBuilderRepository;
 
             public function __construct(GrapesJsBuilderRepository $grapesJsBuilderRepository)
             {
@@ -76,15 +86,24 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
-                return $this->grapesJsBuilderRepository;
+                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
             }
         };
 
         $email = new Email();
 
-        $grapeJsBuilderModel = new GrapesJsBuilderModel($requestStack, $emailModel);
-        $grapeJsBuilderModel->setEntityManager($entityManager);
-        $grapeJsBuilderModel->setTranslator($this->getTranslator());
+        $grapeJsBuilderModel = new GrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(Router::class),
+            $this->getTranslator(),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
+        );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
 
@@ -117,7 +136,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         };
 
         $emailRepository                = new class() extends EmailRepository {
-            public $saveEntityCallCount = 0;
+            public int $saveEntityCallCount = 0;
 
             public function __construct()
             {
@@ -131,13 +150,15 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 ++$this->saveEntityCallCount;
 
                 Assert::assertSame('</html>', $entity->getCustomHtml());
+
+                return 0;
             }
         };
 
         $emailModel = $this->getEmailModel($emailRepository);
 
         $grapesJsBuilderRepository      = new class() extends GrapesJsBuilderRepository {
-            public $saveEntityCallCount = 0;
+            public int $saveEntityCallCount = 0;
 
             public function __construct()
             {
@@ -156,11 +177,13 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 ++$this->saveEntityCallCount;
 
                 Assert::assertSame('</mjml>', $entity->getCustomMjml());
+
+                return 0;
             }
         };
 
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
-            private $grapesJsBuilderRepository;
+            private GrapesJsBuilderRepository $grapesJsBuilderRepository;
 
             public function __construct(GrapesJsBuilderRepository $grapesJsBuilderRepository)
             {
@@ -171,15 +194,24 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
-                return $this->grapesJsBuilderRepository;
+                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
             }
         };
 
         $email = new Email();
 
-        $grapeJsBuilderModel = new GrapesJsBuilderModel($requestStack, $emailModel);
-        $grapeJsBuilderModel->setEntityManager($entityManager);
-        $grapeJsBuilderModel->setTranslator($this->getTranslator());
+        $grapeJsBuilderModel = new GrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(Router::class),
+            $this->getTranslator(),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
+        );
 
         $grapeJsBuilderModel->addOrEditEntity($email);
 
@@ -191,7 +223,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
     private function getEmailModel(EmailRepository $emailRepository): EmailModel
     {
         return new class($emailRepository) extends EmailModel {
-            private $emailRepository;
+            private EmailRepository $emailRepository;
 
             public function __construct(EmailRepository $emailRepository)
             {

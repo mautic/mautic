@@ -2,9 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
-use Exception;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -27,7 +26,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
@@ -77,7 +76,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 break;
             case 'neq':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->$filterOperator(
                         $tableAlias.'.'.$filter->getField(),
@@ -94,18 +93,18 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'lt':
             case 'lte':
             case 'in':
-            case 'between':   //Used only for date with week combination (EQUAL [this week, next week, last week])
+            case 'between':   // Used only for date with week combination (EQUAL [this week, next week, last week])
             case 'regexp':
-            case 'notRegexp': //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
                 $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
                 break;
             case 'notLike':
-            case 'notBetween': //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
+            case 'notBetween': // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             case 'notIn':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->$filterOperator($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
@@ -118,10 +117,10 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $queryBuilder->expr()->andX($expressions);
+                $expression = $queryBuilder->expr()->and(...$expressions);
                 break;
             default:
-                throw new Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         $queryBuilder->addLogic($expression, $filter->getGlue());

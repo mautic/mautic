@@ -98,7 +98,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
                 }
             }
-            $event->setTemplate('@MauticReport/SubscribedEvents\Dashboard/widget.html.twig');
+            $event->setTemplate('@MauticReport/SubscribedEvents/Dashboard/widget.html.twig');
             $event->stopPropagation();
         }
     }

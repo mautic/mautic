@@ -25,7 +25,7 @@ class Plugin extends CommonEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -50,17 +50,17 @@ class Plugin extends CommonEntity
     private $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $version;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $author;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
      */
     private $integrations;
 
@@ -201,7 +201,7 @@ class Plugin extends CommonEntity
      */
     public function hasSecondaryDescription()
     {
-        return preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
+        return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
     /**

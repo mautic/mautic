@@ -15,14 +15,14 @@ class ListChangeEvent extends Event
     private $leads;
     private $list;
     private $added;
+    private ?\DateTime $date;
 
     /**
      * ListChangeEvent constructor.
      *
-     * @param      $leads
      * @param bool $added
      */
-    public function __construct($leads, LeadList $list, $added = true)
+    public function __construct($leads, LeadList $list, $added = true, \DateTime $date = null)
     {
         if (is_array($leads)) {
             $this->leads = $leads;
@@ -31,6 +31,7 @@ class ListChangeEvent extends Event
         }
         $this->list  = $list;
         $this->added = $added;
+        $this->date  = $date;
     }
 
     /**
@@ -75,5 +76,10 @@ class ListChangeEvent extends Event
     public function wasRemoved()
     {
         return !$this->added;
+    }
+
+    public function getDate(): ?\DateTime
+    {
+        return $this->date;
     }
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
-use Exception;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
@@ -91,7 +89,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -110,7 +108,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',
@@ -131,7 +129,7 @@ final class InstallCommandTest extends AbstractMauticTestCase
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $this->testSymfonyCommand(
             'mautic:marketplace:install',

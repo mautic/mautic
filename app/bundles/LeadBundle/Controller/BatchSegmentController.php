@@ -2,27 +2,28 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
-    private $actionModel;
-
-    private $segmentModel;
-
-    public function __construct(CorePermissions $security, UserHelper $userHelper, SegmentActionModel $segmentModel, ListModel $listModel)
+    public function __construct(private SegmentActionModel $segmentActionModel, private ListModel $segmentModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        parent::__construct($security, $userHelper);
-
-        $this->actionModel  = $listModel;
-        $this->segmentModel = $segmentModel;
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -40,11 +41,11 @@ class BatchSegmentController extends AbstractFormController
             $segmentsToRemove = $params['remove'] ?? [];
 
             if ($segmentsToAdd) {
-                $this->actionModel->addContacts($contactIds, $segmentsToAdd);
+                $this->segmentActionModel->addContacts($contactIds, $segmentsToAdd);
             }
 
             if ($segmentsToRemove) {
-                $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+                $this->segmentActionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
