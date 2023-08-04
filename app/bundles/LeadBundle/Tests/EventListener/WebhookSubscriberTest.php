@@ -103,11 +103,12 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testWebhookIsNotDeliveredIfContactIsWithoutChanges(): void
     {
         $mockModel  = $this->createMock(WebhookModel::class);
+        $leadModel  = $this->createMock(LeadModel::class);
 
         $mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($mockModel);
+        $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel);
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
