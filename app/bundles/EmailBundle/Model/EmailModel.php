@@ -1884,8 +1884,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
-        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
+
+        $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
+        $columnWithTimezone    = 't.'.$column;
+        $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
+        $columnName            = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
+        $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
         ->groupBy('hour')
         ->orderBy('count', 'DESC')
         ->setMaxResults(24);
