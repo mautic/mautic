@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
-class CustomMappedDecorator extends BaseDecorator
+class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorForeignInterface
 {
     /**
      * @var ContactSegmentFilterDictionary
@@ -82,7 +82,7 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -92,6 +92,20 @@ class CustomMappedDecorator extends BaseDecorator
             return $this->dictionary->getFilterProperty($originalField, 'where');
         } catch (FilterNotFoundException $e) {
             return parent::getWhere($contactSegmentFilterCrate);
+        }
+    }
+
+    /**
+     * Get foreign table field used in JOIN condition.
+     */
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
+    {
+        $originalField = $contactSegmentFilterCrate->getField();
+
+        try {
+            return $this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
+        } catch (FilterNotFoundException $e) {
+            return 'lead_id';
         }
     }
 }

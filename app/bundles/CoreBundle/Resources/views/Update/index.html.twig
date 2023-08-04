@@ -49,11 +49,11 @@
                           </table>
                           {%- if isComposerEnabled %}
                           <div class="alert alert-warning text-center">
-                              <strong>{{ 'mautic.core.update.composer'|trans|raw }}</strong>
+                              <strong>{{ 'mautic.core.update.composer'|trans|purify }}</strong>
                           </div>
                           {%- else %}
                           <div class="alert alert-warning text-center">
-                              <strong>{{ 'mautic.core.update.ui.deprecated'|trans|raw }}</strong>
+                              <strong>{{ 'mautic.core.update.ui.deprecated'|trans|purify }}</strong>
                           </div>
                           <div class="text-right">
                               <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '');">{{ 'mautic.core.update.now'|trans }}</button>

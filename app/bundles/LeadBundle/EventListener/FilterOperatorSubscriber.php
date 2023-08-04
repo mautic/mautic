@@ -100,7 +100,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$this->isForSegmentation($event)) {
+        if (!$event->isForSegmentation()) {
             return;
         }
 
@@ -326,7 +326,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$this->isForSegmentation($event)) {
+        if (!$event->isForSegmentation()) {
             return;
         }
 
@@ -590,30 +590,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         foreach ($choices as $alias => $fieldOptions) {
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
-    }
-
-    private function isForSegmentation(LeadListFiltersChoicesEvent $event): bool
-    {
-        $route = (string) $event->getRoute();
-
-        // segment form
-        if ('mautic_segment_action' === $route) {
-            return true;
-        }
-
-        // segment API
-        if (0 === strpos($route, 'mautic_api_lists')) {
-            return true;
-        }
-
-        // ajax request to load the filter's value fields
-        $request = $event->getRequest();
-        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
-            return true;
-        }
-
-        // something else such as dynanmic content
-        return false;
     }
 
     private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void

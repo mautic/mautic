@@ -8,7 +8,6 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
@@ -80,7 +79,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $isTransactionActive = $this->connection->isTransactionActive();
 
-        if ($isTransactionActive) {
+        if ($isTransactionActive && $this->useCleanupRollback) {
             $this->insertRollbackCheckData();
             $this->connection->rollback();
         }

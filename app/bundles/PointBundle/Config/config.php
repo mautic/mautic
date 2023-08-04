@@ -15,6 +15,14 @@ return [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
+            'mautic_point.group_index' => [
+                'path'       => '/points/groups/{page}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::indexAction',
+            ],
+            'mautic_point.group_action' => [
+                'path'       => '/points/groups/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
+            ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
@@ -63,7 +71,7 @@ return [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
                 'iconClass' => 'fa-calculator',
-                'access'    => ['point:points:view', 'point:triggers:view'],
+                'access'    => ['point:points:view', 'point:triggers:view', 'point:groups:view'],
                 'priority'  => 30,
                 'children'  => [
                     'mautic.point.menu.index' => [
@@ -73,6 +81,10 @@ return [
                     'mautic.point.trigger.menu.index' => [
                         'route'  => 'mautic_pointtrigger_index',
                         'access' => 'point:triggers:view',
+                    ],
+                    'mautic.point.group.menu.index' => [
+                        'route'  => 'mautic_point.group_index',
+                        'access' => 'point:groups:view',
                     ],
                 ],
             ],
@@ -84,31 +96,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.point.model.point' => [
-                'class'     => \Mautic\PointBundle\Model\PointModel::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.factory',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.point.model.triggerevent' => [
-                'class' => \Mautic\PointBundle\Model\TriggerEventModel::class,
-            ],
-            'mautic.point.model.trigger' => [
-                'class'     => \Mautic\PointBundle\Model\TriggerModel::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.point.model.triggerevent',
-                    'mautic.factory',
-                    'mautic.tracker.contact',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.point.repository.lead_point_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,

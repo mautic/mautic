@@ -75,4 +75,27 @@ Mautic.resetEmailsToNotification = function(obj) {
     }
 };
 
+Mautic.configDnsTestExecute = function(element, action, key) {
+    const $button = mQuery(element),
+        $container = $button.closest('.config-dsn-container');
+
+    $container.find('.fa-spinner').removeClass('hide');
+
+    Mautic.ajaxActionRequest(action, {key: key}, function(response) {
+        const theClass = (response.success) ? 'has-success' : 'has-error',
+            theMessage = response.message;
+        $container.find('.config-dsn-test-container').removeClass('has-success has-error').addClass(theClass);
+        $container.find('.help-block .status-msg').html(theMessage);
+        $container.find('.fa-spinner').addClass('hide');
+    });
+};
+
+Mautic.configDnsTestDisable = function(element) {
+    const $container = mQuery(element).closest('.config-dsn-container');
+
+    $container.find('.help-block .status-msg').html('');
+    $container.find('.help-block .save-config-msg').removeClass('hide');
+    $container.find('.config-dsn-test-button').prop('disabled', true).addClass('disabled');
+};
+
 mQuery(Mautic.observeConfigTabs);

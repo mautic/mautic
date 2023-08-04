@@ -132,9 +132,9 @@ class ContactSegmentService
     /**
      * @param mixed[] $batchLimiters
      */
-    public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters): QueryBuilder
+    public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters, bool $addNewContactsRestrictions = true): QueryBuilder
     {
-        $queryBuilder    = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $queryBuilder    = $this->getNewSegmentContactsQuery($segment, $batchLimiters, $addNewContactsRestrictions);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         // Prepend the DISTINCT to the beginning of the select array
@@ -152,7 +152,8 @@ class ContactSegmentService
         $distinct = is_array($join) && (0 < count($join)) ? 'DISTINCT ' : '';
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
-        $queryBuilder->setQueryPart('select', $select);
+        $queryBuilder->resetQueryPart('select');
+        $queryBuilder->select($select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -161,7 +162,7 @@ class ContactSegmentService
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->lte($leadsTableAlias.'.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime'])),
                     $queryBuilder->expr()->isNull($leadsTableAlias.'.date_added')
                 )
@@ -218,14 +219,16 @@ class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = []): QueryBuilder
+    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [], bool $addNewContactsRestrictions = true): QueryBuilder
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
             $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
+        if ($addNewContactsRestrictions) {
+            $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
+        }
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -316,7 +319,7 @@ class ContactSegmentService
         try {
             $start = microtime(true);
 
-            $result = $qb->execute()->fetchAssociative();
+            $result = $qb->executeQuery()->fetchAssociative();
 
             $end = microtime(true) - $start;
 
@@ -346,7 +349,7 @@ class ContactSegmentService
     {
         try {
             $start  = microtime(true);
-            $result = $qb->execute()->fetchAllAssociative();
+            $result = $qb->executeQuery()->fetchAllAssociative();
 
             $end = microtime(true) - $start;
 

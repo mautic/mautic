@@ -457,9 +457,7 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $request->query->all();
 
-        // Unset the clickthrough from the URL query
         $ct = $query['ct'] ?? null;
-        unset($query['ct']);
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -470,7 +468,7 @@ class PublicController extends CommonFormController
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $ipLookupHelper->getIpAddress();
 
-        if (isset($ct)) {
+        if ($ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
                 /** @var PageModel $pageModel */
@@ -560,12 +558,12 @@ class PublicController extends CommonFormController
                     $options['slides'] = [
                         [
                             'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
                             'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
                             'captionheader'    => 'Caption 2',
                         ],
                     ];

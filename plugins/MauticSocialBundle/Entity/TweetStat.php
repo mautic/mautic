@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -137,7 +138,7 @@ class TweetStat
 
         $builder->addNullableField('favoriteCount', 'integer', 'favorite_count');
         $builder->addNullableField('retweetCount', 'integer', 'retweet_count');
-        $builder->addNullableField('responseDetails', 'json', 'response_details');
+        $builder->addNullableField('responseDetails', Types::JSON, 'response_details');
     }
 
     /**
