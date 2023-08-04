@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -72,7 +71,7 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
     }
