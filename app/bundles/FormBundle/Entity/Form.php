@@ -546,6 +546,29 @@ class Form extends FormEntity
     }
 
     /**
+     * Loops through the form fields and returns an array of fields with mapped data.
+     *
+     * @return array<int, array<string, int|string>>
+     */
+    public function getMappedFieldValues(): array
+    {
+        return array_filter(
+            array_map(
+                function (Field $field) {
+                    return [
+                        'formFieldId'  => $field->getId(),
+                        'mappedObject' => $field->getMappedObject(),
+                        'mappedField'  => $field->getMappedField(),
+                    ];
+                },
+                $this->getFields()->getValues()
+            ),
+            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
+        );
+    }
+
+    /**
+     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]
