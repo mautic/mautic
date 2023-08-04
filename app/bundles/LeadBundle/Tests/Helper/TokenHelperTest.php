@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
@@ -30,18 +31,24 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             'date_format_timeonly' => 'g:i a',
         ]);
 
-        $reflectionProperty = new ReflectionProperty(LeadRepository::class, 'initiateFields');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue([
+        $fields = [
             'select' => [
-                'type'      => 'select',
-                'properties'=> 'a:1:{s:4:"list";a:2:{i:0;a:2:{s:5:"label";s:12:"First option";s:5:"value";s:5:"first";}i:1;a:2:{s:5:"label";s:13:"Second option";s:5:"value";s:6:"second";}}}',
+                'type'       => 'select',
+                'properties' => 'a:1:{s:4:"list";a:2:{i:0;a:2:{s:5:"label";s:12:"First option";s:5:"value";s:5:"first";}i:1;a:2:{s:5:"label";s:13:"Second option";s:5:"value";s:6:"second";}}}',
             ],
-            'bool' => [
-                'type'      => 'boolean',
-                'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
+            'bool'   => [
+                'type'       => 'boolean',
+                'properties' => 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
             ],
-        ]);
+        ];
+        $leadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $leadFieldRepository
+            ->method('getFields')
+            ->willReturn($fields);
+
+        $reflectionProperty = new \ReflectionProperty(LeadRepository::class, 'leadFieldRepository');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($leadFieldRepository);
 
         parent::setUp();
     }
