@@ -38,7 +38,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param        $operation
      * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
@@ -88,7 +87,7 @@ class SalesforceApi extends CrmApi
     public function getLeadFields($object = null)
     {
         if ('company' == $object) {
-            $object = 'Account'; //salesforce object name
+            $object = 'Account'; // salesforce object name
         }
 
         return $this->request('describe', [], 'GET', false, $object);
@@ -108,7 +107,7 @@ class SalesforceApi extends CrmApi
             'Lead'    => [],
         ];
 
-        //try searching for lead as this has been changed before in updated done to the plugin
+        // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
             unset($fields[array_search('HasOptedOutOfEmail', (array) $fields)]);
@@ -153,7 +152,7 @@ class SalesforceApi extends CrmApi
 
         $appendToQuery = '';
 
-        //try searching for lead as this has been changed before in updated done to the plugin
+        // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
             $fields = $this->integration->getFieldsForQuery('Account');
 
@@ -197,8 +196,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $sfObject
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -217,9 +214,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $sfObject
-     * @param $sfObjectId
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -248,8 +242,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $object
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -444,7 +436,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param      $campaignId
      * @param null $modifiedSince
      * @param null $queryUrl
      *
@@ -477,9 +468,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
-     * @param $object
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -504,8 +492,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -546,8 +532,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $requiredFieldString
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -575,7 +559,17 @@ class SalesforceApi extends CrmApi
             }
 
             foreach ($response as $lineItem) {
-                if (is_array($lineItem) && !empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
+                if (!is_array($lineItem)) {
+                    continue;
+                }
+                $lineItemForInvalidSession              = $lineItem;
+                $lineItemForInvalidSession['errorCode'] = 'INVALID_SESSION_ID';
+                if (!empty($lineItemForInvalidSession['message']) && false !== strpos($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
+                    $errors[] = $error;
+                    continue;
+                }
+
+                if (!empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
                     $errors[] = $error;
                 }
             }
@@ -587,8 +581,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $isRetry
-     *
      * @return string|false
      *
      * @throws ApiErrorException
@@ -613,8 +605,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $isRetry
-     *
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
@@ -648,8 +638,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $value
-     *
      * @return bool|float|mixed|string
      */
     private function escapeQueryValue($value)
@@ -658,11 +646,11 @@ class SalesforceApi extends CrmApi
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
         $value = str_replace('\\', '\\\\', $value);
 
-        // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
         // Apply general formatting/cleanup
         $value = $this->integration->cleanPushData($value);
+
+        // Escape single quotes
+        $value = str_replace("'", "\'", $value);
 
         return $value;
     }

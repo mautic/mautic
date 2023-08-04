@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper;
 
 /**
@@ -19,8 +10,6 @@ class RequestUrl
     /**
      * Correctly generate the URL based on given URL parts.
      *
-     * @param      $apiUrl
-     * @param      $queryUrl
      * @param null $operation
      * @param null $object
      *

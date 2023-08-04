@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -62,7 +53,7 @@ class Trackable
 
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->build();
 
         $builder->addField('channel', 'string');
@@ -74,8 +65,6 @@ class Trackable
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

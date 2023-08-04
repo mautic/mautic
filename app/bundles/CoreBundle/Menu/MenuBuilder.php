@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -55,9 +46,6 @@ class MenuBuilder
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     *
      * @return mixed
      */
     public function __call($name, $arguments)
@@ -82,13 +70,13 @@ class MenuBuilder
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
-                    //current match
+                    // current match
                     return $item;
                 } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
-                    //route uri match
+                    // route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
-                    //route name match
+                    // route name match
                     return $item;
                 }
 
@@ -97,15 +85,13 @@ class MenuBuilder
                 }
             }
         } catch (\Exception $e) {
-            //do nothing
+            // do nothing
         }
 
         return null;
     }
 
     /**
-     * @param $name
-     *
      * @return mixed
      */
     private function buildMenu($name)
@@ -115,11 +101,16 @@ class MenuBuilder
         if (!isset($menus[$name])) {
             $loader = new ArrayLoader($this->factory);
 
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            // dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
+
+            // KNP Menu explicitly requires a menu name since v3
+            if (empty($menuItems['name'])) {
+                $menuItems['name'] = $name;
+            }
             $menus[$name] = $loader->load($menuItems);
         }
 

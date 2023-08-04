@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
@@ -91,7 +82,6 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
@@ -109,7 +99,8 @@ class FullObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -145,7 +136,6 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
@@ -163,7 +153,8 @@ class FullObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);

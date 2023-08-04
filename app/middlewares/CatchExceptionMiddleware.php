@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
@@ -18,7 +9,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 100;
+    public const PRIORITY = 100;
 
     /**
      * @var HttpKernelInterface

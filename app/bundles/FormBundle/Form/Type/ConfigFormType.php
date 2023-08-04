@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -37,12 +30,43 @@ class ConfigFormType extends AbstractType
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );
+
+        $builder->add(
+            'form_results_data_sources',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.form.config.form_results_data_sources',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.config.form_results_data_sources.tooltip',
+                ],
+                'data'       => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
+            ]
+        );
+
+        $builder->add(
+            'successful_submit_action',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.form.config.form.successful_submit_action_at_the_top'    => 'top',
+                    'mautic.form.config.form.successful_submit_action_at_the_bottom' => 'bottom',
+                ],
+                'label'             => 'mautic.form.config.form.successful_submit_action',
+                'required'          => true,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.config.form.successful_submit_action.tooltip',
+                ],
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formconfig';
     }

@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CacheBundle\Tests\EventListener;
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
@@ -35,10 +27,12 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->random  = sha1((string) time());
         $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)
             ->disableOriginalConstructor()
-            ->setMethods(['clear', 'getCacheAdapter', 'commit'])
+            ->onlyMethods(['clear', 'commit'])
+            ->addMethods(['getCacheAdapter'])
             ->getMock();
         $this->adapter->method('clear')->willReturn($this->random);
         $this->adapter->method('commit')->willReturn(null);
+        $this->adapter->method('getCacheAdapter')->willReturn('');
     }
 
     public function testClear(): void

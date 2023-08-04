@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -24,12 +15,12 @@ class DynamicContentLeadData extends CommonEntity
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 
@@ -39,7 +30,7 @@ class DynamicContentLeadData extends CommonEntity
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dataAdded;
 
@@ -80,7 +71,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -140,7 +131,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDataAdded()
     {

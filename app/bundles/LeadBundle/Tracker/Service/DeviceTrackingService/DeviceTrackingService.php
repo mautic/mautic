@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
@@ -149,13 +140,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     {
         $this->cookieHelper->deleteCookie('mautic_device_id');
         $this->cookieHelper->deleteCookie('mtc_id');
-        $this->cookieHelper->deleteCookie('mtc_sid');
     }
 
-    /**
-     * @return string|null
-     */
-    private function getTrackedIdentifier()
+    private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -176,10 +163,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $deviceTrackingId;
     }
 
-    /**
-     * @return string
-     */
-    private function getUniqueTrackingIdentifier()
+    private function getUniqueTrackingIdentifier(): string
     {
         do {
             $generatedIdentifier = $this->randomHelper->generate(23);
@@ -192,10 +176,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private function createTrackingCookies(LeadDevice $device)
     {
         // Device cookie
-        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
+        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000, sameSite: Cookie::SAMESITE_NONE);
 
         // Mainly for landing pages so that JS has the same access as 3rd party tracking code
-        $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null);
-        $this->cookieHelper->setCookie('mtc_sid', $device->getTrackingId(), null);
+        $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null, sameSite: Cookie::SAMESITE_NONE);
     }
 }

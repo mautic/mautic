@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -16,9 +7,11 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,18 +21,15 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $swiftMailer = $this->getMockBuilder(\Swift_Mailer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $tokens = [
             '{test}' => 'value',
         ];
 
-        $mailHelper = new MailHelper($mockFactory, $swiftMailer);
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()));
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
+        $email->setSubject('Test subject');
         $email->setCustomHtml(
             <<<'CONTENT'
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -101,7 +91,7 @@ CONTENT
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
             ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $dispatcher->addSubscriber($subscriber);
@@ -120,10 +110,11 @@ CONTENT
         );
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
-        $mailHelper->message->setBody($email->getCustomHtml());
+        $mailHelper->message->html($email->getCustomHtml());
+        $mailHelper->message->subject($email->getSubject());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
-        $parsedBody = $mailHelper->message->getBody();
+        $parsedBody = $mailHelper->message->getHtmlBody();
 
         $this->assertNotFalse(strpos($parsedBody, 'DEC value'));
         $this->assertNotFalse(strpos($parsedBody, 'value test We'));

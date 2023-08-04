@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,7 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DecisionExecutioner implements EventInterface
 {
-    const TYPE = 'decision';
+    public const TYPE = 'decision';
 
     /**
      * @var EventLogger
@@ -80,6 +71,7 @@ class DecisionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        \assert($config instanceof DecisionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
         $failedLogs        = [];
 
@@ -115,13 +107,11 @@ class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @param mixed $passthrough
-     *
      * @throws DecisionNotApplicableException
      */
-    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough = null)
+    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log)
     {
-        $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log, $passthrough);
+        $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log);
 
         if (!$decisionEvent->wasDecisionApplicable()) {
             throw new DecisionNotApplicableException('evaluation failed');

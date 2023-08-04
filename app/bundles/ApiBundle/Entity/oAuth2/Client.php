@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
-use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -34,7 +25,7 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     protected $users;
 
@@ -62,6 +53,11 @@ class Client extends BaseClient
      * @var array
      */
     protected $allowedGrantTypes;
+
+    /**
+     * @var Role|null
+     */
+    protected $role;
 
     public function __construct()
     {
@@ -106,6 +102,11 @@ class Client extends BaseClient
         $builder->createField('allowedGrantTypes', 'array')
             ->columnName('allowed_grant_types')
             ->build();
+
+        $builder->createManyToOne('role', 'Mautic\UserBundle\Entity\Role')
+            ->addJoinColumn('role_id', 'id', true, false)
+            ->cascadePersist()
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -124,10 +125,6 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -241,5 +238,25 @@ class Client extends BaseClient
     public function getUsers()
     {
         return $this->users;
+    }
+
+    /**
+     * Add Authorization Grant Type.
+     */
+    public function addGrantType(string $grantType): Client
+    {
+        $this->allowedGrantTypes[] = $grantType;
+
+        return $this;
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(Role $role): void
+    {
+        $this->role = $role;
     }
 }

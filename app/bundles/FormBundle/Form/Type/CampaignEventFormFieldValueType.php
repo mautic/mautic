@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\FormBundle\Model\FormModel;
@@ -110,14 +101,14 @@ class CampaignEventFormFieldValueType extends AbstractType
                             $options[$field->getAlias()] = [];
                             foreach ($list as $option) {
                                 if (is_array($option) && isset($option['value']) && isset($option['label'])) {
-                                    //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                                    // The select box needs values to be [value] => label format so make sure we have that style then put it in
                                     $options[$field->getAlias()][$option['value']] = $option['label'];
                                 } elseif (is_array($option)) {
                                     foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
                                 } elseif (!is_array($option)) {
-                                    //Kept here for BC
+                                    // Kept here for BC
                                     $options[$field->getAlias()][$option] = $option;
                                 }
                             }

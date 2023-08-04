@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -23,37 +14,37 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Notification
+     * @var Notification|null
      */
     private $notification;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateRead;
 
@@ -63,27 +54,27 @@ class Stat
     private $isClicked = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateClicked;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -93,7 +84,7 @@ class Stat
     private $tokens = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $clickCount;
 
@@ -103,7 +94,7 @@ class Stat
     private $clickDetails = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastClicked;
 
@@ -183,8 +174,6 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -258,11 +247,11 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -434,9 +423,6 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param $details
-     */
     public function addClickDetails($details)
     {
         $this->clickDetails[] = $details;
@@ -496,7 +482,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateRead()
     {

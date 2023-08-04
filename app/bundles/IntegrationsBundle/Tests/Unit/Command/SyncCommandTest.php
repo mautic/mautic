@@ -2,17 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
+use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
@@ -22,15 +14,10 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * This test must run in a separate process because it sets the global constant
- * MAUTIC_INTEGRATION_SYNC_IN_PROGRESS which breaks other tests.
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class SyncCommandTest extends TestCase
 {
+    use IsolatedTestTrait;
+
     private const INTEGRATION_NAME = 'Test';
 
     /**
@@ -73,6 +60,11 @@ class SyncCommandTest extends TestCase
         $this->assertSame(1, $this->commandTester->execute([]));
     }
 
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
     public function testExecuteWithSomeOptions(): void
     {
         $this->syncService->expects($this->once())
@@ -96,6 +88,11 @@ class SyncCommandTest extends TestCase
         $this->assertSame(0, $code);
     }
 
+    /**
+     * @runInSeparateProcess
+     *
+     * @preserveGlobalState disabled
+     */
     public function testExecuteWhenSyncThrowsException(): void
     {
         $this->syncService->expects($this->once())

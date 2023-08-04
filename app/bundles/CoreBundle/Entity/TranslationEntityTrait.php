@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var mixed
      **/
     private $translationParent;
 
@@ -41,7 +32,6 @@ trait TranslationEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      * @param string        $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
@@ -113,7 +103,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getTranslationParent()
     {
@@ -231,8 +221,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)

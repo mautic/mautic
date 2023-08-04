@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -17,13 +8,17 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -32,6 +27,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -41,13 +37,15 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 class FormTestAbstract extends TestCase
 {
@@ -57,9 +55,24 @@ class FormTestAbstract extends TestCase
     protected $formRepository;
     protected $leadFieldModel;
 
+    /**
+     * @var MockObject|LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var MockObject|FormFieldHelper
+     */
+    protected $fieldHelper;
+
+    /**
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
-        $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
+        $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
     }
 
     /**
@@ -67,21 +80,23 @@ class FormTestAbstract extends TestCase
      */
     protected function getFormModel()
     {
-        $requestStack         = $this->createMock(RequestStack::class);
-        $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelper::class);
-        $formActionModel      = $this->createMock(ActionModel::class);
-        $formFieldModel       = $this->createMock(FieldModel::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcher::class);
-        $translator           = $this->createMock(Translator::class);
-        $entityManager        = $this->createMock(EntityManager::class);
-        $formUploaderMock     = $this->createMock(FormUploader::class);
-        $contactTracker       = $this->createMock(ContactTracker::class);
-        $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
-        $this->formRepository = $this->createMock(FormRepository::class);
-        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+        $requestStack          = $this->createMock(RequestStack::class);
+        $twigMock              = $this->createMock(Environment::class);
+        $themeHelper           = $this->createMock(ThemeHelperInterface::class);
+        $formActionModel       = $this->createMock(ActionModel::class);
+        $formFieldModel        = $this->createMock(FieldModel::class);
+        $this->leadModel       = $this->createMock(LeadModel::class);
+        $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $dispatcher            = $this->createMock(EventDispatcher::class);
+        $translator            = $this->createMock(Translator::class);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $formUploaderMock      = $this->createMock(FormUploader::class);
+        $contactTracker        = $this->createMock(ContactTracker::class);
+        $this->leadFieldModel  = $this->createMock(LeadFieldModel::class);
+        $this->formRepository  = $this->createMock(FormRepository::class);
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
 
         $contactTracker->expects($this
             ->any())
@@ -90,39 +105,39 @@ class FormTestAbstract extends TestCase
                 ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
             );
 
-        $templatingHelperMock->expects($this
-            ->any())
-            ->method('getTemplating')
-            ->willReturn($this->createMock(EngineInterface::class));
-
         $entityManager->expects($this
             ->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $this->formRepository],
+                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
                     ]
                 )
             );
 
         $formModel = new FormModel(
             $requestStack,
-            $templatingHelperMock,
+            $twigMock,
             $themeHelper,
             $formActionModel,
             $formFieldModel,
-            $fieldHelper,
+            $this->fieldHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $mappedObjectCollector,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
-
-        $formModel->setDispatcher($dispatcher);
-        $formModel->setTranslator($translator);
-        $formModel->setEntityManager($entityManager);
 
         return $formModel;
     }
@@ -132,29 +147,41 @@ class FormTestAbstract extends TestCase
      */
     protected function getSubmissionModel()
     {
-        $ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $templatingHelperMock     = $this->createMock(TemplatingHelper::class);
-        $formModel                = $this->createMock(FormModel::class);
-        $pageModel                = $this->createMock(PageModel::class);
-        $leadModel                = $this->createMock(LeadModel::class);
-        $campaignModel            = $this->createMock(CampaignModel::class);
-        $membershipManager        = $this->createMock(MembershipManager::class);
-        $leadFieldModel           = $this->createMock(LeadFieldModel::class);
-        $companyModel             = $this->createMock(CompanyModel::class);
-        $fieldHelper              = $this->createMock(FormFieldHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcher::class);
-        $translator               = $this->createMock(Translator::class);
-        $dateHelper               = $this->createMock(DateHelper::class);
+        $ipLookupHelper             = $this->createMock(IpLookupHelper::class);
+        $twigMock                   = $this->createMock(Environment::class);
+        $formModel                  = $this->createMock(FormModel::class);
+        $pageModel                  = $this->createMock(PageModel::class);
+        $leadModel                  = $this->createMock(LeadModel::class);
+        $campaignModel              = $this->createMock(CampaignModel::class);
+        $membershipManager          = $this->createMock(MembershipManager::class);
+        $leadFieldModel             = $this->createMock(LeadFieldModel::class);
+        $companyModel               = $this->createMock(CompanyModel::class);
+        $fieldHelper                = $this->createMock(FormFieldHelper::class);
+        $dispatcher                 = $this->createMock(EventDispatcher::class);
+        $translator                 = $this->createMock(Translator::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dateHelper                 = new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $translator,
+            $this->coreParametersHelper
+        );
         $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
-        $formRepository           = $this->createMock(FormRepository::class);
+        $formRepository           = $this->createMock(SubmissionRepository::class);
         $leadRepository           = $this->createMock(LeadRepository::class);
-        $mockLogger               = $this->createMock(Logger::class);
+        $mockLogger               = $this->createMock(LoggerInterface::class);
         $uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
+        $router                   = $this->createMock(RouterInterface::class);
+        $contactMerger            = $this->createMock(ContactMerger::class);
+        $router->method('generate')->willReturn('absolute/path/somefile.jpg');
+
         $lead                     = new Lead();
         $lead->setId(123);
 
@@ -190,8 +217,8 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticFormBundle:Submission', $formRepository],
+                        [Lead::class, $leadRepository],
+                        [Submission::class, $formRepository],
                     ]
                 )
             );
@@ -212,9 +239,12 @@ class FormTestAbstract extends TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
-            $templatingHelperMock,
+            $twigMock,
             $formModel,
             $pageModel,
             $leadModel,
@@ -226,47 +256,84 @@ class FormTestAbstract extends TestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->createMock(RouterInterface::class)),
+            new FieldValueTransformer($router),
             $dateHelper,
-            $contactTracker
+            $contactTracker,
+            $contactMerger,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $router,
+            $translator,
+            $userHelper,
+            $mockLogger,
+            $this->coreParametersHelper,
         );
-
-        $submissionModel->setDispatcher($dispatcher);
-        $submissionModel->setTranslator($translator);
-        $submissionModel->setEntityManager($entityManager);
-        $submissionModel->setUserHelper($userHelper);
-        $submissionModel->setLogger($mockLogger);
 
         return $submissionModel;
     }
 
-    public function getTestFormFields()
+    /**
+     * @return array<string,array<string,mixed>>
+     */
+    public function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
-        $fields[$fieldSession] =
-            [
-                'label'        => 'Email',
-                'showLabel'    => 1,
-                'saveResult'   => 1,
-                'defaultValue' => false,
-                'alias'        => 'email',
-                'type'         => 'email',
-                'leadField'    => 'email',
-                'id'           => $fieldSession,
-            ];
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'leadField'    => 'email',
+            'id'           => $fieldSession,
+        ];
 
-        $fields['file'] =
-            [
-                'label'                   => 'File',
-                'showLabel'               => 1,
-                'saveResult'              => 1,
-                'defaultValue'            => false,
-                'alias'                   => 'file',
-                'type'                    => 'file',
-                'id'                      => 'file',
-                'allowed_file_size'       => 1,
-                'allowed_file_extensions' => ['jpg', 'gif'],
-            ];
+        $fields['file'] = [
+            'label'                   => 'File',
+            'showLabel'               => 1,
+            'saveResult'              => 1,
+            'defaultValue'            => false,
+            'alias'                   => 'file',
+            'type'                    => 'file',
+            'id'                      => 'file',
+            'allowed_file_size'       => 1,
+            'allowed_file_extensions' => ['jpg', 'gif'],
+        ];
+
+        $fields['123'] = [
+            'label'        => 'Parent Field',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'parent',
+            'type'         => 'select',
+            'id'           => '123',
+        ];
+
+        $fields['456'] = [
+            'label'        => 'Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'child',
+            'type'         => 'text',
+            'id'           => '456',
+            'parent'       => '123',
+        ];
+
+        $fields[$fieldSession2] = [
+            'label'        => 'New Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'new_child',
+            'type'         => 'text',
+            'id'           => $fieldSession2,
+            'parent'       => '123',
+        ];
 
         return $fields;
     }

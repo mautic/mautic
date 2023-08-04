@@ -1,19 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Class ProfileController.
@@ -25,36 +19,37 @@ class ProfileController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
-        //get current user
+        // get current user
         $me    = $this->get('security.token_storage')->getToken()->getUser();
+        /** @var UserModel $model */
         $model = $this->getModel('user');
 
-        //set some permissions
+        // set some permissions
         $permissions = [
-            'apiAccess' => ($this->get('mautic.helper.core_parameters')->get('api_enabled')) ?
-                $this->get('mautic.security')->isGranted('api:access:full')
+            'apiAccess' => ($this->coreParametersHelper->get('api_enabled')) ?
+                $this->security->isGranted('api:access:full')
                 : 0,
-            'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
-            'editUsername' => $this->get('mautic.security')->isGranted('user:profile:editusername'),
-            'editPosition' => $this->get('mautic.security')->isGranted('user:profile:editposition'),
-            'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail'),
+            'editName'     => $this->security->isGranted('user:profile:editname'),
+            'editUsername' => $this->security->isGranted('user:profile:editusername'),
+            'editPosition' => $this->security->isGranted('user:profile:editposition'),
+            'editEmail'    => $this->security->isGranted('user:profile:editemail'),
         ];
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $this->get('form.factory'), $action, ['in_profile' => true]);
+        $form   = $model->createForm($me, $this->formFactory, $action, ['in_profile' => true]);
 
         $overrides = [];
 
-        //make sure this user has access to edit privileged fields
+        // make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
             if ('apiAccess' == $permName) {
                 continue;
             }
 
             if (!$hasAccess) {
-                //set the value to its original
+                // set the value to its original
                 switch ($permName) {
                     case 'editName':
                         $overrides['firstName'] = $me->getFirstName();
@@ -145,16 +140,15 @@ class ProfileController extends FormController
             }
         }
 
-        //Check for a submitted form and process it
-        $submitted = $this->get('session')->get('formProcessed', 0);
-        if ('POST' == $this->request->getMethod() && !$submitted) {
-            $this->get('session')->set('formProcessed', 1);
+        // Check for a submitted form and process it
+        $submitted = $request->getSession()->get('formProcessed', 0);
+        if ('POST' === $request->getMethod() && !$submitted) {
+            $request->getSession()->set('formProcessed', 1);
 
-            //check to see if the password needs to be rehashed
-            $formUser              = $this->request->request->get('user', []);
+            // check to see if the password needs to be rehashed
+            $formUser              = $request->request->get('user') ?? [];
             $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
-            $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
-            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            $overrides['password'] = $model->checkNewPassword($me, $hasher, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
@@ -162,12 +156,10 @@ class ProfileController extends FormController
                         $me->$func($v);
                     }
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($me);
 
-                    //check if the user's locale has been downloaded already, fetch it if not
-                    /** @var LanguageHelper $languageHelper */
-                    $languageHelper     = $this->container->get('mautic.helper.language');
+                    // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
@@ -188,33 +180,33 @@ class ProfileController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 
                     // Update timezone and locale
                     $tz = $me->getTimezone();
                     if (empty($tz)) {
-                        $tz = $this->get('mautic.helper.core_parameters')->get('default_timezone');
+                        $tz = $this->coreParametersHelper->get('default_timezone');
                     }
-                    $this->get('session')->set('_timezone', $tz);
+                    $request->getSession()->set('_timezone', $tz);
 
                     $locale = $me->getLocale();
                     if (empty($locale)) {
-                        $locale = $this->get('mautic.helper.core_parameters')->get('locale');
+                        $locale = $this->coreParametersHelper->get('locale');
                     }
-                    $this->get('session')->set('_locale', $locale);
+                    $request->getSession()->set('_locale', $locale);
 
                     $returnUrl = $this->generateUrl('mautic_user_account');
 
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $returnUrl,
-                            'contentTemplate' => 'MauticUserBundle:Profile:index',
+                            'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],
-                            'flashes' => [ //success
+                            'flashes' => [ // success
                                 [
                                     'type' => 'notice',
                                     'msg'  => 'mautic.user.account.notice.updated',
@@ -224,22 +216,22 @@ class ProfileController extends FormController
                     );
                 }
             } else {
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                return $this->redirectToRoute('mautic_dashboard_index');
             }
         }
-        $this->get('session')->set('formProcessed', 0);
+        $request->getSession()->set('formProcessed', 0);
 
         $parameters = [
             'permissions'       => $permissions,
             'me'                => $me,
             'userForm'          => $form->createView(),
-            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent(),
+            'authorizedClients' => $this->forward('Mautic\ApiBundle\Controller\ClientController::authorizedClientsAction')->getContent(),
         ];
 
         return $this->delegateView(
             [
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
+                'contentTemplate' => '@MauticUser/Profile/index.html.twig',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_user_account'),
                     'mauticContent' => 'user',

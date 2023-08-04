@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Test\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
@@ -20,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
  */
 class FixedMockFileSessionStorage extends MockFileSessionStorage
 {
-    public function setId($id)
+    public function setId(string $id)
     {
         if ($this->id !== $id) {
             parent::setId($id);

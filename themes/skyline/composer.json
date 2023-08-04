@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-skyline",
+  "description": "Mautic Skyline Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "skyline"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

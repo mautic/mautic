@@ -35,8 +35,6 @@ Javascript
 
     Chosen - MIT - Copyright (c) 2011-2014 Harvest http://getharvest.com
 
-    Fullcalendar - MIT - (c) 2013 Adam Shaw
-
     jsPlumb - MIT - Copyright (c) 2010 - 2013 Simon Porritt (simon.porritt@gmail.com)
 
     jQuery - MIT - Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
@@ -78,8 +76,6 @@ PHP
     Minify - New BSD - Copyright (c) 2008 Ryan Grove, Copyright (c) 2008 Steve Clay
 
     mPDF - GPL - Copyright © 2005 - 2014  Ian N Back
-
-    OAuth1 Server Bundle - MIT - Copyright (c) 2011-2012 William Durand
 
     OAuth2 Server Bundle, Rest Bundle - MIT - Copyright (c) 2010 Tim Ridgely
 

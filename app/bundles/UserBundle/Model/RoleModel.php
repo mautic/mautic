@@ -1,36 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class RoleModel.
+ * @extends FormModel<Role>
  */
 class RoleModel extends FormModel
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository()
+    public function getRepository(): RoleRepository
     {
-        return $this->em->getRepository('MauticUserBundle:Role');
+        $result = $this->em->getRepository(Role::class);
+
+        return $result;
     }
 
     /**
@@ -55,8 +47,8 @@ class RoleModel extends FormModel
         $isNew = ($entity->getId()) ? 0 : 1;
 
         if (!$isNew) {
-            //delete all existing
-            $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
+            // delete all existing
+            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -73,7 +65,7 @@ class RoleModel extends FormModel
             return;
         }
 
-        //set permissions if applicable and if the user is not an admin
+        // set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
             $this->security->generatePermissions($rawPermissions) :
             [];
@@ -96,7 +88,7 @@ class RoleModel extends FormModel
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
+        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
@@ -109,7 +101,7 @@ class RoleModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
@@ -167,7 +159,7 @@ class RoleModel extends FormModel
                 $event = new RoleEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

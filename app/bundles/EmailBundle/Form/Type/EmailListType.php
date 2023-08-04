@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
@@ -56,21 +47,15 @@ class EmailListType extends AbstractType
                         ],
                     ];
                 },
-                //'modal_route_parameters' => 'template'
+                // 'modal_route_parameters' => 'template'
                 'email_type'     => 'template',
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],
+
+                'email' => null,
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'email_list';
     }
 
     /**

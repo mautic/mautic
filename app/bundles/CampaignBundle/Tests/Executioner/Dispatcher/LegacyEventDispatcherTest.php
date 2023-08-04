@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
@@ -17,6 +10,8 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
+use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -26,88 +21,78 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
+class LegacyEventDispatcherTest extends TestCase
 {
     /**
-     * @var MockBuilder|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var MockBuilder|EventScheduler
+     * @var MockObject|EventScheduler
      */
     private $scheduler;
 
     /**
-     * @var MockBuilder|NotificationHelper
+     * @var MockObject|NotificationHelper
      */
     private $notificationHelper;
 
     /**
-     * @var MockBuilder|MauticFactory
+     * @var MockObject|MauticFactory
      */
     private $mauticFactory;
 
     /**
-     * @var MockBuilder|ContactTracker
+     * @var MockObject|ContactTracker
      */
     private $contactTracker;
 
+    /**
+     * @var MockObject|AbstractEventAccessor
+     */
+    private $config;
+
+    /**
+     * @var MockObject|PendingEvent
+     */
+    private $pendingEvent;
+
     protected function setUp(): void
     {
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->scheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->mauticFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler          = $this->createMock(EventScheduler::class);
+        $this->notificationHelper = $this->createMock(NotificationHelper::class);
+        $this->mauticFactory      = $this->createMock(MauticFactory::class);
+        $this->contactTracker     = $this->createMock(ContactTracker::class);
+        $this->config             = $this->createMock(AbstractEventAccessor::class);
+        $this->pendingEvent       = $this->createMock(PendingEvent::class);
     }
 
-    public function testAllEventsAreFailedWithBadConfig()
+    public function testAllEventsAreFailedWithBadConfig(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->once())
+        $this->config->expects($this->once())
             ->method('getConfig')
             ->willReturn([]);
 
         $logs = new ArrayCollection([new LeadEventLog()]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('failAll');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent, $this->mauticFactory);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testPrimayLegacyEventsAreProcessed()
+    public function testPrimayLegacyEventsAreProcessed(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -119,37 +104,30 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventLog->setLead(new Lead());
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // BC default is to have pass
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('pass');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
-        // Legacy custom event should dispatch
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class));
+            ->withConsecutive(
+                // Legacy custom event should dispatch
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                // Legacy execution event should dispatch
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
+            );
 
-        // Legacy execution event should dispatch
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class));
-
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testPrimaryCallbackIsProcessed()
+    public function testPrimaryCallbackIsProcessed(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['callback' => [self::class, 'bogusCallback']]);
 
@@ -161,32 +139,28 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $leadEventLog->setLead(new Lead());
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // BC default is to have pass
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('pass');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Legacy execution event should dispatch
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_EXECUTION, $this->isInstanceOf(CampaignExecutionEvent::class));
+            ->withConsecutive(
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
+            );
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testArrayResultAppendedToMetadata()
+    public function testArrayResultAppendedToMetadata(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -200,37 +174,43 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // BC default is to have pass
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('pass');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Legacy custom event should dispatch
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(['foo' => 'bar']);
-            });
+            ->withConsecutive(
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(
+                    function (CampaignExecutionEvent $event, string $eventName) {
+                        $event->setResult(['foo' => 'bar']);
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+                        return $event;
+                    }
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
+            );
+
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
 
         $this->assertEquals(['bar' => 'foo', 'foo' => 'bar'], $leadEventLog->getMetadata());
     }
 
-    public function testFailedResultAsFalseIsProcessed()
+    public function testFailedResultAsFalseIsProcessed(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -245,28 +225,32 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Should fail because we're returning false
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('fail');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Legacy custom event should dispatch
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(false);
-            });
+            ->withConsecutive(
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(
+                    function (CampaignExecutionEvent $event, string $eventName) {
+                        $event->setResult(false);
 
-        $this->dispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
+                        return $event;
+                    }
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (FailedEvent $event) => $event),
+            );
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures');
@@ -275,16 +259,12 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('notifyOfFailure')
             ->with($lead, $event);
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testFailedResultAsArrayIsProcessed()
+    public function testFailedResultAsArrayIsProcessed(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -297,42 +277,42 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Should fail because we're returning false
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('fail');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Legacy custom event should dispatch
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(['result' => false, 'foo' => 'bar']);
-            });
+            ->withConsecutive(
+                [$this->isInstanceOf(CampaignExecutionEvent::class), 'something'],
+                [$this->isInstanceOf(CampaignExecutionEvent::class), CampaignEvents::ON_EVENT_EXECUTION],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(
+                    function (CampaignExecutionEvent $event, string $eventName) {
+                        $event->setResult(['result' => false, 'foo' => 'bar']);
 
-        $this->dispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
+                        return $event;
+                    }
+                ),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (FailedEvent $event) => $event),
+            );
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testPassWithErrorIsHandled()
+    public function testPassWithErrorIsHandled(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -346,38 +326,36 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Should pass but with an error logged
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('passWithError');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Legacy custom event should dispatch
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(['failed' => 1, 'reason' => 'because']);
-            });
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(function (CampaignExecutionEvent $event, string $eventName): object {
+                    $event->setResult(['failed' => 1, 'reason' => 'because']);
+
+                    return $event;
+                }),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
+            );
 
         $this->scheduler->expects($this->never())
             ->method('rescheduleFailure');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testLogIsPassed()
+    public function testLogIsPassed(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(2))
+        $this->config->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -391,38 +369,37 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Should fail because we're returning false
-        $pendingEvent->expects($this->once())
+        $this->pendingEvent->expects($this->once())
             ->method('pass');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
         // Should pass
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(true);
-            });
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(
+                    function (CampaignExecutionEvent $event, $eventName) {
+                        $event->setResult(true);
+
+                        return $event;
+                    }),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),
+            );
 
         $this->scheduler->expects($this->never())
             ->method('rescheduleFailure');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
-    public function testLegacyEventDispatchedForConvertedBatchActions()
+    public function testLegacyEventDispatchedForConvertedBatchActions(): void
     {
-        $config = $this->getMockBuilder(AbstractEventAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->exactly(1))
+        $this->config->expects($this->exactly(1))
             ->method('getConfig')
             ->willReturn(['eventName' => 'something']);
 
@@ -436,31 +413,25 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $pendingEvent = $this->getMockBuilder(PendingEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Should never be called
-        $pendingEvent->expects($this->never())
+        $this->pendingEvent->expects($this->never())
             ->method('pass');
 
         $this->contactTracker->expects($this->exactly(2))
             ->method('setSystemContact');
 
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with('something', $this->isInstanceOf(CampaignExecutionEvent::class))
-            ->willReturnCallback(function ($eventName, CampaignExecutionEvent $event) {
-                $event->setResult(true);
-            });
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
+            ->willReturnOnConsecutiveCalls(
+                $this->returnCallback(
+                    fn (CampaignExecutionEvent $event) => $event->setResult(true)
+                )
+            );
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, true, $pendingEvent);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, true, $this->pendingEvent);
     }
 
-    /**
-     * @return LegacyEventDispatcher
-     */
-    private function getLegacyEventDispatcher()
+    private function getLegacyEventDispatcher(): LegacyEventDispatcher
     {
         return new LegacyEventDispatcher(
             $this->dispatcher,
@@ -472,7 +443,7 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function bogusCallback()
+    public static function bogusCallback(): bool
     {
         return true;
     }

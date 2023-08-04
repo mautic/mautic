@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle;
 
 /**
@@ -25,7 +16,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_PRE_SAVE = 'mautic.report_pre_save';
+    public const REPORT_PRE_SAVE = 'mautic.report_pre_save';
 
     /**
      * The mautic.report_post_save event is dispatched right after a report is persisted.
@@ -34,7 +25,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_POST_SAVE = 'mautic.report_post_save';
+    public const REPORT_POST_SAVE = 'mautic.report_post_save';
 
     /**
      * The mautic.report_pre_delete event is dispatched prior to when a report is deleted.
@@ -43,7 +34,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_PRE_DELETE = 'mautic.report_pre_delete';
+    public const REPORT_PRE_DELETE = 'mautic.report_pre_delete';
 
     /**
      * The mautic.report_post_delete event is dispatched after a report is deleted.
@@ -52,7 +43,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_POST_DELETE = 'mautic.report_post_delete';
+    public const REPORT_POST_DELETE = 'mautic.report_post_delete';
 
     /**
      * The mautic.report_on_build event is dispatched before displaying the report builder form to allow
@@ -62,7 +53,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_ON_BUILD = 'mautic.report_on_build';
+    public const REPORT_ON_BUILD = 'mautic.report_on_build';
 
     /**
      * The mautic.report_on_generate event is dispatched when generating a report to build the base query.
@@ -71,7 +62,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_ON_GENERATE = 'mautic.report_on_generate';
+    public const REPORT_ON_GENERATE = 'mautic.report_on_generate';
 
     /**
      * The mautic.report_query_pre_execute event is dispatched to allow a plugin to alter the query before execution.
@@ -80,7 +71,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_QUERY_PRE_EXECUTE = 'mautic.report_query_pre_execute';
+    public const REPORT_QUERY_PRE_EXECUTE = 'mautic.report_query_pre_execute';
 
     /**
      * The mautic.report_on_display event is dispatched when displaying a report.
@@ -89,7 +80,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_ON_DISPLAY = 'mautic.report_on_display';
+    public const REPORT_ON_DISPLAY = 'mautic.report_on_display';
 
     /**
      * The mautic.report_on_graph_generate event is dispatched to generate a graph data.
@@ -98,7 +89,7 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_ON_GRAPH_GENERATE = 'mautic.report_on_graph_generate';
+    public const REPORT_ON_GRAPH_GENERATE = 'mautic.report_on_graph_generate';
 
     /**
      * The mautic.report_schedule_send event is dispatched to send an exported report to a user.
@@ -107,5 +98,5 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_SCHEDULE_SEND = 'mautic.report_schedule_send';
+    public const REPORT_SCHEDULE_SEND = 'mautic.report_schedule_send';
 }

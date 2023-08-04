@@ -1,20 +1,14 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -24,8 +18,10 @@ use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class WebhookModelTest extends TestCase
 {
@@ -77,7 +73,6 @@ class WebhookModelTest extends TestCase
         $this->userHelper            = $this->createMock(UserHelper::class);
         $this->webhookRepository     = $this->createMock(WebhookRepository::class);
         $this->httpClientMock        = $this->createMock(Client::class);
-        $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->eventDispatcherMock   = $this->createMock(EventDispatcher::class);
         $this->model                 = $this->initModel();
     }
@@ -155,7 +150,7 @@ class WebhookModelTest extends TestCase
                 return null;
             });
 
-        $this->entityManagerMock->expects($this->at(0))
+        $this->entityManagerMock->expects($this->once())
             ->method('getRepository')
             ->with(WebhookQueue::class)
             ->willReturn($queueRepositoryMock);
@@ -211,18 +206,66 @@ class WebhookModelTest extends TestCase
         $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook, $queue));
     }
 
+    public function testProcessWebhook(): void
+    {
+        $webhook = new Webhook();
+        $webhook->setWebhookUrl('test-webhook.com');
+
+        $event = new Event();
+        $event->setEventType('mautic.email_on_send');
+
+        $queue = new class() extends WebhookQueue {
+            public function getId(): int
+            {
+                return 1;
+            }
+        };
+        $queue->setPayload('{"payload": "some data"}');
+        $queue->setEvent($event);
+        $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
+
+        $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
+
+        $this->entityManagerMock
+            ->method('getRepository')
+            ->with(WebhookQueue::class)
+            ->willReturn($webhookQueueRepoMock);
+
+        $webhookQueueRepoMock
+            ->method('deleteQueuesById')
+            ->with([1])
+            ->willReturn(null);
+
+        $responsePayload = [
+            'mautic.email_on_send' => [
+                [
+                    'payload'   => 'some data',
+                    'timestamp' => '2021-04-01T16:00:00+00:00',
+                ],
+            ],
+        ];
+        $this->httpClientMock
+            ->method('post')
+            ->with('test-webhook.com', $responsePayload)
+            ->willReturn(new Response(200, [], 'Success'));
+
+        self::assertTrue($this->model->processWebhook($webhook, $queue));
+    }
+
     private function initModel(): WebhookModel
     {
         $model = new WebhookModel(
             $this->parametersHelperMock,
             $this->serializerMock,
             $this->httpClientMock,
-            $this->eventDispatcherMock
+            $this->entityManagerMock,
+            $this->createMock(CorePermissions::class),
+            $this->eventDispatcherMock,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->userHelper,
+            $this->createMock(LoggerInterface::class)
         );
-
-        $model->setEntityManager($this->entityManagerMock);
-        $model->setUserHelper($this->userHelper);
-        $model->setDispatcher($this->eventDispatcherMock);
 
         return $model;
     }

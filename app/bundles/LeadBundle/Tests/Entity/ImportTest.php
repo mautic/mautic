@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Import;
@@ -159,7 +150,7 @@ class ImportTest extends StandardImportTestHelper
 
         $import->end(false);
 
-        $this->fakeImportStartDate($import, (10 * 60));
+        $this->fakeImportStartDate($import, 10 * 60);
 
         $this->assertTrue($import->getRunTime() instanceof \DateInterval);
         $this->assertSame(10, $import->getRunTime()->i);

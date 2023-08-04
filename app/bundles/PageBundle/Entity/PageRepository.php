@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PageRepository.
+ * @extends CommonRepository<Page>
  */
 class PageRepository extends CommonRepository
 {
@@ -23,9 +14,20 @@ class PageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $q = $this
-            ->createQueryBuilder('p')
-            ->select('p')
+        $select = ['p'];
+
+        if (!empty($args['submissionCount'])) {
+            // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+            $sq = $this->_em->createQueryBuilder()
+                ->select('count(fs.id)')
+                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+                ->where('fs.page = p');
+
+            $select[] = '('.$sq->getDql().') as submission_count';
+        }
+
+        $q = $this->createQueryBuilder('p')
+            ->select($select)
             ->leftJoin('p.category', 'c');
 
         $args['qb'] = $q;
@@ -66,10 +68,11 @@ class PageRepository extends CommonRepository
      * @param bool   $topLevel
      * @param array  $ignoreIds
      * @param array  $extraColumns
+     * @param bool   $publishedOnly
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], $publishedOnly = false)
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
@@ -85,7 +88,7 @@ class PageRepository extends CommonRepository
         }
 
         if ('translation' == $topLevel) {
-            //only get top level pages
+            // only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
         } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
@@ -95,6 +98,11 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }
+
+        if ($publishedOnly) {
+            $q->andWhere($q->expr()->eq('p.isPublished', 1));
+        }
+
         $q->orderBy('p.title');
 
         if (!empty($limit)) {
@@ -132,7 +140,7 @@ class PageRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -208,9 +216,6 @@ class PageRepository extends CommonRepository
 
     /**
      * Resets variant_start_date and variant_hits.
-     *
-     * @param $relatedIds
-     * @param $date
      */
     public function resetVariants($relatedIds, $date)
     {
@@ -232,7 +237,6 @@ class PageRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant

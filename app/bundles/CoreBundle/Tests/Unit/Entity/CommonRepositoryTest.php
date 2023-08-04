@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -16,12 +7,15 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CommonRepository
+     * @var MockObject&CommonRepository<object>
      */
     private $repo;
 
@@ -29,8 +23,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @var QueryBuilder
      */
     private $qb;
+
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @var MockObject|Connection
      */
     private $connectionMock;
 
@@ -39,16 +34,22 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
+        /** @var EntityManager&MockObject $emMock */
         $emMock = $this->getMockBuilder(EntityManager::class)
-            ->setMethods(['none'])
+            ->addMethods(['none'])
+            ->onlyMethods(['getClassMetadata'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metaMock = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ManagerRegistry&MockObject $managerRegistry */
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($emMock);
 
-        $this->repo           = new CommonRepository($emMock, $metaMock);
+        /** @var ClassMetadata<object>&MockObject $classMetadata */
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $emMock->method('getClassMetadata')->willReturn($classMetadata);
+
+        $this->repo           = $this->getMockForAbstractClass(CommonRepository::class, [$managerRegistry, Lead::class]);
         $this->qb             = new QueryBuilder($emMock);
         $this->connectionMock = $this->createMock(Connection::class);
         $this->connectionMock->method('getExpressionBuilder')
@@ -156,6 +157,59 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->callProtectedMethod('validateOrderByClause', [[]]);
+    }
+
+    /**
+     * Copy of.
+     *
+     * @see \Mautic\LeadBundle\Tests\Segment\RandomParameterNameTest::testGenerateRandomParameterName
+     */
+    public function testGenerateRandomParameterName()
+    {
+        $expectedValues = [
+            'par0',
+            'par1',
+            'par2',
+            'par3',
+            'par4',
+            'par5',
+            'par6',
+            'par7',
+            'par8',
+            'par9',
+            'para',
+            'parb',
+            'parc',
+            'pard',
+            'pare',
+            'parf',
+            'parg',
+            'parh',
+            'pari',
+            'parj',
+            'park',
+            'parl',
+            'parm',
+            'parn',
+            'paro',
+            'parp',
+            'parq',
+            'parr',
+            'pars',
+            'part',
+            'paru',
+            'parv',
+            'parw',
+            'parx',
+            'pary',
+            'parz',
+            'par10',
+            'par11',
+        ];
+
+        foreach ($expectedValues as $expectedValue) {
+            self::assertSame($expectedValue, $this->repo->generateRandomParameterName());
+        }
     }
 
     /**

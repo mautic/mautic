@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Language;
 
 use Mautic\CoreBundle\Helper\Language\Installer;
@@ -38,11 +29,11 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($languagePath.'/config.json');
 
         // did it ignore the php config?
-        $this->assertFileNotExists($languagePath.'/config.php');
+        $this->assertFileDoesNotExist($languagePath.'/config.php');
 
         // did it ignore the extra files?
-        $this->assertFileNotExists($languagePath.'/random.txt');
-        $this->assertFileNotExists($languagePath.'/RandomFolder');
+        $this->assertFileDoesNotExist($languagePath.'/random.txt');
+        $this->assertFileDoesNotExist($languagePath.'/RandomFolder');
 
         // did it create the bundles?
         $this->assertFileExists($languagePath.'/CoreBundle');
@@ -55,12 +46,12 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($languagePath.'/CampaignBundle/flashes.ini');
 
         // did it ignore the bundle's extra files?
-        $this->assertFileNotExists($languagePath.'/CoreBundle/random.txt');
+        $this->assertFileDoesNotExist($languagePath.'/CoreBundle/random.txt');
 
         // did the installer cleanup appropriately
         $this->assertFileExists($translationsDirectory.'/tmp/es');
         $installer->cleanup();
-        $this->assertFileNotExists($translationsDirectory.'/tmp/es');
+        $this->assertFileDoesNotExist($translationsDirectory.'/tmp/es');
 
         // cleanup the test
         (new Filesystem())->remove($languagePath);

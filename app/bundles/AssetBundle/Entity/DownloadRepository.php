@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class DownloadRepository.
+ * @extends CommonRepository<Download>
  */
 class DownloadRepository extends CommonRepository
 {
@@ -25,9 +16,6 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Determine if the download is a unique download.
-     *
-     * @param $assetId
-     * @param $trackingId
      *
      * @return bool
      */
@@ -40,7 +28,7 @@ class DownloadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd');
 
         $q2->where(
-            $q2->expr()->andX(
+            $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
                 $q2->expr()->eq('d.asset_id', (int) $assetId)
             )
@@ -51,7 +39,7 @@ class DownloadRepository extends CommonRepository
             )
             ->setParameter('id', $trackingId);
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -99,7 +87,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -122,7 +110,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -141,7 +129,8 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAll();
+        $results = $query->execute()->fetchAllAssociative();
+
         $chart   = new PieChart();
 
         foreach ($results as $result) {
@@ -152,7 +141,6 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param           $pageId
      * @param \DateTime $fromDate
      *
      * @return mixed
@@ -181,7 +169,7 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {
@@ -195,14 +183,13 @@ class DownloadRepository extends CommonRepository
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
-     * @param           $emailId
      * @param \DateTime $fromDate
      *
      * @return mixed
      */
     public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
     {
-        //link email to page hit tracking id to download tracking id
+        // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, e.id, e.subject as name, e.variant_sent_count as total')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
@@ -224,7 +211,7 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {
@@ -234,11 +221,6 @@ class DownloadRepository extends CommonRepository
         return $downloads;
     }
 
-    /**
-     * @param $leadId
-     * @param $newTrackingId
-     * @param $oldTrackingId
-     */
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -252,14 +234,11 @@ class DownloadRepository extends CommonRepository
                 'newTrackingId' => $newTrackingId,
                 'oldTrackingId' => $oldTrackingId,
             ])
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -267,6 +246,6 @@ class DownloadRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

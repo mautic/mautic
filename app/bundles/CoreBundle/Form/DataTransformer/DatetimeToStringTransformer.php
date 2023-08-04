@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
@@ -42,7 +33,7 @@ class DatetimeToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        $datetime = new \Datetime($value->format($this->format));
+        $datetime = new \DateTime($value->format($this->format));
 
         return $datetime->format($this->format);
     }

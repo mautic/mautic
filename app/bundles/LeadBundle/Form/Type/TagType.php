@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -38,7 +29,7 @@ class TagType extends AbstractType
             $transformer = new TagEntityModelTransformer(
                 $this->em,
                 Tag::class,
-                ($options['multiple'])
+                $options['multiple']
             );
 
             $builder->addModelTransformer($transformer);
@@ -50,9 +41,9 @@ class TagType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'         => 'mautic.lead.tags',
-                'class'         => 'MauticLeadBundle:Tag',
+                'class'         => \Mautic\LeadBundle\Entity\Tag::class,
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
+                    return $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC);
                 },
                 'choice_label'    => 'tag',
                 'multiple'        => true,

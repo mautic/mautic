@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ParseEmailEvent extends Event
 {
@@ -52,8 +43,6 @@ class ParseEmailEvent extends Event
     }
 
     /**
-     * @param $messages
-     *
      * @return $this
      */
     public function setMessages($messages)
@@ -85,9 +74,6 @@ class ParseEmailEvent extends Event
 
     /**
      * Check if the set of messages is applicable and should be processed by the listener.
-     *
-     * @param $bundleKey
-     * @param $folderKeys
      *
      * @return bool
      */

@@ -1,28 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadStageLogRepository.
+ * @extends CommonRepository<LeadStageLog>
  */
 class LeadStageLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -32,7 +20,8 @@ class LeadStageLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $actions = [];
         foreach ($results as $r) {
             $actions[] = $r['stage_id'];

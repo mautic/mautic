@@ -1,160 +1,143 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * Modified from
- *
- * @see         https://github.com/barbushin/php-imap
- *
- * @author      Barbushin Sergey http://linkedin.com/in/barbushin
- * @copyright   BSD (three-clause)
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
 use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
-use stdClass;
 
 class Mailbox
 {
     /**
      * Return all mails matching the rest of the criteria.
      */
-    const CRITERIA_ALL = 'ALL';
+    public const CRITERIA_ALL = 'ALL';
 
     /**
      * Match mails with the \\ANSWERED flag set.
      */
-    const CRITERIA_ANSWERED = 'ANSWERED';
+    public const CRITERIA_ANSWERED = 'ANSWERED';
 
     /**
      * CRITERIA_BCC "string" - match mails with "string" in the Bcc: field.
      */
-    const CRITERIA_BCC = 'BCC';
+    public const CRITERIA_BCC = 'BCC';
 
     /**
      * CRITERIA_BEFORE "date" - match mails with Date: before "date".
      */
-    const CRITERIA_BEFORE = 'BEFORE';
+    public const CRITERIA_BEFORE = 'BEFORE';
 
     /**
      * CRITERIA_BODY "string" - match mails with "string" in the body of the mail.
      */
-    const CRITERIA_BODY = 'BODY';
+    public const CRITERIA_BODY = 'BODY';
 
     /**
      * CRITERIA_CC "string" - match mails with "string" in the Cc: field.
      */
-    const CRITERIA_CC = 'CC';
+    public const CRITERIA_CC = 'CC';
 
     /**
      * Match deleted mails.
      */
-    const CRITERIA_DELETED = 'DELETED';
+    public const CRITERIA_DELETED = 'DELETED';
 
     /**
      * Match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set.
      */
-    const CRITERIA_FLAGGED = 'FLAGGED';
+    public const CRITERIA_FLAGGED = 'FLAGGED';
 
     /**
      * CRITERIA_FROM "string" - match mails with "string" in the From: field.
      */
-    const CRITERIA_FROM = 'FROM';
+    public const CRITERIA_FROM = 'FROM';
 
     /**
      *  CRITERIA_KEYWORD "string" - match mails with "string" as a keyword.
      */
-    const CRITERIA_KEYWORD = 'KEYWORD';
+    public const CRITERIA_KEYWORD = 'KEYWORD';
 
     /**
      * Match new mails.
      */
-    const CRITERIA_NEW = 'NEW';
+    public const CRITERIA_NEW = 'NEW';
 
     /**
      * Match old mails.
      */
-    const CRITERIA_OLD = 'OLD';
+    public const CRITERIA_OLD = 'OLD';
 
     /**
      * CRITERIA_ON "date" - match mails with Date: matching "date".
      */
-    const CRITERIA_ON = 'ON';
+    public const CRITERIA_ON = 'ON';
 
     /**
      * Match mails with the \\RECENT flag set.
      */
-    const CRITERIA_RECENT = 'RECENT';
+    public const CRITERIA_RECENT = 'RECENT';
 
     /**
      * Match mails that have been read (the \\SEEN flag is set).
      */
-    const CRITERIA_SEEN = 'SEEN';
+    public const CRITERIA_SEEN = 'SEEN';
 
     /**
      * CRITERIA_SINCE "date" - match mails with Date: after "date".
      */
-    const CRITERIA_SINCE = 'SINCE';
+    public const CRITERIA_SINCE = 'SINCE';
 
     /**
      *  CRITERIA_SUBJECT "string" - match mails with "string" in the Subject:.
      */
-    const CRITERIA_SUBJECT = 'SUBJECT';
+    public const CRITERIA_SUBJECT = 'SUBJECT';
 
     /**
      * CRITERIA_TEXT "string" - match mails with text "string".
      */
-    const CRITERIA_TEXT = 'TEXT';
+    public const CRITERIA_TEXT = 'TEXT';
 
     /**
      * CRITERIA_TO "string" - match mails with "string" in the To:.
      */
-    const CRITERIA_TO = 'TO';
+    public const CRITERIA_TO = 'TO';
 
     /**
      *  Get messages since a specific UID. Eg. UID 2:* will return all messages with UID 2 and above (IMAP includes the given UID).
      */
-    const CRITERIA_UID = 'UID';
+    public const CRITERIA_UID = 'UID';
 
     /**
      *  Match mails that have not been answered.
      */
-    const CRITERIA_UNANSWERED = 'UNANSWERED';
+    public const CRITERIA_UNANSWERED = 'UNANSWERED';
 
     /**
      * Match mails that are not deleted.
      */
-    const CRITERIA_UNDELETED = 'UNDELETED';
+    public const CRITERIA_UNDELETED = 'UNDELETED';
 
     /**
      * Match mails that are not flagged.
      */
-    const CRITERIA_UNFLAGGED = 'UNFLAGGED';
+    public const CRITERIA_UNFLAGGED = 'UNFLAGGED';
 
     /**
      * CRITERIA_UNKEYWORD "string" - match mails that do not have the keyword "string".
      */
-    const CRITERIA_UNKEYWORD = 'UNKEYWORD';
+    public const CRITERIA_UNKEYWORD = 'UNKEYWORD';
 
     /**
      * Match mails which have not been read yet.
      */
-    const CRITERIA_UNSEEN = 'UNSEEN';
+    public const CRITERIA_UNSEEN = 'UNSEEN';
 
     /**
      * Match mails which have not been read yet - alias of CRITERIA_UNSEEN.
      */
-    const CRITERIA_UNREAD = 'UNSEEN';
+    public const CRITERIA_UNREAD = 'UNSEEN';
 
     protected $imapPath;
     protected $imapFullPath;
@@ -227,7 +210,6 @@ class Mailbox
     /**
      * Switch to another configured monitored mailbox.
      *
-     * @param        $bundle
      * @param string $mailbox
      *
      * @throws MailboxException
@@ -275,8 +257,6 @@ class Mailbox
     }
 
     /**
-     * @param $settings
-     *
      * @return array
      */
     public function getImapPath($settings)
@@ -309,7 +289,6 @@ class Mailbox
     /**
      * Get settings.
      *
-     * @param        $bundle
      * @param string $mailbox
      *
      * @return mixed
@@ -355,8 +334,6 @@ class Mailbox
 
     /**
      * Switch to another box.
-     *
-     * @param $folder
      */
     public function switchFolder($folder)
     {
@@ -431,7 +408,7 @@ class Mailbox
      *  Nmsgs - number of mails in the mailbox
      *  Recent - number of recent mails in the mailbox
      *
-     * @return stdClass
+     * @return \stdClass
      */
     public function checkMailbox()
     {
@@ -454,7 +431,7 @@ class Mailbox
      * This function returns an object containing status information.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
      *
-     * @return stdClass if the box doesn't exist
+     * @return \stdClass if the box doesn't exist
      */
     public function statusMailbox()
     {
@@ -564,7 +541,6 @@ class Mailbox
     /**
      * Save mail body.
      *
-     * @param        $mailId
      * @param string $filename
      *
      * @return bool
@@ -577,8 +553,6 @@ class Mailbox
     /**
      * Marks mails listed in mailId for deletion.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function deleteMail($mailId)
@@ -588,9 +562,6 @@ class Mailbox
 
     /**
      * Move mail to another box.
-     *
-     * @param $mailId
-     * @param $mailBox
      *
      * @return bool
      */
@@ -612,8 +583,6 @@ class Mailbox
     /**
      * Add the flag \Seen to a mail.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function markMailAsRead($mailId)
@@ -623,8 +592,6 @@ class Mailbox
 
     /**
      * Remove the flag \Seen from a mail.
-     *
-     * @param $mailId
      *
      * @return bool
      */
@@ -636,8 +603,6 @@ class Mailbox
     /**
      * Add the flag \Flagged to a mail.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function markMailAsImportant($mailId)
@@ -647,8 +612,6 @@ class Mailbox
 
     /**
      * Add the flag \Seen to a mails.
-     *
-     * @param $mailIds
      *
      * @return bool
      */
@@ -660,8 +623,6 @@ class Mailbox
     /**
      * Remove the flag \Seen from some mails.
      *
-     * @param $mailIds
-     *
      * @return bool
      */
     public function markMailsAsUnread(array $mailIds)
@@ -671,8 +632,6 @@ class Mailbox
 
     /**
      * Add the flag \Flagged to some mails.
-     *
-     * @param $mailIds
      *
      * @return bool
      */
@@ -843,7 +802,6 @@ class Mailbox
     /**
      * Get mail data.
      *
-     * @param      $mailId
      * @param bool $markAsSeen
      *
      * @return Message
@@ -928,8 +886,6 @@ class Mailbox
     }
 
     /**
-     * @param            $partStructure
-     * @param            $partNum
      * @param bool|true  $markAsSeen
      * @param bool|false $isDsn
      * @param bool|false $isFbl
@@ -964,6 +920,11 @@ class Mailbox
         $attachmentId = $partStructure->ifid
             ? trim($partStructure->id, ' <>')
             : (isset($params['filename']) || isset($params['name']) ? mt_rand().mt_rand() : null);
+
+        // ignore contentId on body when mail isn't multipart (https://github.com/barbushin/php-imap/issues/71)
+        if (!$partNum && TYPETEXT === $partStructure->type) {
+            $attachmentId = null;
+        }
 
         if ($attachmentId) {
             if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
@@ -1062,8 +1023,6 @@ class Mailbox
     }
 
     /**
-     * @param $partStructure
-     *
      * @return array
      */
     protected function getParameters($partStructure)
@@ -1089,7 +1048,6 @@ class Mailbox
     }
 
     /**
-     * @param        $string
      * @param string $charset
      *
      * @return string
@@ -1109,8 +1067,6 @@ class Mailbox
     }
 
     /**
-     * @param $string
-     *
      * @return bool
      */
     protected function isUrlEncoded($string)
@@ -1122,7 +1078,6 @@ class Mailbox
     }
 
     /**
-     * @param        $string
      * @param string $charset
      *
      * @return string

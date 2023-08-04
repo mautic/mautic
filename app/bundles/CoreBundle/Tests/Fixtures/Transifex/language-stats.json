@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "id": "o:mautic:p:mautic:r:webhookbundle-messages:l:cs",
+      "type": "resource_language_stats",
+      "attributes": {
+        "last_proofread_update": "XXXX-XX-XXTXX:XX:XXZ",
+        "last_review_update": "XXXX-XX-XXTXX:XX:XXZ",
+        "last_translation_update": "XXXX-XX-XXTXX:XX:XXZ",
+        "last_update": "XXXX-XX-XXTXX:XX:XXZ",
+        "proofread_strings": 10,
+        "proofread_words": 10,
+        "reviewed_strings": 10,
+        "reviewed_words": 10,
+        "total_strings": 10,
+        "total_words": 10,
+        "translated_strings": 10,
+        "translated_words": 10,
+        "untranslated_strings": 10,
+        "untranslated_words": 10
+      },
+      "links": {
+        "self": "/resource_stats/o:mautic:p:mautic:r:webhookbundle-messages:l:language_code"
+      },
+      "relationships": {
+        "language": {
+          "data": {
+            "id": "l:cs",
+            "type": "languages"
+          },
+          "links": {
+            "related": "/languages/l:cs"
+          }
+        },
+        "resource": {
+          "data": {
+            "id": "o:mautic:p:mautic:r:webhookbundle-messages",
+            "type": "resources"
+          },
+          "links": {
+            "related": "/resources/o:mautic:p:mautic:r:webhookbundle-messages"
+          }
+        }
+      }
+    }
+  ],
+  "links": {
+    "last": "/resource_language_stats/o:mautic:p:mautic:r:webhookbundle-messages:l:language_code&page[cursor]=XXX",
+    "next": "/resource_language_stats/o:mautic:p:mautic:r:webhookbundle-messages:l:language_code&page[cursor]=XXX",
+    "self": "/resource_language_stats/o:mautic:p:mautic:r:webhookbundle-messages:l:language_code"
+  }
+}

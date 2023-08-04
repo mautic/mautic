@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EmailValidator.
@@ -45,7 +36,6 @@ class EmailValidator
      * Validate that an email is the correct format, doesn't have invalid characters, a MX record is associated with the domain, and
      * leverage integrations to validate.
      *
-     * @param $address
      * @param bool $doDnsCheck
      *
      * @throws InvalidEmailException
@@ -70,8 +60,6 @@ class EmailValidator
     /**
      * Validates that email is in an acceptable format.
      *
-     * @param $address
-     *
      * @returns bool
      */
     public function isValidFormat($address)
@@ -82,21 +70,17 @@ class EmailValidator
     /**
      * Validates that email does not have invalid characters.
      *
-     * @param $address
-     *
      * @returns bool
      */
     public function hasValidCharacters($address)
     {
-        $invalidChar = strpbrk($address, '\'^&*%');
+        $invalidChar = strpbrk($address, '^&*%');
 
         return $invalidChar ? substr($invalidChar, 0, 1) : $invalidChar;
     }
 
     /**
      * Validates if the domain of an email.
-     *
-     * @param $address
      *
      * @returns bool
      */
@@ -110,15 +94,13 @@ class EmailValidator
     /**
      * Validate using 3rd party integrations.
      *
-     * @param $address
-     *
      * @throws InvalidEmailException
      */
     public function doPluginValidation($address)
     {
         $event = $this->dispatcher->dispatch(
-            EmailEvents::ON_EMAIL_VALIDATION,
-            new EmailValidationEvent($address)
+            new EmailValidationEvent($address),
+            EmailEvents::ON_EMAIL_VALIDATION
         );
 
         if (!$event->isValid()) {

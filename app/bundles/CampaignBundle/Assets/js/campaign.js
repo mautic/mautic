@@ -5,11 +5,14 @@
  * @param container
  */
 Mautic.campaignOnLoad = function (container, response) {
+    Mautic.lazyLoadContactListOnCampaignDetail();
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
 
     if (mQuery('#CampaignEventPanel').length) {
+        var tooltipTimeout = null;
         // setup button clicks
         mQuery('#CampaignEventPanelGroups button').on('click', function() {
             var eventType = mQuery(this).data('type');
@@ -53,7 +56,14 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
                 // Recreate tooltips for those left
-                Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                if (tooltipTimeout) {
+                    clearTimeout(tooltipTimeout);
+                }
+
+                // wrap into setTimeout for fast typing users.
+                tooltipTimeout = setTimeout(function () {
+                    Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                }, 200);
             });
         });
 
@@ -115,23 +125,62 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 };
 
+Mautic.lazyLoadContactListOnCampaignDetail = function() {
+    let containerId = '#leads-container';
+    let container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    let campaignContactUrl = container.data('target-url');
+    mQuery.get(campaignContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
+
 /**
  * Update chosen tooltips
  *
  * @param theSelect
- * @param destroy
+ * @param onlyDestroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
-    mQuery('#'+theSelect+' option').each(function () {
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy) {
+    const $select = mQuery('#'+theSelect);
+    const dataAttribute = 'tooltips';
+
+    // create a stack
+    if (undefined === $select.data(dataAttribute)) {
+        $select.data(dataAttribute, []);
+    }
+
+    // remove existing tooltips before we create new ones.
+    const tooltips = $select.data(dataAttribute);
+
+    mQuery.each(tooltips, function (index, $tooltip) {
+        if (undefined === $tooltip) {
+            return;
+        }
+
+        $tooltip.tooltip('hide');
+        $tooltip.tooltip('destroy');
+    });
+    $select.data(dataAttribute, []);
+
+    if (true === onlyDestroy) {
+        return;
+    }
+
+    // create tooltips.
+    $select.find('option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
-            var chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
+            const chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
 
-            if (destroy) {
-                mQuery(chosenOption).tooltip('destroy');
-            } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
-            }
+            const $tooltip = mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
+            $select.data(dataAttribute).push($tooltip);
         }
     });
 }
@@ -152,12 +201,10 @@ Mautic.campaignOnUnload = function(container) {
  */
 Mautic.campaignEventOnLoad = function (container, response) {
     if (mQuery('#campaignevent_triggerHour').length) {
-        Mautic.campaignEventShowHideIntervalSettings();
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
         mQuery('#campaignevent_triggerRestrictedStartHour').on('change', Mautic.campaignEventUpdateIntervalHours);
         mQuery('#campaignevent_triggerRestrictedStopHour').on('change', Mautic.campaignEventUpdateIntervalHours);
-        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').on('change', Mautic.campaignEventSelectDOW);
@@ -273,18 +320,6 @@ Mautic.campaignEventUpdateIntervalHours = function () {
         mQuery('#campaignevent_triggerHour').prop('disabled', false);
         mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', false);
         mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', false);
-    }
-};
-
-/**
- * Show/hide interval settings
- */
-Mautic.campaignEventShowHideIntervalSettings = function() {
-    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
-    if (unit === 'i' || unit === 'h') {
-        mQuery('#interval_settings').addClass('hide');
-    } else {
-        mQuery('#interval_settings').removeClass('hide');
     }
 };
 
@@ -2047,5 +2082,64 @@ Mautic.highlightJumpTarget = function(event, el) {
     }
 };
 
+/**
+ * Display confirmation modal if user wishes to unpublish the campaign.
+ */
+Mautic.showCampaignConfirmation = function (el) {
+    let element = mQuery(el);
+    if (element.prop('checked') && element.val() !== "1") {
+        Mautic.showConfirmation(element);
+    }
+};
 
+/**
+ * Cancel Callback to trigger the yes button and dismiss the confirmation modal.
+ */
+Mautic.setPublishedButtonToYes = function (el) {
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
 
+    // Find the yes button id and trigger click event
+    var yesButton  = mQuery(el).parent('.btn-no').siblings('.btn-yes').children('input');
+    var yesButtonId = mQuery(yesButton).attr('id');
+    if (yesButtonId !== undefined) {
+        mQuery('#' + yesButtonId).trigger('click');
+        mQuery(el).parent('.btn-no').removeClass('active');
+        mQuery(el).parent('.btn-no').siblings('.btn-yes').addClass('active');
+    }
+};
+
+/**
+ * Onclick Callback to show the confirmation modal during toggling campaign status.
+ */
+Mautic.confirmationCampaignPublishStatus = function (el) {
+    let element = mQuery(el);
+
+    // Add the confirmation modal, if current status is published
+    if (element.data('status') === 'published') {
+        Mautic.showConfirmation(element);
+    }
+    else {
+        // Otherwise just change the status.
+        Mautic.confirmCallbackCampaignPublishStatus('', el);
+    }
+}
+
+/**
+ * Confirm Callback to toggling campaign status if user chooses Yes.
+ */
+Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
+    let element = mQuery(el);
+
+    let idClass = element.data('id-class');
+    let model = element.data('model');
+    let itemId = element.data('item-id');
+    let query = element.data('query');
+    let backdrop = element.data('backdrop');
+
+    // Toggles published status of an campaign
+    Mautic.togglePublishStatus(event, idClass, model, itemId, query, backdrop);
+
+    // Dismiss the confirmation
+    Mautic.dismissConfirmation();
+}

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -304,7 +295,7 @@ class ReportType extends AbstractType
                 );
             };
 
-            //Scheduler
+            // Scheduler
             $builder->add(
                 'isScheduled',
                 YesNoButtonGroupType::class,
@@ -399,8 +390,8 @@ class ReportType extends AbstractType
             $builder->addEventListener(
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier) {
-                    $data = $event->getData();
-                    $graphs = (isset($data['graphs'])) ? $data['graphs'] : [];
+                    $data    = $event->getData();
+                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
                     $columns = (isset($data['columns'])) ? $data['columns'] : [];
                     $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }
@@ -422,14 +413,6 @@ class ReportType extends AbstractType
                 'table_list' => [],
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'report';
     }
 
     /**

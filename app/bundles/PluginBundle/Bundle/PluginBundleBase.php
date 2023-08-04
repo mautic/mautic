@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -27,6 +18,8 @@ abstract class PluginBundleBase extends Bundle
      * @param null $installedSchema
      *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
@@ -56,7 +49,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($installQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -74,11 +67,13 @@ abstract class PluginBundleBase extends Bundle
      * @param Schema $installedSchema
      *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
-        //self::updatePluginSchema($metadata, $installedSchema, $factory);
+        // self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
 
     /**
@@ -101,7 +96,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($queries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -136,7 +131,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($dropQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();

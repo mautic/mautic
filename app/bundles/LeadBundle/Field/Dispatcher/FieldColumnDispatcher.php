@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -46,7 +37,7 @@ class FieldColumnDispatcher
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
         $event                     = new AddColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch(LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN);
 
         if ($shouldProcessInBackground) {
             throw new AbortColumnCreateException('Column change will be processed in background job');

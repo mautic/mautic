@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
@@ -43,10 +34,6 @@ class MailboxContainer
         $this->config = $config;
     }
 
-    /**
-     * @param $criteria
-     * @param $mailbox
-     */
     public function addCriteria($criteria, $mailbox)
     {
         if (!isset($this->criteria[$criteria])) {

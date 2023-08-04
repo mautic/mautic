@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
@@ -26,69 +19,57 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockBuilder|EventDispatcherInterface
+     * @var MockObject|EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var MockBuilder|EventScheduler
+     * @var MockObject|EventScheduler
      */
     private $scheduler;
 
     /**
-     * @var MockBuilder|LegacyEventDispatcher
+     * @var MockObject|LegacyEventDispatcher
      */
     private $legacyDispatcher;
 
     /**
-     * @var MockBuilder|NotificationHelper
+     * @var MockObject|NotificationHelper
      */
     private $notificationHelper;
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $this->scheduler = $this->getMockBuilder(EventScheduler::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->legacyDispatcher = $this->getMockBuilder(LegacyEventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $this->scheduler          = $this->createMock(EventScheduler::class);
+        $this->notificationHelper = $this->createMock(NotificationHelper::class);
+        $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
     public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs()
     {
         $event = new Event();
-
-        $lead1 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead1 = $this->createMock(Lead::class);
         $lead1->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(2);
 
-        $log1 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log1 = $this->createMock(LeadEventLog::class);
         $log1->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead1);
@@ -97,8 +78,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log1->method('getEvent')
             ->willReturn($event);
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->expects($this->exactly(3))
             ->method('getLead')
             ->willReturn($lead2);
@@ -114,34 +94,34 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $config = $this->getMockBuilder(ActionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $config = $this->createMock(ActionAccessor::class);
         $config->expects($this->once())
             ->method('getBatchEventName')
             ->willReturn('something');
 
-        $this->dispatcher->expects($this->at(0))
+        $dispatcCounter = 0;
+
+        $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
+            ->withConsecutive(
+                [],
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
+            )
             ->willReturnCallback(
-                function ($eventName, PendingEvent $pendingEvent) use ($logs) {
-                    $pendingEvent->pass($logs->get(1));
-                    $pendingEvent->fail($logs->get(2), 'just because');
+                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter) {
+                    ++$dispatcCounter;
+                    if (1 === $dispatcCounter) {
+                        Assert::assertInstanceOf(PendingEvent::class, $event);
+                        \assert($event instanceof PendingEvent);
+                        $event->pass($logs->get(1));
+                        $event->fail($logs->get(2), 'just because');
+                    }
+
+                    return $event;
                 }
             );
-
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_EXECUTED, $this->isInstanceOf(ExecutedEvent::class));
-
-        $this->dispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $this->isInstanceOf(ExecutedBatchEvent::class));
-
-        $this->dispatcher->expects($this->at(3))
-            ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class));
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures')
@@ -170,21 +150,17 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->expectException(LogNotProcessedException::class);
 
         $event = new Event();
-
-        $lead1 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead1 = $this->createMock(Lead::class);
         $lead1->expects($this->once())
             ->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->once())
             ->method('getId')
             ->willReturn(2);
 
-        $log1 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log1 = $this->createMock(LeadEventLog::class);
         $log1->expects($this->once())
             ->method('getLead')
             ->willReturn($lead1);
@@ -193,8 +169,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log1->method('getEvent')
             ->willReturn($event);
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->expects($this->once())
             ->method('getLead')
             ->willReturn($lead2);
@@ -210,20 +185,19 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $config = $this->getMockBuilder(ActionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(ActionAccessor::class);
 
         $config->expects($this->once())
             ->method('getBatchEventName')
             ->willReturn('something');
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, PendingEvent $pendingEvent) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->pass($logs->get(1));
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );
@@ -237,20 +211,17 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $event = new Event();
 
-        $lead1 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead1 = $this->createMock(Lead::class);
         $lead1->expects($this->once())
             ->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->getMockBuilder(Lead::class)
-            ->getMock();
+        $lead2 = $this->createMock(Lead::class);
         $lead2->expects($this->once())
             ->method('getId')
             ->willReturn(2);
 
-        $log1 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log1 = $this->createMock(LeadEventLog::class);
         $log1->expects($this->once())
             ->method('getLead')
             ->willReturn($lead1);
@@ -259,8 +230,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log1->method('getEvent')
             ->willReturn($event);
 
-        $log2 = $this->getMockBuilder(LeadEventLog::class)
-            ->getMock();
+        $log2 = $this->createMock(LeadEventLog::class);
         $log2->expects($this->once())
             ->method('getLead')
             ->willReturn($lead2);
@@ -276,20 +246,19 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $config = $this->getMockBuilder(ActionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(ActionAccessor::class);
 
         $config->expects($this->once())
             ->method('getBatchEventName')
             ->willReturn('something');
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, PendingEvent $pendingEvent) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->fail($logs->get(2), 'something');
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );
@@ -299,11 +268,8 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testActionBatchEventIsIgnoredWithLegacy()
     {
-        $event = new Event();
-
-        $config = $this->getMockBuilder(ActionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event  = new Event();
+        $config = $this->createMock(ActionAccessor::class);
 
         $config->expects($this->once())
             ->method('getBatchEventName')

@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use DateTime;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
@@ -24,11 +17,11 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriberTest extends CommonMocks
 {
@@ -48,7 +41,7 @@ class LeadSubscriberTest extends CommonMocks
     private $leadEventDispatcher;
 
     /**
-     * @var DncReasonHelper|MockObject
+     * @var DncReasonHelper
      */
     private $dncReasonHelper;
 
@@ -67,15 +60,21 @@ class LeadSubscriberTest extends CommonMocks
      */
     private $router;
 
+    /**
+     * @var ModelFactory<object>&MockObject
+     */
+    private $modelFacotry;
+
     protected function setUp(): void
     {
         $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel       = $this->createMock(AuditLogModel::class);
         $this->leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper     = $this->createMock(DncReasonHelper::class);
+        $this->dncReasonHelper     = new DncReasonHelper($this->createMock(TranslatorInterface::class));
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->router              = $this->createMock(RouterInterface::class);
+        $this->modelFacotry        = $this->createMock(ModelFactory::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
@@ -129,12 +128,11 @@ class LeadSubscriberTest extends CommonMocks
             $this->dncReasonHelper,
             $this->entityManager,
             $this->translator,
-            $this->router
+            $this->router,
+            $this->modelFacotry
         );
 
-        $leadEvent = $this->getMockBuilder(LeadEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEvent = $this->createMock(LeadEvent::class);
 
         $leadEvent->expects($this->exactly(2))
             ->method('getLead')
@@ -172,7 +170,7 @@ class LeadSubscriberTest extends CommonMocks
             'object'     => 'api-single',
             'action'     => 'identified_contact',
             'object_id'  => null,
-            'date_added' => new DateTime(),
+            'date_added' => new \DateTime(),
             'properties' => '{"object_description":"Awesome User"}',
         ];
 
@@ -194,23 +192,16 @@ class LeadSubscriberTest extends CommonMocks
             'contactId'  => $leadEventLog['lead_id'],
         ];
 
-        $leadEvent = new LeadTimelineEvent(
-            $lead
-        );
+        $leadEvent = new LeadTimelineEvent($lead);
+        $repo      = $this->createMock(LeadEventLogRepository::class);
 
-        $repo = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repo->expects($this->at(0))
+        $repo->expects($this->exactly(2))
             ->method('getEvents')
-            ->with($lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue($logs));
-
-        $repo->expects($this->at(1))
-            ->method('getEvents')
-            ->with($lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue(['total' => 0, 'results' => []]));
+            ->withConsecutive(
+                [$lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions()],
+                [$lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions()]
+            )
+            ->willReturnOnConsecutiveCalls($logs, ['total' => 0, 'results' => []]);
 
         $this->entityManager->method('getRepository')
             ->with(LeadEventLog::class)
@@ -224,13 +215,14 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
+            $this->modelFacotry,
             true
         );
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $leadEvent);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

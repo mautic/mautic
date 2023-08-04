@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Update\Step\UpdateTranslationsStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateTranslationsStepTest extends AbstractStepTest
 {

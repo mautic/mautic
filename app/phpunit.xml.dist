@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    convertDeprecationsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    bootstrap="autoload.php"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    failOnRisky="true"
+    failOnWarning="true"
+    cacheResultFile="../var/cache/phpunit/.phpunit.result.cache"
+  >
+  <coverage cacheDirectory="../var/cache/phpunit/code-coverage">
     <include>
       <directory>bundles</directory>
       <directory>./../plugins</directory>
@@ -27,7 +42,6 @@
     </testsuite>
     <testsuite name="Plugin tests">
       <directory>./../plugins/*Bundle/Tests</directory>
-      <exclude>./../plugins/MauticCrmBundle/Tests/Pipedrive</exclude>
     </testsuite>
     <testsuite name="Middleware tests">
       <directory>middlewares/Tests</directory>
@@ -38,10 +52,18 @@
     <env name="MAXMIND_LICENSE_KEY" value=""/>
     <env name="KERNEL_CLASS" value="AppKernel" />
     <const name="IS_PHPUNIT" value="true"/>
+    <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
+    <server name="APP_ENV" value="test" force="true" />
+    <ini name="error_reporting" value="E_ALL" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+    <listener class="\Mautic\CoreBundle\Test\Listeners\SeparateProcessListener" />
   </listeners>
+  <extensions>
+    <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />
+    <extension class="\Mautic\CoreBundle\Test\Hooks\SlowTestExtension" />
+  </extensions>
 </phpunit>

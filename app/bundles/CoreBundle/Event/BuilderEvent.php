@@ -1,19 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class BuilderEvent.
@@ -27,11 +18,10 @@ class BuilderEvent extends Event
     protected $translator;
     protected $entity;
     protected $requested;
-    protected $tokenFilter;
     protected $tokenFilterText;
     protected $tokenFilterTarget;
 
-    public function __construct($translator, $entity = null, $requested = 'all', $tokenFilter = '')
+    public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
     {
         $this->translator        = $translator;
         $this->entity            = $entity;
@@ -42,11 +32,6 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param $key
-     * @param $header
-     * @param $icon
-     * @param $content
-     * @param $form
      * @param int $priority
      */
     public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
@@ -85,14 +70,6 @@ class BuilderEvent extends Event
         return $this->slotTypes;
     }
 
-    /**
-     * @param $key
-     * @param $header
-     * @param $icon
-     * @param $content
-     * @param $form
-     * @param $priority
-     */
     public function addSection($key, $header, $icon, $content, $form, $priority = 0)
     {
         $this->sections[$key] = [
@@ -152,20 +129,19 @@ class BuilderEvent extends Event
     /**
      * Adds an A/B test winner criteria option.
      *
-     * @param string $key      - a unique identifier; it is recommended that it be namespaced i.e. lead.points
-     * @param array  $criteria - can contain the following keys:
-     *                         'group'           => (required) translation string to group criteria by in the dropdown select list
-     *                         'label'           => (required) what to display in the list
-     *                         'formType'        => (optional) name of the form type SERVICE for the criteria
-     *                         'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                         'callback'        => (required) callback function that will be passed the parent page or email for winner determination
-     *                         The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                         array $properties - values saved from the formType as defined here; keyed by page or email id in the case of
-     *                         multiple variants
-     *                         Mautic\CoreBundle\Factory\MauticFactory $factory
-     *                         Mautic\PageBundle\Entity\Page $page | Mautic\EmailBundle\Entity\Email $email (depending on the context)
-     *                         Mautic\PageBundle\Entity\Page|Mautic\EmailBundle\Entity\Email $parent
-     *                         Doctrine\Common\Collections\ArrayCollection $children
+     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.points
+     * @param array{
+     *   group: string,
+     *   label: string,
+     *   event: string,
+     *   formType?: string,
+     *   formTypeOptions?: string
+     * } $criteria Can contain the following keys:
+     *  - group - (required) translation string to group criteria by in the dropdown select list
+     *  - label - (required) what to display in the list
+     *  - event - (required) event class constant that will receieve the DetermineWinnerEvent for further handling. E.g. `HelloWorldEvents::ON_DETERMINE_PLANET_VISIT_WINNER`
+     *  - formType - (optional) name of the form type SERVICE for the criteria
+     *  - formTypeOptions - (optional) array of options to pass to the formType service
      */
     public function addAbTestWinnerCriteria($key, array $criteria)
     {
@@ -173,13 +149,13 @@ class BuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
         }
 
-        //check for required keys
+        // check for required keys
         $this->verifyCriteria(
             ['group', 'label', 'event'],
             $criteria
         );
 
-        //translate the group
+        // translate the group
         $criteria['group']                = $this->translator->trans($criteria['group']);
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
@@ -207,10 +183,6 @@ class BuilderEvent extends Event
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
@@ -324,7 +296,6 @@ class BuilderEvent extends Event
     /**
      * Add tokens from a BuilderTokenHelper.
      *
-     * @param        $tokens
      * @param string $labelColumn
      * @param string $valueColumn
      * @param bool   $convertToLinks If true, the tokens will be converted to links
@@ -350,17 +321,13 @@ class BuilderEvent extends Event
     /**
      * Get tokens from a BuilderTokenHelper.
      *
-     * @param $tokens
-     * @param $labelColumn
-     * @param $valueColumn
-     *
      * @return array|void
      */
     public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
     {
         return $tokenHelper->getTokens(
             $tokens,
-            ('label' == $this->tokenFilterTarget ? $this->tokenFilterText : ''),
+            'label' == $this->tokenFilterTarget ? $this->tokenFilterText : '',
             $labelColumn,
             $valueColumn
         );
@@ -397,8 +364,6 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param $type
-     *
      * @return bool
      */
     protected function getRequested($type)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -30,22 +21,22 @@ class Focus extends FormEntity
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $editor;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $html;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $htmlMode;
 
@@ -62,7 +53,7 @@ class Focus extends FormEntity
     private $type;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $website;
 
@@ -72,12 +63,12 @@ class Focus extends FormEntity
     private $style;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -89,12 +80,12 @@ class Focus extends FormEntity
     private $utmTags = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $form;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cache;
 
@@ -176,8 +167,6 @@ class Focus extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

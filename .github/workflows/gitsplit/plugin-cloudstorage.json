@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticCloudStorageBundle",
+            "directory": "plugins/MauticCloudStorageBundle",
+            "target": "git@github.com:mautic/plugin-cloudstorage.git"
+        }
+    ]
+}

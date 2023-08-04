@@ -1,0 +1,53 @@
+{% form_theme form with formThemes %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'point' %}
+
+{%- block headerTitle -%}
+  {%- if entity.id -%}
+    {{- 'mautic.point.menu.edit'|trans({'%name%': entity.name|trans}) -}}
+  {%- else -%}
+    {{- 'mautic.point.menu.new'|trans -}}
+  {%- endif -%}
+{%- endblock -%}
+
+{% block content %}
+  {{ form_start(form) }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- container -->
+      <div class="col-md-9 bg-auto height-auto bdr-r">
+          <div class="row">
+              <div class="col-md-6">
+                  <div class="pa-md">
+                      {{ form_row(form.name) }}
+                      {{ form_row(form.description) }}
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="pa-md">
+                      {{ form_row(form.delta) }}
+                      {{ form_row(form.type) }}
+                      <div id="pointActionProperties">
+                          {% if form.properties is defined %}
+                              {{ form_row(form.properties) }}
+                          {% endif %}
+                      </div>
+                      {{ form_row(form.group) }}
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 bg-white height-auto">
+          <div class="pr-lg pl-lg pt-md pb-md">
+                  {{ form_row(form.category) }}
+                  {{ form_row(form.isPublished) }}
+                  {{ form_row(form.repeatable) }}
+                  {{ form_row(form.publishUp) }}
+                  {{ form_row(form.publishDown) }}
+          </div>
+      </div>
+  </div>
+  <!-- end: box layout -->
+  {{ form_end(form) }}
+{% endblock %}

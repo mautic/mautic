@@ -1,28 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Twig\Environment;
 
 class MenuRenderer implements RendererInterface
 {
     /**
-     * @var DelegatingEngine
+     * @var Environment
      */
-    private $engine;
+    private $twig;
 
     /**
      * @var MatcherInterface
@@ -34,9 +24,9 @@ class MenuRenderer implements RendererInterface
      */
     private $defaultOptions;
 
-    public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, array $defaultOptions = [])
+    public function __construct(MatcherInterface $matcher, Environment $twig, array $defaultOptions = [])
     {
-        $this->engine         = $templatingHelper->getTemplating();
+        $this->twig           = $twig;
         $this->matcher        = $matcher;
         $this->defaultOptions = array_merge(
             [
@@ -47,7 +37,8 @@ class MenuRenderer implements RendererInterface
                 'ancestorClass'     => 'open',
                 'firstClass'        => 'first',
                 'lastClass'         => 'last',
-                'template'          => 'MauticCoreBundle:Menu:main.html.php',
+                'itemAttributes'    => [],
+                'template'          => '@MauticCore/Menu/main.html.twig',
                 'compressed'        => false,
                 'allow_safe_labels' => false,
                 'clear_matcher'     => true,
@@ -58,10 +49,8 @@ class MenuRenderer implements RendererInterface
 
     /**
      * Renders menu.
-     *
-     * @return string
      */
-    public function render(ItemInterface $item, array $options = [])
+    public function render(ItemInterface $item, array $options = []): string
     {
         $options = array_merge($this->defaultOptions, $options);
 
@@ -69,8 +58,8 @@ class MenuRenderer implements RendererInterface
             $this->matcher->clear();
         }
 
-        //render html
-        $html = $this->engine->render($options['template'], [
+        // render html
+        $html = $this->twig->render($options['template'], [
             'item'    => $item,
             'options' => $options,
             'matcher' => $this->matcher,

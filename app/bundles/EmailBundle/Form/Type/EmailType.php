@@ -1,29 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -31,7 +24,6 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -42,7 +34,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailType extends AbstractType
 {
@@ -63,21 +55,25 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
+    private CoreParametersHelper $coreParametersHelper;
+
     /**
-     * @var CoreParametersHelper
+     * @var ThemeHelperInterface
      */
-    private $coreParametersHelper;
+    private $themeHelper;
 
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
         StageModel $stageModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ThemeHelperInterface $themeHelper
     ) {
         $this->translator           = $translator;
         $this->em                   = $entityManager;
         $this->stageModel           = $stageModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->themeHelper          = $themeHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -95,7 +91,6 @@ class EmailType extends AbstractType
             ]
         );
 
-        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
                 'subject',
@@ -105,7 +100,7 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $builder->add(
@@ -212,6 +207,10 @@ class EmailType extends AbstractType
             ]
         );
 
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'email');
+
         $builder->add(
             'template',
             ThemeListType::class,
@@ -221,44 +220,13 @@ class EmailType extends AbstractType
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.email.form.template.help',
                 ],
-                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data' => $template,
             ]
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
-
-        $builder->add(
-            'publishUp',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                    'tooltip'     => 'mautic.email.form.publishdown.help',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'plainText',
@@ -287,12 +255,14 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
+                        'tooltip'              => 'mautic.email.form.body.help',
                         'class'                => 'form-control editor-builder-tokens builder-html editor-email',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{',
+                        'rows'                 => '15',
                     ],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
@@ -337,7 +307,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -449,7 +419,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -484,7 +454,7 @@ class EmailType extends AbstractType
 
         $transformer = new IdToEntityModelTransformer(
             $this->em,
-            'MauticAssetBundle:Asset',
+            \Mautic\AssetBundle\Entity\Asset::class,
             'id',
             true
         );

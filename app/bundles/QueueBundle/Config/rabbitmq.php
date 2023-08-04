@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl3.0.html
- */
-
 $container->loadFromExtension(
     'old_sound_rabbit_mq',
     [
@@ -54,7 +45,9 @@ $container->loadFromExtension(
                     'auto_delete' => false,
                     'durable'     => true,
                 ],
-                'callback' => 'mautic.queue.helper.rabbitmq_consumer',
+                'callback'               => 'mautic.queue.helper.rabbitmq_consumer',
+                'idle_timeout'           => '%mautic.rabbitmq_idle_timeout%',
+                'idle_timeout_exit_code' => '%mautic.rabbitmq_idle_timeout_exit_code%',
             ],
         ],
     ]

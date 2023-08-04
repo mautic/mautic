@@ -1,34 +1,40 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CategoryBundle\Entity\Category;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class CategoryApiController.
+ * @extends CommonApiController<Category>
  */
 class CategoryApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel('category');
-        $this->entityClass      = 'Mautic\CategoryBundle\Entity\Category';
+        $categoryModel = $modelFactory->getModel('category');
+        \assert($categoryModel instanceof CategoryModel);
+
+        $this->model            = $categoryModel;
+        $this->entityClass      = Category::class;
         $this->entityNameOne    = 'category';
         $this->entityNameMulti  = 'categories';
         $this->serializerGroups = ['categoryDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -63,9 +69,9 @@ class CategoryApiController extends CommonApiController
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return ['show_bundle_select' => true];
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -68,7 +59,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $dateDecorator->method('getOperator')
             ->with()
-            ->willReturn('==<<'); //Test that value is really returned from Decorator
+            ->willReturn('==<<'); // Test that value is really returned from Decorator
 
         $filter        = [
             'operator' => '=<',

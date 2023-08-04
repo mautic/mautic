@@ -1,0 +1,60 @@
+{#
+  Variables
+    - class
+    - shortenLinkText
+    - headItems
+    - widget
+    - bodyItems
+#}
+{% set class = class|default('table') %}
+{% set shortenLinkText = shortenLinkText|default(30) %}
+{% set showHeaders = [
+    'mautic.dashboard.label.url',
+    'mautic.dashboard.label.unique.hit.count',
+    'mautic.dashboard.label.total.hit.count',
+    'mautic.dashboard.label.email.name',
+] %}
+{% set showValues = [
+    'url',
+    'unique_hits',
+    'hits',
+    'email_name',
+] %}
+<table class="{{ class }}">
+    {% if headItems is not empty %}
+        <thead>
+            <tr>
+            {% for headItem in headItems %}
+                {% if headItem in showHeaders %}
+                <th>{{ headItem|trans }}</th>
+                {% endif %}
+            {% endfor %}
+            </tr>
+        </thead>
+    {% endif %}
+    {% if bodyItems is not empty %}
+        <tbody>
+            {% for id, row in bodyItems %}
+                <tr>
+                    {% if row is iterable %}
+                        {% for key, item in row %}
+                            {% if key in showValues %}
+                            <td>
+                                {% if 'email_name' == key %}
+                                    <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': row.email_id}) }}"
+                                        title="{{ item|e }}"
+                                        data-toggle="ajax">
+                                        {{ item|slice(0, shortenLinkText) }}
+                                    </a>
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endif %}
+</table>

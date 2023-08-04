@@ -1,21 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CsvExporter.
@@ -27,9 +20,12 @@ class ExcelExporter
      */
     protected $formatterHelper;
 
-    public function __construct(FormatterHelper $formatterHelper)
+    private TranslatorInterface $translator;
+
+    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
     {
-        $this->formatterHelper = $formatterHelper;
+        $this->formatterHelper      = $formatterHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -37,58 +33,78 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(array $reportData, $name)
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
         }
 
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
-        }
-
         try {
             $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
-
             $objPHPExcel->createSheet();
+            $objPHPExcelSheet = $objPHPExcel->getActiveSheet();
+            $reportData       = $reportDataResult->getData();
+            $rowCount         = 1;
 
-            $header = [];
+            if (empty($reportData)) {
+                throw new \Exception('No report data to be exported');
+            }
 
-            $reportDataResult = new ReportDataResult($reportData);
-            //build the data rows
-            foreach ($reportDataResult->getData() as $count=>$data) {
+            $headersRow = $reportDataResult->getHeaders();
+            $this->putHeader($headersRow, $objPHPExcelSheet);
+
+            // build the data rows
+            foreach ($reportData as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
-                    if (0 === $count) {
-                        //set the header
-                        foreach ($reportData['columns'] as $c) {
-                            if ($c['alias'] == $k) {
-                                $header[] = $c['label'];
-                                break;
-                            }
-                        }
-                    }
-                    $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
+                    $type      = $reportDataResult->getType($k);
+                    $formatted = htmlspecialchars_decode($this->formatterHelper->_($v, $type, true), ENT_QUOTES);
+                    $row[]     = $formatted;
                 }
 
-                if (0 === $count) {
-                    //write the column names row
-                    $objPHPExcel->getActiveSheet()->fromArray($reportDataResult->getHeaders());
-                }
-                //write the row
+                // write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-                //free memory
+                // free memory
                 unset($row, $reportData['data'][$count]);
+            }
+
+            // Add totals to export
+            $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
+            if (!empty($totalsRow)) {
+                $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
             }
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
 
-            $objWriter->save('php://output');
+            $objWriter->save($output);
         } catch (Exception $e) {
             throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }
+    }
+
+    /**
+     * @param array<string> $headers
+     */
+    public function putHeader(array $headers, Worksheet $activeSheet): void
+    {
+        $activeSheet->fromArray($headers);
+    }
+
+    /**
+     * @param array<string> $totals
+     */
+    public function putTotals(array $totals, Worksheet $activeSheet, string $startCell): void
+    {
+        // Put label if the first item is empty
+        $key = array_key_first($totals);
+
+        if (empty($totals[$key])) {
+            $totals[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+        }
+
+        $activeSheet->fromArray($totals, null, $startCell);
     }
 }

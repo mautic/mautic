@@ -319,7 +319,7 @@ class UnitOfWork implements PropertyChangedListener
      * 4) All collection updates
      * 5) All entity deletions
      *
-     * @param object|array|null $entity
+     * @param null|object|array $entity
      *
      * @throws \Exception
      */
@@ -462,7 +462,7 @@ class UnitOfWork implements PropertyChangedListener
     {
         $state = $this->getEntityState($entity);
 
-        if (self::STATE_MANAGED !== $state && self::STATE_REMOVED !== $state) {
+        if ($state !== self::STATE_MANAGED && $state !== self::STATE_REMOVED) {
             throw new \InvalidArgumentException('Entity has to be managed or scheduled for removal for single computation '.self::objToStr($entity));
         }
 
@@ -1804,7 +1804,10 @@ class UnitOfWork implements PropertyChangedListener
                     // If the identifier is ASSIGNED, it is NEW, otherwise an error
                     // since the managed entity was not found.
                     if (!$class->isIdentifierNatural()) {
-                        throw EntityNotFoundException::fromClassNameAndIdentifier($class->getName(), $this->identifierFlattener->flattenIdentifier($class, $id));
+                        throw EntityNotFoundException::fromClassNameAndIdentifier(
+                            $class->getName(),
+                            $this->identifierFlattener->flattenIdentifier($class, $id)
+                        );
                     }
 
                     $managedCopy = $this->newInstance($class);
@@ -1918,6 +1921,7 @@ class UnitOfWork implements PropertyChangedListener
      * Executes a detach operation on the given entity.
      *
      * @param object $entity
+     * @param array  $visited
      * @param bool   $noCascade if true, don't cascade detach operation
      */
     private function doDetach($entity, array &$visited, $noCascade = false)
@@ -2006,6 +2010,7 @@ class UnitOfWork implements PropertyChangedListener
      * Cascades a refresh operation to associated entities.
      *
      * @param object $entity
+     * @param array  $visited
      */
     private function cascadeRefresh($entity, array &$visited)
     {
@@ -2047,6 +2052,7 @@ class UnitOfWork implements PropertyChangedListener
      * Cascades a detach operation to associated entities.
      *
      * @param object $entity
+     * @param array  $visited
      */
     private function cascadeDetach($entity, array &$visited)
     {
@@ -2089,6 +2095,7 @@ class UnitOfWork implements PropertyChangedListener
      *
      * @param object $entity
      * @param object $managedCopy
+     * @param array  $visited
      */
     private function cascadeMerge($entity, $managedCopy, array &$visited)
     {
@@ -2125,6 +2132,7 @@ class UnitOfWork implements PropertyChangedListener
      * Cascades the save operation to associated entities.
      *
      * @param object $entity
+     * @param array  $visited
      */
     private function cascadePersist($entity, array &$visited)
     {
@@ -2159,7 +2167,11 @@ class UnitOfWork implements PropertyChangedListener
 
                 case null !== $relatedEntities:
                     if (!$relatedEntities instanceof $assoc['targetEntity']) {
-                        throw ORMInvalidArgumentException::invalidAssociation($this->em->getClassMetadata($assoc['targetEntity']), $assoc, $relatedEntities);
+                        throw ORMInvalidArgumentException::invalidAssociation(
+                            $this->em->getClassMetadata($assoc['targetEntity']),
+                            $assoc,
+                            $relatedEntities
+                        );
                     }
 
                     $this->doPersist($relatedEntities, $visited);
@@ -2175,6 +2187,7 @@ class UnitOfWork implements PropertyChangedListener
      * Cascades the delete operation to associated entities.
      *
      * @param object $entity
+     * @param array  $visited
      */
     private function cascadeRemove($entity, array &$visited)
     {
@@ -2351,6 +2364,8 @@ class UnitOfWork implements PropertyChangedListener
     /**
      * INTERNAL:
      * Schedules a complete collection for removal when this UnitOfWork commits.
+     *
+     * @param PersistentCollection $coll
      */
     public function scheduleCollectionDeletion(PersistentCollection $coll)
     {
@@ -2767,6 +2782,7 @@ class UnitOfWork implements PropertyChangedListener
      * @ignore
      *
      * @param object $entity
+     * @param array  $data
      */
     public function setOriginalEntityData($entity, array $data)
     {

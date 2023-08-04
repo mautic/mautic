@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
@@ -18,12 +11,14 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -31,32 +26,32 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository
+     * @var MockObject|LeadRepository
      */
     private $leadRepositoryMock;
 
     /**
-     * @var ContactTrackingServiceInterface
+     * @var MockObject|ContactTrackingServiceInterface
      */
     private $contactTrackingServiceMock;
 
     /**
-     * @var DeviceTracker
+     * @var MockObject|DeviceTracker
      */
     private $deviceTrackerMock;
 
     /**
-     * @var CorePermissions
+     * @var MockObject|CorePermissions
      */
     private $securityMock;
 
     /**
-     * @var Logger
+     * @var MockObject|Logger
      */
     private $loggerMock;
 
     /**
-     * @var IpLookupHelper
+     * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelperMock;
 
@@ -66,64 +61,40 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     private $requestStack;
 
     /**
-     * @var CoreParametersHelper
+     * @var MockObject|CoreParametersHelper
      */
     private $coreParametersHelperMock;
 
     /**
-     * @var EventDispatcher
+     * @var MockObject|EventDispatcher
      */
     private $dispatcherMock;
 
     /**
-     * @var FieldModel
+     * @var MockObject|FieldModel
      */
     private $leadFieldModelMock;
 
     protected function setUp(): void
     {
-        $this->leadRepositoryMock = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepositoryMock         = $this->createMock(LeadRepository::class);
+        $this->contactTrackingServiceMock = $this->createMock(ContactTrackingServiceInterface::class);
+        $this->deviceTrackerMock          = $this->createMock(DeviceTracker::class);
+        $this->securityMock               = $this->createMock(CorePermissions::class);
+        $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
+        $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
+        $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
+        $this->loggerMock                 = $this->createMock(Logger::class);
+        $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
+        $this->requestStack               = new RequestStack();
 
-        $this->contactTrackingServiceMock = $this->getMockBuilder(ContactTrackingServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->deviceTrackerMock = $this->getMockBuilder(DeviceTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityMock = $this->getMockBuilder(CorePermissions::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->securityMock->method('isAnonymous')
             ->willReturn(true);
 
-        $this->loggerMock = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->ipLookupHelperMock = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = new RequestStack();
-        $request            = new Request();
-        $this->requestStack->push($request);
-
-        $this->coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dispatcherMock = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->leadFieldModelMock = $this->createMock(FieldModel::class);
+        $this->requestStack->push(new Request());
     }
 
-    public function testSystemContactIsUsedOverTrackedContact()
+    public function testSystemContactIsUsedOverTrackedContact(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -142,7 +113,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lead2->getEmail(), $contactTracker->getContact()->getEmail());
     }
 
-    public function testContactIsTrackedByDevice()
+    public function testContactIsTrackedByDevice(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -172,7 +143,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test@test.com', $contact->getFieldValue('email'));
     }
 
-    public function testContactIsTrackedByOldCookie()
+    public function testContactIsTrackedByOldCookie(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -191,7 +162,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
 
-    public function testContactIsTrackedByIp()
+    public function testContactIsTrackedByIp(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -222,7 +193,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
 
-    public function testNewContactIsCreated()
+    public function testNewContactIsCreated(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -233,9 +204,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelperMock->expects($this->exactly(2))
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
-
-        $this->leadRepositoryMock->expects($this->once())
-            ->method('getFieldValues');
 
         $this->contactTrackingServiceMock->expects($this->once())
             ->method('getTrackedLead')
@@ -253,7 +221,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(true, $contact->isNewlyCreated());
     }
 
-    public function testEventIsDispatchedWithChangeOfContact()
+    public function testEventIsDispatchedWithChangeOfContact(): void
     {
         $contactTracker = $this->getContactTracker();
 
@@ -270,36 +238,30 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $lead2->method('getId')
             ->willReturn(2);
 
+        $leadDevice1 = new LeadDevice();
+        $leadDevice2 = new LeadDevice();
+
+        $leadDevice1->setTrackingId('abc123');
+        $leadDevice2->setTrackingId('def456');
+
+        $this->deviceTrackerMock->method('getTrackedDevice')
+            ->willReturnOnConsecutiveCalls($leadDevice1, $leadDevice2);
+
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED])
+            ->with(LeadEvents::CURRENT_LEAD_CHANGED)
             ->willReturn(true);
 
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED, $this->anything()])
-            ->willReturn(true);
-
-        $leadDevice1 = new LeadDevice();
-        $leadDevice1->setTrackingId('abc123');
-        $this->deviceTrackerMock->expects($this->at(0))
-            ->method('getTrackedDevice')
-            ->willReturn($leadDevice1);
-
-        $leadDevice2 = new LeadDevice();
-        $leadDevice2->setTrackingId('def456');
-        $this->deviceTrackerMock->expects($this->at(2))
-            ->method('getTrackedDevice')
-            ->willReturn($leadDevice2);
+            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
+            ->willReturn(new \stdClass());
 
         $contactTracker->setTrackedContact($lead);
         $contactTracker->setTrackedContact($lead2);
     }
 
-    /**
-     * @return ContactTracker
-     */
-    private function getContactTracker()
+    private function getContactTracker(): ContactTracker
     {
         return new ContactTracker(
             $this->leadRepositoryMock,

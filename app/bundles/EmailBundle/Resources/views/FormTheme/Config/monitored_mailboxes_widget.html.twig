@@ -1,0 +1,53 @@
+{% block monitored_mailboxes_widget %}
+  <div class="row">
+      {% if 'general' != mailbox %}
+        <div class="col-md-6">{{ form_row(form.folder) }}</div>
+        <div class="col-md-6">{{ form_row(form.override_settings) }}</div>
+      {% else %}
+        <div class="col-md-6">{{ form_row(form.address) }}</div>
+        <div class="col-md-6 pt-lg" id="{{ mailbox }}TestButtonContainer">
+            <div class="button_container">
+                {{ form_widget(form.test_connection_button) }}
+                <span class="fa fa-spinner fa-spin hide"></span>
+            </div>
+            <div class="help-block"></div>
+        </div>
+      {% endif %}
+  </div>
+
+  {% if 'general' != mailbox %}
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.address) }}</div>
+        <div class="col-md-6 pt-lg" id="{{ mailbox }}TestButtonContainer" data-show-on='{"config_emailconfig_monitored_email_{{ mailbox }}_override_settings_1": "checked"}'>
+            <div class="button_container">
+                {{ form_widget(form.test_connection_button) }}
+                <span class="fa fa-spinner fa-spin hide"></span>
+            </div>
+            <div class="help-block"></div>
+        </div>
+    </div>
+  {% endif %}
+
+  <div class="row">
+      <div class="col-sm-12 col-md-6">
+          {{ form_row(form.host) }}
+      </div>
+      <div class="col-sm-4 col-md-2">
+          {{ form_row(form.port) }}
+      </div>
+      {% if is_extension_loaded('openssl') %}
+        <div class="col-sm-8 col-md-4">
+            {{ form_row(form.encryption) }}
+        </div>
+      {% endif %}
+  </div>
+
+  <div class="row">
+      <div class="col-md-6">
+          {{ form_row(form.user) }}
+      </div>
+      <div class="col-md-6">
+          {{ form_row(form.password) }}
+      </div>
+  </div>
+{% endblock %}

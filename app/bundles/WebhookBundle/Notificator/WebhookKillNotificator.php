@@ -1,24 +1,16 @@
 <?php
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\WebhookBundle\Notificator;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
 {
@@ -47,18 +39,25 @@ class WebhookKillNotificator
      */
     private $mailer;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         Router $router,
         NotificationModel $notificationModel,
         EntityManager $entityManager,
-        MailHelper $mailer
+        MailHelper $mailer,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->translator        = $translator;
-        $this->router            = $router;
-        $this->notificationModel = $notificationModel;
-        $this->entityManager     = $entityManager;
-        $this->mailer            = $mailer;
+        $this->translator           = $translator;
+        $this->router               = $router;
+        $this->notificationModel    = $notificationModel;
+        $this->entityManager        = $entityManager;
+        $this->mailer               = $mailer;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -69,10 +68,10 @@ class WebhookKillNotificator
         $subject = $this->translator->trans('mautic.webhook.stopped');
         $reason  = $this->translator->trans($reason);
         $htmlUrl = '<a href="'.$this->router->generate(
-                'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhook->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
+            'mautic_webhook_action',
+            ['objectAction' => 'view', 'objectId' => $webhook->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
 
         $details = $this->translator->trans(
             'mautic.webhook.stopped.details',
@@ -83,12 +82,12 @@ class WebhookKillNotificator
         );
 
         /** @var User $owner */
-        $owner = $toUser = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
+        $owner = $toUser = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getCreatedBy());
 
         $ccToUser = null;
 
         if (null !== $webhook->getModifiedBy() && $webhook->getCreatedBy() !== $webhook->getModifiedBy()) {
-            $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getModifiedBy());
+            $modifiedBy = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getModifiedBy());
 
             $toUser   = $modifiedBy; // Send notification to modifier
             $ccToUser = $owner; // And cc e-mail to owner
@@ -108,10 +107,15 @@ class WebhookKillNotificator
         // Send e-mail
         $mailer = $this->mailer;
 
-        $mailer->setTo($toUser->getEmail());
-
-        if ($ccToUser) {
-            $mailer->setCc($ccToUser->getEmail());
+        $sendToAuthor = $this->coreParametersHelper->get('webhook_send_notification_to_author', 1);
+        if ($sendToAuthor) {
+            $mailer->setTo($toUser->getEmail());
+            if ($ccToUser) {
+                $mailer->setCc($ccToUser->getEmail());
+            }
+        } else {
+            $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
+            $mailer->setTo($emailAddresses);
         }
 
         $mailer->setSubject($subject);

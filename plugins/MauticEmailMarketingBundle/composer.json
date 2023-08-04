@@ -1,0 +1,17 @@
+{
+    "name": "mautic/plugin-emailmarketing",
+    "description": "Email Marketing Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration"
+    ],
+    "extra": {
+        "install-directory-name": "MauticEmailMarketingBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^5.0"
+    }
+}

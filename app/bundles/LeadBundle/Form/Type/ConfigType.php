@@ -1,17 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -21,8 +15,26 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add(
+            'contact_unique_identifiers_operator',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.core.config.contact_unique_identifiers_operator.or'    => CompositeExpression::TYPE_OR,
+                    'mautic.core.config.contact_unique_identifiers_operator.and'   => CompositeExpression::TYPE_AND,
+                ],
+                'label'             => 'mautic.core.config.unique_identifiers_operator',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.unique_identifiers_operator.tooltip',
+                ],
+                'placeholder'       => false,
+            ]
+        );
+
         $builder->add(
             'background_import_if_more_rows_than',
             NumberType::class,
@@ -36,7 +48,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $currentColumns) {
+        $formModifier = static function (FormInterface $form, $currentColumns) {
             $order        = [];
             $orderColumns = [];
             if (!empty($currentColumns)) {
@@ -70,7 +82,7 @@ class ConfigType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {
-                $data = $event->getData();
+                $data    = $event->getData();
                 $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
                 $formModifier($event->getForm(), $columns);
             }
@@ -85,12 +97,21 @@ class ConfigType extends AbstractType
                 $formModifier($event->getForm(), $columns);
             }
         );
+
+        $builder->add(
+            'contact_export_in_background',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.background.export.csv',
+                'data'  => $options['data']['contact_export_in_background'] ?? false,
+                'attr'  => [
+                    'tooltip' => 'mautic.lead.background.export.csv.tooltip',
+                ],
+            ]
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadconfig';
     }

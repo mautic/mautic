@@ -1,17 +1,13 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,6 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FileController extends AjaxController
 {
+    public const EDITOR_FROALA   = 'froala';
+    public const EDITOR_CKEDITOR = 'ckeditor';
+
     protected $imageMimes = [
         'image/gif',
         'image/jpeg',
@@ -36,19 +35,21 @@ class FileController extends AjaxController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     *
+     * @throws FileUploadException
      */
-    public function uploadAction()
+    public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader)
     {
-        $mediaDir = $this->getMediaAbsolutePath();
+        $editor   = $request->get('editor', 'froala');
+        $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
-            foreach ($this->request->files as $file) {
+            foreach ($request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($mediaDir, $fileName);
-                    $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $fileName = $fileUploader->upload($mediaDir, $file);
+                    $this->successfulResponse($request, $fileName, $editor);
                 } else {
-                    $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+                    $this->failureResponse($editor);
                 }
             }
         }
@@ -59,16 +60,16 @@ class FileController extends AjaxController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
-    public function listAction()
+    public function listAction(Request $request, PathsHelper $pathsHelper)
     {
-        $fnames = scandir($this->getMediaAbsolutePath());
+        $fnames = scandir($this->getMediaAbsolutePath($pathsHelper));
 
         if ($fnames) {
             foreach ($fnames as $name) {
-                $imagePath = $this->getMediaAbsolutePath().'/'.$name;
-                $imageUrl  = $this->getMediaUrl().'/'.$name;
+                $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.$name;
+                $imageUrl  = $this->getMediaUrl($request).'/'.$name;
                 if (!is_dir($name) && in_array(mime_content_type($imagePath), $this->imageMimes)) {
                     $this->response[] = [
                         'url'   => $imageUrl,
@@ -87,13 +88,13 @@ class FileController extends AjaxController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
-    public function deleteAction()
+    public function deleteAction(Request $request, PathsHelper $pathsHelper)
     {
-        $src       = InputHelper::clean($this->request->request->get('src'));
+        $src       = InputHelper::clean($request->request->get('src'));
         $response  = ['deleted' => false];
-        $imagePath = $this->getMediaAbsolutePath().'/'.basename($src);
+        $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
 
         if (!file_exists($imagePath)) {
             $this->response['error'] = 'File does not exist';
@@ -114,9 +115,9 @@ class FileController extends AjaxController
      *
      * @return string
      */
-    public function getMediaAbsolutePath()
+    public function getMediaAbsolutePath(PathsHelper $pathsHelper)
     {
-        $mediaDir = realpath($this->get('mautic.helper.paths')->getSystemPath('images', true));
+        $mediaDir = realpath($pathsHelper->getSystemPath('images', true));
 
         if (false === $mediaDir) {
             $this->response['error'] = 'Media dir does not exist';
@@ -136,11 +137,33 @@ class FileController extends AjaxController
      *
      * @return string
      */
-    public function getMediaUrl()
+    public function getMediaUrl(Request $request)
     {
-        return $this->request->getScheme().'://'
-            .$this->request->getHttpHost()
-            .$this->request->getBasePath().'/'
+        return $request->getScheme().'://'
+            .$request->getHttpHost()
+            .$request->getBasePath().'/'
             .$this->coreParametersHelper->get('image_path');
+    }
+
+    private function successfulResponse(Request $request, string $fileName, string $editor): void
+    {
+        $filePath = $this->getMediaUrl($request).'/'.$fileName;
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded'] = true;
+            $this->response['url']      = $filePath;
+        } else {
+            $this->response['link'] = $filePath;
+        }
+    }
+
+    private function failureResponse(string $editor): void
+    {
+        $errorMsg = 'The uploaded image does not have an allowed mime type';
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded']         = false;
+            $this->response['error']['message'] = $errorMsg;
+        } else {
+            $this->response['error'] = $errorMsg;
+        }
     }
 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
@@ -95,6 +86,12 @@ class CompanyObjectHelper implements ObjectHelperInterface
      */
     public function update(array $ids, array $objects): array
     {
+        $updatedMappedObjects = [];
+
+        if (!$ids) {
+            return $updatedMappedObjects;
+        }
+
         /** @var Company[] $companies */
         $companies = $this->model->getEntities(['ids' => $ids]);
         DebugLogger::log(
@@ -107,7 +104,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
             __CLASS__.':'.__FUNCTION__
         );
 
-        $updatedMappedObjects = [];
         foreach ($companies as $company) {
             /** @var ObjectChangeDAO $changedObject */
             $changedObject = $objects[$company->getId()];
@@ -153,12 +149,12 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->andX(
+                $qb->expr()->or(
+                    $qb->expr()->and(
                         $qb->expr()->isNotNull('c.date_modified'),
                         $qb->expr()->comparison('c.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
                     ),
-                    $qb->expr()->andX(
+                    $qb->expr()->and(
                         $qb->expr()->isNull('c.date_modified'),
                         $qb->expr()->comparison('c.date_added', 'BETWEEN', ':dateFrom and :dateTo')
                     )
@@ -169,7 +165,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByIds(array $ids): array
@@ -185,7 +181,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByFieldValues(array $fields): array
@@ -196,11 +192,11 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->andWhere("c.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     public function findOwnerIds(array $objectIds): array
@@ -216,6 +212,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->andWhere('c.id IN (:objectIds)');
         $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

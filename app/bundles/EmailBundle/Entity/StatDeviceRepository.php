@@ -1,26 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class StatDeviceRepository.
+ * @extends CommonRepository<StatDevice>
  */
 class StatDeviceRepository extends CommonRepository
 {
     /**
-     * @param           $emailIds
      * @param \DateTime $fromDate
      *
      * @return array
@@ -45,20 +35,20 @@ class StatDeviceRepository extends CommonRepository
         $qb->groupBy('es.list_id, d.device');
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $qb->andWhere(
                 $qb->expr()->gte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
         if (null !== $toDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($toDate);
             $qb->andWhere(
                 $qb->expr()->lte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

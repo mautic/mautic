@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -20,14 +12,18 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -44,10 +40,18 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\EventDispatcher\Event;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Page>
+ */
 class PageModel extends FormModel
 {
     use TranslationModelTrait;
@@ -100,11 +104,6 @@ class PageModel extends FormModel
     protected $queueService;
 
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -119,9 +118,8 @@ class PageModel extends FormModel
      */
     private $contactTracker;
 
-    /**
-     * PageModel constructor.
-     */
+    private ContactRequestHelper $contactRequestHelper;
+
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -133,7 +131,15 @@ class PageModel extends FormModel
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ContactRequestHelper $contactRequestHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -146,12 +152,11 @@ class PageModel extends FormModel
         $this->companyModel         = $companyModel;
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->contactRequestHelper = $contactRequestHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @param $catInUrl
-     */
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
@@ -162,7 +167,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -173,7 +178,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Hit');
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
     /**
@@ -207,9 +212,9 @@ class PageModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
-            //make sure alias is not already taken
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
@@ -229,7 +234,7 @@ class PageModel extends FormModel
         // Set the author for new pages
         $isNew = $entity->isNew();
         if (!$isNew) {
-            //increase the revision
+            // increase the revision
             $revision = $entity->getRevision();
             ++$revision;
             $entity->setRevision($revision);
@@ -262,7 +267,7 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -335,7 +340,7 @@ class PageModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -392,15 +397,13 @@ class PageModel extends FormModel
     /**
      * Generates slug string.
      *
-     * @param $entity
-     *
      * @return string
      */
     public function generateSlug($entity)
     {
         $pageSlug = $entity->getAlias();
 
-        //should the url include the category
+        // should the url include the category
         if ($this->catInUrl) {
             $category = $entity->getCategory();
             $catSlug  = (!empty($category))
@@ -412,7 +415,7 @@ class PageModel extends FormModel
         $parent = $entity->getTranslationParent();
         $slugs  = [];
         if ($parent) {
-            //multiple languages so tack on the language
+            // multiple languages so tack on the language
             $slugs[] = $entity->getLanguage();
         }
 
@@ -449,7 +452,7 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param string        $code
+     * @param string|int    $code
      * @param array         $query
      *
      * @throws \Exception
@@ -462,18 +465,19 @@ class PageModel extends FormModel
         }
 
         // Process the query
-        if (empty($query)) {
+        if (empty($query) || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->contactRequestHelper->getContactFromQuery($query);
 
             // company
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            $companyChangeLog                      = null;
             if ($leadAdded) {
-                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $query);
                 $this->companyModel->saveEntity($companyEntity);
@@ -484,6 +488,10 @@ class PageModel extends FormModel
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
+
+            if (null !== $companyChangeLog) {
+                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
+            }
         }
 
         if (!$lead || !$lead->getId()) {
@@ -492,7 +500,7 @@ class PageModel extends FormModel
         }
 
         $hit = new Hit();
-        $hit->setDateHit(new \Datetime());
+        $hit->setDateHit(new \DateTime());
         $hit->setIpAddress($this->ipLookupHelper->getIpAddress());
 
         // Set info from request
@@ -512,16 +520,20 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
             }
         }
 
-        //save hit to the cookie to use to update the exit time
+        // save hit to the cookie to use to update the exit time
         if ($hit) {
-            $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
+            $this->cookieHelper->setCookie(
+                name: 'mautic_referer_id',
+                value: $hit->getId() ?: null,
+                sameSite: Cookie::SAMESITE_NONE
+            );
         }
 
         if ($this->queueService->isQueueEnabled()) {
@@ -578,7 +590,7 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
                 if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
@@ -602,15 +614,15 @@ class PageModel extends FormModel
         if (isset($query['page_language'])) {
             $hit->setPageLanguage($query['page_language']);
         }
-        if (isset($query['page_title'])) {
+
+        if ($pageTitle = $query['page_title'] ?? ($page instanceof Page ? $page->getTitle() : false)) {
             // Transliterate page titles.
             if ($this->coreParametersHelper->get('transliterate_page_title')) {
-                $safeTitle = InputHelper::transliterate($query['page_title']);
-                $hit->setUrlTitle($safeTitle);
-                $query['page_title'] = $safeTitle;
-            } else {
-                $hit->setUrlTitle($query['page_title']);
+                $pageTitle = InputHelper::transliterate($pageTitle);
             }
+
+            $query['page_title'] = $pageTitle;
+            $hit->setUrlTitle($pageTitle);
         }
 
         $hit->setQuery($query);
@@ -630,7 +642,7 @@ class PageModel extends FormModel
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
-                //this is not a new session so update the last hit if applicable with the date/time the user left
+                // this is not a new session so update the last hit if applicable with the date/time the user left
                 $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
         }
@@ -638,48 +650,46 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($page->getLanguage());
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($page->getLanguage());
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
-                    $this->logger->addError(
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->error(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->pageTrackableModel->getRepository()->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
+                    );
+                }
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+                    throw $exception;
+                } else {
+                    $this->logger->error(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
                 }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV === 'dev') {
-                        throw $exception;
-                    } else {
-                        $this->logger->addError(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
-                    }
-                }
             }
         }
 
-        //glean info from the IP address
+        // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
@@ -696,59 +706,15 @@ class PageModel extends FormModel
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
-        if ($isUnique) {
-            // Add UTM tags entry if a UTM tag exist
-            $queryHasUtmTags = false;
-            if (!is_array($query)) {
-                parse_str($query, $query);
-            }
+        $this->setUtmTags($hit, $lead);
 
-            foreach ($query as $key => $value) {
-                if (false !== strpos($key, 'utm_')) {
-                    $queryHasUtmTags = true;
-                    break;
-                }
-            }
-
-            if ($queryHasUtmTags && $lead) {
-                $utmTags = new UtmTag();
-                $utmTags->setDateAdded($hit->getDateHit());
-                $utmTags->setUrl($hit->getUrl());
-                $utmTags->setReferer($hit->getReferer());
-                $utmTags->setQuery($hit->getQuery());
-                $utmTags->setUserAgent($hit->getUserAgent());
-                $utmTags->setRemoteHost($hit->getRemoteHost());
-                $utmTags->setLead($lead);
-
-                if (array_key_exists('utm_campaign', $query)) {
-                    $utmTags->setUtmCampaign($query['utm_campaign']);
-                }
-                if (array_key_exists('utm_term', $query)) {
-                    $utmTags->setUtmTerm($query['utm_term']);
-                }
-                if (array_key_exists('utm_content', $query)) {
-                    $utmTags->setUtmContent($query['utm_content']);
-                }
-                if (array_key_exists('utm_medium', $query)) {
-                    $utmTags->setUtmMedium($query['utm_medium']);
-                }
-                if (array_key_exists('utm_source', $query)) {
-                    $utmTags->setUtmSource($query['utm_source']);
-                }
-
-                $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
-                $repo->saveEntity($utmTags);
-
-                $this->leadModel->setUtmTags($lead, $utmTags);
-            }
-        }
-        //get a list of the languages the user prefers
+        // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
-                    //remove weights
+                if (($pos = strpos(';q=', $l)) !== false) {
+                    // remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
             }
@@ -763,7 +729,7 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -772,7 +738,7 @@ class PageModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
     }
 
@@ -791,6 +757,12 @@ class PageModel extends FormModel
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);
 
+        // get all params from the url (actual url or passed in as page_url)
+        if (!empty($query['page_url'])) {
+            $queryUrl = $this->getQueryFromUrl($query['page_url']);
+            $query    = \array_merge($queryUrl, $query);
+        }
+
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
             $query['ct'] = $this->decodeArrayFromUrl($query['ct']);
@@ -803,14 +775,13 @@ class PageModel extends FormModel
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param string|null  $tokenFilter
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
+    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
@@ -973,10 +944,11 @@ class PageModel extends FormModel
             ->andWhere($q->expr()->gte('h.date_hit', ':date_from'))
             ->setParameter('date_from', $dateFrom->format('Y-m-d'))
             ->andWhere($q->expr()->lte('h.date_hit', ':date_to'))
-            ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
+            ->setParameter('date_to', $dateTo->format('Y-m-d 23:59:59'));
         $q->groupBy('ds.device');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $chart   = new PieChart();
 
         if (empty($results)) {
@@ -1025,7 +997,7 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_hit');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -1055,12 +1027,79 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
-     * @param $page
+     * Get all params (e.g. UTM tags) from a url.
      */
+    private function getQueryFromUrl(string $pageUrl): array
+    {
+        $query             = [];
+        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+
+        if (is_string($urlQuery)) {
+            parse_str($urlQuery, $urlQueryArray);
+
+            foreach ($urlQueryArray as $key => $value) {
+                if (is_string($value)) {
+                    $key         = strtolower($key);
+                    $query[$key] = urldecode($value);
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Set UTM Tags based on the query of a page hit.
+     */
+    private function setUtmTags(Hit $hit, Lead $lead): void
+    {
+        // Add UTM tags entry if a UTM tag exist
+        $queryHasUtmTags = false;
+        $query           = $hit->getQuery();
+        foreach ($query as $key => $value) {
+            if (false !== strpos($key, 'utm_')) {
+                $queryHasUtmTags = true;
+                break;
+            }
+        }
+
+        if ($queryHasUtmTags && $lead) {
+            $utmTags = new UtmTag();
+            $utmTags->setDateAdded($hit->getDateHit());
+            $utmTags->setUrl($hit->getUrl());
+            $utmTags->setReferer($hit->getReferer());
+            $utmTags->setQuery($hit->getQuery());
+            $utmTags->setUserAgent($hit->getUserAgent());
+            $utmTags->setRemoteHost($hit->getRemoteHost());
+            $utmTags->setLead($lead);
+
+            if (array_key_exists('utm_campaign', $query)) {
+                $utmTags->setUtmCampaign($query['utm_campaign']);
+            }
+            if (array_key_exists('utm_term', $query)) {
+                $utmTags->setUtmTerm($query['utm_term']);
+            }
+            if (array_key_exists('utm_content', $query)) {
+                $utmTags->setUtmContent($query['utm_content']);
+            }
+            if (array_key_exists('utm_medium', $query)) {
+                $utmTags->setUtmMedium($query['utm_medium']);
+            }
+            if (array_key_exists('utm_source', $query)) {
+                $utmTags->setUtmSource($query['utm_source']);
+            }
+
+            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
+            $repo->saveEntity($utmTags);
+
+            $this->leadModel->setUtmTags($lead, $utmTags);
+        }
+    }
+
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
         // Only save the lead and dispatch events if needed
@@ -1084,8 +1123,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param $page
-     *
      * @return mixed|string
      */
     private function getPageUrl(Request $request, $page)
@@ -1096,7 +1133,7 @@ class PageModel extends FormModel
         }
 
         if ($page instanceof Redirect) {
-            //use the configured redirect URL
+            // use the configured redirect URL
             return $page->getUrl();
         }
 
@@ -1184,7 +1221,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    private function cleanQuery($query)
+    private function cleanQuery(array $query): array
     {
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {

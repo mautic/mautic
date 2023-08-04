@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
@@ -17,59 +10,68 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
+     * @var MockObject|ContactTracker
      */
     private $contactTracker;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var MockObject|CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|IpLookupHelper
+     * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
+     * @var MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
+     * @var MockObject|RequestStack
      */
     private $requestStack;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
+     * @var MockObject|Logger
      */
     private $logger;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Lead
+     * @var MockObject|Lead
      */
     private $trackedContact;
 
+    /**
+     * @var MockObject|ContactMerger
+     */
+    private $contactMerger;
+
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -77,8 +79,9 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->requestStack         = $this->createMock(RequestStack::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->dispatcher           = $this->createMock(EventDispatcher::class);
+        $this->trackedContact       = $this->createMock(Lead::class);
+        $this->contactMerger        = $this->createMock(ContactMerger::class);
 
-        $this->trackedContact = $this->createMock(Lead::class);
         $this->trackedContact->method('getId')
             ->willReturn(1);
 
@@ -92,7 +95,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new IpAddress());
     }
 
-    public function testEventDoesNotIdentifyContact()
+    public function testEventDoesNotIdentifyContact(): void
     {
         $query = [
             'ct' => [
@@ -100,7 +103,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'email' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
             ],
         ];
 
@@ -111,8 +114,8 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $stat = new Stat();
         $stat->setEmail($email);
 
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
@@ -122,7 +125,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    public function testEventIdentifiesContact()
+    public function testEventIdentifiesContact(): void
     {
         $query = [
             'ct' => [
@@ -137,14 +140,14 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $contact = new Lead();
 
         $this->dispatcher->method('dispatch')
-            ->willReturnCallback(
-                function ($eventName, ContactIdentificationEvent $event) use ($contact) {
-                    $event->setIdentifiedContact($contact, 'email');
-                }
-            );
+            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact) {
+                $event->setIdentifiedContact($contact, 'email');
 
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
+                return $event;
+            });
+
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
 
         $helper       = $this->getContactRequestHelper();
         $foundContact = $helper->getContactFromQuery($query);
@@ -152,7 +155,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($contact === $foundContact);
     }
 
-    public function testLandingPageClickthroughIdentifiesLeadIfEnabled()
+    public function testLandingPageClickthroughIdentifiesLeadIfEnabled(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -188,16 +191,16 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($queryWithEmail, null, true, true)
+            ->with($queryWithEmail, true, true)
             ->willReturn([$lead, ['email' => 'test@test.com']]);
 
         $helper = $this->getContactRequestHelper();
         $this->assertEquals($lead->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    public function testLandingPageClickthroughDoesNotIdentifyLeadIfDisabled()
+    public function testLandingPageClickthroughDoesNotIdentifyLeadIfDisabled(): void
     {
-        $this->coreParametersHelper->expects($this->at(0))
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
@@ -220,17 +223,14 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($query, null, true, true)
+            ->with($query, true, true)
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    /**
-     * @return ContactRequestHelper
-     */
-    private function getContactRequestHelper()
+    private function getContactRequestHelper(): ContactRequestHelper
     {
         return new ContactRequestHelper(
             $this->leadModel,
@@ -239,7 +239,8 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->ipLookupHelper,
             $this->requestStack,
             $this->logger,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->contactMerger
         );
     }
 }

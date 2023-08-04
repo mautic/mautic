@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-brienz",
+  "description": "Mautic Brienz Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "brienz"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

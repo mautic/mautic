@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,10 +13,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /** @var int Limit number of stored 'openDetails' */
-    const MAX_OPEN_DETAILS = 1000;
+    public const MAX_OPEN_DETAILS = 1000;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     private $id;
 
@@ -40,7 +31,7 @@ class Stat
     private $lead;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $emailAddress;
 
@@ -55,7 +46,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -75,7 +66,7 @@ class Stat
     private $viewedInBrowser = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateRead;
 
@@ -85,7 +76,7 @@ class Stat
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
@@ -110,12 +101,12 @@ class Stat
     private $storedCopy;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $openCount = 0;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastOpened;
 
@@ -259,7 +250,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {
@@ -275,7 +266,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -304,11 +295,11 @@ class Stat
     }
 
     /**
-     * @return id|null
+     * @return int|null
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -567,7 +558,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getLastOpened()
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Doctrine\ORM\EntityManager;
@@ -71,7 +62,8 @@ class SegmentCampaignShare
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
-        $campaigns = $q->execute()->fetchAll();
+        $campaigns = $q->execute()->fetchAllAssociative();
+
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
             if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {

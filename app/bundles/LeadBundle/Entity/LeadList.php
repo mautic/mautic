@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,39 +8,43 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class LeadList extends FormEntity
 {
+    public const TABLE_NAME = 'lead_lists';
+
     /**
      * @var int|null
      */
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $publicName;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $alias;
 
@@ -69,9 +64,19 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
     private $leads;
+
+    /**
+     * @var \DateTimeInterface|null
+     */
+    private $lastBuiltDate;
+
+    /**
+     * @var float|null
+     */
+    private $lastBuiltTime;
 
     public function __construct()
     {
@@ -82,8 +87,9 @@ class LeadList extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_lists')
-            ->setCustomRepositoryClass(LeadListRepository::class);
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadListRepository::class)
+            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist');
 
         $builder->addIdColumns();
 
@@ -110,6 +116,16 @@ class LeadList extends FormEntity
             ->mappedBy('list')
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('lastBuiltDate', 'datetime')
+            ->columnName('last_built_date')
+            ->nullable()
+            ->build();
+
+        $builder->createField('lastBuiltTime', 'float')
+            ->columnName('last_built_time')
+            ->nullable()
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -122,6 +138,8 @@ class LeadList extends FormEntity
             'field'   => 'alias',
             'message' => 'mautic.lead.list.alias.unique',
         ]));
+
+        $metadata->addConstraint(new SegmentInUse());
     }
 
     /**
@@ -137,6 +155,7 @@ class LeadList extends FormEntity
                     'publicName',
                     'alias',
                     'description',
+                    'category',
                 ]
             )
             ->addProperties(
@@ -258,10 +277,21 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->addLegacyParams($this->filters);
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
         }
 
         return $this->filters;
+    }
+
+    public function hasFilterTypeOf(string $type): bool
+    {
+        foreach ($this->getFilters() as $filter) {
+            if ($filter['type'] === $type) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -271,8 +301,8 @@ class LeadList extends FormEntity
      */
     public function setIsGlobal($isGlobal)
     {
-        $this->isChanged('isGlobal', $isGlobal);
-        $this->isGlobal = $isGlobal;
+        $this->isChanged('isGlobal', (bool) $isGlobal);
+        $this->isGlobal = (bool) $isGlobal;
 
         return $this;
     }
@@ -335,6 +365,7 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
         $this->setIsPublished(false);
         $this->setAlias('');
+        $this->lastBuiltDate = null;
     }
 
     /**
@@ -350,8 +381,8 @@ class LeadList extends FormEntity
      */
     public function setIsPreferenceCenter($isPreferenceCenter)
     {
-        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
-        $this->isPreferenceCenter = $isPreferenceCenter;
+        $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
+        $this->isPreferenceCenter = (bool) $isPreferenceCenter;
     }
 
     /**
@@ -364,12 +395,62 @@ class LeadList extends FormEntity
     {
         return array_map(
             function (array $filter) {
-                $filter['filter'] = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
+                $filter['filter']  = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
                 $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
 
                 return $filter;
             },
             $filters
         );
+    }
+
+    public function getLastBuiltDate(): ?\DateTimeInterface
+    {
+        return $this->lastBuiltDate;
+    }
+
+    public function setLastBuiltDate(?\DateTime $lastBuiltDate): void
+    {
+        $this->lastBuiltDate = $lastBuiltDate;
+    }
+
+    public function setLastBuiltDateToCurrentDatetime(): void
+    {
+        $now = (new DateTimeHelper())->getUtcDateTime();
+        $this->setLastBuiltDate($now);
+    }
+
+    public function initializeLastBuiltDate(): void
+    {
+        if ($this->getLastBuiltDate() instanceof \DateTime) {
+            return;
+        }
+
+        $this->setLastBuiltDateToCurrentDatetime();
+    }
+
+    public function getLastBuiltTime(): ?float
+    {
+        return $this->lastBuiltTime;
+    }
+
+    public function setLastBuiltTime(?float $lastBuiltTime): void
+    {
+        $this->lastBuiltTime = $lastBuiltTime;
+    }
+
+    /**
+     * @param mixed[] $filters
+     *
+     * @return mixed[]
+     */
+    private function setFirstFilterGlueToAnd(array $filters): array
+    {
+        foreach ($filters as &$filter) {
+            $filter['glue'] = 'and';
+            break;
+        }
+
+        return $filters;
     }
 }

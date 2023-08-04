@@ -1,0 +1,17 @@
+{
+    "name": "mautic/plugin-cloudstorage",
+    "description": "Cloudstorage Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration"
+    ],
+    "extra": {
+        "install-directory-name": "MauticCloudStorageBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^5.0"
+    }
+}

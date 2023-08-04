@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -29,17 +21,17 @@ class TweetStat
     /**
      * ID of the tweet from Twitter.
      *
-     * @var string
+     * @var string|null
      */
     private $twitterTweetId;
 
     /**
-     * @var Tweet
+     * @var Tweet|null
      */
     private $tweet;
 
     /**
-     * @var TheLead
+     * @var TheLead|null
      */
     private $lead;
 
@@ -54,37 +46,37 @@ class TweetStat
     private $dateSent;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isFailed = false;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $favoriteCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retweetCount = 0;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $responseDetails = [];
 
@@ -146,13 +138,11 @@ class TweetStat
 
         $builder->addNullableField('favoriteCount', 'integer', 'favorite_count');
         $builder->addNullableField('retweetCount', 'integer', 'retweet_count');
-        $builder->addNullableField('responseDetails', 'json_array', 'response_details');
+        $builder->addNullableField('responseDetails', Types::JSON, 'response_details');
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

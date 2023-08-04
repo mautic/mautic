@@ -1,17 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,35 +14,36 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PublicController extends CommonController
 {
-    public function contactDataAction()
+    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper)
     {
-        $content = $this->get('request')->getContent();
+        $content = $request->getContent();
         if (!empty($content)) {
             $data = json_decode($content, true); // 2nd param to get as array
         } else {
             return new Response('ERROR');
         }
 
-        $logger = $this->get('monolog.logger.mautic');
-
-        $integration       = 'Hubspot';
-        $integrationHelper = $this->get('mautic.helper.integration');
+        $integration = 'Hubspot';
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        \assert($integrationObject instanceof HubspotIntegration);
+
         foreach ($data as $info) {
             $object = explode('.', $info['subscriptionType']);
             $id     = $info['objectId'];
 
             try {
                 switch ($object[0]) {
-                    case 'contact': $integrationObject->getContacts($id);
+                    case 'contact':
+                        $executed = [];
+                        $integrationObject->getLeads($id, null, $executed);
                         break;
                     case 'company':
                         $integrationObject->getCompanies($id);
                         break;
                 }
             } catch (\Exception $ex) {
-                $logger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
+                $mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
             }
         }
 

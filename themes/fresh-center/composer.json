@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-fresh-center",
+  "description": "Mautic Fresh Center Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "fresh-center"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

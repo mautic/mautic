@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Validator;
 
@@ -20,15 +13,10 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoEmailsProvided()
+    public function testNoEmailsProvided(): void
     {
-        $emailValidatorMock = $this->getMockBuilder(EmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailValidatorMock = $this->createMock(EmailValidator::class);
+        $constraintMock     = $this->createMock(Constraint::class);
 
         $emailValidatorMock->expects($this->never())
             ->method('validate');
@@ -38,23 +26,14 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $multipleEmailsValidValidator->validate(null, $constraintMock);
     }
 
-    public function testValidEmails()
+    public function testValidEmails(): void
     {
-        $emailValidatorMock = $this->getMockBuilder(EmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailValidatorMock = $this->createMock(EmailValidator::class);
+        $constraintMock     = $this->createMock(Constraint::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $emailValidatorMock->expects($this->at(0))
+        $emailValidatorMock->expects($this->exactly(2))
             ->method('validate')
-            ->with('john@don.com');
-
-        $emailValidatorMock->expects($this->at(1))
-            ->method('validate')
-            ->with('don@john.com');
+            ->withConsecutive(['john@don.com'], ['don@john.com']);
 
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
 
@@ -62,32 +41,17 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $multipleEmailsValidValidator->validate($emails, $constraintMock);
     }
 
-    public function testNotValidEmails()
+    public function testNotValidEmails(): void
     {
-        $emailValidatorMock = $this->getMockBuilder(EmailValidator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailValidatorMock                      = $this->createMock(EmailValidator::class);
+        $constraintMock                          = $this->createMock(Constraint::class);
+        $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
-        $constraintMock = $this->getMockBuilder(Constraint::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $executionContextInterfaceMock = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $constraintViolationBuilderInterfaceMock = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $emailValidatorMock->expects($this->at(0))
+        $emailValidatorMock->expects($this->exactly(2))
             ->method('validate')
-            ->with('john@don.com');
-
-        $emailValidatorMock->expects($this->at(1))
-            ->method('validate')
-            ->with('xxx')
-            ->willThrowException(new InvalidEmailException('xxx'));
+            ->withConsecutive(['john@don.com'], ['xxx'])
+            ->willReturn(null, $this->throwException(new InvalidEmailException('xxx')));
 
         $executionContextInterfaceMock->expects($this->once())
             ->method('buildViolation')

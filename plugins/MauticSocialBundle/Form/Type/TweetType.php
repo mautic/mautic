@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -96,9 +87,9 @@ class TweetType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticAssetBundle:Asset', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
         $builder->add(
-                $builder->create(
+            $builder->create(
                 'asset',
                 AssetListType::class,
                 [
@@ -114,7 +105,7 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',
@@ -143,7 +134,7 @@ class TweetType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);

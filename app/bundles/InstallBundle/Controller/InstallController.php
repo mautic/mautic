@@ -1,41 +1,40 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class InstallController extends CommonController
 {
-    private $configurator;
+    private Configurator $configurator;
 
-    private $installer;
+    private InstallService $installer;
 
-    /**
-     * Initialize controller.
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function __construct(Configurator $configurator, InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->configurator = $this->container->get('mautic.configurator');
-        $this->installer    = $this->container->get('mautic.install.service');
+        $this->configurator = $configurator;
+        $this->installer    = $installer;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -45,30 +44,32 @@ class InstallController extends CommonController
      *
      * @return JsonResponse|Response
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function stepAction($index = 0)
+    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
         if ($this->installer->checkIfInstalled()) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         }
 
-        if (false !== strpos($index, '.')) {
-            [$index, $subIndex] = explode('.', $index);
+        if ($index - floor($index) > 0) {
+            $subIndex = (int) (round($index - floor($index), 1) * 10);
+            $index    = floor($index);
         }
+        $index = (int) $index;
 
         $params = $this->configurator->getParameters();
 
-        $session        = $this->get('session');
+        $session        = $request->getSession();
         $completedSteps = $session->get('mautic.installer.completedsteps', []);
 
         // Check to ensure the installer is in the right place
         if ((empty($params) || empty($params['db_driver'])) && $index > 1) {
             $session->set('mautic.installer.completedsteps', [0]);
 
-            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
         }
 
         /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
@@ -76,13 +77,13 @@ class InstallController extends CommonController
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         // Note if this step is complete
         $complete = false;
 
-        if ('POST' === $this->request->getMethod()) {
-            $form->handleRequest($this->request);
+        if ('POST' === $request->getMethod()) {
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 // Post-step processing
                 $formData = $form->getData();
@@ -98,43 +99,36 @@ class InstallController extends CommonController
                             $formData->password = $params['db_password'];
                         }
                         $dbParams = (array) $formData;
-
                         $messages = $this->installer->createDatabaseStep($step, $dbParams);
-                        if (is_bool($messages) && true === $messages) {
-                            // XXX Regression: we used to also get this if database created but configuration not saved
-                            $schemaHelper             = new SchemaHelper($dbParams);
-                            $formData->server_version = $schemaHelper->getServerVersion();
-
-                            // Refresh to install schema with new connection information in the container
-                            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
-                        } elseif (is_array($messages) && !empty($messages)) {
+                        if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
+                            break;
                         }
-                        break;
 
+                        /**
+                         * We need to clear the ORM metadata cache before creating the schema. If the user provided a database
+                         * table prefix in the UI installer, cached table names don't have the prefix yet (e.g. oauth2_clients).
+                         * After clearing the metadata cache, Doctrine automatically recreates it with the correct prefixes (e.g.
+                         * mau_oauth2_clients), if applicable.
+                         */
+                        $entityManager->getConfiguration()->getMetadataCache()->clear();
+
+                        // Refresh to install schema with new connection information in the container
+                        return $this->redirectToRoute('mautic_installer_step', ['index' => 1.1]);
                     case InstallService::USER_STEP:
                         $adminParam = (array) $formData;
                         $messages   = $this->installer->createAdminUserStep($adminParam);
 
-                        if (is_bool($messages) && true === $messages) {
-                            // Store the data to repopulate the form
-                            unset($formData->password);
-                            $session->set('mautic.installer.user', $formData);
-
-                            $complete = true;
-                        } elseif (is_array($messages) && !empty($messages)) {
+                        if (!empty($messages)) {
                             $this->handleInstallerErrors($form, $messages);
+                            break;
                         }
-                        break;
 
-                    case InstallService::EMAIL_STEP:
-                        $emailParam = (array) $formData;
-                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
-                        if (is_bool($messages)) {
-                            $complete = $messages;
-                        } elseif (is_array($messages) && !empty($messages)) {
-                            $this->handleInstallerErrors($form, $messages);
-                        }
+                        // Store the data to repopulate the form
+                        unset($formData->password);
+                        $session->set('mautic.installer.user', $formData);
+
+                        $complete = true;
                         break;
                 }
             }
@@ -143,27 +137,25 @@ class InstallController extends CommonController
                 case InstallService::DOCTRINE_STEP:
                     $dbParams = (array) $step;
 
-                    switch ((int) $subIndex) {
+                    switch ($subIndex) {
                         case 1:
                             $messages = $this->installer->createSchemaStep($dbParams);
-
-                            if (is_bool($messages) && true === $messages) {
-                                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.2]));
-                            } elseif (is_array($messages) && !empty($messages)) {
+                            if (!empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
+
+                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
                             }
 
-                            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
                         case 2:
-                            $messages = $this->installer->createFixturesStep($this->container);
-
-                            if (is_bool($messages) && true === $messages) {
-                                $complete = true;
-                            } elseif (is_array($messages) && !empty($messages)) {
+                            $messages = $this->installer->createFixturesStep();
+                            if (!empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
 
-                                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
                             }
+
+                            $complete = true;
                             break;
                     }
                     break;
@@ -178,25 +170,25 @@ class InstallController extends CommonController
             if ($index < $this->configurator->getStepCount()) {
                 // On to the next step
 
-                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => (int) $index]));
+                return $this->redirectToRoute('mautic_installer_step', ['index' => (int) $index]);
             } else {
-                $siteUrl  = $this->request->getSchemeAndHttpHost().$this->request->getBaseUrl();
+                $siteUrl  = $request->getSchemeAndHttpHost().$request->getBaseUrl();
                 $messages = $this->installer->createFinalConfigStep($siteUrl);
 
-                if (is_array($messages) && !empty($messages)) {
+                if (!empty($messages)) {
                     $this->handleInstallerErrors($form, $messages);
                 }
 
                 return $this->postActionRedirect(
                     [
-                        'viewParameters' => [
+                        'viewParameters'    => [
                             'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
                             'parameters'  => $this->configurator->render(),
                             'version'     => MAUTIC_VERSION,
                             'tmpl'        => $tmpl,
                         ],
                         'returnUrl'         => $this->generateUrl('mautic_installer_final'),
-                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
+                        'contentTemplate'   => '@MauticInstall/Install/final.html.twig',
                         'forwardController' => false,
                     ]
                 );
@@ -205,13 +197,13 @@ class InstallController extends CommonController
             // Redirect back to last step if the user advanced ahead via the URL
             $last = (int) end($completedSteps) + 1;
             if ($index && $index > $last) {
-                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => (int) $last]));
+                return $this->redirectToRoute('mautic_installer_step', ['index' => $last]);
             }
         }
 
         return $this->delegateView(
             [
-                'viewParameters' => [
+                'viewParameters'  => [
                     'form'           => $form->createView(),
                     'index'          => $index,
                     'count'          => $this->configurator->getStepCount(),
@@ -219,10 +211,10 @@ class InstallController extends CommonController
                     'tmpl'           => $tmpl,
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
-                    'appRoot'        => $this->container->getParameter('kernel.root_dir'),
-                    'cacheDir'       => $this->container->getParameter('kernel.cache_dir'),
-                    'logDir'         => $this->container->getParameter('kernel.logs_dir'),
-                    'configFile'     => $this->get('mautic.helper.paths')->getSystemPath('local_config'),
+                    'appRoot'        => $this->coreParametersHelper->get('kernel.project_dir').'/app',
+                    'cacheDir'       => $this->coreParametersHelper->get('kernel.cache_dir'),
+                    'logDir'         => $this->coreParametersHelper->get('kernel.logs_dir'),
+                    'configFile'     => $pathsHelper->getSystemPath('local_config'),
                     'completedSteps' => $completedSteps,
                 ],
                 'contentTemplate' => $step->getTemplate(),
@@ -240,20 +232,20 @@ class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction()
+    public function finalAction(Request $request, PathsHelper $pathsHelper)
     {
-        $session = $this->get('session');
+        $session = $request->getSession();
 
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
         if ($this->installer->checkIfInstalled()) {
             if (!$session->has('mautic.installer.completedsteps')) {
                 // Arrived here by directly browsing to URL so redirect to the dashboard
 
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                return $this->redirectToRoute('mautic_dashboard_index');
             }
         } else {
             // Shouldn't have made it to this step without having a successful install
-            return $this->redirect($this->generateUrl('mautic_installer_home'));
+            return $this->redirectToRoute('mautic_installer_home');
         }
 
         // Remove installer session variables
@@ -264,19 +256,19 @@ class InstallController extends CommonController
 
         $welcomeUrl = $this->generateUrl('mautic_dashboard_index');
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'welcome_url' => $welcomeUrl,
                     'parameters'  => $this->configurator->render(),
-                    'config_path' => $this->get('mautic.helper.paths')->getSystemPath('local_config'),
+                    'config_path' => $pathsHelper->getSystemPath('local_config'),
                     'is_writable' => $this->configurator->isFileWritable(),
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,
                 ],
-                'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
+                'contentTemplate' => '@MauticInstall/Install/final.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_installer_index',
                     'mauticContent' => 'installer',
@@ -296,7 +288,7 @@ class InstallController extends CommonController
                 case 'warning':
                 case 'error':
                 case 'notice':
-                    $this->addFlash($message, [], $type);
+                    $this->addFlashMessage($message, [], $type);
                     break;
                 default:
                     // If type not a flash type, assume form field error

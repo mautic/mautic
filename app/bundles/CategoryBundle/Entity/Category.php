@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -34,7 +25,7 @@ class Category extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -44,7 +35,7 @@ class Category extends FormEntity
     private $alias;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $color;
 
@@ -98,8 +89,6 @@ class Category extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -143,6 +132,7 @@ class Category extends FormEntity
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -167,6 +157,7 @@ class Category extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;
@@ -191,6 +182,7 @@ class Category extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -215,6 +207,7 @@ class Category extends FormEntity
      */
     public function setColor($color)
     {
+        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -237,6 +230,7 @@ class Category extends FormEntity
      */
     public function setBundle($bundle)
     {
+        $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;
     }
 

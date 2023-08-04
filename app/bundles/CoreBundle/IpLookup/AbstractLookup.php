@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
@@ -27,10 +18,7 @@ abstract class AbstractLookup
     public $timezone     = '';
     public $extra        = '';
 
-    /**
-     * @var Http|null
-     */
-    protected $connector;
+    protected ?Client $client;
 
     /**
      * @var string IP Address
@@ -40,17 +28,10 @@ abstract class AbstractLookup
     /**
      * Authorization for lookup service.
      */
-    protected $auth;
+    protected ?string $auth;
 
-    /**
-     * @var string
-     */
-    protected $cacheDir;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected ?string $cacheDir;
+    protected ?LoggerInterface $logger;
 
     /**
      * @var mixed
@@ -72,22 +53,19 @@ abstract class AbstractLookup
     /**
      * AbstractLookup constructor.
      *
-     * @param null $auth
      * @param null $ipLookupConfig
      * @param null $cacheDir
      */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null)
+    public function __construct(?string $auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
     {
         $this->cacheDir  = $cacheDir;
         $this->logger    = $logger;
         $this->auth      = $auth;
         $this->config    = $ipLookupConfig;
-        $this->connector = $httpConnector;
+        $this->client    = $client;
     }
 
     /**
-     * @param $ip
-     *
      * @return $this
      */
     public function setIpAddress($ip)

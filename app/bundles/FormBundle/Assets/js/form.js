@@ -1,18 +1,14 @@
 //FormBundle
 Mautic.formOnLoad = function (container) {
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
+
+    Mautic.formBuilderNewComponentInit();
+    Mautic.iniNewConditionalField();
+
     var bodyOverflow = {};
-
-    mQuery('select.form-builder-new-component').change(function (e) {
-        mQuery(this).find('option:selected');
-        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
-        // Reset the dropdown
-        mQuery(this).val('');
-        mQuery(this).trigger('chosen:updated');
-    });
-
 
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
@@ -103,6 +99,51 @@ Mautic.formOnLoad = function (container) {
     Mautic.initHideItemButton('#mauticforms_actions');
 };
 
+Mautic.formBuilderNewComponentInit = function () {
+    mQuery('select.form-builder-new-component').change(function (e) {
+        mQuery(this).find('option:selected');
+        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+        // Reset the dropdown
+        mQuery(this).val('');
+        mQuery(this).trigger('chosen:updated');
+    });
+};
+
+Mautic.changeSelectOptions = function(selectEl, options) {
+    selectEl.empty();
+    mQuery.each(options, function(key, field) {
+        selectEl.append(
+            mQuery('<option></option>')
+                .attr('value', field.value)
+                .attr('data-list-type', field.isListType ? 1 : 0)
+                .text(field.label)
+        );
+    });
+    selectEl.trigger('chosen:updated');
+};
+
+Mautic.fetchFieldsOnObjectChange = function() {
+    var fieldSelect = mQuery('select#formfield_mappedField');
+    fieldSelect.attr('disable', true);
+    mQuery.ajax({
+        url: mauticAjaxUrl + "?action=form:getFieldsForObject",
+        data: {
+            mappedObject: mQuery('select#formfield_mappedObject').val(),
+            mappedField: mQuery('input#formfield_originalMappedField').val(),
+            formId: mQuery('input#mauticform_sessionId').val()
+        },
+        success: function (response) {
+            Mautic.changeSelectOptions(fieldSelect, response.fields);
+        },
+        error: function (response, textStatus, errorThrown) {
+            Mautic.processAjaxError(response, textStatus, errorThrown);
+        },
+        complete: function () {
+            fieldSelect.removeAttr('disable');
+        }
+    });
+};
+
 Mautic.updateFormFields = function () {
     Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
 
@@ -178,9 +219,14 @@ Mautic.formFieldOnLoad = function (container, response) {
             mQuery(fieldContainer).replaceWith(newHtml);
             var newField = false;
         } else {
-            //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
-            panel.before(newHtml);
+            var parentContainer = mQuery('#mauticform_'+response.parent);
+            if (parentContainer.length) {
+                (parentContainer.parents('.panel:first')).append(newHtml);
+            }else {
+                //append content
+                var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
+                panel.before(newHtml);
+            }
             var newField = true;
         }
 
@@ -217,8 +263,21 @@ Mautic.formFieldOnLoad = function (container, response) {
         if (mQuery('#form-field-placeholder').length) {
             mQuery('#form-field-placeholder').remove();
         }
+
+        Mautic.activateChosenSelect(mQuery('.form-builder-new-component'));
+        Mautic.formBuilderNewComponentInit();
+        Mautic.iniNewConditionalField();
     }
 };
+
+Mautic.iniNewConditionalField = function(){
+    mQuery('.add-new-conditional-field').click(function (e) {
+        e.preventDefault();
+        mQuery(this).parent().next().show('normal');
+    })
+    mQuery('.add-new-conditional-field').parent().next().hide();
+
+}
 
 Mautic.initFormFieldButtons = function (container) {
     if (typeof container == 'undefined') {
@@ -287,7 +346,7 @@ Mautic.formActionOnLoad = function (container, response) {
 Mautic.initHideItemButton = function(container) {
     mQuery(container).find('[data-hide-panel]').click(function(e) {
         e.preventDefault();
-        mQuery(this).closest('.panel').hide('fast');
+        mQuery(this).closest('.panel,.panel2').hide('fast');
     });
 }
 

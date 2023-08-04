@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -20,7 +11,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UpdateSchemaStep implements StepInterface
 {
@@ -42,7 +33,7 @@ final class UpdateSchemaStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 40;
+        return 50;
     }
 
     public function shouldExecuteInFinalStage(): bool

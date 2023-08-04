@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadDeviceRepository.
+ * @extends CommonRepository<LeadDevice>
  */
 class LeadDeviceRepository extends CommonRepository
 {
@@ -36,8 +27,6 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -45,7 +34,6 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param      $lead
      * @param null $deviceNames
      * @param null $deviceBrands
      * @param null $deviceModels
@@ -117,8 +105,8 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        //get totals
-        $device = $sq->execute()->fetchAll();
+        // get totals
+        $device = $sq->execute()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
@@ -173,14 +161,11 @@ class LeadDeviceRepository extends CommonRepository
             ->setParameter('leadId', (int) $lead->getId())
             ->orderBy('date_added', 'desc')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
