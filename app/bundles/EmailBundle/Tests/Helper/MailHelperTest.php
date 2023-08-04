@@ -3,7 +3,9 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -15,8 +17,11 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Swift_Mailer;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MailHelperTest extends TestCase
 {
@@ -452,7 +457,7 @@ class MailHelperTest extends TestCase
         // From address is set
         $email->setFromAddress('from@nowhere.com');
         $mailer->setEmail($email);
-        $replyTo = key($mailer->message->getReplyTo());
+        $replyTo = key((array) $mailer->message->getReplyTo());
         // Expect from address in reply to
         $this->assertEquals('admin@mautic.com', $replyTo);
     }
@@ -843,5 +848,71 @@ class MailHelperTest extends TestCase
 
         $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $this->assertFalse($mailer->inTokenizationMode());
+    }
+
+    public function testImagesEmbeddedOnSend(): void
+    {
+        $unsubscribeUrl   = '/unsubscribe';
+        $trackingPixelUrl = '/tracking.gif';
+        $parameterMap     = [
+            ['mailer_convert_embed_images', false, true],
+            ['mailer_append_tracking_pixel', false, true],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $router          = $this->createMock(UrlGeneratorInterface::class);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $mockFactory->expects(self::once())
+            ->method('getDispatcher')
+            ->willReturn($eventDispatcher);
+        $mockFactory->expects(self::exactly(3))
+            ->method('getRouter')
+            ->willReturn($router);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setIdHash();
+
+        $initialHtml = 'Text <a href="https://mautic.com">Mautic</a> <img src="{ token }" /> <img src="https://mautic.com/contact/{ token2 }/avatar.png"/> <img src="/tmp/fake.jpg">';
+        $trackedHtml = $initialHtml.'<img height="1" width="1" src="{tracking_pixel}" alt="" />';
+
+        $eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(EmailEvents::EMAIL_ON_SEND, new EmailSendEvent($mailer))
+            ->willReturnCallback(static function (string $eventName, EmailSendEvent $event): object {
+                $event->addToken('{ token }', 'https://mautic.com/image.gif');
+
+                return $event;
+            });
+
+        $router->expects(self::exactly(3))
+            ->method('generate')
+            ->withConsecutive([
+                'mautic_email_unsubscribe', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL,
+            ], [
+                'mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL,
+            ], [
+                'mautic_email_tracker', ['idHash' => $mailer->getIdHash()], UrlGeneratorInterface::ABSOLUTE_URL,
+            ])
+            ->willReturnOnConsecutiveCalls($unsubscribeUrl, $trackingPixelUrl, $trackingPixelUrl);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml($initialHtml);
+        $mailer->setEmail($email);
+
+        Assert::assertNull($mailer->message->getBody());
+        Assert::assertSame($trackedHtml, $mailer->getBody());
+
+        $mailer->send(true);
+
+        Assert::assertMatchesRegularExpression(
+            '~Text <a href="https://mautic.com">Mautic</a> <img src="cid:[a-zA-Z0-9]+@swift.generated" /> <img src="cid:[a-zA-Z0-9]+@swift.generated"/> <img src="cid:[a-zA-Z0-9]+@swift.generated"><img height="1" width="1" src="/tracking.gif" alt="" />~',
+            $mailer->message->getBody()
+        );
+        Assert::assertSame($trackedHtml, $mailer->getBody());
     }
 }

@@ -138,7 +138,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $properties = [];
 
@@ -789,7 +789,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $properties
+     * @param array<mixed> $properties
      *
      * @return Import
      */

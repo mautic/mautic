@@ -3,17 +3,48 @@
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Swift_Mailer;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private SmtpTransport $transport;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadCategoryData::class]);
+        $this->setUpMailer();
+    }
+
+    private function setUpMailer(): void
+    {
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $transport  = new SmtpTransport();
+        $mailer     = new Swift_Mailer($transport);
+        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
+        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+
+        $this->transport  = $transport;
+    }
+
+    protected function tearDown(): void
+    {
+        // Clear owners cache (to leave a clean environment for future tests):
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $this->setPrivateProperty($mailHelper, 'leadOwners', []);
+
+        parent::tearDown();
     }
 
     protected function beforeBeginTransaction(): void
@@ -202,5 +233,155 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
         $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
         $this->assertMatchesRegularExpression('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
+    }
+
+    public function testSendAction(): void
+    {
+        // Create a user (to test use onwer as mailer):
+        $role = new Role();
+        $role->setName('Role');
+        $this->em->persist($role);
+
+        $user = new User();
+        $user->setUserName('apitest');
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+        $user->setEmail('john@api.test');
+        $user->setSignature('Best regards, |FROM_NAME|');
+        $user->setRole($role);
+        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $user->setPassword($encoder->encodePassword('password', null));
+        $this->em->persist($user);
+
+        // Create a contact:
+        $contact = new Lead();
+        $contact->setFirstName('Jane');
+        $contact->setLastName('Doe');
+        $contact->setEmail('jane@api.test');
+        $contact->setOwner($user);
+        $this->em->persist($contact);
+
+        // Create a segment:
+        $segment = new LeadList();
+        $segment->setName('API segment');
+        $segment->setPublicName('API segment');
+        $segment->setAlias('API segment');
+        $segment->setDescription('Segment created via API test');
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        // Add contact to segment:
+        $segmentContact = new ListLead();
+        $segmentContact->setLead($contact);
+        $segmentContact->setList($segment);
+        $segmentContact->setDateAdded(new \DateTime());
+        $this->em->persist($segmentContact);
+
+        // Commit
+        $this->em->flush();
+
+        $contactId = $contact->getId();
+        $segmentId = $segment->getId();
+
+        // Create an email:
+        $createEmail = function () use ($segment) {
+            $email = new Email();
+            $email->setName('API email');
+            $email->setSubject('Email created via API test');
+            $email->setEmailType('list');
+            $email->addList($segment);
+            $email->setCustomHtml('<h1>Email content created by an API test</h1><br>{signature}');
+            $email->setIsPublished(true);
+            $email->setFromAddress('from@api.test');
+            $email->setFromName('API Test');
+            $email->setReplyToAddress('reply@api.test');
+            $email->setBccAddress('bcc@api.test');
+
+            return $email;
+        };
+
+        $email = $createEmail();
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
+
+        // Send to segment:
+        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $clientResponse = $this->client->getResponse();
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
+
+        $testEmail = function (): void {
+            $message = $this->transport->sentMessage;
+            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $bodyRegExp = '#<h1>Email content created by an API test</h1><br><img height="1" width="1" src="[^"]+" alt="" />#';
+            $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
+            $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
+            $this->assertSame($message->getFrom(), ['from@api.test' => 'API Test']);
+            $this->assertSame($message->getReplyTo(), ['reply@api.test' => null]);
+            $this->assertSame($message->getBcc(), ['bcc@api.test' => null]);
+        };
+        $testEmail();
+
+        // Send to contact:
+        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
+        $testEmail();
+
+        // Test use owner as mailer:
+        $email = $createEmail();
+        $email->setUseOwnerAsMailer(true);
+        $this->em->persist($email);
+        $this->em->flush();
+        $emailId = $email->getId();
+
+        // Send to segment:
+        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $clientResponse = $this->client->getResponse();
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
+
+        $testEmailOwnerAsMailer = function (): void {
+            $message = $this->transport->sentMessage;
+            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
+            $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
+            $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
+            $this->assertSame($message->getFrom(), ['john@api.test' => 'John Doe']);
+            $this->assertSame($message->getReplyTo(), ['john@api.test' => null]);
+            $this->assertSame($message->getBcc(), ['bcc@api.test' => null]);
+        };
+        $testEmailOwnerAsMailer();
+
+        // Send to contact:
+        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
+        $testEmailOwnerAsMailer();
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function setPrivateProperty(object $object, string $property, $value): void
+    {
+        $reflector = new \ReflectionProperty(get_class($object), $property);
+        $reflector->setAccessible(true);
+        $reflector->setValue($object, $value);
     }
 }

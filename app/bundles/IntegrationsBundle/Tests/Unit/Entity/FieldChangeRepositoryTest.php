@@ -10,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class FieldChangeRepositoryTest extends TestCase
 {
-    public function testWhereQueryPartForFindingChangesForSingleObject()
+    public function testWhereQueryPartForFindingChangesForSingleObject(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $dbalMock = new DBALMocker($this);
         $metadata = $this->createMock(ClassMetadata::class);
 

@@ -50,8 +50,6 @@ class ContactObjectHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->model             = $this->createMock(LeadModel::class);
         $this->repository        = $this->createMock(LeadRepository::class);
         $this->connection        = $this->createMock(Connection::class);

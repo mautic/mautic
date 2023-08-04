@@ -33,7 +33,7 @@ class TrackingPixelHelper
             apache_setenv('no-gzip', 1);
         }
 
-        ini_set('zlib.output_compression', 0);
+        ini_set('zlib.output_compression', '0');
 
         //removing any content encoding like gzip etc.
         $response->headers->set('Content-Encoding', 'none');

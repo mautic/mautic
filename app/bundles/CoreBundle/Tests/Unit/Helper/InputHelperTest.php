@@ -58,7 +58,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertEquals('john..doe@email.com', $clean);
     }
 
     /**

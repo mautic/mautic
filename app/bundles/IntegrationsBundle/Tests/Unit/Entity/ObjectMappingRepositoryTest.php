@@ -44,7 +44,6 @@ final class ObjectMappingRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->queryBuilder  = new QueryBuilder($this->entityManager);

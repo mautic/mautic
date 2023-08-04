@@ -385,7 +385,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set content.
      *
-     * @param string $content
+     * @param array<string> $content
      *
      * @return Page
      */
@@ -400,7 +400,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get content.
      *
-     * @return string
+     * @return array<string>
      */
     public function getContent()
     {

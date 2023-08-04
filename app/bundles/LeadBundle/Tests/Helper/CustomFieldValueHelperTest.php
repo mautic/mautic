@@ -7,14 +7,11 @@ use PHPUnit\Framework\Assert;
 
 class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNormalizeValueBooleans()
+    /**
+     * @param array<int|string> $fieldParams
+     */
+    private function runNormalizeValueBooleans(array $fieldParams): void
     {
-        $fieldParams = [
-            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
-            'value'     => 1,
-            'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
-        ];
-
         $fields['core']['test'] = $fieldParams;
 
         $fieldParams['value']    = 0;
@@ -30,7 +27,29 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $normalizedFields['core']['test3']['normalizedValue']);
     }
 
-    public function testNormalizeValueSelect()
+    public function testNormalizeValueBooleans(): void
+    {
+        $fieldParams = [
+            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
+            'value'     => 1,
+            'properties'=> 'a:2:{s:2:"no";s:2:"No";s:3:"yes";s:3:"Yes";}',
+        ];
+
+        $this->runNormalizeValueBooleans($fieldParams);
+    }
+
+    public function testNormalizeValueBooleansWithDifferentProperties(): void
+    {
+        $fieldParams = [
+            'type'      => CustomFieldValueHelper::TYPE_BOOLEAN,
+            'value'     => 1,
+            'properties'=> 'a:2:{s:3:"yes";s:3:"Yes";s:2:"no";s:2:"No";}',
+        ];
+
+        $this->runNormalizeValueBooleans($fieldParams);
+    }
+
+    public function testNormalizeValueSelect(): void
     {
         $fields['core']['test'] = [
             'type'      => CustomFieldValueHelper::TYPE_SELECT,
@@ -41,7 +60,7 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Second option', $normalizedFields['core']['test']['normalizedValue']);
     }
 
-    public function testNormalizeValueSelectWithoutProperties()
+    public function testNormalizeValueSelectWithoutProperties(): void
     {
         $fields['core']['test'] = [
             'type'      => CustomFieldValueHelper::TYPE_SELECT,
@@ -51,7 +70,7 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('second', $normalizedFields['core']['test']['normalizedValue']);
     }
 
-    public function testNormalizeValueMultiSelect()
+    public function testNormalizeValueMultiSelect(): void
     {
         $fieldParams = [
             'type'      => CustomFieldValueHelper::TYPE_MULTISELECT,

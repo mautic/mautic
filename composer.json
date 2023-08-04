@@ -87,13 +87,13 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "4.1.0"
+            "mautic/core-lib": "4.3.x-dev"
         }
       }
     },
     {
       "type": "git",
-      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
     }
   ],
   "conflict": {

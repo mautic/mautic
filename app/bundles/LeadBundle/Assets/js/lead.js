@@ -265,6 +265,24 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
+    const segmentCountElem = mQuery('a.col-count');
+
+    if (segmentCountElem.length) {
+        segmentCountElem.each(function() {
+            const elem = mQuery(this);
+            const id = elem.attr('data-id');
+
+            Mautic.ajaxActionRequest(
+                'lead:getLeadCount',
+                {id: id},
+                function (response) {
+                    elem.html(response.html);
+                },
+                false,
+                true
+            );
+        });
+    }
 
     mQuery('#campaign-share-tab').hover(function () {
         if (Mautic.shareTableLoaded != true) {
@@ -565,7 +583,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
-    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+    Mautic.activateFieldTypeahead(displayId, filterId, [], mQuery('#' + displayId).data('action') || 'lead:fieldList');
 
     mQuery = mQueryBackup;
 };
@@ -1505,4 +1523,24 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
     else if (search !== null) {
         assetDownloadFilter.trigger('chosen:open.chosen')
     }
-}
+};
+
+Mautic.listOnLoad = function(container, response) {
+    Mautic.lazyLoadContactListOnSegmentDetail();
+};
+
+Mautic.lazyLoadContactListOnSegmentDetail = function() {
+    const containerId = '#contacts-container';
+    const container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    const segmentContactUrl = container.data('target-url');
+    mQuery.get(segmentContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};

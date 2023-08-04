@@ -72,7 +72,7 @@ class UpdateController extends CommonController
             $minExecutionTime = 300;
             $maxExecutionTime = (int) ini_get('max_execution_time');
             if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-                ini_set('max_execution_time', $minExecutionTime);
+                ini_set('max_execution_time', "$minExecutionTime");
             }
 
             $result = $application->run($input, $output);

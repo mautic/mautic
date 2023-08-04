@@ -272,7 +272,7 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    public function fetchSumTimeData($table, $column, $filters, $sumColumn)
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 

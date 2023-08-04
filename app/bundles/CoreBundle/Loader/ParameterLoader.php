@@ -41,6 +41,11 @@ class ParameterLoader
         $this->createParameterBags();
     }
 
+    public function getDefaultParameters(): array
+    {
+        return self::$defaultParameters;
+    }
+
     public function getParameterBag(): ParameterBag
     {
         return $this->parameterBag;

@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\Form;
@@ -43,7 +43,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     private $themeHelper;
 
@@ -62,7 +62,7 @@ class FormSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         TemplatingHelper $templatingHelper,
         CoreParametersHelper $coreParametersHelper
     ) {

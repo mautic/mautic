@@ -6,8 +6,10 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
+trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be removed in 5.0', CustomFormEvent::class);
+
 /**
- * Class CustomFormEvent.
+ * @deprecated since M4, will be removed in M5 because it's not used
  */
 class CustomFormEvent extends Event
 {
@@ -37,8 +39,6 @@ class CustomFormEvent extends Event
     private $formBuilder;
 
     /**
-     * CustomFormEvent constructor.
-     *
      * @param string $formName
      * @param string $formType
      */
