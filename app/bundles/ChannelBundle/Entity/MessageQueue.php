@@ -21,7 +21,7 @@ class MessageQueue
     public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -33,7 +33,7 @@ class MessageQueue
     private $channelId;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
@@ -68,22 +68,22 @@ class MessageQueue
     private $status = self::STATUS_PENDING;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $datePublished;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $scheduledDate;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastAttempt;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -182,7 +182,7 @@ class MessageQueue
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -272,7 +272,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDatePublished()
     {
@@ -288,7 +288,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -304,7 +304,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastAttempt()
     {
@@ -365,7 +365,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getScheduledDate()
     {

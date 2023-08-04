@@ -114,11 +114,6 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            \Mautic\UserBundle\Controller\SecurityController::class => [
-                'class' => \Mautic\UserBundle\Controller\SecurityController::class,
-            ],
-        ],
         'other' => [
             // Authentication
             'mautic.user.manager' => [
@@ -135,7 +130,7 @@ return [
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
                 'arguments' => [
                     'mautic.helper.integration',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'event_dispatcher',
                     'request_stack',
                     'security.csrf.token_manager',
@@ -160,7 +155,7 @@ return [
                     'mautic.permission.repository',
                     'session',
                     'event_dispatcher',
-                    'security.password_encoder',
+                    'security.password_hasher',
                 ],
             ],
             'mautic.security.authentication_listener' => [
@@ -184,8 +179,12 @@ return [
                 ],
             ],
             'mautic.security.logout_handler' => [
-                'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
-                'arguments' => [
+                'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
+                'tagArguments' => [
+                    'event'      => 'Symfony\Component\Security\Http\Event\LogoutEvent',
+                ],
+                'tag'          => 'kernel.event_listener',
+                'arguments'    => [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
@@ -245,20 +244,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     '%mautic.saml_idp_default_role%',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.user.model.role' => [
-                'class' => 'Mautic\UserBundle\Model\RoleModel',
-            ],
-            'mautic.user.model.user' => [
-                'class'     => 'Mautic\UserBundle\Model\UserModel',
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'mautic.user.model.user_token_service',
                 ],
             ],
             'mautic.user.model.user_token_service' => [
@@ -295,7 +282,7 @@ return [
             'mautic.user.fixture.user' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['security.password_encoder'],
+                'arguments' => ['security.password_hasher'],
             ],
         ],
     ],

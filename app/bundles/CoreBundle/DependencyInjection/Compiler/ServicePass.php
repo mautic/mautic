@@ -37,13 +37,14 @@ final class ServicePass implements CompilerPassInterface
                             $defaultTag = 'form.type';
                             break;
                         case 'helpers':
-                            $defaultTag = 'templating.helper';
+                            $defaultTag = 'twig.helper';
                             break;
                         case 'menus':
                             $defaultTag = 'knp_menu.menu';
                             break;
                         case 'models':
                             $defaultTag = 'mautic.model';
+                            @trigger_error('Setting "models" in config is deprecated. Convert to using autowiring.', E_USER_DEPRECATED);
                             break;
                         case 'permissions':
                             $defaultTag = 'mautic.permissions';
@@ -142,10 +143,6 @@ final class ServicePass implements CompilerPassInterface
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
-
-                                if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
-                                }
                             }
                         } else {
                             $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
@@ -157,10 +154,6 @@ final class ServicePass implements CompilerPassInterface
                                 }
 
                                 $definition->addTag($tag, $tagArguments);
-
-                                if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
-                                }
                             }
 
                             if ('events' == $type) {
@@ -261,7 +254,7 @@ final class ServicePass implements CompilerPassInterface
                 \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.helper.templating'),
+                    new Reference('twig'),
                     $options,
                 ]
             ))

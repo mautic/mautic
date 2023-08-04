@@ -7,6 +7,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
@@ -31,26 +34,25 @@ class PublicController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function callbackAction()
+    public function callbackAction(Request $request, LookupHelper $lookupHelper, LoggerInterface $mauticLogger)
     {
-        if (!$this->request->request->has('result') || !$this->request->request->has('webhookId')) {
+        if (!$request->request->has('result') || !$request->request->has('webhookId')) {
             return new Response('ERROR');
         }
 
-        $result           = json_decode($this->request->request->get('result', []), true);
-        $oid              = $this->request->request->get('webhookId', '');
-        $validatedRequest = $this->get('mautic.plugin.fullcontact.lookup_helper')->validateRequest($oid);
+        $result           = json_decode($request->request->get('result') ?? [], true);
+        $oid              = $request->request->get('webhookId', '');
+        $validatedRequest = $lookupHelper->validateRequest($oid);
 
         if (!$validatedRequest || !is_array($result)) {
             return new Response('ERROR');
         }
 
         if ('company' == $validatedRequest['type']) {
-            return $this->compcallbackAction($result, $validatedRequest);
+            return $this->compcallbackAction($mauticLogger, $result, $validatedRequest);
         }
 
         $notify = $validatedRequest['notify'];
-        $logger = $this->get('monolog.logger.mautic');
 
         try {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -103,18 +105,18 @@ class PublicController extends FormController
 
             if (array_key_exists('contactInfo', $result)) {
                 if (array_key_exists(
-                        'familyName',
-                        $result['contactInfo']
-                    )
+                    'familyName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['lastname']['value'])
                 ) {
                     $data['lastname'] = $result['contactInfo']['familyName'];
                 }
 
                 if (array_key_exists(
-                        'givenName',
-                        $result['contactInfo']
-                    )
+                    'givenName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['firstname']['value'])
                 ) {
                     $data['firstname'] = $result['contactInfo']['givenName'];
@@ -178,7 +180,7 @@ class PublicController extends FormController
                 $data['country'] = $loc['country']['name'];
             }
 
-            $logger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $lead->getSocialCache();
@@ -219,7 +221,7 @@ class PublicController extends FormController
                     }
                 }
             } catch (\Exception $ex2) {
-                $this->get('monolog.mautic.logger')->log('error', 'FullContact: '.$ex2->getMessage());
+                $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
             }
         }
 
@@ -233,10 +235,9 @@ class PublicController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction($result, $validatedRequest)
+    private function compcallbackAction(LoggerInterface $mauticLogger, $result, $validatedRequest)
     {
         $notify = $validatedRequest['notify'];
-        $logger = $this->get('monolog.logger.mautic');
 
         try {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -326,9 +327,9 @@ class PublicController extends FormController
             }
 
             if (array_key_exists(
-                    'approxEmployees',
-                    $org
-                )
+                'approxEmployees',
+                $org
+            )
                 && empty($currFields['companynumber_of_employees']['value'])
             ) {
                 $data['companynumber_of_employees'] = $org['approxEmployees'];
@@ -338,7 +339,7 @@ class PublicController extends FormController
                 $data['companyfax'] = $fax['number'];
             }
 
-            $logger->log('debug', 'SET FIELDS: '.print_r($data, true));
+            $mauticLogger->log('debug', 'SET FIELDS: '.print_r($data, true));
 
             // Unset the nonce so that it's not used again
             $socialCache = $company->getSocialCache();
@@ -379,7 +380,7 @@ class PublicController extends FormController
                     }
                 }
             } catch (\Exception $ex2) {
-                $this->get('monolog.mautic.logger')->log('error', 'FullContact: '.$ex2->getMessage());
+                $mauticLogger->log('error', 'FullContact: '.$ex2->getMessage());
             }
         }
 

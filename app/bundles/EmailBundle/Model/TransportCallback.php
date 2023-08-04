@@ -76,8 +76,6 @@ class TransportCallback
     }
 
     /**
-     * @param          $id
-     * @param          $comments
      * @param int      $dncReason
      * @param int|null $channelId
      */
@@ -87,9 +85,6 @@ class TransportCallback
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    /**
-     * @param $comments
-     */
     private function updateStatDetails(Stat $stat, $comments, $dncReason)
     {
         if (DNC::BOUNCED === $dncReason) {

@@ -46,14 +46,14 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getField('First Name', 'text'),
                 '%22%2F%3E%3Cscript%3Ealert%280%29%3C%2Fscript%3E',
-                '<input id="mauticform_input_mautic_firstname" value="" />',
+                '<input value="" id="mauticform_input_mautic_firstname" />',
                 '<input id="mauticform_input_mautic_firstname" value="&quot;/&gt;alert(0)" />',
-                'Tags should be stripped from text field values submitted via GET to prevent XSS.',
+                'Tags should be stripped from textet field values submitted via GET to prevent XSS.',
             ],
             [
                 $this->getField('First Name', 'text'),
                 '%22%20onfocus=%22alert(123)',
-                '<input id="mauticform_input_mautic_firstname" value="" />',
+                '<input value="" id="mauticform_input_mautic_firstname" />',
                 '<input id="mauticform_input_mautic_firstname" value="&quot; onfocus=&quot;alert(123)" />',
                 'Inline JS values should not be allowed via GET to prevent XSS.',
             ],
@@ -80,7 +80,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $this->getField('Checkbox Multi', 'checkboxgrp'),
-                'myvalue|alsomyvalue',
+                'myvalue%7Calsomyvalue',
                 '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'2" value="alsomyvalue"/><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'3" value="notmyvalue"/>',
                 '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'1" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'2" value="alsomyvalue" checked /><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'3" value="notmyvalue"/>',
                 'Multi-value checkbox groups should have their values set appropriately via GET.',

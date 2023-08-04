@@ -19,7 +19,7 @@ class Message extends FormEntity
     private $id;
 
     /**
-     * @var ?string
+     * @var string
      */
     private $name;
 
@@ -29,12 +29,12 @@ class Message extends FormEntity
     private $description;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishDown;
 
@@ -160,7 +160,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -181,7 +181,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishDown()
     {

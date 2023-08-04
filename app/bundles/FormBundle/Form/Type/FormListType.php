@@ -51,7 +51,7 @@ class FormListType extends AbstractType
                     $choices[$form['name']] = $form['id'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($choices);
 
                 return $choices;

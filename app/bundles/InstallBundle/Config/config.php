@@ -76,16 +76,6 @@ return [
                     'priority' => 1,
                 ],
             ],
-            'mautic.install.configurator.step.email' => [
-                'class'     => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
-                'arguments' => [
-                    'session',
-                ],
-                'tag'          => 'mautic.configurator.step',
-                'tagArguments' => [
-                    'priority' => 3,
-                ],
-            ],
             'mautic.install.configurator.step.user' => [
                 'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
@@ -103,7 +93,7 @@ return [
                     'translator',
                     'kernel',
                     'validator',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
             ],

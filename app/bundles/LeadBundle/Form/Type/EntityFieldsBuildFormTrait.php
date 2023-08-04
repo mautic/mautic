@@ -83,7 +83,7 @@ trait EntityFieldsBuildFormTrait
                 case NumberType::class:
                     if (empty($properties['scale'])) {
                         $properties['scale'] = null;
-                    } //ensure default locale is used
+                    } // ensure default locale is used
                     else {
                         $properties['scale'] = (int) $properties['scale'];
                     }
@@ -121,65 +121,66 @@ trait EntityFieldsBuildFormTrait
                         'constraints' => $constraints,
                     ];
 
-                if (!empty($options['ignore_date_type'])) {
-                    $type = TextType::class;
-                } else {
-                    $opts['html5']  = false;
-                    $opts['input']  = 'string';
-                    $opts['widget'] = 'single_text';
-                    if ($value) {
-                        try {
-                            $dtHelper = new DateTimeHelper($value, null, 'local');
-                        } catch (\Exception $e) {
-                            // Rather return empty value than break the page
-                            $value = null;
-                        }
-                    }
-                    if (DateTimeType::class === $type) {
-                        $opts['attr']['data-toggle'] = 'datetime';
-                        $opts['model_timezone']      = 'UTC';
-                        $opts['view_timezone']       = date_default_timezone_get();
-                        $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
-                        $opts['with_seconds']        = true;
-
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif (DateType::class === $type) {
-                        $opts['attr']['data-toggle'] = 'date';
-                        $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                    if (!empty($options['ignore_date_type'])) {
+                        $type = TextType::class;
                     } else {
-                        $opts['attr']['data-toggle'] = 'time';
-                        // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                        $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
-                    }
+                        $opts['html5']  = false;
+                        $opts['input']  = 'string';
+                        $opts['widget'] = 'single_text';
+                        $opts['html5']  = false;
+                        if ($value) {
+                            try {
+                                $dtHelper = new DateTimeHelper($value, null, 'local');
+                            } catch (\Exception $e) {
+                                // Rather return empty value than break the page
+                                $value = null;
+                            }
+                        }
+                        if (DateTimeType::class === $type) {
+                            $opts['attr']['data-toggle'] = 'datetime';
+                            $opts['model_timezone']      = 'UTC';
+                            $opts['view_timezone']       = date_default_timezone_get();
+                            $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
+                            $opts['with_seconds']        = true;
 
-                    $builder->addEventListener(
-                        FormEvents::PRE_SUBMIT,
-                        function (FormEvent $event) use ($alias, $type) {
-                            $data = $event->getData();
+                            $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
+                        } elseif (DateType::class === $type) {
+                            $opts['attr']['data-toggle'] = 'date';
+                            $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                        } else {
+                            $opts['attr']['data-toggle'] = 'time';
+                            // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
+                            $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                        }
 
-                            if (!empty($data[$alias])) {
-                                if (false === ($timestamp = strtotime($data[$alias]))) {
-                                    $timestamp = null;
-                                }
-                                if ($timestamp) {
-                                    $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
-                                    switch ($type) {
-                                        case DateTimeType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
-                                            break;
-                                        case DateType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d');
-                                            break;
-                                        case TimeType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('H:i:s');
-                                            break;
+                        $builder->addEventListener(
+                            FormEvents::PRE_SUBMIT,
+                            function (FormEvent $event) use ($alias, $type) {
+                                $data = $event->getData();
+
+                                if (!empty($data[$alias])) {
+                                    if (false === ($timestamp = strtotime($data[$alias]))) {
+                                        $timestamp = null;
+                                    }
+                                    if ($timestamp) {
+                                        $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
+                                        switch ($type) {
+                                            case DateTimeType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
+                                                break;
+                                            case DateType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('Y-m-d');
+                                                break;
+                                            case TimeType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('H:i:s');
+                                                break;
+                                        }
                                     }
                                 }
+                                $event->setData($data);
                             }
-                            $event->setData($data);
-                        }
-                    );
-                }
+                        );
+                    }
 
                     $builder->add($alias, $type, $opts);
                     break;

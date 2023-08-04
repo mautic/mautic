@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
@@ -31,32 +30,29 @@ class MonitoringModel extends FormModel
     ];
 
     /**
-     * @param object               $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null          $action
-     * @param mixed[]              $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param mixed[]     $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $params = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
         if (!empty($action)) {
-            $params['action'] = $action;
+            $options['action'] = $action;
         }
 
-        return $formFactory->create(MonitoringType::class, $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $options);
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return Monitoring|null
      */
@@ -67,11 +63,6 @@ class MonitoringModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -119,7 +110,7 @@ class MonitoringModel extends FormModel
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {
-            //increase the revision
+            // increase the revision
             $revision = $monitoringEntity->getRevision();
             ++$revision;
             $monitoringEntity->setRevision($revision);
@@ -133,7 +124,7 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * @return EntityRepository<Monitoring>
+     * @return \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
      */
     public function getRepository()
     {

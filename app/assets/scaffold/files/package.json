@@ -3,14 +3,40 @@
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
-    "grunt": "^1.5.3",
-    "grunt-autoprefixer": "^3.0.4",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt": "^1.6.1",
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-remove": "^0.1.0",
-    "load-grunt-tasks": "^5.1.0",
-    "time-grunt": "^1.4.0"
+    "patch-package": "^7.0.0"
+  },
+  "dependencies": {
+    "@claviska/jquery-minicolors": "^2.3.6",
+    "at.js": "^1.5.4",
+    "bootstrap": "^3.4.1",
+    "chart.js": "^2.9.4",
+    "chosen-js": "^1.8.7",
+    "ckeditor4": "^4.21.0",
+    "codemirror": "^5.65.13",
+    "dropzone": "^4.3.0",
+    "jquery": "^3.7.0",
+    "jquery-datetimepicker": "^2.5.21",
+    "jquery-form": "^4.3.0",
+    "jquery-ui": "^1.13.2",
+    "jquery-ui-touch-punch": "^0.2.3",
+    "jquery.caret": "^0.3.1",
+    "jquery.cookie": "^1.4.1",
+    "jquery.quicksearch": "^2.4.0",
+    "js-cookie": "^2.2.1",
+    "jsplumb": "^2.15.6",
+    "jvectormap-next": "^3.1.1",
+    "modernizr": "^3.12.0",
+    "moment": "^2.29.4",
+    "mousetrap": "^1.6.5",
+    "multiselect": "^0.9.12",
+    "shufflejs": "^5.4.1",
+    "typeahead.js": "^0.11.1",
+    "vimeo-froogaloop2": "^0.1.1"
+  },
+  "scripts": {
+    "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js"
   }
 }

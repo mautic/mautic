@@ -96,12 +96,7 @@ class ReplyHelper
         return $response;
     }
 
-    /**
-     * @param string $message
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    private function dispatchReplyEvent(Lead $contact, $message)
+    private function dispatchReplyEvent(Lead $contact, string $message): ?Response
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 

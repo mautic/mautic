@@ -2,13 +2,25 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<LeadList>
@@ -22,9 +34,9 @@ class ListApiController extends CommonApiController
      */
     protected $model = null;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $listModel = $this->getModel('lead.list');
+        $listModel = $modelFactory->getModel('lead.list');
         \assert($listModel instanceof ListModel);
 
         $this->model            = $listModel;
@@ -33,7 +45,7 @@ class ListApiController extends CommonApiController
         $this->entityNameMulti  = 'lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -43,7 +55,7 @@ class ListApiController extends CommonApiController
      * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
      * from filter root array so Symfony forms would not fail with unknown field error.
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
             return $parameters;
@@ -128,9 +140,9 @@ class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction($id)
+    public function addLeadsAction(Request $request, $id)
     {
-        $contactIds = $this->request->request->get('ids');
+        $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
             return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }

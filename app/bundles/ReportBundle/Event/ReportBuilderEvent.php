@@ -101,12 +101,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             }
         }
 
-        uasort(
-            $data['columns'],
-            function ($a, $b) {
-                return strnatcmp($a['label'], $b['label']);
-            }
-        );
+        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
 
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
@@ -119,12 +114,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 }
             }
 
-            uasort(
-                $data['filters'],
-                function ($a, $b) {
-                    return strnatcmp($a['label'], $b['label']);
-                }
-            );
+            uasort($data['filters'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
         }
 
         $this->tableArray[$context] = $data;
@@ -168,8 +158,6 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Returns lead columns.
-     *
-     * @param $prefix
      *
      * @return array
      */
@@ -319,9 +307,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * @param       $context
-     * @param       $type
-     * @param       $graphId
      * @param array $options
      *
      * @return $this

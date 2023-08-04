@@ -14,7 +14,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -52,7 +52,7 @@ class ContactTracker
     private $trackedContact;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -89,7 +89,7 @@ class ContactTracker
         ContactTrackingServiceInterface $contactTrackingService,
         DeviceTracker $deviceTracker,
         CorePermissions $security,
-        Logger $logger,
+        LoggerInterface $mauticLogger,
         IpLookupHelper $ipLookupHelper,
         RequestStack $requestStack,
         CoreParametersHelper $coreParametersHelper,
@@ -100,7 +100,7 @@ class ContactTracker
         $this->contactTrackingService = $contactTrackingService;
         $this->deviceTracker          = $deviceTracker;
         $this->security               = $security;
-        $this->logger                 = $logger;
+        $this->logger                 = $mauticLogger;
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->requestStack           = $requestStack;
         $this->coreParametersHelper   = $coreParametersHelper;
@@ -127,7 +127,7 @@ class ContactTracker
         }
 
         if ($request) {
-            $this->logger->addDebug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$request->getMethod().' '.$request->getRequestUri());
+            $this->logger->debug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$request->getMethod().' '.$request->getRequestUri());
         }
 
         // Log last active for the tracked contact
@@ -144,7 +144,7 @@ class ContactTracker
      */
     public function setTrackedContact(Lead $trackedContact)
     {
-        $this->logger->addDebug("CONTACT: {$trackedContact->getId()} set as current lead.");
+        $this->logger->debug("CONTACT: {$trackedContact->getId()} set as current lead.");
 
         if ($this->useSystemContact()) {
             // Overwrite system current lead
@@ -191,7 +191,7 @@ class ContactTracker
     public function setSystemContact(Lead $lead = null)
     {
         if (null !== $lead) {
-            $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
+            $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
 
             $fields = $lead->getFields();
             if (empty($fields)) {
@@ -222,13 +222,13 @@ class ContactTracker
     private function getSystemContact()
     {
         if ($this->useSystemContact() && $this->systemContact) {
-            $this->logger->addDebug('CONTACT: System lead is being used');
+            $this->logger->debug('CONTACT: System lead is being used');
 
             return $this->systemContact;
         }
 
         if ($this->isUserSession()) {
-            $this->logger->addDebug('CONTACT: In a Mautic user session');
+            $this->logger->debug('CONTACT: In a Mautic user session');
         }
 
         return null;
@@ -273,7 +273,7 @@ class ContactTracker
         }
 
         if ($lead) {
-            $this->logger->addDebug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
+            $this->logger->debug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
         }
 
         return $lead;
@@ -296,7 +296,7 @@ class ContactTracker
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {
                 $lead = $leads[0];
-                $this->logger->addDebug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
+                $this->logger->debug("CONTACT: Existing lead found with ID# {$lead->getId()}.");
 
                 return $lead;
             }
@@ -312,7 +312,7 @@ class ContactTracker
      */
     private function createNewContact(IpAddress $ip = null, $persist = true)
     {
-        //let's create a lead
+        // let's create a lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
 
@@ -330,7 +330,7 @@ class ContactTracker
 
             $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
 
-            $this->logger->addDebug("CONTACT: New lead created with ID# {$lead->getId()}.");
+            $this->logger->debug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
 
         return $lead;
@@ -366,13 +366,10 @@ class ContactTracker
         return !$this->security->isAnonymous();
     }
 
-    /**
-     * @param $previouslyTrackedId
-     */
     private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId)
     {
         $newTrackingId = $this->getTrackingId();
-        $this->logger->addDebug(
+        $this->logger->debug(
             "CONTACT: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
         );
 

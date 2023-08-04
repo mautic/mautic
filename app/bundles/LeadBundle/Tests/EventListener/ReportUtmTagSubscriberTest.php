@@ -6,12 +6,14 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\EventListener\ReportUtmTagSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -55,8 +57,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testReportBuilder(): void
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock      = $this->createMock(ReportHelper::class);
+        $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 
@@ -78,6 +80,23 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.')
             ->willReturn($leadColumns);
 
+        $fieldsBuilderMock
+            ->expects($this->any())
+            ->method('getLeadFilter')
+            ->willReturn([
+                'tag' => [
+                    'label'     => 'mautic.core.filter.tags',
+                    'type'      => 'multiselect',
+                    'list'      => ['A', 'B', 'C'],
+                    'operators' => [
+                        'in'       => 'mautic.core.operator.in',
+                        'notIn'    => 'mautic.core.operator.notin',
+                        'empty'    => 'mautic.core.operator.isempty',
+                        'notEmpty' => 'mautic.core.operator.isnotempty',
+                    ],
+                ],
+            ]);
+
         $companyReportDataMock->expects($this->once())
             ->method('getCompanyData')
             ->with()
@@ -88,47 +107,62 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $segmentReportSubscriber = new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
 
+        $expectedColumns = [
+            'lead.name' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'name',
+            ],
+            'comp.name' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'name',
+            ],
+            'utm.utm_campaign' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_campaign',
+            ],
+            'utm.utm_content' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_content',
+            ],
+            'utm.utm_medium' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_medium',
+            ],
+            'utm.utm_source' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_source',
+            ],
+            'utm.utm_term' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_term',
+            ],
+        ];
+
         $expected = [
             'lead.utmTag' => [
                 'display_name' => 'mautic.lead.report.utm.utm_tag',
-                'columns'      => [
-                    'lead.name' => [
-                        'label' => null,
-                        'type'  => 'bool',
-                        'alias' => 'name',
+                'columns'      => $expectedColumns,
+                'filters'      => array_merge($expectedColumns, [
+                    'tag' => [
+                        'label'     => null,
+                        'type'      => 'multiselect',
+                        'list'      => ['A', 'B', 'C'],
+                        'operators' => [
+                            'in'       => 'mautic.core.operator.in',
+                            'notIn'    => 'mautic.core.operator.notin',
+                            'empty'    => 'mautic.core.operator.isempty',
+                            'notEmpty' => 'mautic.core.operator.isnotempty',
+                        ],
+                        'alias' => 'tag',
                     ],
-                    'comp.name' => [
-                        'label' => null,
-                        'type'  => 'bool',
-                        'alias' => 'name',
-                    ],
-                    'utm.utm_campaign' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_campaign',
-                    ],
-                    'utm.utm_content' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_content',
-                    ],
-                    'utm.utm_medium' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_medium',
-                    ],
-                    'utm.utm_source' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_source',
-                    ],
-                    'utm.utm_term' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_term',
-                    ],
-                ],
-                'filters' => null,
+                ]),
                 'group'   => 'contacts',
             ],
         ];

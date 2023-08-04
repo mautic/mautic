@@ -10,8 +10,6 @@ class RequestUrl
     /**
      * Correctly generate the URL based on given URL parts.
      *
-     * @param      $apiUrl
-     * @param      $queryUrl
      * @param null $operation
      * @param null $object
      *

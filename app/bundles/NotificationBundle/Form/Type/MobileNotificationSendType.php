@@ -68,7 +68,11 @@ class MobileNotificationSendType extends AbstractType
                 ]
             );
 
-            $notification = $options['data']['notification'];
+            if (array_key_exists('data', $options)) {
+                if (is_array($options['data']) && array_key_exists('notification', $options['data'])) {
+                    $notification = $options['data']['notification'];
+                }
+            }
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_mobile_notification_action', [

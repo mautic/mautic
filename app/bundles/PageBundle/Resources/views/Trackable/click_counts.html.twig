@@ -1,0 +1,80 @@
+{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{% set showConversionRate = showConversionRate is defined ? showConversionRate : false %}
+{% if trackables is not empty %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered click-list"
+                {% if showConversionRate %} data-conversion-rate-table data-entity-id="{{ entity.id }}"{% endif %}>
+            <thead>
+            <tr>
+                <td>{{ 'mautic.trackable.click_url'|trans }}</td>
+                <td>{{ 'mautic.trackable.click_count'|trans }}</td>
+                <td>{{ 'mautic.trackable.click_unique_count'|trans }}</td>
+                {{ customContent('click_counts_headers', mauticTemplateVars) }}
+                {% if showConversionRate %}
+                    <td>{{ 'mautic.trackable.click_conversion_rate'|trans }}</td>
+                {% endif %}
+                <td>{{ 'mautic.trackable.click_track_id'|trans }}</td>
+            </tr>
+            </thead>
+            <tbody>
+                    {% set totalClicks       = 0 %}
+                    {% set totalUniqueClicks = 0 %}
+                    {% for link in trackables %}
+                        {% set totalClicks = totalClicks + link.hits %}
+                        {% set totalUniqueClicks = totalUniqueClicks + link.unique_hits %}
+                        <tr>
+                            <td class="long-text"><a href="{{ link.url }}">{{ link.url }}</a></td>
+                            <td class="text-center">{{ link.hits }}</td>
+                            <td class="text-center">
+                                <span class="mt-xs label label-primary has-click-event clickable-stat">
+                        {% if channel is defined and entity is defined %}
+                            <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.page_source'|trans ~ ':' ~ channel ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_source_id'|trans ~ ':' ~ entity.getId() ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_id'|trans ~ ':' ~ link.id}) }}"
+                                data-toggle="tooltip"
+                                title="{{ 'mautic.email.stat.simple.tooltip'|trans }}">
+                                {{ link.unique_hits }}
+                            </a>
+                        {% else %}
+                            {{ link.unique_hits }}
+                        {% endif %}
+                        </span>
+                            </td>
+                            {{ customContent('click_counts', mauticTemplateVars|merge({'redirect_id' : link.redirect_id})) }}
+                            {% if showConversionRate %}
+                                <td data-conversion-rate-cell data-unique-hits="{{ link.unique_hits }}"><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
+                            {% endif %}
+                            <td>{{ link.redirect_id }}</td>
+                        </tr>
+                {% endfor %}
+
+                <tr>
+                    <td class="long-text">{{ 'mautic.trackable.total_clicks'|trans }}</td>
+                    <td class="text-center">{{ totalClicks }}</td>
+                    <td class="text-center">
+                        <span class="mt-xs label label-primary has-click-event clickable-stat">
+                        {% if channel is defined and entity is defined %}
+                            <a href="{{ path('mautic_contact_index',
+                                {'search' : 'mautic.lead.lead.searchcommand.page_source'|trans ~ ':' ~ channel ~ ' ' ~ 'mautic.lead.lead.searchcommand.page_source_id'|trans ~ ':' ~ entity.getId()}) }}"
+                                data-toggle="tooltip"
+                                title="{{ 'mautic.email.stat.simple.tooltip'|trans }}">
+                                {{ totalUniqueClicks }}
+                            </a>
+                        {% else %}
+                            {{ totalUniqueClicks }}
+                        {% endif %}
+                        </span>
+                    </td>
+                    {% if showConversionRate %}
+                        <td data-conversion-rate-total-cell>
+                            <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                            <i class="fa fa-question-circle" data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.trackable.total_conversion_rate_tooltip'|trans }}"></i>
+                        </td>
+                    {% endif %}
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'header' : 'mautic.trackable.click_counts.header_none', 'message' : 'mautic.trackable.click_counts.none'}) -}}
+    <div class="clearfix"></div>
+{% endif %}

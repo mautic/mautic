@@ -2,11 +2,18 @@
 
 namespace Mautic\ChannelBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,7 +32,18 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $company    = $this->createMock(CompanyModel::class);
         $coreHelper = $this->createMock(CoreParametersHelper::class);
 
-        $this->messageQueue = new MessageQueueModel($lead, $company, $coreHelper);
+        $this->messageQueue = new MessageQueueModel(
+            $lead,
+            $company,
+            $coreHelper,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class)
+        );
 
         $message      = new MessageQueue();
         $scheduleDate = new \DateTime(self::DATE);
@@ -63,6 +81,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $oldScheduleDate = $this->message->getScheduledDate();
         $this->messageQueue->reschedule($this->message, $interval);
         $scheduleDate = $this->message->getScheduledDate();
+        /** @var \DateTime $oldScheduleDate */
         $oldScheduleDate->add($interval);
 
         $this->assertEquals($oldScheduleDate, $scheduleDate);

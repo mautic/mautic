@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
     private string $routeObjectName;
-    private Form $form;
+
+    /**
+     * @var FormInterface<FormInterface>
+     */
+    private FormInterface $form;
     private ?int $ownerId = null;
     private ?int $list    = null;
 
@@ -24,13 +29,19 @@ class ImportValidateEvent extends Event
      */
     private array $tags = [];
 
-    public function __construct(string $routeObjectName, Form $form)
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    public function __construct(string $routeObjectName, FormInterface $form)
     {
         $this->routeObjectName = $routeObjectName;
         $this->form            = $form;
     }
 
-    public function getForm(): Form
+    /**
+     * @return FormInterface<FormInterface>
+     */
+    public function getForm(): FormInterface
     {
         return $this->form;
     }

@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Field;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class CustomFieldIndex
 {
@@ -17,7 +17,7 @@ class CustomFieldIndex
     private $indexSchemaHelper;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -28,11 +28,11 @@ class CustomFieldIndex
 
     public function __construct(
         IndexSchemaHelper $indexSchemaHelper,
-        Logger $logger,
+        LoggerInterface $mauticLogger,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
     ) {
         $this->indexSchemaHelper          = $indexSchemaHelper;
-        $this->logger                     = $logger;
+        $this->logger                     = $mauticLogger;
         $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
@@ -70,8 +70,8 @@ class CustomFieldIndex
 
             $modifySchema->executeChanges();
         } catch (DriverException $e) {
-            if (1069 === $e->getErrorCode() /* ER_TOO_MANY_KEYS */) {
-                $this->logger->addWarning($e->getMessage());
+            if (1069 === $e->getCode() /* ER_TOO_MANY_KEYS */) {
+                $this->logger->warning($e->getMessage());
             } else {
                 throw $e;
             }

@@ -1,0 +1,10 @@
+{{- include('@MauticForm/Field/select.html.twig', {
+        'field': field,
+        'fields': fields|default([]),
+        'mappedFields': mappedFields|default([]),
+        'inForm': inForm|default(false),
+        'list': leadFieldCountryChoices(),
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) -}}

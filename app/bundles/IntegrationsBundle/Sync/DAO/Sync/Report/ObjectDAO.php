@@ -44,9 +44,6 @@ class ObjectDAO
         return $this->changeDateTime;
     }
 
-    /**
-     * @return ObjectDAO
-     */
     public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
     {
         $this->changeDateTime = $changeDateTime;

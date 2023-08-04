@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -29,8 +28,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     private IpLookupHelper $ipLookupHelper;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     private TranslatorInterface $translator;
 
     private RouterInterface $router;
@@ -39,14 +36,12 @@ class FormSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
         RouterInterface $router
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
         $this->router               = $router;
     }
@@ -113,7 +108,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
             'formType'           => SubmitActionEmailType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],
@@ -126,7 +121,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
             'formType'           => SubmitActionRepostType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTheme'          => '@MauticForm/FormTheme/SubmitAction/_submit_action_repost_widget.html.twig',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
@@ -378,8 +373,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $post
-     *
      * @return string
      */
     private function postToHtml($post)
@@ -399,8 +392,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $emailString
-     *
      * @return array<string, null>
      */
     private function getEmailsFromString($emailString): array
@@ -416,11 +407,6 @@ class FormSubscriber implements EventSubscriberInterface
     private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
-
-        // ingore queue
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type') && $config['immediately']) {
-            $this->mailer = $this->mailer->getSampleMailer();
-        }
 
         if (count($to)) {
             $this->mailer->setTo($to);

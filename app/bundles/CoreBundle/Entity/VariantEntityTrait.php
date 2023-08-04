@@ -4,17 +4,18 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 trait VariantEntityTrait
 {
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $variantChildren;
 
     /**
-     * @var Page
+     * @var mixed
      **/
     private $variantParent;
 
@@ -24,13 +25,12 @@ trait VariantEntityTrait
     private $variantSettings = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface|null
      */
     private $variantStartDate;
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      */
     protected static function addVariantMetadata(ClassMetadataBuilder $builder, $entityClass)
     {
@@ -81,7 +81,7 @@ trait VariantEntityTrait
     /**
      * Get variantChildren.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return mixed
      */
     public function getVariantChildren()
     {
@@ -109,7 +109,7 @@ trait VariantEntityTrait
     /**
      * Get variantParent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getVariantParent()
     {
@@ -161,8 +161,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * @param $variantStartDate
-     *
      * @return $this
      */
     public function setVariantStartDate($variantStartDate)
@@ -218,9 +216,9 @@ trait VariantEntityTrait
      * Get the variant parent/children.
      **.
      *
-     * @return array[$parent, $children]
+     * @return array<mixed>
      */
-    public function getVariants()
+    public function getVariants(): array
     {
         $parent = $this->getVariantParent();
         if (empty($parent)) {
@@ -275,8 +273,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeVariantCount($getter)
@@ -303,10 +299,6 @@ trait VariantEntityTrait
 
     /**
      * Finds and appends IDs for translations of a variant.
-     *
-     * @param $entity
-     * @param $ids
-     * @param $publishedOnly
      */
     protected function appendTranslationEntityIds($entity, &$ids, $publishedOnly)
     {

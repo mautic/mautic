@@ -316,9 +316,7 @@ class TwitterCommandHelper
                 $leadEntity->setPreferredProfileImage('Twitter');
 
                 // save the lead now
-                if ($lastActive instanceof \DateTimeInterface) {
-                    $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
-                }
+                $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
 
                 try {
                     // save the lead entity
@@ -413,7 +411,7 @@ class TwitterCommandHelper
         $monitorLead->setDateAdded(new \DateTime());
 
         /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository('MauticSocialBundle:lead');
+        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);
     }
@@ -422,7 +420,6 @@ class TwitterCommandHelper
      * Increment the post counter.
      *
      * @param Monitoring $monitor
-     * @param $tweet
      */
     private function incrementPostCount($monitor, $tweet)
     {

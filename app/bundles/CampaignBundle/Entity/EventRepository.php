@@ -43,8 +43,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $contactId
-     *
      * @return array
      */
     public function getContactPendingEvents($contactId, $type)
@@ -98,7 +96,6 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events by parent.
      *
-     * @param      $parentId
      * @param null $decisionPath
      * @param null $eventType
      *
@@ -109,7 +106,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
@@ -132,19 +129,17 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
-     *
      * @return array
      */
     public function getCampaignEvents($campaignId)
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', 'ASC');
+            ->orderBy('e.order', \Doctrine\Common\Collections\Criteria::ASC);
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -197,8 +192,6 @@ class EventRepository extends CommonRepository
 
     /**
      * Null event parents in preparation for deleI'lting a campaign.
-     *
-     * @param $campaignId
      */
     public function nullEventParents($campaignId)
     {
@@ -211,8 +204,6 @@ class EventRepository extends CommonRepository
 
     /**
      * Null event parents in preparation for deleting events from a campaign.
-     *
-     * @param $events
      */
     public function nullEventRelationships($events)
     {
@@ -223,11 +214,11 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('parent_id', $events)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -245,7 +236,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param        $channel
      * @param null   $campaignId
      * @param string $eventType
      */
@@ -254,30 +244,20 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id');
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
+            ->where('e.channel = :channel')
+            ->setParameter('channel', $channel);
 
-        $expr = $q->expr()->andX();
         if ($campaignId) {
-            $expr->add(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            );
-
-            $q->orderBy('e.order');
+            $q->andWhere('IDENTITY(e.campaign) = :campaignId')
+                ->setParameter('campaignId', $campaignId)
+                ->orderBy('e.order');
         }
-
-        $expr->add(
-            $q->expr()->eq('e.channel', ':channel')
-        );
-        $q->setParameter('channel', $channel);
 
         if ($eventType) {
-            $expr->add(
-                $q->expr()->eq('e.eventType', ':eventType')
-            );
-            $q->setParameter('eventType', $eventType);
+            $q->andWhere('e.eventType', ':eventType')
+            ->setParameter('eventType', $eventType);
         }
-
-        $q->where($expr);
 
         return $q->getQuery()->getResult();
     }
@@ -285,19 +265,17 @@ class EventRepository extends CommonRepository
     /**
      * Get an array of events that have been triggered by this lead.
      *
-     * @param $leadId
-     *
      * @return array
      */
     public function getLeadTriggeredEvents($leadId)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')
-            ->from('MauticCampaignBundle:Event', 'e')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e')
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
 
         $results = $q->getQuery()->getArrayResult();

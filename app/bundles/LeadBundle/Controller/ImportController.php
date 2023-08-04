@@ -2,9 +2,17 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
@@ -16,16 +24,20 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -52,16 +64,16 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
+        $this->logger = $mauticLogger;
         /** @var ImportModel $model */
-        $model = $this->getModel($this->getModelName());
+        $model = $modelFactory->getModel($this->getModelName());
 
-        $this->logger      = $this->container->get('monolog.logger.mautic');
-        $this->session     = $this->container->get('session');
+        $this->session     = $requestStack->getMainRequest()->getSession();
         $this->importModel = $model;
 
-        parent::initialize($event);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -69,12 +81,12 @@ class ImportController extends FormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
 
-        return $this->indexStandard($page);
+        return $this->indexStandard($request, $page);
     }
 
     /**
@@ -122,9 +134,9 @@ class ImportController extends FormController
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, $objectId)
     {
-        return $this->viewStandard($objectId, 'import', 'lead');
+        return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
     /**
@@ -132,7 +144,7 @@ class ImportController extends FormController
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function cancelAction()
+    public function cancelAction(Request $request)
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -149,7 +161,7 @@ class ImportController extends FormController
         $this->removeImportFile($fullPath);
         $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} was canceled.");
 
-        return $this->indexAction();
+        return $this->indexAction($request);
     }
 
     /**
@@ -157,12 +169,12 @@ class ImportController extends FormController
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function queueAction()
+    public function queueAction(Request $request)
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $$this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
 
         if ($import) {
             $import->setStatus($import::QUEUED);
@@ -172,7 +184,7 @@ class ImportController extends FormController
         $this->resetImport($object);
         $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} moved to be processed in the background.");
 
-        return $this->indexAction();
+        return $this->indexAction($request);
     }
 
     /**
@@ -181,12 +193,9 @@ class ImportController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function newAction($objectId = 0, $ignorePost = false)
+    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
     {
-        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', '1');
-
-        $dispatcher = $this->container->get('event_dispatcher');
+        $dispatcher = $this->dispatcher;
 
         try {
             $initEvent = $this->dispatchImportOnInit();
@@ -203,7 +212,7 @@ class ImportController extends FormController
         $this->session->set('mautic.import.object', $object);
 
         // Move the file to cache and rename it
-        $forceStop = $this->request->get('cancel', false);
+        $forceStop = $request->get('cancel', false);
         $step      = ($forceStop) ? self::STEP_UPLOAD_CSV : $this->session->get('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         $fileName  = $this->getImportFileName($object);
         $importDir = $this->getImportDirName();
@@ -214,14 +223,14 @@ class ImportController extends FormController
         if (!file_exists($fullPath) && self::STEP_UPLOAD_CSV !== $step) {
             // Force step one if the file doesn't exist
             $this->logger->log(LogLevel::WARNING, "File {$fullPath} does not exist anymore. Reseting import to step STEP_UPLOAD_CSV.");
-            $this->addFlash('mautic.import.file.missing', ['%file%' => $this->getImportFileName($object)], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.import.file.missing', ['%file%' => $this->getImportFileName($object)], FlashBag::LEVEL_ERROR);
             $step = self::STEP_UPLOAD_CSV;
             $this->session->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         }
 
         $progress = (new Progress())->bindArray($this->session->get('mautic.'.$object.'.import.progress', [0, 0]));
         $import   = $this->importModel->getEntity();
-        $action   = $this->generateUrl('mautic_import_action', ['object' => $this->request->get('object'), 'objectAction' => 'new']);
+        $action   = $this->generateUrl('mautic_import_action', ['object' => $request->get('object'), 'objectAction' => 'new']);
 
         switch ($step) {
             case self::STEP_UPLOAD_CSV:
@@ -231,16 +240,16 @@ class ImportController extends FormController
                     $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was force-stopped.");
                 }
 
-                $form = $this->get('form.factory')->create(LeadImportType::class, [], ['action' => $action]);
+                $form = $this->formFactory->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $dispatcher->dispatch(
-                    new ImportMappingEvent($this->request->get('object')),
+                    new ImportMappingEvent($request->get('object')),
                     LeadEvents::IMPORT_ON_FIELD_MAPPING
                 );
 
                 try {
-                    $form = $this->get('form.factory')->create(
+                    $form = $this->formFactory->create(
                         LeadImportFieldType::class,
                         [],
                         [
@@ -256,7 +265,7 @@ class ImportController extends FormController
                     $this->removeImportFile($fullPath);
                     $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} failed with: {$e->getMessage()}.");
 
-                    return $this->newAction(0, true);
+                    return $this->newAction($request, 0, true);
                 }
 
                 break;
@@ -304,15 +313,15 @@ class ImportController extends FormController
                 }
         }
 
-        ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
+        // /Check for a submitted form and process it
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!isset($form) || $this->isFormCancelled($form)) {
                 $this->resetImport($object);
                 $this->removeImportFile($fullPath);
                 $reason = isset($form) ? 'the form is empty' : 'the form was canceled';
                 $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted because {$reason}.");
 
-                return $this->newAction(0, true);
+                return $this->newAction($request, 0, true);
             }
 
             $valid = $this->isFormValid($form);
@@ -366,7 +375,7 @@ class ImportController extends FormController
                                         $this->session->set('mautic.'.$object.'.import.progress', [0, $linecount]);
                                         $this->session->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
-                                        return $this->newAction(0, true);
+                                        return $this->newAction($request, 0, true);
                                     }
                                 }
                             } catch (FileException $e) {
@@ -384,7 +393,7 @@ class ImportController extends FormController
                                 if (!is_null($errorMessage)) {
                                     $form->addError(
                                         new FormError(
-                                            $this->get('translator')->trans($errorMessage, $errorParameters, 'validators')
+                                            $this->translator->trans($errorMessage, $errorParameters, 'validators')
                                         )
                                     );
                                 }
@@ -393,7 +402,7 @@ class ImportController extends FormController
                     }
                     break;
                 case self::STEP_MATCH_FIELDS:
-                    $validateEvent = new ImportValidateEvent($this->request->get('object'), $form);
+                    $validateEvent = new ImportValidateEvent($request->get('object'), $form);
 
                     $dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
 
@@ -408,7 +417,7 @@ class ImportController extends FormController
                         $this->removeImportFile($fullPath);
                         $this->logger->log(LogLevel::WARNING, "Import for file {$fullPath} was aborted as there were no matched files found.");
 
-                        return $this->newAction(0, true);
+                        return $this->newAction($request, 0, true);
                     }
 
                     /** @var \Mautic\LeadBundle\Entity\Import $import */
@@ -442,13 +451,13 @@ class ImportController extends FormController
 
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
-                        $this->addFlash('mautic.'.$object.'.batch.import.created');
+                        $this->addFlashMessage('mautic.'.$object.'.batch.import.created');
                         $this->resetImport($object);
 
-                        return $this->indexAction();
+                        return $this->indexAction($request);
                     }
 
-                    return $this->newAction(0, true);
+                    return $this->newAction($request, 0, true);
                 default:
                     // Done or something wrong
 
@@ -461,13 +470,13 @@ class ImportController extends FormController
         }
 
         if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
-            $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
+            $contentTemplate = '@MauticLead/Import/new.html.twig';
             $viewParameters  = [
                 'form'       => $form->createView(),
                 'objectName' => $initEvent->objectName,
             ];
         } else {
-            $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
+            $contentTemplate = '@MauticLead/Import/progress.html.twig';
             $viewParameters  = [
                 'progress'         => $progress,
                 'import'           => $import,
@@ -479,7 +488,7 @@ class ImportController extends FormController
             ];
         }
 
-        if (!$complete && $this->request->query->has('importbatch')) {
+        if (!$complete && $request->query->has('importbatch')) {
             // Ajax request to batch process so just return ajax response unless complete
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
@@ -525,11 +534,12 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be processed in client's browser.
      *
-     * @param string $object
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $object
      *
      * @return bool
      */
-    protected function importInBrowser(Form $form, $object)
+    protected function importInBrowser(FormInterface $form, $object)
     {
         $browserImportLimit = $this->getLineCountLimit();
 
@@ -544,23 +554,24 @@ class ImportController extends FormController
 
     protected function getLineCountLimit()
     {
-        return $this->get('mautic.helper.core_parameters')->get('background_import_if_more_rows_than', 0);
+        return $this->coreParametersHelper->get('background_import_if_more_rows_than', 0);
     }
 
     /**
      * Decide whether the import will be queued to be processed by the CLI command in the background.
      *
-     * @param string $object
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $object
      *
      * @return bool
      */
-    protected function importInCli(Form $form, $object)
+    protected function importInCli(FormInterface $form, $object)
     {
         $browserImportLimit = $this->getLineCountLimit();
 
         if ($browserImportLimit && $this->getLineCount($object) >= $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
+        } elseif (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
             return true;
         }
 
@@ -634,8 +645,6 @@ class ImportController extends FormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     public function getViewArguments(array $args, $action)
@@ -675,26 +684,12 @@ class ImportController extends FormController
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
-            $parameters['object'] = $this->request->get('object', 'contacts');
+            $request = $this->getCurrentRequest();
+            \assert(null !== $request);
+            $parameters['object'] = $request->get('object', 'contacts');
         }
 
         return parent::generateUrl($route, $parameters, $referenceType);
-    }
-
-    /**
-     * @deprecated to be removed in 3.0
-     */
-    protected function getObjectFromRequest()
-    {
-        $objectInRequest = $this->request->get('object');
-
-        switch ($objectInRequest) {
-            case 'companies':
-                return 'company';
-            case 'contacts':
-            default:
-                return 'lead';
-        }
     }
 
     protected function getModelName()
@@ -730,7 +725,7 @@ class ImportController extends FormController
      */
     protected function getTemplateBase()
     {
-        return 'MauticLeadBundle:Import';
+        return '@MauticLead/Import';
     }
 
     /**
@@ -755,9 +750,11 @@ class ImportController extends FormController
 
     private function dispatchImportOnInit(): ImportInitEvent
     {
-        $event = new ImportInitEvent($this->request->get('object'));
+        $request = $this->getCurrentRequest();
+        \assert(null !== $request);
+        $event = new ImportInitEvent($request->get('object'));
 
-        $this->container->get('event_dispatcher')->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
+        $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
 
         return $event;
     }

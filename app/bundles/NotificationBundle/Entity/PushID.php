@@ -14,7 +14,7 @@ class PushID
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -41,7 +41,7 @@ class PushID
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\PushIDRepository');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -126,8 +126,6 @@ class PushID
     }
 
     /**
-     * @param $enabled
-     *
      * @return $this
      */
     public function setEnabled($enabled)
