@@ -7,6 +7,7 @@ use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @property SalesforceIntegration $integration
@@ -38,11 +39,11 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array  $elementData
-     * @param string $method
-     * @param bool   $isRetry
-     * @param null   $object
-     * @param null   $queryUrl
+     * @param array       $elementData
+     * @param string      $method
+     * @param bool        $isRetry
+     * @param null        $object
+     * @param string|null $queryUrl
      *
      * @return mixed|string
      *
@@ -336,7 +337,6 @@ class SalesforceApi extends CrmApi
             }
 
             $fields[] = 'Id';
-            $fields   = implode(', ', array_unique($fields));
 
             return $this->requestQueryAllAndHandle($queryUrl, $fields, $object, $query);
         }
@@ -350,13 +350,14 @@ class SalesforceApi extends CrmApi
     /**
      * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
      *
-     * @param string $queryUrl
+     * @param array<string,string> $fields
+     * @param array<string,string> $query
      *
-     * @return mixed|string
+     * @return mixed|string|ResponseInterface
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle($queryUrl, array $fields, $object, array $query)
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, ?string $object = null, array $query = [])
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {

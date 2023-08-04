@@ -968,14 +968,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Notify all admins of the messages.
      *
-     * @param string $header
-     * @param string $message
-     * @param string $type
-     * @param bool   $preventUnreadDuplicates prevent unread duplicates
+     * @param string|array<string,mixed> $header
+     * @param string|array<string,mixed> $message
+     * @param bool                       $preventUnreadDuplicates prevent unread duplicates
      *
      * @throws \Exception
      */
-    public function upsertUnreadAdminsNotification($header, $message, $type = 'error', $preventUnreadDuplicates = true)
+    public function upsertUnreadAdminsNotification(string|array $header, string|array $message, string $type = 'error', bool $preventUnreadDuplicates = true): void
     {
         $notificationTemplate = new Notification();
         $notificationTemplate->setType($type);
@@ -2652,7 +2651,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = [])
+    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = []): void
     {
         $filters            = [];
         $leadIds            = [];
@@ -2734,7 +2733,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $lead = $this->leadModel->getEntity($leadId);
 
             if (true == $newDncValue) {
-                $this->doNotContact->addDncForContact($lead->getId(), 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
+                $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, false, true);
             } elseif (false == $newDncValue) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }

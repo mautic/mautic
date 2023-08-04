@@ -6,9 +6,9 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
-use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SalesforceApiTest extends TestCase
@@ -19,11 +19,9 @@ class SalesforceApiTest extends TestCase
     private $salesforceApi;
 
     /**
-     * @var CrmAbstractIntegration
+     * @var SalesforceIntegration|MockObject
      */
     private $integration;
-
-    private $cacheStorageHelper;
 
     protected function setUp(): void
     {
@@ -35,12 +33,17 @@ class SalesforceApiTest extends TestCase
     public function testThatGetLeadsMethodReturnsNoResultsIfThereAreNoFields(): void
     {
         // Let's use an anonymous class to not use deprecated Mautic\CoreBundle\Helper\CacheStorageHelper
-        $this->cacheStorageHelper = new class() {
+        $cacheStorageHelper = new class() {
             public function get(): bool
             {
                 return true;
             }
 
+            /**
+             * @param string                        $name
+             * @param mixed                         $data
+             * @param string|int|\DateInterval|null $expiration
+             */
             public function set($name, $data, $expiration = null): void
             {
             }
@@ -48,7 +51,7 @@ class SalesforceApiTest extends TestCase
 
         $this->integration->expects($this->any())
             ->method('getCache')
-            ->willReturn($this->cacheStorageHelper);
+            ->willReturn($cacheStorageHelper);
 
         $query  = ['start' => 1];
         $object = 'Leads';

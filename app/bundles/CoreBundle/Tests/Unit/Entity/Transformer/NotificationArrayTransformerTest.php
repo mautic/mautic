@@ -6,20 +6,15 @@ namespace Mautic\CoreBundle\Tests\Unit\Entity\Transformer;
 
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class NotificationArrayTransformerTest extends TestCase
 {
     /**
-     * @var NotificationArrayTransformer
+     * @var NotificationArrayTransformer<Notification>
      */
-    private $notificationArrayTransformer;
-
-    /**
-     * @var Notification
-     */
-    private $notification;
+    private NotificationArrayTransformer $notificationArrayTransformer;
+    private Notification$notification;
 
     protected function setUp(): void
     {
@@ -30,13 +25,12 @@ final class NotificationArrayTransformerTest extends TestCase
     public function testThatTransformWorks(): void
     {
         $notificationProperties = $this->notificationArrayTransformer->transform($this->notification);
-        Assert::assertIsArray($notificationProperties);
-        Assert::assertNotEmpty($notificationProperties);
+        $this->assertNotEmpty($notificationProperties);
     }
 
     public function testThatReverseTransformWorks(): void
     {
         $notification = $this->notificationArrayTransformer->reverseTransform([]);
-        Assert::assertInstanceOf(Notification::class, $notification);
+        $this->assertInstanceOf(Notification::class, $notification);
     }
 }

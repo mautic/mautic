@@ -6,14 +6,22 @@ use Mautic\CoreBundle\Entity\Notification;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @template T of Notification
+ *
+ * @template-implements DataTransformerInterface<T, array<string, mixed>>
+ */
 class NotificationArrayTransformer implements DataTransformerInterface
 {
+    /**
+     * @param T $value
+     *
+     * @return array<string, mixed>
+     */
     public function transform($value)
     {
-        /** Notification $value */
-        if (!$value instanceof Notification) {
-            throw new \InvalidArgumentException('Transformer expects '.Notification::class);
-        }
+        /** @phpstan-ignore-next-line  */
+        assert($value instanceof Notification);
 
         $notification = new Notification();
         $reflection   = new \ReflectionClass($notification);
