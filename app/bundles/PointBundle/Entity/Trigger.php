@@ -62,6 +62,8 @@ class Trigger extends FormEntity
      */
     private $events;
 
+    private ?Group $group = null;
+
     public function __clone()
     {
         $this->id = null;
@@ -106,6 +108,10 @@ class Trigger extends FormEntity
             ->mappedBy('trigger')
             ->cascadeAll()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
     }
 
@@ -363,5 +369,15 @@ class Trigger extends FormEntity
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(Group $group): void
+    {
+        $this->group = $group;
     }
 }

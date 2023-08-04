@@ -34,14 +34,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Used for when updating the password.
      *
-     * @var string
+     * @var ?string
      */
     private $plainPassword;
 
     /**
      * Used for updating account.
      *
-     * @var string
+     * @var ?string
      */
     private $currentPassword;
 
@@ -348,7 +348,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get plain password.
      *
-     * @return string
+     * @return ?string
      */
     public function getPlainPassword()
     {
@@ -358,7 +358,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get current password (that a user has typed into a form).
      *
-     * @return string
+     * @return ?string
      */
     public function getCurrentPassword()
     {
@@ -388,8 +388,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
     }
 
     /**

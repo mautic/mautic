@@ -316,4 +316,86 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('clonesegment', $rows[0]->getAlias());
         $this->assertSame('clonesegment2', $rows[1]->getAlias());
     }
+
+    public function testSegmentFilterIcon(): void
+    {
+        // Save segment.
+        $filters   = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+        $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $this->saveSegment('Lead List 2', 'lead-list-2');
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(2, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    public function testSegmentWarningIcon(): void
+    {
+        $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
+        $segmentWithFreshLastRebuildDate          = $this->saveSegment('Lead List 2', 'lead-list-2');
+        $segmentWithOldLastRebuildDateUnpublished = $this->saveSegment('Lead List 3', 'lead-list-3');
+
+        $segmentWithOldLastRebuildDate->setLastBuiltDate(new \DateTime('-1 year'));
+        $segmentWithFreshLastRebuildDate->setLastBuiltDate(new \DateTime('now'));
+        $segmentWithOldLastRebuildDateUnpublished->isPublished(false);
+
+        $this->em->persist($segmentWithOldLastRebuildDate);
+        $this->em->persist($segmentWithFreshLastRebuildDate);
+        $this->em->persist($segmentWithOldLastRebuildDateUnpublished);
+
+        $this->em->flush();
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(3, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    public function testWarningOnInvalidDateField(): void
+    {
+        $segment = $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => 'Today',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ]
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('Date field filter value &quot;Today&quot; is invalid', $this->client->getResponse()->getContent());
+    }
 }

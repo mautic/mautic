@@ -80,6 +80,13 @@ Mautic.emailOnLoad = function (container, response) {
             Mautic.initDateRangePicker('#emailGraphStats #daterange_date_from', '#emailGraphStats #daterange_date_to');
         });
     }
+
+    var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
+    if ($loadDeliveredElements.length) {
+        $loadDeliveredElements.each(function(i, el) {
+           Mautic.loadEmailDeliveredStat(mQuery(el));
+        });
+    }
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -782,4 +789,14 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
 
         Mautic.activateChosenSelect(filterEl, false, mQuery);
     }
+};
+
+Mautic.loadEmailDeliveredStat = function($el) {
+    var emailId = $el.data('email-stat-delivered-for');
+    Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
+        if (response.success) {
+            var delivered = response.delivered;
+            $el.html(delivered);
+        }
+    }, false, true, "GET");
 };

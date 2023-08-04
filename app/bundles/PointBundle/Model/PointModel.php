@@ -2,11 +2,16 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -18,9 +23,12 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -28,10 +36,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PointModel extends CommonFormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    protected RequestStack $requestStack;
 
     /**
      * @var IpLookupHelper
@@ -55,18 +60,32 @@ class PointModel extends CommonFormModel
      */
     private $contactTracker;
 
+    private PointGroupModel $pointGroupModel;
+
     public function __construct(
-        Session $session,
+        RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         MauticFactory $mauticFactory,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        PointGroupModel $pointGroupModel
     ) {
-        $this->session            = $session;
+        $this->requestStack       = $requestStack;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
+        $this->pointGroupModel    = $pointGroupModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -204,14 +223,15 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        if (null !== $typeId && MAUTIC_ENV === 'prod') {
+        if (null !== $typeId && MAUTIC_ENV === 'prod' && null !== $this->requestStack->getMainRequest()) {
             // let's prevent some unnecessary DB calls
-            $triggeredEvents = $this->session->get('mautic.triggered.point.actions', []);
+            $session         = $this->requestStack->getMainRequest()->getSession();
+            $triggeredEvents = $session->get('mautic.triggered.point.actions', []);
             if (in_array($typeId, $triggeredEvents)) {
                 return;
             }
             $triggeredEvents[] = $typeId;
-            $this->session->set('mautic.triggered.point.actions', $triggeredEvents);
+            $session->set('mautic.triggered.point.actions', $triggeredEvents);
         }
 
         // find all the actions for published points
@@ -220,6 +240,7 @@ class PointModel extends CommonFormModel
         $availablePoints = $repo->getPublishedByType($type);
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
+        $hasLeadPointChanges = false;
         if (null === $lead) {
             $lead = $this->contactTracker->getContact();
 
@@ -285,14 +306,24 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->adjustPoints($delta);
-                    $parsed = explode('.', $action->getType());
+
+                    $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
+                    $pointGroup               = $action->getGroup();
+                    if (!empty($pointGroup)) {
+                        $this->pointGroupModel->adjustPoints($lead, $pointGroup, $delta);
+                    } else {
+                        $lead->adjustPoints($delta);
+                    }
+
+                    $hasLeadPointChanges = true;
+                    $parsed              = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $action->getId().': '.$action->getName(),
+                        $pointsChangeLogEntryName,
                         $parsed[1],
                         $delta,
-                        $ipAddress
+                        $ipAddress,
+                        $pointGroup
                     );
 
                     $event = new PointActionEvent($action, $lead);
@@ -315,7 +346,7 @@ class PointModel extends CommonFormModel
             $this->getRepository()->detachEntities($persist);
         }
 
-        if (!empty($lead->getPointChanges())) {
+        if ($hasLeadPointChanges) {
             $this->leadModel->saveEntity($lead);
         }
     }

@@ -29,8 +29,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['mailer_from_email'] = 'admin@mautic-community.test';
-        $this->configParams['messenger_type']    = 'testEmailSendToContactSync' === $this->getName() ? 'sync' : 'async';
+        $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
 
         parent::setUp();
     }
@@ -482,7 +482,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testEmailSendToContactSync(): void
     {
-        $contact = $this->createContact('contact@an.email');
+        $contact     = $this->createContact('contact@an.email');
+        $replyTo     = 'reply@mautic-community.test';
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
@@ -491,8 +492,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
             [
-                'lead_quickemail[subject]' => 'Ahoy {contactfield=email}',
-                'lead_quickemail[body]'    => 'Your email is <b>{contactfield=email}</b>',
+                'lead_quickemail[subject]'        => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'           => 'Your email is <b>{contactfield=email}</b>',
+                'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
         $crawler = $this->client->submit($form);
@@ -514,7 +516,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame($contact->getEmail(), $email->getTo()[0]->getAddress());
         Assert::assertCount(1, $email->getReplyTo());
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+        Assert::assertSame($replyTo, $email->getReplyTo()[0]->getAddress());
     }
 
     public function testEmailSendToContactAsync(): void

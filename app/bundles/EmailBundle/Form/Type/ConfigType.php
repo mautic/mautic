@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\ConfigBundle\Form\Type\DsnType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
-use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\EmailBundle\Form\DataTransformer\DsnTransformer;
 use Mautic\EmailBundle\Validator\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -24,7 +23,7 @@ class ConfigType extends AbstractType
 {
     public const MINIFY_EMAIL_HTML = 'minify_email_html';
 
-    public function __construct(private TranslatorInterface $translator, private DsnTransformer $dsnTransformer)
+    public function __construct(private TranslatorInterface $translator)
     {
     }
 
@@ -163,7 +162,7 @@ class ConfigType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.name.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -184,7 +183,7 @@ class ConfigType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.email.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'constraints' => [
                     new NotBlank(
@@ -211,7 +210,7 @@ class ConfigType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'required'    => false,
                 'constraints' => [
@@ -234,7 +233,7 @@ class ConfigType extends AbstractType
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'required'    => false,
                 'constraints' => [
@@ -256,7 +255,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.return.path.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'required'   => false,
             ]
@@ -266,18 +265,13 @@ class ConfigType extends AbstractType
             'mailer_dsn',
             DsnType::class,
             [
-                'label'       => false,
-                'constraints' => [
-                    new Dsn(),
-                ],
-                'error_mapping' => [
-                    '.' => 'scheme',
+                'constraints' => [new Dsn()],
+                'test_button' => [
+                    'action' => 'email:sendTestEmail',
+                    'label'  => $this->translator->trans('mautic.email.config.mailer.transport.test_send'),
                 ],
             ]
         );
-
-        $builder->get('mailer_dsn')
-            ->addModelTransformer($this->dsnTransformer);
 
         $builder->add(
             'mailer_convert_embed_images',
@@ -340,19 +334,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_test_send_button',
-            StandAloneButtonType::class,
-            [
-                'label'    => 'mautic.email.config.mailer.transport.test_send',
-                'required' => false,
-                'attr'     => [
-                    'class'   => 'btn btn-info',
-                    'onclick' => 'Mautic.sendTestEmail()',
-                ],
-            ]
-        );
-
-        $builder->add(
             'mailer_custom_headers',
             SortableListType::class,
             [
@@ -360,7 +341,7 @@ class ConfigType extends AbstractType
                 'label'           => 'mautic.email.custom_headers',
                 'attr'            => [
                     'tooltip'  => 'mautic.email.custom_headers.config.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                    'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
                 'option_required' => false,
                 'with_labels'     => true,

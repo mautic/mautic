@@ -29,8 +29,8 @@ class TimeFormatType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => [
-                '24' => '24-'.$this->translator->trans('mautic.core.time.hour'),
-                '12' => '12-'.$this->translator->trans('mautic.core.time.hour'),
+                '24-'.$this->translator->trans('mautic.core.time.hour') => '24',
+                '12-'.$this->translator->trans('mautic.core.time.hour') => '12',
             ],
             'expanded'    => false,
             'multiple'    => false,
