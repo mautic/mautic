@@ -60,6 +60,8 @@ class PointModel extends CommonFormModel
      */
     private $contactTracker;
 
+    private PointGroupModel $pointGroupModel;
+
     public function __construct(
         RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
@@ -73,13 +75,15 @@ class PointModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        PointGroupModel $pointGroupModel
     ) {
-        $this->requestStack   = $requestStack;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
-        $this->mauticFactory  = $mauticFactory;
-        $this->contactTracker = $contactTracker;
+        $this->requestStack       = $requestStack;
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->leadModel          = $leadModel;
+        $this->mauticFactory      = $mauticFactory;
+        $this->contactTracker     = $contactTracker;
+        $this->pointGroupModel    = $pointGroupModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -236,6 +240,7 @@ class PointModel extends CommonFormModel
         $availablePoints = $repo->getPublishedByType($type);
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
+        $hasLeadPointChanges = false;
         if (null === $lead) {
             $lead = $this->contactTracker->getContact();
 
@@ -301,14 +306,24 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->adjustPoints($delta);
-                    $parsed = explode('.', $action->getType());
+
+                    $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
+                    $pointGroup               = $action->getGroup();
+                    if (!empty($pointGroup)) {
+                        $this->pointGroupModel->adjustPoints($lead, $pointGroup, $delta);
+                    } else {
+                        $lead->adjustPoints($delta);
+                    }
+
+                    $hasLeadPointChanges = true;
+                    $parsed              = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $action->getId().': '.$action->getName(),
+                        $pointsChangeLogEntryName,
                         $parsed[1],
                         $delta,
-                        $ipAddress
+                        $ipAddress,
+                        $pointGroup
                     );
 
                     $event = new PointActionEvent($action, $lead);
@@ -331,7 +346,7 @@ class PointModel extends CommonFormModel
             $this->getRepository()->detachEntities($persist);
         }
 
-        if (!empty($lead->getPointChanges())) {
+        if ($hasLeadPointChanges) {
             $this->leadModel->saveEntity($lead);
         }
     }

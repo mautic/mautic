@@ -1408,6 +1408,12 @@ class LeadController extends FormController
                         // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
+                        if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
+                            $addresses = explode(',', $email[EmailType::REPLY_TO_ADDRESS]);
+
+                            $mailer->setReplyTo($addresses);
+                        }
+
                         // From user
                         $user = $userHelper->getUser();
 

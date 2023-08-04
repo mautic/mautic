@@ -52,7 +52,8 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
         * `Mautic\LeadBundle\Model\ListModel::getVersionNew()`
         * `Mautic\LeadBundle\Model\ListModel::getVersionOld()`
-*   Services
+    * `mautic:broadcast:send --limit=10 --batch=2` fix process emails with combination of parameters limit/batch. Before it processed all emails with batch 10. Now process 10 emails with batch 2. If you used to use before, probably you need change it.
+* Services
     * Repository service `mautic.user.token.repository` for `Mautic\UserBundle\Entity\UserTokenRepository` was removed as it was duplicated. Use `mautic.user.repository.user_token` instead.
     * In tests replace `self::$container->get('mautic.http.client.mock_handler')` with `self::$container->get(\GuzzleHttp\Handler\MockHandler::class)` to get HTTP client mock handler.
 * JS Dependencies
@@ -92,6 +93,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Deprecated cookie `mtc_sid` removed.
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
+    * Removed onlyForBC themes: coffee, Mauve, nature
 
 # Dependency injection improvements
 
