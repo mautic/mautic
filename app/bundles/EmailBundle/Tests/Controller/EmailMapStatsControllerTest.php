@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Controller\EmailMapStatsController;
@@ -76,9 +77,18 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function testGetMapOptions(): void
     {
-        $result = $this->mapController->getMapOptions();
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $result = $this->mapController->getMapOptions($email);
         $this->assertSame(EmailMapStatsController::MAP_OPTIONS, $result);
     }
 
@@ -121,6 +131,27 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $results = $this->mapController->getData($email, $dateFrom, $dateTo);
 
         $this->assertCount(2, $results);
-        $this->assertSame($this->getStats(), $results);
+        $this->assertSame([
+            'clicked_through_count' => [
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => '',
+                ],
+                [
+                    'clicked_through_count' => '7',
+                    'country'               => 'Italy',
+                ],
+            ],
+            'read_count' => [
+                [
+                    'read_count'            => '4',
+                    'country'               => '',
+                ],
+                [
+                    'read_count'            => '12',
+                    'country'               => 'Italy',
+                ],
+            ],
+           ], $results);
     }
 }

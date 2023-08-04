@@ -30,7 +30,7 @@ abstract class AbstractCountryMapController extends AbstractController
      *
      * @param T $entity
      *
-     * @return array<int, array<string, int|string>>
+     * @return array<string, array<int, array<string, int|string>>>
      */
     abstract public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
 
@@ -41,14 +41,16 @@ abstract class AbstractCountryMapController extends AbstractController
      */
     abstract public function hasAccess(CorePermissions $security, $entity): bool;
 
+    abstract public function getMapOptionsTitle(): string;
+
     /**
      * @template T
      *
-     * @param T|null $entity
+     * @param T $entity
      *
      * @return array<string,array<string, string>>
      */
-    abstract public function getMapOptions($entity = null): array;
+    abstract public function getMapOptions($entity): array;
 
     /**
      * @throws \Exception
@@ -74,7 +76,7 @@ abstract class AbstractCountryMapController extends AbstractController
                 'data'           => $mapData[0]['data'],
                 'height'         => 315,
                 'optionsEnabled' => true,
-                'optionsTitle'   => 'mautic.email.stats.options.title',
+                'optionsTitle'   => $this->getMapOptionsTitle(),
                 'options'        => $mapData,
                 'legendEnabled'  => true,
                 'statUnit'       => $mapData[0]['unit'],

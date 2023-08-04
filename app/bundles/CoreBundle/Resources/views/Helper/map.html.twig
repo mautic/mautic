@@ -1,6 +1,6 @@
 {%  if optionsEnabled|default(false) %}
     <div class="map-options">
-        {% if optionsTitle is defined %}
+        {% if optionsTitle is defined and optionsTitle is not empty %}
             <h5 class="map-options__title text-white dark-md fw-sb mb-xs">{{ optionsTitle|trans }}</h5>
         {% endif %}
         <div class="map-options__container btn-group btn-block" data-toggle="buttons">

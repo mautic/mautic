@@ -868,4 +868,14 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
     {
         return $this->getEntity($id);
     }
+
+    /**
+     * Get leads in a campaign grouped by country.
+     *
+     * @return array{}|array<int, array<string, string|null>>
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject): array
+    {
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject);
+    }
 }

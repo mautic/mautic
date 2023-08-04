@@ -34,7 +34,7 @@ class EmailMapStatsController extends AbstractCountryMapController
     /**
      * @param Email $entity
      *
-     * @return array<int, array<string, int|string>>
+     * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
@@ -48,12 +48,21 @@ class EmailMapStatsController extends AbstractCountryMapController
 
         $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
 
-        return $this->model->getEmailCountryStats(
+        $emailStats = $this->model->getEmailCountryStats(
             $entity,
             $dateFromObject,
             $dateToObject,
             $includeVariants,
         );
+
+        $results['read_count'] = $results['clicked_through_count'] = [];
+
+        foreach ($emailStats as $e) {
+            $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+            $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+        }
+
+        return $results;
     }
 
     /**
@@ -73,8 +82,13 @@ class EmailMapStatsController extends AbstractCountryMapController
      *
      * @return array<string, array<string, string>>
      */
-    public function getMapOptions($entity = null): array
+    public function getMapOptions($entity): array
     {
         return self::MAP_OPTIONS;
+    }
+
+    public function getMapOptionsTitle(): string
+    {
+        return 'mautic.email.stats.options.title';
     }
 }

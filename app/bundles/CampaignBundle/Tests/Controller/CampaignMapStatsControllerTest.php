@@ -88,12 +88,13 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
+     * @throws OptimisticLockException
      * @throws Exception
+     * @throws ORMException
      */
     public function testGetData(): void
     {
-        $campaign = new Campaign();
-        $campaign->setName('Test campaign');
+        $campaign = $this->createCampaignWithEmail();
 
         $dateFrom = new \DateTime('2023-07-20');
         $dateTo   = new \DateTime('2023-07-25');
@@ -104,8 +105,37 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 
         $results = $this->mapController->getData($campaign, $dateFrom, $dateTo);
 
-        $this->assertCount(3, $results);
-        $this->assertSame($this->getStats(), $results);
+        $this->assertEmpty($results['contacts']);
+        $this->assertCount(3, $results['read_count']);
+        $this->assertCount(3, $results['clicked_through_count']);
+        $this->assertSame([
+            [
+                'read_count'            => '4',
+                'country'               => '',
+            ],
+            [
+                'read_count'            => '8',
+                'country'               => 'Spain',
+            ],
+            [
+                'read_count'            => '8',
+                'country'               => 'Finland',
+            ],
+        ], $results['read_count']);
+        $this->assertSame([
+            [
+                'clicked_through_count' => '4',
+                'country'               => '',
+            ],
+            [
+                'clicked_through_count' => '4',
+                'country'               => 'Spain',
+            ],
+            [
+                'clicked_through_count' => '4',
+                'country'               => 'Finland',
+            ],
+        ], $results['clicked_through_count']);
     }
 
     /**
@@ -122,10 +152,7 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $crawler        = new Crawler($clientResponse->getContent(), $this->client->getInternalRequest()->getUri());
 
-        $this->assertEquals(
-            $this->getContainer()->get('translator')->trans('mautic.email.stats.options.title'),
-            $crawler->filter('.map-options__title')->text()
-        );
+        $this->assertEmpty($crawler->filter('.map-options__title'));
         $this->assertCount(1, $crawler->filter('div.map-options'));
         $this->assertCount(1, $crawler->filter('div.vector-map'));
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -136,6 +163,18 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
      * @throws ORMException
      */
     public function testGetMapOptionsEmailCampaign(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+
+        $result = $this->mapController->getMapOptions($campaign);
+        $this->assertSame(CampaignMapStatsController::MAP_OPTIONS, $result);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithEmail(): Campaign
     {
         $campaign = new Campaign();
         $campaign->setName('Test campaign');
@@ -162,13 +201,21 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         // Add events to campaign
         $campaign->addEvent(0, $event);
 
-        $result = $this->mapController->getMapOptions($campaign);
-        $this->assertSame(CampaignMapStatsController::MAP_OPTIONS, $result);
+        return $campaign;
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function testGetMapOptionsNotEmailCampaign(): void
     {
-        $result = $this->mapController->getMapOptions();
-        $this->assertSame(CampaignMapStatsController::MAP_OPTIONS['contacts'], $result);
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign 1');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $result = $this->mapController->getMapOptions($campaign);
+        $this->assertSame(['contacts' => CampaignMapStatsController::MAP_OPTIONS['contacts']], $result);
     }
 }

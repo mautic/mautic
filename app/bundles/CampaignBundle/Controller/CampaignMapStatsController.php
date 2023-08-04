@@ -38,20 +38,25 @@ class CampaignMapStatsController extends AbstractCountryMapController
     /**
      * @param Campaign $entity
      *
-     * @return array<int, array<string, int|string>>
+     * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
     public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
-        $contacts = '';
-        $emails   = $this->model->getEmailCountryStats(
-            $entity,
-            $dateFromObject,
-            $dateToObject
-        );
+        $results['contacts'] =  $this->model->getCampaignMembersGroupByCountry($entity, $dateFromObject);
 
-        return $emails;
+        if ($entity->getEmailSendEvents()->count() > 0) {
+            $emailStats            = $this->model->getEmailCountryStats($entity, $dateFromObject, $dateToObject);
+            $results['read_count'] = $results['clicked_through_count'] = [];
+
+            foreach ($emailStats as $e) {
+                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -71,12 +76,19 @@ class CampaignMapStatsController extends AbstractCountryMapController
      *
      * @return array<string,array<string, string>>
      */
-    public function getMapOptions($entity = null): array
+    public function getMapOptions($entity): array
     {
-        if (!empty($entity) && $entity->getEmailSendEvents()->count() > 0) {
+        if ($entity->getEmailSendEvents()->count() > 0) {
             return self::MAP_OPTIONS;
-        } else {
-            return self::MAP_OPTIONS['contacts'];
         }
+
+        $key = array_key_first(self::MAP_OPTIONS);
+
+        return [$key => self::MAP_OPTIONS[$key]];
+    }
+
+    public function getMapOptionsTitle(): string
+    {
+        return '';
     }
 }
