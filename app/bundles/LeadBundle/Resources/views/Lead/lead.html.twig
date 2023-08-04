@@ -462,7 +462,7 @@
                         {% for event in upcomingEvents %}
                             {% set metadata = serializerDecode(event.metadata) %}
                             {% set errors = false %}
-                            {% if metadata.errors is defined and metadata.errors is not empty %}
+                            {% if metadata.errors is not empty %}
                                 {% set errors = metadata.errors is iterable ? metadata.errors|join('<br/>') : metadata.errors %}
                             {% endif %}
                             <li class="media">
