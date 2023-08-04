@@ -58,7 +58,7 @@ class AuditlogController extends CommonController
                     'mauticContent' => 'leadAuditlog',
                     'auditLogCount' => $events['total'],
                 ],
-                'contentTemplate' => '@MauticLead/Auditlog/list.html.twig',
+                'contentTemplate' => '@MauticLead/Auditlog/_list.html.twig',
             ]
         );
     }

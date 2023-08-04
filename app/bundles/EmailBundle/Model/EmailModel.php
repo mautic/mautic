@@ -1046,6 +1046,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $queued;
     }
 
+    public function getDeliveredCount(Email $email, bool $includeVariants = false): int
+    {
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+
+        $statRepo = $this->getStatRepository();
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
+
+        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
+        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
+        $sentCount      = (int) $email->getSentCount($includeVariants);
+        $deliveredCount = $sentCount - $failedCount - $bouncedCount;
+
+        // we never want to display a negative number of delivered emails
+        return max($deliveredCount, 0);
+    }
+
     /**
      * Send an email to lead lists.
      *
@@ -1866,8 +1884,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $q          = $query->prepareTimeDataQuery('email_stats', $column, $filter);
-        $q->select('CONCAT(TIME_FORMAT(t.'.$column.', \''.$format.'\'),\'-\',TIME_FORMAT(t.'.$column.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
+
+        $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
+        $columnWithTimezone    = 't.'.$column;
+        $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
+        $columnName            = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
+        $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
         ->groupBy('hour')
         ->orderBy('count', 'DESC')
         ->setMaxResults(24);

@@ -49,7 +49,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->queryBuilder       = $this->createMock(QueryBuilder::class);
         $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelper       = new ReportHelper();
+        $this->reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
     }
