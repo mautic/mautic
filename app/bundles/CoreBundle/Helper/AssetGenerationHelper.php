@@ -98,7 +98,7 @@ class AssetGenerationHelper
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
             $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
-            $assetsPath = $this->pathsHelper->getSystemPath('assets');
+            $assetsPath = $this->pathsHelper->getSystemPath('media');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ('prod' == $env) {

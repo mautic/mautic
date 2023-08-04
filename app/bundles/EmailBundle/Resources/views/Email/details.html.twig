@@ -195,6 +195,12 @@
                               </tr>
                               <tr>
                                   <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.email.stat.delivered'|trans }}</span>
+                                  </td>
+                                  <td data-email-stat-delivered-for="{{ email.id }}"><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
+                              </tr>
+                              <tr>
+                                  <td width="20%">
                                       <span class="fw-b">{{ 'mautic.email.stat.read'|trans }}</span>
                                   </td>
                                   <td>{{ email.readCount }}</td>
