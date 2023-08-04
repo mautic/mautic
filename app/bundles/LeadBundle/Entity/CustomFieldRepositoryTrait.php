@@ -22,19 +22,6 @@ trait CustomFieldRepositoryTrait
     protected $uniqueIdentifiersOperator;
 
     /**
-     * @var array
-     */
-    private static $initiateFields = [];
-
-    /**
-     * @return array
-     */
-    public static function getInitiateFields()
-    {
-        return self::$initiateFields;
-    }
-
-    /**
      * @param string $object
      * @param array  $args
      */
@@ -445,15 +432,6 @@ trait CustomFieldRepositoryTrait
     protected function postSaveEntity($entity)
     {
         // Inherit and use if required
-    }
-
-    public function setInitiateFields(): void
-    {
-        $fields = [];
-        foreach ($this->getFieldList() as $field) {
-            $fields[$field['alias']] = $field;
-        }
-        self::$initiateFields = $fields;
     }
 
     public function setUniqueIdentifiersOperator(string $uniqueIdentifiersOperator): void

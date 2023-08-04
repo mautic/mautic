@@ -12,6 +12,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class LeadFieldRepository extends CommonRepository
 {
+    private static ?array $fields;
+
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
@@ -60,6 +62,26 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return $aliases;
+    }
+
+    /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function getFields(): array
+    {
+        if (!isset(self::$fields)) {
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->setParameter('published', true, 'boolean')
+                ->addOrderBy('f.field_order', 'asc');
+            $results = $fq->execute()->fetchAllAssociative();
+
+            self::$fields = array_column($results, null, 'alias');
+        }
+
+        return self::$fields;
     }
 
     /**

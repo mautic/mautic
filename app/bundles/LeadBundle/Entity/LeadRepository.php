@@ -28,6 +28,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
+    private static LeadFieldRepository $leadFieldRepository;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -87,6 +89,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
     {
         $this->listLeadRepository = $listLeadRepository;
+    }
+
+    public function setLeadFieldRepository(LeadFieldRepository $leadFieldRepository): void
+    {
+        self::$leadFieldRepository = $leadFieldRepository;
+    }
+
+    public static function getLeadFieldRepository(): LeadFieldRepository
+    {
+        return self::$leadFieldRepository;
     }
 
     /**
