@@ -54,7 +54,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'example_send[contact_id]'      => $lead->getId(),
         ]);
         $this->client->submit($form);
-
         $message = $this->transport->sentMessage;
 
         // Asserting email data
