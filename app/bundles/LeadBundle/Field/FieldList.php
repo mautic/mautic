@@ -28,7 +28,7 @@ class FieldList
     /**
      * @param mixed[] $filters
      *
-     * @return mixed[]
+     * @return array<int|string|array<int|string>>
      */
     public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
