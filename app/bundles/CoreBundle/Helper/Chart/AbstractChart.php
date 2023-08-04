@@ -269,7 +269,7 @@ abstract class AbstractChart
         $sb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->where(
-                $sb->expr()->andX(
+                $sb->expr()->and(
                     $sb->expr()->eq('cl.company_id', ':companyId'),
                     $sb->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
                 )
@@ -292,7 +292,7 @@ abstract class AbstractChart
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
                         $sb->expr()->eq('lll.manually_removed', 0)
