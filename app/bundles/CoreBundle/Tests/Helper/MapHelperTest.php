@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 class MapHelperTest extends MauticMysqlTestCase
 {
     /**
-     * @return array<int, array<string, string>>
+     * @return array<string, array<int, array<string, int|string>>>
      */
     private function getStats(): array
     {

@@ -839,11 +839,11 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
     /**
      * @param Campaign $entity
      *
-     * @return array<int, array<string, int|string>>
+     * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
-    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
+    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
@@ -853,10 +853,21 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
         }
 
         /** @var StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(Stat::class);
-        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $statRepo            = $this->em->getRepository(Stat::class);
+        $query               = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom);
 
-        return $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
+        if ($entity->getEmailSendEvents()->count() > 0) {
+            $emailStats            = $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
+            $results['read_count'] = $results['clicked_through_count'] = [];
+
+            foreach ($emailStats as $e) {
+                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+            }
+        }
+
+        return $results;
     }
 
     /**

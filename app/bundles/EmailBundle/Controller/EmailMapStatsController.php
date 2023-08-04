@@ -48,21 +48,12 @@ class EmailMapStatsController extends AbstractCountryMapController
 
         $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
 
-        $emailStats = $this->model->getEmailCountryStats(
+        return $this->model->getCountryStats(
             $entity,
             $dateFromObject,
             $dateToObject,
             $includeVariants,
         );
-
-        $results['read_count'] = $results['clicked_through_count'] = [];
-
-        foreach ($emailStats as $e) {
-            $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
-            $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
-        }
-
-        return $results;
     }
 
     /**

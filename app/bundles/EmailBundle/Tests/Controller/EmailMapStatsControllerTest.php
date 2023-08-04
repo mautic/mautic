@@ -93,45 +93,11 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, string>>
+     * @return array<string, array<int, array<string, string>>>
      */
     private function getStats(): array
     {
         return [
-            [
-                'sent_count'            => '4',
-                'read_count'            => '4',
-                'clicked_through_count' => '4',
-                'country'               => '',
-            ],
-            [
-                'sent_count'            => '20',
-                'read_count'            => '12',
-                'clicked_through_count' => '7',
-                'country'               => 'Italy',
-            ],
-        ];
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testGetData(): void
-    {
-        $email = new Email();
-        $email->setName('Test email');
-
-        $dateFrom = new \DateTime('2023-07-20');
-        $dateTo   = new \DateTime('2023-07-25');
-
-        $this->emailModelMock->method('getEmailCountryStats')
-            ->with($email, $dateFrom, $dateTo, false)
-            ->willReturn($this->getStats());
-
-        $results = $this->mapController->getData($email, $dateFrom, $dateTo);
-
-        $this->assertCount(2, $results);
-        $this->assertSame([
             'clicked_through_count' => [
                 [
                     'clicked_through_count' => '4',
@@ -152,6 +118,27 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
                     'country'               => 'Italy',
                 ],
             ],
-           ], $results);
+        ];
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetData(): void
+    {
+        $email = new Email();
+        $email->setName('Test email');
+
+        $dateFrom = new \DateTime('2023-07-20');
+        $dateTo   = new \DateTime('2023-07-25');
+
+        $this->emailModelMock->method('getCountryStats')
+            ->with($email, $dateFrom, $dateTo, false)
+            ->willReturn($this->getStats());
+
+        $results = $this->mapController->getData($email, $dateFrom, $dateTo);
+
+        $this->assertCount(2, $results);
+        $this->assertSame($this->getStats(), $results);
     }
 }

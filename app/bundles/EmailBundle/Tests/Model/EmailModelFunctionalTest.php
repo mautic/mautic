@@ -297,27 +297,37 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             }
         }
         $this->em->flush();
-        $results = $emailModel->getEmailCountryStats($email, $dateFrom, $dateTo);
+        $results = $emailModel->getCountryStats($email, $dateFrom, $dateTo);
 
-        $this->assertCount(3, $results);
+        $this->assertCount(2, $results);
         $this->assertSame([
-            [
-                'sent_count'            => '1',
-                'read_count'            => '1',
-                'clicked_through_count' => '1',
-                'country'               => '',
+            'clicked_through_count' => [
+                [
+                    'clicked_through_count' => '1',
+                    'country'               => '',
+                ],
+                [
+                    'clicked_through_count' => '1',
+                    'country'               => 'Italy',
+                ],
+                [
+                    'clicked_through_count' => '1',
+                    'country'               => 'Poland',
+                ],
             ],
-            [
-                'sent_count'            => '3',
-                'read_count'            => '2',
-                'clicked_through_count' => '1',
-                'country'               => 'Italy',
-            ],
-            [
-                'sent_count'            => '2',
-                'read_count'            => '2',
-                'clicked_through_count' => '1',
-                'country'               => 'Poland',
+            'read_count' => [
+                [
+                    'read_count'            => '1',
+                    'country'               => '',
+                ],
+                [
+                    'read_count'            => '2',
+                    'country'               => 'Italy',
+                ],
+                [
+                    'read_count'            => '2',
+                    'country'               => 'Poland',
+                ],
             ],
         ], $results);
     }

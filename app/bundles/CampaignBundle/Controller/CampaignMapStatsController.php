@@ -44,19 +44,7 @@ class CampaignMapStatsController extends AbstractCountryMapController
      */
     public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
-        $results['contacts'] =  $this->model->getCampaignMembersGroupByCountry($entity, $dateFromObject);
-
-        if ($entity->getEmailSendEvents()->count() > 0) {
-            $emailStats            = $this->model->getEmailCountryStats($entity, $dateFromObject, $dateToObject);
-            $results['read_count'] = $results['clicked_through_count'] = [];
-
-            foreach ($emailStats as $e) {
-                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
-                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
-            }
-        }
-
-        return $results;
+        return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }
 
     /**

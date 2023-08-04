@@ -37,36 +37,61 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, string>>
+     * @return array<string, array<int, array<string, string>>>
      */
     private function getStats(): array
     {
         return [
-            [
-                'sent_count'            => '4',
-                'read_count'            => '4',
-                'clicked_through_count' => '4',
-                'country'               => '',
+            'contacts' => [
+                [
+                    'contacts' => '4',
+                    'country'  => '',
+                ],
+                [
+                    'contacts' => '4',
+                    'country'  => 'Spain',
+                ],
+                [
+                    'contacts' => '4',
+                    'country'  => 'Finland',
+                ],
             ],
-            [
-                'sent_count'            => '12',
-                'read_count'            => '8',
-                'clicked_through_count' => '4',
-                'country'               => 'Spain',
+            'clicked_through_count' => [
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => '',
+                ],
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => 'Spain',
+                ],
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => 'Finland',
+                ],
             ],
-            [
-                'sent_count'            => '8',
-                'read_count'            => '8',
-                'clicked_through_count' => '4',
-                'country'               => 'Finland',
+            'read_count' => [
+                [
+                    'read_count'            => '4',
+                    'country'               => '',
+                ],
+                [
+                    'read_count'            => '8',
+                    'country'               => 'Spain',
+                ],
+                [
+                    'read_count'            => '8',
+                    'country'               => 'Finland',
+                ],
             ],
         ];
     }
 
     public function testMapCountries(): void
     {
-        $reads   = MapHelper::mapCountries($this->getStats(), 'read_count');
-        $clicks  = MapHelper::mapCountries($this->getStats(), 'clicked_through_count');
+        $stats   = $this->getStats();
+        $reads   = MapHelper::mapCountries($stats['read_count'], 'read_count');
+        $clicks  = MapHelper::mapCountries($stats['clicked_through_count'], 'clicked_through_count');
 
         $this->assertSame([
             'data' => [
@@ -99,13 +124,12 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         $dateFrom = new \DateTime('2023-07-20');
         $dateTo   = new \DateTime('2023-07-25');
 
-        $this->campaignModelMock->method('getEmailCountryStats')
+        $this->campaignModelMock->method('getCountryStats')
             ->with($campaign, $dateFrom, $dateTo)
             ->willReturn($this->getStats());
 
         $results = $this->mapController->getData($campaign, $dateFrom, $dateTo);
 
-        $this->assertEmpty($results['contacts']);
         $this->assertCount(3, $results['read_count']);
         $this->assertCount(3, $results['clicked_through_count']);
         $this->assertSame([

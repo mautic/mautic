@@ -137,28 +137,52 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $results = $model->getEmailCountryStats($campaign, $dateFrom, $dateTo);
+        $results = $model->getCountryStats($campaign, $dateFrom, $dateTo);
 
         $this->assertCount(4, $campaign->getEmailSendEvents());
         $this->assertCount(3, $results);
         $this->assertSame([
-            [
-                'sent_count'            => '4',
-                'read_count'            => '4',
-                'clicked_through_count' => '4',
-                'country'               => '',
+            'contacts' => [
+                [
+                    'country'  => '',
+                    'contacts' => '1',
+                ],
+                [
+                    'country'  => 'Poland',
+                    'contacts' => '2',
+                ],
+                [
+                    'country'  => 'Spain',
+                    'contacts' => '3',
+                ],
             ],
-            [
-                'sent_count'            => '8',
-                'read_count'            => '8',
-                'clicked_through_count' => '4',
-                'country'               => 'Poland',
+            'clicked_through_count' => [
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => '',
+                ],
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => 'Poland',
+                ],
+                [
+                    'clicked_through_count' => '4',
+                    'country'               => 'Spain',
+                ],
             ],
-            [
-                'sent_count'            => '12',
-                'read_count'            => '8',
-                'clicked_through_count' => '4',
-                'country'               => 'Spain',
+            'read_count' => [
+                [
+                    'read_count'            => '4',
+                    'country'               => '',
+                ],
+                [
+                    'read_count'            => '8',
+                    'country'               => 'Poland',
+                ],
+                [
+                    'read_count'            => '8',
+                    'country'               => 'Spain',
+                ],
             ],
         ], $results);
     }

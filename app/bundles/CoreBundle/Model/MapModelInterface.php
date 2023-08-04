@@ -16,11 +16,11 @@ interface MapModelInterface
     /**
      * @param T $entity
      *
-     * @return array<int, array<string, int|string>>
+     * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
-    public function getEmailCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array;
+    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array;
 
     /**
      * Get a specific entity.
