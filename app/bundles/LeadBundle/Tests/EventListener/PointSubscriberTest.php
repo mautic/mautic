@@ -76,7 +76,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
-    public function testOnPointTriggerExecutedForChangeStage()
+    public function testOnPointTriggerExecutedForChangeStage(): void
     {
         $triggerEvent = new TriggerEvent();
         $contact      = new Lead();

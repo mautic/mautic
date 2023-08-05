@@ -34,7 +34,7 @@ class StageHelper
     public function changeStage(Lead $lead, Stage $stage, string $origin): void
     {
         // Get the current stage and validate it vs the new one
-        $currentStage = ($lead instanceof Lead) ? $lead->getStage() : null;
+        $currentStage = $lead->getStage();
         if ($currentStage) {
             if ($currentStage->getId() === $stage->getId()) {
                 throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
@@ -52,16 +52,21 @@ class StageHelper
             sprintf(
                 'StageBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
                 $lead->getId(),
-                $currentStage ? $currentStage->getName() : 'null',
-                $currentStage ? $currentStage->getId() : 'null',
-                $stage ? $stage->getName() : 'null',
-                $stage ? $stage->getId() : 'null',
+                $currentStage ? $currentStage->getName() : null,
+                $currentStage ? $currentStage->getId() : null,
+                $stage->getName(),
+                $stage->getId(),
                 $origin
             )
         );
     }
 
-    public function getStage(int $stageId): Stage
+    /**
+     * Takes a stage ID and returns a Stage object.
+     *
+     * @return Stage|null
+     */
+    public function getStage(int $stageId)
     {
         return $this->stageModel->getEntity($stageId);
     }
