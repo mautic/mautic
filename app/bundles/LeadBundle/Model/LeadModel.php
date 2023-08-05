@@ -881,10 +881,6 @@ class LeadModel extends FormModel
      */
     public function addToStage(Lead $lead, Stage $stage, string $origin): LeadModel
     {
-        if (!$lead instanceof Lead) {
-            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
-        }
         $lead->setStage($stage);
         $lead->stageChangeLogEntry(
             $stage,
