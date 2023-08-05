@@ -1767,12 +1767,20 @@ class LeadController extends FormController
                         $stageModel = $this->getModel('stage');
 
                         $stage = $stageModel->getEntity((int) $data['addstage']);
-                        $model->addToStages($lead, $stage);
+                        $model->addToStage(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.added.batch')
+                        );
                     }
 
                     if (!empty($data['removestage'])) {
                         $stage = $stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages($lead, $stage);
+                        $model->removeFromStages(
+                            $lead,
+                            $stage,
+                            $this->translator->trans('mautic.stage.event.removed.batch')
+                        );
                     }
                 }
             }

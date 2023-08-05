@@ -881,11 +881,11 @@ class LeadModel extends FormModel
      *
      * @param array|Lead  $lead
      * @param array|Stage $stage
-     * @param bool        $manuallyAdded
+     * @param string      $origin used for logging/audit
      *
      * @return $this
      */
-    public function addToStages($lead, $stage, $manuallyAdded = true)
+    public function addToStage($lead, $stage, $origin)
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -895,26 +895,22 @@ class LeadModel extends FormModel
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.added.batch')
+            $origin
         );
 
         return $this;
     }
 
     /**
-     * Remove lead from Stage.
-     *
-     * @param bool $manuallyRemoved
-     *
-     * @return $this
+     * Remove a lead from all Stages.
      */
-    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
+    public function removeFromStages(Lead $lead, Stage $stage, string $origin): LeadModel
     {
         $lead->setStage(null);
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.removed.batch')
+            $origin
         );
 
         return $this;

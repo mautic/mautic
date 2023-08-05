@@ -6,10 +6,9 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
+use Mautic\StageBundle\Helper\StageHelper;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -65,31 +64,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     private function changeStage(LeadEventLog $log, Stage $stage, PendingEvent $pendingEvent): void
     {
         $lead      = $log->getLead();
-        $leadStage = ($lead instanceof Lead) ? $lead->getStage() : null;
 
-        if ($leadStage) {
-            if ($leadStage->getId() === $stage->getId()) {
-                $pendingEvent->passWithError($log, $this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
-
-                return;
-            }
-
-            if ($leadStage->getWeight() > $stage->getWeight()) {
-                $pendingEvent->passWithError($log, $this->translator->trans('mautic.stage.campaign.event.stage_invalid'));
-
-                return;
-            }
+        try {
+            $this->stageHelper->changeStage($lead, $stage, $log->getEvent()->getName());
+            $pendingEvent->pass($log);
+        } catch (\UnexpectedValueException $e) {
+            $pendingEvent->passWithError($log, $e->getMessage());
         }
-
-        $lead->stageChangeLogEntry(
-            $stage,
-            $stage->getId().': '.$stage->getName(),
-            $log->getEvent()->getName()
-        );
-        $lead->setStage($stage);
-
-        $this->leadModel->saveEntity($lead);
-
-        $pendingEvent->pass($log);
     }
 }

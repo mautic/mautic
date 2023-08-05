@@ -72,7 +72,12 @@ class StageApiController extends CommonApiController
 
         $leadModel = $this->getModel('lead');
         \assert($leadModel instanceof LeadModel);
-        $leadModel->addToStages($contact, $stage)->saveEntity($contact);
+        $leadModel->addToStage(
+            $contact,
+            $stage,
+            'API: '.$this->translator->trans('mautic.stage.event.added.batch')
+        );
+        $leadModel->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
@@ -107,7 +112,13 @@ class StageApiController extends CommonApiController
 
         $leadModel = $this->getModel('lead');
         \assert($leadModel instanceof LeadModel);
-        $leadModel->removeFromStages($contact, $stage)->saveEntity($contact);
+
+        $leadModel->removeFromStages(
+            $contact,
+            $stage,
+            'API: '.$this->translator->trans('mautic.stage.event.removed.batch')
+        );
+        $leadModel->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
