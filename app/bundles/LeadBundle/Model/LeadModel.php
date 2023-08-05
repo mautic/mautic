@@ -878,14 +878,8 @@ class LeadModel extends FormModel
 
     /**
      * Add lead to Stage.
-     *
-     * @param array|Lead  $lead
-     * @param array|Stage $stage
-     * @param string      $origin used for logging/audit
-     *
-     * @return $this
      */
-    public function addToStage($lead, $stage, $origin)
+    public function addToStage(Lead $lead, Stage $stage, string $origin): LeadModel
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
