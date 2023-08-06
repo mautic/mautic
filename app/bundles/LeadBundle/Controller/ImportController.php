@@ -162,7 +162,7 @@ class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $$this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
 
         if ($import) {
             $import->setStatus($import::QUEUED);
