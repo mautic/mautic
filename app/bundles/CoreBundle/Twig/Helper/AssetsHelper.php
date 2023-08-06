@@ -10,6 +10,8 @@ use Mautic\InstallBundle\Install\InstallService;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\Intl\Countries;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 
 final class AssetsHelper
 {
@@ -704,14 +706,16 @@ final class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
-
-        if ($urlOnly) {
-            return $flagImg;
-        } else {
-            return '<img src="'.$flagImg.'" class="'.$class.'" />';
+        try {
+            $country = Countries::getName(strtoupper($country));
+        } catch (MissingResourceException) {
         }
+
+        $country  = ucwords(str_replace(' ', '-', $country));
+        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png')
+            ?? $this->getOverridableUrl('images/flags/Default.jpg');
+
+        return $urlOnly ? $flagImg : '<img src="'.$flagImg.'" class="'.$class.'" />';
     }
 
     /**
