@@ -25,7 +25,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
-        $mailer     = new Swift_Mailer($transport);
+        $mailer     = new \Swift_Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
 
