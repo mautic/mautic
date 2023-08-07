@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
+use Swift_Mailer;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
@@ -24,7 +25,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
-        $mailer     = new \Swift_Mailer($transport);
+        $mailer     = new Swift_Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
 
