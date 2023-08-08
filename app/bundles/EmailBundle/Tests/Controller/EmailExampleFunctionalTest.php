@@ -9,13 +9,13 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
+use Swift_Transport;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
-    private SmtpTransport $transport;
+    private Swift_Transport $transport;
 
     protected function setUp(): void
     {
@@ -23,7 +23,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $mailHelper = self::$container->get('mautic.helper.mailer');
-        $transport  = new SmtpTransport();
+        $transport  = new \Swift_SmtpTransport();
         $mailer     = new \Swift_Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
