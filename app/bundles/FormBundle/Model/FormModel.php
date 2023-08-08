@@ -885,7 +885,7 @@ class FormModel extends CommonFormModel
         $leadArray            = ($lead) ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
         foreach ($autoFillFields as $field) {
-            $value = $leadArray[$field->getMappedField()];
+            $value = isset($leadArray[$field->getMappedField()]) ? $leadArray[$field->getMappedField()] : '';
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
