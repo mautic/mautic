@@ -246,7 +246,7 @@ abstract class AbstractChart
      * @param int|null $campaignId
      * @param string   $fromAlias
      */
-    public function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
+    public function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
     {
         if ($campaignId) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
@@ -258,7 +258,7 @@ abstract class AbstractChart
      * @param int|null $companyId
      * @param string   $fromAlias
      */
-    public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
+    public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
     {
         if (!$companyId) {
             return;
@@ -284,7 +284,7 @@ abstract class AbstractChart
      * @param int|null $segmentId
      * @param string   $fromAlias
      */
-    public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
+    public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
     {
         if ($segmentId) {
             $sb = $this->connection->createQueryBuilder();
