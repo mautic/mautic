@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use DateTime;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Swift_Events_EventListener;
-use Swift_Mime_SimpleMessage;
-use Swift_Transport;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @var Swift_Transport
+     * @var \Swift_Transport
      */
     private $transport;
 
@@ -382,7 +378,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     private function createEmail(): Email
     {
         $email = new Email();
-        $email->setDateAdded(new DateTime());
+        $email->setDateAdded(new \DateTime());
         $email->setName('Email name');
         $email->setSubject('Email subject for {contactfield=firstname} {contactfield=lastname}, living in {contactfield=address1}, {contactfield=address2}, {contactfield=city}, {contactfield=country}. Contact number: {contactfield=mobile}');
         $email->setTemplate('Blank');
@@ -408,9 +404,9 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createTransportFake(): Swift_Transport
+    private function createTransportFake(): \Swift_Transport
     {
-        return new class() implements Swift_Transport {
+        return new class() implements \Swift_Transport {
             /**
              * @var array <mixed>
              */
@@ -434,7 +430,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
                 return true;
             }
 
-            public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
+            public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
             {
                 $this->messages[] = clone $message;
 
@@ -443,7 +439,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
                     + count((array) $message->getBcc());
             }
 
-            public function registerPlugin(Swift_Events_EventListener $plugin): void
+            public function registerPlugin(\Swift_Events_EventListener $plugin): void
             {
             }
         };
