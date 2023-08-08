@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -167,6 +166,7 @@ class DBALMocker
                         'andWhere',
                         'setParameter',
                         'execute',
+                        'executeQuery',
                     ]
                 )
                 ->getMock();
@@ -233,15 +233,19 @@ class DBALMocker
                 ->method('execute')
                 ->willReturnCallback([$this, 'getMockResultStatement']);
 
+            $mock->expects($this->testCase->any())
+                ->method('executeQuery')
+                ->willReturnCallback([$this, 'getMockResultStatement']);
+
             $this->mockQueryBuilder = $mock;
         }
 
         return $this->mockQueryBuilder;
     }
 
-    public function getMockResultStatement()
+    public function getMockResultStatement(): \PHPUnit\Framework\MockObject\MockObject
     {
-        $mock = $this->testCase->getMockBuilder(Result::class)
+        $mock = $this->testCase->getMockBuilder(\Doctrine\DBAL\Result::class)
             ->disableOriginalConstructor()
             ->setMethods([
                 'fetchNumeric',
