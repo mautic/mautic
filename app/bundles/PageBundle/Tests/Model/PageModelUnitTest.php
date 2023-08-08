@@ -52,7 +52,7 @@ class PageModelUnitTest extends TestCase
         $this->entityManager  = $this->createMock(EntityManager::class);
     }
 
-    public function testGetBestHours()
+    public function testGetBestHours(): void
     {
         $dbalMock      = new DBALMocker($this);
         $dbalMock->setQueryResponse(

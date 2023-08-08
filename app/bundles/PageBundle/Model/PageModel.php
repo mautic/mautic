@@ -1003,8 +1003,8 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) tracking pages.
      *
-     * @param int   $limit
-     * @param array $filters
+     * @param int               $limit
+     * @param array<int|string> $filters
      *
      * @return array
      */

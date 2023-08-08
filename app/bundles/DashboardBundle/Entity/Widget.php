@@ -430,7 +430,7 @@ class Widget extends FormEntity
     /**
      * Count the limit from the widget height.
      *
-     * @return float
+     * @return int
      */
     public function getLimitCalcByWeight()
     {
@@ -440,6 +440,6 @@ class Widget extends FormEntity
             return $params['limit'];
         }
 
-        return round((($this->getHeight() - 80) / 35) - 1);
+        return (int) round((($this->getHeight() - 80) / 35) - 1);
     }
 }

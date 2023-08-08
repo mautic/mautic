@@ -12,7 +12,7 @@ use Mautic\PageBundle\Tests\Model\PageModelUnitTest;
 
 class DashboardBestTrackingPagesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetPopularTrackedPagesWidget()
+    public function testGetPopularTrackedPagesWidget(): void
     {
         $pageModel = $this->createMock(PageModel::class);
         $pageModel->expects($this->once())->method('getPopularTrackedPages')->willReturn(PageModelUnitTest::POPULAR_TRACKED_PAGES_QUERY_RESPONSE);
