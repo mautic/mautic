@@ -181,16 +181,6 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.coreconfig' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.language',
-                    'mautic.ip_lookup.factory',
-                    '%mautic.ip_lookup_services%',
-                    'mautic.ip_lookup',
-                ],
-            ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
@@ -614,11 +604,6 @@ return [
             ],
             'mautic.helper.url' => [
                 'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    '%mautic.link_shortener_url%',
-                    'monolog.logger.mautic',
-                ],
             ],
             'mautic.helper.export' => [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
@@ -1331,7 +1316,8 @@ return [
         'do_not_track_internal_ips'   => [],
         'track_private_ip_ranges'     => false,
         'link_shortener_url'          => null,
-        'link_shortener_enable_email' => false,
+        'shortener_email_enable'      => false,
+        'shortener_sms_enable'        => true,
         'cached_data_timeout'         => 10,
         'batch_sleep_time'            => 1,
         'batch_campaign_sleep_time'   => false,
@@ -1437,8 +1423,9 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
-        'composer_updates'   => false,
-        'load_froala_assets' => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
-        'redis_primary_only' => false,
+        'composer_updates'                                        => false,
+        'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
+        'redis_primary_only'                                      => false,
+        \Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE => null,
     ],
 ];
