@@ -22,7 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "swiftmailer/swiftmailer": "*"
+    "swiftmailer/swiftmailer": "*",
     "mautic/core-lib": "^5.0"
   },
   "require-dev": {
