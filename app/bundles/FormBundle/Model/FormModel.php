@@ -883,7 +883,7 @@ class FormModel extends CommonFormModel
 
         // get the contact (lead) and primary company field values
         $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-        if (count($leadArray) <= 0) {
+        if (!is_array($leadArray) || count($leadArray) <= 0) {
             return;
         }
 
