@@ -22,7 +22,8 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "^4.0",
+    "swiftmailer/swiftmailer": "*"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0",
