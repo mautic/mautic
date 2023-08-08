@@ -854,17 +854,19 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
-        $formName       = $form->generateFormName();
-        $fields         = $form->getFields();
-        $autoFillFields = [];
+        $formName          = $form->generateFormName();
+        $fields            = $form->getFields();
+        $autoFillFields    = [];
+        $objectsToAutoFill = ['contact', 'company'];
 
         /** @var \Mautic\FormBundle\Entity\Field $field */
         foreach ($fields as $key => $field) {
-            $leadField  = $field->getLeadField();
-            $isAutoFill = $field->getIsAutoFill();
-
             // we want work just with matched autofill fields
-            if ($field->getMappedField() && 'contact' === $field->getMappedObject() && $field->getIsAutoFill()) {
+            if (
+                $field->getMappedField() &&
+                $field->getIsAutoFill() &&
+                in_array($field->getMappedObject(), $objectsToAutoFill)
+            ) {
                 $autoFillFields[$key] = $field;
             }
         }
@@ -881,8 +883,9 @@ class FormModel extends CommonFormModel
 
         // get the contact (lead) and primary company field values
         $leadArray            = ($lead) ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
         foreach ($autoFillFields as $field) {
-            $value = $leadArray[$field->getLeadField()];
+            $value = $leadArray[$field->getMappedField()];
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
