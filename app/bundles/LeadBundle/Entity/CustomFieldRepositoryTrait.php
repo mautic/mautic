@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
@@ -396,7 +397,9 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @return array<int|string>
+     *
+     * @throws Exception
      */
     private function getFieldList(string $object = null): array
     {
