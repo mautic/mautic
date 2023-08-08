@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-110-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-111-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -217,6 +217,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://lenonleite.com.br"><img src="https://avatars.githubusercontent.com/u/218436?v=4?s=100" width="100px;" alt="Lenon Leite"/><br /><sub><b>Lenon Leite</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=lenonleite" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Syrgak-Alan"><img src="https://avatars.githubusercontent.com/u/96595532?v=4?s=100" width="100px;" alt="Alan Syrgak"/><br /><sub><b>Alan Syrgak</b></sub></a><br /><a href="#userTesting-Syrgak-Alan" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MohHeader"><img src="https://avatars.githubusercontent.com/u/3213925?v=4?s=100" width="100px;" alt="Mohammed Header"/><br /><sub><b>Mohammed Header</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MohHeader" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/danadelion"><img src="https://avatars.githubusercontent.com/u/78448517?v=4?s=100" width="100px;" alt="Dana Linhartová"/><br /><sub><b>Dana Linhartová</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=danadelion" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
