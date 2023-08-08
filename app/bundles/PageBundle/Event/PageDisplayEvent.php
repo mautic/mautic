@@ -27,8 +27,6 @@ class PageDisplayEvent extends Event
 
     /**
      * PageDisplayEvent constructor.
-     *
-     * @param $content
      */
     public function __construct($content, Page $page, array $params = [])
     {

@@ -78,11 +78,7 @@ trait FormErrorMessagesTrait
 
     public function getFormErrorForBuilder(Form $form): ?string
     {
-        if (!$form->isSubmitted()) {
-            return null;
-        }
-
-        if ($form->isValid()) {
+        if (!$form->isSubmitted() || $form->isValid()) {
             return null;
         }
 
@@ -94,6 +90,6 @@ trait FormErrorMessagesTrait
 
         $validationError = $this->getFormErrorMessage($validationErrors);
 
-        return $this->get('translator')->trans('mautic.core.form.builder.error', ['%error%' => $validationError]);
+        return $this->translator->trans('mautic.core.form.builder.error', ['%error%' => $validationError]);
     }
 }

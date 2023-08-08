@@ -17,6 +17,10 @@ return [
                 'path'       => '/grapesjsbuilder/delete',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
             ],
+            'grapesjsbuilder_assets' => [
+                'path'       => '/grapesjsbuilder/assets',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction',
+            ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
@@ -58,15 +62,6 @@ return [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
                 'tags'      => [
                     'mautic.builder_integration',
-                ],
-            ],
-        ],
-        'models'  => [
-            'grapesjsbuilder.model' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.email.model.email',
                 ],
             ],
         ],

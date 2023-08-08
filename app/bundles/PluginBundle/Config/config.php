@@ -67,7 +67,7 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.bundle',
                     'mautic.helper.core_parameters',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.plugin.model.plugin',
                 ],
             ],
@@ -87,20 +87,6 @@ return [
                     'mautic.plugin.helper.reload',
                     'translator',
                 ],
-            ],
-        ],
-        'models' => [
-            'mautic.plugin.model.plugin' => [
-                'class'     => \Mautic\PluginBundle\Model\PluginModel::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.bundle',
-                ],
-            ],
-
-            'mautic.plugin.model.integration_entity' => [
-                'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
     ],

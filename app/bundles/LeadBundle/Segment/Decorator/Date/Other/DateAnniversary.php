@@ -65,8 +65,8 @@ class DateAnniversary implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $date           = $this->dateOptionParameters->getDefaultDate();
-        $filter         =  $contactSegmentFilterCrate->getFilter();
-        $relativeFilter =  trim(str_replace(['anniversary', 'birthday'], '', $filter));
+        $filter         = $contactSegmentFilterCrate->getFilter();
+        $relativeFilter = is_string($filter) ? trim(str_replace(['anniversary', 'birthday'], '', $filter)) : $filter;
 
         if ($relativeFilter) {
             $date->modify($relativeFilter);
@@ -92,7 +92,7 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

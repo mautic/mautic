@@ -7,7 +7,10 @@ namespace Mautic\SmsBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -17,6 +20,9 @@ use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -50,6 +56,11 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
      */
     private $transport;
 
+    /**
+     * @var MockObject&CorePermissions
+     */
+    private MockObject $security;
+
     private SmsModel $smsModel;
 
     protected function setUp(): void
@@ -60,12 +71,21 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->transport          = $this->createMock(TransportChain::class);
         $this->cacheStorageHelper = $this->createMock(CacheStorageHelper::class);
         $this->entityManger       = $this->createMock(EntityManager::class);
+        $this->security           = $this->createMock(CorePermissions::class);
         $this->smsModel           = new SmsModel(
             $this->pageTrackableModel,
             $this->leadModel,
             $this->messageQueueModel,
             $this->transport,
-            $this->cacheStorageHelper
+            $this->cacheStorageHelper,
+            $this->entityManger,
+            $this->security,
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
     }
 
@@ -82,23 +102,15 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
             ->with('', 10, 0, true, false)
             ->willReturn($entities);
 
-        // Partial mock, mocks just getRepository
-        /** @var MockObject|SmsModel $smsModel */
-        $smsModel = $this->getMockBuilder(SmsModel::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getRepository'])
-            ->getMock();
-        $smsModel->method('getRepository')
+        $this->entityManger->method('getRepository')
+            ->with(Sms::class)
             ->willReturn($repositoryMock);
 
-        $securityMock = $this->createMock(CorePermissions::class);
-
-        $securityMock->method('isGranted')
+        $this->security->method('isGranted')
             ->with('sms:smses:viewother')
             ->willReturn(true);
-        $smsModel->setSecurity($securityMock);
 
-        $textMessages = $smsModel->getLookupResults(SmsType::class);
+        $textMessages = $this->smsModel->getLookupResults(SmsType::class);
         $this->assertSame('Mautic', $textMessages['cs'][1], 'Mautic is the right text message name');
     }
 
@@ -108,7 +120,6 @@ class SmsModelTest extends \PHPUnit\Framework\TestCase
         $sms->setIsPublished(false);
         $lead = new Lead();
         $lead->setId(1);
-        $this->smsModel->setEntityManager($this->entityManger);
         $results = $this->smsModel->sendSms($sms, $lead);
         self::assertFalse((bool) $results[1]['sent']);
         self::assertSame('mautic.sms.campaign.failed.unpublished', $results[1]['status']);

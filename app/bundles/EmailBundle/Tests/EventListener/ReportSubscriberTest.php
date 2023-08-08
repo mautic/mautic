@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -49,12 +53,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $report;
 
     /**
-     * @var ChannelListHelper|MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 
     /**
-     * @var MockObject|ChannelListHelper
+     * @var MockObject|QueryBuilder
      */
     private $queryBuilder;
 
@@ -82,9 +86,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->fieldsBuilderMock
         );
 
-        $this->report            = $this->createMock(Report::class);
-        $this->channelListHelper = $this->createMock(ChannelListHelper::class);
-        $this->queryBuilder      = new QueryBuilder($this->connectionMock);
+        $this->report             = $this->createMock(Report::class);
+        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
@@ -209,13 +213,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph(): void
     {
-        $eventMock        = $this->createMock(ReportGraphEvent::class);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $chartQueryMock   = $this->createMock(ChartQuery::class);
-        $statementMock    = $this->createMock(Statement::class);
-        $translatorMock   = $this->createMock(TranslatorInterface::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $resultMock        = $this->createMock(Result::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($statementMock);
+        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
@@ -259,5 +264,348 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
+    public function testOnReportBuilderWithEmailSentContext(): void
+    {
+        $translatorMock     = $this->createMock(TranslatorInterface::class);
+        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+
+        $this->companyReportDataMock
+            ->expects($this->any())
+            ->method('getCompanyData')
+            ->willReturn([
+                'comp.companyname' => [
+                    'label' => 'Company Company Name',
+                    'type'  => 'string',
+                ],
+            ]);
+
+        $this->fieldsBuilderMock
+            ->expects($this->any())
+            ->method('getLeadFilter')
+            ->willReturn([
+                'tag' => [
+                    'label'     => 'mautic.core.filter.tags',
+                    'type'      => 'multiselect',
+                    'list'      => ['A', 'B', 'C'],
+                    'operators' => [
+                        'in'       => 'mautic.core.operator.in',
+                        'notIn'    => 'mautic.core.operator.notin',
+                        'empty'    => 'mautic.core.operator.isempty',
+                        'notEmpty' => 'mautic.core.operator.isnotempty',
+                    ],
+                ],
+            ]);
+
+        $event = new ReportBuilderEvent($translatorMock, $this->channelListHelper, ReportSubscriber::CONTEXT_EMAIL_STATS, [], $reportHelper);
+        $this->subscriber->onReportBuilder($event);
+        $tables = $event->getTables();
+
+        $this->assertArrayHasKey('emails', $tables);
+        $this->assertArrayHasKey('email.stats', $tables);
+
+        $emailStatsColsAndFilters = [
+            'e.subject' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'subject',
+            ],
+            'e.lang' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'lang',
+            ],
+            'e.sent_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'sent_count',
+            ],
+            'e.revision' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'revision',
+            ],
+            'e.variant_start_date' => [
+                'label'          => null,
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(e.variant_start_date)',
+                'alias'          => 'variant_start_date',
+            ],
+            'c.id' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'category_id',
+            ],
+            'c.title' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'category_title',
+            ],
+            'unsubscribed' => [
+                'alias'   => 'unsubscribed',
+                'label'   => null,
+                'type'    => 'bool',
+                'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=1, 1, 0)',
+            ],
+            'bounced' => [
+                'alias'   => 'bounced',
+                'label'   => null,
+                'type'    => 'bool',
+                'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)',
+            ],
+            'vp.id' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'id',
+            ],
+            'vp.subject' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'subject',
+            ],
+            'hits' => [
+                'alias'   => 'hits',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(cut.hits, 0)',
+            ],
+            'unique_hits' => [
+                'alias'   => 'unique_hits',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(cut.unique_hits, 0)',
+            ],
+            'is_hit' => [
+                'alias'   => 'is_hit',
+                'label'   => null,
+                'type'    => 'bool',
+                'formula' => 'IF(cut.hits is NULL, 0, 1)',
+            ],
+            'read_delay' => [
+                'alias'   => 'read_delay',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
+            ],
+            'es.email_address' => [
+                'label' => null,
+                'type'  => 'email',
+                'alias' => 'email_address',
+            ],
+            'es.date_sent' => [
+                'label'          => null,
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(es.date_sent)',
+                'alias'          => 'date_sent',
+            ],
+            'es.is_read' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'is_read',
+            ],
+            'es.is_failed' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'is_failed',
+            ],
+            'es.viewed_in_browser' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'viewed_in_browser',
+            ],
+            'es.date_read' => [
+                'label'          => null,
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(es.date_read)',
+                'alias'          => 'date_read',
+            ],
+            'es.retry_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'retry_count',
+            ],
+            'es.source' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'source',
+            ],
+            'es.source_id' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'source_id',
+            ],
+            'clel.campaign_id' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'campaign_id',
+            ],
+            'cmp.name' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'name',
+            ],
+            'l.id' => [
+                'label' => null,
+                'type'  => 'int',
+                'link'  => 'mautic_contact_action',
+                'alias' => 'contactId',
+            ],
+            'i.ip_address' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'ip_address',
+            ],
+            'comp.companyname' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'companyname',
+            ],
+        ];
+
+        $emailStatsCols = [
+            'e.subject' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'subject',
+            ],
+            'e.lang' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'lang',
+            ],
+            'e.read_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'read_count',
+            ],
+            'read_ratio' => [
+                'alias'   => 'read_ratio',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'e.sent_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'sent_count',
+            ],
+            'e.revision' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'revision',
+            ],
+            'e.variant_start_date' => [
+                'label'          => null,
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(e.variant_start_date)',
+                'alias'          => 'variant_start_date',
+            ],
+            'e.variant_sent_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'variant_sent_count',
+            ],
+            'e.variant_read_count' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'variant_read_count',
+            ],
+            'c.id' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'category_id',
+            ],
+            'c.title' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'category_title',
+            ],
+            'unsubscribed' => [
+                'alias'   => 'unsubscribed',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            ],
+            'unsubscribed_ratio' => [
+                'alias'   => 'unsubscribed_ratio',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0))/e.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'bounced' => [
+                'alias'   => 'bounced',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL((SELECT ROUND(SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            ],
+            'bounced_ratio' => [
+                'alias'   => 'bounced_ratio',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0))/e.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'vp.id' => [
+                'label' => null,
+                'type'  => 'int',
+                'alias' => 'id',
+            ],
+            'vp.subject' => [
+                'label' => null,
+                'type'  => 'string',
+                'alias' => 'subject',
+            ],
+            'hits' => [
+                'alias'   => 'hits',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(cut.hits, 0)',
+            ],
+            'unique_hits' => [
+                'alias'   => 'unique_hits',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(cut.unique_hits, 0)',
+            ],
+            'hits_ratio' => [
+                'alias'   => 'hits_ratio',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND(cut.hits/(e.sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'unique_ratio' => [
+                'alias'   => 'unique_ratio',
+                'label'   => null,
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND(cut.unique_hits/(e.sent_count)*100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+        ];
+
+        foreach ($emailStatsColsAndFilters as $key => $val) {
+            $this->assertSame($val, $tables['email.stats']['columns'][$key]);
+            $this->assertSame($val, $tables['email.stats']['filters'][$key]);
+        }
+
+        $this->assertSame([
+            'label'     => null,
+            'type'      => 'multiselect',
+            'list'      => ['A', 'B', 'C'],
+            'operators' => [
+                'in'       => 'mautic.core.operator.in',
+                'notIn'    => 'mautic.core.operator.notin',
+                'empty'    => 'mautic.core.operator.isempty',
+                'notEmpty' => 'mautic.core.operator.isnotempty',
+            ],
+            'alias' => 'tag',
+        ], $tables['email.stats']['filters']['tag']);
+
+        foreach ($emailStatsCols as $key => $val) {
+            $this->assertSame($val, $tables['emails']['columns'][$key]);
+        }
     }
 }

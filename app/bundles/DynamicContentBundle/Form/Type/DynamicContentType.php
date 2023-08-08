@@ -6,11 +6,12 @@ use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
@@ -20,7 +21,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -33,9 +33,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class DynamicContentType.
- */
 class DynamicContentType extends AbstractType
 {
     private $em;
@@ -55,8 +52,6 @@ class DynamicContentType extends AbstractType
     private $leadModel;
 
     /**
-     * DynamicContentType constructor.
-     *
      * @throws \InvalidArgumentException
      */
     public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
@@ -113,7 +108,6 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
                 'description',
@@ -124,7 +118,7 @@ class DynamicContentType extends AbstractType
                     'attr'       => ['class' => 'form-control'],
                     'required'   => false,
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
@@ -155,37 +149,8 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'publishUp',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'content',
@@ -217,7 +182,7 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticDynamicContentBundle:DynamicContent');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\DynamicContentBundle\Entity\DynamicContent::class);
         $builder->add(
             $builder->create(
                 'translationParent',

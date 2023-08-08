@@ -74,13 +74,32 @@ class CredentialsStore implements CredentialStoreInterface
 
     private function createDefaultCredentials(): X509Credential
     {
-        $reflection         = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
-        $vendorPath         = dirname(dirname($reflection->getFileName()));
-        $certificateContent = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.crt');
-        $privateKeyContent  = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.key');
-        $keyPassword        = '';
+        $cache_dir   = $this->coreParametersHelper->get('cache_path');
+        $keyPassword = '';
 
-        return $this->createCredentials($certificateContent, $privateKeyContent, $keyPassword);
+        if (!file_exists($cache_dir.'/saml_default.key') || !file_exists($cache_dir.'/saml_default.crt')) {
+            $dn = ['commonName' => 'Mautic dummy cert'];
+
+            // Generate a new private (and public) key pair
+            $privkey = openssl_pkey_new([
+              'private_key_bits' => 2048,
+              'private_key_type' => OPENSSL_KEYTYPE_RSA,
+            ]);
+
+            // Generate a certificate signing request
+            $csr = openssl_csr_new($dn, $privkey, ['digest_alg' => 'sha256']);
+
+            // Generate a self-signed cert, valid for 365 days
+            $x509 = openssl_csr_sign($csr, null, $privkey, $days=365, ['digest_alg' => 'sha256']);
+
+            openssl_x509_export_to_file($x509, $cache_dir.'/saml_default.crt');
+            openssl_pkey_export_to_file($privkey, $cache_dir.'/saml_default.key', $keyPassword);
+        }
+
+        $cert       = file_get_contents($cache_dir.'/saml_default.crt');
+        $privateKey = file_get_contents($cache_dir.'/saml_default.key');
+
+        return $this->createCredentials($cert, $privateKey, $keyPassword);
     }
 
     private function createCertificate(string $certificateContent): X509Certificate

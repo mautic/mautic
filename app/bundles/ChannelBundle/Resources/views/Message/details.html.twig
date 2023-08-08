@@ -1,0 +1,124 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauicContent %}message
+{% endblock %}
+{% block headerTitle %}
+	{{ item.getName() }}
+{% endblock %}
+{% block actions %}
+	{{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'item': item,
+        'templateButtons': {
+            'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy()),
+            'clone': permissions['channel:messages:create'],
+            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteown'], item.getCreatedBy()),
+        },
+        'routeBase': 'message'
+    }) -}}
+{% endblock %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+{% endblock %}
+{% block content %}
+<!-- start: box layout -->
+    <div class="box-layout">
+        <!-- left section -->
+        <div class="col-md-9 height-auto">
+            <div class="bg-auto">
+                <!-- form detail header -->
+                <div class="pr-md pl-md pt-lg pb-lg">
+                    <div class="box-layout">
+                        <div class="col-xs-10">
+                            <div class="text-muted">{{ item.getDescription()|purify }}</div>
+                        </div>
+
+                    </div>
+                </div>
+                <!--/ form detail header -->
+                <!-- form detail collapseable -->
+                <div class="collapse" id="focus-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-bordered table-striped mb-0">
+                                <tbody>
+                                {{- include('@MauticCore/Helper/details.html.twig', {'entity' : item}) -}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--/ form detail collapseable -->
+            </div>
+
+        <!--/ form detail collapseable toggler -->
+            <div class="bg-auto bg-dark-xs">
+                <!-- form detail collapseable toggler -->
+                <div class="hr-expand nm">
+                        <span data-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
+                            <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
+                        </span>
+                </div>
+                <!-- stats -->
+                <div class="pa-md">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="panel">
+                                <div class="panel-body box-layout">
+                                    <div class="col-md-6 va-m">
+                                        <h5 class="text-white dark-md fw-sb mb-xs">
+                                            <div><i class="fa fa-line-chart pull-left"></i>
+                                                <span class="pull-left"> {% trans %}mautic.messages.processed.messages{% endtrans %}</span></div>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-9 va-m">
+                                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                    </div>
+                                </div>
+                                <div class="pt-0 pl-15 pb-10 pr-15">
+                                    {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : eventCounts, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ stats -->
+                {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+
+                <!-- tabs controls -->
+                <ul class="nav nav-tabs pr-md pl-md">
+                    {% set active = 'active' %}
+                    {% for channel, contacts in messagedLeads %}
+                    <li class="{{ active }}">
+                        <a href="#contacts-{{ channel }}" role="tab" data-toggle="tab">
+                            {{ ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads'|trans() }}
+                        </a>
+                    </li>
+                    {% set active = '' %}
+                    {% endfor %}
+                </ul>
+                <!--/ tabs controls -->
+            </div>
+
+            <!-- start: tab-content -->
+            <div class="tab-content pa-md">
+            {% set active = ' active in' %}
+                {% for channel, contacts in messagedLeads %}
+                <div class="tab-pane bdr-w-0 page-list{{ active }}" id="contacts-{{ channel }}">
+                    {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
+                    <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
+                    <div class="message-{{ channel }}">
+                        {{ contacts|raw }}
+                    </div>
+                </div>
+                {% set active = '' %}
+                {% endfor %}
+            </div>
+        </div>
+        <!-- right section -->
+        <div class="col-md-3 bg-white bdr-l height-auto">
+            <!-- recent activity -->
+            {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
+            {% block rightFormContent %}
+            {% endblock %}
+        </div>
+    </div> 
+{% endblock %}

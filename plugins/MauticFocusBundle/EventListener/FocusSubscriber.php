@@ -102,7 +102,7 @@ class FocusSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event)
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             // get the current event request
             $request    = $event->getRequest();
             $requestUri = $request->getRequestUri();

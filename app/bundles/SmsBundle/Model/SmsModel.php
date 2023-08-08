@@ -3,14 +3,19 @@
 namespace Mautic\SmsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -22,11 +27,16 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Sms>
+ *
  * @implements AjaxLookupModelInterface<Sms>
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
@@ -56,13 +66,15 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     private $cacheStorageHelper;
 
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
         $this->messageQueueModel  = $messageQueueModel;
         $this->transport          = $transport;
         $this->cacheStorageHelper = $cacheStorageHelper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -72,7 +84,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSmsBundle:Sms');
+        return $this->em->getRepository(\Mautic\SmsBundle\Entity\Sms::class);
     }
 
     /**
@@ -80,7 +92,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticSmsBundle:Stat');
+        return $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
     }
 
     /**
@@ -95,19 +107,18 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * Save an array of entities.
      *
      * @param iterable<Sms> $entities
-     * @param $unlock
      *
      * @return array
      */
     public function saveEntities($entities, $unlock = true)
     {
-        //iterate over the results so the events are dispatched on each delete
+        // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
-            //set some defaults
+            // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
             if ($dispatchEvent = $entity instanceof Sms) {
@@ -130,8 +141,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -140,7 +149,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -154,8 +163,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return Sms|null
      */
@@ -193,12 +200,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param       $sendTo
-     * @param array $options
+     * @param array            $options
+     * @param array<int, Lead> $leads
      *
      * @return array
      */
-    public function sendSms(Sms $sms, $sendTo, $options = [])
+    public function sendSms(Sms $sms, $sendTo, $options = [], array &$leads = [])
     {
         $channel = (isset($options['channel'])) ? $options['channel'] : null;
         $listId  = (isset($options['listId'])) ? $options['listId'] : null;
@@ -219,6 +226,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $fetchContacts[] = $lead;
             } else {
                 $contacts[$lead->getId()] = $lead;
+                $leads[$lead->getId()]    = $lead;
             }
         }
 
@@ -231,6 +239,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
             foreach ($foundContacts as $contact) {
                 $contacts[$contact->getId()] = $contact;
+                $leads[$contact->getId()]    = $contact;
             }
         }
 
@@ -248,7 +257,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $contactIds = array_keys($contacts);
 
         /** @var DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
         $dnc     = $dncRepo->getChannelList('sms', $contactIds);
 
         if (!empty($dnc)) {
@@ -367,9 +376,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 if (!$stat->isFailed()) {
                     $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
                 }
-            }
 
-            $this->em->clear(Stat::class);
+                $this->getRepository()->detachEntity($stat);
+                $this->getRepository()->detachEntity($stat->getLead());
+            }
         }
 
         return $results;
@@ -409,11 +419,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -513,8 +518,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param $idHash
-     *
      * @return Stat
      */
     public function getSmsStatus($idHash)
@@ -524,9 +527,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Search for an sms stat by sms and lead IDs.
-     *
-     * @param $smsId
-     * @param $leadId
      *
      * @return array
      */
@@ -544,8 +544,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get an array of tracked links.
      *
-     * @param $smsId
-     *
      * @return array
      */
     public function getSmsClickStats($smsId)
@@ -554,7 +552,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -580,7 +577,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;

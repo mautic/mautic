@@ -2,45 +2,39 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Widget>
  */
 class DashboardModel extends FormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    private PathsHelper $pathsHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem;
+    private Filesystem $filesystem;
 
     /**
      * DashboardModel constructor.
@@ -48,22 +42,26 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        RequestStack $requestStack,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->filesystem           = $filesystem;
-    }
+        $this->pathsHelper  = $pathsHelper;
+        $this->filesystem   = $filesystem;
+        $this->requestStack = $requestStack;
 
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): WidgetRepository
     {
         $result = $this->em->getRepository(Widget::class);
-        \assert($result instanceof WidgetRepository);
 
         return $result;
     }
@@ -80,8 +78,6 @@ class DashboardModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return object|null
      */
@@ -261,16 +257,15 @@ class DashboardModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Widget                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param Widget      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -310,9 +305,10 @@ class DashboardModel extends FormModel
         $dateRangeStart   = new \DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 
+        $session  = $this->requestStack->getSession();
         $today    = new \DateTime();
-        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
-        $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
+        $dateFrom = new \DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new \DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,

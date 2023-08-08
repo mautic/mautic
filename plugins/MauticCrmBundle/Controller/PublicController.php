@@ -3,6 +3,10 @@
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -10,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PublicController extends CommonController
 {
-    public function contactDataAction(\Symfony\Component\HttpFoundation\Request $request)
+    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper)
     {
         $content = $request->getContent();
         if (!empty($content)) {
@@ -19,26 +23,27 @@ class PublicController extends CommonController
             return new Response('ERROR');
         }
 
-        $logger = $this->get('monolog.logger.mautic');
-
-        $integration       = 'Hubspot';
-        $integrationHelper = $this->get('mautic.helper.integration');
+        $integration = 'Hubspot';
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
+        \assert($integrationObject instanceof HubspotIntegration);
+
         foreach ($data as $info) {
             $object = explode('.', $info['subscriptionType']);
             $id     = $info['objectId'];
 
             try {
                 switch ($object[0]) {
-                    case 'contact': $integrationObject->getContacts($id);
+                    case 'contact':
+                        $executed = [];
+                        $integrationObject->getLeads($id, null, $executed);
                         break;
                     case 'company':
                         $integrationObject->getCompanies($id);
                         break;
                 }
             } catch (\Exception $ex) {
-                $logger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
+                $mauticLogger->log('error', 'ERROR on Hubspot webhook: '.$ex->getMessage());
             }
         }
 

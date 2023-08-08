@@ -181,7 +181,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                 /**
                                  * @return FormInterface<FormInterface>
                                  */
-                                public function get($name)
+                                public function get(string $name)
                                 {
                                     Assert::assertSame('properties', $name);
 

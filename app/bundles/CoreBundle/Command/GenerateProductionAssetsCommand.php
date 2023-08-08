@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -14,29 +19,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class GenerateProductionAssetsCommand extends Command
 {
-    private AssetGenerationHelper $assetGenerationHelper;
-    private PathsHelper $pathsHelper;
-    private TranslatorInterface $translator;
-
     public function __construct(
-        AssetGenerationHelper $assetGenerationHelper,
-        PathsHelper $pathsHelper,
-        TranslatorInterface $translator
+        private AssetGenerationHelper $assetGenerationHelper,
+        private PathsHelper $pathsHelper,
+        private TranslatorInterface $translator,
+        private Filesystem $filesystem
     ) {
         parent::__construct();
-
-        $this->assetGenerationHelper = $assetGenerationHelper;
-        $this->pathsHelper           = $pathsHelper;
-        $this->translator            = $translator;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mautic:assets:generate')
-            ->setDescription('Combines and minifies asset files from each bundle into single production files')
+            ->setDescription('Combines and minifies asset files into single production files')
             ->setHelp(
                 <<<'EOT'
-                The <info>%command.name%</info> command Combines and minifies files from each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively.
+                The <info>%command.name%</info> command Combines and minifies files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively. It allso runs the command elfinder:install internally to install ElFinder assets.
 
 <info>php %command.full_name%</info>
 EOT
@@ -45,26 +43,89 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Check that the directory node_modules exists.
+        $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
+        if (!$this->filesystem->exists($nodeModulesDir)) {
+            $output->writeln('<error>'.$this->translator->trans("{$nodeModulesDir} does not exist. Execute `npm install` to generate it.").'</error>');
+
+            return Command::FAILURE;
+        }
+
+        $this->installElFinderAssets();
+
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+
+        $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
+
+        foreach (['mediaelementplayer', 'modal'] as $css_file) {
+            file_put_contents(
+                $mediaDir.'/css/'.$css_file.'.min.css',
+                (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/css/'.$css_file.'.css'])
+            );
+        }
+
         // Minify Mautic Form SDK
         file_put_contents(
-            $this->pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js',
-            \Minify::combine([$this->pathsHelper->getSystemPath('assets', true).'/js/mautic-form-src.js'])
+            $mediaDir.'/js/mautic-form-tmp.js',
+            (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
         );
         // Fix the MauticSDK loader
         file_put_contents(
-            $this->pathsHelper->getSystemPath('assets', true).'/js/mautic-form.js',
-            str_replace("'mautic-form-src.js'", "'mautic-form.js'",
-                file_get_contents($this->pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js'))
+            $mediaDir.'/js/mautic-form.js',
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
         );
         // Remove temp file.
-        unlink($this->pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js');
+        unlink($mediaDir.'/js/mautic-form-tmp.js');
 
-        // Update successful
+        // Check that the production assets were correctly generated.
+        $productionAssets = [
+            'bundles/fmelfinder/css/elfinder.min.css',
+            'bundles/fmelfinder/css/theme.css',
+            'bundles/fmelfinder/js/elfinder.min.js',
+            'css/app.css',
+            'css/libraries.css',
+            'js/app.js',
+            'js/libraries.js',
+            'js/mautic-form.js',
+            'js/ckeditor4/ckeditor.js',
+            'js/ckeditor4/adapters/jquery.js',
+            'js/jquery.min.js',
+            'js/froogaloop.min.js',
+        ];
+
+        foreach ($productionAssets as $relativePath) {
+            $absolutePath = $mediaDir.'/'.$relativePath;
+            if (!$this->filesystem->exists($absolutePath)) {
+                $output->writeln('<error>The file '.$this->translator->trans("{$absolutePath} does not exist. Generating production assets was not sucessful.").'</error>');
+
+                return Command::FAILURE;
+            }
+        }
+
         $output->writeln('<info>'.$this->translator->trans('mautic.core.command.asset_generate_success').'</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    private function installElFinderAssets(): void
+    {
+        $command = $this->getApplication()->find('elfinder:install');
+
+        $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
+    }
+
+    /**
+     * Following libraries are loaded by public, not administration related features so those cannot be built into one JS file.
+     */
+    private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
+    {
+        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
+        $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
+        $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
+    }
+    protected static $defaultDescription = 'Combines and minifies asset files into single production files';
 }

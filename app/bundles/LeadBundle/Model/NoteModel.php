@@ -2,15 +2,25 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -18,20 +28,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NoteModel extends FormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
-    public function setSession(Session $session)
+    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {
-        $this->session = $session;
+        $this->requestStack = $requestStack;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadNoteRepository
     {
         $result = $this->em->getRepository(LeadNote::class);
-        \assert($result instanceof LeadNoteRepository);
 
         return $result;
     }
@@ -49,8 +56,6 @@ class NoteModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return object|null
      */
     public function getEntity($id = null)
@@ -65,8 +70,6 @@ class NoteModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param             $entity
-     * @param             $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -74,7 +77,7 @@ class NoteModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -89,11 +92,6 @@ class NoteModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -135,15 +133,18 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param $useFilters
-     *
      * @return mixed
      */
     public function getNoteCount(Lead $lead, $useFilters = false)
     {
-        $filter   = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
+        $filter   = ($useFilters) ? $this->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType = ($useFilters) ? $this->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
 
         return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
+    }
+
+    private function getSession(): SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 }

@@ -48,22 +48,19 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.stage.model.stage' => [
-                'class'     => 'Mautic\StageBundle\Model\StageModel',
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'session',
-                    'mautic.helper.user',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.stage.repository.lead_stage_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\StageBundle\Entity\LeadStageLog::class,
+                ],
+            ],
+            'mautic.stage.repository.stage' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\StageBundle\Entity\Stage::class,
                 ],
             ],
         ],

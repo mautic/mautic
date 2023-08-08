@@ -15,6 +15,7 @@ use Mautic\LeadBundle\EventListener\ImportCompanySubscriber;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\Translator;
@@ -193,6 +194,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testImportCompanySubscriberDoesHaveTranslatorInitialized(): void
     {
+        /** @var FieldList&MockObject $fieldListMock */
         $fieldListMock         = $this->createMock(FieldList::class);
         $missingRequiredFields = ['Company Name'];
         $matchedFields         = ['Company Email'];
@@ -204,6 +206,8 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 'isRequired'  => true,
             ])
             ->willReturn($missingRequiredFields);
+
+        /** @var TranslatorInterface&MockObject $translatorInterfaceMock */
         $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
         $subscriber              = new ImportCompanySubscriber(
             $fieldListMock,
@@ -211,11 +215,15 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $this->getCompanyModelFake(),
             $translatorInterfaceMock
         );
+
+        /** @var ImportValidateEvent&MockObject $importValidateEventMock */
         $importValidateEventMock = $this->createMock(ImportValidateEvent::class);
         $importValidateEventMock->expects($this->once())
             ->method('importIsForRouteObject')
             ->with('companies')
             ->willReturn(true);
+
+        /** @var Form&MockObject $formMock */
         $formMock = $this->createMock(Form::class);
         $importValidateEventMock->expects($this->exactly(2))
             ->method('getForm')
@@ -232,7 +240,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                     '%fieldOrFields%'  => 'field',
                 ],
                 'validators'
-            );
+            )->willReturn('A translated message');
 
         $subscriber->onValidateImport($importValidateEventMock);
     }

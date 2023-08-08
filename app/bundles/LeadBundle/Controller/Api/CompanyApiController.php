@@ -2,14 +2,26 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Company>
@@ -24,9 +36,9 @@ class CompanyApiController extends CommonApiController
      */
     protected $model = null;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $companyModel = $this->getModel('lead.company');
+        $companyModel = $modelFactory->getModel('lead.company');
         \assert($companyModel instanceof CompanyModel);
 
         $this->model              = $companyModel;
@@ -34,8 +46,10 @@ class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+
         $this->setCleaningRules('company');
-        parent::initialize($event);
     }
 
     /**
@@ -43,10 +57,10 @@ class CompanyApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
         // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         if (empty($parameters['force'])) {
             $leadCompanyModel = $this->getModel('lead.company');
@@ -54,19 +68,17 @@ class CompanyApiController extends CommonApiController
             list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
-                return $this->editEntityAction($company['id']);
+                return $this->editEntityAction($request, $company['id']);
             }
         }
 
-        return parent::newEntityAction();
+        return parent::newEntityAction($request);
     }
 
     /**
      * {@inheritdoc}
      *
      * @param Lead   &$entity
-     * @param        $parameters
-     * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

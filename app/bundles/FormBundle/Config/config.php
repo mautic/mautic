@@ -7,11 +7,6 @@ use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Helper\TokenHelper;
-use Mautic\FormBundle\Model\ActionModel;
-use Mautic\FormBundle\Model\FieldModel;
-use Mautic\FormBundle\Model\FormModel;
-use Mautic\FormBundle\Model\SubmissionModel;
-use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 
@@ -88,6 +83,10 @@ return [
                 'path'       => '/forms/results/file/{submissionId}/{field}',
                 'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileAction',
             ],
+            'mautic_form_file_download_by_name' => [
+                'path'       => '/forms/results/file/{fieldId}/filename/{fileName}',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileByFileNameAction',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'Mautic\FormBundle\Controller\PublicController::submitAction',
@@ -141,6 +140,9 @@ return [
                 'class'       => FieldType::class,
                 'arguments'   => [
                     'translator',
+                    'mautic.form.collector.object',
+                    'mautic.form.collector.field',
+                    'mautic.form.collector.already.mapped.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -166,61 +168,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'mautic.form.model.action' => [
-                'class' => ActionModel::class,
-            ],
-            'mautic.form.model.field' => [
-                'class'     => FieldModel::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                ],
-            ],
-            'mautic.form.model.form' => [
-                'class'     => FormModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.helper.templating',
-                    'mautic.helper.theme',
-                    'mautic.form.model.action',
-                    'mautic.form.model.field',
-                    'mautic.helper.form.field_helper',
-                    'mautic.lead.model.field',
-                    'mautic.form.helper.form_uploader',
-                    'mautic.tracker.contact',
-                    'mautic.schema.helper.column',
-                    'mautic.schema.helper.table',
-                ],
-            ],
-            'mautic.form.model.submission' => [
-                'class'     => SubmissionModel::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.helper.templating',
-                    'mautic.form.model.form',
-                    'mautic.page.model.page',
-                    'mautic.lead.model.lead',
-                    'mautic.campaign.model.campaign',
-                    'mautic.campaign.membership.manager',
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.company',
-                    'mautic.helper.form.field_helper',
-                    'mautic.form.validator.upload_field_validator',
-                    'mautic.form.helper.form_uploader',
-                    'mautic.lead.service.device_tracking_service',
-                    'mautic.form.service.field.value.transformer',
-                    'mautic.helper.template.date',
-                    'mautic.tracker.contact',
-                    'mautic.lead.merger',
-                ],
-            ],
-            'mautic.form.model.submission_result_loader' => [
-                'class'     => SubmissionResultLoader::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.form.repository.form' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
@@ -234,6 +181,22 @@ return [
             ],
         ],
         'other' => [
+            'mautic.form.collector.object' => [
+                'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.field' => [
+                'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.mapped.object' => [
+                'class'     => \Mautic\FormBundle\Collector\MappedObjectCollector::class,
+                'arguments' => ['mautic.form.collector.field'],
+            ],
+            'mautic.form.collector.already.mapped.field' => [
+                'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
+                'arguments' => ['mautic.cache.provider'],
+            ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
                 'arguments' => [
@@ -305,5 +268,6 @@ return [
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,
+        'successful_submit_action'  => 'top',
     ],
 ];

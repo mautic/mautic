@@ -115,7 +115,7 @@ abstract class SocialIntegration extends AbstractIntegration
             if (empty($available) || !is_array($available)) {
                 return [];
             }
-            //create social profile fields
+            // create social profile fields
             $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
@@ -244,9 +244,7 @@ abstract class SocialIntegration extends AbstractIntegration
     /**
      * Returns notes specific to sections of the integration form (if applicable).
      *
-     * @param $section
-     *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -260,13 +258,11 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function getSocialProfileTemplate()
     {
-        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.twig";
     }
 
     /**
      * Get the access token from session or socialCache.
-     *
-     * @param $socialCache
      *
      * @return array|mixed|null
      */

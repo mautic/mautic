@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Cache;
 
-use ReflectionClass;
-use ReflectionException;
-use SplPriorityQueue;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
@@ -22,20 +19,25 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     private $cacheFile;
 
     /**
-     * @var SplPriorityQueue|ReflectionClass[]
+     * @var \SplPriorityQueue|\ReflectionClass[]
      */
     private $specs;
 
     public function __construct(string $env)
     {
         $this->env       = $env;
-        $this->specs     = new SplPriorityQueue();
+        $this->specs     = new \SplPriorityQueue();
     }
 
-    public function warmUp($cacheDirectory)
+    /**
+     * @inerhitDoc
+     */
+    public function warmUp(string $cacheDirectory)
     {
         $this->cacheFile = sprintf('%s/middlewares.cache.php', $cacheDirectory);
         $this->createCacheFile($cacheDirectory);
+
+        return [];
     }
 
     public function isOptional()
@@ -64,9 +66,9 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
 
         $data  = [];
-        $this->specs->setExtractFlags(SplPriorityQueue::EXTR_DATA);
+        $this->specs->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
 
-        /** @var ReflectionClass $middleware */
+        /** @var \ReflectionClass $middleware */
         foreach ($this->specs as $middleware) {
             $data[] = $middleware->getName();
         }
@@ -101,11 +103,11 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     private function push(string $middlewareClass): void
     {
         try {
-            $reflection = new ReflectionClass($middlewareClass);
+            $reflection = new \ReflectionClass($middlewareClass);
             $priority   = $reflection->getConstant('PRIORITY');
 
             $this->specs->insert($reflection, $priority);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             /* If there's an error getting the kernel class, it's
              * an invalid middleware. If it's invalid, don't push
              * it to the stack

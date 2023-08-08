@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\TagEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -22,7 +23,6 @@ class TagModel extends FormModel
     public function getRepository()
     {
         $result = $this->em->getRepository(Tag::class);
-        \assert($result instanceof TagRepository);
 
         return $result;
     }
@@ -57,7 +57,6 @@ class TagModel extends FormModel
      * {@inheritdoc}
      *
      * @param Tag   $entity
-     * @param       $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -65,7 +64,7 @@ class TagModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
@@ -80,11 +79,6 @@ class TagModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

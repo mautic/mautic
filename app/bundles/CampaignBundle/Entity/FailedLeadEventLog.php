@@ -17,12 +17,12 @@ class FailedLeadEventLog
     private $log;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $reason;
 
@@ -47,8 +47,6 @@ class FailedLeadEventLog
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -87,7 +85,7 @@ class FailedLeadEventLog
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

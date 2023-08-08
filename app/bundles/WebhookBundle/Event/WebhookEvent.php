@@ -53,9 +53,6 @@ class WebhookEvent extends CommonEvent
         $this->entity = $webhook;
     }
 
-    /**
-     * @param $reason
-     */
     public function setReason($reason)
     {
         $this->reason = $reason;

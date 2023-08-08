@@ -6,6 +6,8 @@ use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SourceController extends CommonFormController
 {
@@ -14,32 +16,32 @@ class SourceController extends CommonFormController
     /**
      * @param int $objectId
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function newAction($objectId = 0)
+    public function newAction(Request $request, $objectId = 0)
     {
         $success = 0;
         $valid   = $cancelled   = false;
-        $method  = $this->request->getMethod();
-        $session = $this->get('session');
+        $method  = $request->getMethod();
+        $session = $request->getSession();
         if ('POST' == $method) {
-            $source     = $this->request->request->get('campaign_leadsource');
+            $source     = $request->request->all()['campaign_leadsource'] ?? [];
             $sourceType = $source['sourceType'];
         } else {
-            $sourceType = $this->request->query->get('sourceType');
+            $sourceType = $request->query->get('sourceType');
             $source     = [
                 'sourceType' => $sourceType,
             ];
         }
 
-        //set the sourceType key for sources
+        // set the sourceType key for sources
         if (!in_array($sourceType, $this->supportedSourceTypes)) {
             return $this->modalAccessDenied();
         }
 
-        //ajax only for form fields
-        if (!$this->request->isXmlHttpRequest()
-            || !$this->get('mautic.security')->isGranted(
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create',
@@ -53,7 +55,7 @@ class SourceController extends CommonFormController
         $campaignModel = $this->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
         $sourceList = $campaignModel->getSourceLists($sourceType);
-        $form       = $this->get('form.factory')->create(
+        $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
             [
@@ -62,7 +64,7 @@ class SourceController extends CommonFormController
             ]
         );
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -86,7 +88,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['sourceHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    '@MauticCampaign/Source/_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -96,7 +98,7 @@ class SourceController extends CommonFormController
                 $passthroughVars['sourceType'] = $sourceType;
             }
 
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -107,8 +109,9 @@ class SourceController extends CommonFormController
             ];
 
             return $this->ajaxAction(
+                $request,
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -117,20 +120,18 @@ class SourceController extends CommonFormController
     }
 
     /**
-     * @param $objectId
-     *
-     * @return JsonResponse
+     * @return Response
      */
-    public function editAction($objectId)
+    public function editAction(Request $request, $objectId)
     {
-        $session         = $this->get('session');
-        $method          = $this->request->getMethod();
+        $session         = $request->getSession();
+        $method          = $request->getMethod();
         $modifiedSources = $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
         if ('POST' == $method) {
-            $source     = $this->request->request->get('campaign_leadsource');
+            $source     = $request->request->all()['campaign_leadsource'] ?? [];
             $sourceType = $source['sourceType'];
         } else {
-            $sourceType = $this->request->query->get('sourceType');
+            $sourceType = $request->query->get('sourceType');
             $source     = [
                 'sourceType' => $sourceType,
                 $sourceType  => array_flip($selectedSources[$sourceType]),
@@ -144,9 +145,9 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        //ajax only for form fields
-        if (!$this->request->isXmlHttpRequest()
-            || !$this->get('mautic.security')->isGranted(
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create',
@@ -160,7 +161,7 @@ class SourceController extends CommonFormController
         $campaignModel = $this->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
         $sourceList = $campaignModel->getSourceLists($sourceType);
-        $form       = $this->get('form.factory')->create(
+        $form       = $this->formFactory->create(
             CampaignLeadSourceType::class,
             $source,
             [
@@ -169,13 +170,13 @@ class SourceController extends CommonFormController
             ]
         );
 
-        //Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
-                    //save the properties to session
+                    // save the properties to session
                     $modifiedSources[$sourceType] = array_flip($form[$sourceType]->getData());
                     $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $modifiedSources);
                 } else {
@@ -193,7 +194,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['updateHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    '@MauticCampaign/Source/_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -204,7 +205,7 @@ class SourceController extends CommonFormController
                 $passthroughVars['sourceType'] = $sourceType;
             }
 
-            //just close the modal
+            // just close the modal
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
@@ -215,8 +216,9 @@ class SourceController extends CommonFormController
             ];
 
             return $this->ajaxAction(
+                $request,
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -227,19 +229,17 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        $session         = $this->get('session');
+        $session         = $request->getSession();
         $modifiedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
-        $sourceType      = $this->request->get('sourceType');
+        $sourceType      = $request->get('sourceType');
 
-        //ajax only for form fields
-        if (!$this->request->isXmlHttpRequest()
-            || !$this->get('mautic.security')->isGranted(
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(
                 [
                     'campaign:campaigns:edit',
                     'campaign:campaigns:create',
@@ -250,7 +250,7 @@ class SourceController extends CommonFormController
             return $this->accessDenied();
         }
 
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' == $request->getMethod()) {
             // Add the field to the delete list
             if (isset($modifiedSources[$sourceType])) {
                 unset($modifiedSources[$sourceType]);

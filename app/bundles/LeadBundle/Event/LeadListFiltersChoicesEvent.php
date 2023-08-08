@@ -111,4 +111,28 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     {
         $this->choices = $choices;
     }
+
+    public function isForSegmentation(): bool
+    {
+        $route = (string) $this->getRoute();
+
+        // segment form
+        if ('mautic_segment_action' === $route) {
+            return true;
+        }
+
+        // segment API
+        if (str_starts_with($route, 'mautic_api_lists')) {
+            return true;
+        }
+
+        // ajax request to load the filter's value fields
+        $request = $this->getRequest();
+        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
+            return true;
+        }
+
+        // something else such as dynamic content
+        return false;
+    }
 }

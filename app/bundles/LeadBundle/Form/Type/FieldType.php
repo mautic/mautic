@@ -279,7 +279,7 @@ class FieldType extends AbstractType
                             'required'   => false,
                             'choices'    => array_flip($list),
                             'multiple'   => 'multiselect' === $type,
-                            'data'       => 'multiselect' === $type ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'data'       => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
                             'disabled'   => $disableDefaultValue,
                         ]
                     );
@@ -453,7 +453,7 @@ class FieldType extends AbstractType
         /** @var LeadFieldRepository $leadFieldRepository */
         $leadFieldRepository = $this->em->getRepository(LeadField::class);
 
-        //get order list
+        // get order list
         $transformer = new FieldToOrderTransformer($leadFieldRepository);
         $builder->add(
             $builder->create(
@@ -461,11 +461,11 @@ class FieldType extends AbstractType
                 EntityType::class,
                 [
                     'label'         => 'mautic.core.order',
-                    'class'         => 'MauticLeadBundle:LeadField',
+                    'class'         => \Mautic\LeadBundle\Entity\LeadField::class,
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
-                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', 'ASC'),
+                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC),
                     'required'      => false,
                 ]
             )->addModelTransformer($transformer)

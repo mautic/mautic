@@ -9,7 +9,6 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use PHPUnit\Framework\Assert;
-use ReflectionProperty;
 
 class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
@@ -18,7 +17,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $webhookQueue = $this->createWebhookQueue();
 
         $payload  = 'BC payload';
-        $property = new ReflectionProperty(WebhookQueue::class, 'payload');
+        $property = new \ReflectionProperty(WebhookQueue::class, 'payload');
         $property->setAccessible(true);
         $property->setValue($webhookQueue, $payload);
 
@@ -89,6 +88,6 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $query  = sprintf('SELECT payload, payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])
-            ->fetch();
+            ->fetchAssociative();
     }
 }

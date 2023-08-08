@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
@@ -27,7 +26,7 @@ class MessageSchedule
     private $coreParametersHelper;
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
     private $router;
 
@@ -35,7 +34,7 @@ class MessageSchedule
         TranslatorInterface $translator,
         FileProperties $fileProperties,
         CoreParametersHelper $coreParametersHelper,
-        Router $router
+        UrlGeneratorInterface $router
     ) {
         $this->translator           = $translator;
         $this->fileProperties       = $fileProperties;

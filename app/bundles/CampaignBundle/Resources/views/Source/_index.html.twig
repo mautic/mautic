@@ -1,0 +1,31 @@
+{#
+  Variables
+    - sourceType
+    - campaignId
+    - names
+#}
+{% set sourceType = sourceType|default(null) %}
+
+{% if update is not defined or update is empty %}
+  <div id="CampaignEvent_{{ sourceType }}" data-type="source" class="draggable list-campaign-source list-campaign-leadsource">
+{% endif %}
+
+<div class="campaign-event-content">
+    <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-{% if 'lists' == sourceType %}list{% else %}pencil-square-o{% endif %}"></i>{{ names|default(null) }}</span></div>
+</div>
+
+{% if update is not defined or update is empty %}
+  <div class="campaign-event-buttons hide">
+    <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal"
+       href="{{ path('mautic_campaignsource_action', {'objectAction': 'edit', 'objectId': campaignId, 'sourceType': sourceType}) }}"
+       class="btn btn-primary btn-xs btn-edit"><i class="fa fa-pencil"></i></a>
+    <a data-toggle="ajax"
+       data-target="CampaignEvent_{{ sourceType }}"
+       data-ignore-formexit="true"
+       data-method="POST"
+       data-hide-loadingbar="true"
+       href="{{ path('mautic_campaignsource_action', {'objectAction': 'delete', 'objectId': campaignId, 'sourceType': sourceType}) }}"
+       class="btn btn-delete btn-danger btn-xs"><i class="fa fa-times"></i></a>
+  </div>
+</div>
+{% endif %}
