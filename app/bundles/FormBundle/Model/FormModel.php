@@ -26,6 +26,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
@@ -73,6 +74,11 @@ class FormModel extends CommonFormModel
     protected $fieldHelper;
 
     /**
+     * @var PrimaryCompanyHelper
+     */
+    protected $primaryCompanyHelper;
+
+    /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
@@ -109,6 +115,7 @@ class FormModel extends CommonFormModel
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
+        PrimaryCompanyHelper $primaryCompanyHelper,
         LeadFieldModel $leadFieldModel,
         FormUploader $formUploader,
         ContactTracker $contactTracker,
@@ -124,18 +131,19 @@ class FormModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->requestStack          = $requestStack;
-        $this->twig                  = $twig;
-        $this->themeHelper           = $themeHelper;
-        $this->formActionModel       = $formActionModel;
-        $this->formFieldModel        = $formFieldModel;
-        $this->fieldHelper           = $fieldHelper;
-        $this->leadFieldModel        = $leadFieldModel;
-        $this->formUploader          = $formUploader;
-        $this->contactTracker        = $contactTracker;
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->tableSchemaHelper     = $tableSchemaHelper;
-        $this->mappedObjectCollector = $mappedObjectCollector;
+        $this->requestStack           = $requestStack;
+        $this->twig                   = $twig;
+        $this->themeHelper            = $themeHelper;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->primaryCompanyHelper   = $primaryCompanyHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->contactTracker         = $contactTracker;
+        $this->columnSchemaHelper     = $columnSchemaHelper;
+        $this->tableSchemaHelper      = $tableSchemaHelper;
+        $this->mappedObjectCollector  = $mappedObjectCollector;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -871,8 +879,10 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        // get the contact (lead) and primary company field values
+        $leadArray            = ($lead) ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
         foreach ($autoFillFields as $field) {
-            $value = $lead->getFieldValue($field->getMappedField());
+            $value = $leadArray[$field->getLeadField()];
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
