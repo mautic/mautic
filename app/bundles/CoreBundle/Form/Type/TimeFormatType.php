@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TimeFormatType extends AbstractType
 {
@@ -29,8 +29,8 @@ class TimeFormatType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => [
-                '24' => '24-'.$this->translator->trans('mautic.core.time.hour'),
-                '12' => '12-'.$this->translator->trans('mautic.core.time.hour'),
+                '24-'.$this->translator->trans('mautic.core.time.hour') => '24',
+                '12-'.$this->translator->trans('mautic.core.time.hour') => '12',
             ],
             'expanded'    => false,
             'multiple'    => false,

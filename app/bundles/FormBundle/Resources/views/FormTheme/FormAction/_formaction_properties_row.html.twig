@@ -1,0 +1,26 @@
+{% block _formaction_properties_row %}
+  <div class="row">
+      <div class="col-sm-8">{{ form_row(form.subject) }}</div>
+      <div class="col-sm-4">
+          {{ form_row(form.immediately) }}
+          {{ form_row(form.set_replyto) }}
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-sm-8" id="emailMessage">{{ form_row(form.message) }}</div>
+      <div class="col-sm-4">
+          {{ form_row(form.email_to_owner) }}
+          {{ form_row(form.copy_lead) }}
+          <label class="control-label">{{ 'mautic.form.action.sendemail.dragfield'|trans }}</label>
+          <div id="formFieldTokens" class="list-group" style="max-height: 250px; overflow-y: auto;">
+              {% for token, field in formFields %}
+                <a class="list-group-item ellipsis" href="#" onclick="Mautic.insertTextInEditor(mQuery('#formaction_properties_message'), '{{ token }}');">{{ field }}</a>
+              {% endfor %}
+          </div>
+      </div>
+  </div>
+  {{ form_row(form.templates) }}
+  {{ form_row(form.to) }}
+  {{ form_row(form.cc) }}
+  {{ form_row(form.bcc) }}
+{% endblock %}

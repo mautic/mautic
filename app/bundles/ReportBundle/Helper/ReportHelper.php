@@ -2,10 +2,16 @@
 
 namespace Mautic\ReportBundle\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
+use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportHelper extends Helper
+final class ReportHelper
 {
+    public function __construct(private EventDispatcherInterface $dispatcher)
+    {
+    }
+
     /**
      * @return string
      */
@@ -15,8 +21,6 @@ class ReportHelper extends Helper
     }
 
     /**
-     * @param $type
-     *
      * @return string
      */
     public function getReportBuilderFieldType($type)
@@ -117,5 +121,27 @@ class ReportHelper extends Helper
         }
 
         return $columns;
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function getMappedObjectColumns(string $object, array $properties = []): array
+    {
+        $event = new ColumnCollectEvent($object, $properties);
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
+
+        return array_map(
+            function ($item) {
+                if (isset($item['type'])) {
+                    $item['type'] =  $this->getReportBuilderFieldType($item['type']);
+                }
+
+                return $item;
+            },
+            $event->getColumns()
+        );
     }
 }

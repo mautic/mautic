@@ -6,7 +6,11 @@ namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -19,8 +23,10 @@ use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -83,7 +89,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->mauticFactory          = $this->createMock(MauticFactory::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
@@ -91,12 +97,22 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->triggerEventModel,
             $this->mauticFactory,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
 
-        $this->triggerModel->setDispatcher($this->dispatcher);
-        $this->triggerModel->setTranslator($this->translator);
-        $this->triggerModel->setEntityManager($this->entityManager);
+        // reset private static property events in TriggerModel
+        $reflectionClass = new \ReflectionClass(TriggerModel::class);
+        $property        = $reflectionClass->getProperty('events');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
     }
 
     public function testTriggerEvent(): void
@@ -118,7 +134,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    PointEvents::TRIGGER_ON_BUILD,
                     $this->callback(
                         // Emulate a subscriber:
                         function (TriggerBuilderEvent $event) {
@@ -133,7 +148,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                                     'group'           => 'mautic.email.point.trigger',
                                     'label'           => 'mautic.email.point.trigger.send_email_to_user',
                                     'formType'        => \Mautic\EmailBundle\Form\Type\EmailToUserType::class,
-                                    'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
+                                    'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
                                     'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
                                     'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
                                 ]
@@ -142,10 +157,10 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    PointEvents::TRIGGER_ON_BUILD,
                 ],
                 // Ensure the event is triggered if the point trigger event has 'eventName' defined instead of 'callback'.
                 [
-                    EmailEvents::ON_SENT_EMAIL_TO_USER,
                     $this->callback(
                         function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
                             $this->assertSame($contact, $event->getLead());
@@ -154,6 +169,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    EmailEvents::ON_SENT_EMAIL_TO_USER,
                 ]
             );
 

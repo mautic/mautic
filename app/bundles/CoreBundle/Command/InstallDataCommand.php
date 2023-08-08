@@ -2,25 +2,31 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to install Mautic sample data.
  */
-class InstallDataCommand extends ContainerAwareCommand
+class InstallDataCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        parent::__construct();
+
+        $this->translator = $translator;
+    }
+
     protected function configure()
     {
         $this->setName('mautic:install:data')
-            ->setDescription('Installs Mautic with sample data')
             ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
@@ -35,26 +41,21 @@ You can optionally specify to bypass the verification check with the --force opt
 
 <info>php %command.full_name% --force</info>
 EOT
-        );
+            );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $options    = $input->getOptions();
-        $force      = $options['force'];
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+        $options = $input->getOptions();
+        $force   = $options['force'];
 
         if (!$force) {
             $helper         = $this->getHelper('question');
-            $questionString = $translator->trans('mautic.core.command.install_data_confirm').' (y = '.$translator->trans('mautic.core.form.yes').', n = '.$translator->trans('mautic.core.form.no').'): ';
+            $questionString = $this->translator->trans('mautic.core.command.install_data_confirm').' (y = '.$this->translator->trans('mautic.core.form.yes').', n = '.$this->translator->trans('mautic.core.form.no').'): ';
             $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
-                return 0;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -64,7 +65,7 @@ EOT
         $verbosity = $output->getVerbosity();
         $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
 
-        //due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
+        // due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
         $command = $this->getApplication()->find('doctrine:schema:drop');
         $input   = new ArrayInput([
             'command' => 'doctrine:schema:drop',
@@ -75,10 +76,10 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
-        //recreate the database
+        // recreate the database
         $command = $this->getApplication()->find('doctrine:schema:create');
         $input   = new ArrayInput([
             'command' => 'doctrine:schema:create',
@@ -87,10 +88,10 @@ EOT
         ]);
         $returnCode = $command->run($input, $output);
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
-        //now populate the tables with fixture
+        // now populate the tables with fixture
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = [
             'command'  => 'doctrine:fixtures:load',
@@ -104,14 +105,15 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         $output->setVerbosity($verbosity);
         $output->writeln(
-            $translator->trans('mautic.core.command.install_data_success')
+            $this->translator->trans('mautic.core.command.install_data_success')
         );
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Installs Mautic with sample data';
 }

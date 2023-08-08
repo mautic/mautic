@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
@@ -27,7 +27,7 @@ class DeviceTracker
     private $deviceTrackingService;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -48,17 +48,15 @@ class DeviceTracker
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,
         DeviceTrackingServiceInterface $deviceTrackingService,
-        Logger $logger
+        LoggerInterface $mauticLogger
     ) {
         $this->deviceCreatorService  = $deviceCreatorService;
         $this->deviceDetectorFactory = $deviceDetectorFactory;
         $this->deviceTrackingService = $deviceTrackingService;
-        $this->logger                = $logger;
+        $this->logger                = $mauticLogger;
     }
 
     /**
-     * @param $userAgent
-     *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
@@ -102,7 +100,7 @@ class DeviceTracker
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
         if (null !== $trackedDevice) {
-            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
+            $this->logger->debug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 
         return $trackedDevice;

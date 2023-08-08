@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -12,7 +13,6 @@ use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TwitterCommandHelper
 {
@@ -37,7 +37,7 @@ class TwitterCommandHelper
     private $postCountModel;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -79,7 +79,7 @@ class TwitterCommandHelper
         FieldModel $fieldModel,
         MonitoringModel $monitoringModel,
         PostCountModel $postCountModel,
-        TranslatorInterface $translator,
+        Translator $translator,
         EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper
     ) {
@@ -316,9 +316,7 @@ class TwitterCommandHelper
                 $leadEntity->setPreferredProfileImage('Twitter');
 
                 // save the lead now
-                if ($lastActive instanceof \DateTimeInterface) {
-                    $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
-                }
+                $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
 
                 try {
                     // save the lead entity
@@ -413,7 +411,7 @@ class TwitterCommandHelper
         $monitorLead->setDateAdded(new \DateTime());
 
         /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository('MauticSocialBundle:lead');
+        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);
     }
@@ -422,7 +420,6 @@ class TwitterCommandHelper
      * Increment the post counter.
      *
      * @param Monitoring $monitor
-     * @param $tweet
      */
     private function incrementPostCount($monitor, $tweet)
     {

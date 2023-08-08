@@ -56,7 +56,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function removeEmptyValuesProvider(): \Generator
     {
-        $object = new \StdClass();
+        $object = new \stdClass();
         yield [[null], []];
         yield [[], []];
         yield [[123], [123]];
@@ -87,5 +87,27 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('Custom first', key($flippedArray['group1']));
         $this->assertEquals('first', end($flippedArray['group1']));
+    }
+
+    public function testFlatten(): void
+    {
+        $multidimensionalArray = [
+            'first' => 'Custom first',
+            [
+                'second' => 'Custom second',
+                [
+                    'third' => 'Custom third',
+                ],
+            ],
+        ];
+
+        Assert::assertSame(
+            [
+                'first'  => 'Custom first',
+                'second' => 'Custom second',
+                'third'  => 'Custom third',
+            ],
+            ArrayHelper::flatten($multidimensionalArray)
+        );
     }
 }

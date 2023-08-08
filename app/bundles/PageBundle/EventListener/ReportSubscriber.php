@@ -12,13 +12,13 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_PAGES      = 'pages';
-    const CONTEXT_PAGE_HITS  = 'page.hits';
-    const CONTEXT_VIDEO_HITS = 'video.hits';
+    public const CONTEXT_PAGES      = 'pages';
+    public const CONTEXT_PAGE_HITS  = 'page.hits';
+    public const CONTEXT_VIDEO_HITS = 'video.hits';
 
     /**
      * @var CompanyReportData
@@ -505,7 +505,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data  = $queryBuilder->execute()->fetchAll();
+                    $data  = $queryBuilder->execute()->fetchAllAssociative();
                     $chart = new PieChart();
 
                     foreach ($data as $lang) {
@@ -524,8 +524,8 @@ class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data  = $queryBuilder->execute()->fetchAll();
-                    $chart = new PieChart();
+                    $data     = $queryBuilder->execute()->fetchAllAssociative();
+                    $chart    = new PieChart();
 
                     foreach ($data as $device) {
                         $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);

@@ -3,20 +3,63 @@
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use PHPUnit\Framework\TestCase;
+use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends TestCase
+class ReportSubscriberTest extends AbstractMauticTestCase
 {
-    private $submissionRepository;
+    /**
+     * @var CompanyReportData|MockObject
+     */
     private $companyReportData;
+
+    /**
+     * @var SubmissionRepository|MockObject
+     */
+    private $submissionRepository;
+
+    /**
+     * @var FormModel|MockObject
+     */
+    private $formModel;
+
+    /**
+     * @var FormRepository|MockObject
+     */
+    private $formRepository;
+
+    /**
+     * @var ReportHelper|MockObject
+     */
+    private $reportHelper;
+
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var TranslatorInterface|MockObject
+     */
+    private $translator;
 
     /**
      * @var ReportSubscriber
@@ -25,15 +68,28 @@ class ReportSubscriberTest extends TestCase
 
     public function setUp(): void
     {
+        $this->configParams['form_results_data_sources'] = true;
+
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->subscriber           = new ReportSubscriber($this->companyReportData, $this->submissionRepository);
+        $this->formModel            = $this->createMock(FormModel::class);
+        $this->formRepository       = $this->createMock(FormRepository::class);
+        $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->subscriber           = new ReportSubscriber(
+            $this->companyReportData,
+            $this->submissionRepository,
+            $this->formModel,
+            $this->reportHelper,
+            $this->coreParametersHelper,
+            $this->translator
+        );
     }
 
-    public function testOnReportBuilderAddsFormAndFormSubmissionReports()
+    public function testOnReportBuilderAddsFormAndFormSubmissionReports(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -69,9 +125,9 @@ class ReportSubscriberTest extends TestCase
             ->method('getIpColumn')
             ->willReturn([]);
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->exactly(3))
             ->method('checkContext')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, true, false);
 
         $setTables = [];
         $setGraphs = [];
@@ -103,7 +159,70 @@ class ReportSubscriberTest extends TestCase
         $this->assertCount(3, $setGraphs);
     }
 
-    public function testOnReportGenerateFormsContext()
+    public function testOnReportBuilderWithWrongContext(): void
+    {
+        $reportBuilderEvent = new ReportBuilderEvent(
+            $this->translator,
+            $this->createMock(ChannelListHelper::class),
+            'test',
+            [],
+            $this->reportHelper,
+            ''
+        );
+
+        $this->subscriber->onReportBuilder($reportBuilderEvent);
+
+        Assert::assertCount(0, $reportBuilderEvent->getTables());
+    }
+
+    public function testOnReportBuilderAddsFormAndFormResultReports(): void
+    {
+        $reportBuilderEvent = new ReportBuilderEvent(
+            $this->translator,
+            $this->createMock(ChannelListHelper::class),
+            ReportSubscriber::CONTEXT_FORM_RESULT,
+            [],
+            $this->reportHelper,
+            ''
+        );
+
+        $field = new Field();
+        $field->setAlias('email');
+        $field->setType('string');
+        $field->setLabel('Email');
+        $field->setMappedObject('contact');
+        $field->setMappedField('email');
+
+        $form = new Form();
+        $form->addField('email', $field);
+        $field->setForm($form);
+
+        $this->formModel->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->formRepository);
+
+        $this->formModel->expects($this->once())
+            ->method('getCustomComponents')
+            ->willReturn(['viewOnlyFields' => ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak', 'plugin.loginSocial']]);
+
+        $this->formRepository->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([[$form, 1]]);
+
+        $this->formRepository->expects($this->once())
+            ->method('getResultsTableName')
+            ->willReturn('test');
+
+        $this->subscriber->onReportBuilder($reportBuilderEvent);
+
+        $tables = $reportBuilderEvent->getTables();
+
+        Assert::assertCount(2, $tables);
+        Assert::assertArrayHasKey('form.results.test', $tables);
+        Assert::assertCount(3, $tables['form.results.test']['columns']);
+    }
+
+    public function testOnReportGenerateFormsContext(): void
     {
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
@@ -131,7 +250,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGenerateFormSubmissionContext()
+    public function testOnReportGenerateFormSubmissionContext(): void
     {
         $mockQueryBuilder = $this->createMock(QueryBuilder::class);
         $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
@@ -167,7 +286,39 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerateBadContextWillReturn()
+    public function testOnReportGenerateFormResultsContext(): void
+    {
+        $mockQueryBuilder = $this->createMock(QueryBuilder::class);
+        $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'getContext',
+                'getQueryBuilder',
+                'addLeadLeftJoin',
+                'setQueryBuilder',
+            ])
+            ->getMock();
+
+        $mockQueryBuilder->expects($this->once())
+            ->method('from')
+            ->willReturn($mockQueryBuilder);
+
+        $mockQueryBuilder->expects($this->once())
+            ->method('leftJoin')
+            ->willReturn($mockQueryBuilder);
+
+        $mockEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($mockQueryBuilder);
+
+        $mockEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('form.results');
+
+        $this->subscriber->onReportGenerate($mockEvent);
+    }
+
+    public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->createMock(ReportGraphEvent::class);
 
@@ -181,7 +332,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGraphGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerate()
+    public function testOnReportGraphGenerate(): void
     {
         $mockEvent        = $this->createMock(ReportGraphEvent::class);
         $mockTrans        = $this->createMock(Translator::class);

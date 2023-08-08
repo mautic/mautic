@@ -5,46 +5,43 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
 class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
+    protected PathsHelper $pathsHelper;
+    protected CoreParametersHelper $coreParametersHelper;
     protected Connection $connection;
+    private TranslatorInterface $translator;
+    private InstallService $installService;
+    private CheckStep $checkStep;
 
-    /**
-     * SysinfoModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
-        Connection $connection
+        Connection $connection,
+        InstallService $installService,
+        CheckStep $checkStep
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
         $this->connection           = $connection;
+        $this->installService       = $installService;
+        $this->checkStep            = $checkStep;
     }
 
     /**
@@ -74,7 +71,7 @@ class SysinfoModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
-            //ensure TZ is set back to default
+            // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
@@ -83,6 +80,22 @@ class SysinfoModel
         }
 
         return $this->phpInfo;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
     }
 
     /**
@@ -104,11 +117,6 @@ class SysinfoModel
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
-
-        // Show the spool folder only if the email queue is configured
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
-        }
 
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
@@ -142,8 +150,8 @@ class SysinfoModel
     public function getDbInfo(): array
     {
         return [
-            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
-            'driver'   => $this->connection->getDriver()->getName(),
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
+            'driver'   => $this->connection->getParams()['driver'],
             'platform' => get_class($this->connection->getDatabasePlatform()),
         ];
     }
@@ -151,7 +159,6 @@ class SysinfoModel
     /**
      * Method to tail (a few last rows) of a file.
      *
-     * @param     $filename
      * @param int $lines
      * @param int $buffer
      *

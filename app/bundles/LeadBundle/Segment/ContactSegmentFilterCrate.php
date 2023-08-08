@@ -4,8 +4,9 @@ namespace Mautic\LeadBundle\Segment;
 
 class ContactSegmentFilterCrate
 {
-    const CONTACT_OBJECT = 'lead';
-    const COMPANY_OBJECT = 'company';
+    public const CONTACT_OBJECT   = 'lead';
+    public const COMPANY_OBJECT   = 'company';
+    public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
      * @var string|null
@@ -88,6 +89,11 @@ class ContactSegmentFilterCrate
     public function isCompanyType()
     {
         return self::COMPANY_OBJECT === $this->object;
+    }
+
+    public function isBehaviorsType(): bool
+    {
+        return self::BEHAVIORS_OBJECT === $this->object;
     }
 
     /**
@@ -185,7 +191,7 @@ class ContactSegmentFilterCrate
             $operator = ('=' === $operator) === $this->getFilter() ? 'notEmpty' : 'empty';
         }
 
-        if ('=' === $operator && is_array($this->getFilter())) { //Fix for old segments which can have stored = instead on in operator
+        if ('=' === $operator && is_array($this->getFilter())) { // Fix for old segments which can have stored = instead on in operator
             $operator = 'in';
         }
 

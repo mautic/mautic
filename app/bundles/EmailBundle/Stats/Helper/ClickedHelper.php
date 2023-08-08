@@ -7,7 +7,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 class ClickedHelper extends AbstractHelper
 {
-    const NAME = 'email-clicked';
+    public const NAME = 'email-clicked';
 
     /**
      * @return string

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -19,7 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListType extends AbstractType
 {
@@ -38,7 +39,7 @@ class ListType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'clean', 'publicName' => 'clean', 'filter' => 'raw']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add(
@@ -138,6 +139,9 @@ class ListType extends AbstractType
                     'constraints'    => [
                         new CircularDependency([
                             'message' => 'mautic.core.segment.circular_dependency_exists',
+                        ]),
+                        new SegmentDate([
+                            'message' => 'mautic.lead.segment.date_invalid',
                         ]),
                     ],
                 ]

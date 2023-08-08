@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_webhook_index' => [
                 'path'       => '/webhooks/{page}',
-                'controller' => 'MauticWebhookBundle:Webhook:index',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::indexAction',
             ],
             'mautic_webhook_action' => [
                 'path'       => '/webhooks/{objectAction}/{objectId}',
-                'controller' => 'MauticWebhookBundle:Webhook:execute',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::executeAction',
             ],
         ],
         'api' => [
@@ -17,11 +17,11 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => 'MauticWebhookBundle:Api\WebhookApi',
+                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
             ],
             'mautic_api_webhookevents' => [
                 'path'       => '/hooks/triggers',
-                'controller' => 'MauticWebhookBundle:Api\WebhookApi:getTriggers',
+                'controller' => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController::getTriggersAction',
             ],
         ],
     ],
@@ -40,19 +40,7 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.webhook' => [
-                'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
-            ],
-            'mautic.form.type.webhookconfig' => [
-                'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
-            ],
-            'mautic.campaign.type.action.sendwebhook' => [
-                'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
-                'arguments' => [
-                    'arguments' => 'translator',
-                ],
-            ],
+        'others' => [
             'mautic.webhook.notificator.webhookkillnotificator' => [
                 'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
                 'arguments' => [
@@ -64,45 +52,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-        ],
-        'events' => [
-            'mautic.webhook.config.subscriber' => [
-                'class' => \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.webhook.audit.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\WebhookSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                    'mautic.webhook.notificator.webhookkillnotificator',
-                ],
-            ],
-            'mautic.webhook.stats.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.webhook.campaign.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.webhook.campaign.helper',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.webhook.model.webhook' => [
-                'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'jms_serializer',
-                    'mautic.webhook.http.client',
-                    'event_dispatcher',
-                ],
-            ],
-        ],
-        'others' => [
             'mautic.webhook.campaign.helper' => [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
@@ -115,22 +64,8 @@ return [
                 'class'     => \Mautic\WebhookBundle\Http\Client::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.guzzle.client',
+                    'mautic.http.client',
                 ],
-            ],
-        ],
-        'commands' => [
-            'mautic.webhook.command.process.queues' => [
-                'class'     => \Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand::class,
-                'tag'       => 'console.command',
-            ],
-            'mautic.webhook.command.delete.logs' => [
-                'class'     => \Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand::class,
-                'arguments' => [
-                    'mautic.webhook.model.webhook',
-                    'mautic.helper.core_parameters',
-                ],
-                'tag' => 'console.command',
             ],
         ],
         'repositories' => [

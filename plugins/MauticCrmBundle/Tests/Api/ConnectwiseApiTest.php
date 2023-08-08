@@ -12,6 +12,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Tests that fetchAllRecords loops until all records are obtained
+     *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords()
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException

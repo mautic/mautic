@@ -7,7 +7,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 class SentHelper extends AbstractHelper
 {
-    const NAME = 'email-sent';
+    public const NAME = 'email-sent';
 
     /**
      * @return string
@@ -22,9 +22,10 @@ class SentHelper extends AbstractHelper
      */
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
     {
-        $column = $this->generatedColumnsProvider->generatedColumnsAreSupported() ? 'generated_sent_date' : 'date_sent';
-        $query  = $this->getQuery($fromDateTime, $toDateTime);
-        $q      = $query->prepareTimeDataQuery('email_stats', $column, $options->getFilters());
+        $useGeneratedColumn = $this->generatedColumnsProvider->generatedColumnsAreSupported() && 'd' == $options->getUnit();
+        $column             = $useGeneratedColumn ? 'generated_sent_date' : 'date_sent';
+        $query              = $this->getQuery($fromDateTime, $toDateTime);
+        $q                  = $query->prepareTimeDataQuery('email_stats', $column, $options->getFilters());
 
         $this->limitQueryToEmailIds($q, $options->getEmailIds(), 'email_id', 't');
 

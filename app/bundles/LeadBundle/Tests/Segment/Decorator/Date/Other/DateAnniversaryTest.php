@@ -42,7 +42,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
          *
          * @var string
          */
-        $expectedResult = '%'.(new \DateTime(null, new \DateTimeZone('UTC')))->format('-m-d');
+        $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d');
 
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

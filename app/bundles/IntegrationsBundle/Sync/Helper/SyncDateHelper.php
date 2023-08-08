@@ -104,7 +104,7 @@ class SyncDateHelper
             ->setParameter('integration', $integration)
             ->setParameter('object', $object)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
 
         if (!$result) {
             return null;

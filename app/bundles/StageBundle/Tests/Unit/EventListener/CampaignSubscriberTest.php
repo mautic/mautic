@@ -17,7 +17,7 @@ use Mautic\StageBundle\EventListener\CampaignSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends TestCase
 {
@@ -443,22 +443,9 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
-            }
-
-            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-            {
-                return '[trans]'.$id.'[/trans]';
-            }
-
-            public function setLocale($locale)
-            {
-            }
-
-            public function getLocale()
-            {
             }
         };
     }

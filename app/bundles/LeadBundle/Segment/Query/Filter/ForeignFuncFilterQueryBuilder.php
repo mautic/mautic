@@ -72,14 +72,14 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
             case 'notEmpty':
-                $expression = $queryBuilder->expr()->andX(
+                $expression = $queryBuilder->expr()->and(
                     $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
                 );

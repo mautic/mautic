@@ -6,11 +6,12 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -101,6 +102,17 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
+            'group',
+            GroupListType::class,
+            [
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.group.form.group_descr',
+                ],
+            ]
+        );
+
+        $builder->add(
             'triggerExistingLeads',
             YesNoButtonGroupType::class,
             [
@@ -130,37 +142,8 @@ class TriggerType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'publishUp',
-            DateTimeType::class,
-            [
-                'widget'         => 'single_text',
-                'label'          => 'mautic.core.form.publishup',
-                'label_attr'     => ['class' => 'control-label'],
-                    'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'sessionId',

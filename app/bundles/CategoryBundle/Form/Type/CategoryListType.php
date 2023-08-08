@@ -10,12 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CategoryListType.
- */
 class CategoryListType extends AbstractType
 {
     /**
@@ -34,14 +31,11 @@ class CategoryListType extends AbstractType
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
-    /**
-     * CategoryListType constructor.
-     */
-    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
+    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
     {
         $this->em         = $em;
         $this->translator = $translator;
@@ -52,7 +46,7 @@ class CategoryListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (true === $options['return_entity']) {
-            $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
+            $transformer = new IdToEntityModelTransformer($this->em, \Mautic\CategoryBundle\Entity\Category::class, 'id');
             $builder->addModelTransformer($transformer);
         }
     }
@@ -61,9 +55,9 @@ class CategoryListType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {
-                $createNew = $this->translator->trans('mautic.category.createnew');
+                $createNew  = $this->translator->trans('mautic.category.createnew');
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
-                $choices = [];
+                $choices    = [];
                 foreach ($categories as $l) {
                     $choices[$l['title']] = $l['id'];
                 }
@@ -77,7 +71,7 @@ class CategoryListType extends AbstractType
             'placeholder'       => 'mautic.core.form.uncategorized',
             'attr'              => function (Options $options) {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
-                $newUrl = $this->router->generate('mautic_category_action', [
+                $newUrl      = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',
                     'bundle'       => $options['bundle'],
                     'inForm'       => 1,

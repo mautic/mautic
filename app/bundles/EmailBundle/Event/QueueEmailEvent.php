@@ -2,7 +2,8 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class QueueEmailEvent.
@@ -10,7 +11,7 @@ use Symfony\Component\EventDispatcher\Event;
 class QueueEmailEvent extends Event
 {
     /**
-     * @var \Swift_Message
+     * @var MauticMessage
      */
     private $message;
 
@@ -19,13 +20,13 @@ class QueueEmailEvent extends Event
      */
     private $retry = false;
 
-    public function __construct(\Swift_Message $message)
+    public function __construct(MauticMessage $message)
     {
         $this->message = $message;
     }
 
     /**
-     * @return \Swift_Message
+     * @return MauticMessage
      */
     public function getMessage()
     {

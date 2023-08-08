@@ -53,7 +53,7 @@ class PointSubscriber implements EventSubscriberInterface
             'description' => 'mautic.page.point.action.urlhit_descr',
             'callback'    => [PointActionHelper::class, 'validateUrlHit'],
             'formType'    => PointActionUrlHitType::class,
-            'formTheme'   => 'MauticPageBundle:FormTheme\Point',
+            'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
         ];
 
         $event->addAction('url.hit', $action);
@@ -66,10 +66,10 @@ class PointSubscriber implements EventSubscriberInterface
     {
         if ($event->getPage()) {
             // Mautic Landing Page was hit
-            $this->pointModel->triggerAction('page.hit', $event->getHit());
+            $this->pointModel->triggerAction('page.hit', $event->getHit(), null, $event->getLead());
         } else {
             // Mautic Tracking Pixel was hit
-            $this->pointModel->triggerAction('url.hit', $event->getHit());
+            $this->pointModel->triggerAction('url.hit', $event->getHit(), null, $event->getLead());
         }
     }
 }

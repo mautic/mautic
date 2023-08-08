@@ -53,14 +53,6 @@ class AssetListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
-    {
-        return 'asset_list';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;
@@ -81,7 +73,7 @@ class AssetListType extends AbstractType
             $choices[$asset['language']][$asset['title']] = $asset['id'];
         }
 
-        //sort by language
+        // sort by language
         ksort($choices);
 
         return $choices;

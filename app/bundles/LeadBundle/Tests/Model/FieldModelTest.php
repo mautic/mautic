@@ -2,8 +2,13 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
@@ -13,6 +18,9 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FieldModelTest extends MauticMysqlTestCase
 {
@@ -110,23 +118,37 @@ class FieldModelTest extends MauticMysqlTestCase
             ->with($leadField)
             ->willReturn(true);
 
-        $model = new FieldModel($columnSchemaHelper, $leadListModel, $customFieldColumn, $fieldSaveDispatcher, $leadFieldRepository, $fieldsWithUniqueIdentifier, $fieldList, $leadFieldSaver);
+        $model = new FieldModel(
+            $columnSchemaHelper,
+            $leadListModel,
+            $customFieldColumn,
+            $fieldSaveDispatcher,
+            $leadFieldRepository,
+            $fieldsWithUniqueIdentifier,
+            $fieldList,
+            $leadFieldSaver,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
+        );
         $this->assertTrue($model->isUsedField($leadField));
     }
 
     /**
-     * @param $table
-     * @param $column
-     *
      * @return array
      */
     private function getColumns($table, $column)
     {
         $stmt       = $this->connection->executeQuery(
-            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
+            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getParams()['dbname']}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
             ."$table' AND COLUMN_NAME = '$column'"
         );
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAllAssociative();
     }
 }

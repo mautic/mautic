@@ -4,33 +4,26 @@ namespace Mautic\ChannelBundle\Helper;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
 
-class ChannelListHelper extends Helper
+class ChannelListHelper
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    private Translator $translator;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
-    protected $channels = [];
+    private array $channels = [];
 
     /**
-     * @var array
+     * @var array<string,string[]>
      */
-    protected $featureChannels = [];
+    private array $featureChannels = [];
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
     {
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
@@ -53,7 +46,6 @@ class ChannelListHelper extends Helper
     }
 
     /**
-     * @param      $features
      * @param bool $listOnly
      *
      * @return array
@@ -65,7 +57,6 @@ class ChannelListHelper extends Helper
         if (!is_array($features)) {
             $features = [$features];
         }
-
         $channels = [];
         foreach ($features as $feature) {
             $featureChannels = (isset($this->featureChannels[$feature])) ? $this->featureChannels[$feature] : [];
@@ -103,8 +94,6 @@ class ChannelListHelper extends Helper
     }
 
     /**
-     * @param $channel
-     *
      * @return string
      */
     public function getChannelLabel($channel)
@@ -132,13 +121,13 @@ class ChannelListHelper extends Helper
      *
      * Done this way to avoid a circular dependency error with LeadModel
      */
-    protected function setupChannels()
+    private function setupChannels(): void
     {
         if (!empty($this->channels)) {
             return;
         }
 
-        $event                 = $this->dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
+        $event                 = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
         $this->channels        = $event->getChannelConfigs();
         $this->featureChannels = $event->getFeatureChannels();
         unset($event);

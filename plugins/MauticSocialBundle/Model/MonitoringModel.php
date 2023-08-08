@@ -9,12 +9,12 @@ use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class MonitoringModel
- * {@inheritdoc}
+ * @extends FormModel<Monitoring>
  */
 class MonitoringModel extends FormModel
 {
@@ -30,34 +30,29 @@ class MonitoringModel extends FormModel
     ];
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param mixed[]     $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $params = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
         if (!empty($action)) {
-            $params['action'] = $action;
+            $options['action'] = $action;
         }
 
-        return $formFactory->create(MonitoringType::class, $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $options);
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return Monitoring|null
      */
@@ -68,11 +63,6 @@ class MonitoringModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -104,7 +94,7 @@ class MonitoringModel extends FormModel
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -113,15 +103,14 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring
+     * @param Monitoring $monitoringEntity
+     * @param bool       $unlock
      */
     public function saveEntity($monitoringEntity, $unlock = true)
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {
-            //increase the revision
+            // increase the revision
             $revision = $monitoringEntity->getRevision();
             ++$revision;
             $monitoringEntity->setRevision($revision);
@@ -135,11 +124,11 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @return \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSocialBundle:Monitoring');
+        return $this->em->getRepository(Monitoring::class);
     }
 
     /**
@@ -151,7 +140,7 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getNetworkTypes()
     {
@@ -166,7 +155,7 @@ class MonitoringModel extends FormModel
     /**
      * @param string $type
      *
-     * @return |null
+     * @return string|null
      */
     public function getFormByType($type)
     {

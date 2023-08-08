@@ -20,49 +20,49 @@ return [
         'main' => [
             'login' => [
                 'path'       => '/login',
-                'controller' => 'MauticUserBundle:Security:login',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginAction',
             ],
             'mautic_user_logincheck' => [
                 'path'       => '/login_check',
-                'controller' => 'MauticUserBundle:Security:loginCheck',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::loginCheckAction',
             ],
             'mautic_user_logout' => [
                 'path' => '/logout',
             ],
             'mautic_sso_login' => [
                 'path'       => '/sso_login/{integration}',
-                'controller' => 'MauticUserBundle:Security:ssoLogin',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginAction',
             ],
             'mautic_sso_login_check' => [
                 'path'       => '/sso_login_check/{integration}',
-                'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
+                'controller' => 'Mautic\UserBundle\Controller\SecurityController::ssoLoginCheckAction',
             ],
             'lightsaml_sp.login' => [
                 'path'       => '/saml/login',
-                'controller' => 'LightSamlSpBundle:Default:login',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::loginAction',
             ],
             'lightsaml_sp.login_check' => [
                 'path' => '/saml/login_check',
             ],
             'mautic_user_index' => [
                 'path'       => '/users/{page}',
-                'controller' => 'MauticUserBundle:User:index',
+                'controller' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             ],
             'mautic_user_action' => [
                 'path'       => '/users/{objectAction}/{objectId}',
-                'controller' => 'MauticUserBundle:User:execute',
+                'controller' => 'Mautic\UserBundle\Controller\UserController::executeAction',
             ],
             'mautic_role_index' => [
                 'path'       => '/roles/{page}',
-                'controller' => 'MauticUserBundle:Role:index',
+                'controller' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             ],
             'mautic_role_action' => [
                 'path'       => '/roles/{objectAction}/{objectId}',
-                'controller' => 'MauticUserBundle:Role:execute',
+                'controller' => 'Mautic\UserBundle\Controller\RoleController::executeAction',
             ],
             'mautic_user_account' => [
                 'path'       => '/account',
-                'controller' => 'MauticUserBundle:Profile:index',
+                'controller' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
             ],
         ],
 
@@ -71,124 +71,49 @@ return [
                 'standard_entity' => true,
                 'name'            => 'users',
                 'path'            => '/users',
-                'controller'      => 'MauticUserBundle:Api\UserApi',
+                'controller'      => 'Mautic\UserBundle\Controller\Api\UserApiController',
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
-                'controller' => 'MauticUserBundle:Api\UserApi:getSelf',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getSelfAction',
             ],
             'mautic_api_checkpermission' => [
                 'path'       => '/users/{id}/permissioncheck',
-                'controller' => 'MauticUserBundle:Api\UserApi:isGranted',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::isGrantedAction',
                 'method'     => 'POST',
             ],
             'mautic_api_getuserroles' => [
                 'path'       => '/users/list/roles',
-                'controller' => 'MauticUserBundle:Api\UserApi:getRoles',
+                'controller' => 'Mautic\UserBundle\Controller\Api\UserApiController::getRolesAction',
             ],
             'mautic_api_rolesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'roles',
                 'path'            => '/roles',
-                'controller'      => 'MauticUserBundle:Api\RoleApi',
+                'controller'      => 'Mautic\UserBundle\Controller\Api\RoleApiController',
             ],
         ],
         'public' => [
             'mautic_user_passwordreset' => [
                 'path'       => '/passwordreset',
-                'controller' => 'MauticUserBundle:Public:passwordReset',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetAction',
             ],
             'mautic_user_passwordresetconfirm' => [
                 'path'       => '/passwordresetconfirm',
-                'controller' => 'MauticUserBundle:Public:passwordResetConfirm',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetConfirmAction',
             ],
             'lightsaml_sp.metadata' => [
                 'path'       => '/saml/metadata.xml',
-                'controller' => 'LightSamlSpBundle:Default:metadata',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::metadataAction',
             ],
             'lightsaml_sp.discovery' => [
                 'path'       => '/saml/discovery',
-                'controller' => 'LightSamlSpBundle:Default:discovery',
+                'controller' => 'LightSaml\SpBundle\Controller\DefaultController::discoveryAction',
             ],
         ],
     ],
 
     'services' => [
-        'events' => [
-            'mautic.user.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\UserSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.user.search.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.user.model.user',
-                    'mautic.user.model.role',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.user.config.subscriber' => [
-                'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.user.route.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SAMLSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'router',
-                ],
-            ],
-            'mautic.user.security_subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SecuritySubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.user' => [
-                'class'     => \Mautic\UserBundle\Form\Type\UserType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.user.model.user',
-                    'mautic.helper.language',
-                ],
-            ],
-            'mautic.form.type.role' => [
-                'class' => \Mautic\UserBundle\Form\Type\RoleType::class,
-            ],
-            'mautic.form.type.permissions' => [
-                'class' => \Mautic\UserBundle\Form\Type\PermissionsType::class,
-            ],
-            'mautic.form.type.permissionlist' => [
-                'class' => \Mautic\UserBundle\Form\Type\PermissionListType::class,
-            ],
-            'mautic.form.type.passwordreset' => [
-                'class' => \Mautic\UserBundle\Form\Type\PasswordResetType::class,
-            ],
-            'mautic.form.type.passwordresetconfirm' => [
-                'class' => \Mautic\UserBundle\Form\Type\PasswordResetConfirmType::class,
-            ],
-            'mautic.form.type.user_list' => [
-                'class'     => \Mautic\UserBundle\Form\Type\UserListType::class,
-                'arguments' => 'mautic.user.model.user',
-            ],
-            'mautic.form.type.role_list' => [
-                'class'     => \Mautic\UserBundle\Form\Type\RoleListType::class,
-                'arguments' => 'mautic.user.model.role',
-            ],
-            'mautic.form.type.userconfig' => [
-                'class'     => \Mautic\UserBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'translator',
-                ],
-            ],
-        ],
         'other' => [
             // Authentication
             'mautic.user.manager' => [
@@ -196,33 +121,20 @@ return [
                 'arguments' => 'Mautic\UserBundle\Entity\User',
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.user.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\UserRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\User',
-                'factory'   => ['@mautic.user.manager', 'getRepository'],
-            ],
-            'mautic.user.token.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\UserTokenRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\UserToken',
-                'factory'   => ['@doctrine', 'getRepository'],
-            ],
             'mautic.permission.manager' => [
                 'class'     => 'Doctrine\ORM\EntityManager',
                 'arguments' => 'Mautic\UserBundle\Entity\Permission',
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.permission.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\PermissionRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\Permission',
-                'factory'   => ['@mautic.permission.manager', 'getRepository'],
-            ],
-            'mautic.user.form_authenticator' => [
+            'mautic.user.form_guard_authenticator' => [
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
                 'arguments' => [
                     'mautic.helper.integration',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'event_dispatcher',
                     'request_stack',
+                    'security.csrf.token_manager',
+                    'router',
                 ],
             ],
             'mautic.user.preauth_authenticator' => [
@@ -243,11 +155,11 @@ return [
                     'mautic.permission.repository',
                     'session',
                     'event_dispatcher',
-                    'security.password_encoder',
+                    'security.password_hasher',
                 ],
             ],
             'mautic.security.authentication_listener' => [
-                'class'     => 'Mautic\UserBundle\Security\Firewall\AuthenticationListener',
+                'class'     => \Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
                 'arguments' => [
                     'mautic.security.authentication_handler',
                     'security.token_storage',
@@ -267,8 +179,12 @@ return [
                 ],
             ],
             'mautic.security.logout_handler' => [
-                'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
-                'arguments' => [
+                'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
+                'tagArguments' => [
+                    'event'      => 'Symfony\Component\Security\Http\Event\LogoutEvent',
+                ],
+                'tag'          => 'kernel.event_listener',
+                'arguments'    => [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
@@ -328,20 +244,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     '%mautic.saml_idp_default_role%',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.user.model.role' => [
-                'class' => 'Mautic\UserBundle\Model\RoleModel',
-            ],
-            'mautic.user.model.user' => [
-                'class'     => 'Mautic\UserBundle\Model\UserModel',
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'mautic.user.model.user_token_service',
                 ],
             ],
             'mautic.user.model.user_token_service' => [
@@ -355,10 +259,18 @@ return [
         'repositories' => [
             'mautic.user.repository.user_token' => [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => [\Mautic\UserBundle\Entity\UserToken::class],
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\UserBundle\Entity\UserToken::class,
-                ],
+            ],
+            'mautic.user.repository' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => \Mautic\UserBundle\Entity\User::class,
+                'factory'   => ['@mautic.user.manager', 'getRepository'],
+            ],
+            'mautic.permission.repository' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
+                'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
         ],
         'fixtures' => [
@@ -370,7 +282,7 @@ return [
             'mautic.user.fixture.user' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['security.password_encoder'],
+                'arguments' => ['security.password_hasher'],
             ],
         ],
     ],

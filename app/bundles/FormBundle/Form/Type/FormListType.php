@@ -51,7 +51,7 @@ class FormListType extends AbstractType
                     $choices[$form['name']] = $form['id'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($choices);
 
                 return $choices;
@@ -63,14 +63,6 @@ class FormListType extends AbstractType
         ]);
 
         $resolver->setDefined(['form_type']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'form_list';
     }
 
     /**

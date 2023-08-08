@@ -19,9 +19,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ScheduledExecutioner implements ExecutionerInterface
+class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
     /**
      * @var LeadEventLogRepository
@@ -83,10 +84,7 @@ class ScheduledExecutioner implements ExecutionerInterface
      */
     private $counter;
 
-    /**
-     * @var \DateTime
-     */
-    private $now;
+    protected ?\DateTime $now = null;
 
     /**
      * ScheduledExecutioner constructor.
@@ -184,7 +182,7 @@ class ScheduledExecutioner implements ExecutionerInterface
 
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
-        $now       = new \DateTime();
+        $now       = $this->now ?? new \DateTime();
         foreach ($organized as $organizedLogs) {
             /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();
@@ -217,13 +215,17 @@ class ScheduledExecutioner implements ExecutionerInterface
         return $this->counter;
     }
 
+    public function reset(): void
+    {
+        $this->now = null;
+    }
+
     /**
      * @throws NoEventsFoundException
      */
     private function prepareForExecution()
     {
-        $this->progressBar = null;
-        $this->now         = new \Datetime();
+        $this->now = $this->now ?? new \DateTime();
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
@@ -259,7 +261,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     private function executeOrRescheduleEvent()
     {
         // Use the same timestamp across all contacts processed
-        $now = new \DateTime();
+        $now = $this->now ?? new \DateTime();
 
         foreach ($this->scheduledEvents as $eventId) {
             $this->counter->advanceEventCount();
@@ -270,8 +272,6 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -283,7 +283,7 @@ class ScheduledExecutioner implements ExecutionerInterface
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
             try {
-                $this->scheduledContactFinder->hydrateContacts($logs);
+                $fetchedContacts = $this->scheduledContactFinder->hydrateContacts($logs);
             } catch (NoContactsFoundException $e) {
                 break;
             }
@@ -299,7 +299,7 @@ class ScheduledExecutioner implements ExecutionerInterface
             $this->executioner->executeLogs($event, $logs, $this->counter);
 
             // Get next batch
-            $this->scheduledContactFinder->clear();
+            $this->scheduledContactFinder->clear($fetchedContacts);
             $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         }
     }

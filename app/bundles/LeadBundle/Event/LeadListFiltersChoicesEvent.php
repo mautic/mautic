@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
@@ -110,5 +110,29 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
     public function setChoices(array $choices): void
     {
         $this->choices = $choices;
+    }
+
+    public function isForSegmentation(): bool
+    {
+        $route = (string) $this->getRoute();
+
+        // segment form
+        if ('mautic_segment_action' === $route) {
+            return true;
+        }
+
+        // segment API
+        if (str_starts_with($route, 'mautic_api_lists')) {
+            return true;
+        }
+
+        // ajax request to load the filter's value fields
+        $request = $this->getRequest();
+        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
+            return true;
+        }
+
+        // something else such as dynamic content
+        return false;
     }
 }

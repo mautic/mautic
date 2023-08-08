@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -20,7 +21,7 @@ class Channel extends CommonEntity
     private $channel;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $channelId;
 
@@ -57,7 +58,7 @@ class Channel extends CommonEntity
             ->addId()
             ->addField('channel', 'string')
             ->addNamedField('channelId', 'integer', 'channel_id', true)
-            ->addField('properties', 'json_array')
+            ->addField('properties', Types::JSON)
             ->createField('isEnabled', 'boolean')
                 ->columnName('is_enabled')
                 ->build();
@@ -70,8 +71,6 @@ class Channel extends CommonEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

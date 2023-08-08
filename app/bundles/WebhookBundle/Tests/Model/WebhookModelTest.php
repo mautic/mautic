@@ -2,12 +2,13 @@
 
 namespace Mautic\WebhookBundle\Tests\Model;
 
-use DateTime;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
@@ -17,8 +18,10 @@ use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class WebhookModelTest extends TestCase
 {
@@ -133,7 +136,7 @@ class WebhookModelTest extends TestCase
         $event->setEventType('leads');
         $queueMock->method('getPayload')->willReturn('{"the": "payload"}');
         $queueMock->method('getEvent')->willReturn($event);
-        $queueMock->method('getDateAdded')->willReturn(new DateTime('2018-04-10T15:04:57+00:00'));
+        $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
         $queueMock->method('getId')->willReturn(12);
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
@@ -180,7 +183,7 @@ class WebhookModelTest extends TestCase
         $event->setEventType('leads');
         $queue->setPayload('{"the": "payload"}');
         $queue->setEvent($event);
-        $queue->setDateAdded(new DateTime('2018-04-10T15:04:57+00:00'));
+        $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
         $this->parametersHelperMock->method('get')
             ->willReturnCallback(function ($param) {
@@ -219,7 +222,7 @@ class WebhookModelTest extends TestCase
         };
         $queue->setPayload('{"payload": "some data"}');
         $queue->setEvent($event);
-        $queue->setDateAdded(new DateTime('2021-04-01T16:00:00+00:00'));
+        $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
         $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
 
@@ -255,12 +258,14 @@ class WebhookModelTest extends TestCase
             $this->parametersHelperMock,
             $this->serializerMock,
             $this->httpClientMock,
-            $this->eventDispatcherMock
+            $this->entityManagerMock,
+            $this->createMock(CorePermissions::class),
+            $this->eventDispatcherMock,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->userHelper,
+            $this->createMock(LoggerInterface::class)
         );
-
-        $model->setEntityManager($this->entityManagerMock);
-        $model->setUserHelper($this->userHelper);
-        $model->setDispatcher($this->eventDispatcherMock);
 
         return $model;
     }

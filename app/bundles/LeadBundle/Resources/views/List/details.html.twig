@@ -1,0 +1,216 @@
+{#
+  Variables
+    - usageStats
+    - campaignStats
+    - stats
+    - list
+    - segmentCount
+    - permissions
+    - security
+    - dateRangeForm
+    - events
+    - mauticContent
+    - contentOnly
+    - modalView
+    - template
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}list{% endblock %}
+
+{% block headerTitle %}{{ list.name }}{% endblock %}
+
+{% block actions %}
+  {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'item': list,
+            'customButtons': customButtons|default([]),
+            'templateButtons': {
+                'edit': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:editother'], list.createdBy),
+                'delete': securityHasEntityAccess(permissions['lead:lists:deleteother'], permissions['lead:lists:editother'], list.createdBy),
+                'close': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:viewother'], list.createdBy),
+                'clone': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:viewother'], list.createdBy),
+            },
+            'routeBase': 'segment',
+  }) -}}
+{% endblock %}
+
+{% block publishStatus %}
+  {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
+{% endblock %}
+
+{% block content %}
+{% set hasSegmentMembershipFilter = list.hasFilterTypeOf('leadList') %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- page detail header -->
+            <!-- segment detail collapseable toggler -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-white dark-sm mb-0">{{ list.description|purify }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="collapse" id="segment-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': list}) }}
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.leads'|trans }}</span></td>
+                                <td>{{ segmentCount }}</td>
+                            </tr>
+                            {% if list.lastBuiltTime %}
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.list.last_built_time'|trans }}</span></td>
+                                <td>
+                                    {{ 'mautic.core.date.second'|trans({'%count%': list.lastBuiltTime}) }} ({{ dateToFull(list.lastBuiltDate) }})
+                                </td>
+                            </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/ segment detail collapseable toggler -->
+        <div class="bg-auto bg-dark-xs">
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
+                        <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+            </div>
+            <!-- some stats -->
+
+            <!--/ stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-line-chart"></span>
+                                        {{ 'mautic.segment.stats'|trans }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-9 va-m">
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                                          'dateRangeForm': dateRangeForm,
+                                          'class': 'pull-right',
+                                    }) }}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
+                                      'chartData': stats,
+                                      'chartType': 'line',
+                                      'chartHeight': 300,
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+
+            <!-- tabs controls -->
+            <!-- search bar-->
+            <form method="post" action="{{ path('mautic_segment_contacts', {'objectId': list.id}) }}" class="panel" id="segment-contact-filters">
+                {% if events.types is defined and events.types is iterable %}
+                    <div class="history-search panel-footer text-muted">
+                        <div class="col-sm-5">
+                            <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
+                                {% for typeKey, typeName in events.types %}
+                                    <option value="{{ typeKey|purify }}">{{ typeName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+
+            <!--/ search bar -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#contacts-container" role="tab" data-toggle="tab">{{ 'mautic.lead.leads'|trans }}</a>
+                </li>
+                {% if hasSegmentMembershipFilter %}
+                  <li>
+                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
+                  </li>
+                {% endif %}
+                <li>
+                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">{{ 'mautic.lead.campaign.share'|trans }}</a>
+                </li>
+            </ul>
+            <!--/ tabs controls -->
+        </div>
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane active bdr-w-0 page-list"
+                 id="contacts-container"
+                 data-target-url="{{ path('mautic_segment_contacts', {'objectId': list.id, 'page': app.session.get('mautic.segment.contact.page', 1)}) }}">
+              <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
+            {% if hasSegmentMembershipFilter %}
+              <div class="tab-pane bdr-w-0 page-list" id="segment-dependencies-container"></div>
+            {% endif %}
+
+            <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
+                <div id="campaign-share-container" style="position: relative">
+                    <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
+                        <thead>
+                        <tr>
+                            <th>{{ 'mautic.campaign.campaign'|trans }}</th>
+                            <th>{{ 'mautic.lead.share'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for stat in campaignStats %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': stat.id}) }}" data-toggle="ajax">
+                                        {{- stat.name -}}
+                                    </a>
+                                </td>
+                                <td width="20%">
+                                    <span class="campaign-share-stat" data-value="{{ stat.id }}"
+                                          id="campaign-share-stat-{{ stat.id }}">{{ stat.share }}</span> %
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        {{ include('@MauticCore/Helper/usage.html.twig', {
+            'title': 'mautic.lead.segments.usages'|trans,
+            'stats': usageStats,
+        }) }}
+
+        <!-- activity feed -->
+        {#{ includ('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }#}
+    </div>
+    <!--/ right section -->
+    <input name="entityId" id="entityId" type="hidden" value="{{ list.id|e }}" />
+</div>
+<!--/ end: box layout -->
+{% endblock %}

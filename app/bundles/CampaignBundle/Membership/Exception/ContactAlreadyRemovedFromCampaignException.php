@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\Membership\Exception;
 
-class ContactAlreadyRemovedFromCampaignException extends \Exception
+use Mautic\CoreBundle\Exception\FlattenableException;
+
+class ContactAlreadyRemovedFromCampaignException extends FlattenableException
 {
 }

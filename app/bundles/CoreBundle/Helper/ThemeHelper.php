@@ -5,15 +5,14 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Templating\TemplateReference;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
-class ThemeHelper
+class ThemeHelper implements ThemeHelperInterface
 {
     /**
      * @var PathsHelper
@@ -21,9 +20,9 @@ class ThemeHelper
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var TranslatorInterface
@@ -51,7 +50,7 @@ class ThemeHelper
     private $defaultTheme;
 
     /**
-     * @var TemplatingThemeHelper[]
+     * @var twigThemeHelper[]
      */
     private $themeHelpers = [];
 
@@ -83,7 +82,7 @@ class ThemeHelper
     /**
      * Default themes which cannot be deleted.
      *
-     * @var array
+     * @var string[]
      */
     protected $defaultThemes = [
         'Mauve',
@@ -112,7 +111,7 @@ class ThemeHelper
 
     public function __construct(
         PathsHelper $pathsHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
@@ -120,7 +119,7 @@ class ThemeHelper
         BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
         $this->pathsHelper               = $pathsHelper;
-        $this->templatingHelper          = $templatingHelper;
+        $this->twig                      = $twig;
         $this->translator                = $translator;
         $this->coreParametersHelper      = $coreParametersHelper;
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
@@ -128,39 +127,23 @@ class ThemeHelper
         $this->finder                    = clone $finder;
     }
 
-    /**
-     * Get theme names which are stock Mautic.
-     *
-     * @return array
-     */
     public function getDefaultThemes()
     {
         return $this->defaultThemes;
     }
 
-    /**
-     * @param string $defaultTheme
-     */
     public function setDefaultTheme($defaultTheme)
     {
         $this->defaultTheme = $defaultTheme;
     }
 
-    /**
-     * @param string $themeName
-     *
-     * @return TemplatingThemeHelper
-     *
-     * @throws BadConfigurationException
-     * @throws FileNotFoundException
-     */
     public function createThemeHelper($themeName)
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
         }
 
-        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
+        return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
     /**
@@ -173,11 +156,6 @@ class ThemeHelper
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
 
-    /**
-     * @param string $theme
-     *
-     * @return bool
-     */
     public function exists($theme)
     {
         $root    = $this->pathsHelper->getSystemPath('themes', true).'/';
@@ -186,20 +164,12 @@ class ThemeHelper
         return $this->filesystem->exists($root.$dirName);
     }
 
-    /**
-     * @param string      $theme      original theme dir name
-     * @param string      $newName
-     * @param string|null $newDirName if not set then it will be generated from the $newName param
-     *
-     * @throws FileExistsException
-     * @throws FileNotFoundException
-     */
     public function copy($theme, $newName, $newDirName = null)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -215,19 +185,12 @@ class ThemeHelper
         $this->updateConfig($root.$dirName, $newName);
     }
 
-    /**
-     * @param string $theme
-     * @param string $newName
-     *
-     * @throws FileNotFoundException
-     * @throws FileExistsException
-     */
     public function rename($theme, $newName)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -243,17 +206,12 @@ class ThemeHelper
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    /**
-     * @param string $theme
-     *
-     * @throws FileNotFoundException
-     */
     public function delete($theme)
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -280,11 +238,6 @@ class ThemeHelper
         $this->filesystem->dumpFile($configJsonPath, json_encode($config));
     }
 
-    /**
-     * Fetches the optional settings from the defined steps.
-     *
-     * @return array
-     */
     public function getOptionalSettings()
     {
         $minors = [];
@@ -298,45 +251,16 @@ class ThemeHelper
         return $minors;
     }
 
-    /**
-     * @param string $template
-     *
-     * @return string The logical name for the template
-     */
-    public function checkForTwigTemplate($template)
+    public function checkForTwigTemplate($template): string
     {
-        $parser     = $this->templatingHelper->getTemplateNameParser();
-        $templating = $this->templatingHelper->getTemplating();
-
-        $template = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        // Does a twig version exist?
-        if ($templating->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
-        }
-
-        // Does a PHP version exist?
-        if ($templating->exists($template)) {
-            return $template->getLogicalName();
+        if ($this->twig->getLoader()->exists($template)) {
+            return $template;
         }
 
         // Try any theme as a fall back starting with default
-        $this->findThemeWithTemplate($templating, $twigTemplate);
-
-        return $twigTemplate->getLogicalName();
+        return $this->findThemeWithTemplate($template);
     }
 
-    /**
-     * @param string $specificFeature
-     * @param bool   $extended        returns extended information about the themes
-     * @param bool   $ignoreCache     true to get the fresh info
-     * @param bool   $includeDirs     true to get the theme dir details
-     *
-     * @return mixed
-     */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
@@ -352,15 +276,6 @@ class ThemeHelper
         return $this->themes[$key];
     }
 
-    /**
-     * @param string $theme
-     * @param bool   $throwException
-     *
-     * @return TemplatingThemeHelper
-     *
-     * @throws FileNotFoundException
-     * @throws BadConfigurationException
-     */
     public function getTheme($theme = 'current', $throwException = false)
     {
         if (empty($this->themeHelpers[$theme])) {
@@ -399,16 +314,6 @@ class ThemeHelper
         return $this->themeHelpers[$theme];
     }
 
-    /**
-     * Install a theme from a zip package.
-     *
-     * @param string $zipFile path
-     *
-     * @return bool
-     *
-     * @throws FileNotFoundException
-     * @throws \Exception
-     */
     public function install($zipFile)
     {
         if (false === $this->filesystem->exists($zipFile)) {
@@ -488,13 +393,6 @@ class ThemeHelper
         }
     }
 
-    /**
-     * Get the error message from the zip archive.
-     *
-     * @param \ZipArchive $archive
-     *
-     * @return string
-     */
     public function getExtractError($archive)
     {
         switch ($archive) {
@@ -523,15 +421,6 @@ class ThemeHelper
         return $error;
     }
 
-    /**
-     * Creates a zip file from a theme and returns the path where it's stored.
-     *
-     * @param string $themeName
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
     public function zip($themeName)
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
@@ -558,43 +447,45 @@ class ThemeHelper
 
             return $tmpPath;
         }
-
-        return false;
     }
 
     /**
      * @throws BadConfigurationException
-     * @throws FileNotFoundException
      */
-    private function findThemeWithTemplate(EngineInterface $templating, TemplateReference $template)
+    private function findThemeWithTemplate(string $template): string
     {
-        preg_match('/^:(.*?):(.*?)$/', $template->getLogicalName(), $match);
+        preg_match('/^@themes\/(.*?)\/(.*?)$/', $template, $match);
+
         $requestedThemeName = $match[1];
+        $templatePath       = $match[2];
 
         // Try the default theme first
         $defaultTheme = $this->getTheme();
+
         if ($requestedThemeName !== $defaultTheme->getTheme()) {
-            $template->set('controller', $defaultTheme->getTheme());
-            if ($templating->exists($template)) {
-                return;
+            $defaultTemplate = '@themes/'.$defaultTheme->getTheme().'/'.$templatePath;
+            if ($this->twig->getLoader()->exists($defaultTemplate)) {
+                return $defaultTemplate;
             }
         }
 
         // Find any theme as a fallback
         $themes = $this->getInstalledThemes('all', true);
+
         foreach ($themes as $theme) {
             // Already handled the default
             if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
 
-            // Theme name is stored in the controller parameter
-            $template->set('controller', $theme['key']);
+            $fallbackTemplate = '@themes/'.$theme['key'].'/'.$templatePath;
 
-            if ($templating->exists($template)) {
-                return;
+            if ($this->twig->getLoader()->exists($template)) {
+                return $fallbackTemplate;
             }
         }
+
+        throw new BadConfigurationException(sprintf('Could not find theme %s nor a fall back theme to replace it', $requestedThemeName));
     }
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
@@ -672,5 +563,14 @@ class ThemeHelper
         }
 
         return in_array($builderName, $builderRequested);
+    }
+
+    public function getCurrentTheme(string $template, string $specificFeature): string
+    {
+        if ('mautic_code_mode' !== $template && !in_array($template, array_keys($this->getInstalledThemes($specificFeature)))) {
+            return $this->coreParametersHelper->get('theme_email_default');
+        }
+
+        return $template;
     }
 }

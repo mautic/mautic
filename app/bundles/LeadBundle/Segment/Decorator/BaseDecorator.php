@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
 /**

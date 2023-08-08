@@ -1,0 +1,24 @@
+{#
+  Variables
+    - campaignSources
+    - campaignId
+#}
+<div id="SourceGroupList" class="hide">
+    <h4 class="mb-xs">
+        <span>{{ 'mautic.campaign.leadsource.header'|trans }}</span>
+    </h4>
+    <select id="SourceList" class="campaign-event-selector">
+        <option value=""></option>
+        {% for option in ['lists', 'forms'] %}
+            <option id="campaignLeadSource_{{ option }}"
+                    class="option_campaignLeadSource_{{ option }}"
+                    data-href="{{ path('mautic_campaignsource_action', {'objectAction': 'new', 'objectId': campaignId, 'sourceType': option}) }}"
+                    data-target="#CampaignEventModal"
+                    title="{{ ('mautic.campaign.leadsource.'~option~'.tooltip')|trans|e }}"
+                    value="{{ option|e }}"
+                    {% if campaignSources[option] is defined %}disabled{% endif %}>
+                <span>{{ ('mautic.campaign.leadsource.'~option)|trans }}</span>
+            </option>
+        {% endfor %}
+    </select>
+</div>

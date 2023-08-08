@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\NoUserException;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
@@ -38,7 +38,7 @@ class CustomFieldNotification
         $this->translator        = $translator;
     }
 
-    public function customFieldWasCreated(LeadField $leadField, int $userId): void
+    public function customFieldWasCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -55,7 +55,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    public function customFieldLimitWasHit(LeadField $leadField, int $userId): void
+    public function customFieldLimitWasHit(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -72,7 +72,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    public function customFieldCannotBeCreated(LeadField $leadField, int $userId): void
+    public function customFieldCannotBeCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -105,7 +105,7 @@ class CustomFieldNotification
     /**
      * @throws NoUserException
      */
-    private function getUser(int $userId): User
+    private function getUser(?int $userId): User
     {
         if (!$userId || !$user = $this->userModel->getEntity($userId)) {
             throw new NoUserException();

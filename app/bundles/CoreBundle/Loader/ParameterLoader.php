@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Loader;
 
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -23,12 +24,12 @@ class ParameterLoader
     private $localParameterBag;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $localParameters = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private static $defaultParameters = [];
 
@@ -41,6 +42,14 @@ class ParameterLoader
         $this->createParameterBags();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultParameters(): array
+    {
+        return self::$defaultParameters;
+    }
+
     public function getParameterBag(): ParameterBag
     {
         return $this->parameterBag;
@@ -51,7 +60,7 @@ class ParameterLoader
         return $this->localParameterBag;
     }
 
-    public function loadIntoEnvironment()
+    public function loadIntoEnvironment(): void
     {
         $envVariables      = new ParameterBag();
         $defaultParameters = new ParameterBag(self::$defaultParameters);
@@ -69,15 +78,21 @@ class ParameterLoader
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
-        $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+        $dotenv = new Dotenv(MAUTIC_ENV);
+        foreach ($envVariables->all() as $key => $value) {
+            if (null === $value) {
+                $envVariables->set($key, '');
+            }
+        }
         $dotenv->populate($envVariables->all());
     }
 
-    public static function getLocalConfigFile(string $root, $updateDefaultParameters = true): string
+    public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
     {
         $root = realpath($root);
 
-        /** @var array $paths */
+        /** @var array<string> $paths */
+        $paths = [];
         include $root.'/config/paths.php';
 
         if (!isset($paths['local_config'])) {
@@ -88,7 +103,7 @@ class ParameterLoader
             return $root.'/config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+        $paths['local_config'] = str_replace('%kernel.project_dir%', $root.'/..', $paths['local_config']);
 
         if ($updateDefaultParameters) {
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
@@ -122,7 +137,7 @@ class ParameterLoader
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
-            /** @var array $config */
+            /** @var array<string, mixed> $config */
             $config = include $file->getPathname();
 
             $parameters              = $config['parameters'] ?? [];
@@ -137,7 +152,8 @@ class ParameterLoader
 
         // Load parameters array from local configuration
         if (file_exists($localConfigFile)) {
-            /** @var array $parameters */
+            /** @var array<string, mixed> $parameters */
+            $parameters = [];
             include $localConfigFile;
 
             // Override default with local
@@ -147,10 +163,10 @@ class ParameterLoader
         // Force local specific params
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
-            /** @var array $parameters */
+            /** @var array<string, mixed> $parameters */
             include $localParametersFile;
 
-            //override default with forced
+            // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 

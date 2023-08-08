@@ -99,12 +99,4 @@ class MessageSendType extends AbstractType
     {
         $resolver->setDefined(['update_select']);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'message_send';
-    }
 }

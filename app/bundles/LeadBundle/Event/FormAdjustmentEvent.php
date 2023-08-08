@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class FormAdjustmentEvent extends Event
 {
@@ -62,17 +62,11 @@ final class FormAdjustmentEvent extends Event
         return $this->operator;
     }
 
-    /**
-     * @param string ...$operators
-     */
     public function operatorIsOneOf(string ...$operators): bool
     {
         return in_array($this->getOperator(), $operators);
     }
 
-    /**
-     * @param string ...$fieldTypes
-     */
     public function fieldTypeIsOneOf(string ...$fieldTypes): bool
     {
         return in_array($this->getFieldType(), $fieldTypes);

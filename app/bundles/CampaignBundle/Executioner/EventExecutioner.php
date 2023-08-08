@@ -70,7 +70,7 @@ class EventExecutioner
     private $removedContactTracker;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $executionDate;
 
@@ -277,7 +277,6 @@ class EventExecutioner
     }
 
     /**
-     * @param      $reason
      * @param bool $isInactiveEvent
      */
     public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false)
@@ -319,7 +318,7 @@ class EventExecutioner
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {
@@ -511,7 +510,7 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function persistSummaries(): void

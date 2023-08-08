@@ -16,8 +16,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 class MembershipManager
 {
-    const ACTION_ADDED   = 'added';
-    const ACTION_REMOVED = 'removed';
+    public const ACTION_ADDED   = 'added';
+    public const ACTION_REMOVED = 'removed';
 
     /**
      * @var Adder
@@ -92,7 +92,8 @@ class MembershipManager
             } catch (ContactCannotBeAddedToCampaignException $exception) {
                 // Do nothing
                 $this->logger->debug(
-                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                    "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                    $exception->toArray()
                 );
             }
 
@@ -105,7 +106,8 @@ class MembershipManager
         } catch (ContactCannotBeAddedToCampaignException $exception) {
             // Do nothing
             $this->logger->debug(
-                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                $exception->toArray()
             );
 
             return;
@@ -118,17 +120,23 @@ class MembershipManager
     }
 
     /**
-     * @param bool $isManualAction
+     * @param ArrayCollection<int, Lead> $contacts
+     * @param bool                       $isManualAction
      */
     public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true)
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
-        /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $this->advanceProgressBar();
 
+            $this->logger->debug(
+                'CAMPAIGN: Contacts: '.count($contacts),
+                array_map(fn ($item) => $item->getId(), $contacts->toArray())
+            );
+
+            // is the contact an existing campaign member? update and continue
             if (isset($campaignMembers[$contact->getId()])) {
                 try {
                     $this->adder->updateExistingMembership($campaignMembers[$contact->getId()], $isManualAction);
@@ -139,7 +147,8 @@ class MembershipManager
                     $contacts->remove($contact->getId());
 
                     $this->logger->debug(
-                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}."
+                        "CAMPAIGN: Contact ID {$contact->getId()} could not be added to campaign ID {$campaign->getId()}.",
+                        $exception->toArray()
                     );
                 }
 
@@ -158,7 +167,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($contacts->toArray());
     }
 
     /**
@@ -191,20 +200,23 @@ class MembershipManager
         } catch (ContactAlreadyRemovedFromCampaignException $exception) {
             // Do nothing
 
-            $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.");
+            $this->logger->debug(
+                "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
+                $exception->toArray()
+            );
         }
     }
 
     /**
-     * @param bool $isExit If true, the contact can be added by a segment/source. If false, the contact can only be added back
-     *                     by a manual process.
+     * @param ArrayCollection<int, Lead> $contacts
+     * @param bool                       $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
+     *                                             by a manual process.
      */
     public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
-        /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $this->advanceProgressBar();
 
@@ -225,7 +237,10 @@ class MembershipManager
                 // Contact was already removed from this campaign
                 $contacts->remove($contact->getId());
 
-                $this->logger->debug("CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.");
+                $this->logger->debug(
+                    "CAMPAIGN: Contact ID {$contact->getId()} was already removed from campaign ID {$campaign->getId()}.",
+                    $exception->toArray()
+                );
             }
         }
 
@@ -235,7 +250,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($campaignMembers);
     }
 
     public function setProgressBar(ProgressBar $progressBar = null)

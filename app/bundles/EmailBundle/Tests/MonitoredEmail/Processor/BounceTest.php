@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 class BounceTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +24,6 @@ class BounceTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::process()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::updateStat()
-     * @covers  \Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface::processBounce()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
@@ -31,7 +31,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessorInterfaceProcessesMessage()
     {
-        $transport     = new TestTransport(new \Swift_Events_SimpleEventDispatcher());
+        $transport     = new TestTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -97,7 +97,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
      */
     public function testContactIsFoundFromMessageAndDncRecordAdded()
     {
-        $transport     = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher());
+        $transport     = new NullTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();

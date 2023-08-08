@@ -150,7 +150,7 @@ class ImportTest extends StandardImportTestHelper
 
         $import->end(false);
 
-        $this->fakeImportStartDate($import, (10 * 60));
+        $this->fakeImportStartDate($import, 10 * 60);
 
         $this->assertTrue($import->getRunTime() instanceof \DateInterval);
         $this->assertSame(10, $import->getRunTime()->i);

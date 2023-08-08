@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\DTO;
 
+use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
+
 final class Allowlist
 {
     /**
@@ -27,5 +29,16 @@ final class Allowlist
         return new self(
             array_map(fn (array $item) => AllowlistEntry::fromArray($item), $array['allowlist'] ?? []),
         );
+    }
+
+    public function findPackageByName(string $packageName): AllowlistEntry
+    {
+        foreach ($this->entries as $entry) {
+            if ($entry->package === $packageName) {
+                return $entry;
+            }
+        }
+
+        throw new RecordNotFoundException("Package '$packageName' not found in allowlist.");
     }
 }

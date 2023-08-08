@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/#{theme}/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/css/elfinder.min.css") }}" rel="stylesheet" type="text/css">
-    <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/css/theme.css") }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/smoothness/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset("#{prefix}/../../media/bundles/fmelfinder/css/elfinder.min.css") }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset("#{prefix}/../../media/bundles/fmelfinder/css/theme.css") }}" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js") }}"></script>
-    <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/jquery-ui.min.js") }}"></script>
-    <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/elfinder.min.js") }}"></script>
+    <script src="{{ asset("#{prefix}/../../media/js/libraries.js") }}"></script>
+    <script src="{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/elfinder.min.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
     var editorType = '';
     var editor = null;
@@ -21,7 +20,7 @@
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
-            i18nBaseUrl : '{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/i18n/") }}',
+            i18nBaseUrl : '{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/i18n/") }}',
             onlyMimes: {{ onlyMimes|raw }},
             getFileCallback : function(file, fm) {
                 let fileUrl = file.url;

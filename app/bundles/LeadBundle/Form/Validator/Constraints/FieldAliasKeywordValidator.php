@@ -7,9 +7,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FieldAliasKeywordValidator extends ConstraintValidator
 {
-    const RESTRICTED_ALIASES = [
+    public const RESTRICTED_ALIASES = [
         'contact_id',
         'company_id',
     ];
@@ -61,7 +61,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         $oldValue = $this->em->getUnitOfWork()->getOriginalEntityData($field);
         $this->aliasHelper->makeAliasUnique($field);
 
-        //If empty it's a new object else it's an edit
+        // If empty it's a new object else it's an edit
         if (empty($oldValue) || (!empty($oldValue) && is_array($oldValue) && $oldValue['alias'] != $field->getAlias())) {
             if (in_array($field->getAlias(), self::RESTRICTED_ALIASES)) {
                 $this->context->addViolation(

@@ -72,7 +72,7 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
         if (empty($this->cachedTypeChoices)) {
             $event = new ListFieldChoicesEvent();
             $event->setSearchTerm($search);
-            $this->dispatcher->dispatch(LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE);
 
             $this->cachedTypeChoices  = $event->getChoicesForAllListFieldTypes();
             $this->cachedAliasChoices = $event->getChoicesForAllListFieldAliases();

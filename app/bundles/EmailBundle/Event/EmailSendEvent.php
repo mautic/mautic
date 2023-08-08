@@ -56,7 +56,7 @@ class EmailSendEvent extends CommonEvent
     private $tokens = [];
 
     /**
-     * @var internalSend
+     * @var bool
      */
     private $internalSend = false;
 
@@ -103,7 +103,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking.
      *
-     * @return internalSend
+     * @return bool
      */
     public function isInternalSend()
     {
@@ -123,7 +123,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Returns the Email entity.
      *
-     * @return Email
+     * @return Email|null
      */
     public function getEmail()
     {
@@ -132,8 +132,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get email content.
-     *
-     * @param $replaceTokens
      *
      * @return string
      */
@@ -150,8 +148,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Set email content.
-     *
-     * @param $content
      */
     public function setContent($content)
     {
@@ -166,7 +162,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get email content.
      *
-     * @return array
+     * @return string
      */
     public function getPlainText()
     {
@@ -177,9 +173,6 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    /**
-     * @param $content
-     */
     public function setPlainText($content)
     {
         if (null !== $this->helper) {
@@ -242,7 +235,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return array|object|null
      */
     public function getLead()
     {
@@ -270,10 +263,6 @@ class EmailSendEvent extends CommonEvent
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
@@ -295,10 +284,6 @@ class EmailSendEvent extends CommonEvent
         return $tokens;
     }
 
-    /**
-     * @param $name
-     * @param $value
-     */
     public function addTextHeader($name, $value)
     {
         if (null !== $this->helper) {
@@ -336,9 +321,9 @@ class EmailSendEvent extends CommonEvent
         $source       = $this->getSource();
         $email        = $this->getEmail();
         $clickthrough = [
-            //what entity is sending the email?
+            // what entity is sending the email?
             'source' => $source,
-            //the email being sent to be logged in page hit if applicable
+            // the email being sent to be logged in page hit if applicable
             'email' => (null != $email) ? $email->getId() : null,
             'stat'  => $this->getIdHash(),
         ];
@@ -370,5 +355,16 @@ class EmailSendEvent extends CommonEvent
     public function isDynamicContentParsing()
     {
         return $this->isDynamicContentParsing;
+    }
+
+    public function getCombinedContent(): string
+    {
+        $content = $this->getSubject();
+        $content .= $this->getContent();
+        $content .= $this->getPlainText();
+        $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
+        $content .= implode(' ', $this->getTextHeaders());
+
+        return $content;
     }
 }
