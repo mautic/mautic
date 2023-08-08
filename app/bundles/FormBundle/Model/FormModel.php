@@ -882,7 +882,10 @@ class FormModel extends CommonFormModel
         }
 
         // get the contact (lead) and primary company field values
-        $leadArray            = ($lead) ? $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+        $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+        if (count($leadArray) <= 0) {
+            return;
+        }
 
         foreach ($autoFillFields as $field) {
             $value = isset($leadArray[$field->getMappedField()]) ? $leadArray[$field->getMappedField()] : '';
