@@ -16,6 +16,8 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
 
     /**
      * Define the widget(s).
+     *
+     * @var array<string,array<string, string>>
      */
     protected $types = [
         'best.tracking.pages' => [
@@ -23,7 +25,7 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
         ],
     ];
 
-    protected $pageModel;
+    protected PageModel $pageModel;
 
     /**
      * DashboardSubscriber constructor.
@@ -36,7 +38,7 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         if ('best.tracking.pages' == $event->getType()) {
             $widget = $event->getWidget();
