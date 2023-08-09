@@ -69,8 +69,8 @@
     "vimeo-froogaloop2": "^0.1.1"
   },
   "scripts": {
-    "build": "webpack --mode production  --config media/js/ckeditor/webpack.config.js",
-    "postbuild": "tsc -p media/js/ckeditor/tsconfig.types.json",
+    "build": "webpack --mode production  --config ../../../media/js/ckeditor/webpack.config.js",
+    "postbuild": "tsc -p ../../../media/js/ckeditor/tsconfig.types.json",
     "postinstall": "node_modules/modernizr/bin/modernizr -c modernizr-config.json -d node_modules/modernizr/modernizr-mautic-dist.js & npm run build"
   }
 }
