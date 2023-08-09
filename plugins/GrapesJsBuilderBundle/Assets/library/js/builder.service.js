@@ -7,7 +7,7 @@ import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
-import 'grapesjs-plugin-ckeditor';
+import 'grapesjs-plugin-ckeditor5';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -132,16 +132,43 @@ export default class BuilderService {
     return {
       options: {
         language: 'en',
-        toolbar: [
-          { name: 'links', items: ['Link', 'Unlink'] },
-          { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
-          { name: 'colors', items: ['TextColor', 'BGColor'] },
-          { name: 'document', items: ['Source'] },
-          { name: 'insert', items: ['SpecialChar','Token'] },
-        ],
-        extraPlugins: ['sharedspace', 'colorbutton', 'mautictoken'],
-      },
+        toolbar: {
+          items: [
+            'link',
+            'fontColor',
+            'fontSize',
+            'fontFamily',
+            'fontBackgroundColor',
+            'alignment',
+            'bold',
+            'italic',
+            'underline',
+            'strikethrough',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'outdent',
+            'indent',
+            '|',
+            'blockQuote',
+            'insertTable',
+            '|',
+            'undo',
+            'redo'
+          ]
+        },
+
+        table: {
+          contentToolbar: [
+            'tableColumn',
+            'tableRow',
+            'mergeTableCells',
+            'tableCellProperties',
+            'tableProperties'
+          ]
+        },
+        licenseKey: ''
+      }
     };
   }
 
@@ -163,13 +190,13 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
       },
     });
 
@@ -195,11 +222,11 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
       },
     });
 
@@ -231,11 +258,11 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
       },
     });
 
