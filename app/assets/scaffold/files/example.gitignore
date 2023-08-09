@@ -92,7 +92,7 @@
 /media/js/mautic-form.js
 /media/js/froogaloop.min.js
 /media/js/jquery.min.js
-/media/js/ckeditor4/*
+/media/js/ckeditor/build/*
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
