@@ -43,7 +43,6 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         // Check that the directory node_modules exists.
         $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
@@ -52,8 +51,8 @@ EOT
             return Command::FAILURE;
         }
 
-        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
-        $ckeditorFile = $mediaDir.'/'.'js/ckeditor/build/ckeditor.js';
+        $mediaDir     = $this->pathsHelper->getSystemPath('media', true);
+        $ckeditorFile = $mediaDir.'/js/ckeditor/build/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
 
