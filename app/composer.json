@@ -152,6 +152,7 @@
         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
+        "[web-root]/media/js/ckeditor": "assets/scaffold/files/ckeditor",
         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
         "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
       }
