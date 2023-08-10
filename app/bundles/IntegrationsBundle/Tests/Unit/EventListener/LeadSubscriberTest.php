@@ -484,12 +484,17 @@ class LeadSubscriberTest extends TestCase
             ->method('deleteEntities');
     }
 
+    /**
+     * @param mixed[] $fieldChanges
+     */
     private function createLeadMock(array $fieldChanges, int $objectId): Lead
     {
         return new class($fieldChanges, $objectId) extends Lead {
-            private $fieldChanges;
-            private $objectId;
+            /** @var mixed[] */
+            private array $fieldChanges;
+            private int $objectId;
 
+            /** @param mixed[] $fieldChanges */
             public function __construct(array $fieldChanges, int $objectId)
             {
                 parent::__construct();
@@ -514,12 +519,19 @@ class LeadSubscriberTest extends TestCase
         };
     }
 
+    /**
+     * @param mixed[] $fieldChanges
+     */
     private function createCompanyMock(array $fieldChanges, int $objectId): Company
     {
         return new class($fieldChanges, $objectId) extends Company {
-            private $fieldChanges;
-            private $objectId;
+            /** @var mixed[] */
+            private array $fieldChanges;
+            private int $objectId;
 
+            /**
+             * @param mixed[] $fieldChanges
+             */
             public function __construct(array $fieldChanges, int $objectId)
             {
                 $this->fieldChanges = $fieldChanges;
