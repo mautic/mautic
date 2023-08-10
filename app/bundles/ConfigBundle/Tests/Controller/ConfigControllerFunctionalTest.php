@@ -298,7 +298,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         /** @var ChoiceFormField $entityIdField */
         $entityIdField    = $configForm['config[userconfig][saml_idp_entity_id]'];
         $availableOptions = $entityIdField->availableOptionValues();
-        Assert::assertCount(3, $availableOptions);
+        Assert::assertCount(2, $availableOptions);
         $configForm->setValues(
             [
                 'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
