@@ -7,17 +7,14 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectFindByIdEvent extends Event
+final class InternalObjectFindByIdEvent extends Event
 {
-    private ObjectInterface $object;
-
     private ?int $id = null;
 
     private ?object $entity = null;
 
-    public function __construct(ObjectInterface $object)
+    public function __construct(private ObjectInterface $object)
     {
-        $this->object = $object;
     }
 
     public function getObject(): ObjectInterface

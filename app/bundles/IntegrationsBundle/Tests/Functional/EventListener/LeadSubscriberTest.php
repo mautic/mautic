@@ -12,27 +12,22 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Assert;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class LeadSubscriberTest extends MauticMysqlTestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepository;
+    private FieldChangeRepository $fieldChangeRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->dispatcher            = self::$container->get('event_dispatcher');
+        $this->dispatcher            = static::getContainer()->get('event_dispatcher');
         $this->fieldChangeRepository = $this->em->getRepository(FieldChange::class);
 
-        self::$container->set(
+        static::getContainer()->set(
             'mautic.integrations.helper.sync_integrations',
             new class() extends SyncIntegrationsHelper {
                 public function __construct()
@@ -67,7 +62,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $contactProxy->setPoints(100);
         $event = new LeadEvent($contactProxy, true);
 
-        $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
 
         $fieldChanges = $this->fieldChangeRepository->findChangesForObject('unicorn', Lead::class, $contactReal->getId());
         Assert::assertCount(2, $fieldChanges, print_r($fieldChanges, true));

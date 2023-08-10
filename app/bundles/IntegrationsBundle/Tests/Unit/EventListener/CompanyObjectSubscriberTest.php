@@ -24,20 +24,11 @@ use Symfony\Component\Routing\Router;
 
 class CompanyObjectSubscriberTest extends TestCase
 {
-    /**
-     * @var CompanyObjectHelper|MockObject
-     */
-    private $companyObjectHelper;
+    private CompanyObjectHelper|MockObject $companyObjectHelper;
 
-    /**
-     * @var Router|MockObject
-     */
-    private $router;
+    private Router|MockObject $router;
 
-    /**
-     * @var CompanyObjectSubscriber
-     */
-    private $subscriber;
+    private CompanyObjectSubscriber $subscriber;
 
     public function setUp(): void
     {
