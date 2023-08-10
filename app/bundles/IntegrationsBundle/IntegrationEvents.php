@@ -176,4 +176,24 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD = 'mautic.integration.INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD';
+
+    /**
+     * This event is dispatched when a batch of objects have synced from an integration to Mautic after the sync engine has processed everything
+     * so that listeners can then act on mappings stored in the sync_object_mapping table.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC = 'mautic.integration.INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC';
+
+    /**
+     * This event is dispatched when a batch of objects have synced from Mautic to the integration after the sync engine has processed everything
+     * so that listeners can then act on mappings stored in the sync_object_mapping table.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION = 'mautic.integration.INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION';
 }

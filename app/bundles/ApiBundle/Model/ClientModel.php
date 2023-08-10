@@ -1,64 +1,65 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Client>
+ */
 class ClientModel extends FormModel
 {
     /**
      * @var string
      */
-    const API_MODE_OAUTH2 = 'oauth2';
+    public const API_MODE_OAUTH2 = 'oauth2';
 
-    /**
-     * @var string
-     */
-    private $apiMode = 'oauth2';
+    private ?string $apiMode = null;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
-    public function __construct(RequestStack $requestStack)
+    private const DEFAULT_API_MODE = 'oauth2';
+
+    public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
 
-        if ($request) {
-            $this->apiMode = $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
-        }
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @param $apiMode
-     */
+    private function getApiMode(): string
+    {
+        if (null !== $this->apiMode) {
+            return $this->apiMode;
+        }
+
+        if (null !== $request = $this->requestStack->getCurrentRequest()) {
+            return $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', self::DEFAULT_API_MODE));
+        }
+
+        return self::DEFAULT_API_MODE;
+    }
+
     public function setApiMode($apiMode)
     {
         $this->apiMode = $apiMode;
-    }
-
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
     }
 
     /**
@@ -82,7 +83,7 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -99,7 +100,7 @@ class ClientModel extends FormModel
     public function getEntity($id = null): ?Client
     {
         if (null === $id) {
-            return 'oauth2' == $this->apiMode ? new Client() : null;
+            return 'oauth2' === $this->getApiMode() ? new Client() : null;
         }
 
         return parent::getEntity($id);
@@ -132,7 +133,7 @@ class ClientModel extends FormModel
                 $event = new ClientEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -149,8 +150,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * @param $entity
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess($entity)
@@ -159,8 +158,8 @@ class ClientModel extends FormModel
             throw new MethodNotAllowedHttpException(['Client']);
         }
 
-        //remove the user from the client
-        if ('oauth2' == $this->apiMode) {
+        // remove the user from the client
+        if ('oauth2' === $this->getApiMode()) {
             $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
         } else {

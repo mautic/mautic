@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Deduplicate;
 
@@ -15,31 +8,15 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class ContactDeduper
 {
     use DeduperTrait;
 
-    /**
-     * @var ContactMerger
-     */
-    private $contactMerger;
+    private ContactMerger $contactMerger;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private LeadRepository $leadRepository;
 
-    /**
-     * @var bool
-     */
-    private $mergeNewerIntoOlder = false;
-
-    /**
-     * DedupModel constructor.
-     */
     public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
     {
         $this->fieldModel     = $fieldModel;
@@ -48,63 +25,92 @@ class ContactDeduper
     }
 
     /**
-     * @param bool $mergeNewerIntoOlder
-     *
-     * @return int
+     * @return array<string,string>
      */
-    public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
+    public function getUniqueFields(string $object): array
     {
-        $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
-        $lastContactId             = 0;
-        $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
-        $progress                  = null;
+        return $this->fieldModel->getUniqueIdentifierFields(['object' => $object]);
+    }
 
-        if ($output) {
-            $progress = new ProgressBar($output, $totalContacts);
+    /**
+     * @param string[] $uniqueFieldAliases
+     */
+    public function countDuplicatedContacts(array $uniqueFieldAliases): int
+    {
+        return $this->leadRepository->getContactCountWithDuplicateValues($uniqueFieldAliases);
+    }
+
+    /**
+     * @param string[] $uniqueFieldAliases
+     *
+     * @return string[]
+     */
+    public function getDuplicateContactIds(array $uniqueFieldAliases): array
+    {
+        return $this->leadRepository->getDuplicatedContactIds($uniqueFieldAliases);
+    }
+
+    /**
+     * @param string[]|int[] $contactIds
+     *
+     * @return Lead[]
+     */
+    public function getContactsByIds(array $contactIds): array
+    {
+        return $this->leadRepository->getEntities(['ids' => $contactIds, 'ignore_paginator' => false]);
+    }
+
+    /**
+     * @param Lead[] $contacts
+     */
+    public function deduplicateContactBatch(array $contacts, bool $newerIntoOlder, callable $onContactProcessed = null): void
+    {
+        foreach ($contacts as $contact) {
+            $duplicates = $this->checkForDuplicateContacts($contact->getProfileFields(), $newerIntoOlder);
+
+            $this->mergeContacts($duplicates);
+            $this->detachContacts($duplicates);
+
+            if ($onContactProcessed) {
+                $onContactProcessed($contact);
+            }
+        }
+    }
+
+    /**
+     * To save RAM.
+     *
+     * @param Lead[] $contacts
+     */
+    public function detachContacts(array $contacts): void
+    {
+        $this->leadRepository->detachEntities($contacts);
+    }
+
+    /**
+     * @param Lead[] $duplicates
+     */
+    public function mergeContacts(array $duplicates): void
+    {
+        if (empty($duplicates)) {
+            return;
         }
 
-        $dupCount = 0;
-        while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
-            $lastContactId = $contact->getId();
-            $fields        = $contact->getProfileFields();
-            $duplicates    = $this->checkForDuplicateContacts($fields);
-
-            if ($progress) {
-                $progress->advance();
+        $loser = reset($duplicates);
+        while ($winner = next($duplicates)) {
+            try {
+                $this->contactMerger->merge($winner, $loser);
+            } catch (SameContactException $exception) {
             }
 
-            // Were duplicates found?
-            if (count($duplicates) > 1) {
-                $loser = reset($duplicates);
-                while ($winner = next($duplicates)) {
-                    try {
-                        $this->contactMerger->merge($winner, $loser);
-
-                        ++$dupCount;
-
-                        if ($progress) {
-                            // Advance the progress bar for the deleted contacts that are no longer in the total count
-                            $progress->advance();
-                        }
-                    } catch (SameContactException $exception) {
-                    }
-
-                    $loser = $winner;
-                }
-            }
-
-            // Clear all entities in memory for RAM control
-            $this->leadRepository->clear();
-            gc_collect_cycles();
+            $loser = $winner;
         }
-
-        return $dupCount;
     }
 
     /**
      * @return Lead[]
      */
-    public function checkForDuplicateContacts(array $queryFields)
+    public function checkForDuplicateContacts(array $queryFields, bool $mergeNewerIntoOlder = false)
     {
         $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);
@@ -112,7 +118,7 @@ class ContactDeduper
             $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
 
             // By default, duplicates are ordered by newest first
-            if (!$this->mergeNewerIntoOlder) {
+            if (!$mergeNewerIntoOlder) {
                 // Reverse the array so that oldest are on "top" in order to merge oldest into the next until they all have been merged into the
                 // the newest record
                 $duplicates = array_reverse($duplicates);

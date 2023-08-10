@@ -2,36 +2,30 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Model\PointGroupModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var DoNotContact|(DoNotContact&MockObject)|MockObject
      */
-    private $emailModel;
+    private DoNotContact|MockObject $doNotContact;
 
     /**
      * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
@@ -39,52 +33,66 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
     private $leadModel;
 
     /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
+     * @var PointGroupModel|(PointGroupModel&object&MockObject)|(PointGroupModel&MockObject)|(object&MockObject)|MockObject
+     */
+    private MockObject|PointGroupModel $pointGroupModel;
+
+    /**
+     * @var FormSubscriber
+     */
+    private $subscriber;
+
+    /**
+     * @var MockObject|ContactTracker
      */
     private $contactTracker;
 
     /**
-     * @var IpLookupHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|LeadFieldRepository
+     */
+    private $leadFieldRepostory;
+
+    /**
+     * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
 
     protected function setUp(): void
     {
-        $this->emailModel     = $this->createMock(EmailModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->contactTracker = $this->createMock(ContactTracker::class);
-        $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->leadModel          = $this->createMock(LeadModel::class);
+        $this->contactTracker     = $this->createMock(ContactTracker::class);
+        $this->ipLookupHelper     = $this->createMock(IpLookupHelper::class);
+        $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
+        $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
+        $this->doNotContact       = $this->createMock(DoNotContact::class);
+        $this->subscriber         = new FormSubscriber(
+            $this->leadModel,
+            $this->contactTracker,
+            $this->ipLookupHelper,
+            $this->leadFieldRepostory,
+            $this->pointGroupModel,
+            $this->doNotContact
+        );
     }
 
-    public function testOnFormSubmitActionChangePoints()
+    public function testOnFormSubmitActionChangePoints(): void
     {
         $this->contactTracker->method('getContact')->willReturn(new Lead());
 
         $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
 
-        $formSubscriber = new FormSubscriber(
-            $this->emailModel,
-            $this->leadModel,
-            $this->contactTracker,
-            $this->ipLookupHelper
-        );
-
         $submission = new Submission();
         $submission->setForm(new Form());
         $submission->setLead(new Lead());
 
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $submissionEvent = new SubmissionEvent($submission, [], [], $request);
+        $submissionEvent = new SubmissionEvent($submission, [], [], new Request());
 
         $action = new Action();
         $action->setType('lead.pointschange');
         $action->setProperties(['points' => 1, 'operator' => 'plus']);
         $submissionEvent->setAction($action);
 
-        $formSubscriber->onFormSubmitActionChangePoints($submissionEvent);
+        $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
     }

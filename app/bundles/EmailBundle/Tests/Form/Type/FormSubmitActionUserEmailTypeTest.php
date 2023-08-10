@@ -2,34 +2,19 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
-use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Form\Type\UserListType;
-use PHPUnit\Framework\Assert;
-use function PHPUnit\Framework\at;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
 {

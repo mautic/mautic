@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -77,7 +68,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->setUnpublishedMailFlashMessage($campaign);
         }
 
-        //don't set leads
+        // don't set leads
         unset($details['leads']);
 
         if (!empty($details)) {

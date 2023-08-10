@@ -1,26 +1,17 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\ChoiceLoader;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
@@ -40,12 +31,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $options;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -55,7 +46,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * @param array $options
+     * @param ModelFactory<object> $modelFactory
+     * @param array                $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {
@@ -178,9 +170,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // must be [$label => $id]
-        $prepped = $this->prepareChoices($this->choices[$modelName]);
+        $prepped      = $this->prepareChoices($this->choices[$modelName]);
+        $prepped_keys = array_keys($prepped);
 
-        array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
+        array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
@@ -190,8 +183,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $choices
-     *
      * @return array
      */
     protected function prepareChoices($choices)
@@ -230,9 +221,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $modelName
-     * @param $data
-     *
      * @return array|mixed
      */
     protected function fetchChoices($modelName, $data = [])
@@ -263,15 +251,15 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         } elseif (isset($this->options['repo_lookup_method'])) {
             $choices = call_user_func_array([$model->getRepository(), $this->options['repo_lookup_method']], $args);
         } else {
+            // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $expr->andX();
+            $composite = null;
 
             $limit = 100;
             if ($data) {
-                $composite->add(
-                    $expr->in($alias.'.id', $data)
-                );
+                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
+
                 if (count($data) > $limit) {
                     $limit = $data;
                 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
@@ -38,9 +29,6 @@ class FieldValueTransformer
      */
     private $isTransformed = false;
 
-    /**
-     * FieldValueTransformer constructor.
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
@@ -48,9 +36,10 @@ class FieldValueTransformer
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
     {
-        if ($this->isIsTransformed()) {
+        if (true === $this->isTransformed) {
             return;
         }
+
         $fields              = $submissionEvent->getForm()->getFields();
         $contactFieldMatches = $submissionEvent->getContactFieldMatches();
         $tokens              = $submissionEvent->getTokens();
@@ -59,7 +48,6 @@ class FieldValueTransformer
         foreach ($fields as $field) {
             switch ($field->getType()) {
                 case 'file':
-
                     $newValue = $this->router->generate(
                         'mautic_form_file_download',
                         [
@@ -75,8 +63,8 @@ class FieldValueTransformer
                         $this->tokensToUpdate[$tokenAlias] = $tokens[$tokenAlias] = $newValue;
                     }
 
-                    $contactFieldAlias = $field->getLeadField();
-                    if (!empty($contactFieldMatches[$contactFieldAlias])) {
+                    $contactFieldAlias = $field->getMappedField();
+                    if ('contact' === $field->getMappedObject() && !empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
                     }
 
@@ -106,6 +94,8 @@ class FieldValueTransformer
     }
 
     /**
+     * @deprecated will be removed in Mautic 4. This should have been a private method. Not actually needed.
+     *
      * @return bool
      */
     public function isIsTransformed()

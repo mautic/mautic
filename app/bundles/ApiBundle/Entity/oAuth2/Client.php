@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,7 +25,7 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     protected $users;
 
@@ -64,7 +55,7 @@ class Client extends BaseClient
     protected $allowedGrantTypes;
 
     /**
-     * @var Role
+     * @var Role|null
      */
     protected $role;
 
@@ -134,10 +125,6 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);

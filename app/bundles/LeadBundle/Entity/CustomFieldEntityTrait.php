@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -34,15 +25,13 @@ trait CustomFieldEntityTrait
 
     /**
      * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
-     * to the origin of creation in a webhook (like Pipedrive).
+     * to the origin of creation in a webhook.
      *
      * @var array
      */
     protected $eventData = [];
 
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function __get($name)
@@ -51,9 +40,6 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param $name
-     * @param $value
-     *
      * @return $this
      */
     public function __set($name, $value)
@@ -63,7 +49,6 @@ trait CustomFieldEntityTrait
 
     /**
      * @param string $name
-     * @param        $arguments
      *
      * @return mixed
      */
@@ -84,9 +69,6 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    /**
-     * @param $fields
-     */
     public function setFields($fields)
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
@@ -114,8 +96,6 @@ trait CustomFieldEntityTrait
     /**
      * Add an updated field to persist to the DB and to note changes.
      *
-     * @param        $alias
-     * @param        $value
      * @param string $oldValue
      *
      * @return $this
@@ -184,10 +164,8 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get field value.
-     *
-     * @param string $field
-     * @param string $group
+     * @param string      $field
+     * @param string|null $group
      *
      * @return mixed
      */
@@ -275,18 +253,12 @@ trait CustomFieldEntityTrait
         return !empty($this->fields);
     }
 
-    /**
-     * @param $key
-     */
     public function getEventData($key)
     {
         return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function setEventData($key, $value)

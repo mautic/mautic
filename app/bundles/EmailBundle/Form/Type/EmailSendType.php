@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -62,7 +53,7 @@ class EmailSendType extends AbstractType
                 'email_type',
                 ButtonGroupType::class,
                 [
-                    'choices'           => [
+                    'choices' => [
                         'mautic.email.send.emailtype.transactional' => 'transactional',
                         'mautic.email.send.emailtype.marketing'     => 'marketing',
                     ],
@@ -92,7 +83,7 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'   => 'btn btn-primary btn-nospin',
+                        'class'   => 'btn btn-default btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
@@ -118,9 +109,9 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-primary btn-nospin',
+                        'class'    => 'btn btn-default btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
-                        'disabled' => !isset($options['data']['email']),
+                        'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'fa fa-edit',
                     ],
                     'label' => 'mautic.email.send.edit.email',
@@ -135,9 +126,9 @@ class EmailSendType extends AbstractType
                 ButtonType::class,
                 [
                     'attr' => [
-                        'class'    => 'btn btn-primary btn-nospin',
+                        'class'    => 'btn btn-default btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'","origin":"#'.$options['update_select'].'"}))',
-                        'disabled' => !isset($options['data']['email']),
+                        'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
                         'icon'     => 'fa fa-external-link',
                     ],
                     'label' => 'mautic.email.send.preview.email',
@@ -149,7 +140,7 @@ class EmailSendType extends AbstractType
                     'priority',
                     ChoiceType::class,
                     [
-                        'choices'           => [
+                        'choices' => [
                             'mautic.channel.message.send.priority.normal' => MessageQueue::PRIORITY_NORMAL,
                             'mautic.channel.message.send.priority.high'   => MessageQueue::PRIORITY_HIGH,
                         ],

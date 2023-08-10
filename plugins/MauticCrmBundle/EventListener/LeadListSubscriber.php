@@ -1,25 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
@@ -80,7 +72,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                             }
                         );
                     }
-
+                    $integrationChoices                      = FormFieldHelper::parseListForChoices($integrationChoices);
                     $choices[$integration->getDisplayName()] = $integrationChoices;
                 }
             }
@@ -110,7 +102,7 @@ class LeadListSubscriber implements EventSubscriberInterface
      */
     public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
-        //get Integration Campaign members
+        // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];

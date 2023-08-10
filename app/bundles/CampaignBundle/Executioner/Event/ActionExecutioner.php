@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
@@ -22,7 +14,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 class ActionExecutioner implements EventInterface
 {
-    const TYPE = 'action';
+    public const TYPE = 'action';
 
     /**
      * @var ActionDispatcher
@@ -52,6 +44,8 @@ class ActionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        \assert($config instanceof ActionAccessor);
+
         /** @var LeadEventLog $firstLog */
         if (!$firstLog = $logs->first()) {
             return new EvaluatedContacts();

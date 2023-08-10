@@ -1,22 +1,12 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testCreateNewRemoteAsset()
+    public function testCreateNewRemoteAsset(): void
     {
         $payload = [
             'file'            => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
@@ -25,7 +15,8 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
         $this->assertStringContainsString('application/pdf', $response['asset']['mime']);
@@ -33,7 +24,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotNull($response['asset']['size']);
     }
 
-    public function testCreateNewLocalAsset()
+    public function testCreateNewLocalAsset(): void
     {
         $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
         file_put_contents($assetsPath.'/file.txt', 'test');
@@ -45,7 +36,8 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
         $this->assertStringContainsString('text/plain', $response['asset']['mime']);

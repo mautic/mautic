@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -38,27 +29,27 @@ class Asset extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $storageLocation = 'local';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remotePath;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $originalFileName;
 
@@ -107,12 +98,12 @@ class Asset extends FormEntity
     private $language = 'en';
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 
@@ -132,22 +123,22 @@ class Asset extends FormEntity
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $extension;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mime;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $size;
 
@@ -157,7 +148,7 @@ class Asset extends FormEntity
     private $downloadUrl;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $disallow = false;
 
@@ -229,8 +220,6 @@ class Asset extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -523,7 +512,7 @@ class Asset extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -533,7 +522,7 @@ class Asset extends FormEntity
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Asset
      */
@@ -548,7 +537,7 @@ class Asset extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -701,7 +690,7 @@ class Asset extends FormEntity
             $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {
-                //get it from the original name
+                // get it from the original name
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
@@ -1320,7 +1309,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param        $size
      * @param string $unit
      *
      * @return string
@@ -1339,7 +1327,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param        $size
      * @param string $unit
      *
      * @return array

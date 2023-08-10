@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Update\Github;
 
 use GuzzleHttp\Client;
@@ -34,7 +25,7 @@ class ReleaseParser
      * @throws LatestVersionSupportedException
      * @throws UpdatePackageNotFoundException
      */
-    public function getLatestSupportedRelease(array $releases, string $phpVersion, string $mauticVersion, string $allowedStability): Release
+    public function getLatestSupportedRelease(array $releases, string $mauticVersion, string $allowedStability): Release
     {
         foreach ($releases as $release) {
             try {
@@ -48,14 +39,6 @@ class ReleaseParser
                 ('stable' !== $metadata->getStability() && version_compare($allowedStability, $metadata->getStability(), 'gt'))
             ) {
                 // This Mautic does support the given release's stability so continue
-                continue;
-            }
-
-            if (
-                version_compare($phpVersion, $metadata->getMinSupportedPHPVersion(), 'lt') ||
-                version_compare($phpVersion, $metadata->getMaxSupportedPHPVersion(), 'gt')
-            ) {
-                // This PHP version is not supported by the given release so continue
                 continue;
             }
 

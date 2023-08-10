@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -33,7 +24,7 @@ class Action
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -53,7 +44,7 @@ class Action
     private $properties = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 
@@ -99,8 +90,6 @@ class Action
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -126,10 +115,6 @@ class Action
         ]));
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {
@@ -222,7 +207,7 @@ class Action
     /**
      * Get form.
      *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {

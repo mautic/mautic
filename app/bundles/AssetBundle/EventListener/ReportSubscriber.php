@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;
@@ -22,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_ASSET          = 'assets';
-    const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
+    public const CONTEXT_ASSET          = 'assets';
+    public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     /**
      * @var CompanyReportData
@@ -132,6 +123,26 @@ class ReportSubscriber implements EventSubscriberInterface
                     'label' => 'mautic.report.field.source_id',
                     'type'  => 'int',
                 ],
+                $downloadPrefix.'utm_campaign' => [
+                    'label' => 'mautic.report.field.utm_campaign',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_content' => [
+                    'label' => 'mautic.report.field.utm_content',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_medium' => [
+                    'label' => 'mautic.report.field.utm_medium',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_source' => [
+                    'label' => 'mautic.report.field.utm_source',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_term' => [
+                    'label' => 'mautic.report.field.utm_term',
+                    'type'  => 'string',
+                ],
             ];
 
             $companyColumns = $this->companyReportData->getCompanyData();
@@ -187,6 +198,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
                 $event->addCompanyLeftJoin($queryBuilder);
+            }
+
+            if (!$event->hasGroupBy()) {
+                $queryBuilder->groupBy('ad.id');
             }
         }
 

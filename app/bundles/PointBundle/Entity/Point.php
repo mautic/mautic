@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,6 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -33,7 +25,7 @@ class Point extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -48,12 +40,12 @@ class Point extends FormEntity
     private $repeatable = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -68,14 +60,16 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
      */
     private $log;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
+
+    private ?Group $group = null;
 
     public function __clone()
     {
@@ -94,7 +88,7 @@ class Point extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
+            ->setCustomRepositoryClass(PointRepository::class)
             ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
@@ -120,6 +114,10 @@ class Point extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -135,12 +133,15 @@ class Point extends FormEntity
         $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
             'message' => 'mautic.point.delta.notblank',
         ]));
+
+        $metadata->addPropertyConstraint('delta', new Assert\Range([
+            'min' => IntHelper::MIN_INTEGER_VALUE,
+            'max' => IntHelper::MAX_INTEGER_VALUE,
+        ]));
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -304,7 +305,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -325,7 +326,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -383,5 +384,15 @@ class Point extends FormEntity
     public function getRepeatable()
     {
         return $this->repeatable;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?Group $group): void
+    {
+        $this->group = $group;
     }
 }

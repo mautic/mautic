@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -39,8 +30,6 @@ class TokenHelper
     }
 
     /**
-     * @param $content
-     *
      * @return array
      */
     public function findFormTokens($content)
@@ -65,10 +54,10 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
                         '';
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $tokens[$token] = $formHtml;

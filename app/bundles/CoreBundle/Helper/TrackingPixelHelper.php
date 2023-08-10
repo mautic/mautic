@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -37,25 +28,25 @@ class TrackingPixelHelper
             ignore_user_abort(true);
         }
 
-        //turn off gzip compression
+        // turn off gzip compression
         if (function_exists('apache_setenv')) {
             apache_setenv('no-gzip', 1);
         }
 
-        ini_set('zlib.output_compression', 0);
+        ini_set('zlib.output_compression', '0');
 
-        //removing any content encoding like gzip etc.
+        // removing any content encoding like gzip etc.
         $response->headers->set('Content-Encoding', 'none');
 
-        //check to ses if request is a POST
+        // check to ses if request is a POST
         if ('GET' == $request->getMethod()) {
             if ('HTTP/1.1' == $request->getProtocolVersion()) {
                 $response->headers->set('Connection', 'close');
             }
 
-            //return 1x1 pixel transparent gif
+            // return 1x1 pixel transparent gif
             $response->headers->set('Content-Type', 'image/gif');
-            //avoid cache time on browser side
+            // avoid cache time on browser side
             $response->headers->set('Content-Length', '43');
             $response->headers->set('Cache-Control', 'private, no-cache, no-cache=Set-Cookie, proxy-revalidate');
             $response->headers->set('Expires', 'Wed, 11 Jan 2000 12:59:00 GMT');

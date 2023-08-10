@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -17,13 +8,13 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class User extends FormEntity implements AdvancedUserInterface, \Serializable, EquatableInterface
+class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @var int
@@ -43,14 +34,14 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * Used for when updating the password.
      *
-     * @var string
+     * @var ?string
      */
     private $plainPassword;
 
     /**
      * Used for updating account.
      *
-     * @var string
+     * @var ?string
      */
     private $currentPassword;
 
@@ -70,7 +61,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $position;
 
@@ -80,22 +71,22 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $role;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $timezone = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $locale = '';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastLogin;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -110,7 +101,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $preferences = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $signature;
 
@@ -269,8 +260,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
 
-        //check if creating a new user or editing an existing user and the password has been updated
-        if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
+        // check if creating a new user or editing an existing user and the password has been updated
+        if ($data instanceof User && (!$data->getId() || ($data->getId() && $data->getPlainPassword()))) {
             $groups[] = 'CheckPassword';
         }
 
@@ -279,8 +270,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -344,14 +333,14 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      */
     public function getSalt()
     {
-        //bcrypt generates its own salt
+        // bcrypt generates its own salt
         return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -359,7 +348,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * Get plain password.
      *
-     * @return string
+     * @return ?string
      */
     public function getPlainPassword()
     {
@@ -369,7 +358,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * Get current password (that a user has typed into a form).
      *
-     * @return string
+     * @return ?string
      */
     public function getCurrentPassword()
     {
@@ -385,7 +374,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
         if ($this->username) {
             $roles = [
-                (($this->isAdmin()) ? 'ROLE_ADMIN' : 'ROLE_USER'),
+                ($this->isAdmin()) ? 'ROLE_ADMIN' : 'ROLE_USER',
             ];
 
             if (defined('MAUTIC_API_REQUEST') && MAUTIC_API_REQUEST) {
@@ -399,34 +388,36 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<int, mixed>
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->id,
             $this->username,
             $this->password,
             $this->isPublished(),
-        ]);
+        ];
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<int, mixed> $data
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        list(
+        [
             $this->id,
             $this->username,
             $this->password,
             $published
-            ) = unserialize($serialized);
+        ] = $data;
         $this->setIsPublished($published);
     }
 
@@ -472,8 +463,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * Set plain password.
      *
-     * @param $plainPassword
-     *
      * @return User
      */
     public function setPlainPassword($plainPassword)
@@ -485,8 +474,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
     /**
      * Set current password.
-     *
-     * @param $currentPassword
      *
      * @return User
      */
@@ -582,38 +569,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     public function getEmail()
     {
         return $this->email;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAccountNonLocked()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCredentialsNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        return $this->isPublished();
     }
 
     /**

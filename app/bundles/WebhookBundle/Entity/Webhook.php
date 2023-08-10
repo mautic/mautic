@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Webhook extends FormEntity
 {
+    public const LOGS_DISPLAY_LIMIT = 100;
     /**
      * @var int
      */
@@ -36,7 +29,7 @@ class Webhook extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -51,17 +44,17 @@ class Webhook extends FormEntity
     private $secret;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Log>
      */
     private $logs;
 
@@ -87,7 +80,7 @@ class Webhook extends FormEntity
      * ASC or DESC order for fetching order of the events when queue mode is on.
      * Null means use the global default.
      *
-     * @var string
+     * @var string|null
      */
     private $eventsOrderbyDir;
 
@@ -131,8 +124,6 @@ class Webhook extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -313,8 +304,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $events
-     *
      * @return $this
      */
     public function setEvents($events)
@@ -442,6 +431,17 @@ class Webhook extends FormEntity
     public function getLogs()
     {
         return $this->logs;
+    }
+
+    /**
+     * @return Collection<int, \Mautic\WebhookBundle\Entity\Log>
+     */
+    public function getLimitedLogs(): Collection
+    {
+        $criteria = Criteria::create()
+            ->setMaxResults(self::LOGS_DISPLAY_LIMIT);
+
+        return $this->logs->matching($criteria);
     }
 
     /**

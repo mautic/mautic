@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -30,7 +21,7 @@ class IndexSchemaHelper
     protected $prefix;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected $sm;
 
@@ -75,8 +66,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      *
      * @throws SchemaException
@@ -92,17 +81,12 @@ class IndexSchemaHelper
         return $this;
     }
 
-    /**
-     * @param $name
-     */
     public function allowColumn($name)
     {
         $this->allowedColumns[] = $name;
     }
 
     /**
-     * @param       $columns
-     * @param       $name
      * @param array $options
      *
      * @return $this
@@ -176,7 +160,7 @@ class IndexSchemaHelper
 
         if (count($sql)) {
             foreach ($sql as $query) {
-                $this->db->executeUpdate($query);
+                $this->db->executeStatement($query);
             }
             $this->changedIndexes = [];
             $this->dropIndexes    = [];
@@ -185,8 +169,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $columns
-     *
      * @return array
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException

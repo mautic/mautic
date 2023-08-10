@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -17,9 +8,12 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait LeadDetailsTrait
 {
+    private ?RequestStack $requestStack = null;
+
     /**
      * @param int $page
      *
@@ -27,7 +21,7 @@ trait LeadDetailsTrait
      */
     protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -129,9 +123,6 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param $a
-     * @param $b
-     *
      * @return int
      */
     private function cmp($a, $b)
@@ -152,7 +143,7 @@ trait LeadDetailsTrait
     {
         // Get Places from IP addresses
         $places = [];
-        if ($lead->getIpAddresses()) {
+        if ($lead->getIpAddresses()->count() > 0) {
             foreach ($lead->getIpAddresses() as $ip) {
                 if ($details = $ip->getIpDetails()) {
                     if (!empty($details['latitude']) && !empty($details['longitude'])) {
@@ -180,7 +171,7 @@ trait LeadDetailsTrait
      */
     protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
     {
-        $translator = $this->get('translator');
+        $translator = $this->translator;
 
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
@@ -191,7 +182,7 @@ trait LeadDetailsTrait
         }
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
-        $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
@@ -212,7 +203,7 @@ trait LeadDetailsTrait
      */
     protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -251,7 +242,7 @@ trait LeadDetailsTrait
                 'eventLabel'      => $l['userName'],
                 'timestamp'       => $l['dateAdded'],
                 'details'         => $l['details'],
-                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.php',
+                'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
             ];
         }, $logs);
 
@@ -284,7 +275,7 @@ trait LeadDetailsTrait
      */
     protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -331,7 +322,7 @@ trait LeadDetailsTrait
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
-        $chartQuery  = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
@@ -355,15 +346,13 @@ trait LeadDetailsTrait
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
             $model = $this->getModel('lead.lead');
-            // When we change lead data these changes get cached
-            // so we need to clear the entity manager
-            $model->getRepository()->clear();
 
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             if (!isset($contact['lead_id'])) {
                 continue;
             }
-            $lead            = $model->getEntity($contact['lead_id']);
+            $lead = $model->getEntity($contact['lead_id']);
+            $model->getRepository()->refetchEntity($lead);
             if (!$lead instanceof Lead) {
                 continue;
             }
@@ -386,14 +375,12 @@ trait LeadDetailsTrait
     /**
      * Get company graph for points and engagements.
      *
-     * @param $contacts
-     *
      * @return mixed
      */
     protected function getCompanyEngagementsForGraph($contacts)
     {
         $graphData  = $this->getCompanyEngagementData($contacts);
-        $translator = $this->get('translator');
+        $translator = $this->translator;
 
         $fromDate = new \DateTime('first day of this month 00:00:00');
         $fromDate->modify('-6 months');
@@ -416,7 +403,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [
@@ -424,5 +411,11 @@ trait LeadDetailsTrait
                 'eventType' => ['action', 'condition'],
             ]
         );
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

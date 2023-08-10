@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -44,9 +35,6 @@ trait PushToIntegrationTrait
         static::$integrationHelper = $integrationHelper;
     }
 
-    /**
-     * @param $lead
-     */
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
     {
         return static::pushIt($config, $lead, $errors);
@@ -54,10 +42,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
-     *
-     * @param $config
-     * @param $lead
-     * @param $errors
      *
      * @return bool
      */

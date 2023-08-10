@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
@@ -60,9 +51,6 @@ class SortableListTransformer implements DataTransformerInterface
         return $this->formatList($array);
     }
 
-    /**
-     * @param $array
-     */
     private function formatList($array)
     {
         if (null === $array || !isset($array['list'])) {
@@ -82,8 +70,6 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $array
-     *
      * @return array
      */
     private function transformKeyValuePair($array)
@@ -105,8 +91,6 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $array
-     *
      * @return array
      */
     private function reverseTransformKeyValuePair($array)

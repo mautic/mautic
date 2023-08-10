@@ -1,0 +1,12 @@
+{% if showMore is defined and showMore is not empty %}
+<a href="{{ url('mautic_asset_index', {'search' : searchString}) }}" data-toggle="ajax">
+    <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining})|escape }}</span>
+</a>
+{% else %}
+<a href="{{ url('mautic_asset_action', {'objectAction' : 'view', 'objectId' : asset.getId()}) }}" data-toggle="ajax">
+    {{ asset.getTitle()|escape }}
+    <span class="label label-default pull-right" data-toggle="tooltip" title="{% trans %}mautic.asset.downloadcount{% endtrans %}" data-placement="left">
+        {{ asset.getDownloadCount() }}
+    </span>
+</a>
+{% endif %}

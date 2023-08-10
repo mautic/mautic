@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
@@ -22,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SubmitActionEmailType.
@@ -96,28 +87,13 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
-            $builder->add(
-                'immediately',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.action.sendemail.immediately',
-                    'data'  => $default,
-                    'attr'  => [
-                        'tooltip' => 'mautic.form.action.sendemail.immediately.desc',
-                    ],
-                ]
-            );
-        } else {
-            $builder->add(
-                'immediately',
-                HiddenType::class,
-                [
-                    'data' => false,
-                ]
-            );
-        }
+        $builder->add(
+            'immediately',
+            HiddenType::class,
+            [
+                'data' => false,
+            ]
+        );
 
         $default = isset($options['data']['copy_lead']) ? $options['data']['copy_lead'] : false;
         $builder->add(

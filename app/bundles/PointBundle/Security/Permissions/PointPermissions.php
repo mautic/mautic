@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -26,9 +17,7 @@ class PointPermissions extends AbstractPermissions
     {
         parent::__construct($params);
 
-        $this->addStandardPermissions('points');
-        $this->addStandardPermissions('triggers');
-        $this->addStandardPermissions('categories');
+        $this->addStandardPermissions(['points', 'triggers', 'groups', 'categories']);
     }
 
     /**
@@ -47,5 +36,6 @@ class PointPermissions extends AbstractPermissions
         $this->addStandardFormFields('point', 'categories', $builder, $data);
         $this->addStandardFormFields('point', 'points', $builder, $data);
         $this->addStandardFormFields('point', 'triggers', $builder, $data);
+        $this->addStandardFormFields('point', 'groups', $builder, $data);
     }
 }

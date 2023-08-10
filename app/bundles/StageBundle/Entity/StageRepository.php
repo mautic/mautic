@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class StageRepository.
+ * @extends CommonRepository<Stage>
  */
 class StageRepository extends CommonRepository
 {
@@ -53,7 +44,7 @@ class StageRepository extends CommonRepository
             ->select('partial s.{id, name}')
             ->setParameter('type', $type);
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q);
 
         $q->where($expr);
@@ -74,14 +65,14 @@ class StageRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'stages', 's', 'x.stage_id = s.id');
 
-        //make sure the published up and down dates are good
+        // make sure the published up and down dates are good
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 
@@ -142,7 +133,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from('MauticStageBundle:Stage', 's', 's.id');
+            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -182,7 +173,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from('MauticStageBundle:Stage', 's', 's.id');
+            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))

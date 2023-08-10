@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Factory;
 
 use GuzzleHttp\Client;
@@ -31,7 +22,6 @@ class IpLookupFactory
     }
 
     /**
-     * @param      $service
      * @param null $auth
      *
      * @return AbstractLookup|null

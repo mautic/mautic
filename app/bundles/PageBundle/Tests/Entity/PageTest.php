@@ -52,4 +52,32 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield [0, false, ['noIndex' => [null, false]]];
         yield ['string', true, ['noIndex' => [null, true]]];
     }
+
+    /**
+     * Test setHeadScript and getHeadScript.
+     *
+     * @return void
+     */
+    public function testSetHeadScript()
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setHeadScript($script);
+
+        $this->assertEquals($script, $page->getHeadScript());
+    }
+
+    /**
+     * Test setFooterScript and getFooterScript.
+     *
+     * @return void
+     */
+    public function testSetFooterScript()
+    {
+        $script = '<script>console.log("test")';
+        $page   = new Page();
+        $page->setFooterScript($script);
+
+        $this->assertEquals($script, $page->getFooterScript());
+    }
 }

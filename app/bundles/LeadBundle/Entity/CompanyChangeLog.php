@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -45,12 +36,12 @@ class CompanyChangeLog
     private $actionName;
 
     /**
-     * @var Company
+     * @var int
      */
     private $company;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -170,7 +161,7 @@ class CompanyChangeLog
     /**
      * Set delta.
      *
-     * @param Company $company
+     * @param int $company
      *
      * @return CompanyChangeLog
      */
@@ -184,7 +175,7 @@ class CompanyChangeLog
     /**
      * Get company.
      *
-     * @return \Mautic\LeadBundle\Entity\Company
+     * @return int
      */
     public function getCompany()
     {
@@ -208,7 +199,7 @@ class CompanyChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -220,7 +211,7 @@ class CompanyChangeLog
      *
      * @return CompanyChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 

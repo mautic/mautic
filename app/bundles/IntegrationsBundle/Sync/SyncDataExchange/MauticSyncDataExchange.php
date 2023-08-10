@@ -2,20 +2,12 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
@@ -32,9 +24,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\Parti
 
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
-    const NAME           = 'mautic';
-    const OBJECT_CONTACT = 'lead'; // kept as lead for BC
-    const OBJECT_COMPANY = 'company';
+    public const NAME           = 'mautic';
+    public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
+    public const OBJECT_COMPANY = 'company';
 
     /**
      * @var FieldChangeRepository
@@ -91,9 +83,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         return $this->partialObjectReportBuilder->buildReport($requestDAO);
     }
 
-    public function executeSyncOrder(OrderDAO $syncOrderDAO): void
+    public function executeSyncOrder(OrderDAO $syncOrderDAO): ObjectMappingsDAO
     {
-        $this->orderExecutioner->execute($syncOrderDAO);
+        return $this->orderExecutioner->execute($syncOrderDAO);
     }
 
     /**
@@ -108,7 +100,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         // Check to see if we have a match
         $internalObjectDAO = $this->mappingHelper->findMauticObject($mappingManualDAO, $internalObjectName, $integrationObjectDAO);
 
-        if (!$internalObjectDAO) {
+        if (!$internalObjectDAO->getObjectId()) {
             return new ReportObjectDAO($internalObjectName, null);
         }
 

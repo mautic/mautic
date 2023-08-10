@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\Client;
@@ -37,7 +28,7 @@ abstract class AbstractLookup
     /**
      * Authorization for lookup service.
      */
-    protected $auth;
+    protected ?string $auth;
 
     protected ?string $cacheDir;
     protected ?LoggerInterface $logger;
@@ -62,11 +53,10 @@ abstract class AbstractLookup
     /**
      * AbstractLookup constructor.
      *
-     * @param null $auth
      * @param null $ipLookupConfig
      * @param null $cacheDir
      */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
+    public function __construct(?string $auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
     {
         $this->cacheDir  = $cacheDir;
         $this->logger    = $logger;
@@ -76,8 +66,6 @@ abstract class AbstractLookup
     }
 
     /**
-     * @param $ip
-     *
      * @return $this
      */
     public function setIpAddress($ip)

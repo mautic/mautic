@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -49,9 +40,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
      */
     protected $requestStack;
 
-    /**
-     * @param $providerKey
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         EventDispatcherInterface $dispatcher,
@@ -97,7 +85,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                     $authenticatingService,
                     $integrations
                 );
-                $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
+                $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
                     $eventToken = $authEvent->getToken();

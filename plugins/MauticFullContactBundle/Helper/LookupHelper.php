@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -165,9 +156,6 @@ class LookupHelper
         }
     }
 
-    /**
-     * @param $oid
-     */
     public function validateRequest($oid)
     {
         // prefix#entityId#hour#userId#nonce
@@ -220,9 +208,6 @@ class LookupHelper
     }
 
     /**
-     * @param $entity
-     * @param $notify
-     *
      * @return array
      */
     protected function getCache($entity, $notify)

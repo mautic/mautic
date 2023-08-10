@@ -1,42 +1,31 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigBuilderEvent extends Event
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $forms = [];
+    private array $forms = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $formThemes = [
-        'MauticConfigBundle:FormTheme',
+    private array $formThemes = [
+        '@MauticConfig/FormTheme/_config_file_row.html.twig',
+        '@MauticConfig/FormTheme/dsn_row.html.twig',
     ];
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private BundleHelper $bundleHelper;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $encodedFields = [];
+    protected array $encodedFields = [];
 
     public function __construct(BundleHelper $bundleHelper)
     {
@@ -100,8 +89,6 @@ class ConfigBuilderEvent extends Event
     /**
      * Get default parameters from config defined in bundles.
      *
-     * @param $bundle
-     *
      * @return array
      */
     public function getParametersFromConfig($bundle)
@@ -120,8 +107,6 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * @param $fields
-     *
      * @return $this
      */
     public function addFileFields($fields)

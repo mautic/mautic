@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle;
 
 /**
@@ -25,7 +16,17 @@ final class EmailEvents
      *
      * @var string
      */
-    const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
+    public const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
+
+    /**
+     * The mautic.email_address_token_replacement event is thrown right before a email address token needs replacement.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    public const ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT = 'mautic.email_address_token_replacement';
 
     /**
      * The mautic.email_on_open event is dispatched when an email is opened.
@@ -35,7 +36,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_ON_OPEN = 'mautic.email_on_open';
+    public const EMAIL_ON_OPEN = 'mautic.email_on_open';
 
     /**
      * The mautic.email_on_send event is dispatched when an email is sent.
@@ -45,7 +46,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_ON_SEND = 'mautic.email_on_send';
+    public const EMAIL_ON_SEND = 'mautic.email_on_send';
 
     /**
      * The mautic.email_on_display event is dispatched when an email is viewed via a browser.
@@ -55,7 +56,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_ON_DISPLAY = 'mautic.email_on_display';
+    public const EMAIL_ON_DISPLAY = 'mautic.email_on_display';
 
     /**
      * The mautic.email_on_build event is dispatched before displaying the email builder form to allow adding of tokens.
@@ -65,7 +66,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_ON_BUILD = 'mautic.email_on_build';
+    public const EMAIL_ON_BUILD = 'mautic.email_on_build';
 
     /**
      * The mautic.email_pre_save event is dispatched right before a email is persisted.
@@ -75,7 +76,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_PRE_SAVE = 'mautic.email_pre_save';
+    public const EMAIL_PRE_SAVE = 'mautic.email_pre_save';
 
     /**
      * The mautic.email_post_save event is dispatched right after a email is persisted.
@@ -85,7 +86,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_POST_SAVE = 'mautic.email_post_save';
+    public const EMAIL_POST_SAVE = 'mautic.email_post_save';
 
     /**
      * The mautic.email_pre_delete event is dispatched prior to when a email is deleted.
@@ -95,7 +96,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_PRE_DELETE = 'mautic.email_pre_delete';
+    public const EMAIL_PRE_DELETE = 'mautic.email_pre_delete';
 
     /**
      * The mautic.email_post_delete event is dispatched after a email is deleted.
@@ -105,7 +106,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_POST_DELETE = 'mautic.email_post_delete';
+    public const EMAIL_POST_DELETE = 'mautic.email_post_delete';
 
     /**
      * The mautic.monitored_email_config event is dispatched during the configuration in order to inject custom folder locations.
@@ -114,7 +115,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const MONITORED_EMAIL_CONFIG = 'mautic.monitored_email_config';
+    public const MONITORED_EMAIL_CONFIG = 'mautic.monitored_email_config';
 
     /**
      * The mautic.on_email_parse event is dispatched when a monitored email box retrieves messages.
@@ -123,7 +124,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_PARSE = 'mautic.on_email_parse';
+    public const EMAIL_PARSE = 'mautic.on_email_parse';
 
     /**
      * The mautic.on_email_pre_fetch event is dispatched prior to fetching email through a configured monitored inbox in order to set
@@ -133,7 +134,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_PRE_FETCH = 'mautic.on_email_pre_fetch';
+    public const EMAIL_PRE_FETCH = 'mautic.on_email_pre_fetch';
 
     /**
      * The mautic.on_email_failed event is dispatched when an email has failed to clear the queue and is about to be deleted
@@ -143,7 +144,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_FAILED = 'mautic.on_email_failed';
+    public const EMAIL_FAILED = 'mautic.on_email_failed';
 
     /**
      * The mautic.on_email_resend event is dispatched when an attempt to resend an email occurs
@@ -153,7 +154,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_RESEND = 'mautic.on_email_resend';
+    public const EMAIL_RESEND = 'mautic.on_email_resend';
 
     /**
      * The mautic.email.on_campaign_batch_action event is dispatched when the campaign action triggers.
@@ -162,7 +163,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_BATCH_ACTION = 'mautic.email.on_campaign_batch_action';
+    public const ON_CAMPAIGN_BATCH_ACTION = 'mautic.email.on_campaign_batch_action';
 
     /**
      * The mautic.email.on_campaign_trigger_decision event is fired when the campaign action triggers.
@@ -172,7 +173,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
+    public const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
 
     /**
      * The mautic.email.on_campaign_trigger_condition event is dispatched when the campaign condition triggers.
@@ -182,7 +183,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.email.on_campaign_trigger_condition';
+    public const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.email.on_campaign_trigger_condition';
 
     /**
      * The mautic.email_on_reply event is dispatched when an reply came to an email.
@@ -192,7 +193,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const EMAIL_ON_REPLY = 'mautic.email_on_reply';
+    public const EMAIL_ON_REPLY = 'mautic.email_on_reply';
 
     /**
      * The mautic.email.on_email_validation event is dispatched when an email is validated through the validator.
@@ -201,7 +202,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_EMAIL_VALIDATION = 'mautic.email.on_email_validation';
+    public const ON_EMAIL_VALIDATION = 'mautic.email.on_email_validation';
 
     /**
      * The mautic.email.on_sent_email_to_user event is dispatched when email is sent to user.
@@ -211,7 +212,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
+    public const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
 
     /**
      * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_CAMPAIGN_BATCH_ACTION instead.
@@ -223,7 +224,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
 
     /**
      * The mautic.email.on_transport_webhook event is fired when an email transport service sends Mautic a webhook request.
@@ -233,7 +234,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
+    public const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
 
     /**
      * The mautic.email.on_open_rate_winner event is fired when there is a need to determine open rate winner.
@@ -243,7 +244,7 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_DETERMINE_OPEN_RATE_WINNER = 'mautic.email.on_open_rate_winner';
+    public const ON_DETERMINE_OPEN_RATE_WINNER = 'mautic.email.on_open_rate_winner';
 
     /**
      * The mautic.email.on_open_rate_winner event is fired when there is a need to determine clickthrough rate winner.
@@ -253,5 +254,5 @@ final class EmailEvents
      *
      * @var string
      */
-    const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
+    public const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
 }

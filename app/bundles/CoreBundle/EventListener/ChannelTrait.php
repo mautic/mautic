@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -16,19 +7,20 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 trait ChannelTrait
 {
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
-    public function setModelFactory(ModelFactory $modelFactory)
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function setModelFactory(ModelFactory $modelFactory): void
     {
         $this->modelFactory = $modelFactory;
     }
 
     /**
      * Get the model for a channel.
-     *
-     * @param $channel
      *
      * @return mixed
      */
@@ -43,9 +35,6 @@ trait ChannelTrait
 
     /**
      * Get the entity for a channel item.
-     *
-     * @param $channel
-     * @param $channelId
      *
      * @return mixed
      */
@@ -66,8 +55,6 @@ trait ChannelTrait
     /**
      * Get the name and/or view URL for a channel entity.
      *
-     * @param      $channel
-     * @param      $channelId
      * @param bool $returnWithViewUrl
      *
      * @return array|bool|string

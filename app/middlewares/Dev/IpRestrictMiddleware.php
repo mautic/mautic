@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware\Dev;
 
 use Mautic\Middleware\ConfigAwareTrait;
@@ -21,7 +12,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 20;
+    public const PRIORITY = 20;
 
     /**
      * @var HttpKernelInterface

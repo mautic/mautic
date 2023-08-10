@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * LeadNoteRepository.
+ * @extends CommonRepository<LeadNote>
  */
 class LeadNoteRepository extends CommonRepository
 {
@@ -35,10 +26,6 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $filter
-     * @param $noteTypes
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -71,8 +58,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -81,7 +66,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -98,7 +82,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -107,7 +90,7 @@ class LeadNoteRepository extends CommonRepository
         $command                 = $filter->command;
         $string                  = $filter->string;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
@@ -174,9 +157,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

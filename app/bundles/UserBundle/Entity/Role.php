@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,7 +26,7 @@ class Role extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -45,7 +36,7 @@ class Role extends FormEntity
     private $isAdmin = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\Permission>
      */
     private $permissions;
 
@@ -55,7 +46,7 @@ class Role extends FormEntity
     private $rawPermissions;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     private $users;
 
@@ -108,8 +99,6 @@ class Role extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

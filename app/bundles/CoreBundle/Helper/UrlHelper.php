@@ -1,63 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
-
-use GuzzleHttp\Client;
-use Monolog\Logger;
 
 class UrlHelper
 {
-    protected ?Client $client;
-    protected ?string $shortnerServiceUrl;
-    protected ?Logger $logger;
-
-    public function __construct(?Client $client = null, ?string $shortnerServiceUrl = null, ?Logger $logger = null)
-    {
-        $this->client             = $client;
-        $this->shortnerServiceUrl = $shortnerServiceUrl;
-        $this->logger             = $logger;
-    }
-
-    /**
-     * Shorten a URL.
-     *
-     * @param $url
-     *
-     * @return mixed
-     */
-    public function buildShortUrl($url)
-    {
-        if (!$this->shortnerServiceUrl) {
-            return $url;
-        }
-
-        try {
-            $response = $this->client->get($this->shortnerServiceUrl.urlencode($url));
-
-            if (200 === $response->getStatusCode()) {
-                return rtrim($response->getBody());
-            } else {
-                $this->logger->addWarning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
-            }
-        } catch (\Exception $exception) {
-            $this->logger->addError(
-                $exception->getMessage(),
-                ['exception' => $exception]
-            );
-        }
-
-        return $url;
-    }
-
     /**
      * Append query string to URL.
      *
@@ -91,8 +37,6 @@ class UrlHelper
     }
 
     /**
-     * @param $rel
-     *
      * @return string
      */
     public static function rel2abs($rel)
@@ -108,7 +52,6 @@ class UrlHelper
         $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
-        $base = str_replace('/index_dev.php', '', $base);
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
@@ -148,7 +91,8 @@ class UrlHelper
         }
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
-        for ($n = 1; $n > 0; $abs = preg_replace($re, '/', $abs, -1, $n)) {
+        for ($n = 1; $n > 0;) {
+            $abs = preg_replace($re, '/', $abs, -1, $n);
         }
 
         /* absolute URL is ready! */
@@ -233,6 +177,12 @@ class UrlHelper
             return $url;
         }
 
+        $isMailto = 0 === strpos($url, 'mailto:');
+
+        if ($isMailto) {
+            return $url;
+        }
+
         $containSlashes = false !== strpos($url, '://');
 
         if (!$containSlashes) {
@@ -280,7 +230,7 @@ class UrlHelper
 
             if ($parsedQuery) {
                 $encodedQuery = http_build_query($parsedQuery);
-                $url          = str_replace($query, $encodedQuery, $url);
+                $url          = str_replace('?'.$query, '?'.$encodedQuery, $url);
             }
         }
 
@@ -326,5 +276,47 @@ class UrlHelper
         $url          = str_replace($path, implode('/', $encodedPath), $url);
 
         return (bool) filter_var($url, FILTER_VALIDATE_URL);
+    }
+
+    /**
+     * Decode &amp; (HTML), &#38; (decimal) and &#x26; (hex) ampersands.
+     * This even works with double encoded ampersands.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public static function decodeAmpersands($url)
+    {
+        while (false !== strpos($url, '&amp;') || false !== strpos($url, '&#38;') || false !== strpos($url, '&#x26;')) {
+            $url = str_replace(['&amp;', '&#38;', '&#x26;'], '&', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * This method implements unicode slugs instead of transliteration.
+     */
+    public static function stringURLUnicodeSlug(string $string): string
+    {
+        // Replace double byte whitespaces by single byte (East Asian languages)
+        $str = preg_replace('/\xE3\x80\x80/', ' ', $string);
+
+        // Remove any '-' from the string as they will be used as concatenator.
+        // Would be great to let the spaces in but only Firefox is friendly with this
+        $str = str_replace('-', ' ', $str);
+
+        // Replace forbidden characters by whitespaces
+        $str = preg_replace('#[:\#\*"@+=;!><&\.%()\]\/\'\\\\|\[]#', "\x20", $str);
+
+        // Delete all '?'
+        $str = str_replace('?', '', $str);
+
+        // Trim white spaces at beginning and end of alias and make lowercase
+        $str = trim(strtolower($str));
+
+        // Remove any duplicate whitespace and replace whitespaces by hyphens
+        return preg_replace('#\x20+#', '-', $str);
     }
 }

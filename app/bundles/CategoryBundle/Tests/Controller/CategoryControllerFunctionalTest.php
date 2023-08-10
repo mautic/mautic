@@ -7,7 +7,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -80,8 +79,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form       = $saveButton->form();
         $form['category_form[bundle]']->setValue('category');
         $form['category_form[title]']->setValue('Test');
-        $form['category_form[isPublished]']->setValue(1);
-        $form['category_form[inForm]']->setValue(1);
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());

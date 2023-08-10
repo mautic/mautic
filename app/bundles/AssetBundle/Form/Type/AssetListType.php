@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -62,14 +53,6 @@ class AssetListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
-    {
-        return 'asset_list';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;
@@ -90,7 +73,7 @@ class AssetListType extends AbstractType
             $choices[$asset['language']][$asset['title']] = $asset['id'];
         }
 
-        //sort by language
+        // sort by language
         ksort($choices);
 
         return $choices;

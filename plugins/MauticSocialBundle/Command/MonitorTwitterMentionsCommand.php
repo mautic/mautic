@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
@@ -20,8 +11,7 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
      */
     protected function configure()
     {
-        $this->setName('social:monitor:twitter:mentions')
-            ->setDescription('Searches for mentioned tweets');
+        $this->setName('social:monitor:twitter:mentions');
 
         parent::configure();
     }
@@ -62,4 +52,5 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
     {
         return 'twitter';
     }
+    protected static $defaultDescription = 'Searches for mentioned tweets';
 }

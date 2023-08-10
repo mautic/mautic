@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -26,7 +17,7 @@ use Symfony\Component\Form\FormBuilder;
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    const PAGESIZE = 200;
+    public const PAGESIZE = 200;
 
     /**
      * {@inheritdoc}
@@ -245,8 +236,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $fields
-     *
      * @return array
      */
     public function setFields($fields)
@@ -324,15 +313,15 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 );
 
                 $builder->add(
-                        'campaign_task',
-                        IntegrationCampaignsTaskType::class,
-                        [
-                            'label' => false,
-                            'attr'  => [
-                                'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
-                            ],
-                            'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
-                        ]);
+                    'campaign_task',
+                    IntegrationCampaignsTaskType::class,
+                    [
+                        'label' => false,
+                        'attr'  => [
+                            'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
+                        ],
+                        'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                    ]);
             }
         }
     }
@@ -380,7 +369,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'deletedFlag'           => ['type' => 'boolean', 'required' => false],
             'dateDeleted'           => ['type' => 'string', 'required' => false],
             'deletedBy'             => ['type' => 'string', 'required' => false],
-            //todo 'customFields' => 'array',
+            // todo 'customFields' => 'array',
         ];
     }
 
@@ -468,10 +457,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
-    /**
-     * @param $params
-     * @param $object
-     */
     public function getRecords($params, $object)
     {
         if (!$this->isAuthorized()) {
@@ -506,8 +491,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if ($integrationEntities) {
-                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
                 // No use checking the next page if there are less records than the requested page size
@@ -531,9 +516,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Ammend mapped lead data before creating to Mautic.
-     *
-     * @param $data
-     * @param $object
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
@@ -578,17 +560,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $entity
-     * @param $object
-     * @param $mauticObjectReference
-     * @param $integrationEntityId
-     *
      * @return IntegrationEntity|object|null
      */
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
             $this->getName(),
             $object,
@@ -631,7 +608,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             return $leadPushed;
         }
 
-        //findLead first
+        // findLead first
         $cwContactExists = $this->getApiHelper()->getContacts(['Email' => $lead->getEmail()]);
 
         if (!empty($cwContactExists)) {
@@ -668,8 +645,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if (!empty($integrationEntities)) {
-                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
                 $leadPushed = true;
@@ -685,12 +662,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $cwContactData
-     * @param $object
-     * @param $lead
-     * @param $personFound
-     * @param $config
-     *
      * @return array
      */
     public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = [])
@@ -722,9 +693,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Match lead data with integration fields.
-     *
-     * @param $lead
-     * @param $config
      *
      * @return array
      */
@@ -831,7 +799,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $fieldsToUpdate
      * @param array $objects
      *
      * @return array
@@ -852,7 +819,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param        $config
      * @param null   $object
      * @param string $priorityObject
      *
@@ -912,8 +878,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $campaignId
-     *
      * @return bool
      */
     public function getCampaignMembers($campaignId)
@@ -967,11 +931,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @param $allCampaignMembers
-     * @param $campaignMemberObject
-     * @param $campaignId
-     */
     public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
     {
         if (empty($allCampaignMembers)) {
@@ -982,7 +941,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $mauticObject    = new IntegrationObject('Contact', 'lead');
 
         $contacts = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
-        //first find existing campaign members.
+        // first find existing campaign members.
         foreach ($contacts as $contact) {
             $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignId, $contact['internal_entity_id']);
             if (empty($existingCampaignMember)) {
@@ -998,15 +957,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         if ($persistEntities) {
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
+            $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
-            $this->em->clear(IntegrationEntity::class);
         }
     }
 
     /**
-     * @param $records
-     *
      * @return array
      */
     public function getRecordList($records, $index = null)
@@ -1064,10 +1021,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $config
-     * @param $cwContactId
-     * @param $leadId
-     *
      * @return IntegrationEntity|null
      *
      * @throws ApiErrorException

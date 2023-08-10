@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class GroupExecutionDateDAO
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $executionDate;
 
@@ -29,7 +20,7 @@ class GroupExecutionDateDAO
     /**
      * GroupExecutionDateDAO constructor.
      */
-    public function __construct(\DateTime $executionDate)
+    public function __construct(\DateTimeInterface $executionDate)
     {
         $this->executionDate = $executionDate;
         $this->contacts      = new ArrayCollection();
@@ -41,7 +32,7 @@ class GroupExecutionDateDAO
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {

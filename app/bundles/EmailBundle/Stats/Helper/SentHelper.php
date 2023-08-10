@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stats\Helper;
 
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
@@ -16,7 +7,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 class SentHelper extends AbstractHelper
 {
-    const NAME = 'email-sent';
+    public const NAME = 'email-sent';
 
     /**
      * @return string
@@ -31,9 +22,10 @@ class SentHelper extends AbstractHelper
      */
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
     {
-        $column = $this->generatedColumnsProvider->generatedColumnsAreSupported() ? 'generated_sent_date' : 'date_sent';
-        $query  = $this->getQuery($fromDateTime, $toDateTime);
-        $q      = $query->prepareTimeDataQuery('email_stats', $column, $options->getFilters());
+        $useGeneratedColumn = $this->generatedColumnsProvider->generatedColumnsAreSupported() && 'd' == $options->getUnit();
+        $column             = $useGeneratedColumn ? 'generated_sent_date' : 'date_sent';
+        $query              = $this->getQuery($fromDateTime, $toDateTime);
+        $q                  = $query->prepareTimeDataQuery('email_stats', $column, $options->getFilters());
 
         $this->limitQueryToEmailIds($q, $options->getEmailIds(), 'email_id', 't');
 

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -46,7 +37,7 @@ class FieldColumnBackgroundJobDispatcher
 
         $event = new AddColumnBackgroundEvent($leadField);
 
-        $this->dispatcher->dispatch($action, $event);
+        $this->dispatcher->dispatch($event, $action);
 
         if ($event->isPropagationStopped()) {
             throw new AbortColumnCreateException('Column cannot be created now');

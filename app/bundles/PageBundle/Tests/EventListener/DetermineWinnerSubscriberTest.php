@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\Collection;
@@ -19,9 +10,10 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\EventListener\DetermineWinnerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject|HitRepository
@@ -47,7 +39,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber    = new DetermineWinnerSubscriber($this->hitRepository, $this->translator);
     }
 
-    public function testOnDetermineBounceRateWinner()
+    public function testOnDetermineBounceRateWinner(): void
     {
         $parentMock    = $this->createMock(Page::class);
         $childMock     = $this->createMock(Page::class);
@@ -86,46 +78,46 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn($translation);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('hasTranslations')
             ->willReturn(true);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('hasTranslations')
             ->willReturn(true);
 
         $transChildren->method('getKeys')
             ->willReturnOnConsecutiveCalls([2], [4]);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getTranslationChildren')
             ->willReturn($transChildren);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('getTranslationChildren')
             ->willReturn($transChildren);
 
-        $parentMock->expects($this->once())
+        $parentMock->expects(self::once())
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 
-        $childMock->expects($this->any())
+        $childMock
             ->method('getId')
             ->willReturn(3);
 
-        $parentMock->expects($this->once())
+        $parentMock->expects(self::once())
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $this->hitRepository->expects($this->once())
+        $this->hitRepository->expects(self::once())
             ->method('getBounces')
             ->with($ids, $startDate)
             ->willReturn($bounces);
@@ -136,8 +128,9 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [3]);
-        $this->assertEquals($abTestResults['support']['data'][$translation], $expectedData);
+        // Check for lowest bounce rates
+        self::assertEquals([1], $abTestResults['winners']);
+        self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
     public function testOnDetermineDwellTimeWinner()

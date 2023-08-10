@@ -1,18 +1,8 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\TokenHelper;
-use ReflectionProperty;
 
 class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,7 +20,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $reflectionProperty = new ReflectionProperty(TokenHelper::class, 'parameters');
+        $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue([
             'date_format_dateonly' => 'F j, Y',
@@ -67,7 +57,12 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
                 'lastname'  => 'Smith',
                 'companies' => [
                     [
+                        'companyzip' => '77009',
+                        'is_primary' => 0,
+                    ],
+                    [
                         'companyzip' => '77008',
+                        'is_primary' => 1,
                     ],
                 ],
             ],

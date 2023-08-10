@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -117,8 +108,6 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @param $result
      *
      * @return $this
      */

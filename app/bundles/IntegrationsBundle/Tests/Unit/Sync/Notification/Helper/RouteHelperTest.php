@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -59,7 +50,6 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
@@ -68,7 +58,8 @@ class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
             );
 
         $this->routeHelper->getRoute(Contact::NAME, 1);
@@ -85,7 +76,6 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
@@ -94,7 +84,8 @@ class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
             );
 
         $this->routeHelper->getRoute(Company::NAME, 1);
@@ -125,7 +116,6 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
@@ -134,7 +124,8 @@ class RouteHelperTest extends TestCase
                     $event->setRoute('route/for/id/1');
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
             );
 
         $link = $this->routeHelper->getLink(Contact::NAME, 1, 'Hello');
@@ -153,7 +144,6 @@ class RouteHelperTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                     $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame(1, $event->getId());
@@ -163,9 +153,9 @@ class RouteHelperTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                     $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame(2, $event->getId());
@@ -175,6 +165,7 @@ class RouteHelperTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 ]
             );
 

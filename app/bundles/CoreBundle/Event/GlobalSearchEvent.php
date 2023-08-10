@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class GlobalSearchEvent.
@@ -29,13 +21,13 @@ class GlobalSearchEvent extends Event
     protected $searchString;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var Translator
      */
     protected $translator;
 
     /**
-     * @param string                                                 $searchString
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     * @param string     $searchString
+     * @param Translator $translator
      */
     public function __construct($searchString, $translator)
     {

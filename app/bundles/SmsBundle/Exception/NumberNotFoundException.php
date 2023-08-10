@@ -1,17 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Exception;
-
-use Throwable;
 
 class NumberNotFoundException extends \Exception
 {
@@ -27,7 +16,7 @@ class NumberNotFoundException extends \Exception
      * @param string $message
      * @param int    $code
      */
-    public function __construct($number, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct($number, $message = '', $code = 0, \Throwable $previous = null)
     {
         $this->number = $number;
 

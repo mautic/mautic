@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -37,7 +28,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -82,7 +73,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $aggregators = [];
 
     /**
-     * @var array
+     * @var array|null
      */
     private $settings = [];
 
@@ -127,50 +118,50 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Type::BOOLEAN, ['columnName'=>'`system`']);
+        $builder->addField('system', Types::BOOLEAN, ['columnName'=>'`system`']);
 
-        $builder->addField('source', Type::STRING);
+        $builder->addField('source', Types::STRING);
 
-        $builder->createField('columns', Type::TARRAY)
+        $builder->createField('columns', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', Type::TARRAY)
+        $builder->createField('filters', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', Type::TARRAY)
+        $builder->createField('tableOrder', Types::ARRAY)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', Type::TARRAY)
+        $builder->createField('graphs', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', Type::TARRAY)
+        $builder->createField('groupBy', Types::ARRAY)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', Type::TARRAY)
+        $builder->createField('aggregators', Types::ARRAY)
             ->columnName('aggregators')
             ->nullable()
             ->build();
 
-        $builder->createField('settings', Type::JSON_ARRAY)
+        $builder->createField('settings', Types::JSON)
             ->columnName('settings')
             ->nullable()
             ->build();
 
-        $builder->createField('isScheduled', Type::BOOLEAN)
+        $builder->createField('isScheduled', Types::BOOLEAN)
             ->columnName('is_scheduled')
             ->build();
 
-        $builder->addNullableField('scheduleUnit', Type::STRING, 'schedule_unit');
-        $builder->addNullableField('toAddress', Type::STRING, 'to_address');
-        $builder->addNullableField('scheduleDay', Type::STRING, 'schedule_day');
-        $builder->addNullableField('scheduleMonthFrequency', Type::STRING, 'schedule_month_frequency');
+        $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
+        $builder->addNullableField('toAddress', Types::STRING, 'to_address');
+        $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
+        $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -186,8 +177,6 @@ class Report extends FormEntity implements SchedulerInterface
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -221,8 +210,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -236,8 +223,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Report
@@ -261,8 +246,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set system.
-     *
      * @param string $system
      *
      * @return Report
@@ -276,8 +259,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get system.
-     *
      * @return int
      */
     public function getSystem()
@@ -301,8 +282,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get source.
-     *
      * @return string
      */
     public function getSource()
@@ -311,9 +290,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set columns.
-     *
-     * @param string $columns
+     * @param mixed[] $columns
      *
      * @return Report
      */
@@ -326,8 +303,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get columns.
-     *
      * @return array
      */
     public function getColumns()
@@ -336,9 +311,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Set filters.
-     *
-     * @param string $filters
+     * @param mixed[] $filters
      *
      * @return Report
      */
@@ -351,8 +324,6 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * Get filters.
-     *
      * @return array
      */
     public function getFilters()

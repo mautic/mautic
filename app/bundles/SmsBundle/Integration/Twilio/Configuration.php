@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -24,7 +15,7 @@ class Configuration
     /**
      * @var string
      */
-    private $sendingPhoneNumber;
+    private $messagingServiceSid;
 
     /**
      * @var string
@@ -49,11 +40,11 @@ class Configuration
      *
      * @throws ConfigurationException
      */
-    public function getSendingNumber()
+    public function getMessagingServiceSid()
     {
         $this->setConfiguration();
 
-        return $this->sendingPhoneNumber;
+        return $this->messagingServiceSid;
     }
 
     /**
@@ -95,8 +86,8 @@ class Configuration
             throw new ConfigurationException();
         }
 
-        $this->sendingPhoneNumber = $integration->getIntegrationSettings()->getFeatureSettings()['sending_phone_number'];
-        if (empty($this->sendingPhoneNumber)) {
+        $this->messagingServiceSid = $integration->getIntegrationSettings()->getFeatureSettings()['messaging_service_sid'];
+        if (empty($this->messagingServiceSid)) {
             throw new ConfigurationException();
         }
 

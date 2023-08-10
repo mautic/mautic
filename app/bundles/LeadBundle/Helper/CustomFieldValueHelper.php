@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 
 /**
@@ -19,11 +9,11 @@ use Mautic\CoreBundle\Helper\Serializer;
  */
 class CustomFieldValueHelper
 {
-    const TYPE_BOOLEAN     = 'boolean';
+    public const TYPE_BOOLEAN     = 'boolean';
 
-    const TYPE_SELECT      = 'select';
+    public const TYPE_SELECT      = 'select';
 
-    const TYPE_MULTISELECT = 'multiselect';
+    public const TYPE_MULTISELECT = 'multiselect';
 
     /**
      * @return array
@@ -54,34 +44,11 @@ class CustomFieldValueHelper
      */
     private static function normalizeValue(array $field)
     {
-        $value      = ArrayHelper::getValue('value', $field, '');
-        $type       = ArrayHelper::getValue('type', $field);
-        $properties = ArrayHelper::getValue('properties', $field);
-        if ('' !== $value && $type && $properties) {
-            if (!is_array($properties)) {
-                $properties = Serializer::decode($properties);
-            }
-            switch ($type) {
-                case self::TYPE_BOOLEAN:
-                    $values = array_values($properties);
-                    if (isset($values[$value])) {
-                        $value = $values[$value];
-                    }
-                    break;
-                case self::TYPE_SELECT:
-                    $value = self::setValueFromPropertiesList($properties, $value);
-                    break;
-                case self::TYPE_MULTISELECT:
-                    $values = explode('|', $value);
-                    foreach ($values as &$val) {
-                        $val = self::setValueFromPropertiesList($properties, $val);
-                    }
-                    $value = implode('|', $values);
-                    break;
-            }
-        }
+        $value      = $field['value'] ?? '';
+        $type       = $field['type'] ?? null;
+        $properties = $field['properties'] ?? null;
 
-        return $value;
+        return self::normalize($value, $type, $properties);
     }
 
     /**
@@ -97,9 +64,53 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
-                    $value = $property['label'];
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif (isset($property['value']) && $property['value'] == $value) {
+                    return $property['label'];
                 }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed                          $value
+     * @param string|null                    $type
+     * @param string|array<int, string>|null $properties
+     *
+     * @return mixed|string
+     */
+    public static function normalize($value, $type, $properties)
+    {
+        if ('' !== $value && $type && $properties) {
+            if (!is_array($properties)) {
+                $properties = Serializer::decode($properties);
+            }
+            switch ($type) {
+                case self::TYPE_BOOLEAN:
+                    foreach ($properties as $key => $property) {
+                        if ('yes' === $key && !isset($properties[1])) {
+                            $properties[1] = $property;
+                        } elseif ('no' === $key && !isset($properties[0])) {
+                            $properties[0] = $property;
+                        }
+                    }
+                    if (isset($properties[$value])) {
+                        $value = $properties[$value];
+                    }
+                    break;
+                case self::TYPE_SELECT:
+                    $value = self::setValueFromPropertiesList($properties, $value);
+                    break;
+                case self::TYPE_MULTISELECT:
+                    $values = explode('|', $value);
+                    foreach ($values as &$val) {
+                        $val = self::setValueFromPropertiesList($properties, $val);
+                    }
+                    $value = implode('|', $values);
+                    break;
             }
         }
 

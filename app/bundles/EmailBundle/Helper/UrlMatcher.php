@@ -1,21 +1,10 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 class UrlMatcher
 {
     /**
-     * @param $urlToFind
-     *
      * @return bool
      */
     public static function hasMatch(array $urlsToCheckAgainst, $urlToFind)
@@ -34,8 +23,6 @@ class UrlMatcher
     }
 
     /**
-     * @param $url
-     *
      * @return mixed|string
      */
     private static function sanitizeUrl($url)

@@ -1,20 +1,9 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stats\Helper;
 
-use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
@@ -58,9 +47,9 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @return array
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function fetchStats(DateTime $fromDateTime, DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
@@ -92,7 +81,7 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @return ChartQuery
      */
-    protected function getQuery(DateTime $fromDateTime, DateTime $toDateTime)
+    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
@@ -140,11 +129,11 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
         foreach ($results as $result) {
             $statCollection->addStatByDateTimeStringInUTC($result['date'], $result['count']);
         }

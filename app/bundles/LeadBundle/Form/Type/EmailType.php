@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -25,6 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailType extends AbstractType
 {
+    public const REPLY_TO_ADDRESS = 'replyToAddress';
+
     /**
      * @var UserHelper
      */
@@ -35,7 +28,7 @@ class EmailType extends AbstractType
         $this->userHelper = $userHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
 
@@ -56,12 +49,15 @@ class EmailType extends AbstractType
         $builder->add(
             'fromname',
             TextType::class,
-             [
-                'label'      => 'mautic.lead.email.from_name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
-                'data'       => $default,
+            [
+               'label'      => 'mautic.lead.email.from_name',
+               'label_attr' => ['class' => 'control-label'],
+               'attr'       => [
+                   'class'    => 'form-control',
+                   'preaddon' => 'fa fa-user',
+               ],
+               'required'   => false,
+               'data'       => $default,
             ]
         );
 
@@ -72,7 +68,10 @@ class EmailType extends AbstractType
             [
                 'label'       => 'mautic.lead.email.from_email',
                 'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-envelope',
+                ],
                 'required'    => false,
                 'data'        => $default,
                 'constraints' => [
@@ -83,6 +82,21 @@ class EmailType extends AbstractType
                         'message' => 'mautic.core.email.required',
                     ]),
                 ],
+            ]
+        );
+
+        $builder->add(
+            self::REPLY_TO_ADDRESS,
+            TextType::class,
+            [
+                'label'      => 'mautic.email.reply_to_email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-envelope',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                ],
+                'required' => false,
             ]
         );
 

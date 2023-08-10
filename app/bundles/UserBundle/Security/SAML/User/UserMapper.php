@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
@@ -80,6 +71,10 @@ class UserMapper implements UsernameMapperInterface
         $attributes = [];
 
         foreach ($this->attributes as $key => $attributeName) {
+            if (!$attributeName) {
+                continue;
+            }
+
             foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                 $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
                 if ($attribute && $attribute->getFirstAttributeValue()) {

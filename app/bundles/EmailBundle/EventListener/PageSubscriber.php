@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
@@ -61,7 +52,7 @@ class PageSubscriber implements EventSubscriberInterface
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
-            //click trigger condition
+            // click trigger condition
             $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
