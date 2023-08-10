@@ -5924,6 +5924,8 @@
                         "[project-root]/.env": "assets/scaffold/files/.env",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
+                        "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
+                        "[project-root]/tsconfig.types.json": "assets/scaffold/files/tsconfig.types.json",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
