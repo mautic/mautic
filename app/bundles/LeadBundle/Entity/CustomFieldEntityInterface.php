@@ -65,8 +65,6 @@ interface CustomFieldEntityInterface
 
     /**
      * Get flat array of profile fields without groups.
-     *
-     * @return mixed
      */
     public function getAnonymizationProfileFields(): mixed;
 }

@@ -1953,7 +1953,7 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
-                'lead:exports:anonymize',
+                'lead:exports:notAnonymize',
             ],
             'RETURN_ARRAY'
         );
@@ -1962,7 +1962,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $anonymize = $permissions['lead:exports:anonymize'] ? true : false;
+        $notAnonymize = $permissions['lead:exports:notAnonymize'];
 
         $fileType = $request->get('filetype', 'csv');
 
@@ -2015,8 +2015,8 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($anonymize, $exportHelper) {
-            return $exportHelper->parseLeadToExport($contact, $anonymize);
+        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($notAnonymize, $exportHelper) {
+            return $exportHelper->parseLeadToExport($contact, $notAnonymize);
         });
 
         return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
@@ -2032,7 +2032,7 @@ class LeadController extends FormController
             [
                 'lead:leads:viewown',
                 'lead:leads:viewother',
-                'lead:exports:anonymize',
+                'lead:exports:notAnonymize',
             ],
             'RETURN_ARRAY'
         );
@@ -2041,7 +2041,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $anonymize = $permissions['lead:exports:anonymize'] ? true : false;
+        $notAnonymize = $permissions['lead:exports:notAnonymize'];
 
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
@@ -2052,7 +2052,7 @@ class LeadController extends FormController
             return $this->notFound();
         }
 
-        $contactFields = $anonymize ? $lead->getProfileFields() : $lead->getAnonymizationProfileFields();
+        $contactFields = $notAnonymize ? $lead->getProfileFields() : $lead->getAnonymizationProfileFields();
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [

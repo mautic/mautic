@@ -241,8 +241,6 @@ trait CustomFieldEntityTrait
 
     /**
      * Get anonymization profile values.
-     *
-     * @return array
      */
     public function getAnonymizationProfileFields(): array
     {

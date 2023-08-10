@@ -214,12 +214,12 @@ class ExportHelper
     /**
      * @return array<string, string>
      */
-    public function parseLeadToExport(Lead $lead, bool $anonymize): array
+    public function parseLeadToExport(Lead $lead, bool $notAnonymize): array
     {
-        if ($anonymize) {
-            $leadExport = $lead->getAnonymizationProfileFields();
-        } else {
+        if ($notAnonymize) {
             $leadExport = $lead->getProfileFields();
+        } else {
+            $leadExport = $lead->getAnonymizationProfileFields();
         }
 
         $stage               = $lead->getStage();
