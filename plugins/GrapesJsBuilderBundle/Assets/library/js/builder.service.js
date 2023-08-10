@@ -132,39 +132,24 @@ export default class BuilderService {
     return {
       options: {
         language: 'en',
+        removePlugins: ["Image", "ImageCaption", "ImageInsert", "ImageResize", "ImageStyle", "ImageToolbar", "AutoImage", "ImageInline"],
         toolbar: {
           items: [
             'link',
-            'fontColor',
-            'fontSize',
-            'fontFamily',
-            'fontBackgroundColor',
-            'alignment',
+            '|',
             'bold',
             'italic',
-            'underline',
             'strikethrough',
-            'bulletedList',
+            '|',
+            'removeFormat',
+            '|',
             'numberedList',
+            'bulletedList',
             '|',
-            'outdent',
-            'indent',
+            'fontColor',
+            'fontBackgroundColor',
             '|',
-            'blockQuote',
-            'insertTable',
-            '|',
-            'undo',
-            'redo'
-          ]
-        },
-
-        table: {
-          contentToolbar: [
-            'tableColumn',
-            'tableRow',
-            'mergeTableCells',
-            'tableCellProperties',
-            'tableProperties'
+            'sourceEditing'
           ]
         },
         licenseKey: ''
@@ -331,11 +316,13 @@ export default class BuilderService {
     if (richTextEditor.customRte) {
       richTextEditor.customRte.disable = (el, rte) => {
         el.contentEditable = false;
-        if(rte && rte.focusManager) {
+        if (rte && rte.focusManager) {
           rte.focusManager.blur(true);
         }
 
-        rte.destroy(true);
+        if (rte && typeof rte.destroy == 'function') {
+          rte.destroy();
+        }
       }
     }
   }
