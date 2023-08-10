@@ -235,8 +235,8 @@ class LeadSubscriber implements EventSubscriberInterface
         if ($object instanceof Lead) {
             if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)) {
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES,
-                    new InternalContactEvent($integrationName, $object)
+                    new InternalContactEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES
                 );
             }
 
@@ -246,8 +246,8 @@ class LeadSubscriber implements EventSubscriberInterface
         if ($object instanceof Company) {
             if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)) {
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES,
-                    new InternalCompanyEvent($integrationName, $object)
+                    new InternalCompanyEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES
                 );
             }
 

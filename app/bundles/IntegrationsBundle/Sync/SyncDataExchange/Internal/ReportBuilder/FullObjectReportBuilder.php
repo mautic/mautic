@@ -134,7 +134,7 @@ class FullObjectReportBuilder
             if (isset($event)) {
                 // Update object id rather than creating the event again.
                 $event->setId((int) $object['id']);
-                $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $event);
+                $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD);
 
                 if (!$event->getEntity()) {
                     // Object not found, continue.
@@ -173,8 +173,8 @@ class FullObjectReportBuilder
         if ($object instanceof Lead) {
             if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD)) {
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD,
-                    new InternalContactEvent($integrationName, $object)
+                    new InternalContactEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD
                 );
             }
 
@@ -184,8 +184,8 @@ class FullObjectReportBuilder
         if ($object instanceof Company) {
             if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD)) {
                 $this->dispatcher->dispatch(
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD,
-                    new InternalCompanyEvent($integrationName, $object)
+                    new InternalCompanyEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD
                 );
             }
 
