@@ -34,11 +34,11 @@ class ConfigType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $samlEntityIdChoices = [$this->parameters->get('mautic.site_url')];
+        $samlEntityIdChoices = ['', $this->parameters->get('mautic.site_url')];
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
             $samlEntityIdChoices[] = $this->parameters->get('mautic.subdomain_url');
         }
-        if (count(array_unique($samlEntityIdChoices)) > 1) {
+        if (array_unique($samlEntityIdChoices)) {
             $builder->add('saml_idp_entity_id', ChoiceType::class,
                 [
                     'choices'    => array_combine($samlEntityIdChoices, $samlEntityIdChoices),
