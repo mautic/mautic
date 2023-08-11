@@ -5926,6 +5926,8 @@
                         "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
                         "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
+                        "[project-root]/media/js/ckeditor/src/ckeditor.ts": "assets/scaffold/files/ckeditor/src/ckeditor.ts",
+                        "[project-root]/media/js/ckeditor/src/InsertDropDown.js": "assets/scaffold/files/ckeditor/src/InsertDropDown.js",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
@@ -5939,8 +5941,6 @@
                         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
-                        "[web-root]/media/js/ckeditor/src/ckeditor.ts": "assets/scaffold/files/ckeditor/src/ckeditor.ts",
-                        "[web-root]/media/js/ckeditor/src/InsertDropDown.js": "assets/scaffold/files/ckeditor/src/InsertDropDown.js",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
                         "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
                     }
