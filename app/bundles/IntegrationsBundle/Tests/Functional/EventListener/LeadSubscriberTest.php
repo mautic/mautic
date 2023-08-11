@@ -68,14 +68,14 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         Assert::assertCount(2, $fieldChanges, print_r($fieldChanges, true));
 
         Assert::assertSame('unicorn', $fieldChanges[0]['integration']);
-        Assert::assertSame($contactReal->getId(), $fieldChanges[0]['object_id']);
+        Assert::assertSame($contactReal->getId(), (int) $fieldChanges[0]['object_id']);
         Assert::assertSame(Lead::class, $fieldChanges[0]['object_type']);
         Assert::assertSame('email', $fieldChanges[0]['column_name']);
         Assert::assertSame('string', $fieldChanges[0]['column_type']);
         Assert::assertSame('john@doe.email', $fieldChanges[0]['column_value']);
 
         Assert::assertSame('unicorn', $fieldChanges[1]['integration']);
-        Assert::assertSame($contactReal->getId(), $fieldChanges[1]['object_id']);
+        Assert::assertSame($contactReal->getId(), (int) $fieldChanges[1]['object_id']);
         Assert::assertSame(Lead::class, $fieldChanges[1]['object_type']);
         Assert::assertSame('points', $fieldChanges[1]['column_name']);
         Assert::assertSame('int', $fieldChanges[1]['column_type']);

@@ -217,7 +217,6 @@ class FullObjectReportBuilderTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                     $this->callback(
                         function (InternalObjectFindEvent $event) use (
                             $internalObject,
@@ -244,9 +243,9 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD,
                     $this->callback(
                         function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity) {
                             $this->assertSame($internalObject, $event->getObject());
@@ -256,9 +255,9 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD,
                     $this->callback(
                         function (InternalContactEvent $event) use ($contactEntity) {
                             $this->assertSame($contactEntity, $event->getContact());
@@ -266,6 +265,7 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD,
                 ]
             );
 
@@ -322,7 +322,6 @@ class FullObjectReportBuilderTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                     $this->callback(
                         function (InternalObjectFindEvent $event) use (
                             $internalObject,
@@ -349,9 +348,9 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD,
                     $this->callback(
                         function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity) {
                             $this->assertSame($internalObject, $event->getObject());
@@ -361,9 +360,9 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD,
                     $this->callback(
                         function (InternalCompanyEvent $event) use ($companyEntity) {
                             $this->assertSame($companyEntity, $event->getCompany());
@@ -371,6 +370,7 @@ class FullObjectReportBuilderTest extends TestCase
                             return true;
                         }
                     ),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD,
                 ]
             );
 
