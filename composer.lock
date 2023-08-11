@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "93aea0139186c975f6c5e52f9d1f48a655f00d35"
+                "reference": "c69f084a73a456bec7aadf254aab76e06695e15d"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",

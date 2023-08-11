@@ -51,8 +51,8 @@ EOT
             return Command::FAILURE;
         }
 
-        $mediaDir     = $this->pathsHelper->getSystemPath('media', true);
-        $ckeditorFile = $mediaDir.'/js/ckeditor/build/ckeditor.js';
+
+        $ckeditorFile = $this->pathsHelper->getVendorRootPath().'/media/js/ckeditor/build/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
 
@@ -64,6 +64,7 @@ EOT
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
         $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
