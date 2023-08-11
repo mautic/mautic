@@ -10,6 +10,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class RequestNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @return mixed[]
+     */
     public function normalize(mixed $object, string $format = null, array $context = []): array
     {
         \assert($object instanceof Request);
