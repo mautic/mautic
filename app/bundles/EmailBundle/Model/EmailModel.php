@@ -473,7 +473,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function hitEmail(
         $stat,
-        ?Request $request,
+        Request $request,
         bool $viaBrowser = false,
         bool $activeRequest = true,
         \DateTimeInterface $hitDateTime = null,
