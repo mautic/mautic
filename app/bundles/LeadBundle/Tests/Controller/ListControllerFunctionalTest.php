@@ -397,5 +397,53 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertStringContainsString('Date field filter value &quot;Today&quot; is invalid', $this->client->getResponse()->getContent());
+
+        $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => 'birthday',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ],
+            $segment
+        );
+
+        $this->em->clear();
+
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+
+        $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => '2023-01-01 11:00',
+                    'display'  => null,
+                    'operator' => '=',
+                ],
+            ],
+            $segment
+        );
+
+        $this->em->clear();
+
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
     }
 }
