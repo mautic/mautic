@@ -7,9 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -187,14 +187,13 @@ class PageTestAbstract extends TestCase
      */
     protected function getRedirectModel()
     {
-        $urlHelper = $this
-            ->getMockBuilder(UrlHelper::class)
+        $shortener = $this
+            ->getMockBuilder(Shortener::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->setConstructorArgs([
-                $urlHelper,
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
                 $this->createMock(EventDispatcherInterface::class),
@@ -203,6 +202,7 @@ class PageTestAbstract extends TestCase
                 $this->createMock(UserHelper::class),
                 $this->createMock(LoggerInterface::class),
                 $this->createMock(CoreParametersHelper::class),
+                $shortener,
             ])
             ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();

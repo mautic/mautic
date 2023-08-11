@@ -30,6 +30,7 @@ use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -87,6 +88,7 @@ class FormTestAbstract extends TestCase
         $formFieldModel        = $this->createMock(FieldModel::class);
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $translator            = $this->createMock(Translator::class);
         $entityManager         = $this->createMock(EntityManager::class);
@@ -123,6 +125,7 @@ class FormTestAbstract extends TestCase
             $formActionModel,
             $formFieldModel,
             $this->fieldHelper,
+            $primaryCompanyHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
