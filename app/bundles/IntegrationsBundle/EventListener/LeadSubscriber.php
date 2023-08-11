@@ -223,8 +223,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $this->fieldChangeRepo->deleteEntitiesForObjectByColumnName($objectId, $objectType, $changedFields);
         $this->fieldChangeRepo->saveEntities($toPersist);
-
-        $this->fieldChangeRepo->deleteEntities($toPersist);
+        $this->fieldChangeRepo->detachEntities($toPersist);
     }
 
     /**

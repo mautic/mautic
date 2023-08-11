@@ -481,7 +481,7 @@ class LeadSubscriberTest extends TestCase
             ->method('saveEntities');
 
         $this->fieldChangeRepository->expects($this->once())
-            ->method('deleteEntities');
+            ->method('detachEntities');
     }
 
     /**
