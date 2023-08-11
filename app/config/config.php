@@ -2,7 +2,6 @@
 
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
-use Mautic\MessengerBundle\MauticMessengerTransports;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -84,27 +83,27 @@ $container->loadFromExtension('framework', [
             'symfony_serializer' => ['format' => 'json'],
         ],
         'transports'        => [
-            MauticMessengerTransports::EMAIL => [
+            'email'  => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
-            MauticMessengerTransports::HIT    => [
+            'hit'    => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
-            MauticMessengerTransports::FAILED => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
+            'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => MauticMessengerTransports::EMAIL,
-            \Mautic\MessengerBundle\Message\TestEmail::class            => MauticMessengerTransports::EMAIL,
-            \Mautic\MessengerBundle\Message\TestHit::class              => MauticMessengerTransports::HIT,
-            \Mautic\MessengerBundle\Message\TestFailed::class           => MauticMessengerTransports::FAILED,
-            \Mautic\MessengerBundle\Message\PageHitNotification::class  => MauticMessengerTransports::HIT,
-            \Mautic\MessengerBundle\Message\EmailHitNotification::class => MauticMessengerTransports::HIT,
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
+            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
+            \Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
+            \Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
         ],
     ],
 
