@@ -132,7 +132,6 @@ class FormModel extends CommonFormModel
         $this->formActionModel        = $formActionModel;
         $this->formFieldModel         = $formFieldModel;
         $this->fieldHelper            = $fieldHelper;
-        $this->primaryCompanyHelper   = $primaryCompanyHelper;
         $this->leadFieldModel         = $leadFieldModel;
         $this->formUploader           = $formUploader;
         $this->contactTracker         = $contactTracker;
