@@ -121,6 +121,11 @@ class PathsHelper
         return $this->getSystemPath('assets', true);
     }
 
+    public function getMediaPath(): string
+    {
+        return $this->getSystemPath('media', true);
+    }
+
     public function getCoreBundlesPath(): string
     {
         return $this->getSystemPath('bundles', true);

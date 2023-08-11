@@ -15,6 +15,7 @@ class LeadPermissions extends AbstractPermissions
         $this->permissions = [
             'lists' => [
                 'viewother'   => 2,
+                'viewown'     => 4,
                 'editother'   => 8,
                 'deleteother' => 64,
                 'full'        => 1024,

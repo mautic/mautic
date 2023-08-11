@@ -322,13 +322,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $email   = $event->getEmail();
-        $emailId = ($email) ? $email->getId() : null;
-        if (!$email instanceof Email) {
-            $email = $this->emailModel->getEntity($emailId);
-        }
+        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $email          = $event->getEmail();
+        $emailId        = $email instanceof Email ? $email->getId() : null;
+        $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
-        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
@@ -338,9 +336,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
 
             $event->addToken($token, $url);
         }

@@ -2,11 +2,14 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -16,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 
 class AjaxController extends CommonAjaxController
 {
@@ -178,7 +180,7 @@ class AjaxController extends CommonAjaxController
     public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): Response
     {
         $user  = $userHelper->getUser();
-        $email = (new Email())
+        $email = (new MauticMessage())
             ->subject($this->translator->trans('mautic.email.config.mailer.transport.test_send.subject'))
             ->text($this->translator->trans('mautic.email.config.mailer.transport.test_send.body'))
             ->from(new Address($parametersHelper->get('mailer_from_email'), $parametersHelper->get('mailer_from_name') ?: ''))
@@ -241,5 +243,44 @@ class AjaxController extends CommonAjaxController
         }
 
         return new JsonResponse($data);
+    }
+
+    public function getEmailDeliveredCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    {
+        $emailId = (int) InputHelper::clean($request->query->get('id'));
+
+        if (0 === $emailId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $cacheProvider->getItem('email.stats.delivered.'.$emailId);
+
+        if ($cacheItem->isHit()) {
+            $deliveredCount = $cacheItem->get();
+        } else {
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+
+            $email = $model->getEntity($emailId);
+            if (null === $email) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $deliveredCount = $model->getDeliveredCount($email);
+            $cacheItem->set($deliveredCount);
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'     => 1,
+            'delivered'   => $deliveredCount,
+        ]);
     }
 }

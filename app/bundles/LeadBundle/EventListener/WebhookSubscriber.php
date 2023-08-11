@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -21,7 +22,7 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $webhookModel;
 
-    public function __construct(WebhookModel $webhookModel)
+    public function __construct(WebhookModel $webhookModel, private LeadModel $leadModel)
     {
         $this->webhookModel = $webhookModel;
     }
@@ -141,6 +142,11 @@ class WebhookSubscriber implements EventSubscriberInterface
         }
 
         $changes = $lead->getChanges(true);
+
+        if (empty($changes)) {
+            return;
+        }
+
         $this->webhookModel->queueWebhooksByType(
             // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
@@ -266,6 +272,9 @@ class WebhookSubscriber implements EventSubscriberInterface
     {
         $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
         foreach ($contacts as $contact) {
+            if (is_array($contact)) {
+                $contact = $this->leadModel->getEntity($contact['id']);
+            }
             $this->webhookModel->queueWebhooksByType(
                 LeadEvents::LEAD_LIST_CHANGE,
                 [

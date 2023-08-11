@@ -78,11 +78,7 @@ trait FormErrorMessagesTrait
 
     public function getFormErrorForBuilder(Form $form): ?string
     {
-        if (!$form->isSubmitted()) {
-            return null;
-        }
-
-        if ($form->isValid()) {
+        if (!$form->isSubmitted() || $form->isValid()) {
             return null;
         }
 
