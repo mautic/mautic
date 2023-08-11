@@ -810,13 +810,13 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         // verify that all companies are attached to contact
         $companies  = $this->getCompanyLeads($contact->getId());
-        Assert::assertSame($companyLimit, count($companies));
+        Assert::assertCount($companyLimit, $companies);
 
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
         $saveButton    = $crawler->selectButton('lead[buttons][save]');
         $form          = $saveButton->form();
         $leadCompanies = $form['lead[companies]']->getValue();
 
-        Assert::assertSame($companyLimit, count($leadCompanies));
+        Assert::assertCount($companyLimit, $leadCompanies);
     }
 }
