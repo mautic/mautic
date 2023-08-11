@@ -30,7 +30,7 @@ import { Alignment } from "@ckeditor/ckeditor5-alignment";
 import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
 import { Mention } from "@ckeditor/ckeditor5-mention";
-import InsertDropDown from './InsertDropDown';
+import TokenPlugin from './TokenPlugin';
 
 export default class ClassicEditor extends ClassicEditorBase {
     public static override builtinPlugins = [
@@ -54,7 +54,7 @@ export default class ClassicEditor extends ClassicEditorBase {
         FontBackgroundColor,
         RemoveFormat,
         SourceEditing,
-        InsertDropDown,
+        TokenPlugin,
         FontColor,
         FontFamily,
         FontSize,

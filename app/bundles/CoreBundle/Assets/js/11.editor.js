@@ -364,7 +364,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
         });
     }
 
-    if (ckEditorToolbar.indexOf('InsertDropDown') > -1)
+    if (ckEditorToolbar.indexOf('TokenPlugin') > -1)
     {
         Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
             mQuery.extend(ckEditorOption, {

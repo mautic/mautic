@@ -3,12 +3,12 @@ import Model from '@ckeditor/ckeditor5-ui/src/model';
 import Collection from '@ckeditor/ckeditor5-utils/src/collection';
 import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
 
-export default class InsertDropDown extends Plugin {
+export default class TokenPlugin extends Plugin {
     init() {
         const editor = this.editor;
         const tokens = typeof editor.config._config.dynamicToken != undefined ? editor.config._config.dynamicToken : [] ;
         const tokens_label = typeof editor.config._config.dynamicTokenLabel != undefined ? editor.config._config.dynamicTokenLabel : "Insert Token" ;
-        editor.ui.componentFactory.add('InsertDropDown', (locale) => {
+        editor.ui.componentFactory.add('TokenPlugin', (locale) => {
             const dropdownView = createDropdown(locale);
             dropdownView.buttonView.set({
                 withText: true,
