@@ -107,7 +107,8 @@
     "symfony/doctrine-messenger": "^5.4",
     "symfony/mailer": "~5.4",
     "symfony/mime": "~5.4",
-    "wikimedia/less.php": "^4.1"
+    "wikimedia/less.php": "^4.1",
+    "symfony/serializer": "^6.0"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

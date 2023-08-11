@@ -4,45 +4,36 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\MessageHandler;
 
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\DBAL\Exception\DeadlockException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class EmailHitNotificationHandler implements MessageSubscriberInterface
+class EmailHitNotificationHandler implements MessageHandlerInterface
 {
-    public function __construct(private EmailModel $emailModel, private LoggerInterface $logger)
+    private bool $isSyncTransport;
+
+    public function __construct(private EmailModel $emailModel, CoreParametersHelper $parametersHelper)
     {
+        $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
     }
 
     public function __invoke(EmailHitNotification $message, Acknowledger $ack = null): void
     {
         try {
-            $this->logger->debug('Processing email hit notification, statId '.$message->getStatId());
             $this->emailModel->hitEmail(
                 $message->getStatId(),
                 $message->getRequest(),
                 false,
-                $message->isSynchronousRequest(),
+                $this->isSyncTransport,
                 $message->getEventTime(),
                 true
             );
-        } catch (OptimisticLockException $lockException) {
+        } catch (DeadlockException $lockException) {
             throw new RecoverableMessageHandlingException($lockException->getMessage());
-        } catch (\Exception $exception) {
-            $this->logger->error($exception->getMessage(), (array) $exception);
-            throw $exception;
         }
-    }
-
-    /**
-     * @return iterable<string, mixed>
-     */
-    public static function getHandledMessages(): iterable
-    {
-        yield EmailHitNotification::class => [];
     }
 }

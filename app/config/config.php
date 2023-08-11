@@ -78,17 +78,10 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'failure_transport' => 'failed',
-        'serializer'        => [
-            'default_serializer' => 'messenger.transport.native_php_serializer',
-        ],
-        'buses' => [
-            'messenger.bus.hit' => [
-                'default_middleware'    => true,
-                'middleware'            => [
-                    \Mautic\MessengerBundle\Middleware\SynchronousExtrasMiddleware::class,
-                ],
-            ],
+        'failure_transport'  => 'failed',
+        'serializer'         => [
+            'default_serializer' => 'messenger.transport.symfony_serializer',
+            'symfony_serializer' => ['format' => 'json'],
         ],
         'transports'        => [
             MauticMessengerTransports::EMAIL => [
@@ -97,16 +90,18 @@ $container->loadFromExtension('framework', [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
-            MauticMessengerTransports::FAILED => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
-            MauticMessengerTransports::SYNC   => 'sync://',
             MauticMessengerTransports::HIT    => [
-                'dsn'        => 'sync://',
-                'serializer' => 'messenger.transport.jms_serializer',   // Smaller payload
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
+                'retry_strategy' => [
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                ],
             ],
+            MauticMessengerTransports::FAILED => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
             \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => MauticMessengerTransports::EMAIL,
             \Mautic\MessengerBundle\Message\TestEmail::class            => MauticMessengerTransports::EMAIL,
+            \Mautic\MessengerBundle\Message\TestHit::class              => MauticMessengerTransports::HIT,
             \Mautic\MessengerBundle\Message\TestFailed::class           => MauticMessengerTransports::FAILED,
             \Mautic\MessengerBundle\Message\PageHitNotification::class  => MauticMessengerTransports::HIT,
             \Mautic\MessengerBundle\Message\EmailHitNotification::class => MauticMessengerTransports::HIT,

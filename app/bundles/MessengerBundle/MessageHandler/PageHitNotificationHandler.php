@@ -14,9 +14,9 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\Acknowledger;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class PageHitNotificationHandler implements MessageSubscriberInterface
+class PageHitNotificationHandler implements MessageHandlerInterface
 {
     public function __construct(
         private PageRepository $pageRepository,
@@ -31,23 +31,9 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
     /** @throws InvalidPayloadException */
     public function __invoke(PageHitNotification $message, Acknowledger $ack = null): void
     {
-        try {
-            $parsed = $this->parseMessage($message);
-            $this->pageModel->processPageHit(...$parsed);
-        } catch (InvalidPayloadException $payloadException) {
-            $this->logger->error('Invalid payload #'.$message->getHitId().' '.$payloadException->getMessage());
-            throw $payloadException;
-        } catch (\Exception $exception) {
-            $this->logger->error($exception->getMessage(), (array) $exception);
-            throw $exception;
-        }
+        $parsed = $this->parseMessage($message);
+        $this->pageModel->processPageHit(...$parsed);
         $this->logger->info('processed page hit #'.$message->getHitId());
-    }
-
-    /** @return iterable<string, mixed> */
-    public static function getHandledMessages(): iterable
-    {
-        yield PageHitNotification::class => [];
     }
 
     /**
