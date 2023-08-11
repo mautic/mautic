@@ -14,13 +14,13 @@ module.exports = {
 	devtool: 'source-map',
 	performance: { hints: false },
 
-	entry: path.resolve( __dirname, 'media/js/ckeditor/src', 'ckeditor.ts' ),
+	entry: path.resolve( __dirname, 'assets/ckeditor/src', 'ckeditor.ts' ),
 
 	output: {
 		// The name under which the editor will be exported.
 		library: 'ClassicEditor',
 
-		path: path.resolve( __dirname, 'media/js/ckeditor/build' ),
+		path: path.resolve( __dirname, 'assets/ckeditor/build' ),
 		filename: 'ckeditor.js',
 		libraryTarget: 'umd',
 		libraryExport: 'default'
