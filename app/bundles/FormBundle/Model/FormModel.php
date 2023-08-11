@@ -74,11 +74,6 @@ class FormModel extends CommonFormModel
     protected $fieldHelper;
 
     /**
-     * @var PrimaryCompanyHelper
-     */
-    protected $primaryCompanyHelper;
-
-    /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
@@ -115,7 +110,7 @@ class FormModel extends CommonFormModel
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
-        PrimaryCompanyHelper $primaryCompanyHelper,
+        private PrimaryCompanyHelper $primaryCompanyHelper,
         LeadFieldModel $leadFieldModel,
         FormUploader $formUploader,
         ContactTracker $contactTracker,
@@ -888,7 +883,7 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($autoFillFields as $field) {
-            $value = isset($leadArray[$field->getMappedField()]) ? $leadArray[$field->getMappedField()] : '';
+            $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
