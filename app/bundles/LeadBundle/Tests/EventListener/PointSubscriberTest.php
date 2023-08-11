@@ -35,12 +35,9 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModel   = $this->createMock(LeadModel::class);
-
         $this->translator  = $this->createMock(Translator::class);
         $logger            = $this->createMock(LoggerInterface::class);
-        $this->stageModel  = $this->getMockBuilder(StageModel::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
+        $this->stageModel  = $this->createMock(StageModel::class);
 
         $stageHelper       = new StageHelper($this->leadModel, $this->stageModel, $logger, $this->translator);
 
