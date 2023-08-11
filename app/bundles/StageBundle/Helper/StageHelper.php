@@ -11,24 +11,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class StageHelper
 {
-    protected LeadModel $leadModel;
-
-    protected StageModel $stageModel;
-
-    private LoggerInterface $logger;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        LeadModel $leadModel,
-        StageModel $stageModel,
-        LoggerInterface $logger,
-        TranslatorInterface $translator
-        ) {
-        $this->leadModel  = $leadModel;
-        $this->stageModel = $stageModel;
-        $this->logger     = $logger;
-        $this->translator = $translator;
+        private LeadModel $leadModel,
+        private StageModel $stageModel,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator
+    )
+    {
     }
 
     public function changeStage(Lead $lead, Stage $stage, string $origin): void
