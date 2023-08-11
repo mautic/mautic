@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\MessageHandler;
 
-use Doctrine\DBAL\Exception\DeadlockException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
@@ -32,8 +32,8 @@ class EmailHitNotificationHandler implements MessageHandlerInterface
                 $message->getEventTime(),
                 true
             );
-        } catch (DeadlockException $lockException) {
-            throw new RecoverableMessageHandlingException($lockException->getMessage());
+        } catch (RetryableException $e) {
+            throw new RecoverableMessageHandlingException($e->getMessage());
         }
     }
 }

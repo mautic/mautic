@@ -2,9 +2,8 @@
 
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
-use Doctrine\ORM\OptimisticLockException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\MessengerBundle\MessageHandler\EmailHitNotificationHandler;
@@ -50,7 +49,7 @@ class EmailHitNotificationHandlerTest extends TestCase
         $emailModelMock
             ->expects($this->exactly(1))
             ->method('hitEmail')
-            ->willThrowException(new OptimisticLockException('got me?', Stat::class));
+            ->willThrowException($this->createMock(RetryableException::class));
 
         /** @var MockObject&CoreParametersHelper $parametersHelper */
         $parametersHelper = $this->createMock(CoreParametersHelper::class);
