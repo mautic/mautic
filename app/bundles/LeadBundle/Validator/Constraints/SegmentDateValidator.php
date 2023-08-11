@@ -28,11 +28,20 @@ final class SegmentDateValidator extends ConstraintValidator
                     continue;
                 }
 
-                $dateString = str_replace('%', '', $parameterValue);
+                if (str_contains($parameterValue, '%')) {
+                    return;
+                }
 
                 $format = 'Y-m-d';
 
-                $dateTime = \DateTime::createFromFormat($format, $dateString);
+                $dateTime = \DateTime::createFromFormat($format, $parameterValue);
+
+                // try date time format
+                if (false === $dateTime) {
+                    $format   = 'Y-m-d H:i';
+                    $dateTime = \DateTime::createFromFormat($format, $parameterValue);
+                }
+
                 if (false === $dateTime) {
                     $this->context->addViolation($this->translator->trans('mautic.lead.segment.date_invalid', ['%value%' => $parameterValue], 'validators'));
 
