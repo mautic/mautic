@@ -372,7 +372,10 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
-    public function testWarningOnInvalidDateField(): void
+    /**
+     * @dataProvider dateFieldProvider
+     */
+    public function testWarningOnInvalidDateField(string $filter, bool $shouldContainError): void
     {
         $segment = $this->saveSegment(
             'Date Segment',
@@ -383,7 +386,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
                     'field'    => 'date_added',
                     'object'   => 'lead',
                     'type'     => 'date',
-                    'filter'   => 'Today',
+                    'filter'   => $filter,
                     'display'  => null,
                     'operator' => '=',
                 ],
@@ -396,54 +399,25 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringContainsString('Date field filter value &quot;Today&quot; is invalid', $this->client->getResponse()->getContent());
 
-        $this->saveSegment(
-            'Date Segment',
-            'ds',
-            [
-                [
-                    'glue'     => 'and',
-                    'field'    => 'date_added',
-                    'object'   => 'lead',
-                    'type'     => 'date',
-                    'filter'   => 'birthday',
-                    'display'  => null,
-                    'operator' => '=',
-                ],
-            ],
-            $segment
-        );
+        if ($shouldContainError) {
+            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+        } else {
+            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+        }
+    }
 
-        $this->em->clear();
-
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
-
-        $this->saveSegment(
-            'Date Segment',
-            'ds',
-            [
-                [
-                    'glue'     => 'and',
-                    'field'    => 'date_added',
-                    'object'   => 'lead',
-                    'type'     => 'date',
-                    'filter'   => '2023-01-01 11:00',
-                    'display'  => null,
-                    'operator' => '=',
-                ],
-            ],
-            $segment
-        );
-
-        $this->em->clear();
-
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+    /**
+     * @return array<int, array<int,bool|string>>
+     */
+    public function dateFieldProvider(): array
+    {
+        return [
+            ['Today', true],
+            ['birthday', false],
+            ['2023-01-01 11:00', false],
+            ['2023-01-01', false],
+            ['next week', false],
+        ];
     }
 }
