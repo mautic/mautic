@@ -85,6 +85,7 @@ $container->loadFromExtension('framework', [
         'transports'        => [
             'email'  => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
+                'serializer'     => 'messenger.transport.native_php_serializer', // Not possible to use JSON now. See https://github.com/symfony/symfony/issues/33394
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
