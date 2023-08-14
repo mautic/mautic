@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\Serializer;
 
+use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use Mautic\MessengerBundle\Serializer\Handler\HttpRequestHandler;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -33,16 +35,14 @@ final class MauticMessengerSerializer implements SerializerInterface
         $body    = $encodedEnvelope['body'];
         $headers = $encodedEnvelope['headers'];
 
-        $data = json_decode($body, true);
+        [$className, $classData] = explode(':', $body, 2);
 
-        if (!is_array($data) || 1 !== count($data)) {
-            throw new \InvalidArgumentException('Invalid payload');
+        try {
+            $message = $this->serializer->deserialize($classData, $className, 'json');
+        } catch (\Exception $exception) {
+            throw new MessageDecodingFailedException(sprintf('Could not decode message: %s', $exception->getMessage()), 0, $exception);
         }
 
-        [$messageClassName, $message] = [array_key_first($data), array_values($data)[0]];
-        $message                      = $this->serializer->deserialize($message, $messageClassName, 'json');
-
-        // in case of redelivery, unserialize any stamps
         $stamps = [];
         if (isset($headers['stamps'])) {
             $stamps = unserialize($headers['stamps']);
@@ -56,12 +56,10 @@ final class MauticMessengerSerializer implements SerializerInterface
      */
     public function encode(Envelope $envelope): array
     {
-        // this is called if a message is redelivered for "retry"
         $message = $envelope->getMessage();
-
         $messageClass = $message::class;
 
-        $data = [$messageClass => $this->serializer->serialize($message, 'json')];
+        $data = $this->serializer->serialize($message, 'json');
 
         $allStamps = [];
         foreach ($envelope->all() as $stamps) {
@@ -69,7 +67,7 @@ final class MauticMessengerSerializer implements SerializerInterface
         }
 
         return [
-            'body'    => json_encode($data),
+            'body'    => sprintf('%s:%s', $messageClass, $data),
             'headers' => [
                 // store stamps as a header - to be read in decode()
                 'stamps' => serialize($allStamps),
