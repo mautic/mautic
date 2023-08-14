@@ -20,6 +20,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
@@ -38,6 +39,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $formActionModel       = $this->createMock(ActionModel::class);
         $formFieldModel        = $this->createMock(FieldModel::class);
         $fieldHelper           = $this->createMock(FormFieldHelper::class);
+        $primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $formUploaderMock      = $this->createMock(FormUploader::class);
         $contactTracker        = $this->createMock(ContactTracker::class);
@@ -55,6 +57,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $formActionModel,
             $formFieldModel,
             $fieldHelper,
+            $primaryCompanyHelper,
             $leadFieldModel,
             $formUploaderMock,
             $contactTracker,

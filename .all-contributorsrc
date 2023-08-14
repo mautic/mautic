@@ -1062,6 +1062,15 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "PatrickJenkner",
+      "name": "Patrick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/139468697?v=4",
+      "profile": "https://github.com/PatrickJenkner",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
