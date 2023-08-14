@@ -189,13 +189,4 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
     }
-
-    protected function getPrefixedTableName(string $tableName = null): string
-    {
-        if (is_null($tableName)) {
-            $tableName = static::$tableName;
-        }
-
-        return $this->prefix.$tableName;
-    }
 }
