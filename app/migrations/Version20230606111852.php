@@ -17,7 +17,7 @@ final class Version20230606111852 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            $sql  = sprintf("select id from %s where properties like '%s' limit 1", $this->getPrefixedTableName(self::$tableName), '%'.self::OLD_STRING.'%');
+            $sql         = sprintf("select id from %s where properties like '%s' limit 1", $this->getPrefixedTableName(self::$tableName), '%'.self::OLD_STRING.'%');
             $recordCount = $this->connection->executeQuery($sql)->fetchAllAssociative();
 
             return !$recordCount;
