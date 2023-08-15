@@ -304,6 +304,7 @@ class MailHelper
         // Set from email
         if (!$isQueueFlush) {
             $this->setFromForSingleMessage();
+            $this->setReplyToForSingleMessage($this->email);
         } // from is set in flushQueue
 
         if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
@@ -1960,7 +1961,7 @@ class MailHelper
                 $this->lead['owner_id'] = 0;
             }
 
-            $from = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead);
+            $from = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead, $email);
             $this->setFrom($from);
 
             return;
@@ -1970,6 +1971,26 @@ class MailHelper
             $from = $this->fromEmailHelper->getFromAddressArray($this->from, $this->lead);
 
             $this->setFrom($from);
+        }
+    }
+
+    private function setReplyToForSingleMessage(Email $emailToSend): void
+    {
+        if (null !== $emailToSend->getReplyToAddress()) {
+            $this->setReplyTo($emailToSend->getReplyToAddress());
+
+            return;
+        }
+
+        if (empty($this->lead['owner_id'])) {
+            return;
+        }
+
+        try {
+            $owner = $this->fromEmailHelper->getContactOwner((int) $this->lead['owner_id'], $emailToSend);
+            $this->setReplyTo($owner['email']);
+        } catch (OwnerNotFoundException) {
+            $this->setReplyTo($this->replyTo);
         }
     }
 

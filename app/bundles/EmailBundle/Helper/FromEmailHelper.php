@@ -89,8 +89,6 @@ class FromEmailHelper
     }
 
     /**
-     * @param int $userId
-     *
      * @return mixed[]
      *
      * @throws OwnerNotFoundException
@@ -109,7 +107,7 @@ class FromEmailHelper
         }
 
         if (isset($this->owners[$userId])) {
-            return $this->owners[$userId];
+            return $this->lastOwner = $this->owners[$userId];
         }
 
         if ($owner = $this->leadRepository->getLeadOwner($userId)) {
@@ -142,7 +140,7 @@ class FromEmailHelper
 
         foreach ($owner as $key => $value) {
             $token     = sprintf('|USER_%s|', strtoupper($key));
-            $signature = str_replace($token, $value, $signature);
+            $signature = str_replace($token, $value ?? '', $signature);
         }
 
         return EmojiHelper::toHtml($signature);
@@ -208,7 +206,7 @@ class FromEmailHelper
     /**
      * @param mixed[] $contact
      *
-     * @return array<string,?string>
+     * @return array<string,string>
      *
      * @throws OwnerNotFoundException
      */
@@ -218,7 +216,7 @@ class FromEmailHelper
             throw new OwnerNotFoundException();
         }
 
-        $owner      = $this->getContactOwner($contact['owner_id'], $email);
+        $owner      = $this->getContactOwner((int) $contact['owner_id'], $email);
         $ownerEmail = $owner['email'];
         $ownerName  = sprintf('%s %s', $owner['first_name'], $owner['last_name']);
 
