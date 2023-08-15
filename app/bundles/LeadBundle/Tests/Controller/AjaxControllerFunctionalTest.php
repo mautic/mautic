@@ -101,10 +101,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCompanyLookupWithNoModelSet(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn', [], [], $this->createAjaxHeaders());
         $response = $this->client->getResponse();
-        Assert::assertSame(500, $response->getStatusCode());
-        Assert::assertSame('"The searchKey parameter is required."', $response->getContent());
+        Assert::assertSame(400, $response->getStatusCode());
+        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
     public function testSegmentDependencyTree(): void

@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,7 +21,7 @@ trait AjaxLookupControllerTrait
         $start     = (int) $request->query->get('start', '0');
 
         if (!$modelName) {
-            return new JsonResponse('The searchKey parameter is required.', 500);
+            throw new BadRequestException('The searchKey parameter is required.');
         }
 
         if (!$search) {
@@ -30,7 +31,7 @@ trait AjaxLookupControllerTrait
         $model = $this->getModel($modelName);
 
         if (!$model instanceof AjaxLookupModelInterface) {
-            return new JsonResponse("The model {$modelName} must implement the AjaxLookupModelInterface.", 500);
+            throw new BadRequestException("The model {$modelName} must implement the AjaxLookupModelInterface.");
         }
 
         $results = $model->getLookupResults($modelName, $search, $limit, $start);
@@ -76,4 +77,11 @@ trait AjaxLookupControllerTrait
      * @return AbstractCommonModel<object>
      */
     abstract protected function getModel($modelNameKey);
+
+    /**
+     * Get's the content of error page.
+     *
+     * @return Response
+     */
+    abstract public function renderException(\Exception $e);
 }
