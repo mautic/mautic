@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -50,20 +51,14 @@ class MailHelper
      */
     protected $twig;
 
-    /**
-     * @var null
-     */
-    protected $dispatcher;
+    protected ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * @var \Swift_Plugins_Loggers_ArrayLogger
      */
     protected $logger;
 
-    /**
-     * @var FromEmailHelper
-     */
-    private $fromEmailHelper;
+    private FromEmailHelper $fromEmailHelper;
 
     /**
      * @var bool|MauticMessage
@@ -354,13 +349,11 @@ class MailHelper
                     $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
                 }
 
-                if (!empty($tokens)) {
-                    // Replace tokens
-                    $search  = array_keys($tokens);
-                    $replace = $tokens;
+                // Replace tokens
+                $search  = array_keys($tokens);
+                $replace = $tokens;
 
-                    self::searchReplaceTokens($search, $replace, $this->message);
-                }
+                self::searchReplaceTokens($search, $replace, $this->message);
             }
 
             if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
@@ -1958,7 +1951,7 @@ class MailHelper
         $this->fromEmailHelper->setDefaultFromArray($this->systemFrom);
     }
 
-    private function setFromForSingleMessage()
+    private function setFromForSingleMessage(): void
     {
         $email = $this->getEmail();
 

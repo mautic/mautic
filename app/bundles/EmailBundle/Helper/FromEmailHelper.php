@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Helper;
 
@@ -22,50 +15,38 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 class FromEmailHelper
 {
     /**
-     * @var CoreParametersHelper
+     * @var array<int,mixed[]>
      */
-    private $coreParametersHelper;
+    private array $owners = [];
+
+    private ?AddressDTO $defaultFrom = null;
 
     /**
-     * @var LeadRepository
+     * @var mixed[]|null
      */
-    private $leadRepository;
+    private ?array $lastOwner = null;
 
-    /**
-     * @var array
-     */
-    private $owners = [];
-
-    /**
-     * @var AddressDTO|null
-     */
-    private $defaultFrom;
-
-    /**
-     * @var array|null
-     */
-    private $lastOwner;
-
-    /**
-     * FromEmailHelper constructor.
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper, LeadRepository $leadRepository)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private LeadRepository $leadRepository)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadRepository       = $leadRepository;
-    }
-
-    public function setDefaultFromArray(array $from)
-    {
-        $this->defaultFrom = new AddressDTO($from);
     }
 
     /**
-     * @return array
+     * @param array<string,?string> $from
      */
-    public function getFromAddressArrayConsideringOwner(array $from, array $contact = null, Email $email = null)
+    public function setDefaultFromArray(array $from): void
     {
-        $address = new AddressDTO($from);
+        $this->defaultFrom = AddressDTO::fromAddressArray($from);
+    }
+
+    /**
+     * @param array<string,?string> $from
+     * @param mixed[] $contact
+     *
+     * @return array<string,?string>
+     */
+    public function getFromAddressArrayConsideringOwner(array $from, array $contact = null, Email $email = null): array
+    {
+        $address = AddressDTO::fromAddressArray($from);
 
         // Reset last owner
         $this->lastOwner = null;
@@ -87,11 +68,14 @@ class FromEmailHelper
     }
 
     /**
-     * @return array
+     * @param array<string,?string> $from
+     * @param mixed[] $contact
+     *
+     * @return array<string,?string>
      */
-    public function getFromAddressArray(array $from, array $contact = null)
+    public function getFromAddressArray(array $from, array $contact = null): array
     {
-        $address = new AddressDTO($from);
+        $address = AddressDTO::fromAddressArray($from);
 
         // Reset last owner
         $this->lastOwner = null;
@@ -107,11 +91,11 @@ class FromEmailHelper
     /**
      * @param int $userId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws OwnerNotFoundException
      */
-    public function getContactOwner($userId, Email $email = null)
+    public function getContactOwner(int $userId, Email $email = null): array
     {
         // Reset last owner
         $this->lastOwner = null;
@@ -137,10 +121,7 @@ class FromEmailHelper
         throw new OwnerNotFoundException();
     }
 
-    /**
-     * @return string
-     */
-    public function getSignature()
+    public function getSignature(): string
     {
         if (!$this->lastOwner) {
             return '';
@@ -152,11 +133,9 @@ class FromEmailHelper
     }
 
     /**
-     * @param string $signature
-     *
-     * @return string
+     * @param mixed[] $owner
      */
-    private function replaceSignatureTokens($signature, array $owner)
+    private function replaceSignatureTokens(string $signature, array $owner): string
     {
         $signature = nl2br($signature);
         $signature = str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], $signature);
@@ -170,9 +149,9 @@ class FromEmailHelper
     }
 
     /**
-     * @return array
+     * @return array<string,?string>
      */
-    private function getDefaultFromArray()
+    private function getDefaultFromArray(): array
     {
         if ($this->defaultFrom) {
             return $this->defaultFrom->getAddressArray();
@@ -181,25 +160,20 @@ class FromEmailHelper
         return $this->getSystemDefaultFrom()->getAddressArray();
     }
 
-    /**
-     * @return AddressDTO
-     */
-    private function getSystemDefaultFrom()
+    private function getSystemDefaultFrom(): AddressDTO
     {
         $email = $this->coreParametersHelper->get('mailer_from_email');
-        $name  = $this->coreParametersHelper->get('mailer_from_name');
-        $name  = $name ? $name : null;
+        $name  = $this->coreParametersHelper->get('mailer_from_name') ?: null;
 
-        return new AddressDTO([$email => $name]);
+        return new AddressDTO($email, $name);
     }
 
     /**
-     * @param array $contact
-     * @param bool  $asOwner
+     * @param mixed[] $contact
      *
-     * @return array
+     * @return array<string,?string>
      */
-    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, $asOwner = true, Email $email = null)
+    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, bool $asOwner = true, Email $email = null): array
     {
         try {
             if (!$contact) {
@@ -232,11 +206,13 @@ class FromEmailHelper
     }
 
     /**
-     * @return array
+     * @param mixed[] $contact
+     *
+     * @return array<string,?string>
      *
      * @throws OwnerNotFoundException
      */
-    private function getFromEmailArrayAsOwner(array $contact, Email $email = null)
+    private function getFromEmailArrayAsOwner(array $contact, Email $email = null): array
     {
         if (empty($contact['owner_id'])) {
             throw new OwnerNotFoundException();

@@ -1,64 +1,49 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Helper\DTO;
 
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 
-class AddressDTO
+final class AddressDTO
 {
-    /**
-     * @var string|null
-     */
-    private $email;
-
-    /**
-     * @var string|null
-     */
-    private $name;
-
-    /**
-     * AddressDTO constructor.
-     */
-    public function __construct(array $address)
+    public function __construct(private string $email, private ?string $name = null)
     {
-        $this->email = key($address);
-        $this->name  = $address[$this->email];
-
-        // Decode apostrophes and other special characters
-        $this->name = trim(html_entity_decode($this->name, ENT_QUOTES));
     }
 
     /**
-     * @return string|null
+     * @param array<string,?string> $address
      */
-    public function getEmail()
+    public static function fromAddressArray(array $address): self
+    {
+        $email = key($address);
+        $name  = $address[$email] ?? null;
+
+        if ($name) {
+            // Decode apostrophes and other special characters
+            $name = trim(html_entity_decode($name, ENT_QUOTES));
+        }
+
+        return new self($email, $name);
+    }
+
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @return string
+     * @param array<string,mixed> $contact
      *
      * @throws TokenNotFoundOrEmptyException
      */
-    public function getEmailTokenValue(array $contact)
+    public function getEmailTokenValue(array $contact): string
     {
         if (!preg_match('/{contactfield=(.*?)}/', $this->email, $matches)) {
             throw new TokenNotFoundOrEmptyException();
@@ -74,11 +59,11 @@ class AddressDTO
     }
 
     /**
-     * @return string
+     * @param array<string,mixed> $contact
      *
      * @throws TokenNotFoundOrEmptyException
      */
-    public function getNameTokenValue(array $contact)
+    public function getNameTokenValue(array $contact): string
     {
         if (!preg_match('/{contactfield=(.*?)}/', $this->name, $matches)) {
             throw new TokenNotFoundOrEmptyException();
@@ -93,26 +78,20 @@ class AddressDTO
         return $contact[$nameToken];
     }
 
-    /**
-     * @return bool
-     */
-    public function isEmailTokenized()
+    public function isEmailTokenized(): bool
     {
         return (bool) preg_match('/{contactfield=(.*?)}/', $this->email);
     }
 
-    /**
-     * @return bool
-     */
-    public function isNameTokenized()
+    public function isNameTokenized(): bool
     {
         return (bool) preg_match('/{contactfield=(.*?)}/', $this->name);
     }
 
     /**
-     * @return array
+     * @return array<string,?string>
      */
-    public function getAddressArray()
+    public function getAddressArray(): array
     {
         return [$this->email => $this->name];
     }

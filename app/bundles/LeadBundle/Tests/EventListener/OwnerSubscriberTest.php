@@ -17,6 +17,7 @@ use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -202,12 +203,9 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool  $mailIsOwner
-     * @param array $parameterMap
-     *
-     * @return MauticFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @param mixed[] $parameterMap
      */
-    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
+    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory|MockObject
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -231,7 +229,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory|\PHPUnit_Framework_MockObject_MockObject $mockFactory */
+        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -281,14 +279,15 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         return $mockFactory;
     }
 
-    protected function getMockMailer(array $lead)
+    protected function getMockMailer(array $lead): MailHelper
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
-        /** @var MauticFactory $mockFactory */
+        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
+        /** @var FromEmailHelper|MockObject $fromEmaiHelper */
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
         $fromEmaiHelper->expects($this->once())
             ->method('setDefaultFromArray');
@@ -306,14 +305,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Translator|\PHPUnit_Framework_MockObject_MockObject
+     * @return Translator|MockObject
      */
     protected function getMockTranslator()
     {
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Translator|MockObject $translator */
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('hasId')
             ->will($this->returnValue(false));

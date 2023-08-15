@@ -1197,10 +1197,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 );
 
                 if (count($violations) > 0) {
-                    $string = (string) $violations;
-                    $context->buildViolation($string)
-                        ->atPath($field)
-                        ->addViolation();
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                            ->atPath($field)
+                            ->addViolation();
+                    }
                 }
             },
         ]);

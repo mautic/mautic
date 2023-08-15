@@ -8,6 +8,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -25,15 +26,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class MailHelperTest extends TestCase
 {
     /**
-     * @var array
-     */
-    /**
-     * @var FromEmailHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FromEmailHelper|MockObject
      */
     private $fromEmailHelper;
 
     /**
-     * @var array
+     * @var MauticFactory|MockObject
+     */
+    private $mockFactory;
+
+    /**
+     * @var array<array<string,string|int>>
      */
     protected $contacts = [
         [
@@ -76,17 +79,9 @@ class MailHelperTest extends TestCase
         $this->mockFactory->method('get')
             ->with('mautic.helper.from_email_helper')
             ->willReturn($this->fromEmailHelper);
-
-        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
-        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
-
-        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
     }
 
-    /**
-     * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException
-     */
-    public function testQueueModeThrowsExceptionWhenBatchLimitHit()
+    public function testQueueModeThrowsExceptionWhenBatchLimitHit(): void
     {
         $this->expectException(BatchQueueMaxException::class);
 
@@ -104,9 +99,10 @@ class MailHelperTest extends TestCase
             ->with('mautic.helper.from_email_helper')
             ->willReturn($this->createMock(FromEmailHelper::class));
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
 
         // Enable queue mode
         $mailer->enableQueue();
@@ -117,10 +113,9 @@ class MailHelperTest extends TestCase
         $mailer->addTo('somebodyelse4@somewhere.com');
     }
 
-    public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
+    public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit(): void
     {
-        $mockFactory = $this->mockFactory;
-        $mockFactory->method('getParameter')
+        $this->mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
                     [
@@ -129,27 +124,28 @@ class MailHelperTest extends TestCase
                     ]
                 )
             );
-        $mockFactory->method('get')
+        $this->mockFactory->method('get')
             ->with('mautic.helper.from_email_helper')
             ->willReturn($this->createMock(FromEmailHelper::class));
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
 
         // Enable queue mode
         try {
             $mailer->addTo('somebody@somewhere.com');
             $mailer->addTo('somebodyelse@somewhere.com');
-        } catch (BatchQueueMaxException $exception) {
+        } catch (BatchQueueMaxException) {
             $this->fail('BatchQueueMaxException thrown');
         }
 
         // Otherwise success
-        $this->assertTrue(true);
+        self::expectNotToPerformAssertions();
     }
 
-    public function testQueuedEmailFromOverride()
+    public function testQueuedEmailFromOverride(): void
     {
         $mockFactory = $this->getMockFactory(false);
         $mockFactory->method('get')
@@ -169,10 +165,10 @@ class MailHelperTest extends TestCase
                 ['nobody@nowhere.com'   => null]
             );
 
-        $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
 
         $email = new Email();
@@ -206,18 +202,18 @@ class MailHelperTest extends TestCase
         $this->assertTrue(1 === count($from));
     }
 
-    public function testBatchMode()
+    public function testBatchMode(): void
     {
         $mockFactory = $this->getMockFactory(false);
         $mockFactory->method('get')
             ->with('mautic.helper.from_email_helper')
             ->willReturn($this->createMock(FromEmailHelper::class));
 
-        $transport   = new BatchTransport(true);
-        $swiftMailer = new \Swift_Mailer($transport);
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
 
         $from   = ['nobody@nowhere.com' => 'No Body'];
-        $mailer = new MailHelper($mockFactory, $swiftMailer, $from);
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, $from);
         $mailer->enableQueue();
         $this->fromEmailHelper->expects($this->exactly(2))
             ->method('getFromAddressArrayConsideringOwner')
@@ -244,7 +240,7 @@ class MailHelperTest extends TestCase
         $this->assertEmpty($errors['failures'], var_export($errors, true));
     }
 
-    public function testQueuedOwnerAsMailer()
+    public function testQueuedOwnerAsMailer(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -321,14 +317,13 @@ class MailHelperTest extends TestCase
         $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
     }
 
-    public function testMailAsOwnerWithEncodedCharactersInName()
+    public function testMailAsOwnerWithEncodedCharactersInName(): void
     {
-        $mockFactory = $this->getMockFactory();
+        $mockFactory   = $this->getMockFactory();
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
 
-        $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
         $email  = new Email();
         $email->setUseOwnerAsMailer(true);
 
@@ -558,6 +553,23 @@ class MailHelperTest extends TestCase
         if (!$isValid) {
             $this->expectException(InvalidEmailException::class);
         }
+    }
+
+    public function testValidateValidEmails(): void
+    {
+        $helper    = $this->mockEmptyMailHelper();
+        $addresses = [
+            'john@doe.com',
+            'john@doe.email',
+            'john.doe@email.com',
+            'john+doe@email.com',
+            'john@doe.whatevertldtheycomewithinthefuture',
+        ];
+
+        foreach ($addresses as $address) {
+            // will throw InvalidEmailException if it will find the address invalid
+            $this->assertNull($helper::validateEmail($address)); /** @phpstan-ignore-line as it's testing a deprecated method */
+        }
         /** @phpstan-ignore-next-line */
         $this->assertNull($helper::validateEmail($email));
     }
@@ -584,7 +596,63 @@ class MailHelperTest extends TestCase
         ];
     }
 
-    public function testGlobalHeadersAreSet(): void
+    public function testValidateEmailWithoutTld(): void
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('john@doe'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithSpaceInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithCaretInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo^hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithApostropheInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo\'hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithSemicolonInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo;hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithAmpersandInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo&hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithStarInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo*hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateEmailWithPercentInIt()
+    {
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo%hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testGlobalHeadersAreSet()
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -739,13 +807,13 @@ class MailHelperTest extends TestCase
     /**
      * @param mixed[] $parameterMap
      *
-     * @phpstan-ignore-next-line
+     * @phpstan-ignore-next-line as it's using a deprecated class
+     *
+     * @return MauticFactory&MockObject
      */
     protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory
     {
-        $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadRepository = $this->createMock(LeadRepository::class);
 
         $mockLeadRepository->method('getLeadOwner')
             ->will(
@@ -758,12 +826,9 @@ class MailHelperTest extends TestCase
                 )
             );
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadModel = $this->createMock(LeadModel::class);
 
-        $mockLeadModel->method('getRepository')
-            ->willReturn($mockLeadRepository);
+        $mockLeadModel->method('getRepository')->willReturn($mockLeadRepository);
 
         $mockFactory = $this->mockFactory;
 
@@ -823,11 +888,8 @@ class MailHelperTest extends TestCase
                     ]
                 )
             );
-        $mockLogger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockFactory->method('getLogger')
-            ->willReturn($mockLogger);
+        $mockLogger = $this->createMock(Logger::class);
+        $mockFactory->method('getLogger')->willReturn($mockLogger);
 
         $symfonyMailer = new Mailer(new SmtpTransport());
 

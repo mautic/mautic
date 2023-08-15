@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper\DTO;
 
@@ -17,88 +10,84 @@ use PHPUnit\Framework\TestCase;
 
 class AddressDTOTest extends TestCase
 {
-    public function testNameTokenReturnsTrue()
+    public function testNameTokenReturnsTrue(): void
     {
-        $this->assertTrue((new AddressDTO(['someone@somewhere.com' => '{contactfield=other_name}']))->isNameTokenized());
+        $this->assertTrue((AddressDTO::fromAddressArray(['someone@somewhere.com' => '{contactfield=other_name}']))->isNameTokenized());
     }
 
-    public function testNameTokenReturnsFalse()
+    public function testNameTokenReturnsFalse(): void
     {
-        $this->assertFalse((new AddressDTO(['someone@somewhere.com' => 'Someone Somewhere']))->isNameTokenized());
+        $this->assertFalse((new AddressDTO('someone@somewhere.com', 'Someone Somewhere'))->isNameTokenized());
     }
 
-    public function testNameTokenEmptyThrowsException()
+    public function testNameTokenEmptyThrowsException(): void
     {
         $this->expectException(TokenNotFoundOrEmptyException::class);
 
-        (new AddressDTO(['someone@somewhere.com' => '{contactfield=other_name}']))->getNameTokenValue([]);
+        (AddressDTO::fromAddressArray(['someone@somewhere.com' => '{contactfield=other_name}']))->getNameTokenValue([]);
     }
 
-    public function testNameTokenIsReturned()
+    public function testNameTokenIsReturned(): void
     {
-        $contact = [
-            'other_name' => 'Thing Two',
-        ];
+        $contact = ['other_name' => 'Thing Two'];
 
         $this->assertEquals(
             'Thing Two',
-            (new AddressDTO(['someone@somewhere.com' => '{contactfield=other_name}']))->getNameTokenValue($contact)
+            (new AddressDTO('someone@somewhere.com', '{contactfield=other_name}'))->getNameTokenValue($contact)
         );
     }
 
-    public function testEmailTokenReturnsTrue()
+    public function testEmailTokenReturnsTrue(): void
     {
-        $this->assertTrue((new AddressDTO(['{contactfield=other_email}' => 'Someone Somewhere']))->isEmailTokenized());
+        $this->assertTrue((new AddressDTO('{contactfield=other_email}', 'Someone Somewhere'))->isEmailTokenized());
     }
 
-    public function testEmailTokenReturnsFalse()
+    public function testEmailTokenReturnsFalse(): void
     {
-        $this->assertFalse((new AddressDTO(['someone@somewhere.com' => 'Someone Somewhere']))->isEmailTokenized());
+        $this->assertFalse((new AddressDTO('someone@somewhere.com', 'Someone Somewhere'))->isEmailTokenized());
     }
 
-    public function testEmailTokenEmptyThrowsException()
+    public function testEmailTokenEmptyThrowsException(): void
     {
         $this->expectException(TokenNotFoundOrEmptyException::class);
 
-        (new AddressDTO(['{contactfield=other_email}' => 'Thing One']))->getEmailTokenValue([]);
+        (new AddressDTO('{contactfield=other_email}', 'Thing One'))->getEmailTokenValue([]);
     }
 
-    public function testEmailTokenIsReturned()
+    public function testEmailTokenIsReturned(): void
     {
-        $contact = [
-            'other_email' => 'other@somewhere.com',
-        ];
+        $contact = ['other_email' => 'other@somewhere.com'];
 
         $this->assertEquals(
             'other@somewhere.com',
-            (new AddressDTO(['{contactfield=other_email}' => '']))->getEmailTokenValue($contact)
+            (new AddressDTO('{contactfield=other_email}', ''))->getEmailTokenValue($contact)
         );
     }
 
-    public function testTokenValuesReturned()
+    public function testTokenValuesReturned(): void
     {
         $contact = [
             'other_email' => 'thingtwo@somewhere.com',
             'other_name'  => 'Thing Two',
         ];
 
-        $addressDTO = new AddressDTO(['{contactfield=other_email}' => '{contactfield=other_name}']);
+        $addressDTO = new AddressDTO('{contactfield=other_email}', '{contactfield=other_name}');
 
         $this->assertEquals('thingtwo@somewhere.com', $addressDTO->getEmailTokenValue($contact));
         $this->assertEquals('Thing Two', $addressDTO->getNameTokenValue($contact));
     }
 
-    public function testDefaultsAreReturned()
+    public function testDefaultsAreReturned(): void
     {
-        $addressDTO = new AddressDTO(['someone@somewhere.com' => 'Someone Somewhere']);
+        $addressDTO = new AddressDTO('someone@somewhere.com', 'Someone Somewhere');
 
         $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
         $this->assertEquals('Someone Somewhere', $addressDTO->getName());
     }
 
-    public function testSpecialCharactersAreDecoded()
+    public function testSpecialCharactersAreDecoded(): void
     {
-        $addressDTO = new AddressDTO(['someone@somewhere.com' => 'No Body&#39;s Business']);
+        $addressDTO = new AddressDTO('someone@somewhere.com', 'No Body&#39;s Business');
 
         $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
         $this->assertEquals("No Body's Business", $addressDTO->getName());
