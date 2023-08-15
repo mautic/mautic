@@ -16,9 +16,8 @@ trait AjaxLookupControllerTrait
         $dataArray = [];
         $modelName = InputHelper::clean($request->query->get('searchKey'));
         $search    = InputHelper::clean($request->query->get(str_replace('.', '_', $modelName)));
-        $limit     = (int) $request->query->get('limit', 0);
-        $start     = (int) $request->query->get('start', 0);
-        $options   = $request->query->all();
+        $limit     = (int) $request->query->get('limit', '0');
+        $start     = (int) $request->query->get('start', '0');
 
         if (!$modelName) {
             return new JsonResponse('The searchKey parameter is required.', 500);
@@ -34,7 +33,7 @@ trait AjaxLookupControllerTrait
             return new JsonResponse("The model {$modelName} must implement the AjaxLookupModelInterface.", 500);
         }
 
-        $results = $model->getLookupResults($modelName, $search, $limit, $start, $options);
+        $results = $model->getLookupResults($modelName, $search, $limit, $start);
 
         foreach ($results as $group => $result) {
             $option = [];
@@ -63,9 +62,7 @@ trait AjaxLookupControllerTrait
                 $option[$group] = $result;
             }
 
-            if (!empty($option)) {
-                $dataArray[] = $option;
-            }
+            $dataArray[] = $option;
         }
 
         return new JsonResponse($dataArray);
