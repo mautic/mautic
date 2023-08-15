@@ -53,7 +53,7 @@ class BcInterfaceTokenTransport implements TransportInterface
     {
         if ($message instanceof Email) {
             $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-            $this->fromNames[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+            $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
         }
 
         $this->message     = $message;

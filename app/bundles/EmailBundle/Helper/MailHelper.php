@@ -14,9 +14,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -235,6 +235,8 @@ class MailHelper
     ) {
         $this->transport = $this->getTransport();
         $this->fromEmailHelper = $factory->get('mautic.helper.from_email_helper');
+        $this->mailer          = $mailer;
+        $this->transport       = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
         $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
@@ -1995,8 +1997,6 @@ class MailHelper
     }
 
     /**
-     * @param $contact
-     *
      * @return bool|array
      *
      * @deprecated
@@ -2025,8 +2025,6 @@ class MailHelper
     }
 
     /**
-     * @param $owner
-     *
      * @return mixed
      *
      * @deprecated; use FromEmailHelper::getUserSignature

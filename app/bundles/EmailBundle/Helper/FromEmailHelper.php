@@ -40,7 +40,7 @@ class FromEmailHelper
 
     /**
      * @param array<string,?string> $from
-     * @param mixed[] $contact
+     * @param mixed[]               $contact
      *
      * @return array<string,?string>
      */
@@ -69,7 +69,7 @@ class FromEmailHelper
 
     /**
      * @param array<string,?string> $from
-     * @param mixed[] $contact
+     * @param mixed[]               $contact
      *
      * @return array<string,?string>
      */

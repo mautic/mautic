@@ -1184,7 +1184,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     return;
                 }
 
-                $validator = $context->getValidator();
+                $validator  = $context->getValidator();
                 $violations = $validator->validate(
                     $value,
                     [
