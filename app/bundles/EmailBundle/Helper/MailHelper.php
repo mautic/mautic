@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -899,8 +900,7 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $name = $this->cleanName($name);
-            $this->message->addTo(new Address($address, $name ?? ''));
+            $this->message->addTo((new AddressDTO($address, $name))->toMailerAddress());
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -914,8 +914,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed  $addresses
-     * @param string $name
+     * @param string[] $addresses
+     * @param ?string  $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
      *
@@ -926,12 +926,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'cc');
 
         try {
-            $name        = $this->cleanName($name);
             $ccAddresses = [];
             // The email addresses are stored in the array keys not the values
             // The name of the CC is passed in the function and not in the array
             foreach ($addresses as $address => $noName) {
-                $ccAddresses[] = new Address($address, $name ?? '');
+                $ccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
             }
             $this->message->cc(...$ccAddresses);
 
@@ -946,7 +945,8 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param mixed $address
+     * @param string  $address
+     * @param ?string $name
      *
      * @return bool
      */
@@ -955,8 +955,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'cc');
 
         try {
-            $name = $this->cleanName($name);
-            $this->message->addCc(new Address($address, $name ?? ''));
+            $this->message->addCc((new AddressDTO($address, $name ?? ''))->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -969,8 +968,8 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param mixed  $addresses
-     * @param string $name
+     * @param string  $addresses
+     * @param ?string $name
      *
      * //TODO: same bug for the name as the one we have in setCc
      *
@@ -981,12 +980,11 @@ class MailHelper
         $this->checkBatchMaxRecipients(count($addresses), 'bcc');
 
         try {
-            $name         = $this->cleanName($name);
             $bccAddresses = [];
             // The email addresses are stored in the array keys not the values
             // The name of the Bcc is passed in the function and not in the array
             foreach ($addresses as $address => $noName) {
-                $bccAddresses[] = new Address($address, $name ?? '');
+                $bccAddresses[] = (new AddressDTO($address, $name))->toMailerAddress();
             }
 
             $this->message->bcc(...$bccAddresses);
@@ -1002,7 +1000,8 @@ class MailHelper
     /**
      * Add bcc address.
      *
-     * @param string $address
+     * @param string  $address
+     * @param ?string $name
      *
      * @return bool
      */
@@ -1011,8 +1010,7 @@ class MailHelper
         $this->checkBatchMaxRecipients(1, 'bcc');
 
         try {
-            $name = $this->cleanName($name);
-            $this->message->addBcc(new Address($address, $name ?? ''));
+            $this->message->addBcc((new AddressDTO($address, $name))->toMailerAddress());
 
             return true;
         } catch (\Exception $e) {
@@ -1052,10 +1050,8 @@ class MailHelper
     public function setReplyTo($addresses, $name = null): void
     {
         try {
-            $name      = $this->cleanName($name);
-            $addresses = (array) $addresses; // This will cast $addresses to an array
-            foreach ($addresses as $address) {
-                $this->message->replyTo(new Address($address, $name ?? ''));
+            foreach ((array) $addresses as $address) {
+                $this->message->replyTo((new AddressDTO($address, $name))->toMailerAddress());
             }
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
@@ -1087,12 +1083,12 @@ class MailHelper
         $address = null;
 
         if (is_array($fromEmail)) {
-            $fromName   = $this->cleanName($fromEmail[key($fromEmail)]);
-            $address    = new Address(key($fromEmail), $fromName ?? '');
+            $addressDTO = AddressDTO::fromAddressArray($fromEmail);
+            $addressDTO->setName($fromName);
+            $address    = $addressDTO->toMailerAddress()    ;
             $this->from = $fromEmail;
         } else {
-            $fromName   = $this->cleanName($fromName);
-            $address    = new Address($fromEmail, $fromName ?? '');
+            $address    = (new AddressDTO($fromEmail, $fromName))->toMailerAddress();
             $this->from = [$fromEmail => $fromName];
         }
 

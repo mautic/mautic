@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Helper\DTO;
 
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
+use Symfony\Component\Mime\Address;
 
 final class AddressDTO
 {
@@ -12,7 +13,7 @@ final class AddressDTO
 
     public function __construct(private string $email, ?string $name = null)
     {
-        $this->name = $this->cleanName($name);
+        $this->setName($name);
     }
 
     /**
@@ -21,9 +22,12 @@ final class AddressDTO
     public static function fromAddressArray(array $address): self
     {
         $email = key($address);
-        $name  = $address[$email] ?? null;
 
-        return new self($email, $name);
+        if (!$email) {
+            throw new \InvalidArgumentException('Address array must have an email as key');
+        }
+
+        return new self($email, $address[$email] ?? null);
     }
 
     public function getEmail(): ?string
@@ -94,15 +98,22 @@ final class AddressDTO
         return [$this->email => $this->name];
     }
 
+    public function toMailerAddress(): Address
+    {
+        return new Address($this->email, $this->name ?? '');
+    }
+
     /**
      * Decode apostrophes and other special characters
      */
-    private function cleanName(?string $name): ?string
+    public function setName(?string $name): void
     {
         if (!$name) {
-            return $name;
+            $this->name = null;
+
+            return;
         }
 
-        return trim(html_entity_decode($name, ENT_QUOTES));
+        $this->name = trim(html_entity_decode($name, ENT_QUOTES));
     }
 }

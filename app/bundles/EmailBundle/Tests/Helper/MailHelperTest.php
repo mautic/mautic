@@ -729,6 +729,7 @@ class MailHelperTest extends TestCase
         $email->setCustomHtml('{signature}');
         $email->setHeaders(['X-Mautic-Test3' => 'test2', 'X-Mautic-Test4' => 'test2']);
         $mailer->setEmail($email);
+        $mailer->setFrom('some@email.com');
         $mailer->send();
 
         $customHeadersFounds = [];
