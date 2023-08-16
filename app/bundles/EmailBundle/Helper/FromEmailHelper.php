@@ -125,17 +125,15 @@ class FromEmailHelper
             return '';
         }
 
-        $owner = $this->lastOwner;
-
-        return $this->replaceSignatureTokens($owner['signature'], $owner);
+        return $this->replaceSignatureTokens($this->lastOwner);
     }
 
     /**
      * @param mixed[] $owner
      */
-    private function replaceSignatureTokens(string $signature, array $owner): string
+    private function replaceSignatureTokens(array $owner): string
     {
-        $signature = nl2br($signature);
+        $signature = nl2br($owner['signature'] ?? '');
         $signature = str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], $signature);
 
         foreach ($owner as $key => $value) {
