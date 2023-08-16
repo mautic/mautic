@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -10,15 +11,29 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MailHelperTest extends TestCase
 {
+    /**
+     * @var MauticFactory|MockObject
+     */
+    private $mockFactory;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $mockParameterHelper;
+
     /**
      * @var array
      */
@@ -56,6 +71,8 @@ class MailHelperTest extends TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        $this->mockFactory         = $this->createMock(MauticFactory::class);
+        $this->mockParameterHelper = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testBatchIsEnabledWithBcTokenInterface()
@@ -407,7 +424,55 @@ class MailHelperTest extends TestCase
         $this->assertCount(4, $customHeadersFounds);
     }
 
-    protected function mockEmptyMailHelper()
+    public function testUnsubscribeHeader(): void
+    {
+        $this->mockParameterHelper->expects($this->once())
+            ->method('get')
+            ->with('secret_key')
+            ->willReturn('secret');
+
+        $mockRouter  = $this->createMock(Router::class);
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
+        $mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+
+        $this->mockFactory->method('getRouter')
+            ->willReturnOnConsecutiveCalls($mockRouter);
+
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType('marketing');
+        $headers = $mailer->getCustomHeaders();
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
+
+        // There are no unsubscribe headers in transactional emails.
+        $mailer->setEmailType('transactional');
+        $headers = $mailer->getCustomHeaders();
+        $this->assertNull($headers['List-Unsubscribe']);
+    }
+
+    protected function mockEmptyMailHelper(): MailHelper
     {
         $mockFactory   = $this->getMockFactory();
         $transport     = new SmtpTransport();
@@ -416,7 +481,10 @@ class MailHelperTest extends TestCase
         return new MailHelper($mockFactory, $symfonyMailer);
     }
 
-    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
+    /**
+     * @param mixed[] $parameterMap
+     */
+    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
