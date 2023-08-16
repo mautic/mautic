@@ -289,13 +289,8 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->expects($this->once())
-            ->method('setDefaultFromArray');
-        $mockFactory->expects($this->once())
-            ->method('get')
-            ->with('mautic.helper.from_email_helper')
-            ->willReturn($fromEmaiHelper);
-
+        $fromEmaiHelper->expects($this->once())->method('setDefaultFrom');
+        $mockFactory->expects($this->once())->method('get')->with('mautic.helper.from_email_helper')->willReturn($fromEmaiHelper);
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
         $mailerHelper = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);

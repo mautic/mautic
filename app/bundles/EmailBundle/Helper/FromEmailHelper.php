@@ -29,62 +29,49 @@ class FromEmailHelper
     {
     }
 
-    /**
-     * @param array<string,?string> $from
-     */
-    public function setDefaultFromArray(array $from): void
+    public function setDefaultFrom(AddressDTO $from): void
     {
-        $this->defaultFrom = AddressDTO::fromAddressArray($from);
+        $this->defaultFrom = $from;
     }
 
     /**
-     * @param array<string,?string> $from
-     * @param mixed[]               $contact
-     *
-     * @return array<string,?string>
+     * @param mixed[] $contact
      */
-    public function getFromAddressArrayConsideringOwner(array $from, array $contact = null, Email $email = null): array
+    public function getFromAddressConsideringOwner(AddressDTO $address, array $contact = null, Email $email = null): AddressDTO
     {
-        $address = AddressDTO::fromAddressArray($from);
-
         // Reset last owner
         $this->lastOwner = null;
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailArrayFromToken($address, $contact, true, $email);
+            return $this->getEmailFromToken($address, $contact, true, $email);
         }
 
         if (!$contact) {
-            return $from;
+            return $address;
         }
 
         try {
             return $this->getFromEmailArrayAsOwner($contact, $email);
-        } catch (OwnerNotFoundException $exception) {
-            return $from;
+        } catch (OwnerNotFoundException) {
+            return $address;
         }
     }
 
     /**
-     * @param array<string,?string> $from
-     * @param mixed[]               $contact
-     *
-     * @return array<string,?string>
+     * @param mixed[] $contact
      */
-    public function getFromAddressArray(array $from, array $contact = null): array
+    public function getFromAddressDto(AddressDTO $address, array $contact = null): AddressDTO
     {
-        $address = AddressDTO::fromAddressArray($from);
-
         // Reset last owner
         $this->lastOwner = null;
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailArrayFromToken($address, $contact, false);
+            return $this->getEmailFromToken($address, $contact, false);
         }
 
-        return $from;
+        return $address;
     }
 
     /**
@@ -143,16 +130,13 @@ class FromEmailHelper
         return $signature;
     }
 
-    /**
-     * @return array<string,?string>
-     */
-    private function getDefaultFromArray(): array
+    private function getDefaultFrom(): AddressDTO
     {
         if ($this->defaultFrom) {
-            return $this->defaultFrom->getAddressArray();
+            return $this->defaultFrom;
         }
 
-        return $this->getSystemDefaultFrom()->getAddressArray();
+        return $this->getSystemDefaultFrom();
     }
 
     private function getSystemDefaultFrom(): AddressDTO
@@ -165,10 +149,8 @@ class FromEmailHelper
 
     /**
      * @param mixed[] $contact
-     *
-     * @return array<string,?string>
      */
-    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, bool $asOwner = true, Email $email = null): array
+    private function getEmailFromToken(AddressDTO $address, array $contact = null, bool $asOwner = true, Email $email = null): AddressDTO
     {
         try {
             if (!$contact) {
@@ -187,7 +169,7 @@ class FromEmailHelper
 
             $email = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
 
-            return [$email => $name];
+            return new AddressDTO($email, $name);
         } catch (TokenNotFoundOrEmptyException) {
             if ($contact && $asOwner) {
                 try {
@@ -196,18 +178,16 @@ class FromEmailHelper
                 }
             }
 
-            return $this->getDefaultFromArray();
+            return $this->getDefaultFrom();
         }
     }
 
     /**
      * @param mixed[] $contact
      *
-     * @return array<string,string>
-     *
      * @throws OwnerNotFoundException
      */
-    private function getFromEmailArrayAsOwner(array $contact, Email $email = null): array
+    private function getFromEmailArrayAsOwner(array $contact, Email $email = null): AddressDTO
     {
         if (empty($contact['owner_id'])) {
             throw new OwnerNotFoundException();
@@ -220,6 +200,6 @@ class FromEmailHelper
         // Decode apostrophes and other special characters
         $ownerName = trim(html_entity_decode($ownerName, ENT_QUOTES));
 
-        return [$ownerEmail => $ownerName];
+        return new AddressDTO($ownerEmail, $ownerName);
     }
 }

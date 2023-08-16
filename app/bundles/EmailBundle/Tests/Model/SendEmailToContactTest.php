@@ -239,7 +239,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn($routerMock);
 
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->method('getFromAddressArrayConsideringOwner')
+        $fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(['someone@somewhere.com' => null]);
         $factoryMock->method('get')
             ->with('mautic.helper.from_email_helper')
@@ -396,7 +396,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn($emailModelMock);
 
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->method('getFromAddressArrayConsideringOwner')
+        $fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(['someone@somewhere.com' => null]);
         $factoryMock->method('get')
             ->with('mautic.helper.from_email_helper')
@@ -497,7 +497,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn($routerMock);
 
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->method('getFromAddressArrayConsideringOwner')
+        $fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(['someone@somewhere.com' => null]);
         $factoryMock->method('get')
             ->with('mautic.helper.from_email_helper')
@@ -615,6 +615,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     default => '',
                 }
             );
+        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
+        $fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(['someone@somewhere.com' => null]);
+        $factoryMock->method('get')->with('mautic.helper.from_email_helper')->willReturn($fromEmaiHelper);
         $factoryMock->method('getLogger')->willReturn(new NullLogger());
         $factoryMock->method('getDispatcher')->willReturn(new EventDispatcher());
         $routerMock = $this->createMock(Router::class);
@@ -710,6 +713,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new NullLogger()
             );
 
+        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
+        $fromEmaiHelper->expects($this->once())->method('setDefaultFrom');
+        $mockFactory->method('get')->with('mautic.helper.from_email_helper')->willReturn($fromEmaiHelper);
         $mailer         = new Mailer(new BatchTransport());
         $mailHelper     = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
         $statRepository = $this->createMock(StatRepository::class);

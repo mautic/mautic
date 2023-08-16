@@ -39,4 +39,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.repository.email', \Mautic\EmailBundle\Entity\EmailRepository::class);
     $services->alias('mautic.email.repository.emailReply', \Mautic\EmailBundle\Entity\EmailReplyRepository::class);
     $services->alias('mautic.email.repository.stat', \Mautic\EmailBundle\Entity\StatRepository::class);
+    $services->alias('mautic.helper.mailbox', \Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
+    $services->alias('mautic.helper.mailer', \Mautic\EmailBundle\Helper\MailHelper::class);
 };
