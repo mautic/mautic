@@ -1412,9 +1412,6 @@ class LeadController extends FormController
                             $mailer->setReplyTo($addresses);
                         }
 
-                        // From user
-                        $user = $userHelper->getUser();
-
                         $mailer->setFrom(
                             $email['from'],
                             empty($email['fromname']) ? null : $email['fromname']
