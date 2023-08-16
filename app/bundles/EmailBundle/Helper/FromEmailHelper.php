@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
@@ -141,7 +140,7 @@ class FromEmailHelper
             $signature = str_replace($token, $value ?? '', $signature);
         }
 
-        return EmojiHelper::toHtml($signature);
+        return $signature;
     }
 
     /**
@@ -177,7 +176,7 @@ class FromEmailHelper
             }
 
             $name = $address->isNameTokenized() ? $address->getNameTokenValue($contact) : $address->getName();
-        } catch (TokenNotFoundOrEmptyException $exception) {
+        } catch (TokenNotFoundOrEmptyException) {
             $name = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
         }
 
@@ -189,11 +188,11 @@ class FromEmailHelper
             $email = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
 
             return [$email => $name];
-        } catch (TokenNotFoundOrEmptyException $exception) {
+        } catch (TokenNotFoundOrEmptyException) {
             if ($contact && $asOwner) {
                 try {
                     return $this->getFromEmailArrayAsOwner($contact, $email);
-                } catch (OwnerNotFoundException $exception) {
+                } catch (OwnerNotFoundException) {
                 }
             }
 
