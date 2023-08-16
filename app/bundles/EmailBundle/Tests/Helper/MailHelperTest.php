@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -24,16 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MailHelperTest extends TestCase
 {
-    /**
-     * @var MauticFactory|MockObject
-     */
-    private $mockFactory;
-
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private $mockParameterHelper;
-
     /**
      * @var array
      */
@@ -71,8 +60,6 @@ class MailHelperTest extends TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-        $this->mockFactory         = $this->createMock(MauticFactory::class);
-        $this->mockParameterHelper = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testBatchIsEnabledWithBcTokenInterface()
@@ -254,7 +241,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testValidateValidEmails()
+    public function testValidateValidEmails(): void
     {
         $helper    = $this->mockEmptyMailHelper();
         $addresses = [
@@ -267,64 +254,30 @@ class MailHelperTest extends TestCase
 
         foreach ($addresses as $address) {
             // will throw InvalidEmailException if it will find the address invalid
+            /** @phpstan-ignore-next-line */
             $this->assertNull($helper::validateEmail($address));
         }
     }
 
-    public function testValidateEmailWithoutTld()
+    public function testValidateInValidEmails(): void
     {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('john@doe');
-    }
+        $helper    = $this->mockEmptyMailHelper();
+        $addresses = [
+            'john@doe',
+            'jo hn@doe.email',
+            'jo^hn@doe.email',
+            'jo\'hn@doe.email',
+            'jo;hn@doe.email',
+            'jo&hn@doe.email',
+            'jo*hn@doe.email',
+            'jo%hn@doe.email',
+        ];
 
-    public function testValidateEmailWithSpaceInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo hn@doe.email');
-    }
-
-    public function testValidateEmailWithCaretInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo^hn@doe.email');
-    }
-
-    public function testValidateEmailWithApostropheInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo\'hn@doe.email');
-    }
-
-    public function testValidateEmailWithSemicolonInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo;hn@doe.email');
-    }
-
-    public function testValidateEmailWithAmpersandInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo&hn@doe.email');
-    }
-
-    public function testValidateEmailWithStarInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo*hn@doe.email');
-    }
-
-    public function testValidateEmailWithPercentInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo%hn@doe.email');
+        foreach ($addresses as $address) {
+            $this->expectException(InvalidEmailException::class);
+            /** @phpstan-ignore-next-line */
+            $helper::validateEmail($address);
+        }
     }
 
     public function testGlobalHeadersAreSet()
@@ -426,27 +379,24 @@ class MailHelperTest extends TestCase
 
     public function testUnsubscribeHeader(): void
     {
-        $this->mockParameterHelper->expects($this->once())
-            ->method('get')
-            ->with('secret_key')
-            ->willReturn('secret');
-
         $mockRouter  = $this->createMock(Router::class);
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $mockRouter->expects($this->once())
             ->method('generate')
             ->with('mautic_email_unsubscribe',
-                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                ['idHash' => 'hash'],
                 UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
-
-        $this->mockFactory->method('getRouter')
-            ->willReturnOnConsecutiveCalls($mockRouter);
 
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
+
+        /** @var MockObject|MauticFactory $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $mockFactory->method('getRouter')
+            ->willReturnOnConsecutiveCalls($mockRouter);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -469,7 +419,7 @@ class MailHelperTest extends TestCase
         // There are no unsubscribe headers in transactional emails.
         $mailer->setEmailType('transactional');
         $headers = $mailer->getCustomHeaders();
-        $this->assertNull($headers['List-Unsubscribe']);
+        $this->assertNull($headers['List-Unsubscribe'] ?? null);
     }
 
     protected function mockEmptyMailHelper(): MailHelper
@@ -483,6 +433,8 @@ class MailHelperTest extends TestCase
 
     /**
      * @param mixed[] $parameterMap
+     *
+     * @phpstan-ignore-next-line
      */
     protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory
     {

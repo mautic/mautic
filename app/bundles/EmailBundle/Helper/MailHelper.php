@@ -1176,7 +1176,7 @@ class MailHelper
     }
 
     /**
-     * @param null $idHash
+     * @param string|null $idHash
      * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
      */
     public function setIdHash($idHash = null, $statToBeGenerated = true)
