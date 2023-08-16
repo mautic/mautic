@@ -62,6 +62,7 @@
                 {% set fields = form.fields %}
                 {% set fieldCount = canDelete ? 4 : 3 %}
                 {% for f in fields %}
+                    {# skip values for fields that are not to be displayed, e.g. because they are not saved #}
                     {% if f.type not in viewOnlyFields and true == f.saveResult %}
                       {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'formresult.' ~ formId,
@@ -104,19 +105,24 @@
                   </td>
                   <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
                   <td>{{ item['ipAddress']|e }}</td>
-                  {% for key, r in item.results %}
-                      {% set isTextarea = ('textarea' == r.type) %}
-                      <td {% if isTextarea %}class="long-text"{% endif %}>
-                          {% if isTextarea %}
-                              {{ r.value|nl2br|e }}
-                          {% elseif 'file' == r.type %}
-                              <a href="{{ path('mautic_form_file_download', {'submissionId': item['id'], 'field': key}) }}">
-                                  {{ r.value|e }}
-                              </a>
-                          {% else %}
-                              {{ r.value|e }}
-                          {% endif %}
-                      </td>
+                  {% for f in fields %}
+                    {# skip values for fields that are not to be displayed, e.g. because they are not saved #}
+                    {% if f.type not in viewOnlyFields and true == f.saveResult %}
+                        {% set key = f.alias %}
+                        {% set r = item.results[key] %}
+                        {% set isTextarea = ('textarea' == r.type) %}
+                        <td {% if isTextarea %}class="long-text"{% endif %}>
+                            {% if isTextarea %}
+                                {{ r.value|nl2br|e }}
+                            {% elseif 'file' == r.type %}
+                                <a href="{{ path('mautic_form_file_download', {'submissionId': item['id'], 'field': key}) }}">
+                                    {{ r.value|e }}
+                                </a>
+                            {% else %}
+                                {{ r.value|e }}
+                            {% endif %}
+                        </td>
+                    {% endif %}
                   {% endfor %}
               </tr>
           {% endfor %}
