@@ -1978,6 +1978,10 @@ class MailHelper
 
     private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
+        if ($this->message->getReplyTo()) {
+            return; // Reply to is already set.
+        }
+
         if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
             $this->setReplyTo($emailToSend->getReplyToAddress());
 
@@ -1985,6 +1989,8 @@ class MailHelper
         }
 
         if (empty($this->lead['owner_id'])) {
+            $this->setReplyTo($this->replyTo);
+
             return;
         }
 
