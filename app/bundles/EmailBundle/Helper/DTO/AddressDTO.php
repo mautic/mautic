@@ -8,8 +8,11 @@ use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 
 final class AddressDTO
 {
-    public function __construct(private string $email, private ?string $name = null)
+    private ?string $name = null;
+
+    public function __construct(private string $email, ?string $name = null)
     {
+        $this->name = $this->cleanName($name);
     }
 
     /**
@@ -19,11 +22,6 @@ final class AddressDTO
     {
         $email = key($address);
         $name  = $address[$email] ?? null;
-
-        if ($name) {
-            // Decode apostrophes and other special characters
-            $name = trim(html_entity_decode($name, ENT_QUOTES));
-        }
 
         return new self($email, $name);
     }
@@ -94,5 +92,17 @@ final class AddressDTO
     public function getAddressArray(): array
     {
         return [$this->email => $this->name];
+    }
+
+    /**
+     * Decode apostrophes and other special characters
+     */
+    private function cleanName(?string $name): ?string
+    {
+        if (!$name) {
+            return $name;
+        }
+
+        return trim(html_entity_decode($name, ENT_QUOTES));
     }
 }
