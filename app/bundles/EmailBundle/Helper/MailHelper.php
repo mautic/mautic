@@ -1976,9 +1976,9 @@ class MailHelper
         }
     }
 
-    private function setReplyToForSingleMessage(Email $emailToSend): void
+    private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
-        if (null !== $emailToSend->getReplyToAddress()) {
+        if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
             $this->setReplyTo($emailToSend->getReplyToAddress());
 
             return;
