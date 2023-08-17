@@ -1180,7 +1180,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         return new Callback([
             'callback' => function ($value, ExecutionContextInterface $context) use ($field) {
-                if (preg_match('/{contactfield=(.*?)}/', $value)) {
+                if ($value && preg_match('/{contactfield=(.*?)}/', $value)) {
                     return;
                 }
 
