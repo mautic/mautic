@@ -374,6 +374,7 @@ class MailHelper
                 // Reset the addresses from previous send.
                 $this->from    = $this->getSystemFrom();
                 $this->replyTo = $this->getSystemReplyTo();
+                $this->message = $this->getMessageInstance();
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
