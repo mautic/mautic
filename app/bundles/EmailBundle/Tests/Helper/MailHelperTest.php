@@ -241,43 +241,40 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testValidateValidEmails(): void
+    /**
+     * @dataProvider provideEmails
+     */
+    public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper    = $this->mockEmptyMailHelper();
-        $addresses = [
-            'john@doe.com',
-            'john@doe.email',
-            'john.doe@email.com',
-            'john+doe@email.com',
-            'john@doe.whatevertldtheycomewithinthefuture',
-        ];
 
-        foreach ($addresses as $address) {
-            // will throw InvalidEmailException if it will find the address invalid
-            /** @phpstan-ignore-next-line */
-            $this->assertNull($helper::validateEmail($address));
+        if (!$isValid) {
+            $this->expectException(InvalidEmailException::class);
         }
+        /** @phpstan-ignore-next-line */
+        $this->assertNull($helper::validateEmail($email));
     }
 
-    public function testValidateInValidEmails(): void
+    /**
+     * @return mixed[]
+     */
+    public function provideEmails(): array
     {
-        $helper    = $this->mockEmptyMailHelper();
-        $addresses = [
-            'john@doe',
-            'jo hn@doe.email',
-            'jo^hn@doe.email',
-            'jo\'hn@doe.email',
-            'jo;hn@doe.email',
-            'jo&hn@doe.email',
-            'jo*hn@doe.email',
-            'jo%hn@doe.email',
+        return [
+            ['john@doe.com', true],
+            ['john@doe.email', true],
+            ['john@doe.whatevertldtheycomewithinthefuture', true],
+            ['john.doe@email.com', true],
+            ['john+doe@email.com', true],
+            ['john@doe', false],
+            ['jo hn@doe.email', false],
+            ['jo^hn@doe.email', false],
+            ['jo\'hn@doe.email', false],
+            ['jo;hn@doe.email', false],
+            ['jo&hn@doe.email', false],
+            ['jo*hn@doe.email', false],
+            ['jo%hn@doe.email', false],
         ];
-
-        foreach ($addresses as $address) {
-            $this->expectException(InvalidEmailException::class);
-            /** @phpstan-ignore-next-line */
-            $helper::validateEmail($address);
-        }
     }
 
     public function testGlobalHeadersAreSet()
