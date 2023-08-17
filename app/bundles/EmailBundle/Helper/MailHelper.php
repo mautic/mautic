@@ -374,7 +374,6 @@ class MailHelper
                 // Reset the addresses from previous send.
                 $this->from    = $this->getSystemFrom();
                 $this->replyTo = $this->getSystemReplyTo();
-                $this->message = $this->getMessageInstance();
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -1965,10 +1964,6 @@ class MailHelper
 
     private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
-        if ($this->message->getReplyTo()) {
-            return; // Reply to is already set.
-        }
-
         if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
             $this->setReplyTo($emailToSend->getReplyToAddress());
 
