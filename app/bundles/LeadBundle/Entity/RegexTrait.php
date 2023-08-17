@@ -7,7 +7,7 @@ trait RegexTrait
     /**
      * Ensure that special characters are escaped correctly.
      *
-     * @return mixed
+     * @return array|string|string[]
      */
     protected function prepareRegex($regex)
     {

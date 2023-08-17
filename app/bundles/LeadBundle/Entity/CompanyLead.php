@@ -66,7 +66,7 @@ class CompanyLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -74,7 +74,7 @@ class CompanyLead
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
      */
     public function setLead($lead)
     {

@@ -40,7 +40,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
      *
-     * @var array
+     * @var array<int|string, int|string>
      */
     protected $advancedFilterCommands = [];
 
@@ -94,9 +94,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names.
      *
-     * @param string $entityClass
+     * @param class-string                                                           $entityClass
+     * @param array<string, string|array<string, string|array<string, string>>|null> $args
      *
-     * @return array
+     * @return array<string, string|array<string, string|array<string, string>>|null>
      */
     public function convertOrmProperties($entityClass, array $args)
     {
@@ -134,9 +135,10 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param class-string $className
+     * @param class-string<T>            $className
+     * @param array<string, string|null> $data
      *
-     * @return mixed
+     * @return T
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
@@ -174,7 +176,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an array of entities.
      *
-     * @param array $entities
+     * @param array<int, object> $entities
+     *
+     * @return void
      */
     public function deleteEntities($entities)
     {
@@ -197,7 +201,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
      *
-     * @return int
+     * @return void
      */
     public function deleteEntity($entity, $flush = true)
     {
@@ -209,6 +213,11 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<int, object> $entities
+     *
+     * @return void
+     */
     public function detachEntities(array $entities)
     {
         foreach ($entities as $entity) {
@@ -217,7 +226,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param mixed $entity
+     * @param object $entity
      */
     public function detachEntity($entity)
     {
@@ -240,8 +249,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param null $catAlias
-     * @param null $lang
+     * @param string      $alias
+     * @param string|null $catAlias
+     * @param string|null $lang
      *
      * @return mixed|null
      */
@@ -311,7 +321,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param string $entityClass
      * @param bool   $returnColumnNames
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getBaseColumns($entityClass, $returnColumnNames = false)
     {
@@ -431,7 +441,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param QueryBuilder|DbalQueryBuilder $q
      * @param array<mixed>                  $filter
      *
-     * @return array
+     * @return array<int, mixed>
      */
     public function getFilterExpr($q, array $filter, ?string $unique = null)
     {
@@ -582,11 +592,11 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Get an array of rows from one table using DBAL.
      *
-     * @param int   $start
-     * @param int   $limit
-     * @param array $select
+     * @param int                     $start
+     * @param int                     $limit
+     * @param array<int, string>|null $select
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], array $select = null, array $allowedJoins = [])
     {
@@ -659,7 +669,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Array of search commands supported by the repository.
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getSearchCommands()
     {
@@ -676,7 +686,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param string              $extraColumns String of extra select columns
      * @param int                 $limit        Limit for results
      *
-     * @return array
+     * @return list<array<string,mixed>>
      */
     public function getSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0)
     {
@@ -729,7 +739,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, string>
      */
     public function getStandardSearchCommands()
     {
@@ -752,7 +762,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, string>
      */
     public function getTableColumns()
     {
@@ -784,7 +794,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Persist an array of entities.
      *
-     * @param array|ArrayCollection $entities
+     * @param array<int, T>|ArrayCollection<int, T> $entities
+     *
+     * @return void
      */
     public function saveEntities($entities)
     {
@@ -805,8 +817,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param T    $entity
+     * @param bool $flush  true by default; use false if persisting in batches
      *
      * @return int
      */
@@ -826,6 +838,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
      * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     *
+     * @param T $entity
      */
     public function upsert(object $entity): void
     {
@@ -897,6 +911,8 @@ class CommonRepository extends ServiceEntityRepository
      * Set the current user (i.e. from security context) for use within repositories.
      *
      * @param User $user
+     *
+     * @return void
      */
     public function setCurrentUser($user)
     {
@@ -907,6 +923,11 @@ class CommonRepository extends ServiceEntityRepository
         $this->currentUser = $user;
     }
 
+    /**
+     * Set the translator for use within repositories.
+     *
+     * @return void
+     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -915,9 +936,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Validate array for one order by condition.
      *
-     * @param array $clause ['col' => 'column_a', 'dir' => 'ASC']
+     * @param array<string, string> $clause ['col' => 'column_a', 'dir' => 'ASC']
      *
-     * @return array
+     * @return array<string, string>
      *
      * @throws \InvalidArgumentException
      */
@@ -941,9 +962,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Validate the array for one where condition.
      *
-     * @param array $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
+     * @param array<string, string> $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
      *
-     * @return array
+     * @return array<string, string|array<int,string>>
      *
      * @throws \InvalidArgumentException
      */
@@ -975,7 +996,10 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @param QueryBuilder              $qb
+     * @param object|array<int, object> $filters
+     *
+     * @return array<int, mixed>
      */
     protected function addAdvancedSearchWhereClause($qb, $filters)
     {
@@ -1091,7 +1115,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param object                     $filter
      *
-     * @return array
+     * @return array<int, mixed>
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
     {
@@ -1244,6 +1268,7 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array<string, string>      $args
      *
      * @return bool
      */
@@ -1713,20 +1738,12 @@ class CommonRepository extends ServiceEntityRepository
     protected function isSupportedSearchCommand(&$command, &$subcommand)
     {
         $commands = $this->getSearchCommands();
-        foreach ($commands as $k => $c) {
-            if (is_array($c)) {
-                // subcommands
-                if ($this->translator->trans($k) == $command || $this->translator->trans($k, [], null, 'en_US') == $command) {
-                    foreach ($c as $subc) {
-                        if ($this->translator->trans($subc) == $subcommand || $this->translator->trans($subc, [], null, 'en_US') == $subcommand) {
-                            return true;
-                        }
-                    }
-                }
-            } elseif ($this->translator->trans($c) == $command || $this->translator->trans($c, [], null, 'en_US') == $command) {
+        foreach ($commands as $k) {
+            // subcommands
+            if ($this->translator->trans($k) == $command || $this->translator->trans($k, [], null, 'en_US') == $command) {
                 return true;
-            } elseif ($this->translator->trans($c) == "{$command}:{$subcommand}"
-                || $this->translator->trans($c, [], null, 'en_US') == "{$command}:{$subcommand}"
+            } elseif ($this->translator->trans($k) == "{$command}:{$subcommand}"
+                || $this->translator->trans($k, [], null, 'en_US') == "{$command}:{$subcommand}"
             ) {
                 $command    = "{$command}:{$subcommand}";
                 $subcommand = '';

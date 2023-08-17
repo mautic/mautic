@@ -10,14 +10,14 @@ interface CustomFieldEntityInterface
     /**
      * Set fields.
      *
-     * @return mixed
+     * @return void
      */
     public function setFields($fields);
 
     /**
      * Get fields.
      *
-     * @return mixed
+     * @return array<string, array<string, array<string, int|string|null>>>
      */
     public function getFields($fields);
 
@@ -26,14 +26,14 @@ interface CustomFieldEntityInterface
      *
      * @param string $oldValue
      *
-     * @return mixed
+     * @return self
      */
     public function addUpdatedField($alias, $value, $oldValue = '');
 
     /**
      * Get updated fields.
      *
-     * @return mixed
+     * @return array<string, int|float|string|bool>
      */
     public function getUpdatedFields();
 
@@ -42,7 +42,7 @@ interface CustomFieldEntityInterface
      *
      * @param null $group
      *
-     * @return mixed
+     * @return int|float|string|bool|null
      */
     public function getFieldValue($field, $group = null);
 
@@ -59,7 +59,7 @@ interface CustomFieldEntityInterface
     /**
      * Get flat array of profile fields without groups.
      *
-     * @return mixed
+     * @return array<string, bool|float|int|string|null>
      */
     public function getProfileFields();
 }

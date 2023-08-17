@@ -48,7 +48,7 @@ class ListLeadRepository extends CommonRepository
     }
 
     /**
-     * @param mixed[] $filters
+     * @param array<string, int|string> $filters
      */
     public function getContactsCountBySegment(int $segmentId, array $filters = []): int
     {

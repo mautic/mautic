@@ -20,7 +20,6 @@ class CategoryTest extends TestCase
         $category->setColor('Blue');
         $category->setDescription('My Description');
 
-        $this->assertIsArray($category->getChanges());
         $this->assertNotEmpty($category->getChanges());
     }
 }

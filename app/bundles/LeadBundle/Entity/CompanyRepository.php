@@ -44,7 +44,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @param int $id
      *
-     * @return mixed|null
+     * @return Company|null
      */
     public function getEntity($id = 0)
     {
@@ -97,7 +97,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param mixed[] $args
+     * @param array<string, string> $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
@@ -219,7 +219,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param bool   $user
      * @param string $id
      *
-     * @return array|mixed
+     * @return array<string|int, string|int>|list<array<string,mixed>>
      */
     public function getCompanies($user = false, $id = '')
     {
@@ -403,7 +403,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param int $limit
      * @param int $offset
      *
-     * @return mixed
+     * @return list<array<string,mixed>>
      */
     public function getMostCompanies($query, $limit = 10, $offset = 0)
     {
@@ -475,9 +475,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get list of company Ids by unique field data.
      *
-     * @param iterable<mixed> $uniqueFieldsWithData An array of columns & values to filter by
-     * @param int|null        $companyId            The current company id. Added to query to skip and find other companies
-     * @param int|null        $limit                Limit count of results to return
+     * @param iterable<array<string, string|int>> $uniqueFieldsWithData An array of columns & values to filter by
+     * @param int|null                            $companyId            The current company id. Added to query to skip and find other companies
+     * @param int|null                            $limit                Limit count of results to return
      *
      * @return array<array{id: string}>
      */
@@ -489,9 +489,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get list of company Ids by unique field data.
      *
-     * @param iterable<mixed> $uniqueFieldsWithData An array of columns & values to filter by
-     * @param int|null        $companyId            The current company id. Added to query to skip and find other companies
-     * @param int|null        $limit                Limit count of results to return
+     * @param iterable<array<string, string|int>> $uniqueFieldsWithData An array of columns & values to filter by
+     * @param int|null                            $companyId            The current company id. Added to query to skip and find other companies
+     * @param int|null                            $limit                Limit count of results to return
      *
      * @return array<array{id: string}>
      */

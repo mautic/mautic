@@ -40,7 +40,7 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**
@@ -116,7 +116,7 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @return mixed
+     * @return array<int, object>
      */
     public function getEntitiesByLead(Lead $lead)
     {

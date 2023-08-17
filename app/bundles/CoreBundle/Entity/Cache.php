@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class Cache
 {
     /**
-     * @var mixed
+     * @var resource
      */
     private $id;
 
@@ -64,7 +64,7 @@ class Cache
     }
 
     /**
-     * @return int
+     * @return resource
      */
     public function getId()
     {
@@ -72,9 +72,9 @@ class Cache
     }
 
     /**
-     * @param int $id
+     * @param resource $id
      *
-     * @return Cache
+     * @return $this
      */
     public function setId($id)
     {
@@ -84,7 +84,7 @@ class Cache
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getData()
     {
@@ -92,9 +92,9 @@ class Cache
     }
 
     /**
-     * @param string $data
+     * @param mixed $data
      *
-     * @return Cache
+     * @return $this
      */
     public function setData($data)
     {
@@ -114,7 +114,7 @@ class Cache
     /**
      * @param int $lifetime
      *
-     * @return Cache
+     * @return $this
      */
     public function setLifetime($lifetime)
     {
@@ -134,7 +134,7 @@ class Cache
     /**
      * @param int $time
      *
-     * @return Cache
+     * @return $this
      */
     public function setTime($time)
     {

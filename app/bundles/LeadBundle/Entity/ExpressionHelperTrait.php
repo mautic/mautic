@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Orx;
 
 trait ExpressionHelperTrait
 {
@@ -11,7 +12,7 @@ trait ExpressionHelperTrait
      * @param QueryBuilder|\Doctrine\ORM\QueryBuilder $q
      * @param $includeIsNull    true/false or null to auto determine based on operator
      *
-     * @return mixed
+     * @return CompositeExpression|Orx
      */
     public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null)
     {

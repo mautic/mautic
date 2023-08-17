@@ -96,7 +96,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\PointsChangeLog>
+     * @var Collection<int, PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -106,27 +106,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $actualPoints;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @var Collection<int, CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
+     * @var Collection<int, DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\CoreBundle\Entity\IpAddress>
+     * @var Collection<int, IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
+     * @var Collection<int, PushID>
      */
     private $pushIds;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var Collection<int, LeadEventLog>
      */
     private $eventLog;
 
@@ -168,7 +168,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $dateIdentified;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadNote>
+     * @var Collection<int, LeadNote>
      */
     private $notes;
 
@@ -183,7 +183,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\Tag>
+     * @var Collection<int, \Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
@@ -193,17 +193,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $stage;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @var Collection<int, StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\UtmTag>
+     * @var Collection<int, UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
+     * @var Collection<int, FrequencyRule>
      */
     private $frequencyRules;
 
@@ -485,9 +485,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
-     * @param null   $oldValue
+     * @param string                                                                                                                                                                                                                                                                                                                                                                                                        $prop
+     * @param int|string|bool|array<string, array<string, string>>|\DateTimeInterface|User|Company|Stage|Collection<int, PointsChangeLog>|Collection<int, CompanyChangeLog>|Collection<int, DoNotContact>|IpAddress|Collection<int, IpAddress>|Collection<int, PushID>|Collection<int, LeadEventLog>|Collection<int, LeadNote>|Collection<int, StagesChangeLog>|Collection<int, UtmTag>|Collection<int, FrequencyRule>|null $val
+     * @param null                                                                                                                                                                                                                                                                                                                                                                                                          $oldValue
      */
     protected function isChanged($prop, $val, $oldValue = null)
     {
@@ -573,7 +573,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @param int $id
      *
-     * @return Lead
+     * @return $this
      */
     public function setId($id)
     {
@@ -597,7 +597,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @param User $owner
      *
-     * @return Lead
+     * @return $this
      */
     public function setOwner(User $owner = null)
     {
@@ -628,7 +628,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add ipAddress.
      *
-     * @return Lead
+     * @return $this
      */
     public function addIpAddress(IpAddress $ipAddress)
     {
@@ -656,7 +656,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get ipAddresses.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getIpAddresses()
     {
@@ -776,7 +776,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param int    $points
      * @param string $operator
      *
-     * @return Lead
+     * @return $this
      */
     public function adjustPoints($points, $operator = self::POINTS_ADD)
     {
@@ -837,7 +837,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @param int $points
      *
-     * @return Lead
+     * @return $this
      */
     public function setPoints($points)
     {
@@ -917,7 +917,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add pointsChangeLog.
      *
-     * @return Lead
+     * @return $this
      */
     public function addPointsChangeLog(PointsChangeLog $pointsChangeLog)
     {
@@ -944,7 +944,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add StagesChangeLog.
      *
-     * @return Lead
+     * @return $this
      */
     public function stageChangeLog(StagesChangeLog $stageChangeLog)
     {
@@ -954,7 +954,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @return Collection<int, StagesChangeLog>
      */
     public function getStageChangeLog()
     {
@@ -972,7 +972,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get pointsChangeLog.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getPointsChangeLog()
     {
@@ -1005,7 +1005,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add Company ChangeLog.
      *
-     * @return Lead
+     * @return $this
      */
     public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
     {
@@ -1015,7 +1015,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @return Collection<int, CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1072,7 +1072,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
+     * @return Collection<int, PushID>
      */
     public function getPushIDs()
     {
@@ -1122,7 +1122,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
+     * @return Collection<int, DoNotContact>
      */
     public function getDoNotContact(): Collection
     {
@@ -1140,7 +1140,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get internal storage.
      *
-     * @return mixed
+     * @return array<int|string, int|string>
      */
     public function getInternal()
     {
@@ -1158,7 +1158,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get social cache.
      *
-     * @return mixed
+     * @return array<int|string, int|string|array<int|string, int|string>>
      */
     public function getSocialCache()
     {
@@ -1166,7 +1166,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getColor()
     {
@@ -1174,7 +1174,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $color
+     * @param string $color
      */
     public function setColor($color)
     {
@@ -1226,7 +1226,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return self
+     * @return $this
      */
     public function setManipulator(LeadManipulator $manipulator = null)
     {
@@ -1260,7 +1260,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return Collection<int, LeadNote>
      */
     public function getNotes()
     {
@@ -1284,7 +1284,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateIdentified()
     {
@@ -1292,7 +1292,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $dateIdentified
+     * @param \DateTimeInterface|null $dateIdentified
      */
     public function setDateIdentified($dateIdentified)
     {
@@ -1301,7 +1301,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getLastActive()
     {
@@ -1309,7 +1309,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $lastActive
+     * @param \DateTimeInterface $lastActive
      */
     public function setLastActive($lastActive)
     {
@@ -1325,7 +1325,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add tag.
      *
-     * @return Lead
+     * @return $this
      */
     public function addTag(Tag $tag)
     {
@@ -1347,7 +1347,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get tags.
      *
-     * @return mixed
+     * @return Collection<int, \Mautic\LeadBundle\Entity\Tag>
      */
     public function getTags()
     {
@@ -1369,7 +1369,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get utm tags.
      *
-     * @return mixed
+     * @return Collection<int, UtmTag>
      */
     public function getUtmTags()
     {
@@ -1398,7 +1398,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set stage.
      *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
+     * @param Stage $stage
      *
      * @return Stage
      */
@@ -1413,7 +1413,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get stage.
      *
-     * @return \Mautic\StageBundle\Entity\Stage|null
+     * @return Stage|null
      */
     public function getStage()
     {
@@ -1425,7 +1425,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @param FrequencyRule[] $frequencyRules
      *
-     * @return Lead
+     * @return $this
      */
     public function setFrequencyRules($frequencyRules)
     {
@@ -1437,7 +1437,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get frequency rules.
      *
-     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
+     * @return Collection<int, FrequencyRule>
      */
     public function getFrequencyRules()
     {
@@ -1509,7 +1509,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return Company|null
      */
     public function getPrimaryCompany()
     {
@@ -1517,9 +1517,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $primaryCompany
+     * @param array<int|string, int|string>|Company|null $primaryCompany
      *
-     * @return Lead
+     * @return $this
      */
     public function setPrimaryCompany($primaryCompany)
     {
@@ -1529,7 +1529,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTitle()
     {
@@ -1537,9 +1537,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $title
+     * @param string|null $title
      *
-     * @return Lead
+     * @return $this
      */
     public function setTitle($title)
     {
@@ -1550,7 +1550,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getFirstname()
     {
@@ -1558,9 +1558,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $firstname
+     * @param string|null $firstname
      *
-     * @return Lead
+     * @return $this
      */
     public function setFirstname($firstname)
     {
@@ -1571,7 +1571,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getLastname()
     {
@@ -1579,9 +1579,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $lastname
+     * @param string|null $lastname
      *
-     * @return Lead
+     * @return $this
      */
     public function setLastname($lastname)
     {
@@ -1592,7 +1592,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPosition()
     {
@@ -1600,9 +1600,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $position
+     * @param string|null $position
      *
-     * @return Lead
+     * @return $this
      */
     public function setPosition($position)
     {
@@ -1613,7 +1613,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPhone()
     {
@@ -1621,9 +1621,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $phone
+     * @param string|null $phone
      *
-     * @return Lead
+     * @return $this
      */
     public function setPhone($phone)
     {
@@ -1634,7 +1634,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getMobile()
     {
@@ -1642,9 +1642,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $mobile
+     * @param string|null $mobile
      *
-     * @return Lead
+     * @return $this
      */
     public function setMobile($mobile)
     {
@@ -1663,7 +1663,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getAddress1()
     {
@@ -1671,9 +1671,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $address1
+     * @param string|null $address1
      *
-     * @return Lead
+     * @return $this
      */
     public function setAddress1($address1)
     {
@@ -1684,7 +1684,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getAddress2()
     {
@@ -1692,9 +1692,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $address2
+     * @param string|null $address2
      *
-     * @return Lead
+     * @return $this
      */
     public function setAddress2($address2)
     {
@@ -1705,7 +1705,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCity()
     {
@@ -1713,9 +1713,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $city
+     * @param string|null $city
      *
-     * @return Lead
+     * @return $this
      */
     public function setCity($city)
     {
@@ -1726,7 +1726,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getState()
     {
@@ -1734,9 +1734,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $state
+     * @param string|null $state
      *
-     * @return Lead
+     * @return $this
      */
     public function setState($state)
     {
@@ -1747,7 +1747,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getZipcode()
     {
@@ -1755,9 +1755,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $zipcode
+     * @param string|null $zipcode
      *
-     * @return Lead
+     * @return $this
      */
     public function setZipcode($zipcode)
     {
@@ -1778,7 +1778,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param string $timezone
      *
-     * @return Lead
+     * @return $this
      */
     public function setTimezone($timezone)
     {
@@ -1789,7 +1789,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCountry()
     {
@@ -1797,9 +1797,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $country
+     * @param string|null $country
      *
-     * @return Lead
+     * @return $this
      */
     public function setCountry($country)
     {
@@ -1810,7 +1810,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCompany()
     {
@@ -1818,9 +1818,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $company
+     * @param string|null $company
      *
-     * @return Lead
+     * @return $this
      */
     public function setCompany($company)
     {
@@ -1831,7 +1831,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getEmail()
     {
@@ -1839,9 +1839,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param mixed $email
+     * @param string|null $email
      *
-     * @return Lead
+     * @return $this
      */
     public function setEmail($email)
     {
@@ -1854,7 +1854,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Returns array of rules with preferred channels first.
      *
-     * @return mixed
+     * @return array<int|string, array<string, int|string>>|null
      */
     public function getChannelRules()
     {

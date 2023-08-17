@@ -56,7 +56,7 @@ class Tag
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {

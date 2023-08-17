@@ -3,22 +3,28 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+/**
+ * Class CommonEntity.
+ */
 class CommonEntity
 {
     /**
-     * @var array
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string|\DateTime|\DateTimeInterface>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $changes = [];
 
     /**
-     * @var array
+     * @var array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     protected $pastChanges = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    /**
+     * @return void
+     */
+    public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -29,6 +35,8 @@ class CommonEntity
      * Wrapper function for isProperty methods.
      *
      * @param string $name
+     *
+     * @return string
      *
      * @throws \InvalidArgumentException
      */
@@ -57,14 +65,18 @@ class CommonEntity
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param string                                                                                                               $prop
+     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null $val
      */
     protected function isChanged($prop, $val)
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ('category' == $prop) {
+            /**
+             * @var \Mautic\CategoryBundle\Entity\Category|null $current
+             * @var \Mautic\CategoryBundle\Entity\Category|null $val
+             */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -107,6 +119,10 @@ class CommonEntity
         }
     }
 
+    /**
+     * @param string                                                                                                               $key
+     * @param array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null $value
+     */
     protected function addChange($key, $value)
     {
         if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
@@ -117,7 +133,9 @@ class CommonEntity
     }
 
     /**
-     * @return array
+     * @param bool $includePast
+     *
+     * @return array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null>
      */
     public function getChanges($includePast = false)
     {
@@ -130,6 +148,8 @@ class CommonEntity
 
     /**
      * Reset changes.
+     *
+     * @return void
      */
     public function resetChanges()
     {
@@ -137,6 +157,11 @@ class CommonEntity
         $this->changes     = [];
     }
 
+    /**
+     * @param array<string, array<int|string, array<int|string, int|string>|int|string>|\DateTime|\DateTimeInterface|bool|int|string|object|null> $changes
+     *
+     * @return void
+     */
     public function setChanges(array $changes)
     {
         $this->changes = $changes;

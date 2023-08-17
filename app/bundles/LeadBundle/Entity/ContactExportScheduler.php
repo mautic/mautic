@@ -19,10 +19,10 @@ class ContactExportScheduler
 
     private \DateTimeImmutable $scheduledDateTime;
 
-    /** @var array<mixed> */
+    /** @var array<string, int|string|bool|array<string, string|array<string, string>>> */
     private array $data = [];
 
-    /** @var array<mixed> */
+    /** @var array<string, int|string|bool|\DateTimeImmutable|array<string, string|array<string, string>>|null> */
     private array $changes = [];
 
     /**
@@ -87,7 +87,7 @@ class ContactExportScheduler
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, int|string|bool|array<string, string|array<string, string>>>
      */
     public function getData(): array
     {
@@ -95,7 +95,7 @@ class ContactExportScheduler
     }
 
     /**
-     * @param array<mixed> $data
+     * @param array<string, int|string|bool|array<string, string|array<string, string>>> $data
      */
     public function setData(array $data): self
     {
@@ -106,7 +106,7 @@ class ContactExportScheduler
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, int|string|bool|\DateTimeImmutable|array<string, string|array<string, string>>|null>
      */
     public function getChanges(): array
     {
@@ -114,7 +114,7 @@ class ContactExportScheduler
     }
 
     /**
-     * @param mixed $value
+     * @param int|\DateTimeImmutable|array<string, int|string|bool|array<string, string|array<string, string>>>|null $value
      */
     private function addChange(string $property, $value): void
     {

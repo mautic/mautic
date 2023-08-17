@@ -223,6 +223,10 @@ class Sms extends FormEntity
         $current = $this->$getter();
 
         if ('category' == $prop || 'list' == $prop) {
+            /**
+             * @var \Mautic\CategoryBundle\Entity\Category|LeadList|null $current
+             * @var \Mautic\CategoryBundle\Entity\Category|LeadList|null $val
+             */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

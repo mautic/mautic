@@ -155,8 +155,6 @@ trait CustomFieldEntityTrait
 
     /**
      * Get the array of updated fields.
-     *
-     * @return array
      */
     public function getUpdatedFields()
     {
@@ -166,8 +164,6 @@ trait CustomFieldEntityTrait
     /**
      * @param string      $field
      * @param string|null $group
-     *
-     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {
@@ -217,8 +213,6 @@ trait CustomFieldEntityTrait
 
     /**
      * Get profile values.
-     *
-     * @return array
      */
     public function getProfileFields()
     {

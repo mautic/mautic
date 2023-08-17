@@ -302,19 +302,19 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
         if ('role' == $prop) {
-            if ($current && !$val) {
-                $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$this->role && $val) {
-                $this->changes['role'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['role'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
+            $current = $this->getRole();
+            if (!$current instanceof Role) {
+                return;
             }
+
+            /**
+             * @var Role $val
+             */
+            $this->changes['role'] = [
+                $current->getName().'('.$current->getId().')',
+                $val->getName().'('.$val->getId().')',
+            ];
         } else {
             parent::isChanged($prop, $val);
         }
@@ -574,8 +574,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -589,7 +587,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get role.
      *
-     * @return Role
+     * @return ?Role
      */
     public function getRole()
     {

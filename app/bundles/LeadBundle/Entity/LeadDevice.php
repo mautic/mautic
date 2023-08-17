@@ -176,7 +176,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return array<string, string>
      */
     public function getClientInfo()
     {
@@ -184,7 +184,7 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $clientInfo
+     * @param array<string, string> $clientInfo
      */
     public function setClientInfo($clientInfo)
     {
@@ -192,7 +192,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDevice()
     {
@@ -200,7 +200,7 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $device
+     * @param string|null $device
      */
     public function setDevice($device)
     {
@@ -208,7 +208,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDeviceBrand()
     {
@@ -221,7 +221,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDeviceModel()
     {
@@ -229,7 +229,7 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $deviceModel
+     * @param string|null $deviceModel
      */
     public function setDeviceModel($deviceModel)
     {
@@ -237,7 +237,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDeviceOsName()
     {
@@ -382,7 +382,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -390,7 +390,7 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $dateAdded
+     * @param \DateTimeInterface|null $dateAdded
      */
     public function setDateAdded($dateAdded)
     {

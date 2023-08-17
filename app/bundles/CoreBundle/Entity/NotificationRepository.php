@@ -76,7 +76,7 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @return mixed|null
+     * @return \DateTimeInterface|null
      */
     public function getUpstreamLastDate()
     {

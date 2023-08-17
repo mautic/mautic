@@ -68,7 +68,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -92,7 +92,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -100,7 +100,7 @@ class LeadCategory
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
      */
     public function setLead($lead)
     {
