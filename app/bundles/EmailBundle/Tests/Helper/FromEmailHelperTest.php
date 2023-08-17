@@ -15,9 +15,11 @@ use PHPUnit\Framework\TestCase;
 
 class FromEmailHelperTest extends TestCase
 {
-    private CoreParametersHelper|MockObject $coreParametersHelper;
+    /** @var CoreParametersHelper&MockObject */
+    private $coreParametersHelper;
 
-    private LeadRepository|MockObject $leadRepository;
+    /** @var LeadRepository&MockObject */
+    private $leadRepository;
 
     protected function setUp(): void
     {
@@ -441,8 +443,8 @@ class FromEmailHelperTest extends TestCase
             ->method('getLeadOwner');
 
         $defaultFrom = new AddressDTO('default@somewhere.com', 'Default Name');
-        $contact = null;
-        $helper  = $this->getHelper();
+        $contact     = null;
+        $helper      = $this->getHelper();
         $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
         $from = $helper->getFromAddressConsideringOwner($defaultFrom, $contact);
 
@@ -456,8 +458,8 @@ class FromEmailHelperTest extends TestCase
             ->method('getLeadOwner');
 
         $defaultFrom = new AddressDTO('default@somewhere.com', 'Default Name');
-        $contact = null;
-        $helper  = $this->getHelper();
+        $contact     = null;
+        $helper      = $this->getHelper();
         $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
         $from = $helper->getFromAddressDto($defaultFrom, $contact);
 
@@ -687,7 +689,7 @@ class FromEmailHelperTest extends TestCase
             ['mailer_is_owner', null, true],
         ];
         $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
-        
+
         $user = [
             'id'         => 1,
             'first_name' => 'First',

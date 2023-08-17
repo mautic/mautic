@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
@@ -15,10 +16,12 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
@@ -699,6 +702,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
+        /** @var MockObject&MauticFactory $mockFactory */
         $mockFactory = $this->createMock(MauticFactory::class);
         $mockFactory->method('getParameter')
             ->will(
@@ -708,16 +712,27 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-        $mockFactory->method('getLogger')
-            ->willReturn(
-                new NullLogger()
+        $mockFactory->method('getLogger')->willReturn(new NullLogger());
+
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
             );
 
-        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->expects($this->once())->method('setDefaultFrom');
-        $mockFactory->method('get')->with('mautic.helper.from_email_helper')->willReturn($fromEmaiHelper);
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox);
         $statRepository = $this->createMock(StatRepository::class);
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(Translator::class);

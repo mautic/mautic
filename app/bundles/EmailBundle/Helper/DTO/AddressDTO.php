@@ -104,7 +104,7 @@ final class AddressDTO
     }
 
     /**
-     * Decode apostrophes and other special characters
+     * Decode apostrophes and other special characters.
      */
     public function setName(?string $name): void
     {

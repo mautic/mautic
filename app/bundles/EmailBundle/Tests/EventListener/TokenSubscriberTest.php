@@ -3,14 +3,17 @@
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 
@@ -18,19 +21,33 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&MauticFactory $mockFactory */
+        $mockFactory = $this->createMock(MauticFactory::class);
+
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
+            );
 
         $mockFactory->method('get')
             ->with('mautic.helper.from_email_helper')
             ->willReturn($this->createMock(FromEmailHelper::class));
 
-        $tokens = [
-            '{test}' => 'value',
-        ];
+        $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()));
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

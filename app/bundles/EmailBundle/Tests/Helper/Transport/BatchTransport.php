@@ -10,7 +10,6 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportTrait;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
-use Symfony\Component\Mime\Email;
 
 class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
@@ -46,7 +45,11 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     protected function doSend(SentMessage $message): void
     {
         $message = $message->getOriginalMessage();
-        \assert($message instanceof MauticMessage);
+
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
+
         $this->metadatas[] = $message->getMetadata();
 
         if ($this->validate && $this->numberToFail) {
@@ -57,10 +60,8 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
             }
         }
 
-        if ($message instanceof Email) {
-            $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-            $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
-        }
+        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
     }
 
     public function getMaxBatchLimit(): int

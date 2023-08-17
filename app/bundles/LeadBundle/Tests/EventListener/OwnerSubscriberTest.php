@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -289,11 +290,16 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->expects($this->once())->method('setDefaultFrom');
-        $mockFactory->expects($this->once())->method('get')->with('mautic.helper.from_email_helper')->willReturn($fromEmaiHelper);
+
+        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var Mailbox|MockObject $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;

@@ -372,7 +372,7 @@ class MailHelper
                 $this->mailer->send($this->message);
 
                 // Reset the addresses from previous send.
-                $this->from = $this->getSystemFrom();
+                $this->from    = $this->getSystemFrom();
                 $this->replyTo = $this->getSystemReplyTo();
             } catch (TransportExceptionInterface $exception) {
                 /*
@@ -913,8 +913,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param string[] $addresses
-     * @param ?string  $name
+     * @param array<string,?string> $addresses
+     * @param ?string               $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
      *
@@ -967,8 +967,8 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param string  $addresses
-     * @param ?string $name
+     * @param array<string,?string> $addresses
+     * @param ?string               $name
      *
      * //TODO: same bug for the name as the one we have in setCc
      *
@@ -1844,7 +1844,7 @@ class MailHelper
     }
 
     /**
-     * @return array
+     * @return array<string,string>
      */
     private function getSystemHeaders(): array
     {
