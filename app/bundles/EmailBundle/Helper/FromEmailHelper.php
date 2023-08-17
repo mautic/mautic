@@ -52,7 +52,7 @@ class FromEmailHelper
         }
 
         try {
-            return $this->getFromEmailArrayAsOwner($contact, $email);
+            return $this->getFromEmailAsOwner($contact, $email);
         } catch (OwnerNotFoundException) {
             return $address;
         }
@@ -124,7 +124,7 @@ class FromEmailHelper
 
         foreach ($owner as $key => $value) {
             $token     = sprintf('|USER_%s|', strtoupper($key));
-            $signature = str_replace($token, $value ?? '', $signature);
+            $signature = str_replace($token, (string) $value, (string) $signature);
         }
 
         return $signature;
@@ -173,7 +173,7 @@ class FromEmailHelper
         } catch (TokenNotFoundOrEmptyException) {
             if ($contact && $asOwner) {
                 try {
-                    return $this->getFromEmailArrayAsOwner($contact, $email);
+                    return $this->getFromEmailAsOwner($contact, $email);
                 } catch (OwnerNotFoundException) {
                 }
             }
@@ -187,7 +187,7 @@ class FromEmailHelper
      *
      * @throws OwnerNotFoundException
      */
-    private function getFromEmailArrayAsOwner(array $contact, Email $email = null): AddressDTO
+    private function getFromEmailAsOwner(array $contact, Email $email = null): AddressDTO
     {
         if (empty($contact['owner_id'])) {
             throw new OwnerNotFoundException();

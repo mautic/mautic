@@ -87,7 +87,7 @@ final class AddressDTO
 
     public function isNameTokenized(): bool
     {
-        return (bool) preg_match('/{contactfield=(.*?)}/', $this->name);
+        return (bool) ($this->name ? preg_match('/{contactfield=(.*?)}/', $this->name) : false);
     }
 
     /**

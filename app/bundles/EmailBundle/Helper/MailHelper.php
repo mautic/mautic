@@ -370,6 +370,10 @@ class MailHelper
 
             try {
                 $this->mailer->send($this->message);
+
+                // Reset the addresses from previous send.
+                $this->from = $this->getSystemFrom();
+                $this->replyTo = $this->getSystemReplyTo();
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -432,7 +436,7 @@ class MailHelper
 
                 if (!isset($this->metadata[$fromAddress])) {
                     $this->metadata[$fromAddress] = [
-                        'from'     => $from->getAddressArray(),
+                        'from'     => $from,
                         'contacts' => [],
                     ];
                 }
@@ -508,10 +512,14 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
+                $email = $this->getEmail();
+
                 if (!$this->useGlobalFrom) {
                     $this->setFrom($metadatum['from'], null, null);
+                } else if ($email && $email->getUseOwnerAsMailer()) {
+                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
                 } else {
-                    $this->setFrom($this->getFrom(), null);
+                    $this->setFrom($this->getFrom()->getEmail(), $this->getFrom()->getName());
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -1184,7 +1192,7 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
-        if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
+        if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
         }
 
@@ -1214,7 +1222,7 @@ class MailHelper
 
         $this->replyTo = $email->getReplyToAddress();
         if (empty($this->replyTo)) {
-            if (!empty($fromEmail) && empty($this->factory->getParameter('mailer_reply_to_email'))) {
+            if (!empty($fromEmail) && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
                 $this->replyTo = $fromEmail;
             } else {
                 $this->replyTo = $this->getSystemReplyTo();
@@ -1838,7 +1846,7 @@ class MailHelper
     /**
      * @return array
      */
-    private function getSystemHeaders()
+    private function getSystemHeaders(): array
     {
         /**
          * This section is stopped, because it is preventing global headers from being merged
@@ -1847,7 +1855,7 @@ class MailHelper
          *           return [];
          *      }.
          */
-        if (!$systemHeaders = $this->factory->getParameter('mailer_custom_headers', [])) {
+        if (!$systemHeaders = $this->coreParametersHelper->get('mailer_custom_headers', [])) {
             return [];
         }
 
@@ -2035,7 +2043,7 @@ class MailHelper
 
     private function getReplyTo(): string
     {
-        return $this->replyTo ?? $this->systemReplyTo;
+        return $this->replyTo ?? $this->getSystemReplyTo();
     }
 
     private function getSystemReplyTo(): string
@@ -2049,7 +2057,7 @@ class MailHelper
 
     private function getFrom(): AddressDTO
     {
-        return $this->from ?? $this->systemFrom;
+        return $this->from ?? $this->getSystemFrom();
     }
 
     private function getSystemFrom(): AddressDTO
