@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,6 +24,7 @@ use Symfony\Component\Mime\Address;
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
+    use AjaxLookupControllerTrait;
 
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
