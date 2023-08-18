@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEventFactory
 {
