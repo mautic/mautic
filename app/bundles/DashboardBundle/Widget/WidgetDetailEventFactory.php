@@ -13,24 +13,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEventFactory
 {
-    private TranslatorInterface $translator;
-
-    private CacheProvider $cacheProvider;
-
-    private CorePermissions $corePermissions;
-
-    private UserHelper $userHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        CacheProvider $cacheProvider,
-        CorePermissions $corePermissions,
-        UserHelper $userHelper
+        private TranslatorInterface $translator,
+        private CacheProvider $cacheProvider,
+        private CorePermissions $corePermissions,
+        private UserHelper $userHelper
     ) {
-        $this->translator      = $translator;
-        $this->cacheProvider   = $cacheProvider;
-        $this->corePermissions = $corePermissions;
-        $this->userHelper      = $userHelper;
     }
 
     public function create(Widget $widget): WidgetDetailEvent

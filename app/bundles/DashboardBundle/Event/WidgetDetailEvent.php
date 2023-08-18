@@ -356,10 +356,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Checks for cache type. This event should be created by factory thus not legacy approach.
-     *
-     * @return bool
      */
-    private function usesLegacyCache()
+    private function usesLegacyCache(): bool
     {
         return is_null($this->cacheProvider);
     }
@@ -367,13 +365,9 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
-     * @param \DateTimeInterface|mixed $value
-     *
      * @throws CouldNotFormatDateTimeException
-     *
-     * @return string
      */
-    private function castDateTimeToString($value)
+    private function castDateTimeToString(\DateTimeInterface|mixed $value): string
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone
