@@ -1171,12 +1171,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
     }
 
-    /**
-     * @param string $field
-     *
-     * @return \Symfony\Component\Validator\Constraints\Callback
-     */
-    private static function getTokenOrEmailConstraint($field)
+    private static function getTokenOrEmailConstraint(string $field): Callback
     {
         return new Callback([
             'callback' => function ($value, ExecutionContextInterface $context) use ($field) {
