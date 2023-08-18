@@ -1044,6 +1044,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "danadelion",
+      "name": "Dana Linhartová",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78448517?v=4",
+      "profile": "https://github.com/danadelion",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Thanks",
+      "name": "Thanks",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1121545?v=4",
+      "profile": "https://github.com/thanks",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "PatrickJenkner",
+      "name": "Patrick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/139468697?v=4",
+      "profile": "https://github.com/PatrickJenkner",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
