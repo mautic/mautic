@@ -1006,7 +1006,7 @@ class PageModel extends FormModel
      * @param int               $limit
      * @param array<int|string> $filters
      *
-     * @return array
+     * @return array<array<int|string>>
      */
     public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [])
     {
