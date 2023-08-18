@@ -1212,35 +1212,6 @@ class MailHelper
         // Set message settings from the email
         $this->setSubject($subject);
 
-        $fromEmail = $email->getFromAddress();
-        $fromName  = $email->getFromName();
-        if (!empty($fromEmail) || !empty($fromName)) {
-            if (empty($fromName)) {
-                $fromName = $this->getFrom()->getName();
-            } elseif (empty($fromEmail)) {
-                $fromEmail = $this->getFrom()->getEmail();
-            }
-
-            $this->from = new AddressDTO($fromEmail, $fromName);
-        } else {
-            $this->from = $this->getSystemFrom();
-        }
-
-        $this->replyTo = $email->getReplyToAddress();
-        if (empty($this->replyTo)) {
-            if (!empty($fromEmail) && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
-                $this->replyTo = $fromEmail;
-            } else {
-                $this->replyTo = $this->getSystemReplyTo();
-            }
-        }
-        if (!empty($this->replyTo)) {
-            $addresses = explode(',', $this->replyTo);
-
-            // Only a single email is supported
-            $this->setReplyTo($addresses[0]);
-        }
-
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
@@ -1964,6 +1935,20 @@ class MailHelper
             return;
         }
 
+        if ($email) {
+            $fromEmail = $email->getFromAddress();
+            $fromName  = $email->getFromName();
+            if (!empty($fromEmail) || !empty($fromName)) {
+                if (empty($fromName)) {
+                    $fromName = $this->getFrom()->getName();
+                } elseif (empty($fromEmail)) {
+                    $fromEmail = $this->getFrom()->getEmail();
+                }
+
+                $this->from = new AddressDTO($fromEmail, $fromName);
+            }
+        }
+
         if (!$this->message->getFrom()) {
             $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
 
@@ -1980,7 +1965,7 @@ class MailHelper
         }
 
         if (empty($this->lead['owner_id'])) {
-            $this->setReplyTo($this->replyTo);
+            $this->setReplyTo($this->getReplyTo());
 
             return;
         }
@@ -1989,7 +1974,7 @@ class MailHelper
             $owner = $this->fromEmailHelper->getContactOwner((int) $this->lead['owner_id'], $emailToSend);
             $this->setReplyTo($owner['email']);
         } catch (OwnerNotFoundException) {
-            $this->setReplyTo($this->replyTo);
+            $this->setReplyTo($this->getSystemReplyTo());
         }
     }
 
@@ -2054,7 +2039,8 @@ class MailHelper
     private function getSystemReplyTo(): string
     {
         if (!$this->systemReplyTo) {
-            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $this->getSystemFrom()->getEmail();
+            $fromEmailAddress    = $this->from ? $this->from->getEmail() : null;
+            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $fromEmailAddress ?? $this->getSystemFrom()->getEmail();
         }
 
         return $this->systemReplyTo;

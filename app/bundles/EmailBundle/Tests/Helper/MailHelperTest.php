@@ -465,11 +465,13 @@ class MailHelperTest extends TestCase
         $email->setCustomHtml('content');
 
         $mailer->setEmail($email);
+        $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         $this->assertEquals('nobody@nowhere.com', $replyTo);
 
         $email->setReplyToAddress('replytooverride@nowhere.com');
         $mailer->setEmail($email);
+        $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         $this->assertEquals('replytooverride@nowhere.com', $replyTo);
     }
@@ -481,12 +483,12 @@ class MailHelperTest extends TestCase
         $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox);
         $email         = new Email();
 
-        $email->setSubject('Subject');
-        $email->setCustomHtml('content');
-
         // From address is set
         $email->setFromAddress('from@nowhere.com');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
         $mailer->setEmail($email);
+        $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         // Expect from address in reply to
         $this->assertEquals('from@nowhere.com', $replyTo);
@@ -504,6 +506,7 @@ class MailHelperTest extends TestCase
         $email->setSubject('Subject');
         $email->setCustomHtml('content');
         $mailer->setEmail($email);
+        $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         // Expect from address in reply to
         $this->assertEquals('admin@mautic.com', $replyTo);
