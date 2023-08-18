@@ -234,8 +234,9 @@ class AssetController extends FormController
 
         $download = $request->query->get('download', 0);
 
-        // Display the file directly in the browser by default
-        $stream   = $request->query->get('stream', '1');
+        // Display the file directly in the browser just for selected extensions
+        $defaultStream = in_array($activeAsset->getExtension(), $this->coreParametersHelper->get('streamed_extensions')) ? '1' : null;
+        $stream        = $request->query->get('stream', $defaultStream);
 
         if ('1' === $download || '1' === $stream) {
             try {

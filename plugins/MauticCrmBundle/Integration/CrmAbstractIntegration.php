@@ -380,6 +380,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
             // return if uniqueIdentifiers have no data set to avoid duplicating leads.
+            $this->logger->debug('getMauticLead: No unique identifiers', [
+                'uniqueLeadFields' => $uniqueLeadFields,
+                'matchedFields'    => $matchedFields,
+            ]);
+
             return;
         }
 
@@ -404,6 +409,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {
+                $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
+
                 return;
             }
 
