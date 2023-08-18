@@ -71,6 +71,7 @@ class LeadFieldRepository extends CommonRepository
         $queryBuilder->select($this->getTableAlias());
         $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.object = :object");
+        $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.label");
         $queryBuilder->setParameter('object', $object);
 
