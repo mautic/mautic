@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
@@ -23,15 +24,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class RedirectModel extends FormModel
 {
     /**
-     * @var UrlHelper
-     */
-    protected $urlHelper;
-
-    /**
      * RedirectModel constructor.
      */
     public function __construct(
-        UrlHelper $urlHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -39,10 +34,9 @@ class RedirectModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private Shortener $shortener
     ) {
-        $this->urlHelper = $urlHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -92,7 +86,7 @@ class RedirectModel extends FormModel
             );
 
             if ($shortenUrl) {
-                $url = $this->urlHelper->buildShortUrl($url);
+                $url = $this->shortener->shortenUrl($url);
             }
 
             return $url;

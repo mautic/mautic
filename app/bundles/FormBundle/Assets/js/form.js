@@ -100,12 +100,14 @@ Mautic.formOnLoad = function (container) {
 };
 
 Mautic.formBuilderNewComponentInit = function () {
-    mQuery('select.form-builder-new-component').change(function (e) {
-        mQuery(this).find('option:selected');
-        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+    mQuery('select.form-builder-new-component:not(.initialized)').change(function (e) {
+        const select = mQuery(this);
+        select.addClass('initialized');
+        select.find('option:selected');
+        Mautic.ajaxifyModal(select.find('option:selected'));
         // Reset the dropdown
-        mQuery(this).val('');
-        mQuery(this).trigger('chosen:updated');
+        select.val('');
+        select.chosen('destroy').chosen();
     });
 };
 

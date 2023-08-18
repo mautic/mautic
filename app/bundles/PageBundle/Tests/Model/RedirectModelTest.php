@@ -4,9 +4,9 @@ namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
@@ -41,8 +41,8 @@ class RedirectModelTest extends PageTestAbstract
 
     public function testRedirectGenerationEvent()
     {
-        $urlHelper = $this
-            ->getMockBuilder(UrlHelper::class)
+        $shortener = $this
+            ->getMockBuilder(Shortener::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -57,7 +57,6 @@ class RedirectModelTest extends PageTestAbstract
             ->willReturn($url);
 
         $model = new RedirectModel(
-            $urlHelper,
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(CorePermissions::class),
             $dispatcher,
@@ -65,7 +64,8 @@ class RedirectModelTest extends PageTestAbstract
             $this->createMock(Translator::class),
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $shortener
         );
 
         $redirect = new Redirect();
