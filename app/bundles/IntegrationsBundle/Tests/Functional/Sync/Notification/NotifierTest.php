@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -74,7 +65,7 @@ class NotifierTest extends MauticMysqlTestCase
                 $qb->expr()->eq('bundle', $qb->expr()->literal(ExampleIntegration::NAME))
             );
 
-        $this->assertCount(2, $qb->execute()->fetchAll());
+        $this->assertCount(2, $qb->execute()->fetchAllAssociative());
 
         // Contact event log
         $qb = $this->connection->createQueryBuilder();
@@ -86,7 +77,7 @@ class NotifierTest extends MauticMysqlTestCase
                     $qb->expr()->eq('object', $qb->expr()->literal(ExampleIntegration::NAME))
                 )
             );
-        $this->assertCount(1, $qb->execute()->fetchAll());
+        $this->assertCount(1, $qb->execute()->fetchAllAssociative());
 
         // User notifications
         $qb = $this->connection->createQueryBuilder();
@@ -95,6 +86,6 @@ class NotifierTest extends MauticMysqlTestCase
             ->where(
                 $qb->expr()->eq('icon_class', $qb->expr()->literal('fa-refresh'))
             );
-        $this->assertCount(2, $qb->execute()->fetchAll());
+        $this->assertCount(2, $qb->execute()->fetchAllAssociative());
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,37 +18,37 @@ class IntegrationEntity extends CommonEntity
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integration;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integrationEntity;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integrationEntityId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastSyncDate;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $internalEntity;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $internalEntityId;
 
@@ -186,7 +177,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -206,7 +197,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastSyncDate()
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -17,14 +8,17 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -36,9 +30,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class PageType.
- */
 class PageType extends AbstractType
 {
     /**
@@ -52,7 +43,7 @@ class PageType extends AbstractType
     private $model;
 
     /**
-     * @var \Mautic\UserBundle\Model\UserModel
+     * @var User
      */
     private $user;
 
@@ -61,16 +52,23 @@ class PageType extends AbstractType
      */
     private $canViewOther = false;
 
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
+
     public function __construct(
         EntityManager $entityManager,
         PageModel $pageModel,
         CorePermissions $corePermissions,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        ThemeHelperInterface $themeHelper
     ) {
         $this->em           = $entityManager;
         $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
+        $this->themeHelper  = $themeHelper;
     }
 
     /**
@@ -98,12 +96,18 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
+                    'tooltip'              => 'mautic.page.form.customhtml.help',
                     'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
+                    'rows'                 => '25',
                 ],
             ]
         );
+
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'page');
 
         $builder->add(
             'template',
@@ -115,7 +119,7 @@ class PageType extends AbstractType
                     'tooltip' => 'mautic.page.form.template.help',
                 ],
                 'placeholder' => 'mautic.core.none',
-                'data'        => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data'        => $template,
             ]
         );
 
@@ -142,41 +146,11 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'publishUp',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            DateTimeType::class,
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('sessionId', HiddenType::class);
 
-        //Custom field for redirect URL
+        // Custom field for redirect URL
         $this->model->getRepository()->setCurrentUser($this->user);
 
         $redirectUrlDataOptions = '';
@@ -185,7 +159,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -290,16 +264,16 @@ class PageType extends AbstractType
         );
 
         $builder->add(
-          'redirectType',
-          RedirectListType::class,
-          [
-              'feature' => 'page',
-              'attr'    => [
-                  'class'   => 'form-control',
-                  'tooltip' => 'mautic.page.form.redirecttype.help',
-              ],
-              'placeholder' => 'mautic.page.form.redirecttype.none',
-          ]
+            'redirectType',
+            RedirectListType::class,
+            [
+                'feature' => 'page',
+                'attr'    => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.page.form.redirecttype.help',
+                ],
+                'placeholder' => 'mautic.page.form.redirecttype.none',
+            ]
         );
 
         $builder->add(
@@ -337,7 +311,7 @@ class PageType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -387,13 +361,5 @@ class PageType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Page::class,
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'page';
     }
 }

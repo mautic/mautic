@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEvent extends CommonEvent
 {

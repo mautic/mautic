@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -36,7 +27,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'NotificationBundle',
             'formAlias'  => 'notification_config',
             'formType'   => NotificationConfigType::class,
-            'formTheme'  => 'MauticNotificationBundle:FormTheme\Config',
+            'formTheme'  => '@MauticNotification/FormTheme/Config/_config_notification_config_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticNotificationBundle'),
         ]);
     }

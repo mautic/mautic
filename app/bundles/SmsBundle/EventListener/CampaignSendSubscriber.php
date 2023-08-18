@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -62,7 +53,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'formTheme'        => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
                     'channel'          => 'sms',
                     'channelIdField'   => 'sms',
                 ]

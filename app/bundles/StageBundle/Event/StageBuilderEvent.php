@@ -1,19 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class StageBuilderEvent.
@@ -26,13 +17,10 @@ class StageBuilderEvent extends Event
     private $actions = [];
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param Translator $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -46,7 +34,7 @@ class StageBuilderEvent extends Event
      *                       'label'           => (required) what to display in the list
      *                       'description'     => (optional) short description of event
      *                       'template'        => (optional) template to use for the action's HTML in the stage builder
-     *                       i.e AcmeMyBundle:StageAction:theaction.html.php
+     *                       i.e AcmeMyBundle:StageAction:theaction.html.twig
      *                       'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with stage change only
      *                       'formTypeOptions' => (optional) array of options to pass to formType
      *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
@@ -69,14 +57,14 @@ class StageBuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['group', 'label'],
             ['callback'],
             $action
         );
 
-        //translate the label and group
+        // translate the label and group
         $action['label'] = $this->translator->trans($action['label']);
         $action['group'] = $this->translator->trans($action['group']);
 

@@ -1,0 +1,94 @@
+{% block pointaction_urlhit_widget %}
+{%- set timeFrames = {
+    'i': 'mautic.core.time.minutes'|trans,
+    'H': 'mautic.core.time.hours'|trans,
+    'd': 'mautic.core.time.days'|trans,
+} %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ form_row(form['page_url']) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ form_row(form['page_hits']) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 form-group ">
+        {{ form_label(form['returns_within']) }}
+        <div class="input-group">
+            {{ form_widget(form['returns_within']) }}
+            {%- set default = form.returns_within_unit.vars.data %}
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="returns_within_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu time-dropdown">
+                    {%- for abbr, label in timeFrames %}
+                    <li><a href="#" data-time="{{ abbr }}" data-field="returns_within">{{ label }}</a></li>
+                    {%- endfor %}
+                </ul>
+            </div>
+        </div>
+        {{ form_errors(form['returns_within']) }}
+        {{ form_widget(form['returns_within_unit']) }}
+    </div>
+
+    <div class="col-xs-12 form-group ">
+        {{ form_label(form['returns_after']) }}
+        <div class="input-group">
+            {{ form_widget(form['returns_after']) }}
+            {%- set default = form['returns_after_unit'].vars['data'] %}
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="returns_after_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu time-dropdown">
+                    {%- for abbr, label in timeFrames %}
+                        <li><a href="#" data-time="{{ abbr }}" data-field="returns_after">{{ label }}</a></li>
+                    {%- endfor %}
+                </ul>
+            </div>
+        </div>
+        {{ form_errors(form['returns_after']) }}
+        {{ form_widget(form['returns_after_unit']) }}
+    </div>
+
+
+    <div class="col-xs-12 form-group ">
+        {{ form_label(form['accumulative_time']) }}
+        <div class="input-group">
+            {{ form_widget(form['accumulative_time']) }}
+            {%- set default = form['accumulative_time_unit'].vars['data'] %}
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="accumulative_time_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu time-dropdown">
+                    {%- for abbr, label in timeFrames %}
+                        <li><a href="#" data-time="{{ abbr }}" data-field="accumulative_time">{{ label }}</a></li>
+                    {%- endfor %}
+                </ul>
+            </div>
+        </div>
+        {{ form_errors(form['accumulative_time']) }}
+        {{ form_widget(form['accumulative_time_unit']) }}
+    </div>
+</div>
+
+<script>
+    mQuery('.time-dropdown li a').click(function (e) {
+        e.preventDefault();
+        var selected = mQuery(this).data('time');
+        var label    = mQuery(this).html();
+        var field    = mQuery(this).data('field');
+
+        mQuery('#point_properties_' + field + '_unit').val(selected);
+        mQuery('.' + field + '_label').html(label);
+    });
+</script>
+{% endblock %}

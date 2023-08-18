@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,16 +12,16 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class MessageQueue
 {
-    const STATUS_RESCHEDULED = 'rescheduled';
-    const STATUS_PENDING     = 'pending';
-    const STATUS_SENT        = 'sent';
-    const STATUS_CANCELLED   = 'cancelled';
+    public const STATUS_RESCHEDULED = 'rescheduled';
+    public const STATUS_PENDING     = 'pending';
+    public const STATUS_SENT        = 'sent';
+    public const STATUS_CANCELLED   = 'cancelled';
 
-    const PRIORITY_NORMAL = 2;
-    const PRIORITY_HIGH   = 1;
+    public const PRIORITY_NORMAL = 2;
+    public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -42,7 +33,7 @@ class MessageQueue
     private $channelId;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
@@ -77,22 +68,22 @@ class MessageQueue
     private $status = self::STATUS_PENDING;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $datePublished;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $scheduledDate;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastAttempt;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -191,7 +182,7 @@ class MessageQueue
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -281,7 +272,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDatePublished()
     {
@@ -297,7 +288,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -313,7 +304,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastAttempt()
     {
@@ -374,7 +365,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getScheduledDate()
     {

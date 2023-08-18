@@ -2,19 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests\Integration;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Mautic\PluginBundle\Integration\AbstractIntegration;

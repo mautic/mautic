@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
@@ -54,15 +45,15 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $createCacheItem = \Closure::bind(
-          function ($key) {
-              $item = new CacheItem();
-              $item->key = $key;
-              $item->isHit = false;
+            function ($key) {
+                $item        = new CacheItem();
+                $item->key   = $key;
+                $item->isHit = false;
 
-              return $item;
-          },
-          $this,
-          CacheItem::class
+                return $item;
+            },
+            $this,
+            CacheItem::class
         );
 
         $cacheAdapter = $this->createMock(TagAwareAdapterInterface::class);

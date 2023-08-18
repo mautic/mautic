@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use LightSaml\Credential\X509Credential;
@@ -19,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class CredentialsStoreTest extends TestCase
 {
+    private string $cacheDir = __DIR__.'/../../../../../../../var/cache/test';
+
     /**
      * @var CoreParametersHelper|MockObject
      */
@@ -38,6 +31,10 @@ class CredentialsStoreTest extends TestCase
 
     public function testDefaultCredentialsAreUsedIfSamlIsDisabled()
     {
+        $this->coreParametersHelper->method('get')
+          ->withConsecutive(['saml_idp_metadata'], ['cache_path'])
+          ->willReturnOnConsecutiveCalls('', $this->cacheDir);
+
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
         $credentials = $store->getByEntityId('foobar');
@@ -49,8 +46,8 @@ class CredentialsStoreTest extends TestCase
     public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided()
     {
         $this->coreParametersHelper->method('get')
-            ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'])
-            ->willReturnOnConsecutiveCalls('1', '');
+            ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'], ['cache_path'])
+            ->willReturnOnConsecutiveCalls('1', '', $this->cacheDir);
 
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 

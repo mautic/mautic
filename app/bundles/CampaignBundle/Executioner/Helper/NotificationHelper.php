@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -19,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
@@ -77,9 +68,9 @@ class NotificationHelper
                 'mautic.campaign.event.failed',
                 [
                     '%contact%' => '<a href="'.$this->router->generate(
-                            'mautic_contact_action',
-                            ['objectAction' => 'view', 'objectId' => $contact->getId()]
-                        ).'" data-toggle="ajax">'.$contact->getPrimaryIdentifier().'</a>',
+                        'mautic_contact_action',
+                        ['objectAction' => 'view', 'objectId' => $contact->getId()]
+                    ).'" data-toggle="ajax">'.$contact->getPrimaryIdentifier().'</a>',
                 ]
             ),
             null,
@@ -114,9 +105,9 @@ class NotificationHelper
                 'mautic.campaign.event.failed.campaign.unpublished',
                 [
                     '%campaign%' => '<a href="'.$this->router->generate(
-                            'mautic_campaign_action',
-                            ['objectAction' => 'view', 'objectId' => $campaign->getId()]
-                        ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                        'mautic_campaign_action',
+                        ['objectAction' => 'view', 'objectId' => $campaign->getId()]
+                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                     '%event%' => $event->getName(),
                 ]
             ),
@@ -136,13 +127,13 @@ class NotificationHelper
             'mautic.campaign.event.failed.campaign.unpublished',
             [
                 '%campaign%' => '<a href="'.$this->router->generate(
-                        'mautic_campaign_action',
-                        [
-                            'objectAction' => 'view',
-                            'objectId'     => $campaign->getId(),
-                        ],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                    'mautic_campaign_action',
+                    [
+                        'objectAction' => 'view',
+                        'objectId'     => $campaign->getId(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                 '%event%' => $event->getName(),
             ]
         );

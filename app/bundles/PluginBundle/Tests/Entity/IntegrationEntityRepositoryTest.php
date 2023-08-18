@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -36,7 +27,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
         $this->prefix                      = self::$container->getParameter('mautic.db_table_prefix');
-        $this->integrationEntityRepository = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $this->integrationEntityRepository = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void

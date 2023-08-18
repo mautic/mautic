@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -31,7 +22,7 @@ class DbalPass implements CompilerPassInterface
         if ($container->hasDefinition($id)) {
             $container
                 ->getDefinition($id)
-                ->addMethodCall('setResultCacheImpl', [new Reference('doctrine.orm.default_result_cache')]);
+                ->addMethodCall('setResultCache', [new Reference('doctrine.orm.default_result_cache')]);
         }
     }
 }

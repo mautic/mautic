@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -48,6 +39,8 @@ class InstallNewFilesStepTest extends AbstractStepTest
         $this->translator   = $this->createMock(TranslatorInterface::class);
         $this->updateHelper = $this->createMock(UpdateHelper::class);
         $this->pathsHelper  = $this->createMock(PathsHelper::class);
+
+        $this->translator->method('trans')->willReturn('some translation');
 
         $this->step = new InstallNewFilesStep($this->translator, $this->updateHelper, $this->pathsHelper);
     }

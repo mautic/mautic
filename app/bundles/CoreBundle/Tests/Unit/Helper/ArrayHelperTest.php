@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -65,12 +56,58 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function removeEmptyValuesProvider(): \Generator
     {
-        $object = new \StdClass();
+        $object = new \stdClass();
         yield [[null], []];
         yield [[], []];
         yield [[123], [123]];
         yield [[$object], [$object]];
         yield [[''], []];
         yield [['value A', ''], ['value A']];
+    }
+
+    public function testflipArray(): void
+    {
+        $array = [
+            'first' => 'Custom first',
+            'second'=> 'Custom second',
+        ];
+
+        $this->assertSame(array_flip($array), ArrayHelper::flipArray($array));
+
+        $array = [
+            'group1' => [
+                'first' => 'Custom first',
+            ],
+            'group2' => [
+                'second' => 'Custom second',
+            ],
+        ];
+
+        $flippedArray = ArrayHelper::flipArray($array);
+
+        $this->assertEquals('Custom first', key($flippedArray['group1']));
+        $this->assertEquals('first', end($flippedArray['group1']));
+    }
+
+    public function testFlatten(): void
+    {
+        $multidimensionalArray = [
+            'first' => 'Custom first',
+            [
+                'second' => 'Custom second',
+                [
+                    'third' => 'Custom third',
+                ],
+            ],
+        ];
+
+        Assert::assertSame(
+            [
+                'first'  => 'Custom first',
+                'second' => 'Custom second',
+                'third'  => 'Custom third',
+            ],
+            ArrayHelper::flatten($multidimensionalArray)
+        );
     }
 }

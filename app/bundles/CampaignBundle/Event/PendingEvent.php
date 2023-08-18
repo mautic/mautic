@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -42,7 +33,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     private $channelId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $now;
 

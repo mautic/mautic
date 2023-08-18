@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -56,7 +47,7 @@ class IdentifyCompanyHelper
         } else {
             $companyData = $parameters;
 
-            //create new company
+            // create new company
             $companyEntity = new Company();
             $companyModel->setFieldValues($companyEntity, $companyData, true);
             $companyModel->saveEntity($companyEntity);
@@ -137,7 +128,7 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
-        if (!strstr($email, '@')) { //not a valid email adress
+        if (!strstr($email, '@')) { // not a valid email adress
             return false;
         }
 

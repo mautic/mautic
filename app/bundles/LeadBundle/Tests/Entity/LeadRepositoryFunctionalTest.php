@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -115,7 +106,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse(isset($changes['points']));
         // Points should remain the same
         $model->saveEntity($this->lead);
-        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($this->lead);
+        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($this->lead);
         $this->assertEquals(220, $this->lead->getPoints());
     }
 

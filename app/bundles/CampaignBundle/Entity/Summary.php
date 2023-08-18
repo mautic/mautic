@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -27,27 +18,27 @@ class Summary
     private $id;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTimeImmutable|null
      **/
     private $dateTriggered;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $scheduledCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $triggeredCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $nonActionPathTakenCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $failedCount = 0;
 
@@ -163,7 +154,7 @@ class Summary
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTimeInterface $dateTriggered = null): void
+    public function setDateTriggered(\DateTimeImmutable $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

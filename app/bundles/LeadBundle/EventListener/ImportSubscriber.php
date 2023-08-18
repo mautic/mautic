@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -81,7 +72,7 @@ class ImportSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
 
-        //In case of batch delete, this method call remove the uploaded file
+        // In case of batch delete, this method call remove the uploaded file
         $entity->removeFile();
     }
 }

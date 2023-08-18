@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 class RandomParameterName
@@ -26,7 +17,7 @@ class RandomParameterName
      */
     public function generateRandomParameterName(): string
     {
-        $value = base_convert($this->lastUsedParameterId, 10, 36);
+        $value = base_convert((string) $this->lastUsedParameterId, 10, 36);
 
         ++$this->lastUsedParameterId;
 

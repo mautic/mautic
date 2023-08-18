@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\WebhookBundle\Tests\Notificator;
 
 use Doctrine\ORM\EntityManager;
@@ -22,7 +13,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -91,7 +82,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
         $entityManagerMock->expects($this->once())
             ->method('getReference')
-            ->with('MauticUserBundle:User', $createdBy)
+            ->with(\Mautic\UserBundle\Entity\User::class, $createdBy)
             ->willReturn($owner);
 
         $notificationModelMock->expects($this->once())
@@ -197,8 +188,8 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->withConsecutive(
-                ['MauticUserBundle:User', $createdBy],
-                ['MauticUserBundle:User', $modifiedBy]
+                [\Mautic\UserBundle\Entity\User::class, $createdBy],
+                [\Mautic\UserBundle\Entity\User::class, $modifiedBy]
             )
             ->willReturnOnConsecutiveCalls($owner, $modifier);
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\FormBundle\Entity\Field;
@@ -17,7 +8,7 @@ use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface

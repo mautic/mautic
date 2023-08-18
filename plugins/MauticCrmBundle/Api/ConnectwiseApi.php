@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -22,7 +13,6 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 class ConnectwiseApi extends CrmApi
 {
     /**
-     * @param        $endpoint
      * @param array  $parameters
      * @param string $method
      *
@@ -136,8 +126,6 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param $id
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -158,7 +146,6 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param     $campaignId
      * @param int $page
      *
      * @return mixed|string
@@ -205,8 +192,6 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param $endpoint
-     *
      * @return array
      *
      * @throws ApiErrorException

@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -73,7 +64,7 @@ class TwilioCallback implements CallbackInterface
         return trim($request->get('Body'));
     }
 
-    private function validateRequest(ParameterBag $request)
+    private function validateRequest(InputBag $request)
     {
         try {
             $accountSid = $this->configuration->getAccountSid();

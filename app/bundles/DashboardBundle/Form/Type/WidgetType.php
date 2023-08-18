@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -62,7 +53,7 @@ class WidgetType extends AbstractType
 
         $event = new WidgetTypeListEvent();
         $event->setSecurity($this->security);
-        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
         $types = array_map(function ($category) {
             return array_flip($category);
@@ -142,7 +133,7 @@ class WidgetType extends AbstractType
             }
 
             $event->setType($type);
-            $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
+            $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE);
             $widgetForm = $event->getForm();
             $form->setData($params);
 
@@ -177,13 +168,5 @@ class WidgetType extends AbstractType
         // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'widget';
     }
 }

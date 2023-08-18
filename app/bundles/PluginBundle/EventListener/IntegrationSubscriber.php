@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
-use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -25,11 +15,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class IntegrationSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
-    public function __construct(Logger $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -92,7 +82,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
         $xml      = '';
         $isXml    = isset($response->getHeaders()['Content-Type']) && preg_grep('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
-            $doc                     = new DomDocument('1.0');
+            $doc                     = new \DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
             $doc->loadXML($response->getBody());

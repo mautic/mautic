@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -25,26 +18,27 @@ class TagModel extends BaseTagModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return TagRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Tag::class);
+        $result = $this->em->getRepository(Tag::class);
+
+        return $result;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param Tag   $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Tag         $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);

@@ -1,0 +1,30 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'tweet' %}
+
+{% block content %}
+  {{ includeScript('plugins/MauticSocialBundle/Assets/js/social.js', 'composeSocialWatcher', 'composeSocialWatcher') }}
+
+  {{ form_start(form) }}
+    {{ form_row(form.name) }}
+    {{ form_row(form.text) }}
+    <div id="character-count" class="text-right small">
+        {{ 'mautic.social.twitter.tweet.count'|trans }}
+        <span></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <label class="control-label">
+                {{ 'mautic.social.twitter.tweet.handle'|trans }}
+            </label>
+            {{ form_row(form.handle) }}
+        </div>
+        <div class="col-md-4">{{ form_row(form.asset) }}</div>
+        <div class="col-md-4">{{ form_row(form.page) }}</div>
+    </div>
+
+  {{ form_row(form.description) }}
+  {{ form_row(form.category) }}
+  {{ form_end(form) }}
+{% endblock %}

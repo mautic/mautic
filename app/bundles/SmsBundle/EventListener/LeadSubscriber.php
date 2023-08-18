@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -16,7 +7,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -75,7 +66,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository('MauticSmsBundle:Stat');
+        $statRepository        = $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
         $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
@@ -96,7 +87,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $label,
                         'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                     ];
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
 
@@ -113,7 +104,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat'   => $stat,
                             'type'   => $state,
                         ],
-                        'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => '@MauticSms/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',
                         'contactId'       => $contactId,
                     ]

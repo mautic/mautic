@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -16,24 +7,39 @@ use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
     private $dispatcher;
+
+    /**
+     * @var MockObject&EmailValidationEvent
+     */
     private $event;
-    private $emailValidator;
+
+    private EmailValidator $emailValidator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->event      = $this->createMock(EmailValidationEvent::class);
+
+        $this->translator->method('trans')->willReturn('some translation');
 
         $this->emailValidator = new EmailValidator($this->translator, $this->dispatcher);
     }
@@ -42,7 +48,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -56,7 +62,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -70,7 +76,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -84,7 +90,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
         ->method('dispatch')
-        ->with(EmailEvents::ON_EMAIL_VALIDATION)
+        ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
         ->willReturn($this->event);
 
         $this->event->expects($this->once())

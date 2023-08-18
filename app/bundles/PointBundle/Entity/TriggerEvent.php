@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,7 +20,7 @@ class TriggerEvent
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -54,7 +45,7 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadTriggerLog>
      */
     private $log;
 
@@ -103,8 +94,6 @@ class TriggerEvent
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -122,10 +111,6 @@ class TriggerEvent
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {

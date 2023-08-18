@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -16,7 +7,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {

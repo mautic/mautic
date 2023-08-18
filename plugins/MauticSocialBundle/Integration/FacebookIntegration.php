@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
@@ -95,8 +86,6 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * @param $endpoint
-     *
      * @return string
      */
     public function getApiUrl($endpoint)
@@ -106,9 +95,6 @@ class FacebookIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @param $identifier
-     * @param $socialCache
      *
      * @return array
      */

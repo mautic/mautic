@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
@@ -28,7 +20,9 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -54,7 +48,7 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getNonEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
@@ -69,19 +63,23 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::REJECT);
     }
 
     /**
      * Get page subscriber with mocked dependencies.
-     *
-     * @return PageSubscriber
      */
-    protected function getPageSubscriber()
+    protected function getPageSubscriber(): PageSubscriber
     {
-        $assetsHelperMock   = $this->createMock(AssetsHelper::class);
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
+
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        $assetsHelperMock   = new AssetsHelper($packagesMock, $coreParametersHelper);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
         $pageModelMock      = $this->createMock(PageModel::class);
@@ -101,7 +99,7 @@ class PageSubscriberTest extends TestCase
             ->method('find')
             ->will($this->returnValue($leadMock));
 
-        $pageSubscriber = new PageSubscriber(
+        return new PageSubscriber(
             $assetsHelperMock,
             $ipLookupHelperMock,
             $auditLogModelMock,
@@ -112,8 +110,6 @@ class PageSubscriberTest extends TestCase
             $redirectRepository,
             $contactRepository
         );
-
-        return $pageSubscriber;
     }
 
     /**

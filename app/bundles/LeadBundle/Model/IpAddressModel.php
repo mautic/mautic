@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -94,7 +84,7 @@ class IpAddressModel
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function deleteUnusedIpAddresses(int $limit): int
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Enum;
 
 /**
@@ -16,5 +7,5 @@ namespace Mautic\UserBundle\Enum;
  */
 final class UserTokenAuthorizator
 {
-    const RESET_PASSWORD_AUTHORIZATOR = 'reset-password';
+    public const RESET_PASSWORD_AUTHORIZATOR = 'reset-password';
 }

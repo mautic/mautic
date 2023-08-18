@@ -1,27 +1,18 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
@@ -35,7 +26,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * TimelineEventLogCampaignSubscriber constructor.
      */
-    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, TranslatorInterface $translator)
+    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, Translator $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
         $this->userHelper         = $userHelper;
@@ -94,7 +85,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param Lead[] $contacts
-     * @param        $action
      */
     private function writeEntries(array $contacts, Campaign $campaign, $action)
     {
@@ -122,6 +112,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
     }
 }

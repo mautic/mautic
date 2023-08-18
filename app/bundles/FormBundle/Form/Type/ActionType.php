@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -60,7 +51,7 @@ class ActionType extends AbstractType
             'label' => false,
             'data'  => $properties,
             'attr'  => [
-                'data-formid' => $options['formId'], //sneaky way of feeding the formId without requiring the option
+                'data-formid' => $options['formId'], // sneaky way of feeding the formId without requiring the option
             ],
         ];
         if (isset($options['settings']['formTypeCleanMasks'])) {

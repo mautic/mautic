@@ -6,8 +6,8 @@ a = current major release
 b = current minor release
 c = future major release
 
-* a.x for any features and enhancements (e.g. 4.x)
-* a.b for any bug fixes (e.g. 4.0, 4.1, 4.2)
+* a.x for any features and enhancements (e.g. 5.x)
+* a.b for any bug fixes (e.g. 4.4, 5.1)
 * c.x for any features, enhancements or bug fixes with backward compatibility breaking changes (e.g. 5.x) -->
 
 | Q                                      | A
@@ -41,7 +41,7 @@ Please write a short README for your feature/bugfix. This will help people under
 This part is really important. If you want your PR to be merged, take the time to write very clear, annotated and step by step test instructions. Do not assume any previous knowledge - testers may not be developers.
 -->
 1. Open this PR on Gitpod or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
-2.
+2. 
 
 <!--
 If you have any deprecations, list them here along with the new alternative.

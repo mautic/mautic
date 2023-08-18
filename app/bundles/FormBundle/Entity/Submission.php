@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -24,7 +15,7 @@ use Mautic\PageBundle\Entity\Page;
 class Submission
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -39,17 +30,17 @@ class Submission
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSubmitted;
 
@@ -59,7 +50,7 @@ class Submission
     private $referer;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $page;
 
@@ -107,8 +98,6 @@ class Submission
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -149,7 +138,7 @@ class Submission
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -169,7 +158,7 @@ class Submission
     /**
      * Get dateSubmitted.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSubmitted()
     {
@@ -259,8 +248,6 @@ class Submission
     /**
      * Get results.
      *
-     * @param $results
-     *
      * @return Submission
      */
     public function setResults($results)
@@ -321,8 +308,6 @@ class Submission
     }
 
     /**
-     * @param $trackingId
-     *
      * @return $this
      */
     public function setTrackingId($trackingId)

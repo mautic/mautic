@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +8,7 @@ class RequestHelper
 {
     public static function hasBasicAuth(Request $request): bool
     {
-        return 0 === strpos(strtolower($request->headers->get('Authorization')), 'basic');
+        return 0 === strpos(strtolower((string) $request->headers->get('Authorization')), 'basic');
     }
 
     public static function isApiRequest(Request $request): bool

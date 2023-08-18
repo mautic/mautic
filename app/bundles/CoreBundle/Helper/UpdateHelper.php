@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
@@ -102,7 +93,7 @@ class UpdateHelper
 
             $data = $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,

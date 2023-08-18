@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Controller;
 
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    use AjaxLookupControllerTrait;
-
     /**
      * @param $eventId
      * @param $contactId
@@ -32,6 +21,7 @@ class AjaxController extends CommonAjaxController
         $dataArray      = ['success' => 0];
         $messageQueueId = (int) $request->request->get('channelId');
         $queueModel     = $this->getModel('channel.queue');
+        \assert($queueModel instanceof MessageQueueModel);
         $queuedMessage  = $queueModel->getEntity($messageQueueId);
         if ($queuedMessage) {
             $queuedMessage->setStatus('cancelled');

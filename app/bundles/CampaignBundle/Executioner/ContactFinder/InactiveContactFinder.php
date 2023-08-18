@@ -1,21 +1,14 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
@@ -115,9 +108,11 @@ class InactiveContactFinder
 
     /**
      * Clear Lead entities from memory.
+     *
+     * @param Collection<int, Lead> $contacts
      */
-    public function clear()
+    public function clear(Collection $contacts): void
     {
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($contacts->toArray());
     }
 }

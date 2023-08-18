@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -99,12 +90,6 @@ class TwitterIntegration extends SocialIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @param $url
-     * @param $parameters
-     * @param $method
-     * @param $settings
-     * @param $authType
      */
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
@@ -117,7 +102,7 @@ class TwitterIntegration extends SocialIntegration
                 $settings['token_secret'] = $this->keys['oauth_token_secret'];
             }
 
-            //Twitter also requires double encoding of parameters in building base string
+            // Twitter also requires double encoding of parameters in building base string
             $settings['double_encode_basestring_parameters'] = true;
         }
 
@@ -125,8 +110,6 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
-     * @param $endpoint
-     *
      * @return string
      */
     public function getApiUrl($endpoint)
@@ -176,7 +159,7 @@ class TwitterIntegration extends SocialIntegration
 
             $info                  = $this->matchUpData($data);
             $info['profileHandle'] = $data['screen_name'];
-            //remove the size variant
+            // remove the size variant
             $image                = $data['profile_image_url_https'];
             $image                = str_replace(['_normal', '_bigger', '_mini'], '', $image);
             $info['profileImage'] = $image;
@@ -205,7 +188,7 @@ class TwitterIntegration extends SocialIntegration
 
         $id = $socialCache['id'];
 
-        //due to the way Twitter filters, get more than 10 tweets
+        // due to the way Twitter filters, get more than 10 tweets
         $data = $this->makeRequest($this->getApiUrl('/statuses/user_timeline'), [
             'user_id'         => $id,
             'exclude_replies' => 'true',
@@ -235,7 +218,7 @@ class TwitterIntegration extends SocialIntegration
 
                 $socialCache['activity']['tweets'][] = $tweet;
 
-                //images
+                // images
                 if (isset($d['entities']['media'])) {
                     foreach ($d['entities']['media'] as $m) {
                         if ('photo' == $m['type']) {
@@ -248,7 +231,7 @@ class TwitterIntegration extends SocialIntegration
                     }
                 }
 
-                //hastags
+                // hastags
                 if (isset($d['entities']['hashtags'])) {
                     foreach ($d['entities']['hashtags'] as $h) {
                         if (isset($socialCache['activity']['tags'][$h['text']])) {
@@ -288,7 +271,7 @@ class TwitterIntegration extends SocialIntegration
     public function cleanIdentifier($identifier)
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
-            //extract the handle
+            // extract the handle
             $identifier = $match[1];
         } elseif ('@' == substr($identifier, 0, 1)) {
             $identifier = substr($identifier, 1);

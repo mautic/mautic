@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -45,12 +36,12 @@ class LeadField extends FormEntity
     private $type = 'text';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $group = 'core';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $defaultValue;
 
@@ -85,7 +76,7 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isUniqueIdentifer = false;
 
@@ -97,12 +88,12 @@ class LeadField extends FormEntity
     private $isUniqueIdentifier = false;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $order = 1;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $object = 'lead';
 
@@ -209,10 +200,12 @@ class LeadField extends FormEntity
 
         $builder->createField('columnIsNotCreated', 'boolean')
             ->columnName('column_is_not_created')
+            ->option('default', false)
             ->build();
 
         $builder->createField('originalIsPublishedValue', 'boolean')
             ->columnName('original_is_published_value')
+            ->option('default', false)
             ->build();
     }
 
@@ -242,8 +235,6 @@ class LeadField extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -780,11 +771,16 @@ class LeadField extends FormEntity
     public function setColumnWasCreated()
     {
         $this->columnIsNotCreated = false;
-        $this->setIsPublished($this->originalIsPublishedValue);
+        $this->setIsPublished($this->getOriginalIsPublishedValue());
     }
 
     public function disablePublishChange()
     {
         return 'email' === $this->getAlias() || $this->getColumnIsNotCreated();
+    }
+
+    public function getOriginalIsPublishedValue(): bool
+    {
+        return (bool) $this->originalIsPublishedValue;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
 class StatDAO
@@ -19,9 +10,6 @@ class StatDAO
     private $stats = [];
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function addStat($key, $value)
@@ -36,8 +24,6 @@ class StatDAO
     }
 
     /**
-     * @param $key
-     *
      * @return mixed
      */
     public function getStat($key)

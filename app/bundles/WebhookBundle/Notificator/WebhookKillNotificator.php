@@ -1,14 +1,5 @@
 <?php
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\WebhookBundle\Notificator;
 
 use Doctrine\ORM\EntityManager;
@@ -19,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
 {
@@ -77,10 +68,10 @@ class WebhookKillNotificator
         $subject = $this->translator->trans('mautic.webhook.stopped');
         $reason  = $this->translator->trans($reason);
         $htmlUrl = '<a href="'.$this->router->generate(
-                'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhook->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
+            'mautic_webhook_action',
+            ['objectAction' => 'view', 'objectId' => $webhook->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
 
         $details = $this->translator->trans(
             'mautic.webhook.stopped.details',
@@ -91,12 +82,12 @@ class WebhookKillNotificator
         );
 
         /** @var User $owner */
-        $owner = $toUser = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
+        $owner = $toUser = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getCreatedBy());
 
         $ccToUser = null;
 
         if (null !== $webhook->getModifiedBy() && $webhook->getCreatedBy() !== $webhook->getModifiedBy()) {
-            $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getModifiedBy());
+            $modifiedBy = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getModifiedBy());
 
             $toUser   = $modifiedBy; // Send notification to modifier
             $ccToUser = $owner; // And cc e-mail to owner

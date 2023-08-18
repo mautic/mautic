@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
+use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
@@ -74,10 +65,14 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $companyDeduper])
+        $companyModel = $this->getMockBuilder(CompanyModelStub::class)
+            ->setMethodsExcept(['setFieldValues', 'setFieldModel', 'setEmailValidator', 'setCompanyDeduper'])
+            ->disableOriginalConstructor()
             ->getMock();
+        $companyModel->setFieldModel($this->fieldModel);
+        $companyModel->setEmailValidator($emailValidator);
+        $companyModel->setCompanyDeduper($companyDeduper);
+
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
             ->willReturn([]);

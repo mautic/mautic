@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -19,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
-    const SEGMENT_LOG = 'segment.log';
+    public const SEGMENT_LOG = 'segment.log';
 
     /**
      * @var FieldsBuilder
@@ -97,13 +88,13 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_event_log', 'log_removed', $this->generateLeftJoinCondition('log_removed', 'removed').' AND log_removed.object_id = log_added.object_id ');
 
         $qb->andWhere(
-            $qb->expr()->orX(
+            $qb->expr()->or(
                 $qb->expr()->isNotNull('log_added.date_added'),
                 $qb->expr()->isNotNull('log_removed.date_added')
             )
         );
-        $qb->setParameter(':dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
-        $qb->setParameter(':dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
 
         if (!$event->hasGroupBy()) {
             $qb->groupBy('l.id,log_added.object_id');

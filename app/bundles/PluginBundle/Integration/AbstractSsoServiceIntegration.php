@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -70,7 +61,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
-            true //absolute
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL // absolute
         );
     }
 
@@ -91,7 +82,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Don't save the keys as they are only used to validate user login.
      *
-     * @param      $data
      * @param null $tokenOverride
      *
      * @return array
@@ -101,7 +91,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 
-        //parse the response
+        // parse the response
         $authTokenKey = ($tokenOverride) ? $tokenOverride : $this->getAuthTokenKey();
         if (is_array($data) && isset($data[$authTokenKey])) {
             return $data;

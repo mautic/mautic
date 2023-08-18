@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -34,8 +25,10 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $handler = 'Handler';
+        $report  = new Report();
 
-        $report    = new Report();
+        $report->setName('Report A');
+
         $scheduler = new Scheduler($report, new \DateTime());
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
@@ -82,6 +75,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
 
+        $report->setName('Report A');
+
         $exportHandler->expects($this->once())
             ->method('removeFile');
 
@@ -102,6 +97,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
+
+        $report->setName('Report A');
 
         $exportHandler->expects($this->once())
             ->method('getPath');

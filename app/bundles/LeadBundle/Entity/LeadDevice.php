@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -36,47 +27,47 @@ class LeadDevice
     private $clientInfo = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $device;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsShortName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsVersion;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsPlatform;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceBrand;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceModel;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -147,8 +138,6 @@ class LeadDevice
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -171,11 +160,11 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -355,7 +344,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTrackingId()
     {

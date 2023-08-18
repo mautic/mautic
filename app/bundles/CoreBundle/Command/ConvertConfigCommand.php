@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,15 +11,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to convert PHP theme config to JSON.
  */
-class ConvertConfigCommand extends ContainerAwareCommand
+class ConvertConfigCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    private PathsHelper $pathsHelper;
+
+    public function __construct(PathsHelper $pathsHelper)
+    {
+        parent::__construct();
+
+        $this->pathsHelper = $pathsHelper;
+    }
+
     protected function configure()
     {
         $this->setName('mautic:theme:json-config')
-            ->setDescription('Converts theme config to JSON from PHP')
             ->setDefinition([
                 new InputOption(
                     'theme', null, InputOption::VALUE_REQUIRED,
@@ -54,21 +51,18 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options       = $input->getOptions();
         $theme         = $options['theme'];
         $savePhpConfig = $options['save-php-config'];
 
-        $themePath = realpath($this->getContainer()->get('mautic.factory')->getSystemPath('themes').'/'.$theme);
+        $themePath = realpath($this->pathsHelper->getSystemPath('themes', true).'/'.$theme);
 
         if (empty($themePath)) {
             $output->writeln("\n\n<error>The specified theme ($theme) does not exist.</error>");
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $jsonConfigPath = $themePath.'/config.json';
@@ -76,7 +70,7 @@ EOT
         if (file_exists($jsonConfigPath)) {
             $output->writeln("\n\n<error>The specified theme ($theme) already has a JSON config file.");
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $configPath = $themePath.'/config.php';
@@ -84,7 +78,7 @@ EOT
         if (!file_exists($configPath)) {
             $output->writeln("\n\n<error>The php config file for the specified theme ($theme) could not be found.</error>");
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $config = include $configPath;
@@ -92,7 +86,7 @@ EOT
         if (!is_array($config) || !array_key_exists('name', $config)) {
             $output->writeln("\n\n<error>The php config file for the specified theme ($theme) is not a valid config file.</error>");
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $jsonConfig = json_encode($config, JSON_PRETTY_PRINT);
@@ -100,7 +94,7 @@ EOT
         if (!file_put_contents($jsonConfigPath, $jsonConfig)) {
             $output->writeln("\n\n<error>Error writing json config file for the specified theme ($theme).</error>");
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         } else {
             $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ($theme).</info>");
         }
@@ -115,6 +109,7 @@ EOT
             $output->writeln("\n\n<info>PHP config file for theme ($theme) was preserved.</info>");
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Converts theme config to JSON from PHP';
 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -81,34 +72,34 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'required' => false,
                     ],
                     ],
+                [
+                    'any',
+                    YesNoButtonGroupType::class,
                     [
-                        'any',
-                        YesNoButtonGroupType::class,
-                        [
-                            'label' => 'mautic.form.field.form.condition.any_value',
-                            'attr'  => [
-                                'data-show-on' => '{"formfield_conditions_expr": "in"}',
-                            ],
-                            'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        'label' => 'mautic.form.field.form.condition.any_value',
+                        'attr'  => [
+                            'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
+                        'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
                     ],
+                ],
+                [
+                    'expr',
+                    ChoiceType::class,
                     [
-                        'expr',
-                        ChoiceType::class,
-                        [
-                            'choices'  => [
-                                'mautic.core.operator.in'    => 'in',
-                                'mautic.core.operator.notin' => 'notIn',
-                            ],
-                            'label'       => false,
-                            'placeholder' => false,
-                            'attr'        => [
-                                'class' => 'form-control',
-                            ],
-                            'required' => false,
+                        'choices'  => [
+                            'mautic.core.operator.in'    => 'in',
+                            'mautic.core.operator.notin' => 'notIn',
                         ],
-                    ]
-                );
+                        'label'       => false,
+                        'placeholder' => false,
+                        'attr'        => [
+                            'class' => 'form-control',
+                        ],
+                        'required' => false,
+                    ],
+                ]
+            );
 
         $this->form->buildForm($this->formBuilder, $options);
     }

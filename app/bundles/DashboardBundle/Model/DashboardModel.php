@@ -1,40 +1,41 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
+use Mautic\DashboardBundle\Entity\WidgetRepository;
+use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @extends FormModel<Widget>
+ */
 class DashboardModel extends FormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    protected PathsHelper $pathsHelper;
+    private RequestStack $requestStack;
 
     private WidgetDetailEventFactory $eventFactory;
+
+    private PathsHelper $pathsHelper;
 
     private Filesystem $filesystem;
 
@@ -42,27 +43,30 @@ class DashboardModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
         WidgetDetailEventFactory $eventFactory,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        RequestStack $requestStack,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper          = $pathsHelper;
+        $this->pathsHelper  = $pathsHelper;
+        $this->filesystem   = $filesystem;
+        $this->requestStack = $requestStack;
         $this->eventFactory         = $eventFactory;
-        $this->filesystem           = $filesystem;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    public function getRepository(): WidgetRepository
     {
-        $this->session = $session;
-    }
+        $result = $this->em->getRepository(Widget::class);
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getRepository()
-    {
-        return $this->em->getRepository('MauticDashboardBundle:Widget');
+        return $result;
     }
 
     /**
@@ -77,8 +81,6 @@ class DashboardModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
      *
      * @return object|null
      */
@@ -240,8 +242,8 @@ class DashboardModel extends FormModel
         $widget->setParams($resultParams);
 
         $this->dispatcher->dispatch(
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE,
-            $this->eventFactory->create($widget, $this->userHelper->getUser()->getId())
+            $this->eventFactory->create($widget, $this->userHelper->getUser()->getId()),
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
         );
     }
 
@@ -259,16 +261,15 @@ class DashboardModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Widget                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param Widget      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -310,14 +311,14 @@ class DashboardModel extends FormModel
         $dateRangeStart   = new \DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 
+        $session  = $this->requestStack->getSession();
         $today    = new \DateTime();
-        $dateFrom = $this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00'));
-        $dateFrom = new \DateTime($dateFrom);
-        $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
+        $dateFrom = new \DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new \DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,
-            'dateTo'   => $dateTo,
+            'dateTo'   => $dateTo->modify('23:59:59'), // till end of the 'to' date selected
         ];
     }
 }

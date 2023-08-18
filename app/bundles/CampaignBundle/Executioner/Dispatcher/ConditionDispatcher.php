@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -38,8 +29,8 @@ class ConditionDispatcher
     public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log)
     {
         $event = new ConditionEvent($config, $log);
-        $this->dispatcher->dispatch($config->getEventName(), $event);
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $event);
+        $this->dispatcher->dispatch($event, $config->getEventName());
+        $this->dispatcher->dispatch($event, CampaignEvents::ON_EVENT_CONDITION_EVALUATION);
 
         return $event;
     }

@@ -2,21 +2,17 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -24,6 +20,32 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['show_contact_preferences'] = 1;
         parent::setUp();
+    }
+
+    public function testMailerCallbackWhenNoTransportProccessesIt(): void
+    {
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+    }
+
+    public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
+    {
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn () => null /* exists but does nothing */);
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+    }
+
+    public function testMailerCallbackWhenTransportProccessesIt(): void
+    {
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        $this->client->request('POST', '/mailer/callback');
+
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('OK', $this->client->getResponse()->getContent());
     }
 
     public function testUnsubscribeFormActionWithoutTheme(): void
@@ -37,6 +59,22 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
         self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testContactPreferencesSaveMessage(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertStringContainsString('/email/unsubscribe/tracking_hash_unsubscribe_form_email', $crawler->filter('form')->eq(0)->attr('action'));
+        $crawler = $this->client->submitForm('Save');
+
+        $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
+        $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
@@ -85,7 +123,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -101,6 +139,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);
         $stat->setEmailAddress('john@doe.email');
+        $stat->setLead($lead);
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($email);
         $this->em->persist($stat);
@@ -122,5 +161,57 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($form);
 
         return $form;
+    }
+
+    protected function createLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@doe.email');
+        $this->em->persist($lead);
+
+        return $lead;
+    }
+
+    public function testPreviewDisabledByDefault(): void
+    {
+        $emailName    = 'Test preview email';
+
+        $email = new Email();
+        $email->setName($emailName);
+        $email->setSubject($emailName);
+        $email->setEmailType('template');
+        $email->setCustomHtml('some content');
+        $this->em->persist($email);
+
+        $this->client->request('GET', '/email/preview/'.$email->getId());
+        $this->assertTrue($this->client->getResponse()->isNotFound(), $this->client->getResponse()->getContent());
+
+        $email->setPublicPreview(true);
+        $this->em->persist($email);
+
+        $this->em->flush();
+
+        $this->client->request('GET', '/email/preview/'.$email->getId());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+    }
+
+    public function testPreviewForExpiredEmail(): void
+    {
+        $emailName    = 'Test preview email';
+
+        $email = new Email();
+        $email->setName($emailName);
+        $email->setSubject($emailName);
+        $email->setPublishUp(new \DateTime('-2 day'));
+        $email->setPublishDown(new \DateTime('-1 day'));
+        $email->setEmailType('template');
+        $email->setCustomHtml('some content');
+        $email->setPublicPreview(true);
+        $this->em->persist($email);
+
+        $this->em->flush();
+
+        $this->client->request('GET', '/email/preview/'.$email->getId());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
     }
 }

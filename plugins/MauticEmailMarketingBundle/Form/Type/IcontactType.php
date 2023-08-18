@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -21,33 +12,20 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ConstantContactType.
- */
 class IcontactType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private IntegrationHelper $integrationHelper;
 
-    /** @var PluginModel */
-    private $pluginModel;
+    private PluginModel $pluginModel;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    protected SessionInterface $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected CoreParametersHelper $coreParametersHelper;
 
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
         $this->integrationHelper    = $integrationHelper;
         $this->pluginModel          = $pluginModel;

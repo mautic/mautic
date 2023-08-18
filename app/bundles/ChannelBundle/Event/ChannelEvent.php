@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Mautic\ChannelBundle\Model\MessageModel;
@@ -80,8 +71,10 @@ class ChannelEvent extends CommonEvent
 
         // if not defined, try the classic naming convention
         $channel = ucfirst($channel);
+        $class   = "\Mautic\\{$channel}Bundle\Entity\\{$channel}";
+        \assert(class_exists($class));
 
-        return "Mautic{$channel}Bundle:{$channel}";
+        return $class;
     }
 
     /**

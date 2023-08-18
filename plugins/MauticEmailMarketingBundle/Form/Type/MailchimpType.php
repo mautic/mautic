@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -23,12 +14,9 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MailchimpType.
- */
 class MailchimpType extends AbstractType
 {
     /**
@@ -40,7 +28,7 @@ class MailchimpType extends AbstractType
     private $pluginModel;
 
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
@@ -49,7 +37,7 @@ class MailchimpType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
         $this->integrationHelper    = $integrationHelper;
         $this->pluginModel          = $pluginModel;

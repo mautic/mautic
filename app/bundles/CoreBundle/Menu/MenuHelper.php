@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -79,7 +70,7 @@ class MenuHelper
                 continue;
             }
 
-            //Set ID to route name
+            // Set ID to route name
             if (!isset($i['id'])) {
                 if (!empty($i['route'])) {
                     $i['id'] = $i['route'];
@@ -88,7 +79,7 @@ class MenuHelper
                 }
             }
 
-            //Set link attributes
+            // Set link attributes
             if (!isset($i['linkAttributes'])) {
                 $i['linkAttributes'] = [
                     'data-menu-link' => $i['id'],
@@ -114,17 +105,17 @@ class MenuHelper
                 $i['extras']['header'] = $i['header'];
             }
 
-            //Set the icon class for the menu item
+            // Set the icon class for the menu item
             if (!empty($i['iconClass'])) {
                 $i['extras']['iconClass'] = $i['iconClass'];
             }
 
-            //Set the actual route name so that it's available to the menu template
+            // Set the actual route name so that it's available to the menu template
             if (isset($i['route'])) {
                 $i['extras']['routeName'] = $i['route'];
             }
 
-            //Repeat for sub items
+            // Repeat for sub items
             if (isset($i['children'])) {
                 $this->createMenuStructure($i['children'], $depth + 1, $defaultPriority);
             }
@@ -210,9 +201,6 @@ class MenuHelper
 
     /**
      * Sort menu items by priority.
-     *
-     * @param $menuItems
-     * @param $defaultPriority
      */
     public function sortByPriority(&$menuItems, $defaultPriority = 9999)
     {
@@ -239,8 +227,6 @@ class MenuHelper
     }
 
     /**
-     * @param $name
-     *
      * @return mixed
      */
     protected function getParameter($name)
@@ -309,8 +295,6 @@ class MenuHelper
     }
 
     /**
-     * @param $accessLevel
-     *
      * @return bool
      */
     protected function handleAccessCheck($accessLevel)

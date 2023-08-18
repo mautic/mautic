@@ -1,0 +1,20 @@
+{#
+  Variables
+    - id
+    - formId
+    - action
+#}
+<div class="mauticform-row panel {% if action.settings.allowCampaignForm is not defined %}action-standalone-only{% endif %}" id="mauticform_action_{{ id }}">
+    {% if inForm is defined %}
+        {{ include('@MauticForm/Builder/_actions.html.twig', {
+            'id': id,
+            'route': 'mautic_formaction_action',
+            'actionType': 'action',
+            'formId': formId,
+        }) }}
+    {% endif %}
+    <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path('mautic_formaction_action', {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}"><span class="action-label">{{ action.name }}</span></a>
+    {% if action.description is not empty %}
+      <span class="action-descr">{{ action.description|purify }}</span>
+    {% endif %}
+</div>

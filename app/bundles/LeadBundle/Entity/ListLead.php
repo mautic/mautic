@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +10,7 @@ class ListLead
     /**
      * @var string
      */
-    const TABLE_NAME = 'lead_lists_leads';
+    public const TABLE_NAME = 'lead_lists_leads';
 
     /**
      * @var LeadList
@@ -32,7 +23,7 @@ class ListLead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -75,7 +66,7 @@ class ListLead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

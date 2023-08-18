@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Reply;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
@@ -65,12 +56,14 @@ BODY;
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
      */
-    public function testExceptionIsThrownWithHashNotFound()
+    public function testExceptionIsThrownWithHashNotFound(): void
     {
         $this->expectException(ReplyNotFound::class);
 
-        $message = new Message();
-        $parser  = new Parser($message);
+        $message           = new Message();
+        $message->textHtml = 'some html';
+
+        $parser = new Parser($message);
 
         $parser->parse();
     }

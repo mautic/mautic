@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,15 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    use AjaxLookupControllerTrait;
-
-    protected function getSmsCountStatsAction(Request $request)
+    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper)
     {
         /** @var SmsModel $model */
         $model = $this->getModel('sms');
-        /** @var BroadcastQuery $broadcastQuery */
-        $broadcastQuery     = $this->get('mautic.sms.broadcast.query');
-        $cacheStorageHelper = $this->get('mautic.helper.cache_storage');
 
         $id  = $request->get('id');
         $ids = $request->get('ids');

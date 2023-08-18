@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Field\Notification;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -18,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
 {

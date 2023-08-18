@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
@@ -136,7 +127,7 @@ class IpLookupHelper
         }
 
         if (empty($ip) || !$this->ipIsValid($ip)) {
-            //assume local as the ip is empty
+            // assume local as the ip is empty
             $ip = '127.0.0.1';
         }
 
@@ -147,7 +138,7 @@ class IpLookupHelper
         }
 
         if (empty($ipAddresses[$ip])) {
-            $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
+            $repo      = $this->em->getRepository(\Mautic\CoreBundle\Entity\IpAddress::class);
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 
@@ -226,8 +217,6 @@ class IpLookupHelper
     /**
      * Validates if an IP address if valid.
      *
-     * @param $ip
-     *
      * @return mixed
      */
     public function ipIsValid($ip)
@@ -241,9 +230,6 @@ class IpLookupHelper
         );
     }
 
-    /**
-     * @param $ip
-     */
     protected function getClientIpFromProxyList($ip)
     {
         // Proxies are included

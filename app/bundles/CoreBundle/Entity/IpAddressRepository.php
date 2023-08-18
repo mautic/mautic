@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Exception;
-use PDO;
 
 /**
- * IpAddressRepository.
+ * @extends CommonRepository<IpAddress>
  */
 class IpAddressRepository extends CommonRepository
 {
@@ -95,10 +85,10 @@ class IpAddressRepository extends CommonRepository
             LIMIT :limit
 SQL;
 
-        $params = [':limit' => $limit];
-        $types  = [':limit' => PDO::PARAM_INT];
+        $params = ['limit' => $limit];
+        $types  = ['limit' => \PDO::PARAM_INT];
 
-        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
+        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }
 
     /**
@@ -114,6 +104,6 @@ SQL;
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
 
-        return $this->_em->getConnection()->executeUpdate($deleteSql);
+        return $this->_em->getConnection()->executeStatement($deleteSql);
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -17,10 +8,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
-use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
@@ -73,7 +63,6 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
-            EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
     }
 
@@ -118,10 +107,11 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailFailed(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
             if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
@@ -137,22 +127,23 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailResend(Events\QueueEmailEvent $event)
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
             if (null !== $stat) {
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();
                 if ($retries > 3) {
-                    //tried too many times so just fail
+                    // tried too many times so just fail
                     $reason = $this->translator->trans('mautic.email.dnc.retries', [
                         '%subject%' => EmojiHelper::toShort($message->getSubject()),
                     ]);
                     $this->emailModel->setDoNotContact($stat, $reason);
                 } else {
-                    //set it to try again
+                    // set it to try again
                     $event->tryAgain();
                 }
 
@@ -160,14 +151,5 @@ class EmailSubscriber implements EventSubscriberInterface
                 $this->entityManager->flush();
             }
         }
-    }
-
-    /**
-     * This is default handling of email transport webhook requests.
-     * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
-     */
-    public function onTransportWebhook(TransportWebhookEvent $event)
-    {
-        $event->getTransport()->processCallbackRequest($event->getRequest());
     }
 }

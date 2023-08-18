@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder;
@@ -28,12 +19,8 @@ class BundleMetadataBuilderTest extends TestCase
         // Used in paths_helper
         $root = __DIR__.'/../../../../../../../app';
 
-        /** @var array $paths */
+        $paths = [];
         include __DIR__.'/../../../../../../config/paths_helper.php';
-
-        if (!isset($paths)) {
-            throw new \Exception('$paths is not set');
-        }
 
         $this->paths = $paths;
     }

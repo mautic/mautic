@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -73,7 +64,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        //Add trigger
+        // Add trigger
         $pageHitTrigger = [
             'label'          => 'mautic.page.campaign.event.pagehit',
             'description'    => 'mautic.page.campaign.event.pagehit_descr',
@@ -84,7 +75,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
 
-        //Add trigger
+        // Add trigger
         $deviceHitTrigger = [
             'label'          => 'mautic.page.campaign.event.devicehit',
             'description'    => 'mautic.page.campaign.event.devicehit_descr',
@@ -194,7 +185,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         // Check Landing Pages
         if ($pageHit instanceof Page) {
             list($parent, $children) = $pageHit->getVariants();
-            //use the parent (self or configured parent)
+            // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;

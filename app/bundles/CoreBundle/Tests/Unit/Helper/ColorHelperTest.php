@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
@@ -144,7 +135,7 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
 
         foreach ($colors as $hex => $rgba) {
             $helper = new ColorHelper($hex);
-            $randA  = round((mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax()), 2);
+            $randA  = round(mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax(), 2);
             $this->assertEquals(sprintf($rgba, $randA), $helper->toRgba($randA, $randA));
         }
     }

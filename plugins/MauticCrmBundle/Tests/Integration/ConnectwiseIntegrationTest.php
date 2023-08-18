@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
@@ -22,6 +13,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
+     *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords()
      */
     public function testMultiplePagesOfRecordsAreFetched()
@@ -58,6 +50,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
+     *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers()
      */
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched()

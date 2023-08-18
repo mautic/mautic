@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CampaignDecisionEvent.
@@ -31,12 +22,6 @@ class CampaignDecisionEvent extends Event
     protected $logs;
 
     /**
-     * @param $lead
-     * @param $decisionType
-     * @param $decisionEventDetails
-     * @param $events
-     * @param $eventSettings
-     * @param $isRootLevel
      * @param LeadEventLog[] $logs
      */
     public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false, $logs = [])

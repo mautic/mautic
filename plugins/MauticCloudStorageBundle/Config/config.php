@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'Cloud Storage',
     'description' => 'Enables integrations with Mautic supported cloud storage services.',
@@ -16,11 +7,6 @@ return [
     'author'      => 'Mautic',
 
     'services' => [
-        'events' => [
-            'mautic.cloudstorage.remoteassetbrowse.subscriber' => [
-                'class' => \MauticPlugin\MauticCloudStorageBundle\EventListener\RemoteAssetBrowseSubscriber::class,
-            ],
-        ],
         'integrations' => [
             'mautic.integration.amazons3' => [
                 'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,

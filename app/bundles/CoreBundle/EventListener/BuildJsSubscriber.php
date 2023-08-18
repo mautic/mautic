@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -242,7 +233,6 @@ MauticJS.getTrackedContact = function () {
 MauticJS.setTrackedContact = function(response) {
     if (response.id) {
         MauticJS.setCookie('mtc_id', response.id);
-        MauticJS.setCookie('mtc_sid', response.sid);
         MauticJS.setCookie('mautic_device_id', response.device_id);
         MauticJS.mtcSet = true;
             
@@ -250,7 +240,6 @@ MauticJS.setTrackedContact = function(response) {
         // than the current page
         try {
             localStorage.setItem('mtc_id', response.id);
-            localStorage.setItem('mtc_sid', response.sid);
             localStorage.setItem('mautic_device_id', response.device_id);
         } catch (e) {
             console.warn('Browser does not allow storing in local storage');

@@ -1,24 +1,14 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\Driver\AnnotationDriver as BaseAnnotationDriver;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
-use ReflectionClass;
-use ReflectionException;
 
-class ApiMetadataDriver implements DriverInterface
+class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 {
     /**
      * @var ClassMetadata
@@ -48,9 +38,9 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * @return \Metadata\ClassMetadata
      *
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
-    public function loadMetadataForClass(ReflectionClass $class): ?BaseClassMetadata
+    public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata
     {
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());
@@ -62,9 +52,9 @@ class ApiMetadataDriver implements DriverInterface
             $this->resetDefaults();
 
             return $metadata;
+        } else {
+            return new ClassMetadata($class->getName());
         }
-
-        return null;
     }
 
     private function resetDefaults()
@@ -78,8 +68,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set the root (base key).
      *
-     * @param $root
-     *
      * @return $this
      */
     public function setRoot($root)
@@ -91,8 +79,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set prefix for the List and Details groups.
-     *
-     * @param $name
      *
      * @return $this
      */
@@ -106,8 +92,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set the default version for the properties if different than 1.0.
      *
-     * @param $version
-     *
      * @return $this
      */
     public function setDefaultVersion($version)
@@ -119,8 +103,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create a new property.
-     *
-     * @param $name
      *
      * @return $this
      */
@@ -138,7 +120,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Add property and set default version and Details group.
      *
-     * @param      $name
      * @param null $serializedName
      * @param bool $useGetter
      *
@@ -211,7 +192,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $version
      * @param null $property
      *
      * @return $this
@@ -228,7 +208,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $version
      * @param null $property
      *
      * @return $this
@@ -245,7 +224,6 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @param      $name
      * @param null $property
      *
      * @return $this
@@ -263,9 +241,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the groups a property belongs to.
-     *
-     * @param $groups
-     * @param $property
      *
      * @return $this
      */
@@ -287,7 +262,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Add a group the property belongs to.
      *
-     * @param      $group
      * @param null $property True to apply to all current properties
      *
      * @return $this
@@ -325,7 +299,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Set max depth for the property if an association.
      *
-     * @param      $depth
      * @param null $property
      *
      * @return $this

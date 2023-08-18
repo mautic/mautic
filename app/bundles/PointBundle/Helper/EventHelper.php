@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -30,7 +21,7 @@ class EventHelper
 
         $pointsChange = 0;
 
-        //only initiate once per lead per type
+        // only initiate once per lead per type
         if (empty($initiated[$lead->getId()][$action['type']])) {
             if (!empty($action['properties']['delta'])) {
                 $pointsChange = $action['properties']['delta'];

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -108,6 +99,7 @@ class EventType extends AbstractType
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
+                    'html5'  => false,
                     'format' => 'yyyy-MM-dd HH:mm',
                 ]
             );
@@ -291,8 +283,6 @@ class EventType extends AbstractType
     }
 
     /**
-     * @param $name
-     *
      * @return \DateTime|mixed|null
      */
     private function getTimeValue(array $data, $name)

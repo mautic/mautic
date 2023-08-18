@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<ListLead>
+ */
 class ListLeadRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -29,7 +20,8 @@ class ListLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $lists = [];
         foreach ($results as $r) {
             $lists[] = $r['leadlist_id'];

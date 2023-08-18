@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 class IpinfodbLookup extends AbstractRemoteDataLookup
@@ -29,9 +20,6 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
         return "http://api.ipinfodb.com/v3/ip-city/?key={$this->auth}&format=json&ip={$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

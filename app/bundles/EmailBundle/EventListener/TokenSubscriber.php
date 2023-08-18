@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -48,7 +39,7 @@ class TokenSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 254],
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 254],
+            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', -254],
         ];
     }
 
@@ -82,9 +73,10 @@ class TokenSubscriber implements EventSubscriberInterface
                     'dynamicContent' => $dynamicContentAsArray,
                     'idHash'         => $event->getIdHash(),
                 ],
-                $email
+                $email,
+                $event->isInternalSend()
             );
-            $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, EmailEvents::TOKEN_REPLACEMENT);
             $event->addTokens($tokenEvent->getTokens());
         }
     }
@@ -114,6 +106,7 @@ class TokenSubscriber implements EventSubscriberInterface
             foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
                     $filterContent = $filter['content'];
+                    break;
                 }
             }
 
@@ -130,8 +123,9 @@ class TokenSubscriber implements EventSubscriberInterface
                 true
             );
 
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
-            $untokenizedContent = $emailSendEvent->getContent(true);
+            $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
+
+            $untokenizedContent = $emailSendEvent->getContent(!$event->isInternalSend());
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Form\DataTransformer;
 
 use Mautic\CoreBundle\Form\DataTransformer\BarStringTransformer;
@@ -38,7 +29,7 @@ final class BarStringTransformerTest extends TestCase
         yield [null, ''];
         yield [[], ''];
         yield [123, ''];
-        yield [new \StdClass(), ''];
+        yield [new \stdClass(), ''];
         yield ['', ''];
         yield ['value A', ''];
         yield [['value A'], 'value A'];
@@ -65,7 +56,7 @@ final class BarStringTransformerTest extends TestCase
         yield [null, []];
         yield [[], []];
         yield [123, []];
-        yield [new \StdClass(), []];
+        yield [new \stdClass(), []];
         yield ['', ['']];
         yield ['value A', ['value A']];
         yield ['value A|value B', ['value A', 'value B']];

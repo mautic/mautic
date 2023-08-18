@@ -1,35 +1,29 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\SegmentActionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
-    private $actionModel;
-
-    private $segmentModel;
-
-    /**
-     * Initialize object props here to simulate constructor
-     * and make the future controller refactoring easier.
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function __construct(private SegmentActionModel $segmentActionModel, private ListModel $segmentModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->actionModel  = $this->container->get('mautic.lead.model.segment.action');
-        $this->segmentModel = $this->container->get('mautic.lead.model.list');
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -37,25 +31,28 @@ class BatchSegmentController extends AbstractFormController
      *
      * @return JsonResponse
      */
-    public function setAction()
+    public function setAction(Request $request)
     {
-        $params = $this->request->get('lead_batch', []);
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $params     = $request->get('lead_batch', []);
+        $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
-        if ($ids && is_array($ids)) {
-            $segmentsToAdd    = isset($params['add']) ? $params['add'] : [];
-            $segmentsToRemove = isset($params['remove']) ? $params['remove'] : [];
-            $contactIds       = json_decode($params['ids']);
+        if ($contactIds && is_array($contactIds)) {
+            $segmentsToAdd    = $params['add'] ?? [];
+            $segmentsToRemove = $params['remove'] ?? [];
 
-            $this->actionModel->addContacts($contactIds, $segmentsToAdd);
-            $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+            if ($segmentsToAdd) {
+                $this->segmentActionModel->addContacts($contactIds, $segmentsToAdd);
+            }
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($ids),
-                '%count%'     => count($ids),
+            if ($segmentsToRemove) {
+                $this->segmentActionModel->removeContacts($contactIds, $segmentsToRemove);
+            }
+
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
+                '%count%' => count($contactIds),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([
@@ -91,7 +88,7 @@ class BatchSegmentController extends AbstractFormController
                         ]
                     )->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',

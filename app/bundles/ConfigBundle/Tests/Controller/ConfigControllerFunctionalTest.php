@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,44 +20,21 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
-            'kernel.root_dir',
             'kernel.project_dir',
         ];
 
+        $this->configParams['locale'] = 'en_US';
+
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->prefix = MAUTIC_TABLE_PREFIX;
-
-        $configPath = $this->getConfigPath();
-        if (file_exists($configPath)) {
-            // backup original local.php
-            copy($configPath, $configPath.'.backup');
-        } else {
-            // write a temporary local.php
-            file_put_contents($configPath, '<?php $parameters = [];');
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        if (file_exists($this->getConfigPath().'.backup')) {
-            // restore original local.php
-            rename($this->getConfigPath().'.backup', $this->getConfigPath());
-        } else {
-            // local.php didn't exist to start with so delete
-            unlink($this->getConfigPath());
-        }
-
-        parent::tearDown();
     }
 
     public function testValuesAreEscapedProperly(): void
     {
-        $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps        = "%ip1%\n%ip2%\n%kernel.root_dir%\n%kernel.project_dir%";
-        $googleAnalytics = 'reveal pass: %mautic.db_password%';
+        $url                         = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
+        $trackIps                    = "%ip1%\n%ip2%\n%kernel.project_dir%";
+        $googleAnalytics             = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -78,11 +45,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
-                'config[coreconfig][link_shortener_url]' => $url,
-                'config[coreconfig][do_not_track_ips]'   => $trackIps,
-                'config[pageconfig][google_analytics]'   => $googleAnalytics,
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
+                'config[coreconfig][do_not_track_ips]'            => $trackIps,
+                'config[pageconfig][google_analytics]'            => $googleAnalytics,
+                'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
             ]
         );
 
@@ -100,14 +66,11 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_url', $configParameters);
-        Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(
             [
                 $this->escape('%ip1%'),
                 $this->escape('%ip2%'),
-                '%kernel.root_dir%',
                 '%kernel.project_dir%',
             ],
             $configParameters['do_not_track_ips']
@@ -120,7 +83,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
@@ -132,9 +94,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigParameters(): array
     {
+        $parameters = [];
         include $this->getConfigPath();
 
-        /* @var array $parameters */
         return $parameters;
     }
 
@@ -143,12 +105,12 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
-    public function testConfigNotFoundPageConfiguration()
+    public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page1',
             'alias'        => 'page1',
             'template'     => 'blank',
@@ -164,7 +126,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert unpublished record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 0,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page2',
             'alias'        => 'page2',
             'template'     => 'blank',
@@ -180,7 +142,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page3',
             'alias'        => 'page3',
             'template'     => 'blank',
@@ -265,5 +227,62 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testUserAndSystemLocale(): void
+    {
+        // 1. Change user locale in account - should change _locale session
+        $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
+        $accountSaveButton = $accountCrawler->selectButton('user[buttons][save]');
+        $accountForm       = $accountSaveButton->form();
+        $accountForm->setValues(
+            [
+                'user[locale]' => 'en_US',
+            ]
+        );
+        $this->client->submit($accountForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 2. Change system locale in configuration - should not change _locale session
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configForm       = $configSaveButton->form();
+        $configForm->setValues(
+            [
+                'config[coreconfig][locale]'   => 'en_US',
+                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 3. Change user locale to system default in account - should change _locale session to system default
+        $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
+        $accountSaveButton = $accountCrawler->selectButton('user[buttons][save]');
+        $accountForm       = $accountSaveButton->form();
+        $accountForm->setValues(
+            [
+                'user[locale]' => '',
+            ]
+        );
+        $this->client->submit($accountForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 2. Change system locale in configuration to en_US - should change _locale session
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configForm       = $configSaveButton->form();
+        $configForm->setValues(
+            [
+                'config[coreconfig][locale]'   => 'en_US',
+                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
     }
 }

@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignBuilderEvent extends Event
 {
@@ -36,7 +27,7 @@ class CampaignBuilderEvent extends Event
     private $actions = [];
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -81,7 +72,7 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $decision,
@@ -128,7 +119,7 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $event,
@@ -178,14 +169,14 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['batchEventName', 'eventName', 'callback']],
             $action,
             ['callback']
         );
 
-        //translate the group
+        // translate the group
         $action['label']       = $this->translator->trans($action['label']);
         $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
 

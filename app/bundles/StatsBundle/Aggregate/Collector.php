@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
@@ -48,7 +39,7 @@ class Collector
 
         $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $fetchOptions);
 
-        $this->eventDispatcher->dispatch(StatEvents::AGGREGATE_STAT_REQUEST, $event);
+        $this->eventDispatcher->dispatch($event, StatEvents::AGGREGATE_STAT_REQUEST);
 
         return $event->getStatCollection();
     }

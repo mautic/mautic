@@ -1,28 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class PathsHelper.
- */
 class PathsHelper
 {
     /**
-     * @var array
+     * @var array<string, string>
      */
-    private $paths;
+    private array $paths;
 
     /**
      * @var string
@@ -69,22 +57,19 @@ class PathsHelper
      */
     private $user;
 
-    /**
-     * PathsHelper constructor.
-     */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
+        $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $this->user                   = $userHelper->getUser();
         $this->theme                  = $coreParametersHelper->get('theme');
-        $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->get('image_path'));
-        $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_dir'));
-        $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->get('tmp_path'));
-        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_user_dir'));
+        $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
+        $this->dashboardImportDir     = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_dir'));
+        $this->temporaryDir           = $this->removeTrailingSlash((string) $coreParametersHelper->get('tmp_path'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
-        $this->kernelRootDir          = $this->removeTrailingSlash($rootDir);
+        $this->kernelRootDir          = $this->removeTrailingSlash($root);
 
-        $root  = $rootDir;
         $paths = [];
         include $root.'/config/paths_helper.php';
 
@@ -136,6 +121,11 @@ class PathsHelper
         return $this->getSystemPath('assets', true);
     }
 
+    public function getMediaPath(): string
+    {
+        return $this->getSystemPath('media', true);
+    }
+
     public function getCoreBundlesPath(): string
     {
         return $this->getSystemPath('bundles', true);
@@ -144,6 +134,16 @@ class PathsHelper
     public function getPluginsPath(): string
     {
         return $this->getSystemPath('plugins', true);
+    }
+
+    /**
+     * Returns absolute path to the root directory where the "vendor" directory is located.
+     */
+    public function getVendorRootPath(): string
+    {
+        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+
+        return dirname($reflection->getFileName(), 3);
     }
 
     /**
@@ -182,7 +182,7 @@ class PathsHelper
 
             case 'dashboard.user':
             case 'dashboard.global':
-                //these are absolute regardless as they are configurable
+                // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
                 if ('dashboard.global' == $name) {
@@ -224,7 +224,7 @@ class PathsHelper
         return $path;
     }
 
-    private function removeTrailingSlash(?string $dir): ?string
+    private function removeTrailingSlash(string $dir): string
     {
         if ('/' === substr($dir, -1)) {
             $dir = substr($dir, 0, -1);

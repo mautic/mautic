@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -102,7 +93,7 @@ class NotificationConfigType extends AbstractType
     {
         $resolver->setDefaults([
             'validation_groups' => function (FormInterface $form) {
-                $data = $form->getData();
+                $data   = $form->getData();
                 $groups = ['Default'];
                 if (!$data['webhook_send_notification_to_author']) {
                     $groups[] = 'webhook_email_list';
@@ -114,13 +105,5 @@ class NotificationConfigType extends AbstractType
                 return $groups;
             },
         ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'notification_config';
     }
 }

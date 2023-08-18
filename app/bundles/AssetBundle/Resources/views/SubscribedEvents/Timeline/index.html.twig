@@ -1,0 +1,7 @@
+<div>
+Hello
+{{- include('@MauticAsset/Asset/preview.html.twig', {'activeAsset' : event.extra.asset, 'assetDownloadUrl' : url(
+    'mautic_asset_action',
+    {'objectAction' : 'preview', 'objectId' : event.extra.asset.getId()}
+)}) -}}
+</div>

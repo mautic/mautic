@@ -35,7 +35,7 @@ class FocusListType extends AbstractType
                         $choices[$row['name']] = $row['id'];
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices, SORT_NATURAL);
 
                     return $choices;
@@ -54,14 +54,6 @@ class FocusListType extends AbstractType
                 'ignore_ids'     => [],
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'focus_list';
     }
 
     /**

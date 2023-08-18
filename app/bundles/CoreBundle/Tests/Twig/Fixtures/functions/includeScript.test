@@ -1,0 +1,10 @@
+--TEST--
+includeScript asset function
+--TEMPLATE--
+{{ includeScript('app/bundles/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad') }}
+{{ includeScript('app/bundles/IntegrationsBundle/Assets/js/integrations.js') }}
+--DATA--
+return []
+--EXPECT--
+<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript('https://example.com/app/bundles/IntegrationsBundle/Assets/js/integrations.js////}', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');</script>
+<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript('https://example.com/app/bundles/IntegrationsBundle/Assets/js/integrations.js////}', '', '');</script>

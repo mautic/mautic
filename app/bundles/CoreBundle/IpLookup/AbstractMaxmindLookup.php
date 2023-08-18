@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
@@ -28,6 +19,10 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
+        if (!$this->auth) {
+            throw new \InvalidArgumentException('Maxmind Authentication key canot be empty.');
+        }
+
         return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
@@ -53,9 +48,6 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
         return $url."/{$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

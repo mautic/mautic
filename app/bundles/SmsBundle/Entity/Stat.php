@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -24,47 +16,47 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Sms
+     * @var Sms|null
      */
     private $sms;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -79,7 +71,7 @@ class Stat
     private $details = [];
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isFailed = false;
 
@@ -136,13 +128,11 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->addField('details', 'json_array');
+        $builder->addField('details', Types::JSON);
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -169,7 +159,7 @@ class Stat
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -245,7 +235,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {

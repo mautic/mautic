@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -21,7 +11,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\EventListener\DetermineWinnerSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends TestCase
 {
@@ -58,7 +48,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         $ids           = [1, 3];
         $parameters    = ['parent' => $parentMock, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
-        $startDate     = new DateTime();
+        $startDate     = new \DateTime();
         $translation   = 'bounces';
 
         $bounces = [
@@ -149,7 +139,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         $ids         = [1, 2];
         $parameters  = ['parent' => $parentMock];
         $event       = new DetermineWinnerEvent($parameters);
-        $startDate   = new DateTime();
+        $startDate   = new \DateTime();
         $translation = 'dewlltime';
 
         $counts = [

@@ -1,25 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -93,31 +85,10 @@ class StageType extends AbstractType
             ],
         ]);
 
-        $builder->add('publishUp', DateTimeType::class, [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishup',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-        ]);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
-        $builder->add('publishDown', DateTimeType::class, [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-        ]);
-
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -143,13 +114,5 @@ class StageType extends AbstractType
         ]);
 
         $resolver->setDefined(['stageActions', 'actionType']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'stage';
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
@@ -50,7 +41,7 @@ class CampaignHelper
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
 
         $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
-        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+        $this->dispatcher->dispatch($webhookRequestEvent, WebhookEvents::WEBHOOK_ON_REQUEST);
 
         $this->makeRequest(
             $webhookRequestEvent->getUrl(),
@@ -118,7 +109,7 @@ class CampaignHelper
                 } else {
                     $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
                 }
-            $response = $this->client->request($method, $url, $options);
+                $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
                 $response = $this->client->delete($url, [

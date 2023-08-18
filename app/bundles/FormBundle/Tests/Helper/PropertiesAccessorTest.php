@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Helper\PropertiesAccessor;
@@ -40,8 +31,8 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertiesForCountryField(): void
     {
         $field = [
-            'type'      => 'country',
-            'leadField' => 'country',
+            'type'        => 'country',
+            'mappedField' => 'country',
         ];
 
         $this->formModel->expects($this->once())
@@ -58,9 +49,10 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertiesForSyncList(): void
     {
         $field = [
-            'type'       => 'custom_select_a',
-            'leadField'  => 'contact_field_a',
-            'properties' => ['syncList' => true],
+            'type'         => 'custom_select_a',
+            'mappedField'  => 'contact_field_a',
+            'mappedObject' => 'contact',
+            'properties'   => ['syncList' => true],
         ];
 
         $this->formModel->expects($this->once())
@@ -77,9 +69,10 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertiesForTextField(): void
     {
         $field = [
-            'type'       => 'custom_text_a',
-            'leadField'  => 'contact_field_a',
-            'properties' => ['syncList' => false],
+            'type'         => 'custom_text_a',
+            'mappedField'  => 'contact_field_a',
+            'mappedObject' => 'contact',
+            'properties'   => ['syncList' => false],
         ];
 
         $this->formModel->expects($this->never())

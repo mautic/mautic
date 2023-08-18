@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -25,14 +16,16 @@ class Copy
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateCreated;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $body;
+
+    private ?string $bodyText;
 
     /**
      * @var string|null
@@ -44,10 +37,10 @@ class Copy
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_copies')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\CopyRepository');
+            ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->length(32)
             ->build();
 
@@ -56,13 +49,12 @@ class Copy
             ->build();
 
         $builder->addNullableField('body', 'text');
+        $builder->addNullableField('bodyText', 'text', 'body_text');
 
         $builder->addNullableField('subject', 'text');
     }
 
     /**
-     * @param $id
-     *
      * @return $this
      */
     public function setId($id)
@@ -81,7 +73,7 @@ class Copy
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateCreated()
     {
@@ -142,6 +134,19 @@ class Copy
         $subject = EmojiHelper::toShort($subject);
 
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    public function getBodyText(): ?string
+    {
+        return $this->bodyText;
+    }
+
+    public function setBodyText(?string $bodyText): self
+    {
+        $bodyText       = EmojiHelper::toShort($bodyText);
+        $this->bodyText = $bodyText;
 
         return $this;
     }

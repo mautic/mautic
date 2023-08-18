@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -169,7 +160,6 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
                 $this->callback(
                     function (TokenReplacementEvent $event) use ($lead) {
                         Assert::assertSame('{contactfield=active-field}', $event->getContent());
@@ -180,7 +170,8 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
             );
 
         $this->emailValidator->expects($this->exactly(4))
@@ -197,7 +188,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 null,
                 $this->throwException(new InvalidEmailException('{invalid-token}'))
             );
-        //Send email method
+        // Send email method
 
         $this->emailModel
             ->expects($this->once())

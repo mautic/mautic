@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\ORM\ORMException;
@@ -112,7 +103,7 @@ class SendEmailToUser
                 $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
 
                 return $this->replaceToken($contactFieldToken->getFullToken(), $lead);
-            } catch (InvalidValueException | RecordException $e) {
+            } catch (InvalidValueException|RecordException $e) {
                 // If the field does not exist or is not type of email then use the default value.
                 return (string) $contactFieldToken->getDefaultValue();
             }
@@ -122,7 +113,7 @@ class SendEmailToUser
     private function replaceToken(string $token, Lead $lead): string
     {
         $tokenEvent = new TokenReplacementEvent($token, $lead);
-        $this->dispatcher->dispatch(EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT, $tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
     }

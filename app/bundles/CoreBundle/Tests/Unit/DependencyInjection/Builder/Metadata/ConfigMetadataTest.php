@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
@@ -129,7 +120,7 @@ class ConfigMetadataTest extends TestCase
         $config = $this->metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
-        $this->assertEquals('%%kernel.root_dir%%/../var/logs', $config['parameters']['log_path']);
+        $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
     }
 
     public function testParameterTypesArePreserved()
@@ -144,7 +135,7 @@ class ConfigMetadataTest extends TestCase
         $config = $this->metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
-        $this->assertEquals('%%kernel.root_dir%%/../var/logs', $config['parameters']['log_path']);
+        $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
         $this->assertEquals(7, $config['parameters']['max_log_files']);
         $this->assertEquals('media/images', $config['parameters']['image_path']);
         $this->assertEquals(false, $config['parameters']['bool_value']);

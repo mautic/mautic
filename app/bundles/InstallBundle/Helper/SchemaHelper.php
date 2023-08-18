@@ -1,18 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
@@ -47,12 +37,12 @@ class SchemaHelper
     protected $dbParams = [];
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function __construct(array $dbParams)
     {
-        //suppress display of errors as we know its going to happen while testing the connection
-        ini_set('display_errors', 0);
+        // suppress display of errors as we know its going to happen while testing the connection
+        ini_set('display_errors', '0');
 
         // Support for env variables
         foreach ($dbParams as &$v) {
@@ -99,23 +89,22 @@ class SchemaHelper
     /**
      * @return bool
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function createDatabase()
     {
         try {
             $this->db->connect();
         } catch (\Exception $exception) {
-            //it failed to connect so remove the dbname and try to create it
+            // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
             $this->dbParams['dbname'] = null;
-            $this->db                 = DriverManager::getConnection($this->dbParams);
 
             try {
-                //database does not exist so try to create it
+                // database does not exist so try to create it
                 $this->db->getSchemaManager()->createDatabase($dbName);
 
-                //close the connection and reconnect with the new database name
+                // close the connection and reconnect with the new database name
                 $this->db->close();
 
                 $this->dbParams['dbname'] = $dbName;
@@ -134,7 +123,7 @@ class SchemaHelper
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
     public function installSchema()
@@ -142,7 +131,7 @@ class SchemaHelper
         $sm = $this->db->getSchemaManager();
 
         try {
-            //check to see if the table already exist
+            // check to see if the table already exist
             $tables = $sm->listTableNames();
         } catch (\Exception $e) {
             $this->db->close();
@@ -182,7 +171,7 @@ class SchemaHelper
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->db->query($q);
+                    $this->db->executeQuery($q);
                 } catch (\Exception $exception) {
                     $this->db->close();
 
@@ -223,22 +212,19 @@ class SchemaHelper
     }
 
     /**
-     * @param $tables
-     * @param $backupPrefix
-     *
      * @return array
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
     {
         $sql = [];
         $sm  = $this->db->getSchemaManager();
 
-        //backup existing tables
+        // backup existing tables
         $backupRestraints = $backupSequences = $backupIndexes = $backupTables = $dropSequences = $dropTables = [];
 
-        //cycle through the first time to drop all the foreign keys
+        // cycle through the first time to drop all the foreign keys
         foreach ($tables as $t) {
             if (!isset($mauticTables[$t]) && !in_array($t, $mauticTables)) {
                 // Not an applicable table
@@ -248,12 +234,12 @@ class SchemaHelper
             $restraints = $sm->listTableForeignKeys($t);
 
             if (isset($mauticTables[$t])) {
-                //to be backed up
+                // to be backed up
                 $backupRestraints[$mauticTables[$t]] = $restraints;
                 $backupTables[$t]                    = $mauticTables[$t];
                 $backupIndexes[$t]                   = $sm->listTableIndexes($t);
             } else {
-                //existing backup to be dropped
+                // existing backup to be dropped
                 $dropTables[] = $t;
             }
 
@@ -262,14 +248,14 @@ class SchemaHelper
             }
         }
 
-        //now drop all the backup tables
+        // now drop all the backup tables
         foreach ($dropTables as $t) {
             $sql[] = $this->platform->getDropTableSQL($t);
         }
 
-        //now backup tables
+        // now backup tables
         foreach ($backupTables as $t => $backup) {
-            //drop old indexes
+            // drop old indexes
             /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
             foreach ($backupIndexes[$t] as $indexName => $oldIndex) {
                 if ('primary' == $indexName) {
@@ -284,20 +270,21 @@ class SchemaHelper
                     $oldIndex->getColumns(),
                     $oldIndex->isUnique(),
                     $oldIndex->isPrimary(),
-                    $oldIndex->getFlags()
+                    $oldIndex->getFlags(),
+                    $oldIndex->getOptions()
                 );
 
                 $newIndexes[] = $newIndex;
                 $sql[]        = $this->platform->getDropIndexSQL($oldIndex, $t);
             }
 
-            //rename table
+            // rename table
             $tableDiff          = new TableDiff($t);
             $tableDiff->newName = $backup;
             $queries            = $this->platform->getAlterTableSQL($tableDiff);
             $sql                = array_merge($sql, $queries);
 
-            //create new index
+            // create new index
             if (!empty($newIndexes)) {
                 foreach ($newIndexes as $newIndex) {
                     $sql[] = $this->platform->getCreateIndexSQL($newIndex, $backup);
@@ -306,7 +293,7 @@ class SchemaHelper
             }
         }
 
-        //apply foreign keys to backup tables
+        // apply foreign keys to backup tables
         foreach ($backupRestraints as $table => $oldRestraints) {
             foreach ($oldRestraints as $or) {
                 $foreignTable     = $or->getForeignTableName();
@@ -326,16 +313,13 @@ class SchemaHelper
     }
 
     /**
-     * @param $tables
-     * @param $mauticTables
-     *
      * @return array
      */
     protected function dropExistingSchema($tables, $mauticTables)
     {
         $sql = [];
 
-        //drop tables
+        // drop tables
         foreach ($tables as $t) {
             if (isset($mauticTables[$t])) {
                 $sql[] = $this->platform->getDropTableSQL($t);
@@ -346,10 +330,6 @@ class SchemaHelper
     }
 
     /**
-     * @param $prefix
-     * @param $backupPrefix
-     * @param $name
-     *
      * @return mixed|string
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)

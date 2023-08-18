@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadTimelineEvent extends Event
 {
@@ -55,7 +46,7 @@ class LeadTimelineEvent extends Event
     protected $lead;
 
     /**
-     * @var int
+     * @var array<string, int>
      */
     protected $totalEvents = [];
 
@@ -80,12 +71,12 @@ class LeadTimelineEvent extends Event
     protected $countOnly = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateFrom;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateTo;
 
@@ -411,7 +402,6 @@ class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included.
      *
-     * @param      $eventType
      * @param bool $inclusive
      *
      * @return bool
@@ -523,9 +513,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
-     *
-     * @param $eventType
-     * @param $count
      */
     public function subtractFromCounter($eventType, $count = 1)
     {
@@ -568,8 +555,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Add a serializer group for API formatting.
-     *
-     * @param $group
      */
     public function addSerializerGroup($group)
     {

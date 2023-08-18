@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -30,12 +21,13 @@ class Tag
     private $tag;
 
     /**
-     * @param string $tag
-     * @param bool   $clean
+     * @var string|null
      */
-    public function __construct($tag = null, $clean = true)
+    private $description;
+
+    public function __construct(string $tag = null, bool $clean = true)
     {
-        $this->tag = $clean ? $this->validateTag($tag) : $tag;
+        $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
     }
 
     public static function loadMetadata(ClassMetadata $metadata)
@@ -46,7 +38,8 @@ class Tag
             ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
-        $builder->addField('tag', Type::STRING);
+        $builder->addField('tag', Types::STRING);
+        $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
@@ -56,6 +49,7 @@ class Tag
                 [
                     'id',
                     'tag',
+                    'description',
                 ]
             )
             ->build();
@@ -78,11 +72,9 @@ class Tag
     }
 
     /**
-     * @param string $tag
-     *
      * @return Tag
      */
-    public function setTag($tag)
+    public function setTag(string $tag)
     {
         $this->tag = $this->validateTag($tag);
 
@@ -90,12 +82,27 @@ class Tag
     }
 
     /**
-     * @param string $tag
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
      *
      * @return Tag
      */
-    protected function validateTag($tag)
+    public function setDescription($description)
     {
-        return InputHelper::clean(trim($tag));
+        $this->description = $description;
+
+        return $this;
+    }
+
+    private function validateTag(string $tag): string
+    {
+        return InputHelper::string(trim((string) $tag));
     }
 }

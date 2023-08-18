@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * PermissionRepository.
+ * @extends CommonRepository<Permission>
  */
 class PermissionRepository extends CommonRepository
 {
@@ -26,9 +17,9 @@ class PermissionRepository extends CommonRepository
     {
         $query = $this
             ->createQueryBuilder('p')
-            ->delete('MauticUserBundle:Permission', 'p')
+            ->delete(\Mautic\UserBundle\Entity\Permission::class, 'p')
             ->where('p.role = :role')
-            ->setParameter(':role', $role)
+            ->setParameter('role', $role)
             ->getQuery();
         $query->execute();
     }
@@ -46,12 +37,12 @@ class PermissionRepository extends CommonRepository
             ->createQueryBuilder('p')
             ->where('p.role = :role')
             ->orderBy('p.bundle')
-            ->setParameter(':role', $role)
+            ->setParameter('role', $role)
             ->getQuery()
             ->useResultCache(false)
             ->getResult(Query::HYDRATE_ARRAY);
 
-        //rearrange the array to meet needs
+        // rearrange the array to meet needs
         $permissions = [];
         foreach ($results as $r) {
             if ($forForm) {

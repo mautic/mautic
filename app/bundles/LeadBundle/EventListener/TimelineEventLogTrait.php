@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\Translation\TranslatorInterface;
 
 trait TimelineEventLogTrait
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -28,9 +19,6 @@ trait TimelineEventLogTrait
     private $eventLogRepository;
 
     /**
-     * @param      $eventType
-     * @param      $eventTypeName
-     * @param      $icon
      * @param null $bundle
      * @param null $object
      * @param null $action
@@ -87,8 +75,6 @@ trait TimelineEventLogTrait
     }
 
     /**
-     * @param $eventType
-     *
      * @return string
      */
     private function getSourceName(array $log, $eventType)

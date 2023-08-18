@@ -1,0 +1,6 @@
+{{ include('@MauticCore/Helper/tableheader.html.twig', {
+    'sessionVar': 'lead',
+    'orderBy': 'l.'~column,
+    'text': label,
+    'class': 'col-lead-'~column~' '~class|default(''),
+}) }}

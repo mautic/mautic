@@ -1,0 +1,17 @@
+{% import '@MauticSocial//macros.html.twig' as social %}
+{% set tableFields = ['gender', 'homeCity', 'bio'] %}
+<div class="media">
+    {{ social.profileImage(profile) }}
+    <div class="media-body">
+        <h4 class="media-heading">{{ profile.firstName }} {{ profile.lastName }}</h4>
+        <p class="text-muted"><a href="https://foursquare.com/user/{{ profile.profileHandle }}" target="_blank">{{ profile.profileHandle }}</a></p>
+        <table class="table table-condensed table-bordered">
+            {% for t in tableFields|filter(v => profile[v] is defined and profile[v] is not empty) %}
+                <tr>
+                    <td>{{ translatorConditional('mautic.integration.common.' ~ t, 'mautic.integration.Foursquare.' ~ t) }}</td>
+                    <td>{{ profile[t] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
