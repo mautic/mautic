@@ -1048,6 +1048,12 @@ class MailHelper
      */
     public function setReplyTo($addresses, $name = null): void
     {
+        $this->replyTo = $addresses;
+
+        if (str_contains($addresses, ',')) {
+            $addresses = explode(',', $addresses);
+        }
+
         try {
             foreach ((array) $addresses as $address) {
                 $this->message->replyTo((new AddressDTO($address, $name))->toMailerAddress());
@@ -1660,16 +1666,19 @@ class MailHelper
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
-        // create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
-        $stat->setEmail($this->email);
+        $emailExists = $this->email && $this->email->getId();
+
+        if ($emailExists) {
+            $stat->setEmail($this->email);
+        }
 
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
-            } catch (ORMException) {
+                $stat->setLead($this->factory->getEntityManager()->getReference(Lead::class, $this->lead['id']));
+            } catch (ORMException $exception) {
                 // keep IDE happy
             }
             $emailAddress = $this->lead['email'];
@@ -1707,7 +1716,7 @@ class MailHelper
         $emailModel = $this->factory->getModel('email');
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
-        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
+        $id = $emailExists ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
             $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
