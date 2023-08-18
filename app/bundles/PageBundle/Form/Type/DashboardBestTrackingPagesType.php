@@ -8,10 +8,14 @@ use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array>
+ */
 class DashboardBestTrackingPagesType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * @param FormBuilderInterface<string|FormBuilderInterface> $builder
+     * @param mixed[]                                           $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
