@@ -156,13 +156,6 @@ return [
                     'mautic.helper.email.address',
                 ],
             ],
-            'mautic.helper.from_email_helper' => [
-                'class'     => \Mautic\EmailBundle\Helper\FromEmailHelper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.repository.lead',
-                ],
-            ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [

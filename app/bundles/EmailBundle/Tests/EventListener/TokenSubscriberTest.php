@@ -41,10 +41,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $mockFactory->method('get')
-            ->with('mautic.helper.from_email_helper')
-            ->willReturn($this->createMock(FromEmailHelper::class));
-
         $tokens = ['{test}' => 'value'];
 
         $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox);
