@@ -72,9 +72,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->fromEmaiHelper = $this->createMock(FromEmailHelper::class);
+        $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->mailbox = $this->createMock(Mailbox::class);
+        $this->mailbox              = $this->createMock(Mailbox::class);
 
         $this->coreParametersHelper->method('get')->will($this->returnValueMap([
             ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -613,7 +613,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     default => '',
                 }
             );
-        
+
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(new AddressDTO('someone@somewhere.com'));
         $factoryMock->method('getLogger')->willReturn(new NullLogger());
         $factoryMock->method('getDispatcher')->willReturn(new EventDispatcher());
