@@ -397,7 +397,7 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * @return array<array<int|string>>
+     * @return array<array<int|string>|int|string>
      *
      * @throws Exception
      */
