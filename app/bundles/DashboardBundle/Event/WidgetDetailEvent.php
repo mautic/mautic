@@ -24,33 +24,19 @@ class WidgetDetailEvent extends CommonEvent
     protected $cacheTimeout;
     protected $startTime = 0;
     protected $loadTime  = 0;
-    protected $translator;
 
     private $cacheKeyPath = 'dashboard.widget.';
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security = null;
-
-    /**
-     * @var CacheProvider
-     */
-    private $cacheProvider;
-
-    public function __construct(TranslatorInterface $translator, CacheProvider $cacheProvider = null)
+    public function __construct(private TranslatorInterface $translator, private CacheProvider $cacheProvider, private CorePermissions $security, Widget $widget)
     {
-        $this->translator    = $translator;
-        $this->startTime     = microtime(true);
-        $this->cacheProvider = $cacheProvider;
+        $this->setWidget($widget);
+        $this->startTime = microtime(true);
     }
 
     /**
      * Return unique key, uses legacy methods for BC.
-     *
-     * @return string
      */
-    public function getCacheKey()
+    public function getCacheKey(): string
     {
         $cacheKey = [
             $this->getUniqueWidgetId(),
@@ -123,6 +109,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget entity.
+     * 
+     * @deprecated, will be private in M6
      */
     public function setWidget(Widget $widget)
     {

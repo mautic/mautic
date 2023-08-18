@@ -15,7 +15,6 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

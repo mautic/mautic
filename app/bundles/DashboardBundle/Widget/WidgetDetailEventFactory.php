@@ -23,10 +23,8 @@ class WidgetDetailEventFactory
 
     public function create(Widget $widget): WidgetDetailEvent
     {
-        $event = new WidgetDetailEvent($this->translator, $this->cacheProvider);
-        $event->setWidget($widget);
+        $event = new WidgetDetailEvent($this->translator, $this->cacheProvider, $this->corePermissions, $widget);
         $event->setCacheDir(false, $this->userHelper->getUser()->getId());
-        $event->setSecurity($this->corePermissions);
 
         return $event;
     }
