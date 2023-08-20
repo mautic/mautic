@@ -100,6 +100,25 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
+    public function testWebhookIsNotDeliveredIfContactIsWithoutChanges(): void
+    {
+        $mockModel  = $this->createMock(WebhookModel::class);
+        $leadModel  = $this->createMock(LeadModel::class);
+
+        $mockModel->expects($this->exactly(0))
+            ->method('queueWebhooksByType');
+
+        $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel);
+
+        $this->dispatcher->addSubscriber($webhookSubscriber);
+
+        $lead  = new Lead();
+        $lead->setEmail('test@test.com');
+        $lead->setChanges([]);
+        $event = new LeadEvent($lead, false);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+    }
+
     /**
      * @testdox Test that webhook is queued for channel subscription changes
      */

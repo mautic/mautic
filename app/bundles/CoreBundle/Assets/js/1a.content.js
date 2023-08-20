@@ -189,7 +189,7 @@ Mautic.generatePageTitle = function(route){
 
     if (-1 !== route.indexOf('timeline')) {
         return
-    } else if (-1 !== route.indexOf('view')) {
+    } else if (-1 !== route.indexOf('/view')) {
         //loading view of module title
         var currentModule = route.split('/')[3];
 
