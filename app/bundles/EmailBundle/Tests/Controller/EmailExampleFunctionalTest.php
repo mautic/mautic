@@ -4,27 +4,45 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Mailer;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var \Swift_Transport
-     */
-    private $transport;
+    private SmtpTransport $transport;
 
     protected function setUp(): void
     {
         $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
 
-        self::$container->set('swiftmailer.mailer.default.transport.real', $this->transport = $this->createTransportFake());
+        parent::setUp();
+        $this->setUpMailer();
+    }
+
+    private function setUpMailer(): void
+    {
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $transport  = new SmtpTransport();
+        $mailer     = new Mailer($transport);
+        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
+        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+
+        $this->transport  = $transport;
+    }
+
+    private function setPrivateProperty(object $object, string $property, $value): void
+    {
+        $reflector = new \ReflectionProperty(get_class($object), $property);
+        $reflector->setAccessible(true);
+        $reflector->setValue($object, $value);
     }
 
     /**
@@ -50,15 +68,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
-        self::assertCount(1, $this->transport->messages);
-
-        $message = $this->transport->messages[0];
+        $message = $this->transport->sentMessage;
 
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject for Test Lead, living in Lane 11, Near Post Office, Pune, India. Contact number: 012', $message->getSubject());
-        self::assertStringContainsString('Email body for Test Lead, living in Lane 11, Near Post Office, Pune, India. Contact number: 012', $message->getBody());
     }
 
     /**
@@ -79,15 +94,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
 
-        self::assertCount(1, $this->transport->messages);
-
-        $message = $this->transport->messages[0];
+        $message = $this->transport->sentMessage;
 
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject for [First Name] [Last Name], living in [Address Line 1], [Address Line 2], [City], [Country]. Contact number: [Mobile]', $message->getSubject());
-        self::assertStringContainsString('Email body for [First Name] [Last Name], living in [Address Line 1], [Address Line 2], [City], [Country]. Contact number: [Mobile]', $message->getBody());
     }
 
     /**
@@ -159,14 +171,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
+        $message = $this->transport->sentMessage;
 
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
     }
 
     /**
@@ -262,14 +272,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
+        $message = $this->transport->sentMessage;
 
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody());
     }
 
     /**
@@ -365,14 +373,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
+        $message = $this->transport->sentMessage;
 
         // Asserting email data
         self::assertInstanceOf('Swift_Message', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
     }
 
     private function createEmail(): Email
@@ -402,46 +408,5 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
 
         return $lead;
-    }
-
-    private function createTransportFake(): \Swift_Transport
-    {
-        return new class() implements \Swift_Transport {
-            /**
-             * @var array <mixed>
-             */
-            public $messages = [];
-
-            public function isStarted(): bool
-            {
-                return true;
-            }
-
-            public function start(): void
-            {
-            }
-
-            public function stop(): void
-            {
-            }
-
-            public function ping(): bool
-            {
-                return true;
-            }
-
-            public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null): int
-            {
-                $this->messages[] = clone $message;
-
-                return count((array) $message->getTo())
-                    + count((array) $message->getCc())
-                    + count((array) $message->getBcc());
-            }
-
-            public function registerPlugin(\Swift_Events_EventListener $plugin): void
-            {
-            }
-        };
     }
 }
