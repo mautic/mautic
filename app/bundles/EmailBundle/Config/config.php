@@ -311,6 +311,7 @@ return [
     'parameters' => [
         'mailer_from_name'               => 'Mautic',
         'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_default_bcc'             => null,
         'mailer_reply_to_email'          => null,
         'mailer_return_path'             => null,
         'mailer_append_tracking_pixel'   => true,
