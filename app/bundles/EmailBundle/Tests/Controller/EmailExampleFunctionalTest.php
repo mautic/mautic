@@ -20,10 +20,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-        self::bootKernel();
-
         $this->configParams['mailer_spool_type'] = 'file';
+        parent::setUp();
         $this->setUpMailer();
     }
 
