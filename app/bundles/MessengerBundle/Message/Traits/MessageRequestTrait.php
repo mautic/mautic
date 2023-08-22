@@ -38,7 +38,6 @@ trait MessageRequestTrait
             'cookies'    => $this->request->cookies->all(),
             'files'      => $this->request->files->all(),
             'server'     => $this->request->server->all(),
-            'headers'    => $this->request->headers->all(),
         ]);
 
         return $data;
