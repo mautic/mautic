@@ -28,7 +28,7 @@ jobs:
 
     services:
       database:
-        image: ${{ matrix.db-types == 'mysql' && 'mysql:5.7' || 'mariadb:10.3' }}
+        image: ${{ matrix.db-types == 'mysql' && 'mysql:8.0' || 'mariadb:10.3' }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
