@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -14,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
-class EmailExampleFunctionalTest extends MauticMysqlTestCase
+class EmailExampleFunctionalTest extends AbstractMauticTestCase
 {
     private SmtpTransport $transport;
 
