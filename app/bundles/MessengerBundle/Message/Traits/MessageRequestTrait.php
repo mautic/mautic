@@ -43,6 +43,9 @@ trait MessageRequestTrait
         return $data;
     }
 
+    /**
+     * @param mixed[] $data
+     */
     public function __unserialize(array $data): void
     {
         $requestData     = $data['request'];
