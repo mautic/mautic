@@ -51,7 +51,7 @@ class GrapesJsController extends CommonController
             $aclToCheck = 'page:pages:';
         }
 
-        //permission check
+        // permission check
         if (false !== strpos($objectId, 'new')) {
             $isNew = true;
 
@@ -97,7 +97,7 @@ class GrapesJsController extends CommonController
             $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
             $slots       = $themeHelper->getTheme($template)->getSlots($objectType);
 
-            //merge any existing changes
+            // merge any existing changes
             $newContent = $request->getSession()->get('mautic.'.$objectType.'builder.'.$objectId.'.content', []);
 
             if (is_array($newContent)) {
@@ -114,7 +114,7 @@ class GrapesJsController extends CommonController
         }
 
         // Replace short codes to emoji
-        $content = EmojiHelper::toEmoji($content, 'short');
+        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $renderedTemplate =  $this->renderView(
             $logicalName,
@@ -154,9 +154,9 @@ class GrapesJsController extends CommonController
     {
         $content = $entity->getContent();
 
-        //Set the slots
+        // Set the slots
         foreach ($slots as $slot => $slotConfig) {
-            //support previous format where email slots are not defined with config array
+            // support previous format where email slots are not defined with config array
             if (is_numeric($slot)) {
                 $slot       = $slotConfig;
                 $slotConfig = [];
@@ -166,7 +166,7 @@ class GrapesJsController extends CommonController
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
 
-        //add builder toolbar
+        // add builder toolbar
         $slotsHelper->start('builder'); ?>
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php
@@ -225,12 +225,12 @@ class GrapesJsController extends CommonController
                     $options['slides'] = [
                         [
                             'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
                             'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
                             'captionheader'    => 'Caption 2',
                         ],
                     ];

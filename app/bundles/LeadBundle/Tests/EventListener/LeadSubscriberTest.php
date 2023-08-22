@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use DateTime;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -171,7 +170,7 @@ class LeadSubscriberTest extends CommonMocks
             'object'     => 'api-single',
             'action'     => 'identified_contact',
             'object_id'  => null,
-            'date_added' => new DateTime(),
+            'date_added' => new \DateTime(),
             'properties' => '{"object_description":"Awesome User"}',
         ];
 

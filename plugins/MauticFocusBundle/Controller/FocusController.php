@@ -2,21 +2,41 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class FocusController.
- */
 class FocusController extends AbstractStandardFormController
 {
+    private CacheProvider $cacheProvider;
+
+    /** @phpstan-ignore-next-line */
+    public function __construct(CacheProvider $cacheProvider, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    {
+        $this->cacheProvider = $cacheProvider;
+
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     protected function getTemplateBase(): string
     {
         return '@MauticFocus/Focus';
@@ -66,8 +86,6 @@ class FocusController extends AbstractStandardFormController
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function viewAction(Request $request, $objectId)
@@ -110,14 +128,14 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      *
      * @throws \Exception
      */
     public function getViewArguments(array $args, $action)
     {
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
         if ('view' == $action) {
             /** @var Focus $item */
             $item = $args['viewParameters']['item'];
@@ -138,22 +156,43 @@ class FocusController extends AbstractStandardFormController
                 ]
             );
 
-            /** @var FocusModel $model */
-            $model = $this->getModel('focus');
-            $stats = $model->getStats(
-                $item,
-                null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()),
-                new \DateTime($dateRangeForm->get('date_to')->getData())
-            );
+            $statsDateFrom = new \DateTime($dateRangeForm->get('date_from')->getData());
+            $statsDateTo   = new \DateTime($dateRangeForm->get('date_to')->getData());
+            $cacheKey      = "focus.viewArguments.{$item->getId()}.{$statsDateFrom->getTimestamp()}.{$statsDateTo->getTimestamp()}";
+            $cacheItem     = $this->cacheProvider->getItem($cacheKey);
 
-            $args['viewParameters']['stats']         = $stats;
-            $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
+            if ($cacheItem->isHit()) {
+                [$stats, $trackables] = $cacheItem->get();
+            } else {
+                // invalidate cache for entire focus item to keep AJAX loaded data consistent
+                $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
 
-            if ('link' === $item->getType()) {
-                $trackableModel = $this->getModel('page.trackable');
-                \assert($trackableModel instanceof TrackableModel);
-                $args['viewParameters']['trackables'] = $trackableModel->getTrackableList('focus', $item->getId());
+                /** @var FocusModel $model */
+                $model = $this->getModel('focus');
+                $stats = $model->getStats(
+                    $item,
+                    null,
+                    $statsDateFrom,
+                    $statsDateTo
+                );
+
+                if ('link' === $item->getType()) {
+                    $trackableModel = $this->getModel('page.trackable');
+                    \assert($trackableModel instanceof TrackableModel);
+                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+                }
+
+                $cacheItem->set([$stats, $trackables]);
+                $cacheItem->expiresAfter($cacheTimeout * 60);
+                $cacheItem->tag("focus.{$item->getId()}");
+                $this->cacheProvider->save($cacheItem);
+            }
+
+            $args['viewParameters']['stats']                 = $stats;
+            $args['viewParameters']['dateRangeForm']         = $dateRangeForm->createView();
+            $args['viewParameters']['showConversionRate']    = true;
+            if (isset($trackables)) {
+                $args['viewParameters']['trackables'] = $trackables;
             }
         }
 
@@ -161,8 +200,6 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
-     *
      * @return array
      */
     protected function getPostActionRedirectArguments(array $args, $action)

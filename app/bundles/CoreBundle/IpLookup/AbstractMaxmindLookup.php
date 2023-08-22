@@ -19,6 +19,10 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
+        if (!$this->auth) {
+            throw new \InvalidArgumentException('Maxmind Authentication key canot be empty.');
+        }
+
         return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
@@ -44,9 +48,6 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
         return $url."/{$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

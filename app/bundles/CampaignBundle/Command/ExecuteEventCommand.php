@@ -45,7 +45,6 @@ class ExecuteEventCommand extends Command
     {
         $this
             ->setName('mautic:campaigns:execute')
-            ->setDescription('Execute specific scheduled events.')
             ->addOption(
                 '--scheduled-log-ids',
                 null,
@@ -75,6 +74,7 @@ class ExecuteEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Execute specific scheduled events.';
 }

@@ -35,7 +35,7 @@ class FocusListType extends AbstractType
                         $choices[$row['name']] = $row['id'];
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices, SORT_NATURAL);
 
                     return $choices;

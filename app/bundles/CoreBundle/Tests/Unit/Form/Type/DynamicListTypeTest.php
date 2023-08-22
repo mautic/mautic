@@ -63,7 +63,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
                 FormEvents::PRE_SUBMIT,
                 $this->callback(function ($formModifier) {
                     $formEvent = $this->createMock(FormEvent::class);
-                    $data = [['content' => 'dynamic slot content']];
+                    $data      = [['content' => 'dynamic slot content']];
 
                     $formEvent->expects($this->once())
                         ->method('getData')

@@ -40,7 +40,7 @@ class FormType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
-        //details
+        // details
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
@@ -64,7 +64,7 @@ class FormType extends AbstractType
             'required'   => false,
         ]);
 
-        //add category
+        // add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -127,7 +127,7 @@ class FormType extends AbstractType
             [
                 'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
                 'attr'  => [
-                    'style'       => 'width:75px;',
+                    'style'       => 'width:100px;',
                     'class'       => 'form-control',
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',

@@ -39,9 +39,7 @@ class UploadController extends DropzoneController
         return $this->createSupportedJsonResponse($response->assemble());
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $translator;

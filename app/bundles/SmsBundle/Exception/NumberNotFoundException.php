@@ -2,8 +2,6 @@
 
 namespace Mautic\SmsBundle\Exception;
 
-use Throwable;
-
 class NumberNotFoundException extends \Exception
 {
     /***
@@ -18,7 +16,7 @@ class NumberNotFoundException extends \Exception
      * @param string $message
      * @param int    $code
      */
-    public function __construct($number, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct($number, $message = '', $code = 0, \Throwable $previous = null)
     {
         $this->number = $number;
 

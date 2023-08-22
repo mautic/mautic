@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Service\BulkNotificationInterface;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder;
@@ -65,9 +64,9 @@ class BulkNotification
     }
 
     /**
-     * @param DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
+     * @param \DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
      */
-    public function flush(DateTime $deduplicateDateTimeFrom = null): void
+    public function flush(\DateTime $deduplicateDateTimeFrom = null): void
     {
         $this->bulkNotification->flush($deduplicateDateTimeFrom);
     }

@@ -92,7 +92,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $item  = $model->getEntity($log['objectId']);
                     if (null === $item) {
                         $log['objectName'] = $log['object'].'-'.$log['objectId'];
-                    } elseif ($model instanceof FormModel && method_exists($item, $model->getNameGetter())) {
+                    } elseif ($model instanceof FormModel && $model->getNameGetter() && method_exists($item, $model->getNameGetter())) {
                         $log['objectName'] = $item->{$model->getNameGetter()}();
 
                         if ('lead' === $log['bundle'] && 'mautic.lead.lead.anonymous' === $log['objectName']) {
