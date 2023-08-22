@@ -27,4 +27,37 @@ trait MessageRequestTrait
     {
         return $this->request;
     }
+
+    public function __serialize(): array
+    {
+        $data            = get_object_vars($this);
+        $data['request'] = array_filter([
+            'attributes' => $this->request->attributes->all(),
+            'request'    => $this->request->request->all(),
+            'query'      => $this->request->query->all(),
+            'cookies'    => $this->request->cookies->all(),
+            'files'      => $this->request->files->all(),
+            'server'     => $this->request->server->all(),
+            'headers'    => $this->request->headers->all(),
+        ]);
+
+        return $data;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $requestData     = $data['request'];
+        $data['request'] = new Request(
+            $requestData['query'] ?? [],
+            $requestData['request'] ?? [],
+            $requestData['attributes'] ?? [],
+            $requestData['cookies'] ?? [],
+            $requestData['files'] ?? [],
+            $requestData['server'] ?? []
+        );
+
+        foreach ($data as $key => $item) {
+            $this->$key = $item;
+        }
+    }
 }
