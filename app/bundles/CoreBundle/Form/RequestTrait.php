@@ -130,7 +130,7 @@ trait RequestTrait
                         break;
                     }
 
-                    switch ($type) {
+                    switch (get_class($type)) {
                         case DateTimeType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                             break;
@@ -141,7 +141,6 @@ trait RequestTrait
                             $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
                             break;
                     }
-
                     break;
             }
         }

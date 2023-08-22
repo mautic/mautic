@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
+    use AjaxLookupControllerTrait;
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
