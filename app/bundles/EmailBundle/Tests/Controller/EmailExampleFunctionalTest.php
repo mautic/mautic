@@ -36,6 +36,14 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->transport  = $transport;
     }
 
+    /**
+     * @param object $object
+     * @param string $property
+     * @param $value
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
     private function setPrivateProperty(object $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty(get_class($object), $property);
@@ -57,7 +65,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -83,7 +91,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
@@ -159,7 +167,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
@@ -253,7 +261,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -350,7 +358,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
