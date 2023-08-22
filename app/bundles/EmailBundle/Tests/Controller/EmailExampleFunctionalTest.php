@@ -22,8 +22,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
-
-        parent::setUp();
         $this->setUpMailer();
     }
 
