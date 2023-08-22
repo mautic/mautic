@@ -206,10 +206,11 @@ trait LeadDetailsTrait
     protected function getEmailDaysData(Lead $lead): array
     {
         /** @var EmailModel $model */
-        $model       = $this->getModel('email');
-        $translator  = $this->translator;
+        $model          = $this->getModel('email');
+        $statRepository = $model->getStatRepository();
+        $translator     = $this->translator;
 
-        $stats       = $model->getEmailDayStats($lead);
+        $stats       = $statRepository->getEmailDayStats($lead);
 
         $chart  = new BarChart([
             $translator->trans('mautic.core.date.monday'),
@@ -236,10 +237,11 @@ trait LeadDetailsTrait
     protected function getEmailHoursData(Lead $lead): array
     {
         /** @var EmailModel $model */
-        $model       = $this->getModel('email');
-        $translator  = $this->translator;
+        $model          = $this->getModel('email');
+        $statRepository = $model->getStatRepository();
+        $translator     = $this->translator;
 
-        $stats = $model->getEmailTimeStats($lead);
+        $stats = $statRepository->getEmailTimeStats($lead);
 
         $hoursRange = range(0, 23, 1);
         $labels     = [];

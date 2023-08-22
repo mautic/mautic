@@ -30,7 +30,6 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -2387,31 +2386,5 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $context->setScheme($original_scheme);
 
         return $url;
-    }
-
-    /**
-     * @return array<int, array<string, int|string>>
-     *
-     * @throws Exception
-     */
-    public function getEmailDayStats(Lead $lead): array
-    {
-        /** @var StatRepository $statRepository */
-        $statRepository = $this->em->getRepository(Stat::class);
-
-        return $statRepository->getEmailDayStats($lead);
-    }
-
-    /**
-     * @return array<int, array<string, int|string>>
-     *
-     * @throws Exception
-     */
-    public function getEmailTimeStats(Lead $lead): array
-    {
-        /** @var StatRepository $statRepository */
-        $statRepository = $this->em->getRepository(Stat::class);
-
-        return $statRepository->getEmailTimeStats($lead);
     }
 }

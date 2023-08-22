@@ -239,7 +239,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testGetEmailDayStats(): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
+        $emailModel     = $this->getContainer()->get('mautic.email.model.email');
+        $statRepository = $emailModel->getStatRepository();
+
         $hits         = rand(1, 5);
         $uniqueHits   = rand(1, $hits);
 
@@ -255,7 +257,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
         $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
 
-        $results = $emailModel->getEmailDayStats($lead);
+        $results = $statRepository->getEmailDayStats($lead);
 
         $this->assertCount(7, $results);
         $this->assertSame(
@@ -282,7 +284,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testGetEmailTimeStats(): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
+        $emailModel     = $this->getContainer()->get('mautic.email.model.email');
+        $statRepository = $emailModel->getStatRepository();
+
         $hits         = rand(1, 5);
         $uniqueHits   = rand(1, $hits);
 
@@ -298,7 +302,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
         $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
 
-        $results = $emailModel->getEmailTimeStats($lead);
+        $results = $statRepository->getEmailTimeStats($lead);
 
         $this->assertCount(24, $results);
         $this->assertSame(
