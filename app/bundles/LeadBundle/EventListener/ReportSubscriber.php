@@ -10,8 +10,10 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -92,9 +94,11 @@ class ReportSubscriber implements EventSubscriberInterface
      * @var Translator
      */
     private $translator;
+    private FieldModel $fieldModel;
 
     public function __construct(
         LeadModel $leadModel,
+        FieldModel $fieldModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
         EventCollector $eventCollector,
@@ -103,6 +107,7 @@ class ReportSubscriber implements EventSubscriberInterface
         FieldsBuilder $fieldsBuilder,
         Translator $translator
     ) {
+        $this->fieldModel        = $fieldModel;
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
@@ -123,6 +128,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
             ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
+            ReportEvents::REPORT_ON_COLUMN_COLLECT => ['onReportColumnCollect', 0],
         ];
     }
 
@@ -693,6 +699,38 @@ class ReportSubscriber implements EventSubscriberInterface
             }
             unset($queryBuilder);
         }
+    }
+
+    public function onReportColumnCollect(ColumnCollectEvent $event): void
+    {
+        if ('company' === $event->getObject()) {
+            $fields = $this->companyReportData->getCompanyData();
+            unset($fields['companies_lead.is_primary'], $fields['companies_lead.date_added']);
+            $event->addColumns($fields);
+
+            return;
+        }
+
+        $properties = $event->getProperties();
+        $prefix     = $properties['prefix'] ?? 'l.';
+
+        $fields     = [];
+        $leadFields = $this->fieldModel->getPublishedFieldArrays();
+        foreach ($leadFields as $fieldArray) {
+            $fields[$prefix.$fieldArray['alias']] = [
+                'label' => $this->translator->trans('mautic.lead.report.field.lead.label', ['%field%' => $fieldArray['label']]),
+                'type'  => $fieldArray['type'],
+                'alias' => $fieldArray['alias'],
+            ];
+        }
+        $fields[$prefix.'id'] = [
+            'label' => 'mautic.lead.report.contact_id',
+            'type'  => 'int',
+            'link'  => 'mautic_contact_action',
+            'alias' => 'contactId',
+        ];
+
+        $event->addColumns($fields);
     }
 
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
