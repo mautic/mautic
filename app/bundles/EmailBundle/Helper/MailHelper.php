@@ -351,6 +351,11 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
             $this->setReplyTo($this->replyTo);
         }
+
+        if (empty($this->message->getBcc()) && !empty($this->bcc)) {
+            $this->setBcc($this->bcc);
+        }
+
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
@@ -643,6 +648,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->replyTo             = $this->systemReplyTo;
+            $this->bcc                 = $this->systemBcc;
             $this->headers             = [];
             $this->source              = [];
             $this->assets              = [];
