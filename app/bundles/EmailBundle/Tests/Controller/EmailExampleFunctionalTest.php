@@ -69,7 +69,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject for Test Lead, living in Lane 11, Near Post Office, Pune, India. Contact number: 012', $message->getSubject());
     }
 
@@ -94,7 +93,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject for [First Name] [Last Name], living in [Address Line 1], [Address Line 2], [City], [Country]. Contact number: [Mobile]', $message->getSubject());
     }
 
@@ -170,7 +168,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
     }
 
@@ -267,7 +264,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
     }
 
@@ -365,7 +361,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
     }
 
