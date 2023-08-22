@@ -61,7 +61,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
-            'example_send[contact]'         => 'somebody',
             'example_send[contact_id]'      => $lead->getId(),
         ]);
         $this->client->submit($form);
@@ -172,7 +171,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
+        self::assertInstanceOf('SmtpTransport', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
     }
@@ -249,7 +248,6 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
                     'firstname' => 'John',
                     'lastname'  => 'A',
                     'email'     => 'john.a@email.com',
-                    'bool'      => true,
                 ],
             ]
         );
@@ -367,14 +365,13 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
-            'example_send[contact]'         => $contacts['contacts'][0]['firstname'],
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
         $message = $this->transport->sentMessage;
 
         // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
+        self::assertInstanceOf('SmtpTransport', $message);
         self::assertSame('admin@yoursite.com', key($message->getTo()));
         self::assertStringContainsString('Email subject', $message->getSubject());
     }
