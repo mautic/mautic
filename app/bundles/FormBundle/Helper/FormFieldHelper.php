@@ -183,12 +183,16 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
+    /**
+     * Search and replace the HTML of the form field with the value.
+     */
     public function populateField($field, $value, $formName, &$formHtml)
     {
         $alias = $field->getAlias();
 
         switch ($field->getType()) {
             case 'text':
+            case 'number':
             case 'email':
             case 'hidden':
             case 'tel':
