@@ -8,7 +8,6 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -38,11 +37,6 @@ class EmailExampleFunctionalTest extends AbstractMauticTestCase
     }
 
     /**
-     * @param object $object
-     * @param string $property
-     * @param $value
-     *
-     * @return void
      * @throws \ReflectionException
      */
     private function setPrivateProperty(object $object, string $property, $value): void
