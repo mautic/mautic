@@ -78,28 +78,27 @@ class GraphStatsController extends CommonController
      *
      * @throws Exception
      */
-    protected function getEmailDaysData(Lead $lead): array
+    public function getEmailDaysData(Lead $lead): array
     {
         /** @var EmailModel $model */
         $model          = $this->getModel('email');
         $statRepository = $model->getStatRepository();
-        $translator     = $this->translator;
 
         $stats       = $statRepository->getEmailDayStats($lead);
 
         $chart  = new BarChart([
-            $translator->trans('mautic.core.date.monday'),
-            $translator->trans('mautic.core.date.tuesday'),
-            $translator->trans('mautic.core.date.wednesday'),
-            $translator->trans('mautic.core.date.thursday'),
-            $translator->trans('mautic.core.date.friday'),
-            $translator->trans('mautic.core.date.saturday'),
-            $translator->trans('mautic.core.date.sunday'),
+            $this->translator->trans('mautic.core.date.monday'),
+            $this->translator->trans('mautic.core.date.tuesday'),
+            $this->translator->trans('mautic.core.date.wednesday'),
+            $this->translator->trans('mautic.core.date.thursday'),
+            $this->translator->trans('mautic.core.date.friday'),
+            $this->translator->trans('mautic.core.date.saturday'),
+            $this->translator->trans('mautic.core.date.sunday'),
         ]);
 
-        $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
-        $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
-        $chart->setDataset($translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
 
         return $chart->render();
     }
@@ -109,12 +108,11 @@ class GraphStatsController extends CommonController
      *
      * @throws Exception
      */
-    protected function getEmailHoursData(Lead $lead): array
+    public function getEmailHoursData(Lead $lead): array
     {
         /** @var EmailModel $model */
         $model          = $this->getModel('email');
         $statRepository = $model->getStatRepository();
-        $translator     = $this->translator;
 
         $stats = $statRepository->getEmailTimeStats($lead);
 
@@ -126,9 +124,9 @@ class GraphStatsController extends CommonController
         }
 
         $chart  = new BarChart($labels);
-        $chart->setDataset($translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
-        $chart->setDataset($translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
-        $chart->setDataset($translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.sent'), array_column($stats, 'sent_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.read'), array_column($stats, 'read_count'));
+        $chart->setDataset($this->translator->trans('mautic.email.click'), array_column($stats, 'hit_count'));
 
         return $chart->render();
     }
