@@ -4,16 +4,12 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Closure;
 use Doctrine\DBAL\Connection;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
-class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
+class QueryBuilder extends BaseQueryBuilder
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
     /**
      * @var ExpressionBuilder
      */
@@ -26,10 +22,13 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     private $logicStack = [];
 
+    private Connection $connection;
+
     public function __construct(Connection $connection)
     {
-        parent::__construct($connection);
         $this->connection = $connection;
+
+        parent::__construct($connection);
     }
 
     /**
@@ -41,16 +40,34 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->connection);
+        $this->_expr = new ExpressionBuilder($this->getConnection());
 
         return $this->_expr;
     }
 
+    /**
+     * Sets a query parameter for the query being constructed.
+     *
+     * <code>
+     *     $qb = $conn->createQueryBuilder()
+     *         ->select('u')
+     *         ->from('users', 'u')
+     *         ->where('u.id = :user_id')
+     *         ->setParameter(':user_id', 1);
+     * </code>
+     *
+     * @param string|int  $key   the parameter position or name
+     * @param mixed       $value the parameter value
+     * @param string|null $type  one of the PDO::PARAM_* constants
+     *
+     * @return $this this QueryBuilder instance
+     */
     public function setParameter($key, $value, $type = null)
     {
-        if (':' === substr($key, 0, 1)) {
+        if (str_starts_with($key, ':')) {
             // For consistency sake, remove the :
             $key = substr($key, 1);
+            @\trigger_error('Using query key with ":" is deprecated. Use key without ":" instead.', \E_USER_DEPRECATED);
         }
 
         if (is_bool($value)) {
@@ -61,111 +78,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param string $queryPartName
-     * @param mixed  $value
-     *
-     * @return $this
-     */
-    public function setQueryPart($queryPartName, $value)
-    {
-        $this->resetQueryPart($queryPartName);
-        $this->add($queryPartName, $value);
-
-        return $this;
-    }
-
-    public function getSQL()
-    {
-        $sql   = &$this->parentProperty('sql');
-        $state = &$this->parentProperty('state');
-
-        if (null !== $sql && self::STATE_CLEAN === $state) {
-            return $sql;
-        }
-
-        switch ($this->getType()) {
-            case self::INSERT:
-                $sql = $this->parentMethod('getSQLForInsert');
-                break;
-            case self::DELETE:
-                $sql = $this->parentMethod('getSQLForDelete');
-                break;
-
-            case self::UPDATE:
-                $sql = $this->parentMethod('getSQLForUpdate');
-                break;
-
-            case self::SELECT:
-            default:
-                $sql = $this->getSQLForSelect();
-                break;
-        }
-
-        $state = self::STATE_CLEAN;
-
-        return $sql;
-    }
-
-    private function getSQLForSelect(): string
-    {
-        $sqlParts = $this->getQueryParts();
-
-        $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
-            implode(', ', $sqlParts['select']);
-
-        $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.((string) $sqlParts['where']) : '')
-            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.((string) $sqlParts['having']) : '')
-            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
-
-        if ($this->parentMethod('isLimitQuery')) {
-            return $this->connection->getDatabasePlatform()->modifyLimitQuery(
-                $query,
-                $this->getMaxResults(),
-                $this->getFirstResult()
-            );
-        }
-
-        return $query;
-    }
-
-    private function getFromClauses(): array
-    {
-        $fromClauses  = [];
-        $knownAliases = [];
-
-        // Loop through all FROM clauses
-        foreach ($this->getQueryParts()['from'] as $from) {
-            if (null === $from['alias']) {
-                $tableSql       = $from['table'];
-                $tableReference = $from['table'];
-            } else {
-                $tableSql       = $from['table'].' '.$from['alias'];
-                $tableReference = $from['alias'];
-            }
-
-            if (isset($from['hint'])) {
-                $tableSql .= ' '.$from['hint'];
-            }
-
-            $knownAliases[$tableReference] = true;
-
-            $fromClauses[$tableReference] = $tableSql.Closure::bind(function ($tableReference, &$knownAliases) {
-                return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
-            }, $this, parent::class)($tableReference, $knownAliases);
-        }
-
-        $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
-
-        return $fromClauses;
-    }
-
-    /**
-     * @deprecated this method is not used anywhere and will be removed in the future
-     *
-     * @param $alias
-     *
      * @return bool
      */
     public function getJoinCondition($alias)
@@ -183,23 +95,32 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * Add AND condition to existing table alias.
      *
-     * @param $alias
-     * @param $expr
-     *
      * @return $this
      *
      * @throws QueryException
      */
     public function addJoinCondition($alias, $expr)
     {
-        $result = $parts = $this->getQueryPart('join');
-
+        $parts = $this->getQueryPart('join');
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
-                if ($join['joinAlias'] == $alias) {
-                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and ('.$expr.')';
-                    $inserted                            = true;
+                if ($join['joinAlias'] !== $alias) {
+                    continue;
                 }
+
+                $parts[$tbl][$key] = array_merge(
+                    $join,
+                    [
+                        'joinType'      => $join['joinType'],
+                        'joinTable'     => $join['joinTable'],
+                        'joinAlias'     => $join['joinAlias'],
+                        'joinCondition' => $join['joinCondition'].' and ('.$expr.')',
+                    ]
+                );
+                $this->add('join', $parts);
+                $inserted = true;
+
+                break;
             }
         }
 
@@ -207,37 +128,27 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             throw new QueryException('Inserting condition to nonexistent join '.$alias);
         }
 
-        $this->setQueryPart('join', $result);
-
         return $this;
     }
 
     /**
-     * @deprecated this method is not used anywhere and will be removed in the future
-     *
-     * @param $alias
-     * @param $expr
-     *
      * @return $this
      */
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
+        $this->resetQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
             }
+            $this->join($part['joinType'], $part['joinTable'], $part['joinAlias'], $parts['l'][$key]['joinCondition']);
         }
-
-        $this->setQueryPart('join', $parts);
 
         return $this;
     }
 
     /**
-     * @param $parameters
-     * @param $filterParameters
-     *
      * @return QueryBuilder
      */
     public function setParametersPairs($parameters, $filterParameters)
@@ -301,14 +212,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function guessPrimaryLeadContactIdColumn()
     {
         $parts     = $this->getQueryParts();
-
         $leadTable = $parts['from'][0]['alias'];
-        if (!isset($parts['join'][$leadTable])) {
-            return $leadTable.'.id';
+
+        if ('orp' === $leadTable) {
+            return 'orp.lead_id';
         }
 
-        if ('orp' == $leadTable) {
-            return 'orp.lead_id';
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
         }
 
         $joins     = $parts['join'][$leadTable];
@@ -350,6 +261,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
     /**
      * @param string $table
+     * @return bool
      */
     public function isJoinTable($table): bool
     {
@@ -368,21 +280,21 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
     /**
      * @return mixed|string
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDebugOutput()
     {
         $params = $this->getParameters();
         $sql    = $this->getSQL();
         foreach ($params as $key=>$val) {
-            if (!is_int($val) and !is_float($val) and !is_array($val)) {
+            if (!is_int($val) && !is_float($val) && !is_array($val)) {
                 $val = "'$val'";
             } elseif (is_array($val)) {
                 if (Connection::PARAM_STR_ARRAY === $this->getParameterType($key)) {
-                    $val = array_map(function ($value) {
-                        return "'$value'";
-                    }, $val);
+                    $val = array_map(static fn ($value) => "'$value'", $val);
                 }
-                $val = join(', ', $val);
+                $val = implode(', ', $val);
             }
             $sql = str_replace(":{$key}", $val, $sql);
         }
@@ -418,8 +330,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param $expression
-     *
      * @return $this
      */
     private function addLogicStack($expression)
@@ -432,9 +342,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
-     *
-     * @param $expression
-     * @param $glue
      */
     public function addLogic($expression, $glue)
     {
@@ -482,32 +389,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
     public function createQueryBuilder(Connection $connection = null): QueryBuilder
     {
-        $connection = $connection ?: $this->getConnection();
+        $connection = $connection ?: $this->connection;
 
         return new self($connection);
-    }
-
-    /**
-     * @return mixed
-     *
-     * @noinspection PhpPassByRefInspection
-     */
-    private function &parentProperty(string $property)
-    {
-        return Closure::bind(function &() use ($property) {
-            return $this->$property;
-        }, $this, parent::class)();
-    }
-
-    /**
-     * @param mixed ...$arguments
-     *
-     * @return mixed
-     */
-    private function parentMethod(string $method, ...$arguments)
-    {
-        return Closure::bind(function () use ($method, $arguments) {
-            return $this->$method(...$arguments);
-        }, $this, parent::class)();
     }
 }

@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -35,7 +26,7 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 $qb->expr()->in("$alias.lead_id", ':contactIds')
             )
-                ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+                ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
         } elseif ($minContactId && $maxContactId) {
             $qb->andWhere(
                 "$alias.lead_id BETWEEN :minContactId AND :maxContactId"
@@ -86,7 +77,7 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 $qb->expr()->in("IDENTITY($alias.lead)", ':contactIds')
             )
-                ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+                ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
         } elseif ($minContactId && $maxContactId) {
             $qb->andWhere(
                 "IDENTITY($alias.lead) BETWEEN :minContactId AND :maxContactId"

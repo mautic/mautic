@@ -1,0 +1,67 @@
+{#
+  Variables
+    - item
+#}
+{% set fields = item.fields %}
+<tr class="{% if highlight is defined %}warning{% endif %}">
+    <td>
+        {% set hasEditAccess = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.permissionUser) %}
+        {% set custom = [{
+            'attr': {
+                'href': path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}),
+                'data-toggle': 'ajax',
+                'data-method': 'POST',
+            },
+            'btnText': 'mautic.core.details',
+            'iconClass': 'fa fa-info-circle',
+        }] %}
+
+        {% if hasEditAccess and currentList is not empty %}
+            {# this lead was manually added to a list so give an option to remove them #}
+            {% set custom = custom|merge([{
+                'attr': {
+                    'href': path('mautic_segment_action', {'objectAction': 'removeLead', 'objectId': currentList.id, 'leadId': item.id}),
+                    'data-toggle': 'ajax',
+                    'data-method': 'POST',
+                },
+                'btnText': 'mautic.lead.lead.remove.fromlist',
+                'iconClass': 'fa fa-remove',
+            }]) %}
+        {% endif %}
+
+        {% if fields['core']['email']['value'] is not empty %}
+            {% set custom = custom|merge([{
+                'attr': {
+                    'data-toggle': 'ajaxmodal',
+                    'data-target': '#MauticSharedModal',
+                    'data-header': 'mautic.lead.email.send_email.header'|trans({'%email%': fields['core']['email']['value']}),
+                    'href': path('mautic_contact_action', {'objectId': item.id, 'objectAction': 'email', 'list': 1}),
+                },
+                'btnText': 'mautic.lead.email.send_email',
+                'iconClass': 'fa fa-send',
+            }]) %}
+        {% endif %}
+
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+            'item': item,
+            'templateButtons': {
+                'edit': hasEditAccess,
+                'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], item.permissionUser),
+            },
+            'routeBase': 'contact',
+            'langVar': 'lead.lead',
+            'customButtons': custom,
+        }) }}
+    </td>
+    {% for column, label in columns %}
+        {{ include(['@MauticLead/Lead/_list_column_'~column~'.html.twig', '@MauticLead/Lead/_list_column_default.html.twig'], {
+              'item': item,
+              'fields': fields,
+              'label': label,
+              'column': column,
+              'columns': columns,
+              'noContactList': noContactList,
+              'class': (column in columns|keys) ? 'hidden-xs' : '',
+        }) }}
+    {% endfor %}
+</tr>

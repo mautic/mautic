@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\SmsEvents;
@@ -25,9 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class ReplyHelper.
- */
 class ReplyHelper
 {
     /**
@@ -45,9 +32,6 @@ class ReplyHelper
      */
     private $contactTracker;
 
-    /**
-     * ReplyHelper constructor.
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -74,7 +58,7 @@ class ReplyHelper
     public function handleRequest(CallbackInterface $handler, Request $request)
     {
         // Set the default response
-        $response = $this->getDefaultResponse($handler);
+        $response = new Response();
 
         try {
             $message  = $handler->getMessage($request);
@@ -104,7 +88,7 @@ class ReplyHelper
                     '%s: %s was not found. The message sent was "%s"',
                     $handler->getTransportName(),
                     $exception->getNumber(),
-                    isset($message) ? $message : 'unknown'
+                    !empty($message) ? $message : 'unknown'
                 )
             );
         }
@@ -112,37 +96,12 @@ class ReplyHelper
         return $response;
     }
 
-    /**
-     * @param string $message
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    private function dispatchReplyEvent(Lead $contact, $message)
+    private function dispatchReplyEvent(Lead $contact, string $message): ?Response
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 
-        $this->eventDispatcher->dispatch(SmsEvents::ON_REPLY, $replyEvent);
+        $this->eventDispatcher->dispatch($replyEvent, SmsEvents::ON_REPLY);
 
         return $replyEvent->getResponse();
-    }
-
-    /**
-     * @return Response
-     *
-     * @throws \Exception
-     */
-    private function getDefaultResponse(CallbackInterface $handler)
-    {
-        if ($handler instanceof ResponseInterface) {
-            $response = $handler->getResponse();
-
-            if (!$response instanceof Response) {
-                throw new \Exception('getResponse must return a Symfony\Component\HttpFoundation\Response object');
-            }
-
-            return $response;
-        }
-
-        return new Response();
     }
 }

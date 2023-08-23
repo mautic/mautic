@@ -2,16 +2,12 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
+
+use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
+use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
+use Predis\Client;
+use Predis\Connection\Aggregate\SentinelReplication;
 
 /**
  * Helper functions for simpler operations with arrays.
@@ -74,5 +70,25 @@ class PRedisConnectionHelper
         }
 
         return $redisOptions;
+    }
+
+    /**
+     * @param mixed[] $endpoints
+     * @param mixed[] $inputOptions
+     */
+    public static function createClient(array $endpoints, array $inputOptions): Client
+    {
+        $replication = $inputOptions['replication'] ?? null;
+
+        if ('sentinel' === $replication) {
+            $inputOptions['aggregate'] = fn () => fn ($sentinels, $options) => new SentinelReplication(
+                $options->service,
+                $sentinels,
+                $options->connections,
+                new MasterOnlyStrategy(StrategyConfig::fromArray($inputOptions))
+            );
+        }
+
+        return new Client($endpoints, $inputOptions);
     }
 }

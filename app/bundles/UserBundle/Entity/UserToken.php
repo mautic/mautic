@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -37,7 +28,7 @@ class UserToken
     private $secret;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $expiration = null;
 
@@ -140,7 +131,7 @@ class UserToken
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getExpiration()
     {

@@ -1,22 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
@@ -36,7 +26,7 @@ class MessageSchedule
     private $coreParametersHelper;
 
     /**
-     * @var Router
+     * @var UrlGeneratorInterface
      */
     private $router;
 
@@ -44,7 +34,7 @@ class MessageSchedule
         TranslatorInterface $translator,
         FileProperties $fileProperties,
         CoreParametersHelper $coreParametersHelper,
-        Router $router
+        UrlGeneratorInterface $router
     ) {
         $this->translator           = $translator;
         $this->fileProperties       = $fileProperties;

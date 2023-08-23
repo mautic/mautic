@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
@@ -60,8 +51,6 @@ class InstagramIntegration extends SocialIntegration
     }
 
     /**
-     * @param $endpoint
-     *
      * @return string
      */
     public function getApiUrl($endpoint)
@@ -95,7 +84,7 @@ class InstagramIntegration extends SocialIntegration
     {
         $socialCache['has']['activity'] = false;
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
-            //get more than 10 so we can weed out videos
+            // get more than 10 so we can weed out videos
             $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), ['count' => 20]);
 
             $socialCache['activity'] = [
@@ -165,8 +154,8 @@ class InstagramIntegration extends SocialIntegration
 
         if (!empty($data->data)) {
             foreach ($data->data as $user) {
-                //its possible that instagram may return multiple users if the username is a base of another
-                //for example, search for alan may return alanh, alanhartless, etc
+                // its possible that instagram may return multiple users if the username is a base of another
+                // for example, search for alan may return alanh, alanhartless, etc
                 if (strtolower($user->username) == strtolower($identifier)) {
                     $socialCache['id'] = $user->id;
                     break;

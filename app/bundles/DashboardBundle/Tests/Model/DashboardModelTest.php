@@ -2,25 +2,24 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DashboardModelTest extends TestCase
 {
@@ -56,23 +55,31 @@ class DashboardModelTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->filesystem           = $this->createMock(Filesystem::class);
+        $this->session              = $this->createMock(Session::class);
+        $requestStack               = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')
+            ->willReturn($this->session);
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
             $this->pathsHelper,
-            $this->filesystem
+            $this->filesystem,
+            $requestStack,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class)
         );
-
-        $this->session = $this->createMock(Session::class);
-
-        $this->model->setSession($this->session);
     }
 
     public function testGetDefaultFilterFromSession(): void
     {
         $dateFromStr = '-1 month';
         $dateFrom    = new \DateTime($dateFromStr);
-        $dateTo      = new \DateTime();
+        $dateTo      = new \DateTime('23:59:59'); // till end of the 'to' date selected
 
         $this->coreParametersHelper->expects(self::once())
             ->method('get')

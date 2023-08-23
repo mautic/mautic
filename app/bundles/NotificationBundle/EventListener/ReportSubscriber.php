@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -23,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
-    const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
+    public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+    public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
     /**
      * @var Connection

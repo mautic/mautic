@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ChannelBroadcastEvent.
@@ -74,6 +65,16 @@ class ChannelBroadcastEvent extends Event
     private $batch = 50;
 
     /**
+     * @var int|null
+     */
+    private $maxThreads;
+
+    /**
+     * @var int|null
+     */
+    private $threadId;
+
+    /**
      * MaintenanceEvent constructor.
      */
     public function __construct($channel, $channelId, OutputInterface $output)
@@ -122,8 +123,6 @@ class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @param $channel
-     *
      * @return bool
      */
     public function checkContext($channel)
@@ -205,5 +204,25 @@ class ChannelBroadcastEvent extends Event
     public function getBatch()
     {
         return $this->batch;
+    }
+
+    public function getMaxThreads(): ?int
+    {
+        return $this->maxThreads;
+    }
+
+    public function setMaxThreads(?int $maxThreads): void
+    {
+        $this->maxThreads = $maxThreads;
+    }
+
+    public function getThreadId(): ?int
+    {
+        return $this->threadId;
+    }
+
+    public function setThreadId(?int $threadId): void
+    {
+        $this->threadId = $threadId;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -42,9 +33,6 @@ class StatHelper
         $this->repo = $statRepository;
     }
 
-    /**
-     * @param $emailAddress
-     */
     public function storeStat(Stat $stat, $emailAddress)
     {
         $this->repo->saveEntity($stat);
@@ -53,7 +41,7 @@ class StatHelper
         $this->stats[$emailAddress] = new Reference($stat);
 
         // clear stat from doctrine memory
-        $this->repo->clear();
+        $this->repo->detachEntity($stat);
     }
 
     public function deletePending()
@@ -69,8 +57,6 @@ class StatHelper
     }
 
     /**
-     * @param $emailAddress
-     *
      * @return Reference
      *
      * @throws StatNotFoundException

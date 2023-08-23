@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -38,7 +29,7 @@ class ConfigMonitoredEmailType extends AbstractType
             // Default email bundles
             $event->addFolder('general', '', 'mautic.email.config.monitored_email.general');
 
-            $this->dispatcher->dispatch(EmailEvents::MONITORED_EMAIL_CONFIG, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::MONITORED_EMAIL_CONFIG);
 
             $folderSettings = $event->getFolders();
             foreach ($folderSettings as $key => $settings) {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -50,13 +41,14 @@ class PageListType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => function (Options $options) use ($model, $canViewOther) {
-                    $choices = [];
-                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
+                    $choices       = [];
+                    $publishedOnly = $options['published_only'] ?? false;
+                    $pages         = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
                     foreach ($pages as $page) {
                         $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices);
 
                     foreach ($choices as &$pages) {
@@ -74,15 +66,7 @@ class PageListType extends AbstractType
                 ]
         );
 
-        $resolver->setDefined(['top_level', 'ignore_ids']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'page_list';
+        $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
     /**

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -21,9 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProcessReplySubscriber implements EventSubscriberInterface
 {
-    const BUNDLE     = 'EmailBundle';
-    const FOLDER_KEY = 'replies';
-    const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
+    public const BUNDLE     = 'EmailBundle';
+    public const FOLDER_KEY = 'replies';
+    public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
     /**
      * @var Reply

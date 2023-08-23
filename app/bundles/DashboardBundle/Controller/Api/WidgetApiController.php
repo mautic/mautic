@@ -1,39 +1,51 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Mautic\DashboardBundle\Model\DashboardModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class WidgetApiController.
+ * @extends CommonApiController<Widget>
  */
 class WidgetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var DashboardModel|null
+     */
+    protected $model = null;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel('dashboard');
-        $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
+        $dashboardModel = $modelFactory->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
+
+        $this->model            = $dashboardModel;
+        $this->entityClass      = Widget::class;
         $this->entityNameOne    = 'widget';
         $this->entityNameMulti  = 'widgets';
         $this->serializerGroups = [];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -45,8 +57,8 @@ class WidgetApiController extends CommonApiController
     {
         $dispatcher = $this->dispatcher;
         $event      = new WidgetTypeListEvent();
-        $event->setTranslator($this->get('translator'));
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $event->setTranslator($this->translator);
+        $dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
         $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -59,15 +71,15 @@ class WidgetApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getDataAction($type)
+    public function getDataAction(Request $request, $type)
     {
         $start      = microtime(true);
-        $timezone   = InputHelper::clean($this->request->get('timezone', null));
-        $from       = InputHelper::clean($this->request->get('dateFrom', null));
-        $to         = InputHelper::clean($this->request->get('dateTo', null));
-        $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
-        $unit       = InputHelper::clean($this->request->get('timeUnit', 'Y'));
-        $dataset    = InputHelper::clean($this->request->get('dataset', []));
+        $timezone   = InputHelper::clean($request->get('timezone', null));
+        $from       = InputHelper::clean($request->get('dateFrom', null));
+        $to         = InputHelper::clean($request->get('dateTo', null));
+        $dataFormat = InputHelper::clean($request->get('dataFormat', null));
+        $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
+        $dataset    = InputHelper::clean($request->get('dataset', []));
         $response   = ['success' => 0];
 
         try {
@@ -85,20 +97,20 @@ class WidgetApiController extends CommonApiController
         }
 
         $params = [
-            'timeUnit'   => InputHelper::clean($this->request->get('timeUnit', 'Y')),
-            'dateFormat' => InputHelper::clean($this->request->get('dateFormat', null)),
+            'timeUnit'   => InputHelper::clean($request->get('timeUnit', 'Y')),
+            'dateFormat' => InputHelper::clean($request->get('dateFormat', null)),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => (int) $this->request->get('limit', null),
-            'filter'     => InputHelper::clean($this->request->get('filter', [])),
+            'limit'      => (int) $request->get('limit', null),
+            'filter'     => InputHelper::clean($request->get('filter', [])),
             'dataset'    => $dataset,
         ];
 
         // Merge filters into the root array as well as that's how widget edit forms send them.
         $params = array_merge($params, $params['filter']);
 
-        $cacheTimeout = (int) $this->request->get('cacheTimeout', 0);
-        $widgetHeight = (int) $this->request->get('height', 300);
+        $cacheTimeout = (int) $request->get('cacheTimeout', 0);
+        $widgetHeight = (int) $request->get('height', 300);
 
         $widget = new Widget();
         $widget->setParams($params);

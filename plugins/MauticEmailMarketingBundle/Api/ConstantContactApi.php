@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -50,8 +41,6 @@ class ConstantContactApi extends EmailMarketingApi
     }
 
     /**
-     * @param       $email
-     * @param       $listId
      * @param array $fields
      * @param array $config
      *

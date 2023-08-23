@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class TagRepository.
+ * @extends CommonRepository<Tag>
  */
 class TagRepository extends CommonRepository
 {
@@ -33,7 +24,7 @@ class TagRepository extends CommonRepository
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
             ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->execute()->fetch();
+        $delete = $qb->execute()->fetchAssociative();
 
         if (count($delete)) {
             $qb->resetQueryParts();
@@ -85,8 +76,6 @@ class TagRepository extends CommonRepository
     /**
      * Check Lead tags by Ids.
      *
-     * @param $tags
-     *
      * @return bool
      */
     public function checkLeadByTags(Lead $lead, $tags)
@@ -101,7 +90,7 @@ class TagRepository extends CommonRepository
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('t.tag', ':tags'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -109,7 +98,7 @@ class TagRepository extends CommonRepository
             ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -119,16 +108,15 @@ class TagRepository extends CommonRepository
      */
     public function getTagByNameOrCreateNewOne($name)
     {
-        $tag = $this->findOneBy(
+        $tag = new Tag($name, true);
+
+        /** @var Tag|null $existingTag */
+        $existingTag = $this->findOneBy(
             [
-                'tag' => $name,
+                'tag' => $tag->getTag(),
             ]
         );
 
-        if (!$tag) {
-            $tag = new Tag($name);
-        }
-
-        return $tag;
+        return $existingTag ?? $tag;
     }
 }

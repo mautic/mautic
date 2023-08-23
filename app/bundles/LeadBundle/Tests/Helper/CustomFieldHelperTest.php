@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -101,9 +92,9 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'customdate'         => (new DateTimeHelper('-1 day'))->getString('Y-m-d'),
-            'customdatetime'     => (new DateTimeHelper('-1 day'))->getString('Y-m-d H:i:s'),
-            'customtime'         => (new DateTimeHelper('-20 minutes'))->getString('H:i:s'),
+            'customdate'         => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d'),
+            'customdatetime'     => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d H:i:s'),
+            'customtime'         => (new DateTimeHelper('-20 minutes'))->toLocalString('H:i:s'),
             'customnulldatetime' => null,
         ];
 

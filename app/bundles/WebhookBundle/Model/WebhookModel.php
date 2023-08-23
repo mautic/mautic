@@ -1,23 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
@@ -31,19 +26,27 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
+/**
+ * @extends FormModel<Webhook>
+ */
 class WebhookModel extends FormModel
 {
     /**
      *  2 possible types of the processing of the webhooks.
      */
-    const COMMAND_PROCESS   = 'command_process';
-    const IMMEDIATE_PROCESS = 'immediate_process';
+    public const COMMAND_PROCESS   = 'command_process';
+    public const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;
+
+    public const WEBHOOK_LOG_MAX = 1000;
 
     /**
      * Whet queue mode is turned on.
@@ -113,11 +116,6 @@ class WebhookModel extends FormModel
     private $httpClient;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * Timestamp when the webhook processing starts.
      *
      * @var float
@@ -128,12 +126,19 @@ class WebhookModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
         Client $httpClient,
-        EventDispatcherInterface $eventDispatcher
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
         $this->httpClient        = $httpClient;
-        $this->eventDispatcher   = $eventDispatcher;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -149,27 +154,27 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook $entity
-     * @param         $formFactory
-     * @param null    $action
+     * @param Webhook      $entity
+     * @param null         $action
+     * @param array<mixed> $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $params = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
         }
 
         if (!empty($action)) {
-            $params['action'] = $action;
+            $options['action'] = $action;
         }
 
-        $params['events'] = $this->getEvents();
+        $options['events'] = $this->getEvents();
 
-        return $formFactory->create(WebhookType::class, $entity, $params);
+        return $formFactory->create(WebhookType::class, $entity, $options);
     }
 
     /**
@@ -202,10 +207,10 @@ class WebhookModel extends FormModel
         static $events;
 
         if (empty($events)) {
-            //build them
+            // build them
             $events = [];
             $event  = new Events\WebhookBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD);
             $events = $event->getEvents();
         }
 
@@ -224,11 +229,6 @@ class WebhookModel extends FormModel
         return $this->getEventRepository()->getEntitiesByEventType($type);
     }
 
-    /**
-     * @param $type
-     * @param $payload
-     * @param $groups
-     */
     public function queueWebhooksByType($type, $payload, array $groups = [])
     {
         return $this->queueWebhooks(
@@ -238,10 +238,6 @@ class WebhookModel extends FormModel
         );
     }
 
-    /**
-     * @param $webhookEvents
-     * @param $payload
-     */
     public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
     {
         if (!count($webhookEvents) || !is_array($webhookEvents)) {
@@ -266,9 +262,6 @@ class WebhookModel extends FormModel
     /**
      * Creates a WebhookQueue entity, sets the date and returns the created entity.
      *
-     * @param $event
-     * @param $payload
-     *
      * @return WebhookQueue
      */
     public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = [])
@@ -284,7 +277,7 @@ class WebhookModel extends FormModel
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
             $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_QUEUE_ON_ADD, $webhookQueueEvent);
+            $this->dispatcher->dispatch($webhookQueueEvent, WebhookEvents::WEBHOOK_QUEUE_ON_ADD);
         }
 
         return $queue;
@@ -340,7 +333,7 @@ class WebhookModel extends FormModel
 
             $responseStatusCode = $response->getStatusCode();
 
-            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
+            $this->addLog($webhook, $responseStatusCode, microtime(true) - $start, $responseBody);
 
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
@@ -360,10 +353,10 @@ class WebhookModel extends FormModel
             }
 
             // log any errors but allow the script to keep running
-            $this->logger->addError($message);
+            $this->logger->error($message);
 
             // log that the request failed to display it to the user
-            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
+            $this->addLog($webhook, 'N/A', microtime(true) - $start, $message);
 
             return false;
         }
@@ -423,7 +416,7 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
 
         $event = new WebhookEvent($webhook, false, $reason);
-        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
+        $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
     }
 
     /**
@@ -432,25 +425,26 @@ class WebhookModel extends FormModel
      * @param int    $statusCode
      * @param float  $runtime    in seconds
      * @param string $note
+     *                           $runtime variable unit is in seconds
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
-        $log = new Log();
-
-        if ($webhook->getId()) {
-            $log->setWebhook($webhook);
-            $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        if (!$webhook->getId()) {
+            return;
         }
 
+        if (!$this->coreParametersHelper->get('clean_webhook_logs_in_background')) {
+            $this->getLogRepository()->removeLimitExceedLogs($webhook->getId(), $this->logMax);
+        }
+
+        $log = new Log();
+        $log->setWebhook($webhook);
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
-
-        if ($webhook->getId()) {
-            $this->saveEntity($webhook);
-        }
+        $this->saveEntity($webhook);
     }
 
     /**
@@ -579,11 +573,6 @@ class WebhookModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null)
@@ -614,7 +603,7 @@ class WebhookModel extends FormModel
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -623,7 +612,6 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param       $payload
      * @param array $groups
      *
      * @return mixed|string
@@ -635,7 +623,7 @@ class WebhookModel extends FormModel
             $context->setGroups($groups);
         }
 
-        //Only include FormEntity properties for the top level entity and not the associated entities
+        // Only include FormEntity properties for the top level entity and not the associated entities
         $context->addExclusionStrategy(
             new PublishDetailsExclusionStrategy()
         );
@@ -644,7 +632,7 @@ class WebhookModel extends FormModel
             $context->addExclusionStrategy($exclusionStrategy);
         }
 
-        //include null values
+        // include null values
         $context->setSerializeNull(true);
 
         // serialize the data and send it as a payload
@@ -676,7 +664,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }

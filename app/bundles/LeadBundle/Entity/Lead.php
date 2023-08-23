@@ -1,37 +1,34 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS     = '';
-    const POINTS_ADD      = 'plus';
-    const POINTS_SUBTRACT = 'minus';
-    const POINTS_MULTIPLY = 'times';
-    const POINTS_DIVIDE   = 'divide';
+    public const FIELD_ALIAS     = '';
+    public const POINTS_ADD      = 'plus';
+    public const POINTS_SUBTRACT = 'minus';
+    public const POINTS_MULTIPLY = 'times';
+    public const POINTS_DIVIDE   = 'divide';
+    public const DEFAULT_ALIAS   = 'l';
 
     /**
      * Used to determine social identity.
@@ -41,7 +38,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $availableSocialFields = [];
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -72,14 +69,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $zipcode;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $timezone;
 
     private $country;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -99,7 +96,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $updatedPoints;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -109,32 +106,32 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $actualPoints;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\CoreBundle\Entity\IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
      */
     private $pushIds;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
      */
     private $eventLog;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -166,17 +163,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $newlyCreated = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateIdentified;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadNote>
      */
     private $notes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $preferredProfileImage = 'gravatar';
 
@@ -186,29 +183,34 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public $imported = false;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var FrequencyRule[]
+     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
      */
     private $frequencyRules;
+
+    /**
+     * @var ArrayCollection<int,GroupContactScore>
+     */
+    private $groupScores;
 
     private $primaryCompany;
 
@@ -230,6 +232,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
+        $this->groupScores      = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -382,6 +385,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->fetchExtraLazy()
             ->build();
 
+        $builder->createOneToMany('groupScores', GroupContactScore::class)
+            ->mappedBy('contact')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
         self::loadFixedFieldMetadata(
             $builder,
             [
@@ -407,8 +416,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -460,6 +467,21 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'firstname',
+            'lastname',
+            'company',
+            'email',
+        ];
     }
 
     /**
@@ -555,7 +577,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
 
         return $this;
     }
@@ -567,7 +589,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -586,9 +608,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get owner.
-     *
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {
@@ -848,8 +868,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Set by the repository method when points are updated and requeried directly on the DB side.
-     *
-     * @param $points
      */
     public function setActualPoints($points)
     {
@@ -873,13 +891,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Creates a points change entry.
-     *
-     * @param $type
-     * @param $name
-     * @param $action
-     * @param $pointChanges
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -895,6 +908,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
+        if ($group) {
+            $event->setGroup($group);
+        }
         $this->addPointsChangeLog($event);
     }
 
@@ -912,14 +928,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Creates a points change entry.
-     *
-     * @param $stage
-     * @param $name
-     * @param $action
      */
     public function stageChangeLogEntry($stage, $name, $action)
     {
-        //create a new points change event
+        // create a new points change event
         $event = new StagesChangeLog();
         $event->setStage($stage);
         $event->setEventName($name);
@@ -942,7 +954,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @return StagesChangeLog
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     public function getStageChangeLog()
     {
@@ -968,16 +980,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param      $type
-     * @param      $name
-     * @param      $action
      * @param null $company
      */
-    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
             // No need to record a null delta
-            return;
+            return null;
         }
 
         // Create a new company change event
@@ -989,6 +998,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $event->setCompany($company);
         $event->setLead($this);
         $this->addCompanyChangeLog($event);
+
+        return $event;
     }
 
     /**
@@ -1004,7 +1015,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @return CompanyChangeLog
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1012,7 +1023,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param      $identifier
      * @param bool $enabled
      * @param bool $mobile
      *
@@ -1062,7 +1072,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
      */
     public function getPushIDs()
     {
@@ -1112,17 +1122,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
-    public function getDoNotContact()
+    public function getDoNotContact(): Collection
     {
         return $this->doNotContact;
     }
 
     /**
      * Set internal storage.
-     *
-     * @param $internal
      */
     public function setInternal($internal)
     {
@@ -1141,8 +1149,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Set social cache.
-     *
-     * @param $cache
      */
     public function setSocialCache($cache)
     {
@@ -1351,8 +1357,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Set tags.
      *
-     * @param $tags
-     *
      * @return $this
      */
     public function setTags($tags)
@@ -1374,8 +1378,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Set utm tags.
-     *
-     * @param $utmTags
      *
      * @return $this
      */
@@ -1411,7 +1413,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get stage.
      *
-     * @return \Mautic\StageBundle\Entity\Stage
+     * @return \Mautic\StageBundle\Entity\Stage|null
      */
     public function getStage()
     {
@@ -1427,7 +1429,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setFrequencyRules($frequencyRules)
     {
-        $this->frequencyRules = $frequencyRules;
+        $this->frequencyRules = new \Doctrine\Common\Collections\ArrayCollection($frequencyRules);
 
         return $this;
     }
@@ -1435,7 +1437,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get frequency rules.
      *
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
      */
     public function getFrequencyRules()
     {
@@ -1989,5 +1991,44 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
 
         return $rules;
+    }
+
+    /**
+     * @return ArrayCollection<int,GroupContactScore>
+     */
+    public function getGroupScores(): Collection
+    {
+        return $this->groupScores;
+    }
+
+    public function getGroupScore(Group $group): ?GroupContactScore
+    {
+        foreach ($this->groupScores as $groupScore) {
+            if ($groupScore->getGroup() === $group) {
+                return $groupScore;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     */
+    public function setGroupScores($groupScores): void
+    {
+        $this->groupScores = $groupScores;
+    }
+
+    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    {
+        $this->groupScores[] = $groupContactScore;
+
+        return $this;
+    }
+
+    public function removeGroupScore(GroupContactScore $groupContactScore): void
+    {
+        $this->groupScores->removeElement($groupContactScore);
     }
 }

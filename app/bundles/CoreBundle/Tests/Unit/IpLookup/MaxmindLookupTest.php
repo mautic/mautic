@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
@@ -165,7 +156,7 @@ RESPONSE);
 
     public function testCountryIpLookupSuccessful()
     {
-        $ipService = new MaxmindCountryLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindCountryLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -174,7 +165,7 @@ RESPONSE);
 
     public function testOmniIpLookupSuccessful()
     {
-        $ipService = new MaxmindOmniLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindOmniLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -183,7 +174,7 @@ RESPONSE);
 
     public function testPrecisionIpLookupSuccessful()
     {
-        $ipService = new MaxmindPrecisionLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindPrecisionLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 

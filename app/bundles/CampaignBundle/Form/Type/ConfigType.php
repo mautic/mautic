@@ -1,26 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'campaign_time_wait_on_event_false',
@@ -52,9 +41,33 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $builder->add(
+            'campaign_by_range',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.campaignconfig.campaign_by_range',
+                'attr'  => [
+                    'tooltip' => 'mautic.campaignconfig.campaign_by_range.tooltip',
+                ],
+                'data'  => (bool) ($options['data']['campaign_by_range'] ?? false),
+            ]
+        );
+
+        $builder->add(
+            'campaign_use_summary',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.campaignconfig.use_summary',
+                'attr'  => [
+                    'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
+                ],
+                'data'  => (bool) ($options['data']['campaign_use_summary'] ?? false),
+            ]
+        );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignconfig';
     }

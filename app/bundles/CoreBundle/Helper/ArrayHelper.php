@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 /**
@@ -78,6 +69,61 @@ class ArrayHelper
     }
 
     /**
+     * Removes null and empty string values from the array.
+     *
+     * @param mixed[] $array
+     *
+     * @return mixed[]
+     */
+    public static function removeEmptyValues(array $array): array
+    {
+        return array_filter(
+            $array,
+            function ($value) {
+                return !is_null($value) && '' !== $value;
+            }
+        );
+    }
+
+    /**
+     * Flip array or sub arrays.
+     *
+     * @param array<int|string|array<int|string>> $masterArrays
+     *
+     * @return array<int|string|array<int|string>>
+     */
+    public static function flipArray(array $masterArrays): array
+    {
+        if (!is_array(end($masterArrays))) {
+            return array_flip($masterArrays);
+        }
+
+        return array_map(
+            fn (array $subArray) => array_flip($subArray),
+            $masterArrays
+        );
+    }
+
+    /**
+     * @param array<mixed> $multidimensionalArray
+     *
+     * @return array<mixed>
+     */
+    public static function flatten(array $multidimensionalArray): array
+    {
+        $flattenedArray = [];
+
+        array_walk_recursive(
+            $multidimensionalArray,
+            function ($value, $key) use (&$flattenedArray) {
+                $flattenedArray[$key] = $value;
+            }
+        );
+
+        return $flattenedArray;
+    }
+
+    /**
      *  SUM/SUBSTRACT between two arrays.
      *
      * @param bool $subtracted
@@ -86,7 +132,7 @@ class ArrayHelper
      */
     private static function sumOrSub(array $a1, array $b2, $subtracted = false)
     {
-        return  array_map(function ($x, $y) use ($subtracted) {
+        return array_map(function ($x, $y) use ($subtracted) {
             if ($subtracted) {
                 return $x - $y;
             } else {

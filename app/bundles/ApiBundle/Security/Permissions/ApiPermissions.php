@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -70,7 +61,7 @@ class ApiPermissions extends AbstractPermissions
      */
     public function getValue($name, $perm)
     {
-        //ensure api is enabled system wide
+        // ensure api is enabled system wide
         if (empty($this->params['api_enabled'])) {
             return 0;
         }

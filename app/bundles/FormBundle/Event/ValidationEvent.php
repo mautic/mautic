@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -63,9 +54,6 @@ class ValidationEvent extends CommonEvent
         return $this->value;
     }
 
-    /**
-     * @param $reason
-     */
     public function failedValidation($reason)
     {
         $this->valid         = false;

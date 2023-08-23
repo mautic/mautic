@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -86,7 +77,7 @@ class ActionDispatcher
 
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($customEvent, $pendingEvent);
+            $this->dispatcher->dispatch($pendingEvent, $customEvent);
 
             $success = $pendingEvent->getSuccessful();
             $failed  = $pendingEvent->getFailures();
@@ -107,7 +98,7 @@ class ActionDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
+        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, $customEvent, $pendingEvent);
 
         return $pendingEvent;
     }
@@ -120,14 +111,14 @@ class ActionDispatcher
 
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_EXECUTED,
-                new ExecutedEvent($config, $log)
+                new ExecutedEvent($config, $log),
+                CampaignEvents::ON_EVENT_EXECUTED
             );
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
-            new ExecutedBatchEvent($config, $event, $logs)
+            new ExecutedBatchEvent($config, $event, $logs),
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH
         );
     }
 
@@ -140,12 +131,12 @@ class ActionDispatcher
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
             );
 
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_FAILED,
-                new FailedEvent($config, $log)
+                new FailedEvent($config, $log),
+                CampaignEvents::ON_EVENT_FAILED
             );
 
             $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());

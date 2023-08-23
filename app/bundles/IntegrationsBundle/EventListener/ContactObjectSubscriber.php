@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
@@ -23,23 +14,17 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class ContactObjectSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
+    private ContactObjectHelper $contactObjectHelper;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(
         ContactObjectHelper $contactObjectHelper,
-        Router $router
+        RouterInterface $router
     ) {
         $this->contactObjectHelper = $contactObjectHelper;
         $this->router              = $router;

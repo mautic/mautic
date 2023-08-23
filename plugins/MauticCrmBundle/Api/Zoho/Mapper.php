@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
@@ -57,8 +48,6 @@ class Mapper
     }
 
     /**
-     * @param $object
-     *
      * @return $this
      */
     public function setObject($object)
@@ -147,8 +136,6 @@ class Mapper
     }
 
     /**
-     * @param $fieldName
-     *
      * @return mixed
      */
     private function getField($fieldName)

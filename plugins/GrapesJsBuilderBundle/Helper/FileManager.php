@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 
 class FileManager
 {
-    const GRAPESJS_IMAGES_DIRECTORY = '';
+    public const GRAPESJS_IMAGES_DIRECTORY = '';
 
     /**
      * @var FileUploader
@@ -45,8 +45,6 @@ class FileManager
     }
 
     /**
-     * @param $request
-     *
      * @return array
      */
     public function uploadFiles($request)
@@ -96,14 +94,12 @@ class FileManager
     }
 
     /**
-     * @param $fileName
-     *
      * @return string
      */
     public function getFullUrl($fileName, $separator = '/')
     {
         // if a static_url (CDN) is configured use that, otherwiese use the site url
-        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
+        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
 
         return $url
             .$separator

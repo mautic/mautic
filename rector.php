@@ -1,67 +1,111 @@
 <?php
 
-use Rector\Core\Configuration\Option;
-use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
-use Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector;
-use Rector\DeadCode\Rector\ClassConst\RemoveUnusedClassConstantRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
-use Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector;
-use Rector\DeadCode\Rector\If_\SimplifyIfElseWithSameContentRector;
-use Rector\DeadCode\Rector\MethodCall\RemoveDefaultArgumentValueRector;
-use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
-use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
-use Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector;
-use Rector\Php74\Rector\Property\TypedPropertyRector;
-use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+declare(strict_types=1);
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    // here we can define, what sets of rules will be applied
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::SETS, [SetList::DEAD_CODE]);
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Php80\Rector\Class_\DoctrineAnnotationClassToAttributeRector;
 
-    $parameters->set(
-        Option::PATHS,
+return static function (Rector\Config\RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
+    $rectorConfig->skip(
         [
-            __DIR__ . '/app/bundles',
-            __DIR__ . '/plugins'
+            __DIR__.'/*/test/*',
+            __DIR__.'/*/tests/*',
+            __DIR__.'/*/Test/*',
+            __DIR__.'/*/Tests/*',
+            __DIR__.'/*.html.php',
+            __DIR__.'/*.less.php',
+            __DIR__.'/*.inc.php',
+            __DIR__.'/*.js.php',
+            \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
+                __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
+                __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+            ],
         ]
     );
 
-    $parameters->set(
-        Option::SKIP,
-        [
-            __DIR__ . '/*/tests/*',
-            __DIR__ . '/*/tests/*',
-            __DIR__ . '/*/Tests/*',
-            __DIR__ . '/*/Test/*',
-            __DIR__ . '/*/test/*',
-            __DIR__ . '/*/InstallFixtures/*',
-            __DIR__ . '/*/Fixtures/*',
-            __DIR__ . '/*.html.php',
-            __DIR__ . '/*.less.php',
-            __DIR__ . '/*.inc.php',
-            __DIR__ . '/*.js.php',
-            __DIR__ . '/app/bundles/LeadBundle/Entity/LeadField.php',
-            __DIR__ . '/app/bundles/WebhookBundle/Entity/Webhook.php',
-            __DIR__ . '/app/bundles/UserBundle/Entity/UserToken.php',
-            __DIR__ . '/app/bundles/EmailBundle/Entity/EmailReplyRepository.php',
-            RemoveUnusedParameterRector::class, # Causes BC breaks and broken services. Use only manually with caution.
-            RemoveDefaultArgumentValueRector::class, # Doesn't play nicely every time.
-            SimplifyIfElseWithSameContentRector::class, # Removes code that is not the same.
-            RemoveDeadIfForeachForRector::class, # Problematic with some copy-pasted code.
-            TernaryToBooleanOrFalseToBooleanAndRector::class, # see https://github.com/rectorphp/rector/issues/2765
-            RemoveDuplicatedCaseInSwitchRector::class, # see https://github.com/rectorphp/rector/issues/2730
-            RecastingRemovalRector::class, # Does some dangerous changes in e.g. queries
-            RemoveUnusedDoctrineEntityMethodAndPropertyRector::class, # Incorrectly removes loadMetadata() methods
-            RemoveUnusedPrivatePropertyRector::class, # Incorrectly removes some private properties
-            RemoveUnusedClassConstantRector::class, # Incorrectly removes some class constants that we use
-            RemoveDeadRecursiveClassMethodRector::class # Changed quite some code, didn't have time to check if it's correct
-        ]
-    );
+    $rectorConfig->parallel();
 
-    // register single rule
-    //$services = $containerConfigurator->services();
-    //$services->set(TypedPropertyRector::class);
+    foreach (['dev', 'test', 'prod'] as $environment) {
+        $environmentCap = ucfirst($environment);
+        $xmlPath        = __DIR__."/var/cache/{$environment}/appAppKernel{$environmentCap}DebugContainer.xml";
+        if (file_exists($xmlPath)) {
+            $rectorConfig->symfonyContainerXml($xmlPath);
+            break;
+        }
+    }
+
+    $rectorConfig->cacheClass(FileCacheStorage::class);
+    $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
+
+    // Define what rule sets will be applied
+    $rectorConfig->sets([
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
+        \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30,
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_213,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
+        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
+
+        // @todo implement the whole set. Start rule by rule below.
+        // \Rector\Set\ValueObject\SetList::DEAD_CODE
+    ]);
+
+    // Define what single rules will be applied
+    $rectorConfig->rule(\Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
+    $rectorConfig->rule(\Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
+
+    $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
+        \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
+            'MauticApiBundle'                         => 'Mautic\ApiBundle\Entity',
+            'MauticAssetBundle'                       => 'Mautic\AssetBundle\Entity',
+            'MauticCampaignBundle'                    => 'Mautic\CampaignBundle\Entity',
+            'MauticCategoryBundle'                    => 'Mautic\CategoryBundle\Entity',
+            'MauticChannelBundle'                     => 'Mautic\ChannelBundle\Entity',
+            'MauticCoreBundle'                        => 'Mautic\CoreBundle\Entity',
+            'MauticDashboardBundle'                   => 'Mautic\DashboardBundle\Entity',
+            'MauticDynamicContentBundle'              => 'Mautic\DynamicContentBundle\Entity',
+            'MauticEmailBundle'                       => 'Mautic\EmailBundle\Entity',
+            'MauticFormBundle'                        => 'Mautic\FormBundle\Entity',
+            'MauticIntegrationBundle'                 => 'Mautic\IntegrationBundle\Entity',
+            'MauticLeadBundle'                        => 'Mautic\LeadBundle\Entity',
+            'MauticNotificationBundle'                => 'Mautic\NotificationBundle\Entity',
+            'MauticPageBundle'                        => 'Mautic\PageBundle\Entity',
+            'MauticPluginBundle'                      => 'Mautic\PluginBundle\Entity',
+            'MauticPointBundle'                       => 'Mautic\PointBundle\Entity',
+            'MauticReportBundle'                      => 'Mautic\ReportBundle\Entity',
+            'MauticSmsBundle'                         => 'Mautic\SmsBundle\Entity',
+            'MauticStageBundle'                       => 'Mautic\StageBundle\Entity',
+            'MauticUserBundle'                        => 'Mautic\UserBundle\Entity',
+            'MauticWebhookBundle'                     => 'Mautic\WebhookBundle\Entity',
+            'MauticPluginMauticSocialBundle'          => 'MauticPlugin\MauticSocialBundle\Entity',
+            'MauticPluginMauticCitrixBundle'          => 'MauticPlugin\MauticCitrixBundle\Entity',
+            'MauticPluginMauticCrmBundle'             => 'MauticPlugin\MauticCrmBundle\Entity',
+            'MauticPluginMauticTagManagerBundle'      => 'MauticPlugin\MauticTagManagerBundle\Entity',
+            'MauticPluginMauticFocusBundle'           => 'MauticPlugin\MauticFocusBundle\Entity',
+            'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
+            'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
+        ],
+    ]);
+
+    // This rule stopped existing :shrug:
+    // $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
+    //     DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
+    // ]);
 };

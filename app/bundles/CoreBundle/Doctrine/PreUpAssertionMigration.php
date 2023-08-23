@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -19,9 +10,9 @@ use Doctrine\Migrations\Exception\SkipMigration;
 abstract class PreUpAssertionMigration extends AbstractMauticMigration
 {
     /**
-     * @var array[]
+     * @var array<int, array<string>>
      */
-    private $skipAssertions = [];
+    private array $skipAssertions = [];
 
     /**
      * Implement this method to add skip assertions via `PreUpAssertionMigration::skipAssertion()`.

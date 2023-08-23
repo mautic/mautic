@@ -1,27 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ConfigType.
  */
 class ConfigType extends AbstractType
 {
+    public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
+
     /**
      * @var TransportChain
      */
@@ -58,6 +52,18 @@ class ConfigType extends AbstractType
             ],
             'choices'           => $choices,
             ]);
+
+        $builder->add(
+            self::SMS_DISABLE_TRACKABLE_URLS,
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
+                'attr'  => [
+                    'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
+                ],
+                'data'=> !empty($options['data'][self::SMS_DISABLE_TRACKABLE_URLS]) ? true : false,
+            ]
+        );
     }
 
     /**

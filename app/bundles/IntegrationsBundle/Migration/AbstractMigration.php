@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\IntegrationsBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -50,7 +41,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void
     {
@@ -64,7 +55,7 @@ abstract class AbstractMigration implements MigrationInterface
 
         foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
-            $stmt->execute();
+            $stmt->executeStatement();
         }
     }
 

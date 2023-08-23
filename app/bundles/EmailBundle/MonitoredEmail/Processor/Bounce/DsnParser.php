@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -53,12 +44,9 @@ class DsnParser
     /**
      * @todo - refactor to get rid of the if/else statements
      *
-     * @param $dsnMessage
-     * @param $dsnReport
-     *
      * @return array
      */
-    public function parse($dsnMessage, $dsnReport)
+    public function parse(string $dsnMessage, string $dsnReport)
     {
         // initialize the result array
         $result = [

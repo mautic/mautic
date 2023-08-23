@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class RedirectRepository.
+ * @extends CommonRepository<Redirect>
  */
 class RedirectRepository extends CommonRepository
 {
@@ -69,7 +60,6 @@ class RedirectRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      */
@@ -142,7 +132,7 @@ class RedirectRepository extends CommonRepository
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('cl.company_id', ':companyId'),
                         $sb->expr()->eq('cl.lead_id', 'ph.lead_id')
                     )
@@ -160,7 +150,7 @@ class RedirectRepository extends CommonRepository
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
                         $sb->expr()->eq('lll.manually_removed', 0)
@@ -179,6 +169,6 @@ class RedirectRepository extends CommonRepository
 
         $q->orderBy('hits', 'DESC');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 }

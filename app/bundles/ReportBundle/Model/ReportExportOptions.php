@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,12 +17,12 @@ class ReportExportOptions
     private $page;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateFrom;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTo;
 
@@ -76,7 +67,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateFrom()
     {
@@ -92,7 +83,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateTo()
     {

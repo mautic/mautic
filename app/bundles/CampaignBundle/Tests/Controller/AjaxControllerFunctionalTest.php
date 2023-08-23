@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -44,7 +35,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
 
         // Ensure we'll fetch fresh data from the database and not from entity manager.
-        $this->em->clear();
+        $this->em->detach($contact);
+        $this->em->detach($campaign);
 
         /** @var LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);

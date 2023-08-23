@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -354,7 +345,6 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED,
                     $this->callback(
                         function (ScheduledEvent $event) use ($now) {
                             // The first log was scheduled to 10 minutes.
@@ -364,9 +354,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED,
                 ],
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED,
                     $this->callback(
                         function (ScheduledEvent $event) use ($now) {
                             // The second log was not scheduled so the default interval is used.
@@ -376,9 +366,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED,
                 ],
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
                     $this->callback(
                         function (ScheduledBatchEvent $event) {
                             Assert::assertCount(2, $event->getScheduled());
@@ -386,6 +376,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
                 ]
             );
 

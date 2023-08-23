@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Api;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Psr\Log\LoggerInterface;
@@ -42,8 +43,14 @@ class Connection
         $this->logger->debug('About to query the Packagist API: '.$url);
 
         $request  = new Request('GET', $url, $this->getHeaders());
-        $response = $this->httpClient->send($request);
-        $body     = (string) $response->getBody();
+
+        try {
+            $response = $this->httpClient->send($request);
+        } catch (GuzzleException $e) {
+            throw new ApiException($e->getMessage(), $e->getCode());
+        }
+
+        $body = (string) $response->getBody();
 
         if ($response->getStatusCode() >= 300) {
             throw new ApiException($body, $response->getStatusCode());
@@ -58,7 +65,7 @@ class Connection
 
     private function getHeaders(): array
     {
-        return  [
+        return [
             'Content-Type'    => 'application/json',
             'Accept'          => 'application/json',
             'Accept-Encoding' => 'gzip, deflate, br',

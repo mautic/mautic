@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -81,9 +72,6 @@ class TokenHelper
     }
 
     /**
-     * @param $alias
-     * @param $defaultValue
-     *
      * @return mixed
      */
     private static function getTokenValue(array $lead, $alias, $defaultValue)
@@ -91,8 +79,13 @@ class TokenHelper
         $value = '';
         if (isset($lead[$alias])) {
             $value = $lead[$alias];
-        } elseif (isset($lead['companies'][0][$alias])) {
-            $value = $lead['companies'][0][$alias];
+        } elseif (!empty($lead['companies'])) {
+            foreach ($lead['companies'] as $company) {
+                if (1 === (int) $company['is_primary'] && $company[$alias]) {
+                    $value = $company[$alias];
+                    break;
+                }
+            }
         }
 
         if ('' !== $value) {
@@ -132,8 +125,6 @@ class TokenHelper
     }
 
     /**
-     * @param $match
-     *
      * @return string
      */
     private static function getTokenDefaultValue($match)
@@ -147,8 +138,6 @@ class TokenHelper
     }
 
     /**
-     * @param $match
-     *
      * @return mixed
      */
     private static function getFieldAlias($match)

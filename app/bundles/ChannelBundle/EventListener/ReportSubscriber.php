@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -21,7 +12,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
+    public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
     /**
      * @var CompanyReportData

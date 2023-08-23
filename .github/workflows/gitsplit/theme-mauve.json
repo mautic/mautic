@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-mauve",
+            "directory": "themes/Mauve",
+            "target": "git@github.com:mautic/theme-mauve.git"
+        }
+    ]
+}

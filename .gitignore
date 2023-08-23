@@ -4,12 +4,19 @@
 !.htaccess
 !.gitkeep
 !.ddev
+!.php-cs-fixer.php
+!.github/ci-files/.my.cnf
 .ddev/mautic-preference
+/.ddev/docker-compose.host-docker-internal.yaml
+!.gitpod.Dockerfile
+!.gitpod.yml
+!.ddev/commands/web/dd
 .php_cs.cache
-/.env
+/.env.local
+/.env.local.php
+/.env.*.local
 /composer.phar
 /coverage.xml
-
 /app/bootstrap*
 /app/console
 /app/tests.bootstrap*
@@ -64,6 +71,7 @@
 /upgrade
 /upgrade_errors.txt
 
+/media/bundles/*
 /media/dashboards/*
 !/media/dashboards/*.json
 /media/files/*
@@ -77,10 +85,17 @@
 !/media/images/favicon.ico
 !/media/images/mautic_logo*
 !/media/images/.htaccess
+/media/css/app.css
+/media/css/libraries.css
+/media/js/app.js
+/media/js/libraries.js
+/media/js/mautic-form.js
+/media/js/froogaloop.min.js
+/media/js/jquery.min.js
+/media/js/ckeditor4/*
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
-!/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle
 !/plugins/MauticCrmBundle
@@ -101,6 +116,7 @@
 !/themes/blank
 !/themes/cards
 !/themes/coffee
+!/themes/confirmme
 !/themes/fresh-center
 !/themes/fresh-fixed
 !/themes/fresh-left

@@ -1,28 +1,18 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\Reference;
 use Mautic\EmailBundle\Stat\StatHelper;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
@@ -152,7 +142,7 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], string $emailType = null)
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -161,6 +151,7 @@ class SendEmailToContact
         $this->mailer->enableQueue();
 
         if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
+            $this->mailer->setEmailType($emailType);
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
@@ -203,7 +194,7 @@ class SendEmailToContact
 
         $this->mailer->setTokens($tokens);
         $this->mailer->setLead($contact);
-        $this->mailer->setIdHash(); //auto generates
+        $this->mailer->setIdHash(); // auto generates
 
         try {
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
@@ -232,7 +223,7 @@ class SendEmailToContact
             list($success, $errors) = $this->sendStandardEmail();
         }
 
-        //queue or send the message
+        // queue or send the message
         if (!$success) {
             unset($errors['failures']);
             $this->failContact(false, implode('; ', (array) $errors));
@@ -244,9 +235,6 @@ class SendEmailToContact
      */
     public function reset()
     {
-        [];
-        [];
-        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];
@@ -257,8 +245,6 @@ class SendEmailToContact
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];
-
-        $this->dncModel->clearEntities();
 
         $this->mailer->reset();
     }
@@ -319,9 +305,6 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    /**
-     * @param $sendFailures
-     */
     protected function processSendFailures($sendFailures)
     {
         $failedEmailAddresses = $sendFailures['failures'];
@@ -368,9 +351,6 @@ class SendEmailToContact
         }
     }
 
-    /**
-     * @param $email
-     */
     protected function createContactStatEntry($email)
     {
         ++$this->statBatchCounter;
@@ -428,7 +408,7 @@ class SendEmailToContact
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();
 
-        // Create the stat to ensure it is availble for emails sent
+        // Create the stat to ensure it is available for emails sent
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event

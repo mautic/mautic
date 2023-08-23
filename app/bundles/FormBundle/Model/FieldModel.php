@@ -1,81 +1,62 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
+use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FieldModel.
+ * @extends CommonFormModel<Field>
  */
 class FieldModel extends CommonFormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
     /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
 
-    /**
-     * FieldModel constructor.
-     */
-    public function __construct(LeadFieldModel $leadFieldModel)
+    public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {
         $this->leadFieldModel = $leadFieldModel;
+        $this->requestStack   = $requestStack;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    private function getSession(): SessionInterface
     {
-        $this->session = $session;
+        return $this->requestStack->getSession();
     }
 
     /**
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
+     * @param object|array<mixed> $entity
+     * @param string|null         $action
+     * @param array               $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
-        list($fields, $choices)               = $this->getObjectFields('lead');
-        list($companyFields, $companyChoices) = $this->getObjectFields('company');
-
-        // Only show the lead fields not already used
-        $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
-        $testLeadFields   = array_flip($usedLeadFields);
-        $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
-        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
-            unset($testLeadFields[$currentLeadField]);
-        }
-
-        foreach ($choices as &$group) {
-            $group = array_diff_key($group, $testLeadFields);
-        }
-
-        $options['leadFields']['lead']          = $choices;
-        $options['leadFieldProperties']['lead'] = $fields;
-
-        $options['leadFields']['company']          = $companyChoices;
-        $options['leadFieldProperties']['company'] = $companyFields;
-
         if ($action) {
             $options['action'] = $action;
         }
@@ -83,16 +64,21 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
+    /**
+     * @deprecated to be removed in Mautic 4. This method is not used anymore.
+     */
     public function getObjectFields($object = 'lead')
     {
         $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
         $choices = [];
 
         foreach ($fields as $alias => $field) {
+            if (empty($field['isPublished'])) {
+                continue;
+            }
             if (!isset($choices[$field['group_label']])) {
                 $choices[$field['group_label']] = [];
             }
-
             $choices[$field['group_label']][$field['label']] = $alias;
         }
 
@@ -100,27 +86,19 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\FieldRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Field');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Field
     {
         if (null === $id) {
             return new Field();
@@ -132,29 +110,24 @@ class FieldModel extends CommonFormModel
     /**
      * Get the fields saved in session.
      *
-     * @param $formId
-     *
      * @return array
      */
     public function getSessionFields($formId)
     {
-        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', []);
-        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', []);
+        $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
+        $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         return array_diff_key($fields, array_flip($remove));
     }
 
     /**
-     * @param $label
-     * @param $aliases
-     *
-     * @return string
+     * @param string[] $aliases
      */
-    public function generateAlias($label, &$aliases)
+    public function generateAlias(string $label, array &$aliases): string
     {
         $alias = $this->cleanAlias($label, 'f_', 25);
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $testAlias = $alias;
 
         $count    = (int) in_array($alias, $aliases);
@@ -175,5 +148,46 @@ class FieldModel extends CommonFormModel
         $aliases[] = $testAlias;
 
         return $testAlias;
+    }
+
+    /**
+     * @return FormFieldEvent|Event|void|null
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof Field) {
+            throw new MethodNotAllowedHttpException(['Form']);
+        }
+
+        switch ($action) {
+            case 'pre_save':
+                $name = FormEvents::FIELD_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = FormEvents::FIELD_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = FormEvents::FIELD_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = FormEvents::FIELD_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new FormFieldEvent($entity, $isNew);
+            }
+
+            $this->dispatcher->dispatch($event, $name);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }

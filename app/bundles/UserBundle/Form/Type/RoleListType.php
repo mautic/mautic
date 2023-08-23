@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\RoleModel;
@@ -47,14 +38,6 @@ class RoleListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'role_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return ChoiceType::class;
@@ -84,7 +67,7 @@ class RoleListType extends AbstractType
             $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by name
+        // sort by name
         ksort($choices);
 
         return $choices;

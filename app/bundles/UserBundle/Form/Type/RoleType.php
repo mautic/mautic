@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -70,7 +61,7 @@ class RoleType extends AbstractType
             PermissionsType::class,
             [
                 'label'    => 'mautic.user.role.permissions',
-                'mapped'   => false, //we'll have to manually build the permissions for persisting
+                'mapped'   => false, // we'll have to manually build the permissions for persisting
                 'required' => false,
                 'attr'     => [
                     'class' => $hidden,
@@ -96,13 +87,5 @@ class RoleType extends AbstractType
             'constraints'       => [new Valid()],
             'permissionsConfig' => [],
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'role';
     }
 }

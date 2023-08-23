@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -52,6 +43,18 @@ class ConfigTrackingPageType extends AbstractType
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
                     'data-show-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'do_not_track_404_anonymous',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.do_not_track_404_anonymous',
+                'data'  => isset($options['data']['do_not_track_404_anonymous']) ? (bool) $options['data']['do_not_track_404_anonymous'] : false,
+                'attr'  => [
+                    'tooltip'      => 'mautic.page.config.form.do_not_track_404_anonymous.tooltip',
                 ],
             ]
         );

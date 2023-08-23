@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
@@ -30,7 +21,7 @@ class Configurator
     /**
      * Array containing the steps.
      *
-     * @var StepInterface[]
+     * @var array<int, StepInterface[]>
      */
     protected $steps = [];
 
@@ -44,7 +35,7 @@ class Configurator
     /**
      * Configuration parameters.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $parameters;
 
@@ -75,7 +66,7 @@ class Configurator
      *
      * @param int $priority
      */
-    public function addStep(StepInterface $step, $priority = 0)
+    public function addStep(StepInterface $step, $priority = 0): void
     {
         if (!isset($this->steps[$priority])) {
             $this->steps[$priority] = [];
@@ -90,7 +81,7 @@ class Configurator
      *
      * @param int $index
      *
-     * @return StepInterface
+     * @return StepInterface[]
      *
      * @throws \InvalidArgumentException
      */
@@ -106,7 +97,7 @@ class Configurator
     /**
      * Retrieves the loaded steps in sorted order.
      *
-     * @return array
+     * @return StepInterface[]
      */
     public function getSteps()
     {
@@ -138,9 +129,9 @@ class Configurator
     /**
      * Retrieves the configuration parameters.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -158,9 +149,9 @@ class Configurator
     /**
      * Merges parameters to the main configuration.
      *
-     * @param array $parameters
+     * @param array<string, mixed> $parameters
      */
-    public function mergeParameters($parameters)
+    public function mergeParameters(array $parameters): void
     {
         $this->parameters = array_merge($this->parameters, $parameters);
     }
@@ -168,9 +159,9 @@ class Configurator
     /**
      * Fetches the requirements from the defined steps.
      *
-     * @return array
+     * @return array<string>
      */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         $majors = [];
 
@@ -186,9 +177,9 @@ class Configurator
     /**
      * Fetches the optional settings from the defined steps.
      *
-     * @return array
+     * @return array<string>
      */
-    public function getOptionalSettings()
+    public function getOptionalSettings(): array
     {
         $minors = [];
 
@@ -231,8 +222,8 @@ class Configurator
     }
 
     /**
-     * @param     $array
-     * @param int $level
+     * @param array<mixed> $array
+     * @param int          $level
      *
      * @return string
      */
@@ -242,17 +233,15 @@ class Configurator
 
         $count = $counter = count($array);
         foreach ($array as $key => $value) {
-            if (is_string($key) or is_numeric($key)) {
-                if ($counter === $count) {
-                    $string .= str_repeat("\t", $level + 1);
-                }
-                $string .= '\''.$key.'\' => ';
+            if ($counter === $count) {
+                $string .= str_repeat("\t", $level + 1);
             }
+            $string .= '\''.$key.'\' => ';
 
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '\''.addcslashes($value, '\\\'').'\'';
+                $string .= '\''.addcslashes((string) $value, '\\\'').'\'';
             }
 
             --$counter;
@@ -289,17 +278,18 @@ class Configurator
     /**
      * Reads parameters from file.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function read()
+    protected function read(): array
     {
         if (!file_exists($this->filename)) {
             return [];
         }
 
+        $parameters = [];
         include $this->filename;
 
         // Return the $parameters array defined in the file
-        return isset($parameters) ? $parameters : [];
+        return $parameters;
     }
 }

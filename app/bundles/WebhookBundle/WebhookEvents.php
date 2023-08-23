@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   Mautic, Inc
- * @author      Mautic, Inc
- *
- * @link        http://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle;
 
 /**
@@ -24,7 +15,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_PRE_SAVE = 'mautic.webhook_pre_save';
+    public const WEBHOOK_PRE_SAVE = 'mautic.webhook_pre_save';
 
     /**
      * The mautic.webhook_post_save event is thrown right after a form is persisted.
@@ -33,7 +24,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_POST_SAVE = 'mautic.webhook_post_save';
+    public const WEBHOOK_POST_SAVE = 'mautic.webhook_post_save';
 
     /**
      * The mautic.webhook_pre_delete event is thrown before a form is deleted.
@@ -42,7 +33,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_PRE_DELETE = 'mautic.webhook_pre_delete';
+    public const WEBHOOK_PRE_DELETE = 'mautic.webhook_pre_delete';
 
     /**
      * The mautic.webhook_post_delete event is thrown after a form is deleted.
@@ -51,7 +42,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_POST_DELETE = 'mautic.webhook_post_delete';
+    public const WEBHOOK_POST_DELETE = 'mautic.webhook_post_delete';
 
     /**
      * The mautic.webhook_kill event is thrown when target is not available.
@@ -60,7 +51,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_KILL = 'mautic.webhook_kill';
+    public const WEBHOOK_KILL = 'mautic.webhook_kill';
 
     /**
      * The mautic.webhook_queue_on_add event is thrown as the queue entity is created, before it is persisted to the database.
@@ -69,7 +60,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_QUEUE_ON_ADD = 'mautic.webhook_queue_on_add';
+    public const WEBHOOK_QUEUE_ON_ADD = 'mautic.webhook_queue_on_add';
 
     /**
      * The mautic.webhook_pre_execute event is thrown right before a webhook URL is executed.
@@ -78,7 +69,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_PRE_EXECUTE = 'mautic.webhook_pre_execute';
+    public const WEBHOOK_PRE_EXECUTE = 'mautic.webhook_pre_execute';
 
     /**
      * The mautic.webhook_post_execute event is thrown right after a webhook URL is executed.
@@ -87,7 +78,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_POST_EXECUTE = 'mautic.webhook_post_execute';
+    public const WEBHOOK_POST_EXECUTE = 'mautic.webhook_post_execute';
 
     /**
      * The mautic.webhook_on_build event is as the webhook form is built.
@@ -96,7 +87,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_ON_BUILD = 'mautic.webhook_on_build';
+    public const WEBHOOK_ON_BUILD = 'mautic.webhook_on_build';
 
     /**
      * The mautic.webhook.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
@@ -106,7 +97,7 @@ final class WebhookEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.webhook.campaign_on_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.webhook.campaign_on_trigger_action';
 
     /**
      * The mautic.webhook_on_request event is fired before request is processed.
@@ -115,5 +106,5 @@ final class WebhookEvents
      *
      * @var string
      */
-    const WEBHOOK_ON_REQUEST = 'mautic.webhook_on_request';
+    public const WEBHOOK_ON_REQUEST = 'mautic.webhook_on_request';
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -25,7 +16,7 @@ class ModelFactoryTest extends TestCase
     private $container;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     private $factory;
 

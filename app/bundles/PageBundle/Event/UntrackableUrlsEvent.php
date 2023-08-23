@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class UntrackableUrlsEvent.
@@ -34,8 +25,6 @@ class UntrackableUrlsEvent extends Event
 
     /**
      * TrackableEvent constructor.
-     *
-     * @param $content
      */
     public function __construct($content)
     {
@@ -44,8 +33,6 @@ class UntrackableUrlsEvent extends Event
 
     /**
      * set a URL or token to not convert to trackables.
-     *
-     * @param $url
      */
     public function addNonTrackable($url)
     {

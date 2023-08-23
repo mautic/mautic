@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\StageBundle\Entity\Stage;
@@ -43,7 +34,7 @@ class StageListType extends AbstractType
             $this->choices[$choice->getName()] = $choice->getId();
         }
 
-        //sort by language
+        // sort by language
         ksort($this->choices);
     }
 
@@ -59,14 +50,6 @@ class StageListType extends AbstractType
             'required'          => false,
             'placeholder'       => 'mautic.core.form.chooseone',
         ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'stage_list';
     }
 
     public function getParent()

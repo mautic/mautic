@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -207,7 +198,7 @@ class PartialObjectReportBuilder
 
         $event = new InternalObjectFindEvent($this->objectProvider->getObjectByName($objectName));
         $event->setIds(array_keys($this->objectsWithMissingFields));
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS);
 
         return $event->getFoundObjects();
     }

@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class BuildJsEvent.
@@ -42,7 +33,7 @@ class BuildJsEvent extends Event
      */
     public function getJs()
     {
-        return $this->debugMode ? $this->js : \JSMin::minify($this->js);
+        return $this->debugMode ? $this->js : \JSMin\JSMin::minify($this->js);
     }
 
     /**

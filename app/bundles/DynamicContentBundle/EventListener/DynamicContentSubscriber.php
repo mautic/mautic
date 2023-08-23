@@ -1,18 +1,7 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use DOMDocument;
-use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -216,11 +205,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = [];
-        if ($lead instanceof Lead) {
-            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        }
-        $result = [];
+        $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
+        $result    = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
             if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
@@ -230,9 +216,9 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content = str_replace(array_keys($result), array_values($result), $content);
 
         // replace slots
-        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-        $xpath = new DOMXPath($dom);
+        $xpath = new \DOMXPath($dom);
 
         $divContent = $xpath->query('//*[@data-slot="dwc"]');
         for ($i = 0; $i < $divContent->length; ++$i) {

@@ -1,26 +1,15 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MergeRecordRepository.
+ * @extends CommonRepository<MergeRecord>
  */
 class MergeRecordRepository extends CommonRepository
 {
     /**
-     * @param $id
-     *
      * @return Lead|null
      */
     public function findMergedContact($id)
@@ -30,7 +19,7 @@ class MergeRecordRepository extends CommonRepository
             $contact = $record->getContact();
 
             // Clear these records from the EM so that subsequent fetches don't return deleted entities
-            $this->getEntityManager()->clear(MergeRecord::class);
+            $this->getEntityManager()->detach($record);
 
             return $contact;
         }
@@ -40,9 +29,6 @@ class MergeRecordRepository extends CommonRepository
 
     /**
      * Keep track of subseqent merges by cascading records to the latest lead that was merged into.
-     *
-     * @param $fromId
-     * @param $toId
      */
     public function moveMergeRecord($fromId, $toId)
     {

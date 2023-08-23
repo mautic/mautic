@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
@@ -39,7 +30,7 @@ class FoursquareIntegration extends SocialIntegration
     {
         return [
             'email',
-            'twitter', //foursquare allows searching directly by twitter handle
+            'twitter', // foursquare allows searching directly by twitter handle
         ];
     }
 
@@ -79,7 +70,6 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
-     * @param        $url
      * @param array  $parameters
      * @param string $method
      * @param array  $settings
@@ -95,9 +85,6 @@ class FoursquareIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @param $identifier
-     * @param $socialCache
      *
      * @return array
      */
@@ -120,18 +107,15 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $identifier
-     * @param $socialCache
-     *
      * @return array|void
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = [
-                //'mayorships' => array(),
+                // 'mayorships' => array(),
                 'tips' => [],
-                //'lists'      => array()
+                // 'lists'      => array()
             ];
 
             /*
@@ -165,13 +149,13 @@ class FoursquareIntegration extends SocialIntegration
             }
             */
 
-            //tips
+            // tips
             $url  = $this->getApiUrl("users/{$id}/tips").'&limit=5&sort=recent';
             $data = $this->makeRequest($url);
 
             if (isset($data->response->tips) && count($data->response->tips->items)) {
                 foreach ($data->response->tips->items as $t) {
-                    //find main category of venue
+                    // find main category of venue
                     $category = '';
                     foreach ($t->venue->categories as $c) {
                         if ($c->primary) {
@@ -308,9 +292,6 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
-     * @param $identifier
-     * @param $socialCache
-     *
      * @return bool
      */
     private function getContactUserId(&$identifier, &$socialCache)

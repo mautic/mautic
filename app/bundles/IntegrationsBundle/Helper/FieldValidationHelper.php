@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Helper;
 
 use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
@@ -20,7 +11,8 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldValidationHelper
 {
@@ -45,7 +37,10 @@ class FieldValidationHelper
         $this->translator  = $translator;
     }
 
-    public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    public function validateRequiredFields(FormInterface $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {
         $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         if (!$integrationConfiguration->getIsPublished()) {

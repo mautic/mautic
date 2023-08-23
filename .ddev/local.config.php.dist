@@ -1,7 +1,4 @@
 <?php
-/**
- * Parameter overrides for DDEV.
- */
 $parameters = [
     'api_enabled'           => true,
     'api_enable_basic_auth' => true,
@@ -14,4 +11,8 @@ $parameters = [
     'db_password'           => 'db',
     'admin_email'           => 'mautic@ddev.local',
     'admin_password'        => 'mautic',
+    'install_source'        => 'DDEV',
+    'mailer_from_name'      => 'DDEV',
+    'mailer_from_email'     => 'mautic@ddev.local',
+    'mailer_dsn'            => 'smtp://localhost:1025',
 ];

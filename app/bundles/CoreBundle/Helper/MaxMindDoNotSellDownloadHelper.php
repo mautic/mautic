@@ -11,10 +11,10 @@ class MaxMindDoNotSellDownloadHelper
     /**
      * @const REMOTE_DATA
      */
-    const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
+    public const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $auth;
 
@@ -36,7 +36,7 @@ class MaxMindDoNotSellDownloadHelper
     public function __construct($auth, LoggerInterface $logger, HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
     {
         $this->logger     = $logger;
-        $this->auth       = explode(':', $auth, 2);
+        $this->auth       = explode(':', (string) $auth, 2);
         $this->httpClient = $httpClient;
         $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }

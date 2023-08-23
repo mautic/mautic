@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
@@ -65,7 +56,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $startDate = $parent->getVariantStartDate();
 
         if (null != $startDate && !empty($ids)) {
-            //get their bounce rates
+            // get their bounce rates
             $counts = $repo->getOpenedRates($ids, $startDate);
 
             $translator = $this->translator;
@@ -89,7 +80,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {
-                    //make sure that parent and published children are included
+                    // make sure that parent and published children are included
                     $support['labels'][] = $parent->getName().' (0%)';
 
                     $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
@@ -99,7 +90,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
-                            //make sure that parent and published children are included
+                            // make sure that parent and published children are included
                             $support['labels'][]                                            = $c->getName().' (0%)';
                             $data[$translator->trans('mautic.email.abtest.label.opened')][] = 0;
                             $data[$translator->trans('mautic.email.abtest.label.sent')][]   = 0;
@@ -108,7 +99,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
                 $support['data'] = $data;
 
-                //set max for scales
+                // set max for scales
                 $maxes = [];
                 foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
@@ -116,20 +107,20 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $top                   = max($maxes);
                 $support['step_width'] = (ceil($top / 10) * 10);
 
-                //put in order from least to greatest just because
+                // put in order from least to greatest just because
                 asort($rates);
 
-                //who's the winner?
+                // who's the winner?
                 $max = max($rates);
 
-                //get the page ids with the most number of downloads
+                // get the page ids with the most number of downloads
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.openrate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;
@@ -161,7 +152,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
-            //get their bounce rates
+            // get their bounce rates
             $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate);
             $sentCounts         = $emailRepo->getSentCounts($ids, $startDate);
 
@@ -190,7 +181,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {
-                    //make sure that parent and published children are included
+                    // make sure that parent and published children are included
                     $support['labels'][] = $parent->getName().' (0%)';
 
                     $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
@@ -200,7 +191,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
-                            //make sure that parent and published children are included
+                            // make sure that parent and published children are included
                             $support['labels'][]                                                  = $c->getName().' (0%)';
                             $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = 0;
                             $data[$translator->trans('mautic.email.abtest.label.opened')][]       = 0;
@@ -209,7 +200,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
                 $support['data'] = $data;
 
-                //set max for scales
+                // set max for scales
                 $maxes = [];
                 foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
@@ -217,20 +208,20 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $top                   = max($maxes);
                 $support['step_width'] = (ceil($top / 10) * 10);
 
-                //put in order from least to greatest just because
+                // put in order from least to greatest just because
                 asort($rates);
 
-                //who's the winner?
+                // who's the winner?
                 $max = max($rates);
 
-                //get the page ids with the most number of downloads
+                // get the page ids with the most number of downloads
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.clickthrough',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;

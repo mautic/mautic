@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -97,10 +88,12 @@ class SubmissionEvent extends CommonEvent
     private $postSubmitResponse;
 
     /**
+     * @var array<mixed>
+     */
+    private $postSubmitPayload;
+
+    /**
      * SubmissionEvent constructor.
-     *
-     * @param $post
-     * @param $server
      */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
@@ -232,10 +225,6 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @param $key
-     * @param $feedback
-     */
     public function setActionFeedback($key, $feedback)
     {
         $this->feedback[$key] = $feedback;
@@ -350,5 +339,21 @@ class SubmissionEvent extends CommonEvent
     public function setPostSubmitResponse($response): void
     {
         $this->postSubmitResponse = $response;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getPostSubmitPayload(): array
+    {
+        return $this->postSubmitPayload;
+    }
+
+    /**
+     * @param mixed[] $postSubmitPayload
+     */
+    public function setPostSubmitPayload(array $postSubmitPayload): void
+    {
+        $this->postSubmitPayload = $postSubmitPayload;
     }
 }

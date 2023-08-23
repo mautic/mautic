@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class UtmTagRepository.
+ * @extends CommonRepository<UtmTag>
  */
 class UtmTagRepository extends CommonRepository
 {
@@ -38,7 +29,7 @@ class UtmTagRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $qb->andWhere($qb->expr()->orX(
+            $qb->andWhere($qb->expr()->or(
                 $qb->expr()->like('ut.utm_campaign', $qb->expr()->literal('%'.$options['search'].'%')),
                 $qb->expr()->like('ut.utm_content', $qb->expr()->literal('%'.$options['search'].'%')),
                 $qb->expr()->like('ut.utm_medium', $qb->expr()->literal('%'.$options['search'].'%')),

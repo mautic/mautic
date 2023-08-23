@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -19,12 +10,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|AbstractCommonModel
+     * @var MockObject|AbstractCommonModel<object>
      */
     private $commonModel;
 
     /**
-     * @var MockObject|CommonRepository
+     * @var MockObject|CommonRepository<object>
      */
     private $commonRepository;
 
@@ -51,7 +42,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->commonModel->expects($this->once())
             ->method('getEntities')
-            ->with(['limit' => 1000, 'start' => 0])
+            ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => [['a'], ['b']]]);
 
         $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
@@ -66,7 +57,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->commonModel->expects($this->once())
             ->method('getEntities')
-            ->with(['limit' => 1000, 'start' => 0])
+            ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => []]);
 
         $this->commonModel->method('getRepository')->willReturn($this->commonRepository);

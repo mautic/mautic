@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -16,15 +7,13 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class StatRepository.
+ * @extends CommonRepository<Stat>
  */
 class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * @param $dynamicContentId
-     *
      * @return array
      */
     public function getSentStats($dynamicContentId)
@@ -35,7 +24,7 @@ class StatRepository extends CommonRepository
             ->where('s.dynamic_content_id = :dynamic_content')
             ->setParameter('dynamic_content', $dynamicContentId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -70,7 +59,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -93,7 +82,7 @@ class StatRepository extends CommonRepository
             );
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('e.date_sent', $q->expr()->literal($dt->toUtcString()))
@@ -101,8 +90,8 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.dynamic_content_id');
 
-        //get a total number of sent DC stats first
-        $results = $q->execute()->fetchAll();
+        // get a total number of sent DC stats first
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 
@@ -146,9 +135,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -161,8 +147,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
     public function deleteStat($id)
     {
@@ -170,7 +154,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +12,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
  */
 class Plugin extends CommonEntity
 {
-    const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
 
     /**
      * @var int
@@ -34,7 +25,7 @@ class Plugin extends CommonEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -59,17 +50,17 @@ class Plugin extends CommonEntity
     private $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $version;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $author;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
      */
     private $integrations;
 
@@ -210,7 +201,7 @@ class Plugin extends CommonEntity
      */
     public function hasSecondaryDescription()
     {
-        return preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
+        return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
     /**

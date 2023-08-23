@@ -2,40 +2,20 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
-class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilder
+class ExpressionBuilder extends BaseExpressionBuilder
 {
-    const REGEXP  = 'REGEXP';
-    const BETWEEN = 'BETWEEN';
-
-    public function andX($x = null): CompositeExpression
-    {
-        if (is_array($x)) {
-            return new CompositeExpression(CompositeExpression::TYPE_AND, $x);
-        }
-
-        return new CompositeExpression(CompositeExpression::TYPE_AND, func_get_args());
-    }
-
-    public function orX($x = null): CompositeExpression
-    {
-        if (is_array($x)) {
-            return new CompositeExpression(CompositeExpression::TYPE_OR, $x);
-        }
-
-        return new CompositeExpression(CompositeExpression::TYPE_OR, func_get_args());
-    }
+    public const REGEXP  = 'REGEXP';
+    public const BETWEEN = 'BETWEEN';
 
     /**
      * Creates a between comparison expression.
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function between($x, $arr)
     {
@@ -56,12 +36,9 @@ class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilde
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param $x
-     * @param $arr
+     * @return string
      *
      * @throws SegmentQueryException
-     *
-     * @return string
      */
     public function notBetween($x, $arr)
     {
@@ -111,8 +88,6 @@ class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilde
     /**
      * Puts argument into EXISTS mysql function.
      *
-     * @param $input
-     *
      * @return string
      */
     public function exists($input)
@@ -122,8 +97,6 @@ class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilde
 
     /**
      * Puts argument into NOT EXISTS mysql function.
-     *
-     * @param $input
      *
      * @return string
      */
@@ -150,6 +123,6 @@ class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilde
             $additionArguments[$k] = is_numeric($v) && intval($v) === $v ? $v : $this->literal($v);
         }
 
-        return  $func.'('.$x.(count($additionArguments) ? ', ' : '').join(',', $additionArguments).')';
+        return $func.'('.$x.(count($additionArguments) ? ', ' : '').join(',', $additionArguments).')';
     }
 }

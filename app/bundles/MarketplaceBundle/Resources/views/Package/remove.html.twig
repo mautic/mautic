@@ -1,0 +1,58 @@
+<div class="text-center" id="marketplace-removal-in-progress">
+    <p>{{ 'marketplace.package.remove.html.in.progress'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()})|purify }}</p>
+    <div class="spinner">
+        <i class="fa fa-spin fa-spinner"></i>
+    </div>
+</div>
+<div style="display: none" class="text-center" id="marketplace-removal-failed">
+    <p>{{ 'marketplace.package.remove.html.failed'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()})|purify }}</p>
+    <textarea class="form-control" readonly id="marketplace-removal-failed-details"></textarea>
+</div>
+<div style="display: none" class="text-center" id="marketplace-removal-success">
+    <p>{{ 'marketplace.package.remove.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()})|purify }}</p>
+    <p><a class="btn btn-primary" href="{{ path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')) }}">
+    {% trans %}marketplace.package.remove.html.success.continue{% endtrans %}</a></p>
+</div>
+
+<script>
+    const removePackageResetView = () => {
+        mQuery('#marketplace-removal-in-progress').show();
+        mQuery('#marketplace-removal-success').hide();
+        mQuery('#marketplace-removal-failed').hide();
+    }
+
+    removePackageResetView();
+
+    Mautic.Marketplace.removePackage(
+        '{{ packageDetail.packageBase.getVendorName()|escape }}',
+        '{{ packageDetail.packageBase.getPackageName()|escape }}',
+        (response) => {
+            if (response.success) {
+                mQuery('#marketplace-removal-in-progress').hide();
+                mQuery('#marketplace-removal-success').show();
+            } else if (response.redirect) {
+                window.location = response.redirect;
+            }
+        },
+        (request, textStatus, errorThrown) => {
+            let error;
+
+            try {
+                const res = JSON.parse(request.responseText);
+                if (res.error) {
+                    error = res.error;
+                } else {
+                    error = res.errors[0].message ?? 'Unknown error';
+                }
+            } catch (e) {
+                error = 'An unknown error occurred. Please check the logs for more details.';
+                console.error(request.responseText);
+                console.error(e);
+            }
+            
+            mQuery('#marketplace-removal-in-progress').hide();
+            mQuery('#marketplace-removal-failed').show();
+            mQuery('#marketplace-removal-failed-details').text(error);
+        }
+    );
+</script>
