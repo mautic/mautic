@@ -14,8 +14,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class GraphStatsController extends CommonController
 {
-    use LeadDetailsTrait;
-
     public function emailsTimeGraphAction(CorePermissions $security, int $leadId, string $timeUnit): Response
     {
         /** @var LeadModel $model */
