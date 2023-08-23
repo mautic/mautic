@@ -1400,7 +1400,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getConnection()
             ->createQueryBuilder()
             ->select('list.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_lists', 'list')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
             ->where('list.alias = :alias')
             ->setParameter('alias', $alias)
             ->execute()

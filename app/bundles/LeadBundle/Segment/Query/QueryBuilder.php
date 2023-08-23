@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
@@ -261,7 +260,6 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * @param string $table
-     * @return bool
      */
     public function isJoinTable($table): bool
     {

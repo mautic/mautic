@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
 use Doctrine\ORM\ORMException;
@@ -162,7 +152,7 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $listLead = new ListLead();
         $listLead->setLead($leadOne);
         $listLead->setList($sourceList);
-        $listLead->setDateAdded(new DateTime());
+        $listLead->setDateAdded(new \DateTime());
         $this->em->persist($listLead);
     }
 }
