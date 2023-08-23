@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -393,7 +392,6 @@ class LeadController extends FormController
         \assert($leadNoteModel instanceof NoteModel);
 
         $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
-        $emailTimeStats       = $this->getLeadEmailTimeStats($lead);
 
         return $this->delegateView(
             [
@@ -410,8 +408,6 @@ class LeadController extends FormController
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
-                    'emailDaysData'     => $emailTimeStats['days'] ?? [],
-                    'emailHoursData'    => $emailTimeStats['hours'] ?? [],
                     'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'           => $leadDeviceRepository->getLeadDevices($lead),
@@ -440,27 +436,6 @@ class LeadController extends FormController
                 ],
             ]
         );
-    }
-
-    /**
-     * @return array{}|array<string, array<string, array<int, array<string, array<int, string>|bool|string>|string>>>
-     */
-    public function getLeadEmailTimeStats(Lead $lead): array
-    {
-        $stats = [];
-
-        try {
-            $stats['days']  = $this->getEmailDaysData($lead);
-            $stats['hours'] = $this->getEmailHoursData($lead);
-        } catch (Exception $e) {
-            $this->addFlashMessage(
-                'Failed to load email statistics charts',
-                [],
-                'error'
-            );
-        }
-
-        return $stats;
     }
 
     /**

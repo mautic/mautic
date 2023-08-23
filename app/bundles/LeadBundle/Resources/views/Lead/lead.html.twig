@@ -227,13 +227,11 @@
                                 {{ 'mautic.lead.field.header.engagements'|trans }}
                             </a>
                         </li>
-                        {% if emailHoursData is not empty and emailDaysData is not empty %}
-                            <li>
-                                <a href="#emails-read" role="tab" data-toggle="tab">
-                                    {{ 'mautic.lead.field.header.email.time'|trans }}
-                                </a>
-                            </li>
-                        {% endif %}
+                        <li>
+                            <a href="#emails-read" role="tab" data-toggle="tab">
+                                {{ 'mautic.lead.field.header.email.time'|trans }}
+                            </a>
+                        </li>
                     </ul>
                     <!--/ tabs controls -->
                 </div>
@@ -247,23 +245,29 @@
                         </div>
                         {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
                     </div>
-                    {% if emailHoursData is not empty and emailDaysData is not empty %}
-                        <div class="tab-pane bdr-w-0" id="emails-read">
-                            <div class="panel-body box-layout">
-                                <div class="col-xs-12 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                    <div class="tab-pane bdr-w-0" id="emails-read">
+                        <div class="panel-body box-layout">
+                            <div class="col-xs-12 va-t text-right">
+                                <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div data-graph-url="{{ path('mautic_emails_time_graph_stats', {'leadId' : lead.id, 'timeUnit' : 'd'}) }}">
+                                    <div class="spinner">
+                                        <i class="fa fa-spin fa-spinner"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': emailDaysData, 'chartType': 'bar', 'chartHeight': 250}) }}
-                                </div>
-                                <div class="col-xs-6">
-                                    {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': emailHoursData, 'chartType': 'bar', 'chartHeight': 250}) }}
+                            <div class="col-xs-6">
+                                <div data-graph-url="{{ path('mautic_emails_time_graph_stats', {'leadId' : lead.id, 'timeUnit' : 'h'}) }}">
+                                    <div class="spinner">
+                                        <i class="fa fa-spin fa-spinner"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
             {% endif %}
             <!-- tabs controls -->

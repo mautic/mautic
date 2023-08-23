@@ -144,6 +144,10 @@ return [
                 'path'       => '/contacts/export/download/{fileName}',
                 'controller' => 'Mautic\LeadBundle\Controller\LeadController::downloadExportAction',
             ],
+            'mautic_emails_time_graph_stats' => [
+                'path'       => '/emails-time-graph-stats/{leadId}/{timeUnit}',
+                'controller' => 'Mautic\LeadBundle\Controller\GraphStatsController::emailsTimeGraphAction',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
