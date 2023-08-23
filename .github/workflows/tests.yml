@@ -72,6 +72,8 @@ jobs:
         mysqldump --print-defaults
         cp .github/ci-files/.my.cnf ~/.my.cnf
         mysqldump --print-defaults
+        DB_LOG_NAME="${{ matrix.db-types }}"
+        echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
 
     - name: Set SYMFONY_ENV to test
       run: |
@@ -122,7 +124,7 @@ jobs:
       if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
-        name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
 
   misc:
