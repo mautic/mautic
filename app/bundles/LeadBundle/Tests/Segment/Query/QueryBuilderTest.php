@@ -39,7 +39,7 @@ class QueryBuilderTest extends TestCase
         $queryBuilder = $this->queryBuilder->setParameter(':one', 'first');
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         $this->queryBuilder->setParameter('two', true);
-        $this->queryBuilder->setParameter(':three', false);
+        $this->queryBuilder->setParameter('three', false);
         $this->queryBuilder->setParameter(4, 'fourth');
 
         Assert::assertSame([
@@ -168,7 +168,7 @@ class QueryBuilderTest extends TestCase
         $queryBuilder = $this->queryBuilder->setParametersPairs('one', 'first');
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         $this->queryBuilder->setParametersPairs('two', 'second');
-        $this->queryBuilder->setParametersPairs(':three', 'third');
+        $this->queryBuilder->setParametersPairs('three', 'third');
 
         Assert::assertSame([
             'one'   => 'first',
@@ -179,7 +179,7 @@ class QueryBuilderTest extends TestCase
 
     public function testSetParametersPairsWithArray(): void
     {
-        $queryBuilder     = $this->queryBuilder->setParametersPairs(['one', 'three', ':five'], ['first', 'third', 'fifth']);
+        $queryBuilder     = $this->queryBuilder->setParametersPairs(['one', 'three', 'five'], ['first', 'third', 'fifth']);
         Assert::assertSame($queryBuilder, $this->queryBuilder);
         Assert::assertSame([
             'one'   => 'first',
@@ -282,7 +282,7 @@ class QueryBuilderTest extends TestCase
         $this->queryBuilder->select('1')
             ->from('lead_lists_leads', 'orp');
 
-        Assert::assertSame('orp.id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
+        Assert::assertSame('orp.lead_id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
     }
 
     public function testGuessPrimaryLeadContactIdColumnWithOrphanedLeadsWithJoin(): void
