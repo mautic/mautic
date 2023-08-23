@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
@@ -39,7 +40,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->getConnection());
+        $this->_expr = new ExpressionBuilder($this->connection);
 
         return $this->_expr;
     }
@@ -77,6 +78,109 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
+     * @param string $queryPartName
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setQueryPart($queryPartName, $value)
+    {
+        $this->resetQueryPart($queryPartName);
+        $this->add($queryPartName, $value);
+
+        return $this;
+    }
+
+    public function getSQL()
+    {
+        $sql   = &$this->parentProperty('sql');
+        $state = &$this->parentProperty('state');
+
+        if (null !== $sql && self::STATE_CLEAN === $state) {
+            return $sql;
+        }
+
+        switch ($this->getType()) {
+            case self::INSERT:
+                $sql = $this->parentMethod('getSQLForInsert');
+                break;
+            case self::DELETE:
+                $sql = $this->parentMethod('getSQLForDelete');
+                break;
+
+            case self::UPDATE:
+                $sql = $this->parentMethod('getSQLForUpdate');
+                break;
+
+            case self::SELECT:
+            default:
+                $sql = $this->getSQLForSelect();
+                break;
+        }
+
+        $state = self::STATE_CLEAN;
+
+        return $sql;
+    }
+
+    private function getSQLForSelect(): string
+    {
+        $sqlParts = $this->getQueryParts();
+
+        $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
+            implode(', ', $sqlParts['select']);
+
+        $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
+            .(null !== $sqlParts['where'] ? ' WHERE '.((string) $sqlParts['where']) : '')
+            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
+            .(null !== $sqlParts['having'] ? ' HAVING '.((string) $sqlParts['having']) : '')
+            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
+
+        if ($this->parentMethod('isLimitQuery')) {
+            return $this->connection->getDatabasePlatform()->modifyLimitQuery(
+                $query,
+                $this->getMaxResults(),
+                $this->getFirstResult()
+            );
+        }
+
+        return $query;
+    }
+
+    private function getFromClauses(): array
+    {
+        $fromClauses  = [];
+        $knownAliases = [];
+
+        // Loop through all FROM clauses
+        foreach ($this->getQueryParts()['from'] as $from) {
+            if (null === $from['alias']) {
+                $tableSql       = $from['table'];
+                $tableReference = $from['table'];
+            } else {
+                $tableSql       = $from['table'].' '.$from['alias'];
+                $tableReference = $from['alias'];
+            }
+
+            if (isset($from['hint'])) {
+                $tableSql .= ' '.$from['hint'];
+            }
+
+            $knownAliases[$tableReference] = true;
+
+            $fromClauses[$tableReference] = $tableSql.Closure::bind(function ($tableReference, &$knownAliases) {
+                    return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
+                }, $this, parent::class)($tableReference, $knownAliases);
+        }
+
+        $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
+
+        return $fromClauses;
+    }
+
+    /**
+     * @deprecated this method is not used anywhere and will be removed in the future
+     *
      * @return bool
      */
     public function getJoinCondition($alias)
@@ -136,13 +240,13 @@ class QueryBuilder extends BaseQueryBuilder
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
-        $this->resetQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
             }
-            $this->join($part['joinType'], $part['joinTable'], $part['joinAlias'], $parts['l'][$key]['joinCondition']);
         }
+
+        $this->setQueryPart('join', $parts);
 
         return $this;
     }
@@ -390,5 +494,29 @@ class QueryBuilder extends BaseQueryBuilder
         $connection = $connection ?: $this->connection;
 
         return new self($connection);
+    }
+
+    /**
+     * @return mixed
+     *
+     * @noinspection PhpPassByRefInspection
+     */
+    private function &parentProperty(string $property)
+    {
+        return Closure::bind(function &() use ($property) {
+            return $this->$property;
+        }, $this, parent::class)();
+    }
+
+    /**
+     * @param mixed ...$arguments
+     *
+     * @return mixed
+     */
+    private function parentMethod(string $method, ...$arguments)
+    {
+        return Closure::bind(function () use ($method, $arguments) {
+            return $this->$method(...$arguments);
+        }, $this, parent::class)();
     }
 }
