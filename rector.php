@@ -42,10 +42,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30,
         // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
@@ -53,7 +51,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
         // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
@@ -70,39 +68,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
     $rectorConfig->rule(\Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
-
-    $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
-        \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
-            'MauticApiBundle'                         => 'Mautic\ApiBundle\Entity',
-            'MauticAssetBundle'                       => 'Mautic\AssetBundle\Entity',
-            'MauticCampaignBundle'                    => 'Mautic\CampaignBundle\Entity',
-            'MauticCategoryBundle'                    => 'Mautic\CategoryBundle\Entity',
-            'MauticChannelBundle'                     => 'Mautic\ChannelBundle\Entity',
-            'MauticCoreBundle'                        => 'Mautic\CoreBundle\Entity',
-            'MauticDashboardBundle'                   => 'Mautic\DashboardBundle\Entity',
-            'MauticDynamicContentBundle'              => 'Mautic\DynamicContentBundle\Entity',
-            'MauticEmailBundle'                       => 'Mautic\EmailBundle\Entity',
-            'MauticFormBundle'                        => 'Mautic\FormBundle\Entity',
-            'MauticIntegrationBundle'                 => 'Mautic\IntegrationBundle\Entity',
-            'MauticLeadBundle'                        => 'Mautic\LeadBundle\Entity',
-            'MauticNotificationBundle'                => 'Mautic\NotificationBundle\Entity',
-            'MauticPageBundle'                        => 'Mautic\PageBundle\Entity',
-            'MauticPluginBundle'                      => 'Mautic\PluginBundle\Entity',
-            'MauticPointBundle'                       => 'Mautic\PointBundle\Entity',
-            'MauticReportBundle'                      => 'Mautic\ReportBundle\Entity',
-            'MauticSmsBundle'                         => 'Mautic\SmsBundle\Entity',
-            'MauticStageBundle'                       => 'Mautic\StageBundle\Entity',
-            'MauticUserBundle'                        => 'Mautic\UserBundle\Entity',
-            'MauticWebhookBundle'                     => 'Mautic\WebhookBundle\Entity',
-            'MauticPluginMauticSocialBundle'          => 'MauticPlugin\MauticSocialBundle\Entity',
-            'MauticPluginMauticCitrixBundle'          => 'MauticPlugin\MauticCitrixBundle\Entity',
-            'MauticPluginMauticCrmBundle'             => 'MauticPlugin\MauticCrmBundle\Entity',
-            'MauticPluginMauticTagManagerBundle'      => 'MauticPlugin\MauticTagManagerBundle\Entity',
-            'MauticPluginMauticFocusBundle'           => 'MauticPlugin\MauticFocusBundle\Entity',
-            'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
-            'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
-        ],
-    ]);
 
     // This rule stopped existing :shrug:
     // $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
