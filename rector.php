@@ -3,25 +3,22 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\Php80\Rector\Class_\DoctrineAnnotationClassToAttributeRector;
+use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
-    $rectorConfig->skip(
-        [
-            __DIR__.'/*/test/*',
-            __DIR__.'/*/tests/*',
-            __DIR__.'/*/Test/*',
-            __DIR__.'/*/Tests/*',
-            __DIR__.'/*.html.php',
-            __DIR__.'/*.less.php',
-            __DIR__.'/*.inc.php',
-            __DIR__.'/*.js.php',
-            \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
-                __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
-            ],
-        ]
-    );
+    $rectorConfig->paths([
+        __DIR__.'/app/bundles',
+        __DIR__.'/plugins',
+    ]);
+
+    $rectorConfig->skip([
+        '*/Test/*',
+        '*/Tests/*',
+        '*.html.php',
+        ContainerGetToConstructorInjectionRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+        ],
+    ]);
 
     $rectorConfig->parallel();
 
@@ -67,6 +64,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class,
         \Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class,
         \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
-        \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class,
+        ContainerGetToConstructorInjectionRector::class,
     ]);
 };
