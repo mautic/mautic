@@ -130,9 +130,9 @@ class QueryBuilder extends BaseQueryBuilder
             implode(', ', $sqlParts['select']);
 
         $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.((string) $sqlParts['where']) : '')
+            .(null !== $sqlParts['where'] ? ' WHERE '.($sqlParts['where']) : '')
             .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.((string) $sqlParts['having']) : '')
+            .(null !== $sqlParts['having'] ? ' HAVING '.($sqlParts['having']) : '')
             .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
 
         if ($this->parentMethod('isLimitQuery')) {
