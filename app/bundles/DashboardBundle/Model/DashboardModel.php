@@ -13,9 +13,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -53,9 +53,9 @@ class DashboardModel extends FormModel
         LoggerInterface $mauticLogger
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper  = $pathsHelper;
-        $this->filesystem   = $filesystem;
-        $this->requestStack = $requestStack;
+        $this->pathsHelper          = $pathsHelper;
+        $this->filesystem           = $filesystem;
+        $this->requestStack         = $requestStack;
         $this->eventFactory         = $eventFactory;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

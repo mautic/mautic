@@ -109,7 +109,7 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget entity.
-     * 
+     *
      * @deprecated, will be private in M6
      */
     public function setWidget(Widget $widget)
@@ -174,9 +174,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget template data.
-     * 
-     * @param array $templateData
-     * @param bool  $skipCache
+     *
+     * @param bool $skipCache
      *
      * @return bool
      *
@@ -194,6 +193,7 @@ class WidgetDetailEvent extends CommonEvent
                 $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
                 // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
                 $expireTime = $this->widget->getCacheTimeout() * 60;
+
                 return $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
             }
 
@@ -290,7 +290,7 @@ class WidgetDetailEvent extends CommonEvent
             return false;
         }
 
-        return ($this->cacheProvider->getItem($this->getCacheKey()))->isHit();
+        return $this->cacheProvider->getItem($this->getCacheKey())->isHit();
     }
 
     /**
