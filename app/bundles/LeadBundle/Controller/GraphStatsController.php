@@ -22,7 +22,7 @@ class GraphStatsController extends CommonController
         /** @var Lead $lead */
         $lead = $model->getEntity($leadId);
 
-        if (empty($lead) || !$security->hasEntityAccess(
+        if (!$security->hasEntityAccess(
             'lead:leads:viewown',
             'lead:leads:viewother',
             $lead->getOwner()->getId()
