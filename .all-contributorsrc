@@ -1089,6 +1089,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "rubnogueira",
+      "name": "Ruben Nogueira",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40404708?v=4",
+      "profile": "https://www.rubnogueira.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

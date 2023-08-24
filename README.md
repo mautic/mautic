@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-115-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-116-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -224,6 +224,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/PatrickJenkner"><img src="https://avatars.githubusercontent.com/u/139468697?v=4?s=100" width="100px;" alt="Patrick"/><br /><sub><b>Patrick</b></sub></a><br /><a href="#userTesting-PatrickJenkner" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://tomasvotruba.com"><img src="https://avatars.githubusercontent.com/u/924196?v=4?s=100" width="100px;" alt="Tomas Votruba"/><br /><sub><b>Tomas Votruba</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TomasVotruba" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tirtharajghosh"><img src="https://avatars.githubusercontent.com/u/58604532?v=4?s=100" width="100px;" alt="Tirtharaj Ghosh"/><br /><sub><b>Tirtharaj Ghosh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=tirtharajghosh" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.rubnogueira.com"><img src="https://avatars.githubusercontent.com/u/40404708?v=4?s=100" width="100px;" alt="Ruben Nogueira"/><br /><sub><b>Ruben Nogueira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rubnogueira" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
