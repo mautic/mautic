@@ -24,6 +24,7 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\PermissionsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\ServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
+        $container->addCompilerPass(new Compiler\ShortenerServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\ORMPurgerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
 
         if ('test' === $container->getParameter('kernel.environment')) {
