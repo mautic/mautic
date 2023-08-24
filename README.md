@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-112-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-114-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -219,7 +219,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MohHeader"><img src="https://avatars.githubusercontent.com/u/3213925?v=4?s=100" width="100px;" alt="Mohammed Header"/><br /><sub><b>Mohammed Header</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MohHeader" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/danadelion"><img src="https://avatars.githubusercontent.com/u/78448517?v=4?s=100" width="100px;" alt="Dana Linhartová"/><br /><sub><b>Dana Linhartová</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=danadelion" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thanks"><img src="https://avatars.githubusercontent.com/u/1121545?v=4?s=100" width="100px;" alt="Thanks"/><br /><sub><b>Thanks</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Thanks" title="Tests">⚠️</a></td>
+    </tr>
+    <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/PatrickJenkner"><img src="https://avatars.githubusercontent.com/u/139468697?v=4?s=100" width="100px;" alt="Patrick"/><br /><sub><b>Patrick</b></sub></a><br /><a href="#userTesting-PatrickJenkner" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://tomasvotruba.com"><img src="https://avatars.githubusercontent.com/u/924196?v=4?s=100" width="100px;" alt="Tomas Votruba"/><br /><sub><b>Tomas Votruba</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TomasVotruba" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
