@@ -76,7 +76,7 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
         $this->securityMock       = $this->createMock(CorePermissions::class);
         $this->leadMock           = $this->createMock(Lead::class);
         $this->flashBagMock       = $this->createMock(FlashBag::class);
-        $this->containerMock      = $this->createMock(Container::class);
+        $containerMock            = $this->createMock(Container::class);
         $this->twig               = $this->createMock(Environment::class);
 
         $emailModelMock->method('getStatRepository')
@@ -103,15 +103,15 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
             $this->securityMock
         );
 
-        $this->containerMock->method('has')
+        $containerMock->method('has')
             ->with('twig')
             ->willReturn(true);
 
-        $this->containerMock->method('get')
+        $containerMock->method('get')
             ->with('twig')
             ->willReturn($this->twig);
 
-        $this->graphStatsController->setContainer($this->containerMock);
+        $this->graphStatsController->setContainer($containerMock);
     }
 
     /**
