@@ -169,7 +169,7 @@ class QueryBuilder extends BaseQueryBuilder
 
             $fromClauses[$tableReference] = $tableSql.\Closure::bind(function ($tableReference, &$knownAliases) {
                 return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
-                }, $this, parent::class)($tableReference, $knownAliases);
+            }, $this, parent::class)($tableReference, $knownAliases);
         }
 
         $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
