@@ -201,7 +201,7 @@ class Plugin extends CommonEntity
      */
     public function hasSecondaryDescription()
     {
-        return preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
+        return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,9 +32,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testValuesAreEscapedProperly(): void
     {
-        $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
-        $googleAnalytics = 'reveal pass: %mautic.db_password%';
+        $url                         = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
+        $trackIps                    = "%ip1%\n%ip2%\n%kernel.project_dir%";
+        $googleAnalytics             = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -46,11 +45,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
-                'config[coreconfig][link_shortener_url]' => $url,
-                'config[coreconfig][do_not_track_ips]'   => $trackIps,
-                'config[pageconfig][google_analytics]'   => $googleAnalytics,
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
+                'config[coreconfig][do_not_track_ips]'            => $trackIps,
+                'config[pageconfig][google_analytics]'            => $googleAnalytics,
+                'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
             ]
         );
 
@@ -68,8 +66,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_url', $configParameters, 'Assert "link_shortener_url" in: '.implode(',', array_keys($configParameters)));
-        Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(
             [
@@ -87,7 +83,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
@@ -115,7 +110,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page1',
             'alias'        => 'page1',
             'template'     => 'blank',
@@ -131,7 +126,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert unpublished record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 0,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page2',
             'alias'        => 'page2',
             'template'     => 'blank',
@@ -147,7 +142,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => 1,
-            'date_added'   => (new DateTime())->format('Y-m-d H:i:s'),
+            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'page3',
             'alias'        => 'page3',
             'template'     => 'blank',

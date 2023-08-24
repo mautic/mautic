@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\Tests\Helper;
 
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportHelperTest extends TestCase
 {
@@ -16,7 +17,7 @@ final class ReportHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->reportHelper = new ReportHelper();
+        $this->reportHelper = new ReportHelper($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testGetStandardColumnsMethodReturnsCorrectColumns(): void

@@ -93,8 +93,6 @@ class DoNotContact
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -196,7 +194,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = InputHelper::string($comments);
+        $this->comments = InputHelper::string((string) $comments);
 
         return $this;
     }

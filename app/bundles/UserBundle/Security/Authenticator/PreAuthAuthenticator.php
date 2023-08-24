@@ -40,9 +40,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
      */
     protected $requestStack;
 
-    /**
-     * @param $providerKey
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         EventDispatcherInterface $dispatcher,

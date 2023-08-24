@@ -3,10 +3,15 @@
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -17,10 +22,12 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
@@ -29,11 +36,6 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
     /**
      * @var \Mautic\FormBundle\Model\FormModel
      */
@@ -66,9 +68,16 @@ class FocusModel extends FormModel
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
         Environment $twig,
-        EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
         ContactTracker $contactTracker,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
@@ -76,6 +85,8 @@ class FocusModel extends FormModel
         $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -139,9 +150,9 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null $id
+     * @param int|null $id
      *
-     * @return Focus
+     * @return Focus|null
      */
     public function getEntity($id = null)
     {
@@ -175,24 +186,13 @@ class FocusModel extends FormModel
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
     {
         // If cached is not an array, rebuild to support the new format
-        $cached = json_decode($focus->getCache(), true);
+        $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
         if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
             $focusArray = $focus->toArray();
 
             $url = '';
             if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
-                $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focusArray['properties']['content']['link_url'],
-                    'focus',
-                    $focusArray['id']
-                );
-
-                $url = $this->trackableModel->generateTrackableUrl(
-                    $trackable,
-                    ['channel' => ['focus', $focusArray['id']]],
-                    false,
-                    $focus->getUtmTags()
-                );
+                $url = $focusArray['properties']['content']['link_url'];
             }
 
             $javascript = $this->twig->render(
@@ -309,9 +309,6 @@ class FocusModel extends FormModel
     /**
      * Get whether the color is light or dark.
      *
-     * @param $hex
-     * @param $level
-     *
      * @return bool
      */
     public static function isLightColor($hex, $level = 200)
@@ -330,7 +327,7 @@ class FocusModel extends FormModel
      * Add a stat entry.
      *
      * @param mixed                                         $type
-     * @param null                                          $data
+     * @param mixed                                         $data
      * @param array<int|string|array<int|string>>|Lead|null $lead
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
@@ -423,7 +420,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param      $unit
      * @param null $dateFormat
      * @param bool $canViewOthers
      *
@@ -470,5 +466,20 @@ class FocusModel extends FormModel
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    public function getViewsCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getViewsCount($focus->getId());
+    }
+
+    public function getUniqueViewsCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getUniqueViewsCount($focus->getId());
+    }
+
+    public function getClickThroughCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getClickThroughCount($focus->getId());
     }
 }

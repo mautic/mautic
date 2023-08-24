@@ -93,7 +93,7 @@ return [
                     'translator',
                     'kernel',
                     'validator',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
             ],

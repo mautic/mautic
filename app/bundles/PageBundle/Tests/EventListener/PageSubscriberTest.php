@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
@@ -19,6 +20,7 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -68,16 +70,16 @@ class PageSubscriberTest extends TestCase
 
     /**
      * Get page subscriber with mocked dependencies.
-     *
-     * @return PageSubscriber
      */
-    protected function getPageSubscriber()
+    protected function getPageSubscriber(): PageSubscriber
     {
-        $packagesMock = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
 
-        $assetsHelperMock   = new AssetsHelper($packagesMock);
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        $assetsHelperMock   = new AssetsHelper($packagesMock, $coreParametersHelper);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
         $pageModelMock      = $this->createMock(PageModel::class);
@@ -97,7 +99,7 @@ class PageSubscriberTest extends TestCase
             ->method('find')
             ->will($this->returnValue($leadMock));
 
-        $pageSubscriber = new PageSubscriber(
+        return new PageSubscriber(
             $assetsHelperMock,
             $ipLookupHelperMock,
             $auditLogModelMock,
@@ -108,8 +110,6 @@ class PageSubscriberTest extends TestCase
             $redirectRepository,
             $contactRepository
         );
-
-        return $pageSubscriber;
     }
 
     /**

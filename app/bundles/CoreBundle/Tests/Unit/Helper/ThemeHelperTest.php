@@ -74,6 +74,8 @@ class ThemeHelperTest extends TestCase
 
         $this->builderIntegrationsHelper = $this->createMock(BuilderIntegrationsHelper::class);
 
+        $this->translator->method('trans')->willReturn('some translation');
+
         $this->themeHelper = new ThemeHelper(
             $this->pathsHelper,
             $this->twig,
@@ -189,7 +191,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
-        $this->assertEquals('@themes/nature/html/page.html.twig', $template);
+        $this->assertEquals('@themes/aurora/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void

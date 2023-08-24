@@ -75,9 +75,6 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    /**
-     * @param $campaignMember
-     */
     private function saveCampaignMember($campaignMember)
     {
         $this->leadRepository->saveEntity($campaignMember);

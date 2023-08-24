@@ -124,8 +124,6 @@ class Webhook extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -306,8 +304,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $events
-     *
      * @return $this
      */
     public function setEvents($events)

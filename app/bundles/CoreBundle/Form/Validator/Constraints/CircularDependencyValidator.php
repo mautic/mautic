@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use UnexpectedValueException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -45,7 +44,7 @@ class CircularDependencyValidator extends ConstraintValidator
             if (in_array($segmentId, $dependentSegmentIds)) {
                 $this->context->addViolation($constraint->message);
             }
-        } catch (UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // Segment ID is not in the request. May be new segment.
         }
     }
@@ -53,7 +52,7 @@ class CircularDependencyValidator extends ConstraintValidator
     /**
      * @return int
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
     private function getSegmentIdFromRequest()
     {
@@ -61,7 +60,7 @@ class CircularDependencyValidator extends ConstraintValidator
         $routeParams = $request->get('_route_params');
 
         if (empty($routeParams['objectId'])) {
-            throw new UnexpectedValueException('Segment ID is missing in the request');
+            throw new \UnexpectedValueException('Segment ID is missing in the request');
         }
 
         return (int) $routeParams['objectId'];

@@ -278,8 +278,6 @@ class Form extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -313,14 +311,10 @@ class Form extends FormEntity
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         if ('actions' == $prop || 'fields' == $prop) {
-            //changes are already computed so just add them
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -552,6 +546,29 @@ class Form extends FormEntity
     }
 
     /**
+     * Loops through the form fields and returns an array of fields with mapped data.
+     *
+     * @return array<int, array<string, int|string>>
+     */
+    public function getMappedFieldValues(): array
+    {
+        return array_filter(
+            array_map(
+                function (Field $field) {
+                    return [
+                        'formFieldId'  => $field->getId(),
+                        'mappedObject' => $field->getMappedObject(),
+                        'mappedField'  => $field->getMappedField(),
+                    ];
+                },
+                $this->getFields()->getValues()
+            ),
+            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
+        );
+    }
+
+    /**
+     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]
@@ -785,17 +802,9 @@ class Form extends FormEntity
     /**
      * Generate a form name for HTML attributes.
      */
-    public function generateFormName()
+    public function generateFormName(): string
     {
-        $name = strtolower(
-            InputHelper::alphanum(
-                InputHelper::transliterate(
-                    $this->name
-                )
-            )
-        );
-
-        return (empty($name)) ? 'form-'.$this->id : $name;
+        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
     }
 
     /**

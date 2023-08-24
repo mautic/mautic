@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use AppKernel;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,7 +57,7 @@ class CookieHelperTest extends TestCase
 
         $response          = $this->createMock(Response::class);
         $response->headers = $headers;
-        $kernel            = new AppKernel(MAUTIC_ENV, false);
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
         $request           = $this->createMock(Request::class);
 
         $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
@@ -94,7 +93,7 @@ class CookieHelperTest extends TestCase
 
         $response          = $this->createMock(Response::class);
         $response->headers = $headers;
-        $kernel            = new AppKernel(MAUTIC_ENV, false);
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
         $request           = $this->createMock(Request::class);
 
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
@@ -128,7 +127,7 @@ class CookieHelperTest extends TestCase
 
         $response          = $this->createMock(Response::class);
         $response->headers = $headers;
-        $kernel            = new AppKernel(MAUTIC_ENV, false);
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
         $request           = $this->createMock(Request::class);
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 

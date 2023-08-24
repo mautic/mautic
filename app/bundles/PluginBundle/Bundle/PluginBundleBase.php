@@ -73,7 +73,7 @@ abstract class PluginBundleBase extends Bundle
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
     {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
-        //self::updatePluginSchema($metadata, $installedSchema, $factory);
+        // self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
 
     /**

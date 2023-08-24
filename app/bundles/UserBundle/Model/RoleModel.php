@@ -47,7 +47,7 @@ class RoleModel extends FormModel
         $isNew = ($entity->getId()) ? 0 : 1;
 
         if (!$isNew) {
-            //delete all existing
+            // delete all existing
             $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
         }
 
@@ -65,7 +65,7 @@ class RoleModel extends FormModel
             return;
         }
 
-        //set permissions if applicable and if the user is not an admin
+        // set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
             $this->security->generatePermissions($rawPermissions) :
             [];

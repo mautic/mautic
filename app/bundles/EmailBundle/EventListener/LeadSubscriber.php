@@ -75,9 +75,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param $state
-     */
     private function addEmailEvents(LeadTimelineEvent $event, $state)
     {
         // Set available event types
@@ -118,7 +115,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 } else {
                     $dateSent = 'read';

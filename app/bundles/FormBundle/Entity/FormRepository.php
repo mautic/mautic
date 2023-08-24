@@ -15,7 +15,7 @@ class FormRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+        // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
             ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
@@ -94,7 +94,7 @@ class FormRepository extends CommonRepository
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $parameters      = [];
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):

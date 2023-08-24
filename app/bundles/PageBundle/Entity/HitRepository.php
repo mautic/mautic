@@ -93,7 +93,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * @param      $source
      * @param null $sourceId
      * @param null $fromDate
      *
@@ -127,7 +126,6 @@ class HitRepository extends CommonRepository
     /**
      * Get an array of hits via an email clickthrough.
      *
-     * @param           $emailIds
      * @param \DateTime $fromDate
      * @param int       $code
      *
@@ -305,7 +303,7 @@ class HitRepository extends CommonRepository
         );
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt   = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
             $expr = $expr->with(
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
@@ -381,7 +379,7 @@ class HitRepository extends CommonRepository
             );
 
         if (isset($options['fromDate']) && null !== $options['fromDate']) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(
                 $q->expr()->gte('ph.date_hit', $q->expr()->literal($dt->toUtcString()))
@@ -390,7 +388,7 @@ class HitRepository extends CommonRepository
 
         $results = $q->execute()->fetchAllAssociative();
 
-        //loop to structure
+        // loop to structure
         $times  = [];
         $titles = [];
 
@@ -402,7 +400,7 @@ class HitRepository extends CommonRepository
             $times[$r['page_id']][] = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
         }
 
-        //now loop to create stats
+        // now loop to create stats
         $stats = [];
 
         foreach ($times as $pid => $time) {
@@ -535,11 +533,6 @@ class HitRepository extends CommonRepository
         return $query->execute()->fetchAllAssociative();
     }
 
-    /**
-     * @param $leadId
-     * @param $newTrackingId
-     * @param $oldTrackingId
-     */
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -558,9 +551,6 @@ class HitRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

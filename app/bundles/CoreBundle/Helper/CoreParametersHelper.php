@@ -47,7 +47,7 @@ class CoreParametersHelper
         $name = $this->stripMauticPrefix($name);
 
         if ('db_table_prefix' === $name && defined('MAUTIC_TABLE_PREFIX')) {
-            //use the constant in case in the installer
+            // use the constant in case in the installer
             return MAUTIC_TABLE_PREFIX;
         }
 

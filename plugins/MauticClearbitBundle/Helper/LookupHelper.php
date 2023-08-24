@@ -134,10 +134,6 @@ class LookupHelper
         }
     }
 
-    /**
-     * @param $oid
-     * @param $type
-     */
     public function validateRequest($oid, $type)
     {
         // prefix#entityId#hour#userId#nonce
@@ -188,9 +184,6 @@ class LookupHelper
     }
 
     /**
-     * @param $entity
-     * @param $notify
-     *
      * @return array
      */
     protected function getCache($entity, $notify)

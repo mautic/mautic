@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -15,15 +16,22 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends CommonFormModel<Campaign>
@@ -60,13 +68,23 @@ class CampaignModel extends CommonFormModel
         FormModel $formModel,
         EventCollector $eventCollector,
         MembershipBuilder $membershipBuilder,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->leadListModel     = $leadListModel;
         $this->formModel         = $formModel;
         $this->eventCollector    = $eventCollector;
         $this->membershipBuilder = $membershipBuilder;
         $this->contactTracker    = $contactTracker;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -143,8 +161,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
-     *
      * @return Campaign|null
      */
     public function getEntity($id = null)
@@ -169,11 +185,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -218,10 +229,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $sessionEvents
-     * @param $sessionConnections
-     * @param $deletedEvents
-     *
      * @return array
      */
     public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
@@ -236,7 +243,7 @@ class CampaignModel extends CommonFormModel
 
             foreach ($properties as $f => $v) {
                 if ('id' == $f && 0 === strpos($v, 'new')) {
-                    //set the temp ID used to be able to match up connections
+                    // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
 
@@ -336,7 +343,7 @@ class CampaignModel extends CommonFormModel
 
         $entity->addEvents($events);
 
-        //set event order used when querying the events
+        // set event order used when querying the events
         $this->buildOrder($hierarchy, $events, $entity);
 
         uasort(
@@ -361,8 +368,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param      $entity
-     * @param      $settings
      * @param bool $persist
      * @param null $events
      *
@@ -436,8 +441,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get list of sources for a campaign.
      *
-     * @param $campaign
-     *
      * @return array
      */
     public function getLeadSources($campaign)
@@ -457,10 +460,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Add and/or delete lead sources from a campaign.
-     *
-     * @param $entity
-     * @param $addedSources
-     * @param $deletedSources
      */
     public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
     {
@@ -518,7 +517,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
 
-            // no break
+                // no break
             case 'forms':
             case null:
                 $choices['forms'] = [];
@@ -573,7 +572,7 @@ class CampaignModel extends CommonFormModel
         if (!isset($campaigns[$lead->getId()])) {
             $repo   = $this->getRepository();
             $leadId = $lead->getId();
-            //get the campaigns the lead is currently part of
+            // get the campaigns the lead is currently part of
             $campaigns[$leadId] = $repo->getPublishedCampaigns(
                 null,
                 $lead->getId(),
@@ -629,7 +628,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get details of leads in a campaign.
      *
-     * @param      $campaign
      * @param null $leads
      *
      * @return mixed
@@ -662,8 +660,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $id
-     *
      * @return array
      */
     public function getCampaignListIds($id)
@@ -767,7 +763,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param          $hierarchy
      * @param Campaign $entity
      * @param string   $root
      * @param int      $order
@@ -807,8 +802,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $segmentId
-     *
      * @return array
      */
     public function getCampaignIdsWithDependenciesOnSegment($segmentId)

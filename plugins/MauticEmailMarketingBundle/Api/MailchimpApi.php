@@ -9,7 +9,6 @@ class MailchimpApi extends EmailMarketingApi
     private $version = '3.0';
 
     /**
-     * @param        $endpoint
      * @param array  $parameters
      * @param string $method
      *
@@ -56,8 +55,6 @@ class MailchimpApi extends EmailMarketingApi
     }
 
     /**
-     * @param $listId
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -68,8 +65,6 @@ class MailchimpApi extends EmailMarketingApi
     }
 
     /**
-     * @param       $email
-     * @param       $listId
      * @param array $fields
      * @param array $config
      *

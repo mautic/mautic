@@ -56,21 +56,30 @@ EOT
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
-        $assetsDir = $this->pathsHelper->getAssetsPath();
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+
+        $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
+
+        foreach (['mediaelementplayer', 'modal'] as $css_file) {
+            file_put_contents(
+                $mediaDir.'/css/'.$css_file.'.min.css',
+                (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/css/'.$css_file.'.css'])
+            );
+        }
 
         // Minify Mautic Form SDK
         file_put_contents(
-            $assetsDir.'/js/mautic-form-tmp.js',
-            \Minify::combine([$assetsDir.'/js/mautic-form-src.js'])
+            $mediaDir.'/js/mautic-form-tmp.js',
+            (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
         );
         // Fix the MauticSDK loader
         file_put_contents(
-            $assetsDir.'/js/mautic-form.js',
-            str_replace("'mautic-form-src.js'", "'mautic-form.js'",
-                file_get_contents($assetsDir.'/js/mautic-form-tmp.js'))
+            $mediaDir.'/js/mautic-form.js',
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
         );
         // Remove temp file.
-        unlink($assetsDir.'/js/mautic-form-tmp.js');
+        unlink($mediaDir.'/js/mautic-form-tmp.js');
 
         // Check that the production assets were correctly generated.
         $productionAssets = [
@@ -82,10 +91,14 @@ EOT
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
+            'js/ckeditor4/ckeditor.js',
+            'js/ckeditor4/adapters/jquery.js',
+            'js/jquery.min.js',
+            'js/froogaloop.min.js',
         ];
 
         foreach ($productionAssets as $relativePath) {
-            $absolutePath = $assetsDir.'/'.$relativePath;
+            $absolutePath = $mediaDir.'/'.$relativePath;
             if (!$this->filesystem->exists($absolutePath)) {
                 $output->writeln('<error>The file '.$this->translator->trans("{$absolutePath} does not exist. Generating production assets was not sucessful.").'</error>');
 
@@ -104,4 +117,15 @@ EOT
 
         $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
     }
+
+    /**
+     * Following libraries are loaded by public, not administration related features so those cannot be built into one JS file.
+     */
+    private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
+    {
+        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
+        $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
+        $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
+    }
+    protected static $defaultDescription = 'Combines and minifies asset files into single production files';
 }
