@@ -74,17 +74,17 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws Exception
+     * @return array<int, array<string, int|string>>
      */
-    public function testGetEmailDaysData(): void
+    private function generateDayStats(): array
     {
-        $expectedHourStats = [];
+        $dayStats = [];
         for ($i = 0; $i < 7; ++$i) {
             $send = rand(0, 10);
             $read = rand(0, $send);
             $hit  = rand(0, $read);
 
-            $expectedHourStats[] = [
+            $dayStats[] = [
                 'day'        => $i,
                 'sent_count' => (string) $send,
                 'read_count' => (string) $read,
@@ -92,9 +92,41 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
             ];
         }
 
+        return $dayStats;
+    }
+
+    /**
+     * @return array<int, array<string, int|string>>
+     */
+    private function generateHourStats(): array
+    {
+        $hourStats = [];
+        for ($i = 0; $i < 24; ++$i) {
+            $send = rand(0, 10);
+            $read = rand(0, $send);
+            $hit  = rand(0, $read);
+
+            $hourStats[] = [
+                'hour'       => $i,
+                'sent_count' => (string) $send,
+                'read_count' => (string) $read,
+                'hit_count'  => (string) $hit,
+            ];
+        }
+
+        return $hourStats;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetEmailDaysData(): void
+    {
+        $expectedDayStats = $this->generateDayStats();
+
         $this->statRepositoryMock->method('getEmailDayStats')
             ->with($this->leadMock)
-            ->willReturn($expectedHourStats);
+            ->willReturn($expectedDayStats);
 
         $this->translatorMock->method('trans')
             ->willReturnOnConsecutiveCalls(
@@ -114,11 +146,11 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], $results['labels']);
         $this->assertEquals('Email sent', $results['datasets'][0]['label']);
-        $this->assertSame(array_column($expectedHourStats, 'sent_count'), $results['datasets'][0]['data']);
+        $this->assertSame(array_column($expectedDayStats, 'sent_count'), $results['datasets'][0]['data']);
         $this->assertEquals('Email read', $results['datasets'][1]['label']);
-        $this->assertSame(array_column($expectedHourStats, 'read_count'), $results['datasets'][1]['data']);
+        $this->assertSame(array_column($expectedDayStats, 'read_count'), $results['datasets'][1]['data']);
         $this->assertEquals('Email clicked', $results['datasets'][2]['label']);
-        $this->assertSame(array_column($expectedHourStats, 'hit_count'), $results['datasets'][2]['data']);
+        $this->assertSame(array_column($expectedDayStats, 'hit_count'), $results['datasets'][2]['data']);
     }
 
     /**
@@ -126,19 +158,7 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
      */
     public function testGetEmailHoursData(): void
     {
-        $expectedHourStats = [];
-        for ($i = 0; $i < 24; ++$i) {
-            $send = rand(0, 10);
-            $read = rand(0, $send);
-            $hit  = rand(0, $read);
-
-            $expectedHourStats[] = [
-                'hour'       => $i,
-                'sent_count' => (string) $send,
-                'read_count' => (string) $read,
-                'hit_count'  => (string) $hit,
-            ];
-        }
+        $expectedHourStats = $this->generateHourStats();
 
         $this->statRepositoryMock->method('getEmailTimeStats')
             ->with($this->leadMock)
@@ -185,5 +205,31 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
         $this->assertSame(array_column($expectedHourStats, 'read_count'), $results['datasets'][1]['data']);
         $this->assertEquals('Email clicked', $results['datasets'][2]['label']);
         $this->assertSame(array_column($expectedHourStats, 'hit_count'), $results['datasets'][2]['data']);
+    }
+
+    public function testGetLeadEmailTimeStats(): void
+    {
+        $expectedDayStats  = $this->generateDayStats();
+        $expectedHourStats = $this->generateHourStats();
+
+        $this->statRepositoryMock->method('getEmailDayStats')
+            ->with($this->leadMock)
+            ->willReturn($expectedDayStats);
+
+        $this->statRepositoryMock->method('getEmailTimeStats')
+            ->with($this->leadMock)
+            ->willReturn($expectedHourStats);
+
+        $resultsDays        = $this->graphStatsController->getLeadEmailTimeStats($this->leadMock, 'd');
+        $resultsHours       = $this->graphStatsController->getLeadEmailTimeStats($this->leadMock, 'h');
+        $resultsInvalidUnit = $this->graphStatsController->getLeadEmailTimeStats($this->leadMock, 't');
+
+        $this->assertCount(3, $resultsDays['datasets']);
+        $this->assertCount(3, $resultsHours['datasets']);
+        $this->assertCount(7, $resultsDays['datasets'][0]['data']);
+        $this->assertCount(24, $resultsHours['datasets'][0]['data']);
+        $this->assertSame(array_column($expectedDayStats, 'sent_count'), $resultsDays['datasets'][0]['data']);
+        $this->assertSame(array_column($expectedHourStats, 'sent_count'), $resultsHours['datasets'][0]['data']);
+        $this->assertEmpty($resultsInvalidUnit);
     }
 }
