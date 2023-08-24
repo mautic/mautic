@@ -1080,6 +1080,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "tirtharajghosh",
+      "name": "Tirtharaj Ghosh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58604532?v=4",
+      "profile": "https://github.com/tirtharajghosh",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
