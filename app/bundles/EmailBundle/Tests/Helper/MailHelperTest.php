@@ -408,12 +408,12 @@ class MailHelperTest extends TestCase
         $lead->setEmail('someemail@email.test');
         $mailer->setLead($lead);
 
-        $mailer->setEmailType('marketing');
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
         $headers = $mailer->getCustomHeaders();
         $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
 
         // There are no unsubscribe headers in transactional emails.
-        $mailer->setEmailType('transactional');
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
         $headers = $mailer->getCustomHeaders();
         $this->assertNull($headers['List-Unsubscribe'] ?? null);
     }

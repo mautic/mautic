@@ -37,6 +37,7 @@ class MailHelper
     public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+    public const EMAIL_TYPE_MARKETING     = 'marketing';
     /**
      * @var MauticFactory
      */
