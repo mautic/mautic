@@ -244,7 +244,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [tagged-release]: <https://github.com/mautic/mautic/releases>
 [composer]: <http://getcomposer.org/>
 [download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
-[ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
+[ddev-mautic]: <https://kb.mautic.org/article/how-to-set-up-a-mautic-instance-for-testing-locally-with-ddev.html>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
 [mautic-docs]: <https://docs.mautic.org>
