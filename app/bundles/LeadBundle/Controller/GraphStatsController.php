@@ -21,7 +21,6 @@ class GraphStatsController extends CommonController
 
         /** @var Lead $lead */
         $lead = $model->getEntity($leadId);
-        $model->getRepository()->refetchEntity($lead);
 
         if (empty($lead) || !$security->hasEntityAccess(
             'lead:leads:viewown',
