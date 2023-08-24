@@ -58,16 +58,18 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     ]);
 
     // Define what single rules will be applied
-    $rectorConfig->rule(\Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
-    $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
-    $rectorConfig->rule(\Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
+    $rectorConfig->rules([
+        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
+        \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
+        \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,
+        \Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class,
+        \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
+        \Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class,
+        \Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class,
+        \Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class,
+        \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
+        \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class,
+    ]);
 
     // This rule stopped existing :shrug:
     // $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
