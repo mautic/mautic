@@ -35,7 +35,7 @@ class FormUploader
     {
         $uploadedFiles = [];
         $result        = $submission->getResults();
-        $alias         = ''; //Only for IDE - will be overriden by foreach
+        $alias         = ''; // Only for IDE - will be overriden by foreach
 
         try {
             foreach ($filesToUpload as $fileFieldCrate) {
@@ -137,8 +137,6 @@ class FormUploader
     /**
      * Fix iOS picture orientation after upload PHP
      * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
-     *
-     * @param $filename
      */
     private function fixRotationJPG($filename)
     {
@@ -149,7 +147,7 @@ class FormUploader
         if (empty($exif['Orientation'])) {
             return;
         }
-        $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
+        $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
         $ort1 = $ort;
         $exif = exif_read_data($filename, '', true);
         if (!empty($ort1)) {

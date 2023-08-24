@@ -68,7 +68,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->setUnpublishedMailFlashMessage($campaign);
         }
 
-        //don't set leads
+        // don't set leads
         unset($details['leads']);
 
         if (!empty($details)) {

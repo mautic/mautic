@@ -48,7 +48,7 @@ class FileHelper
         $sSuffix = substr($sSize, -1);
         $iValue  = (int) substr($sSize, 0, -1);
 
-        //missing breaks are important
+        // missing breaks are important
         switch (strtoupper($sSuffix)) {
             case 'P':
                 $iValue *= 1024;

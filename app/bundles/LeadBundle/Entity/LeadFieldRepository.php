@@ -37,7 +37,7 @@ class LeadFieldRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('is_published', ':true')
             )
-                ->setParameter(':true', true, 'boolean');
+                ->setParameter('true', true, 'boolean');
         }
 
         if ($object) {
@@ -54,8 +54,8 @@ class LeadFieldRepository extends CommonRepository
         }
 
         if ($includeEntityFields) {
-            //add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead')->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
+            // add lead main column names to prevent attempt to create a field with the same name
+            $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 
@@ -69,8 +69,9 @@ class LeadFieldRepository extends CommonRepository
     {
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.object = :object");
+        $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.label");
         $queryBuilder->setParameter('object', $object);
 
@@ -94,7 +95,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -156,7 +157,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $queryBuilder = $this->_em->createQueryBuilder();
         $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
         $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.object");
@@ -240,7 +241,7 @@ class LeadFieldRepository extends CommonRepository
                 $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
                 $compositeExpression              = ('empty' === $operatorExpr) ?
                     $q->expr()->or(
-                         $q->expr()->isNull($property),
+                        $q->expr()->isNull($property),
                         $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
                     )
                     :
@@ -301,7 +302,7 @@ class LeadFieldRepository extends CommonRepository
                 } else {
                     $expr = $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
-                        ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
+                        'in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values')
                     );
 
                     $q->where($expr)
@@ -428,8 +429,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param $type
-     *
      * @return LeadField[]
      */
     public function getFieldsByType($type)
@@ -444,7 +443,7 @@ class LeadFieldRepository extends CommonRepository
     {
         return $this->_em->createQueryBuilder()
             ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
-            ->from($this->_entityName, 'f', 'f.alias')
+            ->from($this->getEntityName(), 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()

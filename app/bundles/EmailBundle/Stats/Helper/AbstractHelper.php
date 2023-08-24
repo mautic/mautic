@@ -2,10 +2,8 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
-use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
@@ -49,9 +47,9 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @return array
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function fetchStats(DateTime $fromDateTime, DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
@@ -83,7 +81,7 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @return ChartQuery
      */
-    protected function getQuery(DateTime $fromDateTime, DateTime $toDateTime)
+    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
@@ -131,7 +129,7 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {

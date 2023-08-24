@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use DOMElement;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,7 +25,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
 
         $elements = $crawler->filter('form input[name*="campaign[isPublished]"]')->getIterator();
 
-        /** @var DOMElement $element */
+        /** @var \DOMElement $element */
         foreach ($elements as $element) {
             foreach ($attributes as $attribute) {
                 $this->assertFalse($element->hasAttribute($attribute), sprintf('The "%s" attribute is present.', $attribute));
@@ -56,7 +55,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
 
         $elements = $crawler->filter('form input[name*="campaign[isPublished]"]')->getIterator();
 
-        /** @var DOMElement $element */
+        /** @var \DOMElement $element */
         foreach ($elements as $element) {
             foreach ($attributes as $key => $val) {
                 $this->assertStringContainsString($val, $element->getAttribute($key));

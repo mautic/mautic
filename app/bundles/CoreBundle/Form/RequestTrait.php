@@ -130,7 +130,7 @@ trait RequestTrait
                         break;
                     }
 
-                    switch ($type) {
+                    switch (get_class($type)) {
                         case DateTimeType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                             break;
@@ -141,7 +141,6 @@ trait RequestTrait
                             $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
                             break;
                     }
-
                     break;
             }
         }
@@ -174,7 +173,7 @@ trait RequestTrait
             case 'boolean':
                 $fieldData[$leadField['alias']] = InputHelper::boolean($fieldData[$leadField['alias']]);
                 break;
-            // Ensure date/time entries match what symfony expects
+                // Ensure date/time entries match what symfony expects
             case 'datetime':
             case 'date':
             case 'time':

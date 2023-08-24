@@ -277,7 +277,6 @@ class EventExecutioner
     }
 
     /**
-     * @param      $reason
      * @param bool $isInactiveEvent
      */
     public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false)

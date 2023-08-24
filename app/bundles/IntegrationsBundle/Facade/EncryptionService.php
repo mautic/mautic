@@ -40,7 +40,6 @@ class EncryptionService
     }
 
     /**
-     * @param      $keys
      * @param bool $onlyPrimaryCipher
      *
      * @return array|string

@@ -60,8 +60,6 @@ class LanguageHelper
      *
      * This will attempt to download the package if it is not found
      *
-     * @param $languageCode
-     *
      * @return array
      */
     public function extractLanguagePackage($languageCode)

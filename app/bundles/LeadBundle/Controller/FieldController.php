@@ -23,7 +23,7 @@ class FieldController extends FormController
      */
     public function indexAction(Request $request, $page = 1)
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
 
         $session = $request->getSession();
@@ -38,7 +38,7 @@ class FieldController extends FormController
         $search = $request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfilter.filter', $search);
 
-        //do some default filtering
+        // do some default filtering
         $orderBy    = $request->getSession()->get('mautic.leadfilter.orderby', 'f.order');
         $orderByDir = $request->getSession()->get('mautic.leadfilter.orderbydir', 'ASC');
 
@@ -62,7 +62,7 @@ class FieldController extends FormController
         $count = count($fields);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -82,7 +82,7 @@ class FieldController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.leadfield.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -117,17 +117,17 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        //retrieve the entity
+        // retrieve the entity
         $field = new LeadField();
         /** @var FieldModel $model */
         $model = $this->getModel('lead.field');
-        //set the return URL for post actions
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
         $action    = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']);
-        //get the user form factory
+        // get the user form factory
         $form = $model->createForm($field, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -136,7 +136,7 @@ class FieldController extends FormController
                     if (isset($requestData['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $requestData['leadfield']['properties']);
                         if (true !== $result) {
-                            //set the error
+                            // set the error
                             $form->get('properties')->addError(
                                 new FormError(
                                     $this->translator->trans($result, [], 'validators')
@@ -149,7 +149,7 @@ class FieldController extends FormController
                     if ($valid) {
                         $flashMessage = 'mautic.core.notice.created';
                         try {
-                            //form is valid so process the data
+                            // form is valid so process the data
                             $model->saveEntity($field);
                         } catch (\Doctrine\DBAL\Exception $ee) {
                             $flashMessage = $ee->getMessage();
@@ -161,26 +161,26 @@ class FieldController extends FormController
                             $valid = false;
                         } catch (\Exception $e) {
                             $form['alias']->addError(
-                                    new FormError(
-                                        $this->translator->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
-                                    )
-                                );
+                                new FormError(
+                                    $this->translator->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
+                                )
+                            );
                             $valid = false;
                         }
                         $this->addFlashMessage(
-                                $flashMessage,
-                                [
-                                    '%name%'      => $field->getLabel(),
-                                    '%menu_link%' => 'mautic_contactfield_index',
-                                    '%url%'       => $this->generateUrl(
-                                        'mautic_contactfield_action',
-                                        [
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $field->getId(),
-                                        ]
-                                    ),
-                                ]
-                            );
+                            $flashMessage,
+                            [
+                                '%name%'      => $field->getLabel(),
+                                '%menu_link%' => 'mautic_contactfield_index',
+                                '%url%'       => $this->generateUrl(
+                                    'mautic_contactfield_action',
+                                    [
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $field->getId(),
+                                    ]
+                                ),
+                            ]
+                        );
                     }
                 }
             }
@@ -225,7 +225,6 @@ class FieldController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param            $objectId
      * @param bool|false $ignorePost
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -240,7 +239,7 @@ class FieldController extends FormController
         $model = $this->getModel('lead.field');
         $field = $model->getEntity($objectId);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
 
         $postActionVars = [
@@ -251,7 +250,7 @@ class FieldController extends FormController
                 'mauticContent' => 'leadfield',
             ],
         ];
-        //list not found
+        // list not found
         if (null === $field) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -265,14 +264,14 @@ class FieldController extends FormController
                 ])
             );
         } elseif ($model->isLocked($field)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $field, 'lead.field');
         }
 
         $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form   = $model->createForm($field, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -281,7 +280,7 @@ class FieldController extends FormController
                     if (isset($requestData['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $requestData['leadfield']['properties']);
                         if (true !== $result) {
-                            //set the error
+                            // set the error
                             $form->get('properties')->addError(new FormError(
                                 $this->translator->trans($result, [], 'validators')
                             ));
@@ -290,7 +289,7 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        //form is valid so process the data
+                        // form is valid so process the data
                         $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         $this->addFlashMessage('mautic.core.notice.updated', [
@@ -304,7 +303,7 @@ class FieldController extends FormController
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($field);
             }
 
@@ -328,7 +327,7 @@ class FieldController extends FormController
                 $form = $newForm;
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($field);
         }
 
@@ -347,8 +346,6 @@ class FieldController extends FormController
 
     /**
      * Clone an entity.
-     *
-     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -376,8 +373,6 @@ class FieldController extends FormController
 
     /**
      * Delete a field.
-     *
-     * @param $objectId
      *
      * @return Response
      */
@@ -413,7 +408,7 @@ class FieldController extends FormController
             } elseif ($model->isLocked($field)) {
                 return $this->isLocked($postActionVars, $field, 'lead.field');
             } elseif ($field->isFixed()) {
-                //cannot delete fixed fields
+                // cannot delete fixed fields
                 return $this->accessDenied();
             }
 
@@ -445,7 +440,7 @@ class FieldController extends FormController
             }
 
             $flashes[] = $flashMessage;
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -543,7 +538,7 @@ class FieldController extends FormController
                     ];
                 }
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

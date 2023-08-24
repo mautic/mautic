@@ -169,7 +169,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -190,7 +190,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }
@@ -211,7 +211,7 @@ class ThemeHelper implements ThemeHelperInterface
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
 
-        //check to make sure the theme exists
+        // check to make sure the theme exists
         if (!isset($themes[$theme])) {
             throw new FileNotFoundException($theme.' not found!');
         }

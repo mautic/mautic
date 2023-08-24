@@ -11,9 +11,6 @@ class Cleaner
     public const FIELD_TYPE_DATE     = 'date';
 
     /**
-     * @param $value
-     * @param $fieldType
-     *
      * @return bool|float|string
      */
     public static function clean($value, $fieldType = self::FIELD_TYPE_STRING)

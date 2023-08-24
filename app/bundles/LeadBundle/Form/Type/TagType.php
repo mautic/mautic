@@ -29,7 +29,7 @@ class TagType extends AbstractType
             $transformer = new TagEntityModelTransformer(
                 $this->em,
                 Tag::class,
-                ($options['multiple'])
+                $options['multiple']
             );
 
             $builder->addModelTransformer($transformer);
@@ -41,7 +41,7 @@ class TagType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'         => 'mautic.lead.tags',
-                'class'         => 'MauticLeadBundle:Tag',
+                'class'         => \Mautic\LeadBundle\Entity\Tag::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC);
                 },

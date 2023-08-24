@@ -25,12 +25,12 @@ class ClearCacheCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:cache:clear')
-            ->setDescription('Clears Mautic\'s cache');
+        $this->setName('mautic:cache:clear');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return (int) !$this->cacheProvider->clear();
     }
+    protected static $defaultDescription = 'Clears Mautic\'s cache';
 }

@@ -18,7 +18,6 @@ class ConfigChangeLogger
      */
     private $filterKeys = [
         'transifex_password',
-        'mailer_api_key',
         'mailer_is_owner',
     ];
 

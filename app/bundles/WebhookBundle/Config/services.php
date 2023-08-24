@@ -13,10 +13,13 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Form/DataTransformer/EventsToArrayTransformer.php',
     ];
 
     $services->load('Mautic\\WebhookBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\WebhookBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->alias('mautic.webhook.model.webhook', \Mautic\WebhookBundle\Model\WebhookModel::class);
 };

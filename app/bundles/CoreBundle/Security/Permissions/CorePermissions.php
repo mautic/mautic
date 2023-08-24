@@ -161,10 +161,10 @@ class CorePermissions
     {
         $entities = [];
 
-        //give bundles an opportunity to analyze and adjust permissions based on others
+        // give bundles an opportunity to analyze and adjust permissions based on others
         $objects = $this->getPermissionObjects();
 
-        //bust out permissions into their respective bundles
+        // bust out permissions into their respective bundles
         $bundlePermissions = [];
         foreach ($permissions as $permission => $perms) {
             [$bundle, $level]                   = explode(':', $permission);
@@ -179,8 +179,8 @@ class CorePermissions
             }
         }
 
-        //do a first round to give bundles a chance to update everything and give an opportunity to require a second round
-        //if the permission it is looking for from another bundle is not configured yet
+        // do a first round to give bundles a chance to update everything and give an opportunity to require a second round
+        // if the permission it is looking for from another bundle is not configured yet
         $secondRound = [];
         foreach ($objects as $bundle => $object) {
             $needsRoundTwo = $object->analyzePermissions($bundlePermissions[$bundle], $bundlePermissions);
@@ -193,7 +193,7 @@ class CorePermissions
             $objects[$bundle]->analyzePermissions($bundlePermissions[$bundle], $bundlePermissions, true);
         }
 
-        //create entities
+        // create entities
         foreach ($bundlePermissions as $bundle => $permissions) {
             foreach ($permissions as $name => $perms) {
                 $entity = new Permission();
@@ -204,7 +204,7 @@ class CorePermissions
                 $object = $this->getPermissionObject($bundle);
 
                 foreach ($perms as $perm) {
-                    //get the bit for the perm
+                    // get the bit for the perm
                     if (!$object->isSupported($name, $perm)) {
                         throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
                     }
@@ -266,15 +266,15 @@ class CorePermissions
             }
 
             if ($userEntity->isAdmin()) {
-                //admin user has access to everything
+                // admin user has access to everything
                 $permissions[$permission] = true;
             } else {
                 $activePermissions = ($userEntity instanceof User) ? $userEntity->getActivePermissions() : [];
 
-                //check against bundle permissions class
+                // check against bundle permissions class
                 $permissionObject = $this->getPermissionObject($parts[0]);
 
-                //Is the permission supported?
+                // Is the permission supported?
                 if (!$permissionObject->isSupported($parts[1], $parts[2])) {
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
@@ -282,10 +282,10 @@ class CorePermissions
                         throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
                     }
                 } elseif ('anon.' == $userEntity) {
-                    //anon user or session timeout
+                    // anon user or session timeout
                     $permissions[$permission] = false;
                 } elseif (!isset($activePermissions[$parts[0]])) {
-                    //user does not have implicit access to bundle so deny
+                    // user does not have implicit access to bundle so deny
                     $permissions[$permission] = false;
                 } else {
                     $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
@@ -296,10 +296,10 @@ class CorePermissions
         }
 
         if ('MATCH_ALL' == $mode) {
-            //deny if any of the permissions are denied
+            // deny if any of the permissions are denied
             return in_array(0, $permissions) ? false : true;
         } elseif ('MATCH_ONE' == $mode) {
-            //grant if any of the permissions were granted
+            // grant if any of the permissions were granted
             return in_array(1, $permissions) ? true : false;
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
@@ -333,7 +333,7 @@ class CorePermissions
             if (3 != count($parts)) {
                 $result[$p] = false;
             } else {
-                //check against bundle permissions class
+                // check against bundle permissions class
                 $permissionObject = $this->getPermissionObject($parts[0], false);
                 $result[$p]       = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
             }
@@ -355,7 +355,7 @@ class CorePermissions
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {
-            //user is likely anon. so assume no access and let controller handle via published status
+            // user is likely anon. so assume no access and let controller handle via published status
             return false;
         }
 

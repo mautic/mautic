@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\ErrorHandler\Debug;
-        use Symfony\Component\ErrorHandler\Error\FatalError;
+    use Symfony\Component\ErrorHandler\Error\FatalError;
     use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
@@ -96,9 +96,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this->debugLogger;
         }
 
-        /**
-         * @param $logger
-         */
         public function setDebugLogger($logger)
         {
             $this->debugLogger = $logger;
@@ -118,8 +115,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param        $level
-         * @param        $message
          * @param string $file
          * @param int    $line
          * @param array  $context
@@ -164,7 +159,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $exception
          * @param bool $returnContent
          * @param bool $inTemplate
          *
@@ -242,8 +236,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $exception
-         *
          * @return array
          */
         public static function prepareExceptionForOutput($exception)
@@ -330,7 +322,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 set_error_handler([self::$handler, 'handleError']);
 
                 // Hide errors by default so we can format them
-                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));
                 ini_set('display_errors', '0');
             }
 
@@ -386,8 +378,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param       $logLevel
-         * @param       $message
          * @param array $context
          * @param null  $debugTrace
          */
@@ -509,6 +499,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
+                $mediaBase          = $assetPrefix.$base.$paths['media'];
+                $error['mediaBase'] = $mediaBase;
+
                 $assetBase          = $assetPrefix.$base.$paths['assets'];
                 $error['assetBase'] = $assetBase;
 
@@ -540,8 +533,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $bit
-         *
          * @return string
          */
         private function getErrorName($bit)

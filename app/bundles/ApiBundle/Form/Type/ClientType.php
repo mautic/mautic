@@ -165,7 +165,7 @@ class ClientType extends AbstractType
 
                 if ($form->has('redirectUris')) {
                     foreach ($data->getRedirectUris() as $uri) {
-                        $urlConstraint = new OAuthCallback();
+                        $urlConstraint          = new OAuthCallback();
                         $urlConstraint->message = $this->translator->trans(
                             'mautic.api.client.redirecturl.invalid',
                             ['%url%' => $uri],

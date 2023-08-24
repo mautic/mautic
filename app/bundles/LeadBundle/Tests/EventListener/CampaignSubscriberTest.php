@@ -15,6 +15,10 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\PointBundle\Model\PointGroupModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -112,8 +116,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockGroupModel     = $this->createMock(PointGroupModel::class);
         $companyEntityFrom  = $this->createMock(Company::class);
         $doNotContact       = $this->createMock(DoNotContact::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $companyEntityFrom->method('getId')
             ->willReturn($this->configFrom['id']);
@@ -133,7 +143,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
 
-        $mockCompanyModel->expects($this->once())
+        $mockCompanyModel->expects($this->atLeastOnce())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
@@ -158,7 +168,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCompanyModel,
             $mockCampaignModel,
             $mockCoreParametersHelper,
-            $doNotContact
+            $doNotContact,
+            $mockGroupModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -204,6 +216,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $doNotContact       = $this->createMock(DoNotContact::class);
+        $mockGroupModel     = $this->createMock(PointGroupModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -220,7 +238,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCompanyModel,
             $mockCampaignModel,
             $mockCoreParametersHelper,
-            $doNotContact
+            $doNotContact,
+            $mockGroupModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -253,6 +273,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockGroupModel     = $this->createMock(PointGroupModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -268,6 +294,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockGroupModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -320,6 +348,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockGroupModel     = $this->createMock(PointGroupModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -335,6 +369,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockGroupModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();
@@ -388,6 +424,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $mockDoNotContact   = $this->createMock(DoNotContact::class);
+        $mockGroupModel     = $this->createMock(PointGroupModel::class);
+
+        $filterOperatorProvider = new FilterOperatorProvider(
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -403,6 +445,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCampaignModel,
             $mockCoreParametersHelper,
             $mockDoNotContact,
+            $mockGroupModel,
+            $filterOperatorProvider
         );
 
         $lead = new Lead();

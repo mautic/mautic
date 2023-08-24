@@ -12,11 +12,6 @@ class MessageQueueRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @param $channel
-     * @param $channelId
-     * @param $leadId
-     */
     public function findMessage($channel, $channelId, $leadId)
     {
         $results = $this->createQueryBuilder('mq')
@@ -33,12 +28,10 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param      $limit
-     * @param      $processStarted
      * @param null $channel
      * @param null $channelId
      *
-     * @return mixed
+     * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
     {
@@ -71,8 +64,6 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param $channel
-     *
      * @return bool|string
      */
     public function getQueuedChannelCount($channel, array $ids = null)

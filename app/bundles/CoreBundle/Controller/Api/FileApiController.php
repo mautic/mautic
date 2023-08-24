@@ -2,13 +2,24 @@
 
 namespace Mautic\CoreBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<object>
@@ -22,13 +33,13 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->coreParametersHelper->get('allowed_extensions');
+        $this->allowedExtensions = $coreParametersHelper->get('allowed_extensions');
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -141,9 +152,9 @@ class FileApiController extends CommonApiController
     protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
     {
         try {
-            $possibleDirs = ['assets', 'images'];
-            $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, false, ['/']));
+            $possibleDirs = ['media', 'images'];
+            $dir          = InputHelper::alphanum($dir, true, null, ['_', '.']);
+            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, null, ['/']));
 
             // Dots in the dir name are slashes
             if (false !== strpos($dir, '.') && !$subdir) {
@@ -159,7 +170,7 @@ class FileApiController extends CommonApiController
 
             if ('images' === $dir) {
                 $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
-            } elseif ('assets' === $dir) {
+            } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
 
