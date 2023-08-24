@@ -564,6 +564,8 @@ class EmailRepository extends CommonRepository
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
+                $q->execute();
+
                 return;
             } catch (\Doctrine\DBAL\Exception $e) {
                 --$retrialLimit;
@@ -574,28 +576,31 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    public function upCountSent(int $id, int $increaseBy, bool $variant = false): void
+    public function upCountSent(int $id, int $increaseBy = 1, bool $variant = false): void
     {
-        if (!$increaseBy) {
+        if ($increaseBy <= 0) {
             return;
         }
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->update(MAUTIC_TABLE_PREFIX.'emails');
-        $q->set('sent_count', 'sent_count + 1'.$increaseBy);
-        $q->where('id = '.$id);
+        $connection  = $this->getEntityManager()->getConnection();
+        $updateQuery = $connection->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'emails')
+            ->set('sent_count', 'sent_count + :increaseBy')
+            ->where('id = :id');
 
         if ($variant) {
-            $q->set('variant_sent_count', 'variant_sent_count + '.$increaseBy);
+            $updateQuery->set('variant_sent_count', 'variant_sent_count + :increaseBy');
         }
 
+        $updateQuery
+            ->setParameter('increaseBy', $increaseBy)
+            ->setParameter('id', $id);
+
         // Try to execute 3 times before throwing the exception
-        // to increase the chance the update will do its stuff.
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
-                $q->executeStatement();
+                $updateQuery->executeStatement();
 
                 return;
             } catch (\Doctrine\DBAL\Exception $e) {
@@ -633,7 +638,6 @@ class EmailRepository extends CommonRepository
         }
 
         // Try to execute 3 times before throwing the exception
-        // to increase the chance the update will do its stuff.
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
