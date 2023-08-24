@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
@@ -168,7 +167,7 @@ class QueryBuilder extends BaseQueryBuilder
 
             $knownAliases[$tableReference] = true;
 
-            $fromClauses[$tableReference] = $tableSql.Closure::bind(function ($tableReference, &$knownAliases) {
+            $fromClauses[$tableReference] = $tableSql.\Closure::bind(function ($tableReference, &$knownAliases) {
                     return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
                 }, $this, parent::class)($tableReference, $knownAliases);
         }
@@ -503,7 +502,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function &parentProperty(string $property)
     {
-        return Closure::bind(function &() use ($property) {
+        return \Closure::bind(function &() use ($property) {
             return $this->$property;
         }, $this, parent::class)();
     }
@@ -515,7 +514,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function parentMethod(string $method, ...$arguments)
     {
-        return Closure::bind(function () use ($method, $arguments) {
+        return \Closure::bind(function () use ($method, $arguments) {
             return $this->$method(...$arguments);
         }, $this, parent::class)();
     }
