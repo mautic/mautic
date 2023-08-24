@@ -18,7 +18,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/*.inc.php',
             __DIR__.'/*.js.php',
             \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
-                __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
                 __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
             ],
         ]
