@@ -536,7 +536,7 @@ class EmailRepository extends CommonRepository
     /**
      * Up the read/sent counts.
      *
-     * @depreacated use upCountSent or upCountRead method
+     * @depreacated use upCountSent or incrementRead method
      *
      * @param int        $id
      * @param string     $type
