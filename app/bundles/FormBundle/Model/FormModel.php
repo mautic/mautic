@@ -26,6 +26,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
@@ -109,6 +110,7 @@ class FormModel extends CommonFormModel
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
+        private PrimaryCompanyHelper $primaryCompanyHelper,
         LeadFieldModel $leadFieldModel,
         FormUploader $formUploader,
         ContactTracker $contactTracker,
@@ -124,18 +126,18 @@ class FormModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->requestStack          = $requestStack;
-        $this->twig                  = $twig;
-        $this->themeHelper           = $themeHelper;
-        $this->formActionModel       = $formActionModel;
-        $this->formFieldModel        = $formFieldModel;
-        $this->fieldHelper           = $fieldHelper;
-        $this->leadFieldModel        = $leadFieldModel;
-        $this->formUploader          = $formUploader;
-        $this->contactTracker        = $contactTracker;
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->tableSchemaHelper     = $tableSchemaHelper;
-        $this->mappedObjectCollector = $mappedObjectCollector;
+        $this->requestStack           = $requestStack;
+        $this->twig                   = $twig;
+        $this->themeHelper            = $themeHelper;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->contactTracker         = $contactTracker;
+        $this->columnSchemaHelper     = $columnSchemaHelper;
+        $this->tableSchemaHelper      = $tableSchemaHelper;
+        $this->mappedObjectCollector  = $mappedObjectCollector;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -846,17 +848,19 @@ class FormModel extends CommonFormModel
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
-        $formName       = $form->generateFormName();
-        $fields         = $form->getFields();
-        $autoFillFields = [];
+        $formName          = $form->generateFormName();
+        $fields            = $form->getFields();
+        $autoFillFields    = [];
+        $objectsToAutoFill = ['contact', 'company'];
 
         /** @var \Mautic\FormBundle\Entity\Field $field */
         foreach ($fields as $key => $field) {
-            $leadField  = $field->getLeadField();
-            $isAutoFill = $field->getIsAutoFill();
-
             // we want work just with matched autofill fields
-            if ($field->getMappedField() && 'contact' === $field->getMappedObject() && $field->getIsAutoFill()) {
+            if (
+                $field->getMappedField() &&
+                $field->getIsAutoFill() &&
+                in_array($field->getMappedObject(), $objectsToAutoFill)
+            ) {
                 $autoFillFields[$key] = $field;
             }
         }
@@ -871,8 +875,14 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        // get the contact (lead) and primary company field values
+        $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+        if (!is_array($leadArray) || count($leadArray) <= 0) {
+            return;
+        }
+
         foreach ($autoFillFields as $field) {
-            $value = $lead->getFieldValue($field->getMappedField());
+            $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
