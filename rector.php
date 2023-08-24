@@ -70,9 +70,4 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
         \Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class,
     ]);
-
-    // This rule stopped existing :shrug:
-    // $rectorConfig->ruleWithConfiguration(DoctrineAnnotationClassToAttributeRector::class, [
-    //     DoctrineAnnotationClassToAttributeRector::REMOVE_ANNOTATIONS => true,
-    // ]);
 };
