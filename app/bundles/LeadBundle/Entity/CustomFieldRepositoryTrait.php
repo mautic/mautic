@@ -52,7 +52,7 @@ trait CustomFieldRepositoryTrait
             }
 
             // get a total count
-            $result = $dq->execute()->fetchAllAssociative();
+            $result = $dq->executeQuery()->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
@@ -189,7 +189,7 @@ trait CustomFieldRepositoryTrait
         }
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
-        $values = $q->execute()->fetchAssociative();
+        $values = $q->executeQuery()->fetchAssociative();
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }

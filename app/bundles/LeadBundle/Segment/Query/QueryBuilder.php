@@ -268,8 +268,8 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param string $table
-     * @param null   $joinType allowed values: inner, left, right
+     * @param string      $table
+     * @param string|null $joinType allowed values: inner, left, right
      *
      * @return array|bool|string
      */

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\FetchMode;
@@ -1103,7 +1104,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->setParameter('stageIds', $stages, ArrayParameterType::INTEGER)
             ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchOne();
@@ -1404,8 +1405,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
             ->where('list.alias = :alias')
             ->setParameter('alias', $alias)
-            ->execute()
-            ->fetchAll(FetchMode::COLUMN);
+            ->executeQuery()
+            ->fetchFirstColumn();
     }
 
     /**
