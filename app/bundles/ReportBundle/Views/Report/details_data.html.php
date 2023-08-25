@@ -118,19 +118,20 @@ $graphContent = $view->render(
                                             <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
                                                 <?php endif; ?>
                                                 <?php
-                                                    $cellType = $columns[$key]['type'];
-                                                    $cellVal  = $row[$columns[$key]['alias']];
+                                                $cellType = $columns[$key]['type'];
+                                                $cellVal  = $row[$columns[$key]['alias']];
 
-                                                    // If field is date or datetime, and is formatted with string
-                                                    // which does not convert back to date simply print the formatted string.
-                                                    if (in_array($cellType, ['date', 'datetime']) && !strtotime($cellVal)) {
-                                                        echo $cellVal;
-                                                    } else {
-                                                        // For grouping by datetime fields, so we don't get the timestamp on them
-                                                        if ('datetime' === $cellType && 10 === strlen($cellVal)) {
-                                                            $cellType = 'date';
-                                                        }
-
+                                                // If field is date or datetime, and is formatted with string
+                                                // which does not convert back to date simply print the formatted string.
+                                                if (in_array($cellType, ['date', 'datetime']) && !strtotime($cellVal)) {
+                                                    echo $cellVal;
+                                                }
+                                                else {
+                                                    // For grouping by datetime fields, so we don't get the timestamp on them
+                                                    if ('datetime' === $cellType && 10 === strlen($cellVal)) {
+                                                        $cellType = 'date';
+                                                    }
+                                                    if ('' !== $cellVal && !is_null($cellVal)) {
                                                         switch ($cellType) {
                                                             case 'datetime':
                                                                 echo $view['date']->toFullConcat($cellVal, 'UTC');
@@ -143,6 +144,7 @@ $graphContent = $view->render(
                                                                 break;
                                                         }
                                                     }
+                                                }
                                                 ?>
                                                 <?php if ($closeLink): ?></a><?php endif; ?>
                                         </td>
