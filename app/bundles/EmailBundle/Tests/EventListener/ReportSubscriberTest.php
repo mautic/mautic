@@ -266,6 +266,59 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGraphGenerate($eventMock);
     }
 
+    public function testOnReportGraphGenerateForEmailContextWithEmailGraph1(): void
+    {
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $resultMock        = $this->createMock(Result::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
+
+        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $resultMock->method('fetchOne')->willReturn([]);
+
+        $eventMock->expects($this->once())
+            ->method('getRequestedGraphs')
+            ->willReturn(['mautic.email.table.most.emails.failed']);
+
+        $eventMock->method('checkContext')
+            ->withConsecutive(
+                [['email.stats', 'emails']],
+                ['emails']
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $eventMock->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilderMock);
+
+        $eventMock->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('select')
+            ->with('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('andWhere')
+            ->with('es.is_failed = 1'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('groupBy')
+            ->with('e.id, e.subject'
+            )->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('having')
+            ->with('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
+            )->willReturn($queryBuilderMock);
+
+        $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
     public function testOnReportBuilderWithEmailSentContext(): void
     {
         $translatorMock     = $this->createMock(TranslatorInterface::class);
