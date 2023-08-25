@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,20 +21,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
-    private TranslatorInterface $translator;
-    private EventDispatcherInterface $dispatcher;
+    protected static $defaultDescription = 'Updates the Mautic application';
+    public const NAME                    = 'mautic:maintenance:cleanup';
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, protected PathsHelper $pathsHelper, private CoreParametersHelper $coreParametersHelper, private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
-
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:maintenance:cleanup')
+        $this->setName(self::NAME)
             ->setDefinition(
                 [
                     new InputOption(
@@ -69,6 +68,7 @@ EOT
         if (!$this->checkRunStatus($input, $output)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
+        $this->translator->setLocale($this->coreParametersHelper->get('locale', 'en_US'));
 
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
@@ -80,7 +80,7 @@ EOT
         }
 
         if (!empty($gdpr)) {
-            // to fullfil GDPR, you must delete inactive user data older than 3years
+            // to fullfil GDPR, you must delete inactive user data older than 3 years
             $daysOld = 365 * 3;
         }
 
@@ -122,10 +122,32 @@ EOT
                 $output->writeln($query);
             }
         }
+        // store to audit log
+        $this->storeToAuditLog($stats, $dryRun, $input->getOptions());
 
         $this->completeRun();
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
-    protected static $defaultDescription = 'Updates the Mautic application';
+
+    protected function storeToAuditLog(array $stats, $dryRun, array $options): void
+    {
+        $notEmptyStats = array_filter($stats);
+        if (!$dryRun && count($notEmptyStats)) {
+            $log = [
+                'userName'  => 'system',
+                'userId'    => 0,
+                'bundle'    => 'core',
+                'object'    => 'core',
+                'objectId'  => 0,
+                'action'    => 'maintenance',
+                'details'   => [
+                    'options' => array_filter($options),
+                    'stats'   => $notEmptyStats,
+                ],
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
+        }
+    }
 }
