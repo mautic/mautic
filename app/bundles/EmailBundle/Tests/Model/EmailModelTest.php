@@ -732,9 +732,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     public function setUpHitEmail(bool $isIpTrackable): void
     {
-        $dispatcher    = new EventDispatcher();
-        $this->emailModel->setDispatcher($dispatcher);
-
         $ipAddress     = $this->createMock(IpAddress::class);
         $ipAddress->expects($this->any())
             ->method('isTrackable')
