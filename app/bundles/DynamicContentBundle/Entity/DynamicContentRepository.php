@@ -21,7 +21,7 @@ class DynamicContentRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from(\Mautic\DynamicContentBundle\Entity\DynamicContent::class, 'e', 'e.id');
+            ->from(DynamicContent::class, 'e', 'e.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
@@ -130,7 +130,7 @@ class DynamicContentRepository extends CommonRepository
             ->set('sent_count', 'sent_count + '.(int) $increaseBy)
             ->where('id = '.(int) $id);
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -206,7 +206,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAllAssociative();
+        $result = $qb->executeQuery()->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

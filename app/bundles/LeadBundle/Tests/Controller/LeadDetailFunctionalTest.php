@@ -74,7 +74,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                 $leadFields,
                 Connection::PARAM_STR_ARRAY
             )
-            ->execute()
+            ->executeQuery()
             ->fetchFirstColumn();
 
         $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);

@@ -127,7 +127,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
             ])->setParameter('slot', $slot);
 
-        $qb->execute();
+        $qb->executeStatement();
     }
 
     /**
@@ -157,7 +157,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
-        return $qb->execute()->fetchAssociative();
+        return $qb->executeQuery()->fetchAssociative();
     }
 
     /**

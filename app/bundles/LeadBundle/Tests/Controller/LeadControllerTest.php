@@ -349,7 +349,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Delete all company associations for this test because the fixures have mismatching data to start with
         $this->connection->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
-            ->execute();
+            ->executeStatement();
 
         // Test a single company is added and is set as primary
         $this->assertCompanyAssociation([1], 1);
@@ -389,7 +389,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed, cl.date_last_exited')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -398,7 +398,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $this->connection->createQueryBuilder()
             ->select('ll.id', 'll.name', 'll.category_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -637,7 +637,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
             ->where("cl.lead_id = {$leadId}")
             ->orderBy('cl.company_id')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -647,7 +647,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('l.company')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 

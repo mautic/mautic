@@ -1461,14 +1461,6 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Download.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/AssetBundle/Entity/DownloadRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/AssetBundle/Entity/DownloadRepository.php
@@ -3942,14 +3934,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/LeadEventLog.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
@@ -4096,14 +4080,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Mautic\\\\CampaignBundle\\\\Entity\\\\Lead\\:\\:getId\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
 
@@ -4294,14 +4270,6 @@ parameters:
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Entity\\\\Summary\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/Summary.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/CampaignBundle/Entity/SummaryRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -6823,14 +6791,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/CampaignBundle/Model/CampaignModel.php
-
-		-
 			message: "#^Instanceof between Mautic\\\\CampaignBundle\\\\Entity\\\\Campaign and Mautic\\\\CampaignBundle\\\\Entity\\\\Campaign will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Model/CampaignModel.php
@@ -7146,14 +7106,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Tests/CampaignTestAbstract.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/AbstractCampaignCommand.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Tests\\\\Command\\\\AbstractCampaignCommand\\:\\:createEvent\\(\\) has parameter \\$property with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Tests/Command/AbstractCampaignCommand.php
@@ -7196,14 +7148,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 7
-			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: """
 				#^Call to deprecated method runCommand\\(\\) of class Mautic\\\\CoreBundle\\\\Test\\\\AbstractMauticTestCase\\:
 				use testSymfonyCommand\\(\\) instead$#
 			"""
@@ -7234,14 +7178,6 @@ parameters:
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Tests\\\\Command\\\\TriggerCampaignCommandTest\\:\\:testCampaignExecutionForSome\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/ValidateEventCommandTest.php
 
 		-
 			message: """
@@ -8791,14 +8727,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Entity/MessageQueue.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/ChannelBundle/Entity/MessageQueueRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/ChannelBundle/Entity/MessageQueueRepository.php
@@ -8882,14 +8810,6 @@ parameters:
 			message: "#^Method Mautic\\\\ChannelBundle\\\\Entity\\\\MessageQueueRepository\\:\\:getTimelineResults\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/ChannelBundle/Entity/MessageQueueRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/ChannelBundle/Entity/MessageRepository.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
@@ -11656,14 +11576,6 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/AuditLog.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/CoreBundle/Entity/AuditLogRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/CoreBundle/Entity/AuditLogRepository.php
@@ -11864,14 +11776,6 @@ parameters:
 				Use `and\\(\\)` instead\\.$#
 			"""
 			count: 3
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
@@ -12522,14 +12426,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Entity\\\\Notification\\:\\:setUser\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/Notification.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/CoreBundle/Entity/NotificationRepository.php
 
 		-
 			message: "#^If condition is always false\\.$#"
@@ -13845,14 +13741,6 @@ parameters:
 			path: app/bundles/CoreBundle/EventListener/ExceptionListener.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/CoreBundle/EventListener/MaintenanceSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\EventListener\\\\MaintenanceSubscriber\\:\\:cleanupData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/EventListener/MaintenanceSubscriber.php
@@ -14539,14 +14427,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\DateRangeType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/DateRangeType.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/CoreBundle/Form/Type/DynamicContentFilterEntryFiltersType.php
 
 		-
 			message: "#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\DynamicContentFilterEntryFiltersType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
@@ -15552,14 +15432,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Helper\\\\Chart\\\\ChartInterface\\:\\:render\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Helper/Chart/ChartInterface.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/CoreBundle/Helper/Chart/ChartQuery.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with non\\-empty\\-array will always evaluate to true\\.$#"
@@ -20673,14 +20545,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContentLeadData.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContentRepository.php
-
-		-
 			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContentRepository.php
@@ -20852,14 +20716,6 @@ parameters:
 			message: "#^Property Mautic\\\\DynamicContentBundle\\\\Entity\\\\Stat\\:\\:\\$tokens type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/Stat.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 6
-			path: app/bundles/DynamicContentBundle/Entity/StatRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -21084,14 +20940,6 @@ parameters:
 			message: "#^Method Mautic\\\\DynamicContentBundle\\\\EventListener\\\\LeadSubscriber\\:\\:onTimelineGenerate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/EventListener/LeadSubscriber.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/DynamicContentBundle/Form/Type/DwcEntryFiltersType.php
 
 		-
 			message: "#^Class Mautic\\\\DynamicContentBundle\\\\Form\\\\Type\\\\DwcEntryFiltersType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
@@ -21336,14 +21184,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Entity\\\\VariantEntityInterface\\:\\:isPublished\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
 		-
@@ -22573,14 +22413,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/EmailReply.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/EmailBundle/Entity/EmailReplyRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/EmailBundle/Entity/EmailReplyRepository.php
@@ -22624,14 +22456,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\EmailReplyRepositoryInterface\\:\\:getByLeadIdForTimeline\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/EmailReplyRepositoryInterface.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 6
-			path: app/bundles/EmailBundle/Entity/EmailRepository.php
 
 		-
 			message: "#^Call to deprecated method iterate\\(\\) of class Doctrine\\\\ORM\\\\Query\\.$#"
@@ -22957,14 +22781,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/StatDevice.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatDeviceRepository.php
-
-		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\StatDeviceRepository\\:\\:getDeviceStats\\(\\) has parameter \\$emailIds with no type specified\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/StatDeviceRepository.php
@@ -22973,14 +22789,6 @@ parameters:
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\StatDeviceRepository\\:\\:getDeviceStats\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/StatDeviceRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 13
-			path: app/bundles/EmailBundle/Entity/StatRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -26918,14 +26726,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/EmailBundle/Stats/Helper/AbstractHelper.php
-
-		-
-			message: """
 				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
 			"""
@@ -29173,14 +28973,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/Form.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/FormBundle/Entity/FormRepository.php
-
-		-
 			message: "#^Method Mautic\\\\FormBundle\\\\Entity\\\\FormRepository\\:\\:addCatchAllWhereClause\\(\\) has parameter \\$filter with no type specified\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Entity/FormRepository.php
@@ -29277,14 +29069,6 @@ parameters:
 			message: "#^Property Mautic\\\\FormBundle\\\\Entity\\\\Submission\\:\\:\\$results type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Entity/Submission.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 16
-			path: app/bundles/FormBundle/Entity/SubmissionRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -32162,14 +31946,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/IntegrationsBundle/Entity/FieldChangeRepository.php
-
-		-
-			message: """
 				#^Fetching deprecated class constant PARAM_STR_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:STRING\\} instead\\.$#
 			"""
@@ -32225,14 +32001,6 @@ parameters:
 			message: "#^Property Mautic\\\\IntegrationsBundle\\\\Entity\\\\ObjectMapping\\:\\:\\$internalStorage type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Entity/ObjectMapping.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/IntegrationsBundle/Entity/ObjectMappingRepository.php
 
 		-
 			message: """
@@ -33102,14 +32870,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/Helper/RelationsHelper.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Helper/SyncDateHelper.php
-
-		-
 			message: "#^Method Mautic\\\\IntegrationsBundle\\\\Sync\\\\Logger\\\\DebugLogger\\:\\:log\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php
@@ -33128,14 +32888,6 @@ parameters:
 			message: "#^Property Mautic\\\\IntegrationsBundle\\\\Sync\\\\Notification\\\\Handler\\\\HandlerContainer\\:\\:\\$handlers type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/Notification/Handler/HandlerContainer.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/CompanyHelper.php
 
 		-
 			message: "#^Method Mautic\\\\IntegrationsBundle\\\\Sync\\\\Notification\\\\Helper\\\\OwnerProvider\\:\\:getOwnersForObjectIds\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -33176,14 +32928,6 @@ parameters:
 			message: "#^Property Mautic\\\\IntegrationsBundle\\\\Sync\\\\Notification\\\\Helper\\\\RouteHelper\\:\\:\\$dispatcher has unknown class Mautic\\\\IntegrationsBundle\\\\Sync\\\\Notification\\\\Helper\\\\RouEventDispatcherInterfaceter as its type\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/RouteHelper.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/UserHelper.php
 
 		-
 			message: "#^Method Mautic\\\\IntegrationsBundle\\\\Sync\\\\Notification\\\\Helper\\\\UserHelper\\:\\:getAdminUsers\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -33278,22 +33022,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolver.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/ObjectHelper/CompanyObjectHelper.php
-
-		-
-			message: """
 				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
 			"""
@@ -33339,14 +33067,6 @@ parameters:
 			message: "#^Method Mautic\\\\IntegrationsBundle\\\\Sync\\\\SyncDataExchange\\\\Internal\\\\ObjectHelper\\\\CompanyObjectHelper\\:\\:update\\(\\) has parameter \\$ids with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/ObjectHelper/CompanyObjectHelper.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/ObjectHelper/ContactObjectHelper.php
 
 		-
 			message: """
@@ -33615,14 +33335,6 @@ parameters:
 				Use `and\\(\\)` instead\\.$#
 			"""
 			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Functional/Sync/Notification/NotifierTest.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
 			path: app/bundles/IntegrationsBundle/Tests/Functional/Sync/Notification/NotifierTest.php
 
 		-
@@ -36446,14 +36158,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/CompanyLead.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 8
-			path: app/bundles/LeadBundle/Entity/CompanyLeadRepository.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\CompanyLeadRepository\\:\\:getCompaniesByLeadId\\(\\) has parameter \\$companyId with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyLeadRepository.php
@@ -36534,14 +36238,6 @@ parameters:
 				Use `and\\(\\)` instead\\.$#
 			"""
 			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 12
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
 
 		-
@@ -36921,14 +36617,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/DoNotContact.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/LeadBundle/Entity/DoNotContactRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/LeadBundle/Entity/DoNotContactRepository.php
@@ -37033,14 +36721,6 @@ parameters:
 			message: "#^Property Mautic\\\\LeadBundle\\\\Entity\\\\FrequencyRule\\:\\:\\$preferredChannel \\(bool\\) does not accept default value of type int\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/FrequencyRule.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/LeadBundle/Entity/FrequencyRuleRepository.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with null will always evaluate to false\\.$#"
@@ -37819,14 +37499,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadCategory.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadCategoryRepository.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadCategoryRepository\\:\\:getLeadCategories\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadCategoryRepository.php
@@ -37898,14 +37570,6 @@ parameters:
 			message: "#^Property Mautic\\\\LeadBundle\\\\Entity\\\\LeadDevice\\:\\:\\$clientInfo type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadDevice.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/LeadBundle/Entity/LeadDeviceRepository.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with \\*NEVER\\* will always evaluate to true\\.$#"
@@ -37991,14 +37655,6 @@ parameters:
 			message: "#^Property Mautic\\\\LeadBundle\\\\Entity\\\\LeadEventLog\\:\\:\\$properties type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadEventLog.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/LeadBundle/Entity/LeadEventLogRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -38165,14 +37821,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 7
-			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
-
-		-
-			message: """
 				#^Fetching deprecated class constant PARAM_STR_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:STRING\\} instead\\.$#
 			"""
@@ -38291,14 +37939,6 @@ parameters:
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadList.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/LeadBundle/Entity/LeadListRepository.php
 
 		-
 			message: """
@@ -38549,14 +38189,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadNote.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadNoteRepository\\:\\:addCatchAllWhereClause\\(\\) has parameter \\$filter with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
@@ -38627,14 +38259,6 @@ parameters:
 				Use `and\\(\\)` instead\\.$#
 			"""
 			count: 2
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 18
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
@@ -39146,14 +38770,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/ListLead.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/LeadBundle/Entity/ListLeadRepository.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\ListLeadRepository\\:\\:updateLead\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/ListLeadRepository.php
@@ -39182,14 +38798,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\MergeRecord\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/MergeRecord.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Entity/MergeRecordRepository.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\MergeRecordRepository\\:\\:findMergedContact\\(\\) has parameter \\$id with no type specified\\.$#"
@@ -39243,14 +38851,6 @@ parameters:
 			message: "#^Parameter \\#4 \\$inversedBy of method Mautic\\\\CoreBundle\\\\Doctrine\\\\Mapping\\\\ClassMetadataBuilder\\:\\:addLead\\(\\) expects null, string given\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/PointsChangeLog.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/LeadBundle/Entity/PointsChangeLogRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -39351,14 +38951,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/StagesChangeLog.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/LeadBundle/Entity/StagesChangeLogRepository.php
-
-		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/LeadBundle/Entity/StagesChangeLogRepository.php
@@ -39417,14 +39009,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Tag\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Tag.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/LeadBundle/Entity/TagRepository.php
 
 		-
 			message: """
@@ -39524,14 +39108,6 @@ parameters:
 			message: "#^Property Mautic\\\\LeadBundle\\\\Entity\\\\UtmTag\\:\\:\\$url has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/UtmTag.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/LeadBundle/Entity/UtmTagRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -40546,14 +40122,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DoctrineSubscriber.php
-
-		-
-			message: """
 				#^Call to deprecated method getSchemaDefinition\\(\\) of class Mautic\\\\LeadBundle\\\\Model\\\\FieldModel\\:
 				Use SchemaDefinition\\:\\:getSchemaDefinition method instead$#
 			"""
@@ -40846,14 +40414,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/LeadSubscriber.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/LeadBundle/EventListener/MaintenanceSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\MaintenanceSubscriber\\:\\:onDataCleanup\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/MaintenanceSubscriber.php
@@ -40942,14 +40502,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\ReportDNCSubscriber\\:\\:onReportGenerate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/ReportDNCSubscriber.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/ReportSubscriber.php
 
 		-
 			message: """
@@ -42089,14 +41641,6 @@ parameters:
 			message: "#^Class Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\FilterPropertiesType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/FilterPropertiesType.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/FilterType.php
 
 		-
 			message: "#^Class Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\FilterType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
@@ -43606,14 +43150,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/ImportModel.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Model/IpAddressModel.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Model\\\\IpAddressModel\\:\\:insertIpAddressReference\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Model/IpAddressModel.php
@@ -44233,14 +43769,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: """
 				#^Call to deprecated method getFilterExpressionFunctions\\(\\) of class Mautic\\\\LeadBundle\\\\Model\\\\ListModel\\:
 				to be removed in Mautic 3\\. Use FilterOperatorProvider\\:\\:getAllOperators\\(\\) instead\\.$#
 			"""
@@ -44679,14 +44207,6 @@ parameters:
 			message: "#^Class Mautic\\\\LeadBundle\\\\Segment\\\\ContactSegmentFilters implements generic interface Iterator but does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/ContactSegmentFilters.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/LeadBundle/Segment/ContactSegmentService.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\ContactSegmentService\\:\\:formatPeriod\\(\\) has parameter \\$inputSeconds with no type specified\\.$#"
@@ -45447,14 +44967,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/RelativeDate.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Stat/ChartQuery/SegmentContactsLineChartQuery.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Stat\\\\ChartQuery\\\\SegmentContactsLineChartQuery\\:\\:__construct\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Stat/ChartQuery/SegmentContactsLineChartQuery.php
@@ -45508,14 +45020,6 @@ parameters:
 			message: "#^Property Mautic\\\\LeadBundle\\\\Segment\\\\Stat\\\\ChartQuery\\\\SegmentContactsLineChartQuery\\:\\:\\$removedEventLogStats type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Stat/ChartQuery/SegmentContactsLineChartQuery.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Stat/SegmentCampaignShare.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Stat\\\\SegmentCampaignShare\\:\\:getCampaignList\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -45653,14 +45157,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Command/UpdateLeadListCommandFunctionalTest.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/AjaxControllerFunctionalTest.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\AjaxControllerFunctionalTest\\:\\:getMembersForCampaign\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Controller/AjaxControllerFunctionalTest.php
@@ -45795,14 +45291,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Controller/ImportControllerTest.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/LeadBundle/Tests/Controller/LeadControllerTest.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\LeadControllerTest\\:\\:getLeadLists\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Controller/LeadControllerTest.php
@@ -45811,14 +45299,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\Controller\\\\LeadControllerTest\\:\\:getMembersForCampaign\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Controller/LeadControllerTest.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/LeadDetailFunctionalTest.php
 
 		-
 			message: """
@@ -49015,14 +48495,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Entity/Notification.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/NotificationRepository.php
-
-		-
 			message: "#^Call to function is_array\\(\\) with non\\-falsy\\-string will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/NotificationBundle/Entity/NotificationRepository.php
@@ -49204,14 +48676,6 @@ parameters:
 			message: "#^Property Mautic\\\\NotificationBundle\\\\Entity\\\\Stat\\:\\:\\$tokens type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/NotificationBundle/Entity/Stat.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/NotificationBundle/Entity/StatRepository.php
 
 		-
 			message: "#^Call to method execute\\(\\) on an unknown class Mautic\\\\NotificationBundle\\\\Entity\\\\QueryBuilder\\.$#"
@@ -50049,14 +49513,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/Hit.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 14
-			path: app/bundles/PageBundle/Entity/HitRepository.php
-
-		-
 			message: "#^Call to function is_array\\(\\) with \\*NEVER\\* will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/HitRepository.php
@@ -50482,14 +49938,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/Page.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/PageBundle/Entity/PageRepository.php
-
-		-
 			message: "#^Loose comparison using \\=\\= between 'variant' and false will always evaluate to false\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/PageRepository.php
@@ -50640,14 +50088,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/Redirect.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/PageBundle/Entity/RedirectRepository.php
-
-		-
 			message: "#^Method Mautic\\\\PageBundle\\\\Entity\\\\RedirectRepository\\:\\:findByIds\\(\\) has parameter \\$ids with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/RedirectRepository.php
@@ -50696,14 +50136,6 @@ parameters:
 			message: "#^Method Mautic\\\\PageBundle\\\\Entity\\\\Trackable\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/Trackable.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/PageBundle/Entity/TrackableRepository.php
 
 		-
 			message: "#^Method Mautic\\\\PageBundle\\\\Entity\\\\TrackableRepository\\:\\:findByChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
@@ -50852,14 +50284,6 @@ parameters:
 			message: "#^Property Mautic\\\\PageBundle\\\\Entity\\\\VideoHit\\:\\:\\$url has no type specified\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/VideoHit.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/PageBundle/Entity/VideoHitRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -51404,14 +50828,6 @@ parameters:
 			path: app/bundles/PageBundle/EventListener/LeadSubscriber.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 3
-			path: app/bundles/PageBundle/EventListener/MaintenanceSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\PageBundle\\\\EventListener\\\\MaintenanceSubscriber\\:\\:cleanData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/EventListener/MaintenanceSubscriber.php
@@ -51804,14 +51220,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Entity\\\\VariantEntityInterface\\:\\:isPublished\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
 			count: 1
 			path: app/bundles/PageBundle/Model/PageModel.php
 
@@ -53116,14 +52524,6 @@ parameters:
 			message: "#^Property Mautic\\\\PluginBundle\\\\Entity\\\\IntegrationEntity\\:\\:\\$internal type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Entity/IntegrationEntity.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 10
-			path: app/bundles/PluginBundle/Entity/IntegrationEntityRepository.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with \\*NEVER\\* will always evaluate to true\\.$#"
@@ -55973,14 +55373,6 @@ parameters:
 			path: app/bundles/PointBundle/Entity/LeadPointLog.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/PointBundle/Entity/LeadPointLogRepository.php
-
-		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\LeadPointLogRepository\\:\\:updateLead\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/LeadPointLogRepository.php
@@ -56037,14 +55429,6 @@ parameters:
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\LeadTriggerLog\\:\\:setLead\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/LeadTriggerLog.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/PointBundle/Entity/LeadTriggerLogRepository.php
 
 		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\LeadTriggerLogRepository\\:\\:updateLead\\(\\) has no return type specified\\.$#"
@@ -56130,14 +55514,6 @@ parameters:
 			message: "#^Property Mautic\\\\PointBundle\\\\Entity\\\\Point\\:\\:\\$properties type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/Point.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/PointBundle/Entity/PointRepository.php
 
 		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\PointRepository\\:\\:addCatchAllWhereClause\\(\\) has parameter \\$filter with no type specified\\.$#"
@@ -56333,14 +55709,6 @@ parameters:
 			message: "#^Property Mautic\\\\PointBundle\\\\Entity\\\\TriggerEvent\\:\\:\\$properties type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/TriggerEvent.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/PointBundle/Entity/TriggerEventRepository.php
 
 		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\TriggerEventRepository\\:\\:getLeadTriggeredEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -57473,14 +56841,6 @@ parameters:
 			path: app/bundles/ReportBundle/Entity/Report.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/ReportBundle/Entity/ReportRepository.php
-
-		-
 			message: "#^Elseif condition is always false\\.$#"
 			count: 1
 			path: app/bundles/ReportBundle/Entity/ReportRepository.php
@@ -58241,14 +57601,6 @@ parameters:
 			path: app/bundles/ReportBundle/Model/ReportFileWriter.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/ReportBundle/Model/ReportModel.php
-
-		-
 			message: "#^Call to function is_null\\(\\) with null will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/ReportBundle/Model/ReportModel.php
@@ -58990,14 +58342,6 @@ parameters:
 			path: app/bundles/SmsBundle/Broadcast/BroadcastExecutioner.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/SmsBundle/Broadcast/BroadcastQuery.php
-
-		-
 			message: "#^Method Mautic\\\\SmsBundle\\\\Broadcast\\\\BroadcastQuery\\:\\:excludeDnc\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Broadcast/BroadcastQuery.php
@@ -59350,14 +58694,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/Sms.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/SmsBundle/Entity/SmsRepository.php
-
-		-
 			message: "#^Call to deprecated method iterate\\(\\) of class Doctrine\\\\ORM\\\\Query\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Entity/SmsRepository.php
@@ -59469,14 +58805,6 @@ parameters:
 			message: "#^Property Mautic\\\\SmsBundle\\\\Entity\\\\Stat\\:\\:\\$tokens type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Entity/Stat.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 5
-			path: app/bundles/SmsBundle/Entity/StatRepository.php
 
 		-
 			message: "#^Call to function is_callable\\(\\) with null will always evaluate to false\\.$#"
@@ -59915,14 +59243,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$model of class Mautic\\\\CoreBundle\\\\Form\\\\EventListener\\\\FormExitSubscriber constructor expects Mautic\\\\CoreBundle\\\\Model\\\\CommonModel, string given\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Form/Type/SmsType.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/SmsBundle/Helper/ContactHelper.php
 
 		-
 			message: "#^Call to method getId\\(\\) on an unknown class Mautic\\\\SmsBundle\\\\Helper\\\\Lead\\.$#"
@@ -60534,14 +59854,6 @@ parameters:
 			path: app/bundles/StageBundle/Entity/LeadStageLog.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 4
-			path: app/bundles/StageBundle/Entity/LeadStageLogRepository.php
-
-		-
 			message: "#^Method Mautic\\\\StageBundle\\\\Entity\\\\LeadStageLogRepository\\:\\:updateLead\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Entity/LeadStageLogRepository.php
@@ -60625,14 +59937,6 @@ parameters:
 			message: "#^Property Mautic\\\\StageBundle\\\\Entity\\\\Stage\\:\\:\\$id \\(int\\) does not accept null\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Entity/Stage.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/StageBundle/Entity/StageRepository.php
 
 		-
 			message: "#^Call to function is_object\\(\\) with bool will always evaluate to false\\.$#"
@@ -61834,14 +61138,6 @@ parameters:
 			message: "#^Property Mautic\\\\UserBundle\\\\Entity\\\\Role\\:\\:\\$rawPermissions type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/UserBundle/Entity/Role.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/UserBundle/Entity/RoleRepository.php
 
 		-
 			message: "#^Method Mautic\\\\UserBundle\\\\Entity\\\\RoleRepository\\:\\:addCatchAllWhereClause\\(\\) has parameter \\$filter with no type specified\\.$#"
@@ -63305,14 +62601,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Entity/Log.php
 
 		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 7
-			path: app/bundles/WebhookBundle/Entity/LogRepository.php
-
-		-
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Entity\\\\LogRepository\\:\\:removeOldLogs\\(\\) should return int but return statement is missing\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Entity/LogRepository.php
@@ -63436,14 +62724,6 @@ parameters:
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Entity\\\\WebhookQueue\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Entity/WebhookQueue.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: app/bundles/WebhookBundle/Entity/WebhookQueueRepository.php
 
 		-
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Entity\\\\WebhookQueueRepository\\:\\:deleteQueuesById\\(\\) has no return type specified\\.$#"
@@ -73136,14 +72416,6 @@ parameters:
 			message: "#^Method MauticPlugin\\\\MauticTagManagerBundle\\\\Entity\\\\Tag\\:\\:loadMetadata\\(\\) has parameter \\$metadata with generic class Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata but does not specify its types\\: T$#"
 			count: 1
 			path: plugins/MauticTagManagerBundle/Entity/Tag.php
-
-		-
-			message: """
-				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
-				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
-			"""
-			count: 2
-			path: plugins/MauticTagManagerBundle/Entity/TagRepository.php
 
 		-
 			message: "#^Method MauticPlugin\\\\MauticTagManagerBundle\\\\Entity\\\\TagRepository\\:\\:countByLeads\\(\\) has parameter \\$tagIds with no type specified\\.$#"
