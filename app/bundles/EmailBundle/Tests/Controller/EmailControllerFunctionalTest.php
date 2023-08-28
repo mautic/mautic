@@ -411,7 +411,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/ajax', $payload, [], $this->createAjaxHeaders());
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(1, $response['success']);
         $this->assertNotEmpty($response['subject']);
