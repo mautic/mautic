@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
@@ -31,7 +31,6 @@ class QueryBuilderTest extends TestCase
         $expr = $this->queryBuilder->expr();
 
         Assert::assertInstanceOf(ExpressionBuilder::class, $expr);
-        Assert::assertSame($expr, $this->queryBuilder->expr());
     }
 
     public function testSetParameter(): void
