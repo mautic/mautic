@@ -11115,6 +11115,14 @@ parameters:
 			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TranslationsPass.php
 
 		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TwigPass.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\DependencyInjection\\\\Compiler\\\\UpdateStepPass\\:\\:process\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/DependencyInjection/Compiler/UpdateStepPass.php
@@ -14051,11 +14059,6 @@ parameters:
 			path: app/bundles/CoreBundle/Factory/MauticFactory.php
 
 		-
-			message: "#^Service \"twig\\.helper\\.slots\" is not registered in the container\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Factory/MauticFactory.php
-
-		-
 			message: "#^Service \"twig\\.helper\\.translator\" is not registered in the container\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Factory/MauticFactory.php
@@ -14739,6 +14742,14 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/FormButtonsType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\GatedVideoType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/GatedVideoType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\GatedVideoType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/GatedVideoType.php
@@ -14834,9 +14845,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SelectType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotButtonType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotButtonType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotButtonType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotButtonType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCategoryListType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotCategoryListType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCategoryListType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14844,9 +14871,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotCategoryListType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotChannelFrequencyType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotChannelFrequencyType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotChannelFrequencyType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotChannelFrequencyType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCodeModeType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotCodeModeType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCodeModeType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14854,9 +14897,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotCodeModeType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotDwcType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotDwcType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotDwcType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotDwcType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotDynamicContentType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotDynamicContentType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotDynamicContentType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14864,9 +14923,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotDynamicContentType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCaptionType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotImageCaptionType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCaptionType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotImageCaptionType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCardType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotImageCardType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCardType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14874,9 +14949,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotImageCardType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotImageType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotImageType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotPreferredChannelType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotPreferredChannelType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotPreferredChannelType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14884,9 +14975,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotPreferredChannelType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSavePrefsButtonType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSavePrefsButtonType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSavePrefsButtonType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotSavePrefsButtonType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSegmentListType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSegmentListType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSegmentListType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14894,9 +15001,25 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotSegmentListType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSeparatorType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSeparatorType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSeparatorType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotSeparatorType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSocialFollowType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSocialFollowType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSocialFollowType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -14904,9 +15027,33 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Type/SlotSocialFollowType.php
 
 		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSocialShareType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSocialShareType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSuccessMessageType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotSuccessMessageType.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSuccessMessageType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/SlotSuccessMessageType.php
+
+		-
+			message: """
+				#^Class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotTextType extends deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Form/Type/SlotTextType.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotTextType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -18140,6 +18287,14 @@ parameters:
 			path: app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
 
 		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\GatedVideoType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Tests/Functional/Type/GatedVideoTypeTest.php
+
+		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Command\\\\MaxMindDoNotSellPurgeCommandTest\\:\\:buildMockEntityManager\\(\\) has parameter \\$dataToReturn with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Command/MaxMindDoNotSellPurgeCommandTest.php
@@ -19598,6 +19753,14 @@ parameters:
 			message: "#^Parameter \\#2 \\$maxUploadSizeMB of method Mautic\\\\CoreBundle\\\\Validator\\\\FileUploadValidator\\:\\:checkFileSize\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: app/bundles/CoreBundle/Tests/Unit/Validator/FileUploadValidatorTest.php
+
+		-
+			message: """
+				#^Parameter \\$slotsHelper of method Mautic\\\\CoreBundle\\\\Twig\\\\Extension\\\\SlotExtension\\:\\:__construct\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/CoreBundle/Twig/Extension/SlotExtension.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with array\\<string, mixed\\> will always evaluate to true\\.$#"
@@ -21696,6 +21859,14 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
+			message: """
+				#^Call to deprecated method processSlots\\(\\) of class Mautic\\\\EmailBundle\\\\Controller\\\\EmailController\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/Controller/EmailController.php
+
+		-
 			message: "#^Call to function method_exists\\(\\) with \\$this\\(Mautic\\\\EmailBundle\\\\Controller\\\\EmailController\\) and 'getRouteBase' will always evaluate to true\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Controller/EmailController.php
@@ -21711,6 +21882,14 @@ parameters:
 				2\\.3 \\- to be removed in 3\\.0; use AbstractFormController instead$#
 			"""
 			count: 1
+			path: app/bundles/EmailBundle/Controller/EmailController.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\BuilderSectionType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
 			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
@@ -21829,6 +22008,14 @@ parameters:
 			path: app/bundles/EmailBundle/Controller/EmailController.php
 
 		-
+			message: """
+				#^Parameter \\$slotsHelper of method Mautic\\\\EmailBundle\\\\Controller\\\\EmailController\\:\\:builderAction\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/Controller/EmailController.php
+
+		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Mautic\\\\EmailBundle\\\\Entity\\\\Email will always evaluate to false\\.$#"
 			count: 2
 			path: app/bundles/EmailBundle/Controller/EmailController.php
@@ -21847,6 +22034,14 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between null and Mautic\\\\EmailBundle\\\\Entity\\\\Email will always evaluate to false\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Controller/EmailGraphStatsController.php
+
+		-
+			message: """
+				#^Call to deprecated method getContent\\(\\) of class Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 3
+			path: app/bundles/EmailBundle/Controller/PublicController.php
 
 		-
 			message: """
@@ -23531,6 +23726,78 @@ parameters:
 			path: app/bundles/EmailBundle/EventListener/BroadcastSubscriber.php
 
 		-
+			message: """
+				#^Call to deprecated method addSection\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 3
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Call to deprecated method addSlotType\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 9
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotButtonType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCodeModeType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCaptionType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCardType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSeparatorType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSocialFollowType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotTextType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
+
+		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\EventListener\\\\BuilderSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/BuilderSubscriber.php
@@ -24391,6 +24658,14 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/EmailValidator.php
 
 		-
+			message: """
+				#^Call to deprecated method getContent\\(\\) of class Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 3
+			path: app/bundles/EmailBundle/Helper/MailHelper.php
+
+		-
 			message: "#^Call to method dispatch\\(\\) on an unknown class Symfony\\\\Component\\\\EventDispatcher\\\\ContainerAwareEventDispatcher\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
@@ -25221,6 +25496,30 @@ parameters:
 			message: """
 				#^Call to deprecated method andX\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\ExpressionBuilder\\:
 				Use `and\\(\\)` instead\\.$#
+			"""
+			count: 2
+			path: app/bundles/EmailBundle/Model/EmailModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getSections\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
+			path: app/bundles/EmailBundle/Model/EmailModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getSlotTypes\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
+			path: app/bundles/EmailBundle/Model/EmailModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getSlots\\(\\) of class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\ThemeHelper\\:
+				to be removed in 6\\.0$#
 			"""
 			count: 2
 			path: app/bundles/EmailBundle/Model/EmailModel.php
@@ -28717,6 +29016,14 @@ parameters:
 			message: """
 				#^Parameter \\$factory of method Mautic\\\\FormBundle\\\\Controller\\\\FormController\\:\\:__construct\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
 				2\\.0 to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: app/bundles/FormBundle/Controller/FormController.php
+
+		-
+			message: """
+				#^Parameter \\$slotsHelper of method Mautic\\\\FormBundle\\\\Controller\\\\FormController\\:\\:previewAction\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
 			"""
 			count: 1
 			path: app/bundles/FormBundle/Controller/FormController.php
@@ -45775,14 +46082,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated method getSchemaManager\\(\\) of class Doctrine\\\\DBAL\\\\Connection\\:
-				Use \\{@see createSchemaManager\\(\\)\\} instead\\.$#
-			"""
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/FieldFunctionalTest.php
-
-		-
-			message: """
 				#^Call to deprecated method runCommand\\(\\) of class Mautic\\\\CoreBundle\\\\Test\\\\AbstractMauticTestCase\\:
 				use testSymfonyCommand\\(\\) instead$#
 			"""
@@ -48639,11 +48938,6 @@ parameters:
 			path: app/bundles/MarketplaceBundle/Tests/Functional/Controller/AjaxControllerTest.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: app/bundles/MessengerBundle/DependencyInjection/Compiler/MessengerTransportPass.php
-
-		-
 			message: "#^Class Mautic\\\\MessengerBundle\\\\Form\\\\Type\\\\ConfigType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
 			count: 1
 			path: app/bundles/MessengerBundle/Form/Type/ConfigType.php
@@ -49834,6 +50128,14 @@ parameters:
 			path: app/bundles/PageBundle/Controller/Api/PageApiController.php
 
 		-
+			message: """
+				#^Call to deprecated method processSlots\\(\\) of class Mautic\\\\PageBundle\\\\Controller\\\\PageController\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/Controller/PageController.php
+
+		-
 			message: "#^Cannot use array destructuring on array\\|Doctrine\\\\Common\\\\Collections\\\\ArrayCollection\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
@@ -49844,6 +50146,14 @@ parameters:
 				2\\.3 \\- to be removed in 3\\.0; use AbstractFormController instead$#
 			"""
 			count: 1
+			path: app/bundles/PageBundle/Controller/PageController.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\BuilderSectionType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
 			path: app/bundles/PageBundle/Controller/PageController.php
 
 		-
@@ -49888,6 +50198,14 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$unit of method Mautic\\\\PageBundle\\\\Model\\\\PageModel\\:\\:getHitsLineChartData\\(\\) expects Mautic\\\\PageBundle\\\\Model\\\\char, null given\\.$#"
+			count: 1
+			path: app/bundles/PageBundle/Controller/PageController.php
+
+		-
+			message: """
+				#^Parameter \\$slotsHelper of method Mautic\\\\PageBundle\\\\Controller\\\\PageController\\:\\:builderAction\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
+			"""
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
 
@@ -51113,8 +51431,152 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated method addSection\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 3
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Call to deprecated method addSlotType\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 17
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
 				#^Call to deprecated method getExpressionBuilder\\(\\) of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see createExpressionBuilder\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\GatedVideoType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotButtonType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCategoryListType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotChannelFrequencyType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotCodeModeType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotDwcType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCaptionType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageCardType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotImageType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotPreferredChannelType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSavePrefsButtonType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSegmentListType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSeparatorType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSocialFollowType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotSuccessMessageType\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Form\\\\Type\\\\SlotTextType\\:
+				to be removed in 6\\.0$#
 			"""
 			count: 1
 			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
@@ -51813,6 +52275,22 @@ parameters:
 				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
 			"""
 			count: 1
+			path: app/bundles/PageBundle/Model/PageModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getSections\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
+			path: app/bundles/PageBundle/Model/PageModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getSlotTypes\\(\\) of class Mautic\\\\CoreBundle\\\\Event\\\\BuilderEvent\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 2
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
@@ -59993,16 +60471,6 @@ parameters:
 			path: app/bundles/SmsBundle/Integration/Twilio/TwilioTransport.php
 
 		-
-			message: "#^Property Mautic\\\\SmsBundle\\\\Integration\\\\Twilio\\\\TwilioTransport\\:\\:\\$configuration is never read, only written\\.$#"
-			count: 1
-			path: app/bundles/SmsBundle/Integration/Twilio/TwilioTransport.php
-
-		-
-			message: "#^Property Mautic\\\\SmsBundle\\\\Integration\\\\Twilio\\\\TwilioTransport\\:\\:\\$sendingPhoneNumber is never written, only read\\.$#"
-			count: 1
-			path: app/bundles/SmsBundle/Integration/Twilio/TwilioTransport.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Integration/Twilio/TwilioTransport.php
@@ -60350,11 +60818,6 @@ parameters:
 			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
 
 		-
-			message: "#^Method Mautic\\\\SmsBundle\\\\Tests\\\\Integration\\\\Twilio\\\\ConfigurationTest\\:\\:testConfigurationExceptionThrownWithoutSendingNumber\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
-
-		-
 			message: "#^Method Mautic\\\\SmsBundle\\\\Tests\\\\Integration\\\\Twilio\\\\ConfigurationTest\\:\\:testConfigurationExceptionThrownWithoutUsername\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
@@ -60366,11 +60829,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\SmsBundle\\\\Tests\\\\Integration\\\\Twilio\\\\ConfigurationTest\\:\\:testGetAuthToken\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
-
-		-
-			message: "#^Method Mautic\\\\SmsBundle\\\\Tests\\\\Integration\\\\Twilio\\\\ConfigurationTest\\:\\:testGetSendingNumber\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
 
@@ -64126,6 +64584,46 @@ parameters:
 			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
 
 		-
+			message: """
+				#^Call to deprecated method getContent\\(\\) of class Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
+			message: """
+				#^Call to deprecated method getSlots\\(\\) of class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\ThemeHelper\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
+			message: """
+				#^Call to deprecated method processEmailSlots\\(\\) of class MauticPlugin\\\\GrapesJsBuilderBundle\\\\Controller\\\\GrapesJsController\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
+			message: """
+				#^Call to deprecated method processPageSlots\\(\\) of class MauticPlugin\\\\GrapesJsBuilderBundle\\\\Controller\\\\GrapesJsController\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
+			message: """
+				#^Call to deprecated method setContent\\(\\) of class Mautic\\\\EmailBundle\\\\Entity\\\\Email\\:
+				to be removed in 6\\.0$#
+			"""
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
 			message: "#^Method MauticPlugin\\\\GrapesJsBuilderBundle\\\\Controller\\\\GrapesJsController\\:\\:checkForMjmlTemplate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
@@ -64157,6 +64655,14 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$haystack of function strpos expects string, int given\\.$#"
+			count: 1
+			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
+
+		-
+			message: """
+				#^Parameter \\$slotsHelper of method MauticPlugin\\\\GrapesJsBuilderBundle\\\\Controller\\\\GrapesJsController\\:\\:builderAction\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\SlotsHelper\\:
+				to be removed in 6\\.0$#
+			"""
 			count: 1
 			path: plugins/GrapesJsBuilderBundle/Controller/GrapesJsController.php
 
@@ -72494,11 +73000,6 @@ parameters:
 			message: "#^Property MauticPlugin\\\\MauticSocialBundle\\\\Helper\\\\CampaignEventHelper\\:\\:\\$clickthrough type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: plugins/MauticSocialBundle/Helper/CampaignEventHelper.php
-
-		-
-			message: "#^Instanceof between DateTime and DateTimeInterface will always evaluate to true\\.$#"
-			count: 1
-			path: plugins/MauticSocialBundle/Helper/TwitterCommandHelper.php
 
 		-
 			message: "#^Instanceof between Symfony\\\\Component\\\\Console\\\\Output\\\\OutputInterface and Symfony\\\\Component\\\\Console\\\\Output\\\\OutputInterface will always evaluate to true\\.$#"
