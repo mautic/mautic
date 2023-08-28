@@ -4,6 +4,7 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -47,7 +48,8 @@ class SmsSubscriber implements EventSubscriberInterface
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
-        SmsHelper $smsHelper
+        SmsHelper $smsHelper,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         $this->auditLogModel    = $auditLogModel;
         $this->trackableModel   = $trackableModel;
@@ -118,19 +120,20 @@ class SmsSubscriber implements EventSubscriberInterface
 
             // Disable trackable urls
             if (!$this->smsHelper->getDisableTrackableUrls()) {
-                list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+                [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                     $content,
                     $tokens,
                     'sms',
                     $clickthrough['channel'][1]
                 );
 
+                $shortenEnabled = $this->coreParametersHelper->get('shortener_sms_enable', false);
                 /**
                  * @var string
                  * @var Trackable $trackable
                  */
                 foreach ($trackables as $token => $trackable) {
-                    $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, true);
+                    $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled);
                 }
             }
 
