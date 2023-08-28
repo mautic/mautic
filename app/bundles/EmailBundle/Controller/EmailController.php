@@ -26,14 +26,11 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1491,7 +1488,7 @@ class EmailController extends FormController
         );
     }
 
-    public function heatmapAction(Request $request, SlotsHelper $slotsHelper, FieldList $fieldList, $objectId)
+    public function heatmapAction(int $objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
@@ -1510,62 +1507,8 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        $BCcontent = $email->getContent();
         $content   = $email->getCustomHtml();
-        if (empty($content) && !empty($BCcontent)) {
-            $template = $email->getTemplate();
-            $slots    = $this->factory->getTheme($template)->getSlots('email');
-
-            $this->processSlots($slotsHelper, $slots, $email);
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
-
-            $response = $this->render(
-                $logicalName,
-                [
-                    'inBrowser' => true,
-                    'slots'     => $slots,
-                    'content'   => $content,
-                    'email'     => $email,
-                    'lead'      => null,
-                    'template'  => $template,
-                ]
-            );
-
-            // replace tokens
-            $content = $response->getContent();
-        }
-
-        // Convert emojis
-        $content = EmojiHelper::toEmoji($content, 'short');
-
-        // Override tracking_pixel
-        $tokens = ['{tracking_pixel}' => ''];
-
-        // Prepare a fake lead
-        $fields     = $fieldList->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field) {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
-
-        // Generate and replace tokens
-        $event = new EmailSendEvent(
-            null,
-            [
-                'content'      => $content,
-                'email'        => $email,
-                'idHash'       => 'xxxxxxxxxxxxxx',
-                'tokens'       => $tokens,
-                'internalSend' => true,
-                'lead'         => [],
-            ]
-        );
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
-
-        $content = $event->getContent(true);
+        $content   = EmojiHelper::toEmoji($content, 'short');
 
         return new Response($content);
     }

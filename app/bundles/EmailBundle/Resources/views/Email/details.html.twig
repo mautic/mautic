@@ -324,7 +324,16 @@
                   </span>
                   </div>
               </div>
+              <div>
+                  <div class="panel-body">
+                      <button class="btn btn-default" data-email-heatmap="{{ email.getId() }}">
+                          <span><i class="fa fa-fire"></i> {{ 'mautic.email.click.heatmap'|trans }}</span>
+                      </button>
+                  </div>
+              </div>
           </div>
+
+
 
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
