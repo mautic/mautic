@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -177,7 +178,7 @@ class EmailApiController extends CommonApiController
                     'assetAttachments'  => $assetsIds,
                     'return_errors'     => true,
                     'ignoreDNC'         => true,
-                    'email_type'        => 'transactional',
+                    'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                 ]
             );
 

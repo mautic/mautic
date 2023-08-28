@@ -679,7 +679,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                     'lastname'  => 'someone',
                 ],
             ],
-            ['email_type' => 'marketing']
+            ['email_type' => MailHelper::EMAIL_TYPE_MARKETING]
         );
         $this->assertTrue(0 === count($result), print_r($result, true));
     }
