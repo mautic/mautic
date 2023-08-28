@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Predis\Command\Unlink;
 use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
 use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
 use Predis\Client;
+use Predis\Cluster\ClusterStrategy;
+use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\SentinelReplication;
 use Predis\Profile\RedisProfile;
 
@@ -100,7 +102,20 @@ class PRedisConnectionHelper
         $client  = new Client($endpoints, $inputOptions);
         $profile = $client->getProfile();
         \assert($profile instanceof RedisProfile);
-        $profile->defineCommand(Unlink::ID, Unlink::class);
+
+        if (!$profile->getCommandClass(Unlink::ID)) {
+            $profile->defineCommand(Unlink::ID, Unlink::class);
+        }
+
+        $connection = $client->getConnection();
+
+        if ($connection instanceof RedisCluster) {
+            $clusterStrategy = $connection->getClusterStrategy();
+
+            if ($clusterStrategy instanceof ClusterStrategy && !in_array(Unlink::ID, $clusterStrategy->getSupportedCommands())) {
+                $clusterStrategy->setCommandHandler(Unlink::ID, [$clusterStrategy, 'getKeyFromAllArguments']);
+            }
+        }
 
         return $client;
     }
