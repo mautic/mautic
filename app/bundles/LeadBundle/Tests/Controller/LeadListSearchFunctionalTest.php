@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var $clientOptions array<string, bool>
+     */
     protected array $clientOptions = ['debug' => true];
 
     /** @noinspection SqlResolve */
@@ -93,6 +96,10 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @param string[] $expectedQueries
+     * @param string[] $previousQueries
+     */
     private function assertQueries(array $expectedQueries, array &$previousQueries): void
     {
         /** @var DoctrineDataCollector $dbCollector */

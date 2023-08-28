@@ -1397,7 +1397,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->defaultPrepareDbalFieldsForSave($fields);
     }
 
-    /** 
+    /**
      * @return int[]
      */
     private function getListIdsByAlias(string $alias): array
