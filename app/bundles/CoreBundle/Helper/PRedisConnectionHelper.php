@@ -69,6 +69,12 @@ class PRedisConnectionHelper
             $redisOptions['parameters'] = ['password' => $redisConfiguration['password']];
         }
 
+        foreach (['cluster', 'scheme', 'ssl'] as $key) {
+            if (isset($redisConfiguration[$key])) {
+                $redisOptions[$key] = $redisConfiguration[$key];
+            }
+        }
+
         return $redisOptions;
     }
 
