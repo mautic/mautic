@@ -61,7 +61,7 @@ abstract class AbstractCountryMapController extends AbstractController
         string $dateFrom = '',
         string $dateTo = ''
     ): Response {
-        $entity = $this->model->getContextEntity($objectId);
+        $entity = $this->model->getEntity($objectId);
 
         if (empty($entity) || !$this->hasAccess($security, $entity)) {
             throw new AccessDeniedHttpException();

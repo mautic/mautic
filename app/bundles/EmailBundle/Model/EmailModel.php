@@ -2418,14 +2418,4 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModel
 
         return $url;
     }
-
-    /**
-     * Get context entity.
-     *
-     * @return Email|null
-     */
-    public function getContextEntity(int $id = null): ?object
-    {
-        return $this->getEntity($id);
-    }
 }

@@ -202,7 +202,7 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $id     = $campaign->getId();
-        $result = $model->getContextEntity($id);
+        $result = $model->getEntity($id);
 
         $this->assertSame($campaign, $result);
     }

@@ -871,16 +871,6 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
     }
 
     /**
-     * Get context entity.
-     *
-     * @return Campaign|null
-     */
-    public function getContextEntity(int $id = null): ?object
-    {
-        return $this->getEntity($id);
-    }
-
-    /**
      * Get leads in a campaign grouped by country.
      *
      * @return array{}|array<int, array<string, string|null>>

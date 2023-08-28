@@ -347,7 +347,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $id     = $email->getId();
-        $result = $emailModel->getContextEntity($id);
+        $result = $emailModel->getEntity($id);
 
         $this->assertSame($email, $result);
     }
