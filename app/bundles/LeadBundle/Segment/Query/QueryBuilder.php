@@ -178,9 +178,7 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @deprecated this method is not used anywhere and will be removed in the future
-     *
-     * @return bool
+     * @return bool|string
      */
     public function getJoinCondition($alias)
     {

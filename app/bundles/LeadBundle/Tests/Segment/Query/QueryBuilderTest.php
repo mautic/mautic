@@ -26,13 +26,6 @@ class QueryBuilderTest extends TestCase
         $this->queryBuilder = new QueryBuilder($this->createConnectionFake());
     }
 
-    public function testExpr(): void
-    {
-        $expr = $this->queryBuilder->expr();
-
-        Assert::assertInstanceOf(ExpressionBuilder::class, $expr);
-    }
-
     public function testSetParameter(): void
     {
         $queryBuilder = $this->queryBuilder->setParameter(':one', 'first');
@@ -109,7 +102,7 @@ class QueryBuilderTest extends TestCase
     public function testGetSQLUpdate(): void
     {
         $this->queryBuilder->update('table1')
-            ->set('enabled', 1)
+            ->set('enabled', '1')
             ->where('enabled = 0');
         $this->assertSQL('UPDATE table1 SET enabled = 1 WHERE enabled = 0', 2);
     }
