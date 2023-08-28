@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -780,7 +781,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
                     ->where(
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->eq('l.id', 'lla.lead_id'),
                             $q->expr()->eq('lla.manually_removed', 0),
                             $q->expr()->in('lla.leadlist_id', ":$unique")
@@ -856,7 +857,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq->select('duplicate.lead_id')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'duplicate')
                     ->where(
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->in('duplicate.leadlist_id', $imploder),
                             $q->expr()->eq('duplicate.manually_removed', 0)
                         )
@@ -1396,6 +1397,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->defaultPrepareDbalFieldsForSave($fields);
     }
 
+    /** 
+     * @return int[]
+     */
     private function getListIdsByAlias(string $alias): array
     {
         return $this->getEntityManager()
