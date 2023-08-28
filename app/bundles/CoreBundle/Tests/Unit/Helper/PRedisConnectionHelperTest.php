@@ -9,7 +9,10 @@ use Mautic\CoreBundle\Predis\Command\Unlink;
 use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Predis\Cluster\ClusterStrategy;
 use Predis\Command\Processor\KeyPrefixProcessor;
+use Predis\Connection\Aggregate\PredisCluster;
+use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\SentinelReplication;
 use Predis\Profile\RedisProfile;
 
@@ -78,6 +81,15 @@ class PRedisConnectionHelperTest extends TestCase
         $profile = $client->getProfile();
         \assert($profile instanceof RedisProfile);
         Assert::assertTrue($profile->supportsCommand(Unlink::ID));
+
+        $connection = $client->getConnection();
+
+        if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
+            $clusterStrategy = $connection->getClusterStrategy();
+            \assert($clusterStrategy instanceof ClusterStrategy);
+
+            Assert::assertContains(Unlink::ID, $clusterStrategy->getSupportedCommands());
+        }
     }
 
     public function testCreateClientWithSentinel(): void
