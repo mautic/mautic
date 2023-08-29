@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
 use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
 use Predis\Client;
 use Predis\Cluster\ClusterStrategy;
+use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\SentinelReplication;
 use Predis\Profile\RedisProfile;
@@ -109,7 +110,7 @@ class PRedisConnectionHelper
 
         $connection = $client->getConnection();
 
-        if ($connection instanceof RedisCluster) {
+        if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
             $clusterStrategy = $connection->getClusterStrategy();
 
             if ($clusterStrategy instanceof ClusterStrategy && !in_array(Unlink::ID, $clusterStrategy->getSupportedCommands())) {
