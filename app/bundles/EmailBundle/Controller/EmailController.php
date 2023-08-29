@@ -1488,31 +1488,6 @@ class EmailController extends FormController
         );
     }
 
-    public function heatmapAction(int $objectId)
-    {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model       = $this->getModel('email');
-        $email       = $model->getEntity($objectId);
-
-        if (null === $email) {
-            return $this->notFound();
-        }
-
-        if (!$this->security->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
-            $email->getCreatedBy()
-        )
-        ) {
-            return $this->accessDenied();
-        }
-
-        $content   = $email->getCustomHtml();
-        $content   = EmojiHelper::toEmoji($content, 'short');
-
-        return new Response($content);
-    }
-
     public function getModelName(): string
     {
         return 'email';

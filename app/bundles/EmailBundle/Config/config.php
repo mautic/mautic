@@ -19,10 +19,6 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
-            'mautic_email_heatmap' => [
-                'path'       => '/email/heatmap/{objectId}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailController::heatmapAction',
-            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [

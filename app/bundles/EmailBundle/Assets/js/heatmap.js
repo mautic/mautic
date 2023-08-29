@@ -1,4 +1,4 @@
-(function(Mautic, mQuery) {
+(function(document, Mautic, mQuery) {
     class Heatmap {
         constructor(emailId) {
             this.emailId = emailId;
@@ -17,7 +17,7 @@
 
         renderModal() {
             const $modalContainer = mQuery("<div />").attr({"class": "modal fade heatmap-modal"});
-            const $modalDialogDiv = mQuery("<div />").attr({"class": "modal-dialog"});
+            const $modalDialogDiv = mQuery("<div />").attr({"class": "modal-dialog modal-dialog-heatmap"});
             const $modalContentDiv = mQuery("<div />").attr({"class": "modal-content"});
 
             const $iframe = mQuery('<iframe class="heatmap-iframe">' + this.content + '</iframe>');
@@ -30,6 +30,15 @@
             const iframeDocument = $iframe[0].contentDocument || $iframe[0].contentWindow.document;
             iframeDocument.open();
             iframeDocument.write(this.content);
+
+            var cssLink = document.createElement("link");
+            cssLink.href = "/app/bundles/EmailBundle/Assets/css/heatmap.css";
+            cssLink.rel = "stylesheet";
+            cssLink.type = "text/css";
+            iframeDocument.head.appendChild(cssLink);
+
+            const $iframeBody = mQuery('body', iframeDocument);
+            $iframeBody.addClass('heatmap-iframe-body');
             iframeDocument.close();
 
             mQuery('.heatmap-modal').on('hidden.bs.modal', function () {
@@ -41,11 +50,12 @@
     }
 
     mQuery(document).ready(function() {
-        mQuery('[data-email-heatmap]').click(function(e) {
-            const emailId = mQuery(this).data('email-heatmap');
+        mQuery('[data-toggle="email-heatmap"]').click(function(e) {
+            const emailId = mQuery(this).data('email');
             const heatmap = new Heatmap(emailId);
             heatmap.init();
+            e.preventDefault();
         });
     });
 
-})(Mautic, mQuery);
+})(document, Mautic, mQuery);

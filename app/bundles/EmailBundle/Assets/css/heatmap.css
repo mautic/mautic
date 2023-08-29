@@ -1,4 +1,25 @@
+@media (min-width: 768px) {
+    .modal-dialog-heatmap {
+        width: 90%;
+        max-width: 1200px;
+    }
+}
+
 .heatmap-iframe {
+    display: block;
     width: 100%;
     height: 600px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    .heatmap-iframe {
+        height: 90vh;
+    }
+}
+
+body.heatmap-iframe-body a {
+    background: #ff0000;
 }
