@@ -315,9 +315,12 @@ class AjaxController extends CommonAjaxController
         $content   = $email->getCustomHtml();
         $content   = EmojiHelper::toEmoji($content, 'short');
 
+        $clickStats = $model->getEmailClickStats($emailId);
+
         return $this->sendJsonResponse([
             'success'     => 1,
             'content'     => $content,
+            'clickStats'  => $clickStats,
         ]);
     }
 }

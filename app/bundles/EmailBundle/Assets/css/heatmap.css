@@ -20,6 +20,28 @@
     }
 }
 
-body.heatmap-iframe-body a {
-    background: #ff0000;
+body.heatmap-iframe-body a.heatmap-link {
+    position: relative;
+    z-index: 1010;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.heatmap-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.heatmap-label {
+    position: absolute;
+    z-index: 1050;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100%;
 }
