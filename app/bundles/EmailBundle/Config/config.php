@@ -187,7 +187,7 @@ return [
             'mautic.email.helper.request.storage' => [
                 'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
                 'arguments' => [
-                    'mautic.helper.cache_storage',
+                    'mautic.cache.provider',
                 ],
             ],
             'mautic.email.helper.stats_collection' => [

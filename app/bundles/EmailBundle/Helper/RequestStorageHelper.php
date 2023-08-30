@@ -2,7 +2,8 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -15,12 +16,9 @@ class RequestStorageHelper
      */
     public const KEY_SEPARATOR = ':webhook_request:';
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorage;
+    private CacheProviderInterface $cacheStorage;
 
-    public function __construct(CacheStorageHelper $cacheStorage)
+    public function __construct(CacheProviderInterface $cacheStorage)
     {
         $this->cacheStorage = $cacheStorage;
     }
@@ -34,9 +32,10 @@ class RequestStorageHelper
      */
     public function storeRequest($transportName, Request $request)
     {
-        $key = $this->getUniqueCacheHash($transportName);
-
-        $this->cacheStorage->set($key, $request->request->all());
+        $key  = $this->getUniqueCacheHash($transportName);
+        $item = $this->cacheStorage->getItem($key);
+        $item->set($request->request->all());
+        $this->cacheStorage->save($item);
 
         return $key;
     }
@@ -52,24 +51,26 @@ class RequestStorageHelper
      */
     public function getRequest($key)
     {
-        $key           = $this->removeCachePrefix($key);
-        $cachedRequest = $this->cacheStorage->get($key);
+        $key = $this->removeCachePrefix($key);
 
-        if (false === $cachedRequest) {
-            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$this->cacheStorage->getAdaptorClassName()}'.");
+        try {
+            $item = $this->cacheStorage->getItem($key);
+        } catch (InvalidArgumentException $e) {
+            $adapter = get_class($this->cacheStorage);
+            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$adapter}'.");
         }
 
-        return new Request([], $cachedRequest);
+        return new Request([], $item->get());
     }
 
     /**
      * @param string $key
+     *
+     * @return void
      */
     public function deleteCachedRequest($key)
     {
-        $key = $this->removeCachePrefix($key);
-
-        $this->cacheStorage->delete($key);
+        $this->cacheStorage->deleteItem($this->removeCachePrefix($key));
     }
 
     /**
@@ -94,12 +95,8 @@ class RequestStorageHelper
 
     /**
      * Remove the default cache key prefix if set.
-     *
-     * @param string $key
-     *
-     * @return string
      */
-    private function removeCachePrefix($key)
+    private function removeCachePrefix(string $key): string
     {
         if (0 === strpos($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
@@ -110,22 +107,9 @@ class RequestStorageHelper
 
     /**
      * Generates unique hash in format $transportName:webhook_request:unique.hash.
-     *
-     * @param string $transportName
-     *
-     * @return string
-     *
-     * @throws \LengthException
      */
-    private function getUniqueCacheHash($transportName)
+    private function getUniqueCacheHash(string $transportName): string
     {
-        $key       = uniqid($transportName.self::KEY_SEPARATOR, true);
-        $keyLength = strlen($key);
-
-        if ($keyLength > 191) {
-            throw new \LengthException(sprintf('Key %s must be shorter than 191 characters. It has %d characters', $key, $keyLength));
-        }
-
-        return $key;
+        return uniqid(str_replace('\\', '|', $transportName).self::KEY_SEPARATOR, true);
     }
 }
