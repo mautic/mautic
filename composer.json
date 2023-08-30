@@ -154,7 +154,8 @@
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
       "symfony/flex": true,
-      "phpstan/extension-installer": true
+      "phpstan/extension-installer": true,
+      "php-http/discovery": true
     }
   },
   "extra": {

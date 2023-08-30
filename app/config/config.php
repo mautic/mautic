@@ -77,10 +77,16 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'failure_transport' => 'failed',
-        'transports'        => [
+        'failure_transport'  => 'failed',
+        'transports'         => [
             'email' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
+                'retry_strategy' => [
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                ],
+            ],
+            'hit' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
@@ -90,7 +96,10 @@ $container->loadFromExtension('framework', [
         'routing' => [
             \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
             \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
             \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
+            \Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
+            \Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
         ],
     ],
 

@@ -34,6 +34,15 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'messenger_dsn_hit',
+            DsnType::class,
+            [
+                'constraints' => [new Dsn()],
+                'test_button' => $testButton,
+            ]
+        );
+
+        $builder->add(
             'messenger_dsn_failed',
             DsnType::class,
             [
