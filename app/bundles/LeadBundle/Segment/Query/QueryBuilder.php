@@ -90,38 +90,6 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function getSQL()
-    {
-        $sql   = &$this->parentProperty('sql');
-        $state = &$this->parentProperty('state');
-
-        if (null !== $sql && self::STATE_CLEAN === $state) {
-            return $sql;
-        }
-
-        switch ($this->getType()) {
-            case self::INSERT:
-                $sql = $this->parentMethod('getSQLForInsert');
-                break;
-            case self::DELETE:
-                $sql = $this->parentMethod('getSQLForDelete');
-                break;
-
-            case self::UPDATE:
-                $sql = $this->parentMethod('getSQLForUpdate');
-                break;
-
-            case self::SELECT:
-            default:
-                $sql = $this->getSQLForSelect();
-                break;
-        }
-
-        $state = self::STATE_CLEAN;
-
-        return $sql;
-    }
-
     private function getSQLForSelect(): string
     {
         $sqlParts = $this->getQueryParts();
