@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Query;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use PHPUnit\Framework\Assert;
@@ -21,9 +21,12 @@ class QueryBuilderTest extends TestCase
      */
     private $queryBuilder;
 
+    private Connection $connection;
+
     protected function setUp(): void
     {
-        $this->queryBuilder = new QueryBuilder($this->createConnectionFake());
+        $this->connection = $this->createConnectionFake();
+        $this->queryBuilder = new QueryBuilder($this->connection);
     }
 
     public function testSetParameter(): void
@@ -349,7 +352,7 @@ class QueryBuilderTest extends TestCase
             ->orderBy('t.id', 'DESC')
             ->setParameter('enabled', true)
             ->setParameter(':salary', 5000)
-            ->setParameter('states', ['new', 'active'], Connection::PARAM_STR_ARRAY)
+            ->setParameter('states', ['new', 'active'], ArrayParameterType::STRING)
             ->setParameter('flag', 'internal')
             ->setFirstResult(30)
             ->setMaxResults(10);
@@ -496,18 +499,18 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateQueryBuilderWithoutConnectionPassed(): void
     {
-        $existingConnection = $this->queryBuilder->getConnection();
+        $existingConnection = $this->connection;
         $queryBuilder       = $this->queryBuilder->createQueryBuilder();
-        Assert::assertSame($existingConnection, $queryBuilder->getConnection());
+        Assert::assertSame($existingConnection, $this->connection);
     }
 
     public function testCreateQueryBuilderWithConnectionPassed(): void
     {
-        $existingConnection = $this->queryBuilder->getConnection();
+        $existingConnection = $this->connection;
         $newConnection      = $this->createConnectionFake();
         $queryBuilder       = $this->queryBuilder->createQueryBuilder($newConnection);
-        Assert::assertSame($newConnection, $queryBuilder->getConnection());
-        Assert::assertNotSame($existingConnection, $queryBuilder->getConnection());
+        Assert::assertSame($newConnection, $this->connection);
+        Assert::assertNotSame($existingConnection, $this->connection);
     }
 
     private function assertSQL(string $sql, int $repeat = 1): void
