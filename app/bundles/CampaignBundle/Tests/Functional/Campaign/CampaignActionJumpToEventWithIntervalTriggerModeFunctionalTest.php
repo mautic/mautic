@@ -86,7 +86,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         $this->em->clear();
 
         // Execute Campaign
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:campaigns:trigger',
             ['--campaign-id' => $campaign->getId()]
         );
