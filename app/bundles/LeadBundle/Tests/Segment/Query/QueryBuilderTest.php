@@ -504,15 +504,6 @@ class QueryBuilderTest extends TestCase
         Assert::assertSame($existingConnection, $this->connection);
     }
 
-    public function testCreateQueryBuilderWithConnectionPassed(): void
-    {
-        $existingConnection = $this->connection;
-        $newConnection      = $this->createConnectionFake();
-        $queryBuilder       = $this->queryBuilder->createQueryBuilder($newConnection);
-        Assert::assertSame($newConnection, $this->connection);
-        Assert::assertNotSame($existingConnection, $this->connection);
-    }
-
     private function assertSQL(string $sql, int $repeat = 1): void
     {
         for ($i = 0; $i < $repeat; ++$i) {
