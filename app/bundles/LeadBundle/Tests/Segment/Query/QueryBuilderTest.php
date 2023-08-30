@@ -25,7 +25,7 @@ class QueryBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createConnectionFake();
+        $this->connection   = $this->createConnectionFake();
         $this->queryBuilder = new QueryBuilder($this->connection);
     }
 
@@ -514,7 +514,7 @@ class QueryBuilderTest extends TestCase
     private function createConnectionFake(): Connection
     {
         return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /* @phpstan-ignore-next-line */
             public function __construct()
             {
             }

@@ -55,9 +55,9 @@ class QueryBuilder extends BaseQueryBuilder
      *         ->setParameter(':user_id', 1);
      * </code>
      *
-     * @param string|int  $key   the parameter position or name
-     * @param mixed       $value the parameter value
-     * @param string|null $type  one of the PDO::PARAM_* constants
+     * @param string|int      $key   the parameter position or name
+     * @param mixed           $value the parameter value
+     * @param string|int|null $type  one of the PDO::PARAM_* constants
      *
      * @return $this this QueryBuilder instance
      */
