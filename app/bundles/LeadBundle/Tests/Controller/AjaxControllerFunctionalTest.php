@@ -150,7 +150,19 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($company2->getId(), (int) $content[0]['value']);
     }
 
-    public function testSegmentDependencyTree(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testSegmentDependencyTree(string $filterField): void
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
@@ -189,14 +201,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentB->getId()]],
                 ], [
                     'object'     => 'lead',
                     'glue'       => 'or',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => '!in',
                     'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
@@ -209,7 +221,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentE->getId()]],
@@ -257,7 +269,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    public function testSegmentDependencyTreeWithLoop(): void
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testSegmentDependencyTreeWithLoop(string $filterField): void
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
@@ -296,14 +311,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentB->getId()]],
                 ], [
                     'object'     => 'lead',
                     'glue'       => 'or',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => '!in',
                     'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
@@ -316,7 +331,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentE->getId()]],
@@ -329,7 +344,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentA->getId()]],
@@ -371,7 +386,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                                 'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
                                 'name'    => $segmentA->getName(),
                                 'link'    => "/s/segments/view/{$segmentA->getId()}",
-                                'message' => 'This segment already exists in the segment dependency tree',
+                                'message' => 'This segment creates a loop in the dependency tree.',
                             ],
                         ],
                     ],
