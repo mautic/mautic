@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -46,7 +47,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
         $sendTo            = [];
         $messagesByContact = [];
         $options           = [
-            'email_type' => 'marketing',
+            'email_type' => MailHelper::EMAIL_TYPE_MARKETING,
         ];
 
         /** @var MessageQueue $message */

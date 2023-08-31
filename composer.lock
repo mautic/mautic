@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "177f07256b56d5450f55abafc61186487298c0b1"
+                "reference": "c0442e4c4fe84f634585a739320446f18600f161"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5869,6 +5869,7 @@
                 "ramsey/uuid": "^4.7",
                 "simshaun/recurr": "^5.0",
                 "stack/builder": "^1.0",
+                "symfony/amqp-messenger": "~5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",
@@ -5890,7 +5891,7 @@
                 "symfony/intl": "~5.4.0",
                 "symfony/lock": "^5.1",
                 "symfony/mailer": "~5.4",
-                "symfony/messenger": "^5.4",
+                "symfony/messenger": "~5.4",
                 "symfony/mime": "~5.4",
                 "symfony/monolog-bridge": "~5.4.0",
                 "symfony/monolog-bundle": "~3.5.0",
