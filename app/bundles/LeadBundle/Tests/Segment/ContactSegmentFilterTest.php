@@ -144,6 +144,9 @@ class ContactSegmentFilterTest extends TestCase
         self::assertEquals($where, $filter->getWhere());
     }
 
+    /**
+     * @deprecated as unused. To be removed in Mautic 6.0
+     */
     public function testIsContactSegmentReference(): void
     {
         $filter = $this->createContactSegmentFilter();
@@ -153,7 +156,7 @@ class ContactSegmentFilterTest extends TestCase
                 [$this->contactSegmentFilterCrate],
                 [$this->contactSegmentFilterCrate]
             )
-            ->willReturnOnConsecutiveCalls('leadlist', 'something');
+            ->willReturnOnConsecutiveCalls('leadlist', 'something'); // leadlist_static too?
 
         self::assertTrue($filter->isContactSegmentReference());
         self::assertFalse($filter->isContactSegmentReference());
