@@ -154,6 +154,18 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
             ],
+            'leadlist_static' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lists_static'),
+                'properties' => [
+                    'type' => 'leadlist',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
+                    OperatorOptions::IN,
+                    OperatorOptions::NOT_IN,
+                ]),
+                'object'    => 'lead',
+            ],
             'campaign' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
                 'properties' => [
