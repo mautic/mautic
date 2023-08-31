@@ -788,4 +788,35 @@ class LeadControllerTest extends MauticMysqlTestCase
             'action'   => $action,
         ]);
     }
+
+    public function testAllAssociatedCompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $contact = $this->createContact('test-contact@a.email');
+
+        // Create more than 100 companies and attached to lead
+        $companyLimit = 102;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+
+            ++$counter;
+
+            $this->createLeadCompany($contact, $company);
+        }
+
+        $this->em->flush();
+
+        // verify that all companies are attached to contact
+        $companies  = $this->getCompanyLeads($contact->getId());
+        Assert::assertCount($companyLimit, $companies);
+
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
+        $saveButton    = $crawler->selectButton('lead[buttons][save]');
+        $form          = $saveButton->form();
+        $leadCompanies = $form['lead[companies]']->getValue();
+
+        Assert::assertCount($companyLimit, $leadCompanies);
+    }
 }
