@@ -11,6 +11,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
+ * 
+ * @deprecated to be removed in Mautic 6.0, use SegmentInUseValidator instead
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
@@ -35,6 +37,7 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint)
     {
+        // $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
         $dependentSegmentIds = $this->flatten(array_map(function ($id) {
             return $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters());
         }, $this->reduceToSegmentIds($filters)));
@@ -72,7 +75,7 @@ class CircularDependencyValidator extends ConstraintValidator
     private function reduceToSegmentIds(array $filters)
     {
         $segmentFilters = array_filter($filters, function (array $filter) {
-            return 'leadlist' === $filter['type']
+            return 'leadlist' === $filter['type'] // leadlist_static too?
                 && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
         });
 

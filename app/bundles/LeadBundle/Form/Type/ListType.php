@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
@@ -137,9 +136,6 @@ class ListType extends AbstractType
                     'allow_delete'   => true,
                     'label'          => false,
                     'constraints'    => [
-                        new CircularDependency([
-                            'message' => 'mautic.core.segment.circular_dependency_exists',
-                        ]),
                         new SegmentDate([
                             'message' => 'mautic.lead.segment.date_invalid',
                         ]),
