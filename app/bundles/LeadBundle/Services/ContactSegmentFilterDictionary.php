@@ -144,7 +144,13 @@ class ContactSegmentFilterDictionary
         $this->filters['leadlist']                      = [
             'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
         ];
-        $this->filters['globalcategory']                = [
+        $this->filters['leadlist_static'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'lead_lists_leads',
+            'field'         => 'leadlist_id',
+            'where'         => 'lead_lists_leads.manually_removed = 0',
+        ];
+        $this->filters['globalcategory'] = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_categories',
             'field'         => 'category_id',
