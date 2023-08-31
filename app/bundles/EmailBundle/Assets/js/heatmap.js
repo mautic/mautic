@@ -8,10 +8,19 @@
             this.$iframe = null;
             this.$iframeBody = null;
             this.iframeDocument = null;
+            this.totalUniqueClicks = null;
+            this.legendTemplate = null;
         }
 
         init() {
-            this.fetchHeatmap(this.render.bind(this));
+            this.fetchHeatmap(function() {
+                this.calculateRates()
+                this.render();
+            }.bind(this));
+        }
+
+        calculateRates() {
+
         }
 
         render() {
@@ -25,6 +34,8 @@
                 if (response.success) {
                     this.content = response.content;
                     this.clickStats = response.clickStats;
+                    this.totalUniqueClicks = response.totalUniqueClicks;
+                    this.legendTemplate = response.legendTemplate;
                     callback();
                 }
             }.bind(this), false, true, "GET");
@@ -82,6 +93,7 @@
             this.$iframeBody = $('body', this.iframeDocument);
             this.$iframeBody.addClass('heatmap-iframe-body');
             this.$iframeBody.append('<div class="heatmap-backdrop"></div>');
+            $modalContentDiv.append(this.legendTemplate);
             this.iframeDocument.close();
         }
 
@@ -92,7 +104,8 @@
                 $a.addClass('heatmap-link');
                 $a.each(function() {
                     const $el = $(this);
-                    const $label = $('<div class="heatmap-label">' + link.unique_hits + ' clicks</div>');
+                    const text =  link.unique_hits_text;
+                    const $label = $('<div class="heatmap-label">' + text + '</div>');
                     self.$iframeBody.append($label);
                     $el.data('heatmap-label', $label);
                 });

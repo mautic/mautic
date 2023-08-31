@@ -315,12 +315,23 @@ class AjaxController extends CommonAjaxController
         $content   = $email->getCustomHtml();
         $content   = EmojiHelper::toEmoji($content, 'short');
 
-        $clickStats = $model->getEmailClickStats($emailId);
+        $clickStats        = $model->getEmailClickStats($emailId);
+        $totalUniqueClicks = 0;
+        foreach ($clickStats as &$stat) {
+            $totalUniqueClicks += $stat['unique_hits'];
+            $stat['unique_hits_text'] = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['unique_hits']]);
+            $stat['hits_text']        = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['hits']]);
+        }
+        $legendTemplate = $this->renderView('@MauticEmail/Heatmap/heatmap_legend.html.twig', [
+            'totalUniqueClicks' => $totalUniqueClicks,
+        ]);
 
         return $this->sendJsonResponse([
-            'success'     => 1,
-            'content'     => $content,
-            'clickStats'  => $clickStats,
+            'success'           => 1,
+            'content'           => $content,
+            'clickStats'        => $clickStats,
+            'totalUniqueClicks' => $totalUniqueClicks,
+            'legendTemplate'    => $legendTemplate,
         ]);
     }
 }
