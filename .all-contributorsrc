@@ -1098,6 +1098,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "exsesx",
+      "name": "Oleh Vanin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399517?v=4",
+      "profile": "https://exsesx.dev/",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,

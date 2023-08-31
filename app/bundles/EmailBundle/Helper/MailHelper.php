@@ -31,16 +31,13 @@ use Twig\Environment;
  */
 class MailHelper
 {
-    public const QUEUE_RESET_TO = 'RESET_TO';
-
-    public const QUEUE_FULL_RESET = 'FULL_RESET';
-
-    public const QUEUE_DO_NOTHING = 'DO_NOTHING';
-
-    public const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
-
-    public const QUEUE_RETURN_ERRORS = 'RETURN_ERRORS';
-
+    public const QUEUE_RESET_TO           = 'RESET_TO';
+    public const QUEUE_FULL_RESET         = 'FULL_RESET';
+    public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+    public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+    public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+    public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+    public const EMAIL_TYPE_MARKETING     = 'marketing';
     /**
      * @var MauticFactory
      */
@@ -1180,8 +1177,8 @@ class MailHelper
     }
 
     /**
-     * @param null $idHash
-     * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
+     * @param string|null $idHash
+     * @param bool        $statToBeGenerated Pass false if a stat entry is not to be created
      */
     public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
@@ -1414,7 +1411,7 @@ class MailHelper
 
         // Personal and transactional emails do not contain unsubscribe header
         $email = $this->getEmail();
-        if (empty($email) || 'transactional' === $this->getEmailType()) {
+        if (empty($email) || self::EMAIL_TYPE_TRANSACTIONAL === $this->getEmailType()) {
             return $headers;
         }
 
