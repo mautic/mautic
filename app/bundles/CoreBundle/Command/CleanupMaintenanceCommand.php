@@ -68,8 +68,6 @@ EOT
         if (!$this->checkRunStatus($input, $output)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
-        $this->translator->setLocale($this->coreParametersHelper->get('locale', 'en_US'));
-
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');

@@ -150,10 +150,6 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
             {
                 return '[trans]'.$id.'[/trans]';
             }
-
-            public function setLocale(?string $locale): void
-            {
-            }
         };
     }
 }
