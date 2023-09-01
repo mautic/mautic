@@ -5,6 +5,7 @@
 - The calendar feature was removed. See https://github.com/mautic/mautic/pull/11270
 - The Froala assets are disabled by default. Enable them if you use the legacy email or page builder. See https://github.com/mautic/mautic/pull/12416
 - New shortening service in Mautic 5, reconfiguration is needed after migrating to Mautic 5. A user reads the documentation to understand how to set it up in the configuration.
+- Removed Show after X submissions option from forms. See documentation for the setup real progressive profiling for forms.
 
 ## Mailer
 The underlying library used for sending emails (Swift Mailer) was discontinued and Mautic 5 is using the [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) library instead. There are user facing changes coming with this change.
