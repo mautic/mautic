@@ -316,9 +316,9 @@ class AjaxController extends CommonAjaxController
         $content   = EmojiHelper::toEmoji($content, 'short');
 
         $clickStats        = $model->getEmailClickStats($emailId);
-        $totalUniqueClicks = 0;
+        $totalUniqueClicks = array_sum(array_column($clickStats, 'unique_hits'));
         foreach ($clickStats as &$stat) {
-            $totalUniqueClicks += $stat['unique_hits'];
+            $stat['unique_hits_rate'] = round($totalUniqueClicks > 0 ? ($stat['unique_hits'] / $totalUniqueClicks) : 0, 4);
             $stat['unique_hits_text'] = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['unique_hits']]);
             $stat['hits_text']        = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['hits']]);
         }

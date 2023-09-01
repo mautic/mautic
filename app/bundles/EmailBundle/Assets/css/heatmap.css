@@ -23,7 +23,6 @@
 body.heatmap-iframe-body a.heatmap-link {
     position: relative;
     z-index: 1010;
-    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .heatmap-backdrop {
@@ -33,17 +32,22 @@ body.heatmap-iframe-body a.heatmap-link {
     bottom: 0;
     left: 0;
     z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .heatmap-label {
     position: absolute;
     z-index: 1050;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: rgba(255, 255, 255, 0.5);
-    width: 100%;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+}
+
+.heatmap-label > p {
+    padding: 6px 6px 4px 6px !important;
+    margin: 0 !important;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    color: #fff !important;
 }
 
 .heatmap-legend {
