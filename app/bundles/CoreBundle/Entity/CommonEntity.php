@@ -117,7 +117,9 @@ class CommonEntity
     }
 
     /**
-     * @return array
+     * @param bool $includePast
+     *
+     * @return mixed[]
      */
     public function getChanges($includePast = false)
     {
@@ -129,7 +131,7 @@ class CommonEntity
     }
 
     /**
-     * Reset changes.
+     * @return void
      */
     public function resetChanges()
     {
