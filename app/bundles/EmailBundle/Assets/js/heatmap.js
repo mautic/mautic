@@ -118,6 +118,7 @@
             this.$iframeBody.addClass('heatmap-iframe-body');
             this.$iframeBody.append('<div class="heatmap-backdrop"></div>');
             $modalContentDiv.append(this.legendTemplate);
+            $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-dismiss="modal"><span aria-hidden="true">×</span></button>');
             this.iframeDocument.close();
         }
 
@@ -211,7 +212,6 @@
             const emailId = $(this).data('email');
             const heatmap = new Heatmap(emailId);
             heatmap.init();
-            console.log(heatmap);
             e.preventDefault();
         });
     });

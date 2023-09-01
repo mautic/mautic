@@ -5,6 +5,23 @@
     }
 }
 
+.modal-heatmap-close {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    color: #fff;
+    z-index: 1080;
+    float: none;
+    opacity: 0.75;
+}
+
+.modal-heatmap-close:hover,
+.modal-heatmap-close:focus {
+    opacity: 1;
+    color: #fff;
+}
+
+
 .heatmap-iframe {
     display: block;
     width: 100%;
@@ -32,13 +49,13 @@ body.heatmap-iframe-body a.heatmap-link {
     bottom: 0;
     left: 0;
     z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.45);
 }
 
 .heatmap-label {
     position: absolute;
     z-index: 1050;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
 }
 
 .heatmap-label > p {
@@ -51,15 +68,21 @@ body.heatmap-iframe-body a.heatmap-link {
 }
 
 .heatmap-legend {
+    display: none;
     position: absolute;
     z-index: 1060;
     right: 20px;
-    top: 20px;
+    top: 30px;
     color: #fff;
     padding: 15px;
     background-color: rgba(0, 0, 0, 0.85);
     border-radius: 4px;
-    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    .heatmap-legend {
+        display: block;
+    }
 }
 
 .heatmap-legend > p:nth-child(1),
