@@ -45,18 +45,18 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string|array<bool|string|null>>
+     * @return array<string|array<bool|string|''>>
      */
     public function utmTagsDataProvider(): array
     {
         return [
-            'All tags are null'       => [null, null, null, null, null, false],
-            'Only utmCampaign is set' => ['campaign', null, null, null, null, true],
-            'Only utmSource is set'   => [null, 'source', null, null, null, true],
-            'Only utmMedium is set'   => [null, null, 'medium', null, null, true],
-            'Only utmContent is set'  => [null, null, null, 'content', null, true],
-            'Only utmTerm is set'     => [null, null, null, null, 'term', true],
-            'All tags are set'        => ['campaign', 'source', 'medium', 'content', 'term', true],
+            'All tags are empty'       => ['', '', '', '', '', false],
+            'Only utmCampaign is set'  => ['campaign', '', '', '', '', true],
+            'Only utmSource is set'    => ['', 'source', '', '', '', true],
+            'Only utmMedium is set'    => ['', '', 'medium', '', '', true],
+            'Only utmContent is set'   => ['', '', '', 'content', '', true],
+            'Only utmTerm is set'      => ['', '', '', '', 'term', true],
+            'All tags are set'         => ['campaign', 'source', 'medium', 'content', 'term', true],
         ];
     }
 }
