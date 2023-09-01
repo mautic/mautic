@@ -3,9 +3,11 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\CleanupMaintenanceCommand;
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,7 +28,12 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
     private $ipLookupHelper;
 
     /**
-     * @var mixed|\PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     * @var PathsHelper|(PathsHelper&object&\PHPUnit\Framework\MockObject\MockObject)|(PathsHelper&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private PathsHelper|\PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+
+    /**
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -42,24 +49,30 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
 
     public function getCommandTester(): CommandTester
     {
-        $this->eventDispatcher->method('dispatch')->willReturnCallback(function () {
-            $maintenanceEvent = $this->createMock(MaintenanceEvent::class);
-            $maintenanceEvent->expects($this->once())->method('getStats')->willReturn(
-                [
-                    'Visitors'          => 10,
-                    'Visitor page hits' => 99,
-                ]
-            );
+        $cacheDir = __DIR__.'/resource/cache/tmp';
 
-            return $maintenanceEvent;
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
+            ->willReturn($cacheDir);
+
+        $event = new MaintenanceEvent(100, false, false);
+        $this->eventDispatcher->method('dispatch')
+        ->willReturnCallback(function ($event, $eventName) {
+            $this->assertEquals($eventName, CoreEvents::MAINTENANCE_CLEANUP_DATA);
+            $this->assertInstanceOf(MaintenanceEvent::class, $event);
+            $event->setStat('Visitor page hits', 10);
+
+            return $event;
         });
 
         $command = new CleanupMaintenanceCommand(
-            $this->auditLogModel,
-            $this->ipLookupHelper,
             $this->translator,
             $this->eventDispatcher,
-            $this->coreParametersHelper
+            $this->pathsHelper,
+            $this->coreParametersHelper,
+            $this->auditLogModel,
+            $this->ipLookupHelper
         );
 
         $application = new Application();
@@ -94,9 +107,10 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createTranslatorMock();
         $this->eventDispatcher      = $this->createMock(EventDispatcher::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
     }
 
-    public function testCommandDryRun()
+    public function testCommandDryRun(): void
     {
         $this->auditLogModel->expects($this->never())->method('writeToLog');
 
@@ -106,17 +120,17 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertStringContainsString('Visitor page hits', $output);
     }
 
-    public function testCommandInteraction()
+    public function testCommandInteraction(): void
     {
         $this->auditLogModel->expects($this->never())->method('writeToLog');
 
         $commandTester = $this->getCommandTester();
-        $commandTester->execute([]);
+        $commandTester->execute(['']);
         $output = $commandTester->getDisplay();
         $this->assertStringContainsString('mautic.maintenance.confirm_data_purge', $output);
     }
 
-    public function testCommandNoInteraction()
+    public function testCommandNoInteraction(): void
     {
         $this->auditLogModel->expects($this->once())->method('writeToLog');
 
@@ -129,22 +143,12 @@ class CleanupMaintenanceCommandTest extends \PHPUnit\Framework\TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
+            /**
+             * @param array<int|string> $parameters
+             */
             public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 return '[trans]'.$id.'[/trans]';
-            }
-
-            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-            {
-                return '[trans]'.$id.'[/trans]';
-            }
-
-            public function setLocale($locale)
-            {
-            }
-
-            public function getLocale()
-            {
             }
         };
     }
