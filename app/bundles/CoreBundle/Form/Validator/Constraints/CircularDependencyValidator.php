@@ -2,97 +2,56 @@
 
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
-use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Helper\Tree\IntNode;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
+use RecursiveIteratorIterator;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
- * 
- * @deprecated to be removed in Mautic 6.0, use SegmentInUseValidator instead
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
     /**
-     * @var ListModel
+     * @var SegmentDependencyTreeFactory
      */
-    private $model;
+    private $segmentDependencyTreeFactory;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(ListModel $model, RequestStack $requestStack)
+    public function __construct(SegmentDependencyTreeFactory $segmentDependencyTreeFactory)
     {
-        $this->model        = $model;
-        $this->requestStack = $requestStack;
+        $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }
 
     /**
-     * @param array $filters
+     * @param LeadList $leadList
      */
-    public function validate($filters, Constraint $constraint)
+    public function validate($segment, Constraint $constraint)
     {
-        // $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
-        $dependentSegmentIds = $this->flatten(array_map(function ($id) {
-            return $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters());
-        }, $this->reduceToSegmentIds($filters)));
+        if (!$constraint instanceof CircularDependency) {
+            throw new UnexpectedTypeException($constraint, CircularDependency::class);
+        }
 
-        try {
-            $segmentId = $this->getSegmentIdFromRequest();
-            if (in_array($segmentId, $dependentSegmentIds)) {
-                $this->context->addViolation($constraint->message);
+        if (!$segment instanceof LeadList || !$segment->getId()) {
+            return;
+        }
+
+        $parentNode = $this->segmentDependencyTreeFactory->buildTree($segment);
+
+        /** @var RecursiveIteratorIterator<IntNode> $iterator */
+        $iterator = new RecursiveIteratorIterator($parentNode, RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($iterator as $childNode) {
+            if (((int) $segment->getId()) === $childNode->getValue()) {
+                $this->context->buildViolation($constraint->message)
+                    ->atPath('filters')
+                    ->setCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                    ->setParameter('%segments%', $childNode->getParent()->getValue())
+                    ->addViolation();
             }
-        } catch (\UnexpectedValueException $e) {
-            // Segment ID is not in the request. May be new segment.
         }
-    }
-
-    /**
-     * @return int
-     *
-     * @throws \UnexpectedValueException
-     */
-    private function getSegmentIdFromRequest()
-    {
-        $request     = $this->requestStack->getCurrentRequest();
-        $routeParams = $request->get('_route_params');
-
-        if (empty($routeParams['objectId'])) {
-            throw new \UnexpectedValueException('Segment ID is missing in the request');
-        }
-
-        return (int) $routeParams['objectId'];
-    }
-
-    /**
-     * @return array
-     */
-    private function reduceToSegmentIds(array $filters)
-    {
-        $segmentFilters = array_filter($filters, function (array $filter) {
-            return 'leadlist' === $filter['type'] // leadlist_static too?
-                && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
-        });
-
-        $segentIdsInFilter = array_map(function (array $filter) {
-            $bcValue = $filter['filter'] ?? [];
-
-            return $filter['properties']['filter'] ?? $bcValue;
-        }, $segmentFilters);
-
-        return $this->flatten($segentIdsInFilter);
-    }
-
-    /**
-     * @return array
-     */
-    private function flatten(array $array)
-    {
-        return array_unique(array_reduce($array, 'array_merge', []));
     }
 }

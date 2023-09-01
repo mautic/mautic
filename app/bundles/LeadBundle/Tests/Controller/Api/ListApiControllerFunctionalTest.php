@@ -2,9 +2,11 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -296,7 +298,118 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response2['lists'][1]['filters']);
     }
 
-    public function testUnpublishUsedSingleSegment(): void
+    public function testWeGet422ResponseCodeIfSegmentIsBeingUsedInSomeCampaignAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id' => $campaign->getId(),
+            'leadlist_id' => $segment->getId(),
+        ]);
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        Assert::assertArrayHasKey('errors', $response);
+        $errorMessage = $this->translator->transChoice(
+            'mautic.lead.lists.used_in_campaigns.unpublish',
+            1,
+            [
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => 'Segment1',
+            ],
+            'validators'
+        );
+        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+    }
+
+    public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign = new Campaign();
+        $campaign->setName('campaign1');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertArrayNotHasKey('errors', $response);
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testCircularDepencencySegment(string $filterName): void
+    {
+        $segmentA = $this->saveSegment('SA', 's1');
+        $segmentB = $this->saveSegment('SB', 's2', [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => $filterName,
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$segmentA->getId()],
+            ],
+            'display' => '',
+        ]]);
+        $this->em->clear();
+
+        $this->client->request('PATCH', "/api/segments/{$segmentA->getId()}/edit", ['name' => 'API segment changed', 'filters' => [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => $filterName,
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$segmentB->getId()],
+            ],
+            'display' => '',
+        ]]]);
+        $expectedErrorMessage = "filters: This segment is used in segment with ID = {$segmentB->getId()}. This operation would create an infinite loop. Please double check what you are intending to do.";
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
+    }
+
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedSingleSegment(string $filterName): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -310,7 +423,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterName,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [
@@ -329,7 +442,10 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
     }
 
-    public function testUnpublishUsedBatchSegment(): void
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedBatchSegment(string $filterName): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -343,7 +459,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterName,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [

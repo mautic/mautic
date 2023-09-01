@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-/**
- * @deprecated to be removed in Mautic 6.0, use SegmentInUseValidator instead
- */
 class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**

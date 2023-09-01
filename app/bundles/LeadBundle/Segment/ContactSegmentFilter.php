@@ -182,7 +182,7 @@ class ContactSegmentFilter
 
     /**
      * Whether the filter references another ContactSegment.
-     * 
+     *
      * @deprecated as unused. To be removed in Mautic 6.0
      *
      * @return bool

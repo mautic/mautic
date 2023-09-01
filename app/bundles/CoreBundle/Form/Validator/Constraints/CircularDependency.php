@@ -4,15 +4,17 @@ namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @deprecated to be removed in Mautic 6.0, use SegmentInUse instead
- */
 class CircularDependency extends Constraint
 {
-    public $message;
+    public $message = 'mautic.lead_list.is_in_use';
 
     public function validatedBy()
     {
         return CircularDependencyValidator::class;
+    }
+
+    public function getTargets(): string
+    {
+        return self::CLASS_CONSTRAINT;
     }
 }
