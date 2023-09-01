@@ -382,7 +382,7 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'showAfterXSubmissions',
-                TextType::class,
+                HiddenType::class,
                 [
                     'label'      => 'mautic.form.field.form.show.after.x.submissions',
                     'label_attr' => ['class' => 'control-label'],
