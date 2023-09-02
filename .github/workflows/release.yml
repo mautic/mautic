@@ -30,6 +30,7 @@ jobs:
       with:
         php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        tools: composer:2.5
 
     - name: Get tag name
       id: get-mautic-version
@@ -142,6 +143,7 @@ jobs:
       with:
         php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        tools: composer:2.5
 
     - name: Download full installation package from previous step
       uses: actions/download-artifact@v3
@@ -194,6 +196,7 @@ jobs:
       with:
         php-version: ${{ env.MAUTIC_PHP_MINIMUM_VERSION }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        tools: composer:2.5
 
     - name: "Download and install minimum Mautic version: ${{ env.MAUTIC_MINIMUM_VERSION }}"
       env:
@@ -242,6 +245,7 @@ jobs:
       with:
         php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        tools: composer:2.5
 
     - name: Install dependencies
       working-directory: ./.github/workflows/mautic-asset-upload
