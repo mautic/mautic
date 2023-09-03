@@ -3,11 +3,13 @@
 namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -20,11 +22,14 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\QueueBundle\Queue\QueueService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageTestAbstract extends TestCase
 {
@@ -109,8 +114,8 @@ class PageTestAbstract extends TestCase
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
-        $queueService = $this
-            ->getMockBuilder(QueueService::class)
+        $messageBus = $this
+            ->getMockBuilder(MessageBus::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -126,21 +131,14 @@ class PageTestAbstract extends TestCase
                 ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
             );
 
-        $queueService->expects($this
-            ->any())
-            ->method('isQueueEnabled')
-            ->will(
-                $this->returnValue(false)
-            );
-
         $entityManager->expects($this
             ->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticPageBundle:Page', $pageRepository],
-                        ['MauticPageBundle:Hit', $hitRepository],
+                        [\Mautic\PageBundle\Entity\Page::class, $pageRepository],
+                        [\Mautic\PageBundle\Entity\Hit::class, $hitRepository],
                     ]
                 )
             );
@@ -159,19 +157,20 @@ class PageTestAbstract extends TestCase
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
-            $queueService,
+            $messageBus,
             $companyModel,
             $deviceTrackerMock,
             $contactTracker,
             $coreParametersHelper,
-            $contactRequestHelper
+            $contactRequestHelper,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $this->router,
+            $translator,
+            $userHelper,
+            $this->createMock(LoggerInterface::class)
         );
-
-        $pageModel->setDispatcher($dispatcher);
-        $pageModel->setTranslator($translator);
-        $pageModel->setEntityManager($entityManager);
-        $pageModel->setRouter($this->router);
-        $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
     }
@@ -181,13 +180,23 @@ class PageTestAbstract extends TestCase
      */
     protected function getRedirectModel()
     {
-        $urlHelper = $this
-            ->getMockBuilder(UrlHelper::class)
+        $shortener = $this
+            ->getMockBuilder(Shortener::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
-            ->setConstructorArgs([$urlHelper])
+            ->setConstructorArgs([
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+                $shortener,
+            ])
             ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 

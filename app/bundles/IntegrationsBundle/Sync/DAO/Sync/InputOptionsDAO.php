@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
@@ -48,12 +46,12 @@ class InputOptionsDAO
     private $integrationObjectIds;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
     private $startDateTime;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeInterface|null
      */
     private $endDateTime;
 
@@ -128,12 +126,12 @@ class InputOptionsDAO
         return $this->integrationObjectIds;
     }
 
-    public function getStartDateTime(): ?DateTimeInterface
+    public function getStartDateTime(): ?\DateTimeInterface
     {
         return $this->startDateTime;
     }
 
-    public function getEndDateTime(): ?DateTimeInterface
+    public function getEndDateTime(): ?\DateTimeInterface
     {
         return $this->endDateTime;
     }
@@ -146,17 +144,17 @@ class InputOptionsDAO
     /**
      * @throws InvalidValueException
      */
-    private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
+    private function validateDateTime(array $input, string $optionName): ?\DateTimeInterface
     {
         if (empty($input[$optionName])) {
             return null;
         }
 
-        if ($input[$optionName] instanceof DateTimeInterface) {
+        if ($input[$optionName] instanceof \DateTimeInterface) {
             return $input[$optionName];
         } else {
             try {
-                return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
+                return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
             } catch (\Throwable $e) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }

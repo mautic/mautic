@@ -29,7 +29,6 @@ class CommonEntity
      * Wrapper function for isProperty methods.
      *
      * @param string $name
-     * @param        $arguments
      *
      * @throws \InvalidArgumentException
      */
@@ -108,10 +107,6 @@ class CommonEntity
         }
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     protected function addChange($key, $value)
     {
         if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
@@ -122,7 +117,9 @@ class CommonEntity
     }
 
     /**
-     * @return array
+     * @param bool $includePast
+     *
+     * @return mixed[]
      */
     public function getChanges($includePast = false)
     {
@@ -134,7 +131,7 @@ class CommonEntity
     }
 
     /**
-     * Reset changes.
+     * @return void
      */
     public function resetChanges()
     {

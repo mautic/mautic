@@ -20,7 +20,7 @@ class SyncIntegrationsHelper
     private $integrations = [];
 
     /**
-     * @var array|null
+     * @var array<int,string>|null
      */
     private $enabled;
 
@@ -60,7 +60,7 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @return array|null
+     * @return array<int,string>|null
      *
      * @throws IntegrationNotFoundException
      */

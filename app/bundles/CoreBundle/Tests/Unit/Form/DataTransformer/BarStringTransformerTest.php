@@ -29,7 +29,7 @@ final class BarStringTransformerTest extends TestCase
         yield [null, ''];
         yield [[], ''];
         yield [123, ''];
-        yield [new \StdClass(), ''];
+        yield [new \stdClass(), ''];
         yield ['', ''];
         yield ['value A', ''];
         yield [['value A'], 'value A'];
@@ -56,7 +56,7 @@ final class BarStringTransformerTest extends TestCase
         yield [null, []];
         yield [[], []];
         yield [123, []];
-        yield [new \StdClass(), []];
+        yield [new \stdClass(), []];
         yield ['', ['']];
         yield ['value A', ['value A']];
         yield ['value A|value B', ['value A', 'value B']];

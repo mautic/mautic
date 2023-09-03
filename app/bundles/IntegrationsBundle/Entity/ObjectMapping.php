@@ -31,7 +31,7 @@ class ObjectMapping
     private $internalObjectName;
 
     /**
-     * @var int
+     * @var string
      */
     private $internalObjectId;
 
@@ -215,7 +215,7 @@ class ObjectMapping
      */
     public function getInternalObjectId()
     {
-        return $this->internalObjectId;
+        return (int) $this->internalObjectId;
     }
 
     /**
@@ -225,7 +225,7 @@ class ObjectMapping
      */
     public function setInternalObjectId($internalObjectId)
     {
-        $this->internalObjectId = $internalObjectId;
+        $this->internalObjectId = (string) $internalObjectId;
 
         return $this;
     }
@@ -317,9 +317,6 @@ class ObjectMapping
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function appendToInternalStorage($key, $value)

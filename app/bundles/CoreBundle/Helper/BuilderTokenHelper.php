@@ -70,9 +70,9 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @throws \BadMethodCallException
-     *
      * @return array|void
+     *
+     * @throws \BadMethodCallException
      */
     public function getTokens(
         $tokenRegex,
@@ -85,7 +85,7 @@ class BuilderTokenHelper
             throw new \BadMethodCallException('You must call the "'.get_class($this).'::configure()" method first.');
         }
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             $this->permissionSet,
             'RETURN_ARRAY'
@@ -142,10 +142,6 @@ class BuilderTokenHelper
 
     /**
      * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param $token
-     * @param $description
-     * @param $forPregReplace
      *
      * @return string
      */

@@ -51,18 +51,18 @@ class DateTimeToken
         $relativeDate  = $parseModifier[1] ?? '';
 
         switch ($modifier) {
-                case 'datetime':
-                    $format = $defaultDatetimeFormat;
-                    break;
-                case 'date':
-                    $format = $defaultDateFormat;
-                    break;
-                case 'time':
-                    $format = $defaultTimeFormat;
+            case 'datetime':
+                $format = $defaultDatetimeFormat;
                 break;
-                default:
-                    $format  = $modifier ?: $defaultDatetimeFormat;
-            }
+            case 'date':
+                $format = $defaultDateFormat;
+                break;
+            case 'time':
+                $format = $defaultTimeFormat;
+                break;
+            default:
+                $format  = $modifier ?: $defaultDatetimeFormat;
+        }
 
         if ($relativeDate) {
             $dateTime->modify($relativeDate);

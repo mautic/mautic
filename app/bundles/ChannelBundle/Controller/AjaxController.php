@@ -4,19 +4,15 @@ namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @param $eventId
-     * @param $contactId
-     *
-     * @return LeadEventLog|\Symfony\Component\HttpFoundation\JsonResponse
-     *
-     * @throws \Exception
-     */
-    public function cancelQueuedMessageEventAction(Request $request)
+    use AjaxLookupControllerTrait;
+
+    public function cancelQueuedMessageEventAction(Request $request): JsonResponse
     {
         $dataArray      = ['success' => 0];
         $messageQueueId = (int) $request->request->get('channelId');

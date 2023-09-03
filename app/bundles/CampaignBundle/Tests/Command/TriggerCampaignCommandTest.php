@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
@@ -39,7 +35,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -206,7 +202,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -566,13 +562,10 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignInfiniteLoop(): void
     {
         $campaignMemberRepo = $this->em->getRepository(Lead::class);
-        \assert($campaignMemberRepo instanceof LeadRepository);
 
         $segmentMemberRepo = $this->em->getRepository(ListLead::class);
-        \assert($segmentMemberRepo instanceof ListLeadRepository);
 
         $campaignRepo = $this->em->getRepository(Campaign::class);
-        \assert($campaignRepo instanceof CampaignRepository);
 
         // Clear the campaign and segment members as those are manually_added.
         $campaignMemberRepo->deleteEntities($campaignMemberRepo->findAll());
@@ -605,7 +598,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSegmentCacheCount(): void
     {

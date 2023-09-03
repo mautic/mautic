@@ -32,7 +32,6 @@ class FetchLeadsCommand extends Command
                     'mautic:integration:synccontacts',
                 ]
             )
-            ->setDescription('Fetch leads from integration.')
             ->addOption(
                 '--integration',
                 '-i',
@@ -143,7 +142,7 @@ class FetchLeadsCommand extends Command
                 $output->writeln('<info>'.$this->translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                 $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
-                //Handle case when integration object are named "Contacts" and "Leads"
+                // Handle case when integration object are named "Contacts" and "Leads"
                 $leadObjectName = 'Lead';
                 if (in_array('Leads', $config['objects'])) {
                     $leadObjectName = 'Leads';
@@ -291,6 +290,7 @@ class FetchLeadsCommand extends Command
             }
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch leads from integration.';
 }

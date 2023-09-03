@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-use DateTime;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -16,6 +15,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -79,8 +79,8 @@ class ContactObjectHelperTest extends TestCase
             ->method('detachEntity');
 
         $objects = [
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new DateTime()),
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new \DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new \DateTime()),
         ];
 
         $objectMappings = $this->getObjectHelper()->create($objects);
@@ -100,8 +100,8 @@ class ContactObjectHelperTest extends TestCase
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
-        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new DateTime());
-        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
+        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new \DateTime());
+        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objects          = [$objectChangeDaoA, $objectChangeDaoB];
         $companyId        = 1234;
         $companyValue     = new ReferenceValueDAO();
@@ -158,7 +158,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 1, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 1)));
 
         $objects = [
@@ -181,7 +181,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('removeDncForContact')
             ->with(1, 'email');
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 0)));
 
         $objects = [
@@ -204,7 +204,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 3, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 4)));
 
         $objects = [
@@ -219,6 +219,38 @@ class ContactObjectHelperTest extends TestCase
             ->method('getEntities')
             ->willReturn([$contact1]);
         $this->getObjectHelper()->update([1], $objects);
+    }
+
+    public function testFindObjectById(): void
+    {
+        $contact = new Lead();
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($contact);
+
+        self::assertSame($contact, $this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testFindObjectByIdReturnsNull(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1);
+
+        self::assertNull($this->getObjectHelper()->findObjectById(1));
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function testSetFieldValues(): void
+    {
+        $contact = new Lead();
+        $this->model->expects(self::once())
+            ->method('setFieldValues')
+            ->with($contact, []);
+        $this->getObjectHelper()->setFieldValues($contact);
     }
 
     /**

@@ -105,8 +105,8 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository('MauticPluginBundle:Integration');
-            //get a list of plugins for filter
+            $integrationRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class);
+            // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
                     'hydration_mode' => 'hydrate_array',
@@ -129,7 +129,7 @@ class IntegrationHelper
 
                     $id                  = $installedPlugins[$plugin['bundle']]['id'];
                     $this->byPlugin[$id] = [];
-                    $pluginReference     = $this->em->getReference('MauticPluginBundle:Plugin', $id);
+                    $pluginReference     = $this->em->getReference(\Mautic\PluginBundle\Entity\Plugin::class, $id);
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
@@ -329,21 +329,17 @@ class IntegrationHelper
     /**
      * Get a single integration object.
      *
-     * @param $name
-     *
      * @return AbstractIntegration|false
      */
     public function getIntegrationObject($name)
     {
         $integrationObjects = $this->getIntegrationObjects($name);
 
-        return ((isset($integrationObjects[$name]))) ? $integrationObjects[$name] : false;
+        return (isset($integrationObjects[$name])) ? $integrationObjects[$name] : false;
     }
 
     /**
      * Gets a count of integrations.
-     *
-     * @param $plugin
      *
      * @return int
      */
@@ -383,7 +379,7 @@ class IntegrationHelper
     public function getSocialProfileUrlRegex($find = true)
     {
         if ($find) {
-            //regex to find a match
+            // regex to find a match
             return [
                 'twitter'  => "/twitter.com\/(.*?)($|\/)/",
                 'facebook' => [
@@ -402,7 +398,7 @@ class IntegrationHelper
                 'skype'  => "/skype:(.*?)($|\?)/",
             ];
         } else {
-            //populate placeholder
+            // populate placeholder
             return [
                 'twitter'    => 'https://twitter.com/%handle%',
                 'facebook'   => 'https://facebook.com/%handle%',
@@ -424,12 +420,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getCoreIntegrations();
     }
 
     /**
@@ -449,10 +445,10 @@ class IntegrationHelper
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
         if ($refresh) {
-            //regenerate from integrations
+            // regenerate from integrations
             $now = new DateTimeHelper();
 
-            //check to see if there are social profiles activated
+            // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
             /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
@@ -468,7 +464,7 @@ class IntegrationHelper
                 if ($identifierField && $settings->isPublished()) {
                     $profile = (!isset($socialCache[$integration])) ? [] : $socialCache[$integration];
 
-                    //clear the cache
+                    // clear the cache
                     unset($profile['profile'], $profile['activity']);
 
                     if (in_array('public_profile', $features) && $sn->isAuthorized()) {
@@ -489,14 +485,14 @@ class IntegrationHelper
                         $socialCache[$integration]['lastRefresh'] = $now->toUtcString();
                     }
                 } elseif (isset($socialCache[$integration])) {
-                    //integration is now not applicable
+                    // integration is now not applicable
                     unset($socialCache[$integration]);
                 }
             }
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -515,7 +511,6 @@ class IntegrationHelper
     }
 
     /**
-     * @param      $lead
      * @param bool $integration
      *
      * @return array
@@ -529,7 +524,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
 
         return $socialCache;
     }
@@ -557,7 +552,7 @@ class IntegrationHelper
                 $plugin          = $settings->getPlugin();
                 $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : [];
 
-                //add the api keys for use within the share buttons
+                // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
                 $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
                     'settings' => $shareSettings,
@@ -571,9 +566,6 @@ class IntegrationHelper
     /**
      * Loops through field values available and finds the field the integration needs to obtain the user.
      *
-     * @param $integrationObject
-     * @param $fields
-     *
      * @return bool
      */
     public function getUserIdentifierField($integrationObject, $fields)
@@ -584,14 +576,14 @@ class IntegrationHelper
 
         $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound) {
             if (is_array($identifier)) {
-                //there are multiple fields the integration can identify by
+                // there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
                     if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
-                            //found enough matches so break
+                            // found enough matches so break
                             $matchFound = true;
                             break;
                         }
@@ -606,7 +598,7 @@ class IntegrationHelper
         $groups = ['core', 'social', 'professional', 'personal'];
         $keys   = array_keys($fields);
         if (0 !== count(array_intersect($groups, $keys)) && count($keys) <= 4) {
-            //fields are group
+            // fields are group
             foreach ($fields as $groupFields) {
                 $availableFields = array_keys($groupFields);
                 foreach ($availableFields as $f) {
@@ -633,8 +625,6 @@ class IntegrationHelper
 
     /**
      * Get the path to the integration's icon relative to the site root.
-     *
-     * @param $integration
      *
      * @return string
      */

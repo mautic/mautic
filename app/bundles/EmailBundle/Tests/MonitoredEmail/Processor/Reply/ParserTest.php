@@ -56,12 +56,14 @@ BODY;
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
      */
-    public function testExceptionIsThrownWithHashNotFound()
+    public function testExceptionIsThrownWithHashNotFound(): void
     {
         $this->expectException(ReplyNotFound::class);
 
-        $message = new Message();
-        $parser  = new Parser($message);
+        $message           = new Message();
+        $message->textHtml = 'some html';
+
+        $parser = new Parser($message);
 
         $parser->parse();
     }

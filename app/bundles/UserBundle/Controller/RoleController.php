@@ -4,7 +4,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\UserBundle\Entity as Entity;
+use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -110,33 +110,33 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        //retrieve the entity
+        // retrieve the entity
         $entity = new Entity\Role();
         $model  = $this->getModel('user.role');
         \assert($model instanceof RoleModel);
 
-        //set the return URL for post actions
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
 
-        //set the page we came from
+        // set the page we came from
         $page   = $request->getSession()->get('mautic.role.page', 1);
         $action = $this->generateUrl('mautic_role_action', ['objectAction' => 'new']);
 
-        //get the user form factory
+        // get the user form factory
         $permissionsConfig = $this->getPermissionsConfig($entity);
         $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //set the permissions
+                    // set the permissions
                     $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
@@ -160,8 +160,8 @@ class RoleController extends FormController
                         'mauticContent' => 'role',
                     ],
                 ]);
-            } else {
-                return $this->editAction($request, $entity->getId());
+            } elseif ($valid) {
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 
@@ -188,7 +188,7 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = true)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:roles:edit')) {
             return $this->accessDenied();
@@ -198,10 +198,10 @@ class RoleController extends FormController
         $model  = $this->getModel('user.role');
         $entity = $model->getEntity($objectId);
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.role.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_role_index', ['page' => $page]);
 
         $postActionVars = [
@@ -214,7 +214,7 @@ class RoleController extends FormController
             ],
         ];
 
-        //user not found
+        // user not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -228,7 +228,7 @@ class RoleController extends FormController
                 ])
             );
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'user.role');
         }
 
@@ -236,18 +236,18 @@ class RoleController extends FormController
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //set the permissions
+                    // set the permissions
                     $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.core.notice.updated', [
@@ -260,19 +260,19 @@ class RoleController extends FormController
                     ]);
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             } else {
-                //the form has to be rebuilt because the permissions were updated
+                // the form has to be rebuilt because the permissions were updated
                 $permissionsConfig = $this->getPermissionsConfig($entity);
                 $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -300,7 +300,7 @@ class RoleController extends FormController
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -315,10 +315,10 @@ class RoleController extends FormController
                 $bundle = $object->getName();
                 $label  = $translator->trans("mautic.{$bundle}.permissions.header");
 
-                //convert the permission bits from the db into readable names
+                // convert the permission bits from the db into readable names
                 $data = $object->convertBitsToPermissionNames($permissionsArray);
 
-                //get the ratio of granted/total
+                // get the ratio of granted/total
                 list($granted, $total) = $object->getPermissionRatio($data);
 
                 $permissions[$bundle] = [
@@ -337,7 +337,7 @@ class RoleController extends FormController
             }
         }
 
-        //order permissions by label
+        // order permissions by label
         uasort($permissions, function ($a, $b) {
             return strnatcmp($a['label'], $b['label']);
         });
@@ -405,7 +405,7 @@ class RoleController extends FormController
                     'msg'  => $e->getMessage(),
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -445,7 +445,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository('MauticUserBundle:User')->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [
@@ -480,7 +480,7 @@ class RoleController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

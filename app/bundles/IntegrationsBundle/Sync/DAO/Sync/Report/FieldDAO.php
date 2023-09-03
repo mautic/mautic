@@ -57,9 +57,6 @@ class FieldDAO
         return $this->changeDateTime;
     }
 
-    /**
-     * @return FieldDAO
-     */
     public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
     {
         $this->changeDateTime = $changeDateTime;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -17,6 +16,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -192,7 +192,7 @@ class ContactObjectHelper implements ObjectHelperInterface
      * @param int $start
      * @param int $limit
      */
-    public function findObjectsBetweenDates(DateTimeInterface $from, DateTimeInterface $to, $start, $limit): array
+    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
@@ -342,8 +342,6 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param $value
-     *
      * @return int
      */
     private function getDoNotContactReason($value)
@@ -356,5 +354,18 @@ class ContactObjectHelper implements ObjectHelperInterface
 
         // Assume manually removed
         return DoNotContact::MANUAL;
+    }
+
+    public function findObjectById(int $id): ?Lead
+    {
+        return $this->repository->getEntity($id);
+    }
+
+    /**
+     * @throws ImportFailedException
+     */
+    public function setFieldValues(Lead $lead): void
+    {
+        $this->model->setFieldValues($lead, []);
     }
 }

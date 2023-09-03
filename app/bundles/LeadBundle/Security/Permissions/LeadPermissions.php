@@ -15,6 +15,7 @@ class LeadPermissions extends AbstractPermissions
         $this->permissions = [
             'lists' => [
                 'viewother'   => 2,
+                'viewown'     => 4,
                 'editother'   => 8,
                 'deleteother' => 64,
                 'full'        => 1024,
@@ -79,7 +80,7 @@ class LeadPermissions extends AbstractPermissions
     {
         parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
 
-        //make sure the user has access to own leads as well if they have access to lists, notes or fields
+        // make sure the user has access to own leads as well if they have access to lists, notes or fields
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
             (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
@@ -97,7 +98,7 @@ class LeadPermissions extends AbstractPermissions
     protected function getSynonym($name, $level)
     {
         if ('fields' === $name) {
-            //set some synonyms
+            // set some synonyms
             switch ($level) {
                 case 'publishown':
                 case 'publishother':

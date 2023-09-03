@@ -147,6 +147,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

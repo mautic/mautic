@@ -30,10 +30,6 @@ class ChannelSubscriptionChange extends Event
 
     /**
      * ContactStatusChange constructor.
-     *
-     * @param $channel
-     * @param $oldStatus
-     * @param $newStatus
      */
     public function __construct(Lead $lead, $channel, $oldStatus, $newStatus)
     {
@@ -92,8 +88,6 @@ class ChannelSubscriptionChange extends Event
     }
 
     /**
-     * @param $reason
-     *
      * @return string
      */
     private function getDncReasonVerb($reason)

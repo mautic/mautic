@@ -18,15 +18,6 @@ return function (ContainerConfigurator $configurator) {
         'MonitoredEmail/Organizer',
         'MonitoredEmail/Processor',
         'Stat/Reference.php',
-        // Will be removed in M5:
-        'Swiftmailer/Exception',
-        'Swiftmailer/Momentum/Callback/ResponseItem.php',
-        'Swiftmailer/Momentum/Callback/ResponseItems.php',
-        'Swiftmailer/Momentum/DTO',
-        'Swiftmailer/Momentum/Exception',
-        'Swiftmailer/Momentum/Metadata',
-        'Swiftmailer/SendGrid/Callback/ResponseItem.php',
-        'Swiftmailer/SendGrid/Callback/ResponseItems.php',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')
@@ -35,4 +26,11 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+    $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
+        ->decorate('mailer.transport_factory');
+
+    $services->alias('mautic.email.model.email', \Mautic\EmailBundle\Model\EmailModel::class);
+    $services->alias('mautic.email.model.send_email_to_user', \Mautic\EmailBundle\Model\SendEmailToUser::class);
+    $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);
+    $services->alias('mautic.email.model.transport_callback', \Mautic\EmailBundle\Model\TransportCallback::class);
 };

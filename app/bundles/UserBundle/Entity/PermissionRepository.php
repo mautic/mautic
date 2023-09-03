@@ -17,9 +17,9 @@ class PermissionRepository extends CommonRepository
     {
         $query = $this
             ->createQueryBuilder('p')
-            ->delete('MauticUserBundle:Permission', 'p')
+            ->delete(\Mautic\UserBundle\Entity\Permission::class, 'p')
             ->where('p.role = :role')
-            ->setParameter(':role', $role)
+            ->setParameter('role', $role)
             ->getQuery();
         $query->execute();
     }
@@ -37,12 +37,12 @@ class PermissionRepository extends CommonRepository
             ->createQueryBuilder('p')
             ->where('p.role = :role')
             ->orderBy('p.bundle')
-            ->setParameter(':role', $role)
+            ->setParameter('role', $role)
             ->getQuery()
             ->useResultCache(false)
             ->getResult(Query::HYDRATE_ARRAY);
 
-        //rearrange the array to meet needs
+        // rearrange the array to meet needs
         $permissions = [];
         foreach ($results as $r) {
             if ($forForm) {

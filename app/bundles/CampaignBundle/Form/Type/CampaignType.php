@@ -64,7 +64,7 @@ class CampaignType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'campaign',
         ]);

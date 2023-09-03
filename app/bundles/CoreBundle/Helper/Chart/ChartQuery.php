@@ -74,7 +74,7 @@ class ChartQuery extends AbstractChart
     {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
-        $this->isTimeUnit     = (in_array($this->unit, ['H', 'i', 's']));
+        $this->isTimeUnit     = in_array($this->unit, ['H', 'i', 's']);
         $this->connection     = $connection;
         $this->setDateRange($dateFrom, $dateTo);
     }
@@ -568,8 +568,6 @@ class ChartQuery extends AbstractChart
     }
 
     /**
-     * @param $table
-     *
      * @return mixed
      */
     protected function prepareTable($table)

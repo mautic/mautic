@@ -5,9 +5,11 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -27,6 +29,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
+    private Shortener $shortenerFactory;
+
     /**
      * @var TranslatorInterface
      */
@@ -52,24 +56,20 @@ class ConfigType extends AbstractType
      */
     private $ipLookup;
 
-    /**
-     * @var array
-     */
-    private $ipLookupServices;
-
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        array $ipLookupServices,
-        AbstractLookup $ipLookup = null
+        AbstractLookup $ipLookup = null,
+        Shortener $shortenerFactory,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator          = $translator;
         $this->langHelper          = $langHelper;
         $this->ipLookupFactory     = $ipLookupFactory;
         $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->ipLookupServices    = $ipLookupServices;
+        $this->shortenerFactory    = $shortenerFactory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -437,14 +437,14 @@ class ConfigType extends AbstractType
                 'choices' => [
                     'mautic.core.daterange.0days'                                                                 => 'midnight',
                     'mautic.core.daterange.1days'                                                                 => '-24 hours',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])                      => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])                      => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])                      => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1])                     => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2])                     => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3])                     => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])                      => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])                      => '-2 years',
                 ],
                 'expanded'          => false,
                 'multiple'          => false,
@@ -560,20 +560,48 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $enabledServices = $this->shortenerFactory->getEnabledServices();
+        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+
         $builder->add(
-            'link_shortener_url',
-            TextType::class,
+            Shortener::SHORTENER_SERVICE,
+            ChoiceType::class,
             [
-                'label'      => 'mautic.core.config.form.link.shortener',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'choices'           => $choices,
+                'label'             => 'mautic.core.config.form.shortener',
+                'required'          => false,
+                'attr'              => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.link.shortener.tooltip',
+                    'tooltip' => 'mautic.core.config.form.shortener.tooltip',
                 ],
-                'required' => false,
             ]
         );
 
+        $builder->add(
+            'shortener_email_enable',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.shortener.enable_email',
+                'data'       => (array_key_exists('shortener_email_enable', $options['data']) && !empty($options['data']['shortener_email_enable'])),
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_email.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'shortener_sms_enable',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.shortener.enable_sms',
+                'data'       => (array_key_exists('shortener_sms_enable', $options['data']) && !empty($options['data']['shortener_sms_enable'])),
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_sms.tooltip',
+                ],
+            ]
+        );
         $builder->add(
             'max_entity_lock_time',
             NumberType::class,
@@ -586,19 +614,32 @@ class ConfigType extends AbstractType
                 ],
                 'required' => false,
             ]
-            );
+        );
 
         $builder->add(
-          'transliterate_page_title',
-          YesNoButtonGroupType::class,
-          [
-            'label' => 'mautic.core.config.form.transliterate.page.title',
-            'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
-            'attr'  => [
-              'class'   => 'form-control',
-              'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
-            ],
-          ]
+            'transliterate_page_title',
+            YesNoButtonGroupType::class,
+            [
+              'label' => 'mautic.core.config.form.transliterate.page.title',
+              'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
+              'attr'  => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
+              ],
+            ]
+        );
+
+        $builder->add(
+            'load_froala_assets',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.load.froala.assets',
+                'data'  => (array_key_exists('load_froala_assets', $options['data']) && !empty($options['data']['load_froala_assets'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.load.froala.assets.tooltip',
+                ],
+            ]
         );
 
         $builder->add(
@@ -723,8 +764,9 @@ class ConfigType extends AbstractType
 
     private function getIpServicesChoices(): array
     {
-        $choices = [];
-        foreach ($this->ipLookupServices as $name => $service) {
+        $choices          = [];
+        $ipLookupServices = $this->coreParametersHelper->get('ip_lookup_services') ?? [];
+        foreach ($ipLookupServices as $name => $service) {
             $choices[$service['display_name']] = $name;
         }
 
