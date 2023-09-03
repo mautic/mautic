@@ -161,7 +161,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         ]);
         $bobsUtmValues->setUtmCampaign('test2');
         $bobsUtmValues->setUtmContent('test2');
-        $bobsUtmValues->setDateAdded(new \Datetime());
+        $bobsUtmValues->setDateAdded(new \DateTime());
 
         $model->getUtmTagRepository()->saveEntity($bobsUtmValues);
         $model->setUtmTags($bobsUtmValues->getLead(), $bobsUtmValues);
@@ -181,7 +181,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         ]);
         $janesUtmValues->setUtmCampaign('test1');
         $janesUtmValues->setUtmContent('test1');
-        $janesUtmValues->setDateAdded(new \Datetime());
+        $janesUtmValues->setDateAdded(new \DateTime());
 
         $model->getUtmTagRepository()->saveEntity($janesUtmValues);
         $model->setUtmTags($janesUtmValues->getLead(), $janesUtmValues);
