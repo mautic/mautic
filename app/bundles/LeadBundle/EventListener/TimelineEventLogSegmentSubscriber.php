@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -96,10 +95,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param $action
-     */
-    private function writeEntries(array $contacts, LeadList $segment, $action, DateTime $date = null)
+    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null)
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -108,7 +104,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         foreach ($contacts as $key => $contact) {
             if (!$contact instanceof Lead) {
                 $id                      = is_array($contact) ? $contact['id'] : $contact;
-                $contact                 = $this->em->getReference('MauticLeadBundle:Lead', $id);
+                $contact                 = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $id);
                 $contacts[$key]          = $contact;
                 $detachContactReferences = true;
             }
@@ -135,7 +131,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
 
         if ($detachContactReferences) {
             foreach ($contacts as $contact) {

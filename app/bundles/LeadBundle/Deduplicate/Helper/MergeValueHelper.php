@@ -41,8 +41,6 @@ class MergeValueHelper
     }
 
     /**
-     * @param $value
-     *
      * @return bool
      */
     public static function isNotEmpty($value)

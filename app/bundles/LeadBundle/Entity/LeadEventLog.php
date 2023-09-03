@@ -20,42 +20,42 @@ class LeadEventLog
     public const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     protected $lead;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $userId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $userName;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $object;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $objectId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $action;
 
@@ -65,7 +65,7 @@ class LeadEventLog
     protected $dateAdded;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $properties = [];
 
@@ -103,8 +103,6 @@ class LeadEventLog
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -133,7 +131,7 @@ class LeadEventLog
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -151,7 +149,7 @@ class LeadEventLog
     /**
      * Get lead.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

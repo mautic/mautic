@@ -21,7 +21,7 @@ class IndexSchemaHelper
     protected $prefix;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected $sm;
 
@@ -66,8 +66,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      *
      * @throws SchemaException
@@ -83,17 +81,12 @@ class IndexSchemaHelper
         return $this;
     }
 
-    /**
-     * @param $name
-     */
     public function allowColumn($name)
     {
         $this->allowedColumns[] = $name;
     }
 
     /**
-     * @param       $columns
-     * @param       $name
      * @param array $options
      *
      * @return $this
@@ -176,8 +169,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $columns
-     *
      * @return array
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException

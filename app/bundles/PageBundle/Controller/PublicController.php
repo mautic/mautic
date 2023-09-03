@@ -32,8 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PublicController extends CommonFormController
 {
     /**
-     * @param $slug
-     *
      * @return Response
      *
      * @throws \Exception
@@ -51,7 +49,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
-        /** @var Page $entity */
+        /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
@@ -143,15 +141,15 @@ class PublicController extends CommonFormController
                     }
 
                     if (count($variants)) {
-                        //check to see if this user has already been displayed a specific variant
+                        // check to see if this user has already been displayed a specific variant
                         $variantCookie = $request->cookies->get('mautic_page_'.$entity->getId());
 
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
-                                //if not the parent, show the specific variant already displayed to the visitor
+                                // if not the parent, show the specific variant already displayed to the visitor
                                 if ($variantCookie !== $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
-                                } //otherwise proceed with displaying parent
+                                } // otherwise proceed with displaying parent
                             }
                         } else {
                             // Add parent weight
@@ -170,7 +168,7 @@ class PublicController extends CommonFormController
                             }
                             $totalHits += $variants[$id]['hits'];
 
-                            //determine variant to show
+                            // determine variant to show
                             foreach ($variants as &$variant) {
                                 $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
                             }
@@ -193,12 +191,12 @@ class PublicController extends CommonFormController
                                 }
                             );
 
-                            //find the one with the most difference from weight
+                            // find the one with the most difference from weight
 
                             reset($variants);
                             $useId = key($variants);
 
-                            //set the cookie - 14 days
+                            // set the cookie - 14 days
                             $cookieHelper->setCookie(
                                 'mautic_page_'.$entity->getId(),
                                 $useId,
@@ -242,7 +240,7 @@ class PublicController extends CommonFormController
                  * @deprecated  BC support to be removed in 3.0
                  */
                 $template = $entity->getTemplate();
-                //all the checks pass so display the content
+                // all the checks pass so display the content
                 $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
@@ -292,7 +290,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        if ($tracking404Model->isTrackable()) {
+        if (false !== $entity && $tracking404Model->isTrackable()) {
             $tracking404Model->hitPage($entity, $request);
         }
 
@@ -300,8 +298,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $id
-     *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
      * @throws \Exception
@@ -322,7 +318,7 @@ class PublicController extends CommonFormController
         $content   = $entity->getCustomHtml();
         if (empty($content) && !empty($BCcontent)) {
             $template = $entity->getTemplate();
-            //all the checks pass so display the content
+            // all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $entity->getContent();
 
@@ -425,8 +421,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $redirectId
-     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      *
      * @throws \Exception
@@ -436,11 +430,9 @@ class PublicController extends CommonFormController
         ContactRequestHelper $contactRequestHelper,
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
-        LoggerInterface $mauticLogger,
+        LoggerInterface $logger,
         $redirectId
     ) {
-        $logger = $mauticLogger;
-
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -463,9 +455,7 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $request->query->all();
 
-        // Unset the clickthrough from the URL query
         $ct = $query['ct'] ?? null;
-        unset($query['ct']);
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -476,7 +466,7 @@ class PublicController extends CommonFormController
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $ipLookupHelper->getIpAddress();
 
-        if (isset($ct)) {
+        if ($ct) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
                 /** @var PageModel $pageModel */
@@ -484,6 +474,7 @@ class PublicController extends CommonFormController
 
                 try {
                     $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+
                     $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
@@ -503,7 +494,11 @@ class PublicController extends CommonFormController
             }
 
             if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
-                $url .= '?ct='.$ct;
+                if (strpos($url, '&')) {
+                    $url .= '&ct='.$ct;
+                } else {
+                    $url .= '?ct='.$ct;
+                }
             }
         }
 
@@ -562,12 +557,12 @@ class PublicController extends CommonFormController
                     $options['slides'] = [
                         [
                             'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_lb200.png'),
                             'captionheader'    => 'Caption 1',
                         ],
                         [
                             'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
+                            'background-image' => $assetsHelper->getOverridableUrl('images/mautic_logo_db200.png'),
                             'captionheader'    => 'Caption 2',
                         ],
                     ];

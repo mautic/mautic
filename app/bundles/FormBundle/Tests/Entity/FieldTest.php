@@ -301,4 +301,31 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setIsAutoFill(false);
         Assert::assertTrue($field->showForContact(null, $contact, $form));
     }
+
+    /**
+     * @dataProvider dataProvider
+     *
+     * @param array<string, int> $properties
+     */
+    public function testHasChoices(string $type, array $properties, bool $result): void
+    {
+        $field = new Field();
+        $field->setProperties($properties);
+        $field->setType($type);
+
+        $this->assertEquals($result, $field->hasChoices());
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function dataProvider(): iterable
+    {
+        yield ['string', [], false];
+        yield ['string', ['multiple' => 0], false];
+        yield ['string', ['multiple' => 1], true];
+        yield ['checkboxgrp', [], true];
+        yield ['checkboxgrp', ['multiple' => 0], true];
+        yield ['checkboxgrp', ['multiple' => 1], true];
+    }
 }

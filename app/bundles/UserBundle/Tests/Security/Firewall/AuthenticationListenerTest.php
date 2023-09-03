@@ -12,6 +12,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Firewall\AuthenticationListener;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -30,7 +31,7 @@ class AuthenticationListenerTest extends TestCase
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var ObjectRepository */
+    /** @var ObjectRepository<User>&MockObject */
     private $objectRepository;
 
     /** @var OAuthToken */

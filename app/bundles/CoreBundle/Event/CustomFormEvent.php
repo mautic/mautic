@@ -89,10 +89,6 @@ class CustomFormEvent extends Event
         return $this->subscribers;
     }
 
-    /**
-     * @param $eventName
-     * @param $listener
-     */
     public function addListener($eventName, $listener)
     {
         if (!is_callable($listener)) {

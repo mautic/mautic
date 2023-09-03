@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -41,7 +40,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $doNotContact = new DoNotContact();
         $doNotContact->setLead($lead);
-        $doNotContact->setDateAdded(new DateTime());
+        $doNotContact->setDateAdded(new \DateTime());
         $doNotContact->setChannel('email');
         $this->em->persist($doNotContact);
 
@@ -75,7 +74,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $doNotContact = new DoNotContact();
         $doNotContact->setLead($lead);
-        $doNotContact->setDateAdded(new DateTime());
+        $doNotContact->setDateAdded(new \DateTime());
         $doNotContact->setChannel('email');
         $doNotContact->setReason(1);
         $doNotContact->setComments('Some comment');

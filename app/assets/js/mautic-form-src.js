@@ -19,7 +19,8 @@
         };
         //Mautic Form
         var Form = {
-            clickEvents: []
+            clickEvents: [],
+            clonedNodes: {},
         };
         //Mautic Profiler
         var Profiler = {};
@@ -95,8 +96,7 @@
         };
 
         Form.getFormLink = function(options) {
-            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
+            return Core.getMauticBaseUrl() + 'index.php/form/' + options.data['id'] + '?' + options.params;
         };
 
         Form.createIframe = function(options, embed) {
@@ -284,30 +284,28 @@
         }
 
         Form.filterOptGroups = function(selectElement, optGroupValue) {
-            var optGroups = selectElement.querySelectorAll('optgroup');
-            var optGroupCount = optGroups.length;
+            // safari doesn't support hiding optgroup, so we need to restore the select before filtering
+            selectElement.querySelectorAll('select').forEach(function (select) {
+                if (typeof Form.clonedNodes[select.id] === 'undefined') {
+                    Form.clonedNodes[select.id] = select.cloneNode(true);
+                }
 
-            if (!optGroupCount) {
+                select.innerHTML = Form.clonedNodes[select.id].innerHTML;
+            });
+
+            const matchingOptionGroups = selectElement.querySelectorAll('optgroup[label="' + optGroupValue + '"]');
+            const notMatchingOptionGroups = selectElement.querySelectorAll('optgroup:not([label="' + optGroupValue + '"])');
+
+            // hide if all option groups don't match
+            if (!matchingOptionGroups.length && notMatchingOptionGroups.length) {
+                Form.hideField(selectElement);
+
                 return;
             }
 
-            var optGroupFound = false;
-
-            for (var index = 0; index < optGroupCount; ++index) {
-                var optGroup = optGroups[index];
-                if (optGroup.getAttribute('label') !== optGroupValue) {
-                    optGroup.style.display = 'none';
-                } else {
-                    optGroup.style.display = 'block';
-                    optGroupFound = true;
-                }
-            }
-
-            // Hide select field itself if no opt group label match the selected value.
-            // Use case: Show states only for countries which have some states.
-            if (false === optGroupFound) {
-                Form.hideField(selectElement);
-            }
+            [].forEach.call(notMatchingOptionGroups, function (notMatchingOptionGroup) {
+                notMatchingOptionGroup.remove();
+            });
         };
 
         Form.preparePagination = function(formId) {
@@ -821,7 +819,7 @@
             var s = document.createElement('link');
             s.rel = "stylesheet"
             s.type = "text/css"
-            s.href = Core.debug() ? Core.getMauticBaseUrl() + 'media/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
+            s.href = Core.debug() ? Core.getMauticBaseUrl() + 'app/assets/css/modal.css' : Core.getMauticBaseUrl() + 'media/css/modal.min.css';
             document.head.appendChild(s);
             if (Core.debug()) console.log(s);
         };

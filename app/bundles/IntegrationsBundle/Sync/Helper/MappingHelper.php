@@ -233,7 +233,7 @@ class MappingHelper
     private function saveObjectMapping(ObjectMapping $objectMapping): void
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
-        $this->objectMappingRepository->clear();
+        $this->objectMappingRepository->detachEntity($objectMapping);
     }
 
     /**

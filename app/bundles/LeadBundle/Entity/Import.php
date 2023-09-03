@@ -78,7 +78,7 @@ class Import extends FormEntity
     /**
      * Name of the original uploaded file.
      *
-     * @var string
+     * @var string|null
      */
     private $originalFile;
 
@@ -111,7 +111,7 @@ class Import extends FormEntity
     private $ignoredCount = 0;
 
     /**
-     * @var bool
+     * @var int
      */
     private $priority;
 
@@ -136,7 +136,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     private $properties = [];
 
@@ -190,8 +190,6 @@ class Import extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -323,7 +321,7 @@ class Import extends FormEntity
     public function setFilePath($path)
     {
         $fileName = basename($path);
-        $dir      = substr($path, 0, (-1 * (strlen($fileName) + 1)));
+        $dir      = substr($path, 0, -1 * (strlen($fileName) + 1));
 
         $this->setDir($dir);
         $this->setFile($fileName);
@@ -748,8 +746,6 @@ class Import extends FormEntity
     }
 
     /**
-     * @param $line
-     *
      * @return Import
      */
     public function setLastLineImported($line)

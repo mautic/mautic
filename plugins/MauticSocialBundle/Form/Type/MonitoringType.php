@@ -90,7 +90,7 @@ class MonitoringType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);

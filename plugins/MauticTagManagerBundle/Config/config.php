@@ -50,14 +50,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'mautic.tagmanager.model.tag' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class,
-                'arguments' => [
-                    'service_container',
-                ],
-            ],
-        ],
     ],
     'menu' => [
         'main' => [

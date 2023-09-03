@@ -23,7 +23,6 @@ class TagModel extends BaseTagModel
     public function getRepository()
     {
         $result = $this->em->getRepository(Tag::class);
-        \assert($result instanceof TagRepository);
 
         return $result;
     }

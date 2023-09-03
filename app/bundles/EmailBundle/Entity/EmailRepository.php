@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -103,7 +102,7 @@ class EmailRepository extends CommonRepository
         $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticEmailBundle:Email', 'e', 'e.id');
+            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e', 'e.id');
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
@@ -126,7 +125,7 @@ class EmailRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from('MauticEmailBundle:Email', 'e');
+            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -176,7 +175,7 @@ class EmailRepository extends CommonRepository
         $mqQb->select('mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
-                $mqQb->expr()->andX(
+                $mqQb->expr()->and(
                     $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email'))
                 )
@@ -225,7 +224,7 @@ class EmailRepository extends CommonRepository
         $segmentQb->select('ll.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
-                $segmentQb->expr()->andX(
+                $segmentQb->expr()->and(
                     $segmentQb->expr()->in('ll.leadlist_id', $listIds),
                     $segmentQb->expr()->eq('ll.manually_removed', ':false')
                 )
@@ -262,7 +261,7 @@ class EmailRepository extends CommonRepository
 
         // Has an email
         $q->andWhere(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->isNotNull('l.email'),
                 $q->expr()->neq('l.email', $q->expr()->literal(''))
             )
@@ -442,7 +441,7 @@ class EmailRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -502,7 +501,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -566,7 +565,7 @@ class EmailRepository extends CommonRepository
                 $q->execute();
 
                 return;
-            } catch (DBALException $e) {
+            } catch (\Doctrine\DBAL\Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -633,7 +632,7 @@ class EmailRepository extends CommonRepository
         $result = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().'.id')
-            ->from('MauticEmailBundle:Email', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(\Mautic\EmailBundle\Entity\Email::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->where($this->getTableAlias().'.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->andWhere('e.isPublished = 0')

@@ -21,7 +21,7 @@ class Copy
     private $dateCreated;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $body;
 
@@ -55,8 +55,6 @@ class Copy
     }
 
     /**
-     * @param $id
-     *
      * @return $this
      */
     public function setId($id)
