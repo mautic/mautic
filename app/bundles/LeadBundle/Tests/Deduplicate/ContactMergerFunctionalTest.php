@@ -138,13 +138,13 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testUtmTagsAreMerged(): void
     {
         $model = self::$container->get('mautic.lead.model.lead');
-        \assert(get_class($model) === LeadModel::class);
+        \assert(LeadModel::class === get_class($model));
 
         $em = self::$container->get('doctrine.orm.entity_manager');
-        \assert(get_class($em) === EntityManager::class);
+        \assert(EntityManager::class === get_class($em));
 
         $merger = self::$container->get('mautic.lead.merger');
-        \assert(get_class($merger) === ContactMerger::class);
+        \assert(ContactMerger::class === get_class($merger));
 
         // Merging contact
         $bob = new Lead();
