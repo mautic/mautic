@@ -64,7 +64,7 @@ class SegmentDependencyTreeFactory
     /**
      * @return LeadList[]
      */
-    public function findChildSegments(LeadList $segment): array
+    private function findChildSegments(LeadList $segment): array
     {
         $segmentMembershipFilters = array_filter(
             $segment->getFilters(),
