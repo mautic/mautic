@@ -92,39 +92,55 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function provideSegments(): array
     {
         return [
-            'segment-test-1'                                                     => 1,
-            'segment-test-2'                                                     => 4,
-            'segment-test-3'                                                     => 24,
-            'segment-test-4'                                                     => 1,
-            'segment-test-5'                                                     => 53,
-            'like-percent-end'                                                   => 32,
-            'segment-test-without-filters'                                       => 0,
-            'segment-test-exclude-segment-with-filters'                          => 7,
-            'segment-test-include-segment-without-filters'                       => 0,
-            'segment-test-exclude-segment-without-filters'                       => 11,
-            'segment-test-include-segment-mixed-filters'                         => 24,
-            'segment-test-exclude-segment-mixed-filters'                         => 30,
-            'segment-test-mixed-include-exclude-filters'                         => 8,
-            'segment-test-manual-membership'                                     => 12,
-            'segment-test-include-segment-manual-members'                        => 12,
-            'segment-test-exclude-segment-manual-members'                        => 25,
-            'segment-test-exclude-segment-without-other-filters'                 => 42,
-            'segment-test-include-segment-with-unrelated-segment-manual-removal' => 11,
-            'segment-membership-regexp'                                          => 11,
-            'segment-company-only-fields'                                        => 6,
-            'segment-including-segment-with-company-only-fields'                 => 14,
-            'name-is-not-equal-not-null-test'                                    => 54,
-            'manually-unsubscribed-sms-test'                                     => 1,
-            'clicked-link-in-any-email'                                          => 2,
-            'did-not-click-link-in-any-email'                                    => 52,
-            'clicked-link-in-any-email-on-specific-date'                         => 2,
-            'clicked-link-in-any-sms'                                            => 3,
-            'clicked-link-in-any-sms-on-specific-date'                           => 2,
-            'tags-empty'                                                         => 52,
-            'tags-not-empty'                                                     => 2,
-            'segment-having-company'                                             => 50,
-            'segment-not-having-company'                                         => 4,
-            'has-email-and-visited-url'                                          => 4,
+            'segment-test-1'                                                            => 1,
+            'segment-test-2'                                                            => 4,
+            'segment-test-3'                                                            => 24,
+            'segment-test-4'                                                            => 1,
+            'segment-test-5'                                                            => 53,
+            'like-percent-end'                                                          => 32,
+            'segment-test-without-filters'                                              => 0,
+            'segment-test-include-segment-with-filters'                                 => 26,
+            'segment-test-exclude-segment-with-filters'                                 => 7,
+            'segment-test-include-segment-without-filters'                              => 0,
+            'segment-test-exclude-segment-without-filters'                              => 11,
+            'segment-test-include-segment-mixed-filters'                                => 24,
+            'segment-test-exclude-segment-mixed-filters'                                => 30,
+            'segment-test-mixed-include-exclude-filters'                                => 8,
+            'segment-test-manual-membership'                                            => 12,
+            'segment-test-include-segment-manual-members'                               => 12,
+            'segment-test-exclude-segment-manual-members'                               => 25,
+            'segment-test-exclude-segment-without-other-filters'                        => 42,
+            'segment-test-include-segment-with-unrelated-segment-manual-removal'        => 11,
+            'segment-membership-regexp'                                                 => 11,
+            'segment-company-only-fields'                                               => 6,
+            'segment-including-segment-with-company-only-fields'                        => 14,
+            'name-is-not-equal-not-null-test'                                           => 54,
+            'manually-unsubscribed-sms-test'                                            => 1,
+            'clicked-link-in-any-email'                                                 => 2,
+            'did-not-click-link-in-any-email'                                           => 52,
+            'clicked-link-in-any-email-on-specific-date'                                => 2,
+            'clicked-link-in-any-sms'                                                   => 3,
+            'clicked-link-in-any-sms-on-specific-date'                                  => 2,
+            'clicked-any-link-from-any-email-test'                                      => 2,
+            'not-clicked-any-link-from-any-email-test'                                  => 52,
+            'table-name-missing-in-filter'                                              => 1,
+            'tags-empty'                                                                => 52,
+            'tags-not-empty'                                                            => 2,
+            'segment-having-company'                                                    => 50,
+            'segment-not-having-company'                                                => 4,
+            'has-email-and-visited-url'                                                 => 4,
+            'segment-test-include-static-segment-with-filters'                          => 26,
+            'segment-test-exclude-static-segment-with-filters'                          => 7,
+            'segment-test-include-static-segment-without-filters'                       => 0,
+            'segment-test-exclude-static-segment-without-filters'                       => 11,
+            'segment-test-include-static-segment-mixed-filters'                         => 24,
+            'segment-test-exclude-static-segment-mixed-filters'                         => 30,
+            'segment-test-mixed-include-exclude-static-filters'                         => 8,
+            'segment-test-include-static-segment-manual-members'                        => 12,
+            'segment-test-exclude-static-segment-manual-members'                        => 25,
+            'segment-test-exclude-static-segment-without-other-filters'                 => 42,
+            'segment-test-include-static-segment-with-unrelated-segment-manual-removal' => 11,
+            'segment-including-static-segment-with-company-only-fields'                 => 14,
         ];
     }
 
@@ -178,7 +194,21 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(
             11,
             $segmentContacts[$segmentTest40Ref->getId()]['count'],
-            'There should be 11 contacts in the segment-test-include-segment-with-or segment after rebuilding from the command line.'
+            'There should be 11 contacts in the segment-test-include-static-segment-with-or segment after rebuilding from the command line.'
+        );
+
+        $segmentTest64Ref = $this->getReference('segment-test-include-static-segment-with-or');
+        $this->runCommand('mautic:segments:update', [
+            '-i'    => $segmentTest64Ref->getId(),
+            '--env' => 'test',
+        ]);
+
+        $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest64Ref);
+
+        $this->assertEquals(
+            11,
+            $segmentContacts[$segmentTest64Ref->getId()]['count'],
+            'There should be 11 contacts in the segment-test-include-static-segment-with-or segment after rebuilding from the command line.'
         );
 
         $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
