@@ -2,12 +2,14 @@
     class Heatmap {
         constructor(emailId) {
             this.emailId = emailId;
+            this.mode = 'total';
             this.content = null;
             this.clickStats = null;
             this.$modal = null;
             this.$iframe = null;
             this.$iframeBody = null;
             this.iframeDocument = null;
+            this.totalClicks  = null;
             this.totalUniqueClicks = null;
             this.legendTemplate = null;
             this.links = [];
@@ -38,6 +40,7 @@
                 if (response.success) {
                     this.content = response.content;
                     this.clickStats = response.clickStats;
+                    this.totalClicks = response.totalClicks;
                     this.totalUniqueClicks = response.totalUniqueClicks;
                     this.legendTemplate = response.legendTemplate;
                     callback();
@@ -75,6 +78,32 @@
             self.$modal.on('hidden.bs.modal', function () {
                 $(this).remove();
             });
+
+            $('[data-toggle="heatmap-total"]').click(function(e) {
+                e.preventDefault();
+                if (self.mode === 'total') return;
+                self.mode = 'total';
+                $('[data-heatmap-clicks]').html(self.totalClicks);
+                $('[data-toggle="heatmap-unique"]').removeClass('active');
+                $(this).addClass('active');
+                self.removeLabels();
+                self.renderLabels();
+            });
+
+            $('[data-toggle="heatmap-unique"]').click(function(e) {
+                e.preventDefault();
+                if (self.mode === 'unique') return;
+                self.mode = 'unique';
+                $('[data-heatmap-clicks]').html(self.totalUniqueClicks);
+                $('[data-toggle="heatmap-total"]').removeClass('active');
+                $(this).addClass('active');
+                self.removeLabels();
+                self.renderLabels();
+            });
+
+            $('div.heatmap-legend').on('scroll mousewheel touchmove', function(e) {
+                e.preventDefault();
+            });
         }
 
         bindMouseEvents() {
@@ -89,9 +118,8 @@
                 $label.css('z-index', 1050);
             }
 
-            const $heatmapElements = $('.heatmap-label, a.heatmap-link', self.$iframeBody);
-            $heatmapElements.on('mouseenter focus', moveUp);
-            $heatmapElements.on('mouseleave blur', moveDown);
+            self.$iframeBody.on('mouseenter focus', '.heatmap-label, a.heatmap-link', moveUp);
+            self.$iframeBody.on('mouseleave blur', '.heatmap-label, a.heatmap-link', moveDown);
         }
 
         renderModal() {
@@ -109,7 +137,7 @@
             this.iframeDocument.write(this.content);
 
             const cssLink = document.createElement("link");
-            cssLink.href = "/app/bundles/EmailBundle/Assets/css/heatmap.css?v=" + (Math.random() + 1).toString(36).substring(7);
+            cssLink.href = "/app/bundles/EmailBundle/Assets/css/heatmap.css";
             cssLink.rel = "stylesheet";
             cssLink.type = "text/css";
             this.iframeDocument.head.appendChild(cssLink);
@@ -124,19 +152,21 @@
 
         renderLabels() {
             const self = this;
-
             self.clickStats.forEach(function(link) {
                 const $a = $('a[href="' + link.url + '"]', self.$iframeBody);
                 $a.addClass('heatmap-link');
                 $a.each(function() {
                     const $el = $(this);
                     self.links.push($el);
-                    const uniqueHitsPercent =  parseFloat((link.unique_hits_rate * 100).toFixed(2));
-                    const text =  link.unique_hits_text + ' (' + uniqueHitsPercent.toString() + '%)';
+
+                    const rate = self.mode === 'total' ? link.hits_rate : link.unique_hits_rate;
+                    const percent = Math.round(rate * 100);
+                    const text =  (self.mode === 'total' ? link.hits_text : link.unique_hits_text) + ' (' + percent.toString() + '%)';
+
                     const $label = $('<div class="heatmap-label"><p>' + text + '</p></div>');
-                    const bgColor = self.interpolateColor(link.unique_hits_rate);
-                    const bgColorLeft = self.interpolateColor(link.unique_hits_rate - 0.1);
-                    const bgColorRight = self.interpolateColor(link.unique_hits_rate + 0.1);
+                    const bgColor = self.interpolateColor(rate);
+                    const bgColorLeft = self.interpolateColor(rate - 0.1);
+                    const bgColorRight = self.interpolateColor(rate + 0.1);
                     $label.css({
                         'background-color': bgColor,
                         'background': 'linear-gradient(to right, ' +bgColorLeft+ ', '+ bgColorRight +')'
@@ -156,6 +186,15 @@
                 });
             });
             self.labelPositions();
+        }
+
+        removeLabels() {
+            if (!this.links.length) return;
+
+            $(this.links).each(function() {
+                $(this).data('heatmap-label').remove();
+            });
+            this.links = [];
         }
 
         labelPositions() {
@@ -208,7 +247,7 @@
     }
 
     $(document).ready(function() {
-        $('[data-toggle="email-heatmap"]').click(function(e) {
+        $('body').on('click', '[data-toggle="email-heatmap"]', function(e) {
             const emailId = $(this).data('email');
             const heatmap = new Heatmap(emailId);
             heatmap.init();

@@ -317,12 +317,15 @@ class AjaxController extends CommonAjaxController
 
         $clickStats        = $model->getEmailClickStats($emailId);
         $totalUniqueClicks = array_sum(array_column($clickStats, 'unique_hits'));
+        $totalClicks       = array_sum(array_column($clickStats, 'hits'));
         foreach ($clickStats as &$stat) {
             $stat['unique_hits_rate'] = round($totalUniqueClicks > 0 ? ($stat['unique_hits'] / $totalUniqueClicks) : 0, 4);
             $stat['unique_hits_text'] = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['unique_hits']]);
+            $stat['hits_rate']        = round($totalClicks > 0 ? ($stat['hits'] / $totalClicks) : 0, 4);
             $stat['hits_text']        = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['hits']]);
         }
         $legendTemplate = $this->renderView('@MauticEmail/Heatmap/heatmap_legend.html.twig', [
+            'totalClicks'       => $totalClicks,
             'totalUniqueClicks' => $totalUniqueClicks,
         ]);
 
@@ -331,6 +334,7 @@ class AjaxController extends CommonAjaxController
             'content'           => $content,
             'clickStats'        => $clickStats,
             'totalUniqueClicks' => $totalUniqueClicks,
+            'totalClicks'       => $totalClicks,
             'legendTemplate'    => $legendTemplate,
         ]);
     }

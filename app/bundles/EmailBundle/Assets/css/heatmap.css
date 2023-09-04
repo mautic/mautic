@@ -85,10 +85,21 @@ body.heatmap-iframe-body a.heatmap-link {
     }
 }
 
+.heatmap-legend a {
+    color: rgba(255, 255, 255, 0.6);
+}
+.heatmap-legend a.active,
+.heatmap-legend a:focus,
+.heatmap-legend a:hover {
+    color: rgba(255, 255, 255, 1);
+    text-decoration: underline;
+}
+
 .heatmap-legend > p:nth-child(1),
 .heatmap-legend > p:nth-child(3) {
     color: #cccccc;
     font-size: 18px;
+    line-height: 1.1;
 }
 
 .heatmap-legend > p:nth-child(1) {
