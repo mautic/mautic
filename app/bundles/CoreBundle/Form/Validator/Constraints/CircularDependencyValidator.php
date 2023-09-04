@@ -40,7 +40,7 @@ class CircularDependencyValidator extends ConstraintValidator
             return;
         }
 
-        $parentNode = $this->segmentDependencyTreeFactory->buildTree($segment);
+        $parentNode     = $this->segmentDependencyTreeFactory->buildTree($segment);
         $directChildren = $parentNode->getChildrenArray();
 
         $segmentIdsToCheck = array_map(fn (IntNode $child) => $child->getValue(), $directChildren);
@@ -55,7 +55,7 @@ class CircularDependencyValidator extends ConstraintValidator
                         ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                         ->setParameter('%segments%', "{$segment->getName()} > {$this->getSegmentCiclePath($childNode)}")
                         ->addViolation();
-    
+
                     return;
                 }
 
@@ -65,7 +65,7 @@ class CircularDependencyValidator extends ConstraintValidator
                         ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                         ->setParameter('%segments%', "{$this->getSegmentCiclePath($childNode)} > {$segment->getName()}")
                         ->addViolation();
-    
+
                     return;
                 }
             }

@@ -90,7 +90,7 @@ final class CircularDependencyValidatorTest extends MauticMysqlTestCase
             [
                 'name'        => "API changed ({$segmentKeyToUpdate})",
                 'description' => 'Segment created via API test',
-                'filters'     => $newSegmentFiltersBuilder($existingSegments)
+                'filters'     => $newSegmentFiltersBuilder($existingSegments),
             ]
         );
         $clientResponse = $this->client->getResponse();
@@ -120,7 +120,7 @@ final class CircularDependencyValidatorTest extends MauticMysqlTestCase
                     ],
                 ],
             ],
-            "Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular" => [
+            'Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular' => [
                 'filters: Circular dependency detected in the segment membership filter. API changed (segment-1) > Segment 2 > API changed (segment-1). This operation would create an infinite loop. Please double check what you are intending to do.',
                 422,
                 'segment-1',
