@@ -389,7 +389,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'display' => '',
         ]]]);
-        $expectedErrorMessage = "filters: This segment is used in segment with ID = {$segmentB->getId()}. This operation would create an infinite loop. Please double check what you are intending to do.";
+        $expectedErrorMessage = "filters: Circular dependency detected in the segment membership filter. API segment changed > SB > API segment changed. This operation would create an infinite loop. Please double check what you are intending to do.";
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
