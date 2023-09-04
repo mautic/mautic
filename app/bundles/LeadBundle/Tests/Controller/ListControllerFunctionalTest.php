@@ -46,7 +46,19 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->leadRepo = $leadModel->getRepository();
     }
 
-    public function testUnpublishUsedSegment(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedSegment(string $filterField): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -60,7 +72,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterField,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [

@@ -107,7 +107,19 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
-    public function testSegmentDependencyTree(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testSegmentDependencyTree(string $filterField): void
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
@@ -146,14 +158,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentB->getId()]],
                 ], [
                     'object'     => 'lead',
                     'glue'       => 'or',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => '!in',
                     'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
@@ -166,7 +178,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentE->getId()]],
@@ -214,7 +226,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    public function testSegmentDependencyTreeWithLoop(): void
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testSegmentDependencyTreeWithLoop(string $filterField): void
     {
         $segmentA = new LeadList();
         $segmentA->setName('Segment A');
@@ -253,14 +268,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentB->getId()]],
                 ], [
                     'object'     => 'lead',
                     'glue'       => 'or',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => '!in',
                     'properties' => ['filter' => [$segmentC->getId(), $segmentD->getId()]],
@@ -273,7 +288,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentE->getId()]],
@@ -286,7 +301,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
-                    'field'      => 'leadlist',
+                    'field'      => $filterField,
                     'type'       => 'leadlist',
                     'operator'   => 'in',
                     'properties' => ['filter' => [$segmentA->getId()]],

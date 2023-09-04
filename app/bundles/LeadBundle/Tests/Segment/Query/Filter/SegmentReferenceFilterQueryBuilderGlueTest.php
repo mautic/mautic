@@ -12,7 +12,19 @@ class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    public function testMultipleFiltersConnectedWithOrGlue(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testMultipleFiltersConnectedWithOrGlue(string $filterField): void
     {
         $leadA = $this->createLead('A');
         $leadB = $this->createLead('B');
@@ -37,7 +49,7 @@ class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
             [
                 'object'     => 'lead',
                 'glue'       => 'and',
-                'field'      => 'leadlist',
+                'field'      => $filterField,
                 'type'       => 'leadlist',
                 'operator'   => 'in',
                 'properties' => [
@@ -49,7 +61,7 @@ class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
             [
                 'object'     => 'lead',
                 'glue'       => 'or',
-                'field'      => 'leadlist',
+                'field'      => $filterField,
                 'type'       => 'leadlist',
                 'operator'   => 'in',
                 'properties' => [
