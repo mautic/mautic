@@ -304,7 +304,7 @@ class ContactSegmentQueryBuilder
         $segmentEdges   = [];
 
         foreach ($segmentFilters as $segmentFilter) {
-            if (isset($segmentFilter['field']) && 'leadlist' === $segmentFilter['field']) {
+            if (isset($segmentFilter['field']) && in_array($segmentFilter['field'], ['leadlist', 'leadlist_static'])) {
                 $bcFilter     = $segmentFilter['filter'] ?? [];
                 $filterEdges  = $segmentFilter['properties']['filter'] ?? $bcFilter;
                 $segmentEdges = array_merge($segmentEdges, $filterEdges);
