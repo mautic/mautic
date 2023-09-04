@@ -28,7 +28,7 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @param LeadList $leadList
+     * @param LeadList $segment
      */
     public function validate($segment, Constraint $constraint)
     {
@@ -36,22 +36,51 @@ class CircularDependencyValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, CircularDependency::class);
         }
 
-        if (!$segment instanceof LeadList || !$segment->getId()) {
+        if (!$segment instanceof LeadList) {
             return;
         }
 
         $parentNode = $this->segmentDependencyTreeFactory->buildTree($segment);
+        $directChildren = $parentNode->getChildrenArray();
 
-        /** @var RecursiveIteratorIterator<IntNode> $iterator */
-        $iterator = new RecursiveIteratorIterator($parentNode, RecursiveIteratorIterator::SELF_FIRST);
-        foreach ($iterator as $childNode) {
-            if (((int) $segment->getId()) === $childNode->getValue()) {
-                $this->context->buildViolation($constraint->message)
-                    ->atPath('filters')
-                    ->setCode(Response::HTTP_UNPROCESSABLE_ENTITY)
-                    ->setParameter('%segments%', $childNode->getParent()->getValue())
-                    ->addViolation();
+        $segmentIdsToCheck = array_map(fn (IntNode $child) => $child->getValue(), $directChildren);
+
+        foreach ($directChildren as $directChildNode) {
+            /** @var RecursiveIteratorIterator<IntNode> $iterator */
+            $iterator = new RecursiveIteratorIterator($directChildNode, RecursiveIteratorIterator::LEAVES_ONLY);
+            foreach ($iterator as $childNode) {
+                if (in_array($childNode->getValue(), $segmentIdsToCheck)) {
+                    $this->context->buildViolation($constraint->message)
+                        ->atPath('filters')
+                        ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
+                        ->setParameter('%segments%', "{$segment->getName()} > {$this->getSegmentCiclePath($childNode)}")
+                        ->addViolation();
+    
+                    return;
+                }
+
+                if ($segment->getId() && $childNode->getValue() === $segment->getId()) {
+                    $this->context->buildViolation($constraint->message)
+                        ->atPath('filters')
+                        ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
+                        ->setParameter('%segments%', "{$this->getSegmentCiclePath($childNode)} > {$segment->getName()}")
+                        ->addViolation();
+    
+                    return;
+                }
             }
         }
+    }
+
+    private function getSegmentCiclePath(IntNode $node): string
+    {
+        $path = [];
+
+        while ($node->getParent()) {
+            $path[] = $node->getParam('name');
+            $node   = $node->getParent();
+        }
+
+        return implode(' > ', $path);
     }
 }

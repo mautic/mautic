@@ -35,7 +35,7 @@ class SegmentDependencyTreeFactory
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
     {
-        $rootNode      = $rootNode ?? new IntNode($segment->getId());
+        $rootNode      = $rootNode ?? new IntNode($segment->getId() ?? 0);
         $childSegments = $this->findChildSegments($segment);
 
         $rootNode->addParam('name', $segment->getName());
@@ -64,7 +64,7 @@ class SegmentDependencyTreeFactory
     /**
      * @return LeadList[]
      */
-    private function findChildSegments(LeadList $segment): array
+    public function findChildSegments(LeadList $segment): array
     {
         $segmentMembershipFilters = array_filter(
             $segment->getFilters(),
@@ -80,9 +80,9 @@ class SegmentDependencyTreeFactory
         $childSegmentIds = [];
 
         foreach ($segmentMembershipFilters as $filter) {
-            // Old segments don't use properties array.
-            $segmentIds = $filter['properties']['filter'] ?? $filter['filter'];
-            foreach ($segmentIds as $childSegmentId) {
+            $bcFilter              = $filter['filter'] ?? [];
+            $childSegmentIdsFilter = $filter['properties']['filter'] ?? $bcFilter;
+            foreach ($childSegmentIdsFilter as $childSegmentId) {
                 $childSegmentIds[] = (int) $childSegmentId;
             }
         }
