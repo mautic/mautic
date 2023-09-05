@@ -23,7 +23,7 @@ jobs:
       matrix:
         php-versions: ['8.0', '8.1']
         db-types: ['mysql', 'mariadb']
-  
+
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
@@ -84,7 +84,7 @@ jobs:
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
         rm -rf var/cache
-        
+
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT="${{ job.services.database.ports[3306] }}"
@@ -175,10 +175,9 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-    
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
