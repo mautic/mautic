@@ -42,16 +42,6 @@ body.heatmap-iframe-body a.heatmap-link {
     z-index: 1010;
 }
 
-.heatmap-backdrop {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.45);
-}
-
 .heatmap-label {
     position: absolute;
     z-index: 1050;

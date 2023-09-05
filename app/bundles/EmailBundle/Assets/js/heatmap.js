@@ -144,7 +144,6 @@
 
             this.$iframeBody = $('body', this.iframeDocument);
             this.$iframeBody.addClass('heatmap-iframe-body');
-            this.$iframeBody.append('<div class="heatmap-backdrop"></div>');
             $modalContentDiv.append(this.legendTemplate);
             $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-dismiss="modal"><span aria-hidden="true">×</span></button>');
             this.iframeDocument.close();
