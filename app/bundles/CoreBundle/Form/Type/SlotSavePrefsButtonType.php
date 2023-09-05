@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class SlotButtonType.
+ * @deprecated to be removed in 6.0
  */
 class SlotSavePrefsButtonType extends SlotType
 {

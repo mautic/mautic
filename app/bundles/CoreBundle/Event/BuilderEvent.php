@@ -11,7 +11,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class BuilderEvent extends Event
 {
+    /**
+     * @deprecated to be removed in 6.0
+     */
     protected $slotTypes            = [];
+
+    /**
+     * @deprecated to be removed in 6.0
+     */
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
@@ -33,6 +40,8 @@ class BuilderEvent extends Event
 
     /**
      * @param int $priority
+     *
+     * @deprecated to be removed in 6.0
      */
     public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
     {
@@ -50,6 +59,8 @@ class BuilderEvent extends Event
      * Get slot types.
      *
      * @return array
+     *
+     * @deprecated to be removed in 6.0
      */
     public function getSlotTypes()
     {
@@ -70,6 +81,9 @@ class BuilderEvent extends Event
         return $this->slotTypes;
     }
 
+    /**
+     * @deprecated to be removed in 6.0
+     */
     public function addSection($key, $header, $icon, $content, $form, $priority = 0)
     {
         $this->sections[$key] = [
@@ -85,6 +99,8 @@ class BuilderEvent extends Event
      * Get slot types.
      *
      * @return array
+     *
+     * @deprecated to be removed in 6.0
      */
     public function getSections()
     {

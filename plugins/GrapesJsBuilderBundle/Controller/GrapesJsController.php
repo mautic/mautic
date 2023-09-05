@@ -149,6 +149,8 @@ class GrapesJsController extends CommonController
      *
      * @param array $slots
      * @param Email $entity
+     *
+     * @deprecated to be removed in 6.0
      */
     private function processEmailSlots(SlotsHelper $slotsHelper, $slots, $entity)
     {
@@ -178,6 +180,8 @@ class GrapesJsController extends CommonController
      *
      * @param array $slots
      * @param Page  $entity
+     *
+     * @deprecated to be removed in 6.0
      */
     private function processPageSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, FormFactoryInterface $formFactory, $slots, $entity)
     {

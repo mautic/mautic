@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class SlotImageType.
+ * @deprecated to be removed in 6.0
  */
 class SlotCodeModeType extends SlotType
 {

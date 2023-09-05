@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class SlotImageCaptionType.
+ * @deprecated to be removed in 6.0
  */
 class SlotImageCaptionType extends SlotType
 {

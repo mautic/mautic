@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class SlotDwcType.
+ * @deprecated to be removed in 6.0
  */
 class SlotDwcType extends SlotType
 {

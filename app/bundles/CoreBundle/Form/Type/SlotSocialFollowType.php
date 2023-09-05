@@ -5,6 +5,9 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @deprecated to be removed in 6.0
+ */
 class SlotSocialFollowType extends SlotType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
