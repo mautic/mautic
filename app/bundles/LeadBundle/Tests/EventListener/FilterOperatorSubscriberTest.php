@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -48,6 +49,11 @@ final class FilterOperatorSubscriberTest extends TestCase
     private $translator;
 
     /**
+     * @var MockObject&CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @var FilterOperatorSubscriber
      */
     private $subscriber;
@@ -61,13 +67,15 @@ final class FilterOperatorSubscriberTest extends TestCase
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
             $this->operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,
-            $this->translator
+            $this->translator,
+            $this->coreParametersHelper
         );
     }
 

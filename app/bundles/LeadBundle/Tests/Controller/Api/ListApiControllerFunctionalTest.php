@@ -18,6 +18,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['show_leadlist_static_filter'] = 'testCircularDepencencySegment' === $this->getName(false);
+
         parent::setUp();
         /* @var ListModel $listModel */
         $this->listModel = self::$container->get('mautic.lead.model.list');

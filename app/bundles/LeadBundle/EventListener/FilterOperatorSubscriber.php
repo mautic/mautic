@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -29,18 +30,22 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     private TranslatorInterface $translator;
 
+    private CoreParametersHelper $coreParametersHelper;
+
     public function __construct(
         OperatorOptions $operatorOptions,
         LeadFieldRepository $leadFieldRepository,
         TypeOperatorProviderInterface $typeOperatorProvider,
         FieldChoicesProviderInterface $fieldChoicesProvider,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->operatorOptions      = $operatorOptions;
         $this->leadFieldRepository  = $leadFieldRepository;
         $this->typeOperatorProvider = $typeOperatorProvider;
         $this->fieldChoicesProvider = $fieldChoicesProvider;
         $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public static function getSubscribedEvents(): array
@@ -153,18 +158,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
-            ],
-            'leadlist_static' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.lists_static'),
-                'properties' => [
-                    'type' => 'leadlist',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
-                ],
-                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::IN,
-                    OperatorOptions::NOT_IN,
-                ]),
-                'object'    => 'lead',
             ],
             'campaign' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
@@ -329,6 +322,21 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
             ],
         ];
+
+        if ($this->coreParametersHelper->get('show_leadlist_static_filter', false)) {
+            $staticFields['leadlist_static'] = [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lists_static'),
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'leadlist',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
+                    OperatorOptions::IN,
+                    OperatorOptions::NOT_IN,
+                ]),
+            ];
+        }
 
         foreach ($staticFields as $alias => $fieldOptions) {
             $event->addChoice('lead', $alias, $fieldOptions);

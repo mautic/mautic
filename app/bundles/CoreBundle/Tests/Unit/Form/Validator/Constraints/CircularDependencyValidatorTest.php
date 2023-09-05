@@ -9,6 +9,13 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 final class CircularDependencyValidatorTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams['show_leadlist_static_filter'] = true;
+
+        parent::setUp();
+    }
+
     /**
      * Verify a constraint message.
      *
