@@ -321,7 +321,7 @@ class FormEntity extends CommonEntity
     /**
      * Get modifiedBy.
      *
-     * @return User
+     * @return int|null
      */
     public function getModifiedBy()
     {
