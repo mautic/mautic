@@ -36,7 +36,7 @@ class FormEntity extends CommonEntity
     private $dateModified;
 
     /**
-     * var null|int.
+     * @var null|int
      */
     private $modifiedBy;
 
