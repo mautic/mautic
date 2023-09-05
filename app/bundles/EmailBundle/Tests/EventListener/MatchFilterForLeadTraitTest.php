@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class MatchFilterForLeadTraitTest extends TestCase
 {
     /** @var mixed[] */
-    private $lead = [
+    private array $lead = [
         'id'     => 1,
         'custom' => 'my custom text',
     ];
