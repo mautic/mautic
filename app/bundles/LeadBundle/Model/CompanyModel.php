@@ -450,7 +450,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             // make sure they are ints
             $searchForCompanies = [];
             foreach ($companies as &$l) {
-                $l = (int) $l;
+                $l                    = (int) $l;
                 $searchForCompanies[] = $l;
             }
             if (!empty($searchForCompanies)) {
