@@ -138,6 +138,6 @@ class ReportRepository extends CommonRepository
 
         $qb->orderBy('r.name');
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

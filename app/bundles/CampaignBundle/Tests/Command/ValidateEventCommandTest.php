@@ -74,7 +74,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
             ->set('manually_removed', 1)
             ->where('lead_id = 1')
-            ->execute();
+            ->executeStatement();
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
