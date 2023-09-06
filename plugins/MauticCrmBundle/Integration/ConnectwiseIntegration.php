@@ -641,10 +641,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if (!empty($integrationEntities)) {
-                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
-                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
-                }
+                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
             }
