@@ -37,14 +37,12 @@
 
         fetchHeatmap(callback) {
             Mautic.ajaxActionRequest('email:heatmap', {id: this.emailId}, function(response){
-                if (response.success) {
-                    this.content = response.content;
-                    this.clickStats = response.clickStats;
-                    this.totalClicks = response.totalClicks;
-                    this.totalUniqueClicks = response.totalUniqueClicks;
-                    this.legendTemplate = response.legendTemplate;
-                    callback();
-                }
+                this.content = response.content;
+                this.clickStats = response.clickStats;
+                this.totalClicks = response.totalClicks;
+                this.totalUniqueClicks = response.totalUniqueClicks;
+                this.legendTemplate = response.legendTemplate;
+                callback();
             }.bind(this), false, true, "GET");
         }
 

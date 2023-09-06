@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
@@ -287,18 +286,13 @@ class AjaxController extends CommonAjaxController
         ]);
     }
 
-    public function heatmapAction(Request $request): JsonResponse
+    public function heatmapAction(Request $request, EmailModel $model): JsonResponse
     {
-        $emailId = (int) InputHelper::clean($request->query->get('id'));
-
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-
+        $emailId     = (int) $request->query->get('id');
         $email       = $model->getEntity($emailId);
 
         if (null === $email) {
             return $this->sendJsonResponse([
-                'success' => 0,
                 'message' => $this->translator->trans('mautic.api.call.notfound'),
             ], 404);
         }
@@ -312,9 +306,7 @@ class AjaxController extends CommonAjaxController
             return $this->accessDenied();
         }
 
-        $content   = $email->getCustomHtml();
-        $content   = EmojiHelper::toEmoji($content, 'short');
-
+        $content           = $email->getCustomHtml();
         $clickStats        = $model->getEmailClickStats($emailId);
         $totalUniqueClicks = array_sum(array_column($clickStats, 'unique_hits'));
         $totalClicks       = array_sum(array_column($clickStats, 'hits'));
@@ -330,7 +322,6 @@ class AjaxController extends CommonAjaxController
         ]);
 
         return $this->sendJsonResponse([
-            'success'           => 1,
             'content'           => $content,
             'clickStats'        => $clickStats,
             'totalUniqueClicks' => $totalUniqueClicks,
