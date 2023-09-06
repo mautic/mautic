@@ -237,6 +237,8 @@ export default class BuilderService {
         'Button\n' +
         '</a>',
     });
+
+    return this.editor;
   }
 
   /**
