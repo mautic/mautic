@@ -58,6 +58,13 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'Inline JS values should not be allowed via GET to prevent XSS.',
             ],
             [
+                $this->getField('Phone', 'tel'),
+                '+41 123 456 7890',
+                '<input value="" id="mauticform_input_mautic_phone" />',
+                '<input id="mauticform_input_mautic_phone" value="+41 123 456 7890" />',
+                'Phone number are populated properly',
+            ],
+            [
                 $this->getField('Description', 'textarea'),
                 '%22%2F%3E%3Cscript%3Ealert%280%29%3C%2Fscript%3E',
                 '<textarea id="mauticform_input_mautic_description"></textarea>',
