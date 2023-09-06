@@ -17,15 +17,14 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->helper = $this->getContainer()->get('mautic.email.helper.request.storage');
+        $this->helper = $this->getContainer()->get(RequestStorageHelper::class);
     }
 
     public function testStoreRequest(): void
     {
-        $key = $this->helper->storeRequest(MomentumTransport::class, new Request([], ['some' => 'values']));
+        $key = $this->helper->storeRequest(NullTransport::class, new Request([], ['some' => 'values']));
 
-        $this->assertStringStartsWith('Mautic|EmailBundle|Swiftmailer|Transport|MomentumTransport', $key);
-        $this->assertEquals(98, strlen($key));
+        $this->assertStringStartsWith('Symfony|Component|Mailer|Transport|NullTransport', $key);
 
         $request = $this->helper->getRequest($key);
         $this->assertInstanceOf(Request::class, $request);
@@ -34,8 +33,7 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
 
     public function testGetRequestIfNotFound(): void
     {
-        $payload = ['some' => 'values'];
-        $key     = NullTransport::class.':webhook_request:5b43832134cfb0.36545510';
+        $key = NullTransport::class.';webhook_request;5b43832134cfb0.36545510';
 
         $this->expectException(\UnexpectedValueException::class);
         $this->helper->getRequest($key);
@@ -43,7 +41,7 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
 
     public function testGetTransportNameFromKey(): void
     {
-        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey(NullTransport::class.':webhook_request:5b43832134cfb0.36545510'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey(NullTransport::class.';webhook_request;5b43832134cfb0.36545510'));
     }
 
     /**
@@ -51,6 +49,6 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
      */
     public function testGetTransportNameFromKeyWithGlobalPrefix(): void
     {
-        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey('mautic:Symfony|Component|Mailer|Transport|NullTransport:webhook_request:5bfbe8ce671198.00044461'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey('mautic:Symfony|Component|Mailer|Transport|NullTransport;webhook_request;5bfbe8ce671198.00044461'));
     }
 }

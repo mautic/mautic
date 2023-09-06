@@ -14,7 +14,7 @@ class RequestStorageHelper
     /**
      * Separator between the transport class name and random hash.
      */
-    public const KEY_SEPARATOR = ':webhook_request:';
+    public const KEY_SEPARATOR = ';webhook_request;';
 
     private CacheProviderInterface $cacheStorage;
 
