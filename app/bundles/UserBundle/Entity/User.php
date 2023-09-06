@@ -297,9 +297,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
             ->build();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -320,26 +317,17 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt()
     {
         // bcrypt generates its own salt
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -365,9 +353,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return $this->currentPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles()
     {
         $roles = [];
@@ -385,16 +370,10 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return $roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function serialize()
     {
         return serialize([
@@ -405,9 +384,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function unserialize($serialized)
     {
         list(
@@ -608,8 +584,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
 
     /**
      * Get active permissions.
-     *
-     * @return mixed
      */
     public function getActivePermissions()
     {
@@ -705,17 +679,11 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastLogin()
     {
         return $this->lastLogin;
     }
 
-    /**
-     * @param mixed $lastLogin
-     */
     public function setLastLogin($lastLogin = null)
     {
         if (empty($lastLogin)) {
@@ -724,17 +692,11 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         $this->lastLogin = $lastLogin;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastActive()
     {
         return $this->lastActive;
     }
 
-    /**
-     * @param mixed $lastActive
-     */
     public function setLastActive($lastActive = null)
     {
         if (empty($lastActive)) {
@@ -743,9 +705,6 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         $this->lastActive = $lastActive;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPreferences()
     {
         return $this->preferences;
@@ -803,5 +762,14 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     public function isGuest()
     {
         return $this->guest;
+    }
+
+    public function getUserStatus()
+    {
+        if (1 == $this->isPublished()) {
+            return 'published';
+        } else {
+            return 'unpublished';
+        }
     }
 }
