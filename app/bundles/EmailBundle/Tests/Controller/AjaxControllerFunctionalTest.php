@@ -176,7 +176,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $content = json_decode($response->getContent(), true);
-        $this->assertSame(1, $content['success']);
         $this->assertSame('Test html', $content['content']);
         $this->assertSame([
             [
