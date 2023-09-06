@@ -251,11 +251,11 @@ Mautic.getFeedItems = function (queryText) {
 
 Mautic.getTokensForPlugIn = function(method) {
     method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
-    const d = mQuery.Deferred();
     // OK, let's fetch the tokens.
     mQuery.ajax({
         url: mauticAjaxUrl,
         data: 'action=' + method,
+        async: false,
         success: function (response) {
             if (typeof response.tokens === 'object') {
                 Mautic.builderTokens = response.tokens;
@@ -264,19 +264,16 @@ Mautic.getTokensForPlugIn = function(method) {
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
                     return {'id':i, 'name':value};
                 });
-                d.resolve(Mautic.builderTokensForCkEditor);
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            d.reject();
         },
         complete: function() {
             Mautic.builderTokensRequestInProgress = false;
-            return d.promise();
         }
     });
-    return d.promise();
+    return Mautic.builderTokensForCkEditor;
 };
 
 Mautic.getCKEditorFonts = function(fonts) {
@@ -293,14 +290,13 @@ Mautic.getCKEditorFonts = function(fonts) {
 }
 
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
+    const tokenCallback = textarea.attr('data-token-callback');
+    Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
+}
+
+Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
-
-    if (ckEditors.has( textarea[0] ))
-    {
-        ckEditors.get( textarea[0] ).destroy();
-        ckEditors.delete( textarea[0] )
-    }
 
     const ckEditorOption = {
         toolbar: {
@@ -366,29 +362,23 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
 
     if (ckEditorToolbar.indexOf('TokenPlugin') > -1)
     {
-        Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
-            mQuery.extend(ckEditorOption, {
-                extraPlugins: [Mautic.MentionLinks],
-                dynamicTokenLabel: 'Insert token',
-                dynamicToken: tokens,
-                mention: {
-                    feeds: [
-                        {
-                            marker: '{',
-                            feed: Mautic.getFeedItems,
-                            itemRenderer: Mautic.customItemRenderer
-                        }
-                    ]
-                }
-            });
-
-            Mautic.InitCkEditor(textarea, ckEditorOption);
-        })
+        const tokens = Mautic.getTokensForPlugIn(tokenCallback);
+        mQuery.extend(ckEditorOption, {
+            extraPlugins: [Mautic.MentionLinks],
+            dynamicTokenLabel: 'Insert token',
+            dynamicToken: tokens,
+            mention: {
+                feeds: [
+                    {
+                        marker: '{',
+                        feed: Mautic.getFeedItems,
+                        itemRenderer: Mautic.customItemRenderer
+                    }
+                ]
+            }
+        });
     }
-    else
-    {
-        Mautic.InitCkEditor(textarea, ckEditorOption);
-    }
+    return ckEditorOption;
 }
 
 Mautic.InitCkEditor  = function(textarea, options) {

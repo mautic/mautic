@@ -128,32 +128,11 @@ export default class BuilderService {
     };
   }
 
-  static getCkeConf() {
+  static getCkeConf(tokenCallback) {
+    const ckEditorToolbarOptions = ['undo', 'redo', '|', 'bold','italic', 'underline','strikethrough', '|', 'fontSize','fontFamily','fontColor','fontBackgroundColor', '|' ,'alignment','outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'bulletedList','numberedList', '|', 'link', '|', 'TokenPlugin'];
     return {
-      options: {
-        language: 'en',
-        removePlugins: ["Image", "ImageCaption", "ImageInsert", "ImageResize", "ImageStyle", "ImageToolbar", "AutoImage", "ImageInline"],
-        toolbar: {
-          items: [
-            'link',
-            '|',
-            'bold',
-            'italic',
-            'strikethrough',
-            '|',
-            'removeFormat',
-            '|',
-            'numberedList',
-            'bulletedList',
-            '|',
-            'fontColor',
-            'fontBackgroundColor',
-            '|',
-            'sourceEditing'
-          ]
-        },
-        licenseKey: ''
-      }
+      ckeditor_module: `${mauticBaseUrl}assets/ckeditor/build/ckeditor.js`,
+      options:  Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback)
     };
   }
 
@@ -181,7 +160,7 @@ export default class BuilderService {
           formsOpts: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
-        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('page:getBuilderTokens'),
       },
     });
 
@@ -211,7 +190,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
-        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
 
@@ -247,7 +226,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
-        'gjs-plugin-ckeditor5': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
 
@@ -258,8 +237,6 @@ export default class BuilderService {
         'Button\n' +
         '</a>',
     });
-
-    return this.editor;
   }
 
   /**
@@ -323,7 +300,7 @@ export default class BuilderService {
         if (rte && typeof rte.destroy == 'function') {
           rte.destroy();
         }
-      }
+      };
     }
   }
   /**
