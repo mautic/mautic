@@ -51,13 +51,18 @@ class RequestStorageHelper
      */
     public function getRequest($key)
     {
-        $key = $this->removeCachePrefix($key);
+        $key     = $this->removeCachePrefix($key);
+        $adapter = get_class($this->cacheStorage);
+        $error   = "Request with key '{$key}' was not found in the cache store '{$adapter}'.";
 
         try {
             $item = $this->cacheStorage->getItem($key);
         } catch (InvalidArgumentException $e) {
-            $adapter = get_class($this->cacheStorage);
-            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$adapter}'.");
+            throw new \UnexpectedValueException($error);
+        }
+
+        if (!$item->isHit()) {
+            throw new \UnexpectedValueException($error);
         }
 
         return new Request([], $item->get());
