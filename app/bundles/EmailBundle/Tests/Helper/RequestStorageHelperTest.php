@@ -27,7 +27,6 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
         $this->assertStringStartsWith('Symfony|Component|Mailer|Transport|NullTransport', $key);
 
         $request = $this->helper->getRequest($key);
-        $this->assertInstanceOf(Request::class, $request);
         $this->assertEquals(['some' => 'values'], $request->request->all());
     }
 
