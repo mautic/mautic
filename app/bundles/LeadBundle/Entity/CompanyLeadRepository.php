@@ -36,7 +36,7 @@ class CompanyLeadRepository extends CommonRepository
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
-                )->execute();
+                )->executeStatement();
             }
         }
 
@@ -64,7 +64,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -79,7 +79,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':company'))
             ->setParameter('company', $companyId);
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -96,7 +96,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
         $q->orderBy('cl.date_added', 'DESC');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         return !empty($result) ? $result[0] : [];
     }
@@ -112,7 +112,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -144,7 +144,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
-        $leadIds = $q->execute()->fetchOne();
+        $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
@@ -152,7 +152,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('company', $company->getName())
             ->where(
                 $q->expr()->in('id', $leadIds)
-            )->execute();
+            )->executeStatement();
         }
     }
 
@@ -164,6 +164,6 @@ class CompanyLeadRepository extends CommonRepository
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', 1)
-        )->execute();
+        )->executeStatement();
     }
 }

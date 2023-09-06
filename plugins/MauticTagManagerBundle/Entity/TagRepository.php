@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 class TagRepository extends BaseTagRepository
 {
     /**
-     * @return array
+     * @return string[][]
      */
     protected function getDefaultOrder()
     {
@@ -36,9 +36,7 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAllAssociative();
-
-        return count($result);
+        return $q->executeQuery()->rowCount();
     }
 
     /**
@@ -64,7 +62,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

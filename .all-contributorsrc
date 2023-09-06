@@ -1071,6 +1071,42 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "TomasVotruba",
+      "name": "Tomas Votruba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/924196?v=4",
+      "profile": "https://tomasvotruba.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tirtharajghosh",
+      "name": "Tirtharaj Ghosh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58604532?v=4",
+      "profile": "https://github.com/tirtharajghosh",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "rubnogueira",
+      "name": "Ruben Nogueira",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40404708?v=4",
+      "profile": "https://www.rubnogueira.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "exsesx",
+      "name": "Oleh Vanin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399517?v=4",
+      "profile": "https://exsesx.dev/",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,

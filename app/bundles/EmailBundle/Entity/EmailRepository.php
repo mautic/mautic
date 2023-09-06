@@ -36,7 +36,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -63,7 +63,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc     = count($results) ? $results[0] : null;
 
@@ -206,7 +206,7 @@ class EmailRepository extends CommonRepository
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
-                ->execute()
+                ->executeQuery()
                 ->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
@@ -325,7 +325,7 @@ class EmailRepository extends CommonRepository
             return $q;
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
@@ -530,7 +530,7 @@ class EmailRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $relatedIds)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -562,7 +562,7 @@ class EmailRepository extends CommonRepository
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
-                $q->execute();
+                $q->executeStatement();
 
                 return;
             } catch (\Doctrine\DBAL\Exception $e) {
