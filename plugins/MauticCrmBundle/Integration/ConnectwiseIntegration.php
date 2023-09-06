@@ -559,10 +559,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    /**
-     * @return IntegrationEntity|object|null
-     */
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
+    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
