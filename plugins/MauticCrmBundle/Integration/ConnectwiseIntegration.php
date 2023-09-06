@@ -638,9 +638,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
                 if (isset($config['push_activities']) and true == $config['push_activities']) {
-                    $savedEntities = $this->createActivity($config['campaign_task'], $id, $lead->getId());
-                    if ($savedEntities) {
-                        $integrationEntities[] = $savedEntities;
+                    $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                    if ($savedEntity instanceof IntegrationEntity) {
+                        $integrationEntities[] = $savedEntity;
                     }
                 }
 
@@ -1021,11 +1021,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return IntegrationEntity|null
-     *
      * @throws ApiErrorException
      */
-    public function createActivity($config, $cwContactId, $leadId)
+    public function createActivity($config, $cwContactId, $leadId): ?IntegrationEntity
     {
         if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [
