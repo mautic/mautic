@@ -290,6 +290,11 @@ Mautic.getCKEditorFonts = function(fonts) {
 }
 
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
+    if (ckEditors.has( textarea[0] ))
+    {
+        ckEditors.get( textarea[0] ).destroy();
+        ckEditors.delete( textarea[0] )
+    }
     const tokenCallback = textarea.attr('data-token-callback');
     Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
 }
