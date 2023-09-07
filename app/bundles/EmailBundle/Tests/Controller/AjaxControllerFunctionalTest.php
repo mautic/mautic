@@ -208,7 +208,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test email lookup with name with special chars.
      */
-    public function testEmailGetLookupChoiceListAction()
+    public function testEmailGetLookupChoiceListAction(): void
     {
         $emailName = 'It\'s an email';
         $email     = new Email();
