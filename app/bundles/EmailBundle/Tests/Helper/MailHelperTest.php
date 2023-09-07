@@ -923,7 +923,7 @@ class MailHelperTest extends TestCase
     public static function minifyHtmlDataProvider(): array
     {
         return [
-            // [false, self::MINIFY_HTML, self::MINIFY_HTML],
+            [false, self::MINIFY_HTML, self::MINIFY_HTML],
             [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)],
         ];
     }
