@@ -342,8 +342,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
             $contact = new Lead();
             $contact->setEmail($emailAddress);
-            $contact->setAddress1('address1 name');
-            $contact->setAddress2('address2@email.address');
+            $contact->setAddress1('address1 name for '.$emailAddress);
+            $contact->setAddress2('address2+'.$emailAddress);
 
             $member = new ListLead();
             $member->setLead($contact);
@@ -368,22 +368,37 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(2);
 
-        $email = $this->getMailerMessage();
+        $messages = self::getMailerMessages();
+        $messageOne = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@one.email'))[0];
+        $messageTwo = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@two.email'))[0];
 
-        // The order of the recipients is not guaranteed, so we need to check both possibilities.
-        Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame('address1 name', $email->getFrom()[0]->getName());
-        Assert::assertSame('address2@email.address', $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+        Assert::assertSame('Subject A', $messageOne->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageOne->getHtmlBody());
+        Assert::assertSame('Dear contact@one.email', $messageOne->getTextBody());
+        Assert::assertCount(1, $messageOne->getFrom());
+        Assert::assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
+        Assert::assertSame('address2+contact@one.email', $messageOne->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $messageOne->getTo());
+        Assert::assertSame('', $messageOne->getTo()[0]->getName());
+        Assert::assertSame('contact@one.email', $messageOne->getTo()[0]->getAddress());
+        Assert::assertCount(1, $messageOne->getReplyTo());
+        Assert::assertSame('', $messageOne->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
+
+        Assert::assertSame('Subject A', $messageTwo->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageTwo->getHtmlBody());
+        Assert::assertSame('Dear contact@two.email', $messageTwo->getTextBody());
+        Assert::assertCount(1, $messageTwo->getFrom());
+        Assert::assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
+        Assert::assertSame('address2+contact@two.email', $messageTwo->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $messageTwo->getTo());
+        Assert::assertSame('', $messageTwo->getTo()[0]->getName());
+        Assert::assertSame('contact@two.email', $messageTwo->getTo()[0]->getAddress());
+        Assert::assertCount(1, $messageTwo->getReplyTo());
+        Assert::assertSame('', $messageTwo->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
     private function createSegment(string $suffix = 'A'): LeadList
