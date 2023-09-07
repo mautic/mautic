@@ -536,6 +536,8 @@ class EmailRepository extends CommonRepository
     /**
      * Up the read/sent counts.
      *
+     * @deprecated use upCountSent or incrementRead method
+     *
      * @param int        $id
      * @param string     $type
      * @param int        $increaseBy
@@ -559,6 +561,83 @@ class EmailRepository extends CommonRepository
 
         // Try to execute 3 times before throwing the exception
         // to increase the chance the update will do its stuff.
+        $retrialLimit = 3;
+        while ($retrialLimit >= 0) {
+            try {
+                $q->executeStatement();
+
+                return;
+            } catch (\Doctrine\DBAL\Exception $e) {
+                --$retrialLimit;
+                if (0 === $retrialLimit) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function upCountSent(int $id, int $increaseBy = 1, bool $variant = false): void
+    {
+        if ($increaseBy <= 0) {
+            return;
+        }
+
+        $connection  = $this->getEntityManager()->getConnection();
+        $updateQuery = $connection->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'emails')
+            ->set('sent_count', 'sent_count + :increaseBy')
+            ->where('id = :id');
+
+        if ($variant) {
+            $updateQuery->set('variant_sent_count', 'variant_sent_count + :increaseBy');
+        }
+
+        $updateQuery
+            ->setParameter('increaseBy', $increaseBy)
+            ->setParameter('id', $id);
+
+        // Try to execute 3 times before throwing the exception
+        $retrialLimit = 3;
+        while ($retrialLimit >= 0) {
+            try {
+                $updateQuery->executeStatement();
+
+                return;
+            } catch (\Doctrine\DBAL\Exception $e) {
+                --$retrialLimit;
+                if (0 === $retrialLimit) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function incrementRead(int $emailId, int $statId, bool $isVariant = false): void
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('es.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+            ->where('es.id = :statId')
+            ->andWhere('es.is_read = 1');
+
+        $q->update(MAUTIC_TABLE_PREFIX.'emails', 'e')
+            ->set('read_count', 'read_count + 1')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('e.id', ':emailId'),
+                    $q->expr()->notIn('e.id', $subQuery->getSQL())
+                )
+            )
+            ->setParameter('emailId', $emailId)
+            ->setParameter('statId', $statId);
+
+        if ($isVariant) {
+            $q->set('variant_read_count', 'variant_read_count + 1');
+        }
+
+        // Try to execute 3 times before throwing the exception
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {

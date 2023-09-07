@@ -36,6 +36,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock->expects($this->never())
             ->method('update');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45, 'sent', 0);
     }
 
@@ -56,6 +57,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock->expects($this->once())
             ->method('executeStatement');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 
@@ -78,6 +80,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock->expects($this->once())
             ->method('executeStatement');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45, 'read', 2, true);
     }
 
@@ -91,6 +94,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
                 0
             );
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 
@@ -101,6 +105,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
             ->will($this->throwException(new DBALException()));
 
         $this->expectException(DBALException::class);
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 }
