@@ -30,6 +30,20 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
         $this->assertEquals(['some' => 'values'], $request->request->all());
     }
 
+    public function testDeleteRequest(): void
+    {
+        $key = $this->helper->storeRequest(NullTransport::class, new Request([], ['some' => 'values']));
+
+        $request = $this->helper->getRequest($key);
+        $this->assertEquals(['some' => 'values'], $request->request->all());
+
+        $this->helper->deleteCachedRequest($key);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Request with key '{$key}' was not found.");
+        $request = $this->helper->getRequest($key);
+    }
+
     public function testGetRequestIfNotFound(): void
     {
         $key = NullTransport::class.';webhook_request;5b43832134cfb0.36545510';

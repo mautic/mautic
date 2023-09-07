@@ -51,9 +51,8 @@ class RequestStorageHelper
      */
     public function getRequest($key)
     {
-        $key     = $this->removeCachePrefix($key);
-        $adapter = get_class($this->cacheStorage);
-        $error   = "Request with key '{$key}' was not found in the cache store '{$adapter}'.";
+        $error = "Request with key '{$key}' was not found.";
+        $key   = $this->removeCachePrefix($key);
 
         try {
             $item = $this->cacheStorage->getItem($key);
