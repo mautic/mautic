@@ -555,10 +555,11 @@ class MailHelperTest extends TestCase
      */
     public function testValidateEmails(string $email, bool $isValid): void
     {
-        $helper    = $this->mockEmptyMailHelper();
+        $helper = $this->mockEmptyMailHelper();
         if (!$isValid) {
             $this->expectException(InvalidEmailException::class);
         }
+        $this->assertNull($helper::validateEmail($email)); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
     public function testValidateValidEmails(): void
@@ -576,8 +577,6 @@ class MailHelperTest extends TestCase
             // will throw InvalidEmailException if it will find the address invalid
             $this->assertNull($helper::validateEmail($address)); /** @phpstan-ignore-line as it's testing a deprecated method */
         }
-        /** @phpstan-ignore-next-line */
-        $this->assertNull($helper::validateEmail($email));
     }
 
     /**

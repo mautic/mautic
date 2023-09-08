@@ -1051,7 +1051,7 @@ class MailHelper
     /**
      * Set Reply to for the current message we are sending. Can be in the middle of the sending loop.
      */
-    private function setMessageReplyTo(string $addresses, string $name = null)
+    private function setMessageReplyTo(string $addresses, string $name = null): void
     {
         if (str_contains($addresses, ',')) {
             $addresses = explode(',', $addresses);
