@@ -1949,11 +1949,9 @@ class MailHelper
             }
         }
 
-        if (!$this->message->getFrom()) {
-            $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
 
-            $this->setFrom($from->getEmail(), $from->getName());
-        }
+        $this->setFrom($from->getEmail(), $from->getName());
     }
 
     private function setReplyToForSingleMessage(?Email $emailToSend): void
