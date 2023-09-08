@@ -302,7 +302,7 @@ class MailHelper
         } // from is set in flushQueue
 
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
-            $this->setReplyTo($this->getReplyTo());
+            $this->setMessageReplyTo($this->getReplyTo());
         }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
@@ -1038,7 +1038,7 @@ class MailHelper
     }
 
     /**
-     * Set reply to address(es).
+     * Set reply to address(es) for this mailer instance.
      *
      * @param array<string>|string $addresses
      * @param string               $name
@@ -1046,7 +1046,13 @@ class MailHelper
     public function setReplyTo($addresses, $name = null): void
     {
         $this->replyTo = $addresses;
+    }
 
+    /**
+     * Set Reply to for the current message we are sending. Can be in the middle of the sending loop.
+     */
+    private function setMessageReplyTo(string $addresses, string $name = null)
+    {
         if (str_contains($addresses, ',')) {
             $addresses = explode(',', $addresses);
         }
@@ -1960,22 +1966,22 @@ class MailHelper
     private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
         if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
-            $this->setReplyTo($emailToSend->getReplyToAddress());
+            $this->setMessageReplyTo($emailToSend->getReplyToAddress());
 
             return;
         }
 
         if (empty($this->lead['owner_id'])) {
-            $this->setReplyTo($this->getReplyTo());
+            $this->setMessageReplyTo($this->getReplyTo());
 
             return;
         }
 
         try {
             $owner = $this->fromEmailHelper->getContactOwner((int) $this->lead['owner_id'], $emailToSend);
-            $this->setReplyTo($owner['email']);
+            $this->setMessageReplyTo($owner['email']);
         } catch (OwnerNotFoundException) {
-            $this->setReplyTo($this->getSystemReplyTo());
+            $this->setMessageReplyTo($this->getSystemReplyTo());
         }
     }
 

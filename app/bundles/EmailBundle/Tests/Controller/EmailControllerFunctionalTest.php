@@ -369,8 +369,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(2);
 
         $messages   = self::getMailerMessages();
-        $messageOne = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@one.email'))[0];
-        $messageTwo = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@two.email'))[0];
+        $messageOne = array_values(array_filter($messages, fn ($message) => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
+        $messageTwo = array_values(array_filter($messages, fn ($message) => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
 
         Assert::assertSame('Subject A', $messageOne->getSubject());
         Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageOne->getHtmlBody());
