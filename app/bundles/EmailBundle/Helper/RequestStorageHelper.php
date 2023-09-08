@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Helper class for storing request payload to a cache location and retrieving it back as a Request.
+ *
+ * @deprecated as unused. To be removed in Mautic 6.0.
  */
 class RequestStorageHelper
 {

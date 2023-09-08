@@ -9,6 +9,9 @@ use Mautic\EmailBundle\Helper\RequestStorageHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
+/**
+ * @deprecated as unused. To be removed in Mautic 6.0.
+ */
 class RequestStorageHelperTest extends MauticMysqlTestCase
 {
     private RequestStorageHelper $helper;
