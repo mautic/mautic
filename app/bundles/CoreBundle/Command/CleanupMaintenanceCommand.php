@@ -129,8 +129,8 @@ EOT
     }
 
     /**
-     * @param array<int|string>                       $stats
-     * @param array<string|bool|int|float|array|null> $options
+     * @param array<int|string>                                   $stats
+     * @param array<string|bool|int|float|array<int|string>|null> $options
      */
     protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
     {
