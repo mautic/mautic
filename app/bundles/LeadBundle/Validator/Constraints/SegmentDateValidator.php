@@ -32,14 +32,13 @@ final class SegmentDateValidator extends ConstraintValidator
                     return;
                 }
 
-                $format = 'Y-m-d';
+                $formats  = ['Y-m-d', 'Y-m-d H:i', 'Y-m-d H:i:s'];
 
-                $dateTime = \DateTime::createFromFormat($format, $parameterValue);
-
-                // try date time format
-                if (false === $dateTime) {
-                    $format   = 'Y-m-d H:i';
-                    $dateTime = \DateTime::createFromFormat($format, $parameterValue);
+                foreach ($formats as $fmt) {
+                    $dateTime = \DateTime::createFromFormat($fmt, $parameterValue);
+                    if (false !== $dateTime) {
+                        break;
+                    }
                 }
 
                 if (false === $dateTime) {
