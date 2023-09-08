@@ -24,7 +24,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     protected static $defaultDescription = 'Updates the Mautic application';
     public const NAME                    = 'mautic:maintenance:cleanup';
 
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, protected PathsHelper $pathsHelper, private CoreParametersHelper $coreParametersHelper, private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
+    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, protected PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
@@ -69,7 +69,7 @@ EOT
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
         $daysOld       = $input->getOption('days-old');
-        $dryRun        = $input->getOption('dry-run');
+        $dryRun        = (bool) $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
         $gdpr          = $input->getOption('gdpr');
         if (empty($daysOld) && empty($gdpr)) {
@@ -128,7 +128,11 @@ EOT
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
-    protected function storeToAuditLog(array $stats, $dryRun, array $options): void
+    /**
+     * @param array<int|string> $stats
+     * @param array<int|string> $options
+     */
+    protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
     {
         $notEmptyStats = array_filter($stats);
         if (!$dryRun && count($notEmptyStats)) {
