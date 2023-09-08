@@ -28,6 +28,10 @@ final class SegmentDateValidator extends ConstraintValidator
                     continue;
                 }
 
+                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains'])) {
+                    continue;
+                }
+
                 if (str_contains($parameterValue, '%')) {
                     return;
                 }
