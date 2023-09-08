@@ -370,10 +370,6 @@ class MailHelper
 
             try {
                 $this->mailer->send($this->message);
-
-                // Reset the addresses from previous send.
-                $this->from    = $this->getSystemFrom();
-                $this->replyTo = $this->getSystemReplyTo();
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -518,8 +514,9 @@ class MailHelper
                     $this->setFrom($metadatum['from'], null, null);
                 } else if ($email && $email->getUseOwnerAsMailer()) {
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
+                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
                 } else {
-                    $this->setFrom($this->getFrom()->getEmail(), $this->getFrom()->getName());
+                    $this->setMessageFrom($this->getFrom());
                 }
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -1078,7 +1075,7 @@ class MailHelper
     }
 
     /**
-     * Set from email address and name (defaults to determining automatically unless isGlobal is true).
+     * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
      * @param string       $fromName
@@ -1091,9 +1088,15 @@ class MailHelper
         } else {
             $this->from = new AddressDTO($fromEmail, $fromName);
         }
+    }
 
+    /**
+     * Sets FROM for the concreste message that we are currently sending. Can be in the middle of the loop of sending.
+     */
+    private function setMessageFrom(AddressDTO $from): void
+    {
         try {
-            $this->message->from($this->from->toMailerAddress());
+            $this->message->from($from->toMailerAddress());
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }
@@ -1930,7 +1933,7 @@ class MailHelper
             }
 
             $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $email);
-            $this->setFrom($from->getEmail(), $from->getName());
+            $this->setMessageFrom($from);
 
             return;
         }
@@ -1951,7 +1954,7 @@ class MailHelper
 
         $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
 
-        $this->setFrom($from->getEmail(), $from->getName());
+        $this->setMessageFrom($from);
     }
 
     private function setReplyToForSingleMessage(?Email $emailToSend): void

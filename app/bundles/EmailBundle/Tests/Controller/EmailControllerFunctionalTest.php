@@ -368,7 +368,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(2);
 
-        $messages = self::getMailerMessages();
+        $messages   = self::getMailerMessages();
         $messageOne = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@one.email'))[0];
         $messageTwo = array_values(array_filter($messages, fn ($message) => $message->getTo()[0]->getAddress() === 'contact@two.email'))[0];
 
