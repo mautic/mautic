@@ -375,7 +375,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider dateFieldProvider
      */
-    public function testWarningOnInvalidDateField(string $filter, bool $shouldContainError): void
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(
             'Date Segment',
@@ -388,7 +388,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
                     'type'     => 'date',
                     'filter'   => $filter,
                     'display'  => null,
-                    'operator' => '=',
+                    'operator' => $operator,
                 ],
             ]
         );
@@ -416,8 +416,11 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
             ['Today', true],
             ['birthday', false],
             ['2023-01-01 11:00', false],
+            ['2023-01-01 11:00:00', false],
             ['2023-01-01', false],
             ['next week', false],
+            [null, false],
+            ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
         ];
     }
 }
