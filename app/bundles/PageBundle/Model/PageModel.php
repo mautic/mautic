@@ -875,14 +875,9 @@ class PageModel extends FormModel
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
-     *
-     * @return array
+     * @return array<int|string>
      */
-    public function getUniqueVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getUniqueVsReturningPieChartData(\DateTime $dateFrom, \DateTime $dateTo, bool $canViewOthers = true): array
     {
         $chart              = new PieChart();
         $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -909,7 +904,7 @@ class PageModel extends FormModel
         }
 
         $allQ->resetQueryPart('select')->select('t.id');
-        $allQ->groupBy('t.id');
+        $allQ->groupBy('t.lead_id');
 
         // fetch all group by lead_id
         $q  = $this->em->getConnection()->createQueryBuilder();
