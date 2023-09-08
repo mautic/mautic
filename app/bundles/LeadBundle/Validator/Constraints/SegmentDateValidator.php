@@ -24,11 +24,16 @@ final class SegmentDateValidator extends ConstraintValidator
             if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'])) {
                 $segmentFilter  = $this->contactSegmentFilterFactory->factorSegmentFilter($filter);
                 $parameterValue = $segmentFilter->getParameterValue();
+
                 if (is_array($parameterValue)) {
                     continue;
                 }
 
                 if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains'])) {
+                    continue;
+                }
+
+                if (null === $parameterValue) {
                     continue;
                 }
 
