@@ -408,7 +408,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<int,bool|string>>
+     * @return array<int, array<int, bool|string|null>>
      */
     public function dateFieldProvider(): array
     {
