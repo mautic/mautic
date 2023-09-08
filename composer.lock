@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "132dfdb8fb98da74420ab28886aa6a54",
+    "content-hash": "7a3a3b1211261cb0931e4b41b97dce4e",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5264,7 +5264,7 @@
             ],
             "support": {
                 "issues": "https://github.com/armetiz/LeezyPheanstalkBundle/issues",
-                "source": "https://github.com/armetiz/LeezyPheanstalkBundle/tree/master"
+                "source": "https://github.com/armetiz/LeezyPheanstalkBundle/tree/5.0.0"
             },
             "time": "2022-03-08T08:08:12+00:00"
         },
@@ -5816,11 +5816,11 @@
         },
         {
             "name": "mautic/core-lib",
-            "version": "4.4.x-dev",
+            "version": "5.0.0-dev",
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "1a89d213220e309fd7323fd43c1938fc2963cf52"
+                "reference": "c0442e4c4fe84f634585a739320446f18600f161"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5869,6 +5869,7 @@
                 "ramsey/uuid": "^4.7",
                 "simshaun/recurr": "^5.0",
                 "stack/builder": "^1.0",
+                "symfony/amqp-messenger": "~5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",
@@ -5890,7 +5891,7 @@
                 "symfony/intl": "~5.4.0",
                 "symfony/lock": "^5.1",
                 "symfony/mailer": "~5.4",
-                "symfony/messenger": "^5.4",
+                "symfony/messenger": "~5.4",
                 "symfony/mime": "~5.4",
                 "symfony/monolog-bridge": "~5.4.0",
                 "symfony/monolog-bundle": "~3.5.0",
@@ -5922,34 +5923,21 @@
                 "mautic-scaffold": {
                     "file-mapping": {
                         "[project-root]/.env": "assets/scaffold/files/.env",
-                        "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
+                        "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
+                        "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
-                        "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
-                        "[project-root]/app/config/bootstrap.php": "assets/scaffold/files/bootstrap.php",
-                        "[project-root]/app/console-application.php": "assets/scaffold/files/console-application.php",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
-                        "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
-                        "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess",
-                        "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
+                        "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
+                        "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
-                        "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
-                        "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",
+                        "[web-root]/translations/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/favicon.ico": "assets/scaffold/files/favicon.ico",
-                        "[web-root]/media/dashboards/alternative-default.json": "assets/scaffold/media/dashboards/alternative-default.json",
-                        "[web-root]/media/dashboards/default.json": "assets/scaffold/media/dashboards/default.json",
-                        "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
-                        "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
-                        "[web-root]/media/js/mautic-form-src.js": "assets/js/mautic-form-src.js",
-                        "[web-root]/media/css/mediaelementplayer.css": "assets/css/mediaelementplayer.css",
-                        "[web-root]/media/css/mediaelementplayer.min.css": "assets/css/mediaelementplayer.min.css",
-                        "[web-root]/media/css/modal.css": "assets/css/modal.css",
-                        "[web-root]/media/css/modal.min.css": "assets/css/modal.min.css",
-                        "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
-                        "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
+                        "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
                         "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
                     }
@@ -15660,16 +15648,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.14",
+            "version": "1.10.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "d232901b09e67538e5c86a724be841bea5768a7c"
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d232901b09e67538e5c86a724be841bea5768a7c",
-                "reference": "d232901b09e67538e5c86a724be841bea5768a7c",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
                 "shasum": ""
             },
             "require": {
@@ -15718,7 +15706,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-04-19T13:47:27+00:00"
+            "time": "2023-08-22T13:48:25+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -16435,21 +16423,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.16.0",
+            "version": "0.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "2125ff71ea05b079562a8f59ca48a97eb78dc07f"
+                "reference": "758ada29b5c80d933f906735d3026520390a2a1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/2125ff71ea05b079562a8f59ca48a97eb78dc07f",
-                "reference": "2125ff71ea05b079562a8f59ca48a97eb78dc07f",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/758ada29b5c80d933f906735d3026520390a2a1d",
+                "reference": "758ada29b5c80d933f906735d3026520390a2a1d",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.14"
+                "phpstan/phpstan": "^1.10.26"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -16461,11 +16449,6 @@
                 "bin/rector"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "0.15-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -16484,7 +16467,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.16.0"
+                "source": "https://github.com/rectorphp/rector/tree/0.18.0"
             },
             "funding": [
                 {
@@ -16492,7 +16475,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-05-05T12:12:17+00:00"
+            "time": "2023-08-17T12:53:22+00:00"
         },
         {
             "name": "sebastian/cli-parser",

@@ -51,7 +51,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('integrationObjectName', $integrationObjectName);
 
-        $result = $qb->execute()->fetchAssociative();
+        $result = $qb->executeQuery()->fetchAssociative();
 
         return $result ?: null;
     }
@@ -85,7 +85,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('oldObjectName', $oldObjectName)
             ->setParameter('oldObjectId', $oldObjectId);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     public function updateInternalObjectId(int $internalObjectId, int $id): int
@@ -98,7 +98,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('id', $id);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     /**
@@ -131,7 +131,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('isDeleted', [], Types::BOOLEAN)
             ->setParameter('internalStorage', [], Types::JSON);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     /**
@@ -162,7 +162,7 @@ class ObjectMappingRepository extends CommonRepository
             $qb->andWhere($qb->expr()->eq('m.integration_object_id', ':objectId'));
         }
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     public function deleteEntitiesForObject(int $internalObjectId, string $internalObject): void

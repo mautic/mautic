@@ -18,7 +18,8 @@ class PointRepository extends CommonRepository
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from(\Mautic\PointBundle\Entity\Point::class, $this->getTableAlias())
-            ->leftJoin($this->getTableAlias().'.category', 'cat');
+            ->leftJoin($this->getTableAlias().'.category', 'cat')
+            ->leftJoin($this->getTableAlias().'.group', 'pl');
 
         $args['qb'] = $q;
 
@@ -77,7 +78,7 @@ class PointRepository extends CommonRepository
         )
             ->setParameter('type', $type);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
 
@@ -107,7 +108,7 @@ class PointRepository extends CommonRepository
             )
         );
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
 

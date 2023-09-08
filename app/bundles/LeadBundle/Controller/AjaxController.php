@@ -5,15 +5,14 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -30,6 +29,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
+    use AjaxLookupControllerTrait;
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -307,62 +308,6 @@ class AjaxController extends CommonAjaxController
                 }
 
                 $dataArray['socialCount'] = $socialCount;
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * Updates the timeline events and gets returns updated HTML.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function updateTimelineAction(Request $request)
-    {
-        $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
-        $search        = InputHelper::clean($request->request->get('search'));
-        $leadId        = (int) $request->request->get('leadId');
-
-        if (!empty($leadId)) {
-            // find the lead
-            $model = $this->getModel('lead.lead');
-            $lead  = $model->getEntity($leadId);
-
-            if (null !== $lead) {
-                $session = $request->getSession();
-
-                $filter = [
-                    'search'        => $search,
-                    'includeEvents' => $includeEvents,
-                    'excludeEvents' => $excludeEvents,
-                ];
-
-                $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filter);
-
-                // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
-                $dispatcher = $this->dispatcher;
-                $event      = new LeadTimelineEvent($lead, $filter);
-                $dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
-
-                $events     = $event->getEvents();
-                $eventTypes = $event->getEventTypes();
-
-                $timeline = $this->renderView(
-                    '@MauticLead/Lead/history.html.twig',
-                    [
-                        'events'       => $events,
-                        'eventTypes'   => $eventTypes,
-                        'eventFilters' => $filter,
-                        'lead'         => $lead,
-                    ]
-                );
-
-                $dataArray['success']      = 1;
-                $dataArray['timeline']     = $timeline;
-                $dataArray['historyCount'] = count($events);
             }
         }
 

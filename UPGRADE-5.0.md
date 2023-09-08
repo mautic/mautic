@@ -4,6 +4,7 @@
 - The LinkedIn plugin has been removed from Mautic Core as it did not work with new LinkedIn API. See https://github.com/mautic/mautic/pull/12147
 - The calendar feature was removed. See https://github.com/mautic/mautic/pull/11270
 - The Froala assets are disabled by default. Enable them if you use the legacy email or page builder. See https://github.com/mautic/mautic/pull/12416
+- New shortening service in Mautic 5, reconfiguration is needed after migrating to Mautic 5. A user reads the documentation to understand how to set it up in the configuration.
 
 ## Mailer
 The underlying library used for sending emails (Swift Mailer) was discontinued and Mautic 5 is using the [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) library instead. There are user facing changes coming with this change.
@@ -26,6 +27,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
       * `.env.$APP_ENV`       committed environment-specific defaults
       * `.env.$APP_ENV.local` uncommitted environment-specific overrides
     * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
+    * Remove Custom shortener API URL from configuration (link_shortener_url variable) and remove `Mautic\CoreBundle\Helper\UrlHelper::buildShortUrl()` method. As a developer, use the \Mautic\CoreBundle\Shortener\Shortener::class service.
 * Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
@@ -52,7 +54,8 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
         * `Mautic\LeadBundle\Model\ListModel::getVersionNew()`
         * `Mautic\LeadBundle\Model\ListModel::getVersionOld()`
-*   Services
+    * `mautic:broadcast:send --limit=10 --batch=2` fix process emails with combination of parameters limit/batch. Before it processed all emails with batch 10. Now process 10 emails with batch 2. If you used to use before, probably you need change it.
+* Services
     * Repository service `mautic.user.token.repository` for `Mautic\UserBundle\Entity\UserTokenRepository` was removed as it was duplicated. Use `mautic.user.repository.user_token` instead.
     * In tests replace `self::$container->get('mautic.http.client.mock_handler')` with `self::$container->get(\GuzzleHttp\Handler\MockHandler::class)` to get HTTP client mock handler.
 * JS Dependencies
@@ -92,6 +95,14 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Deprecated cookie `mtc_sid` removed.
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
+    * Removed onlyForBC themes: coffee, Mauve, nature
+
+### QueueBundle removed in favor symfony's messenger, see: [readme](app/bundles/MessengerBundle/README.md)
+ * **Related configuration** is no longer valid. 
+ * **Events** removed without replacement: QueueEvents, Event\QueueConsumerEvent, Event\QueueEvent
+ * `QueueService` removed without replacement
+ * **Helper** removed `app/bundles/QueueBundle/Helper/QueueRequestHelper.php` in favor of serialization (reused)
+ * **Command** `mautic:queue:process` is no longer available, use messenger:consume instead
 
 # Dependency injection improvements
 

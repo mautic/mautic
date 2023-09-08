@@ -222,7 +222,7 @@
                             </optgroup>
                         {% else %}
                             {% if 'lists' != dataKey or (currentListId is not defined or (value != currentListId)) %}
-                                <option value="{{ value }}">{{ label }}</option>
+                                <option value="{{ label }}">{{ value }}</option>
                             {% endif %}
                         {% endif %}
                     {% endfor %}

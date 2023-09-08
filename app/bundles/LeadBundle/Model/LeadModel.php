@@ -53,6 +53,8 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Entity\GroupContactScore;
+use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
@@ -350,6 +352,11 @@ class LeadModel extends FormModel
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadList::class);
     }
 
+    public function getGroupContactScoreRepository(): GroupContactScoreRepository
+    {
+        return $this->em->getRepository(GroupContactScore::class);
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -377,7 +384,7 @@ class LeadModel extends FormModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface<object>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -1385,6 +1392,12 @@ class LeadModel extends FormModel
             }
         }
         unset($fieldData['ownerusername']);
+
+        if (!empty($fields['tags']) && !empty($data[$fields['tags']])) {
+            $leadTags = explode('|', $data[$fields['tags']]);
+            $this->modifyTags($lead, $leadTags, null, false);
+        }
+        unset($fieldData['tags']);
 
         if (null !== $owner) {
             $lead->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
