@@ -91,7 +91,7 @@ class LeadImportFieldType extends AbstractType
             );
 
             $builder->add(
-                'tags',
+                'optional_tags',
                 TagType::class,
                 [
                     'label'      => 'mautic.lead.tags',
