@@ -9,11 +9,12 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends FormController
 {
@@ -104,7 +105,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder)
+    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
         if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
@@ -133,7 +134,7 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
+                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
@@ -187,7 +188,7 @@ class UserController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $languageHelper, $encoder, $user->getId(), true);
+                return $this->editAction($request, $languageHelper, $hasher, $user->getId(), true);
             }
         }
 
@@ -210,7 +211,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();
@@ -268,7 +269,7 @@ class UserController extends FormController
                 // check to see if the password needs to be rehashed
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
+                $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
@@ -414,7 +415,7 @@ class UserController extends FormController
      *
      * @return Response
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, $objectId)
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, $objectId)
     {
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
@@ -449,12 +450,12 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
-                    $message = (new \Swift_Message())
-                        ->setSubject($subject)
-                        ->setFrom($currentUser->getEmail(), $currentUser->getName())
-                        ->setTo($user->getEmail(), $user->getName())
-                        ->setBody($body);
-                    $this->get('mailer')->send($message);
+
+                    $mailer->setFrom($currentUser->getEmail(), $currentUser->getName());
+                    $mailer->setSubject($subject);
+                    $mailer->setTo($user->getEmail(), $user->getName());
+                    $mailer->setBody($body);
+                    $mailer->send();
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {

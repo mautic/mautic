@@ -34,7 +34,6 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param      $lead
      * @param null $deviceNames
      * @param null $deviceBrands
      * @param null $deviceModels
@@ -106,8 +105,8 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        //get totals
-        $device = $sq->execute()->fetchAllAssociative();
+        // get totals
+        $device = $sq->executeQuery()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
@@ -161,15 +160,12 @@ class LeadDeviceRepository extends CommonRepository
             ->where('lead_id = :leadId')
             ->setParameter('leadId', (int) $lead->getId())
             ->orderBy('date_added', 'desc')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -177,6 +173,6 @@ class LeadDeviceRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

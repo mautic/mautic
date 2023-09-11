@@ -1044,6 +1044,69 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "danadelion",
+      "name": "Dana Linhartová",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78448517?v=4",
+      "profile": "https://github.com/danadelion",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Thanks",
+      "name": "Thanks",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1121545?v=4",
+      "profile": "https://github.com/thanks",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "PatrickJenkner",
+      "name": "Patrick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/139468697?v=4",
+      "profile": "https://github.com/PatrickJenkner",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "TomasVotruba",
+      "name": "Tomas Votruba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/924196?v=4",
+      "profile": "https://tomasvotruba.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tirtharajghosh",
+      "name": "Tirtharaj Ghosh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58604532?v=4",
+      "profile": "https://github.com/tirtharajghosh",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "rubnogueira",
+      "name": "Ruben Nogueira",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40404708?v=4",
+      "profile": "https://www.rubnogueira.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "exsesx",
+      "name": "Oleh Vanin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399517?v=4",
+      "profile": "https://exsesx.dev/",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,

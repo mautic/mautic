@@ -91,7 +91,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $openRate = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
@@ -307,7 +307,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
         }
 
-        $signatureText = $this->coreParametersHelper->get('default_signature_text');
+        $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
         $fromName      = $this->coreParametersHelper->get('mailer_from_name');
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
@@ -322,13 +322,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $email   = $event->getEmail();
-        $emailId = ($email) ? $email->getId() : null;
-        if (!$email instanceof Email) {
-            $email = $this->emailModel->getEntity($emailId);
-        }
+        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $email          = $event->getEmail();
+        $emailId        = $email instanceof Email ? $email->getId() : null;
+        $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
-        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
@@ -338,9 +336,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
 
             $event->addToken($token, $url);
         }

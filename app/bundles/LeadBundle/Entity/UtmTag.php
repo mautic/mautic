@@ -94,8 +94,6 @@ class UtmTag
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -384,6 +382,11 @@ class UtmTag
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    public function hasUtmTags(): bool
+    {
+        return !empty($this->utmCampaign) || !empty($this->utmSource) || !empty($this->utmMedium) || !empty($this->utmContent) || !empty($this->utmTerm);
     }
 
     /**

@@ -1,52 +1,63 @@
-{%- macro row_if_exists(form, field) %}
-  {% if form[field] is defined %}
-    <div class="col-md-6">
-      {{ form_row(form[field]) }}
-    </div>
-  {% endif %}
-{%- endmacro %}
-
 {% block _config_messengerconfig_widget %}
-{% set fields = form.children %}
-{% set fieldKeys = fields|keys %}
 
-{# we want to show these keys no matter what is the transport selected #}
-{% set retryKeys = [
-    'messenger_retry_strategy_max_retries',
-    'messenger_retry_strategy_delay',
-    'messenger_retry_strategy_multiplier',
-    'messenger_retry_strategy_max_delay'
-] %}
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#transport-configuration' } %}mautic.messenger.config.dns_help_general{% endtrans %}
+</div>
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.config.tab.messengerconfig'|trans }}</h3>
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_email'|trans }}</h3>
     </div>
     <div class="panel-body">
-    <div class='row'>
-    {% for key in fieldKeys|filter(v => v not in retryKeys) %}
-        {{ _self.row_if_exists(fields, key) }}
-    {% endfor %}
+        {{ form_row(form.messenger_dsn_email) }}
     </div>
-        {% if fields.messenger_type is defined %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_retries') }}
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_delay') }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_multiplier') }}
-                            {{ _self.row_if_exists(fields, 'messenger_retry_strategy_max_delay') }}
-                        </div>
-                    </div>
-                </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_hit'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_hit) }}
+    </div>
+</div>
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#retries-failures' } %}mautic.messenger.config.dns_help_retry_strategy{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_max_retries) }}
             </div>
-        {% endif %}
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_delay) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_multiplier) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_max_delay) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#saving-retrying-failed-messages' } %}mautic.messenger.config.dns_help_failed{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dns_failed'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_failed) }}
     </div>
 </div>
 {% endblock %}

@@ -25,10 +25,10 @@ class LogRepository extends CommonRepository
             ->setParameter('logMaxLimit', $logMaxLimit);
 
         return array_map(
-            function ($row) {
+            static function ($row) {
                 return (int) $row['webhook_id'];
             },
-            $qb->execute()->fetchAllAssociative()
+            $qb->executeQuery()->fetchAllAssociative()
         );
     }
 
@@ -54,7 +54,7 @@ class LogRepository extends CommonRepository
         $count = $qb->select('count(id) as log_count')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
             ->where('webhook_id = '.$webhookId)
-            ->execute()
+            ->executeQuery()
             ->fetchAssociative();
 
         if ((int) $count['log_count'] >= (int) $logMax) {
@@ -64,14 +64,14 @@ class LogRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
                 ->where('webhook_id = '.$webhookId)
                 ->orderBy('date_added', 'ASC')->setMaxResults(1)
-                ->execute()
+                ->executeQuery()
                 ->fetchAssociative();
 
             $qb = $this->_em->getConnection()->createQueryBuilder();
 
             $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_logs')
                 ->where($qb->expr()->in('id', $id))
-                ->execute();
+                ->executeStatement();
         }
     }
 
@@ -91,7 +91,7 @@ class LogRepository extends CommonRepository
             ->orderBy('id', 'DESC')
             ->setMaxResults(1)
             ->setFirstResult($logMax) // if log max limit is 1000 then it will fetch id of 1001'th record from last and we will delete all log which have id less than or equal to this id.
-            ->execute()->fetchOne();
+            ->executeQuery()->fetchOne();
 
         if ($id) {
             $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
@@ -134,7 +134,7 @@ class LogRepository extends CommonRepository
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
             ->setParameter('webhookId', $webhookId);
 
-        $result = $countAllQb->execute()->fetchAssociative();
+        $result = $countAllQb->executeQuery()->fetchAssociative();
 
         if (isset($result['thecount'])) {
             $allCount = (int) $result['thecount'];
@@ -150,7 +150,7 @@ class LogRepository extends CommonRepository
             ->andWhere($countSuccessQb->expr()->lt($this->getTableAlias().'.status_code', 300))
             ->setParameter('webhookId', $webhookId);
 
-        $result = $countSuccessQb->execute()->fetchAssociative();
+        $result = $countSuccessQb->executeQuery()->fetchAssociative();
 
         if (isset($result['thecount'])) {
             $successCount = (int) $result['thecount'];

@@ -114,14 +114,11 @@ class VideoHitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -129,6 +126,6 @@ class VideoHitRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'video_hits')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

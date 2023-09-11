@@ -52,7 +52,7 @@ class StatRepository extends CommonRepository
             ->setParameter('leadId', $contactId)
             ->setParameter('emailId', $emailId);
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         if ($result) {
             foreach ($result as $row) {
@@ -161,7 +161,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.id');
         $q->orderBy('s.id', 'DESC');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -188,7 +188,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -302,10 +302,14 @@ class StatRepository extends CommonRepository
         }
 
         if ($chartQuery) {
-            $chartQuery->applyDateFilters($q, 'date_sent', 's');
+            if ('is_read' === $column) {
+                $chartQuery->applyDateFilters($q, 'date_read', 's');
+            } else {
+                $chartQuery->applyDateFilters($q, 'date_sent', 's');
+            }
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -349,7 +353,7 @@ class StatRepository extends CommonRepository
         $sq->groupBy('e.email_id');
 
         // get a total number of sent emails first
-        $totalCounts = $sq->execute()->fetchAllAssociative();
+        $totalCounts = $sq->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($inIds as $id) {
@@ -369,7 +373,7 @@ class StatRepository extends CommonRepository
         // now get a read count
         $sq->andWhere('e.is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $readCounts = $sq->execute()->fetchAllAssociative();
+        $readCounts = $sq->executeQuery()->fetchAllAssociative();
 
         foreach ($readCounts as $r) {
             $return[$r['email_id']]['readCount'] = (int) $r['the_count'];
@@ -408,7 +412,7 @@ class StatRepository extends CommonRepository
             $q->andWhere('s.list_id = '.(int) $listId);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -566,7 +570,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.email_id');
 
         // get a total number of sent emails first
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $counts = [];
 
@@ -586,7 +590,7 @@ class StatRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -605,7 +609,7 @@ class StatRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $ids)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -643,7 +647,7 @@ class StatRepository extends CommonRepository
             ->setParameter('email', $emailId)
             ->setParameter('contacts', $contacts);
 
-        return $query->execute()->fetchAssociative();
+        return $query->executeQuery()->fetchAssociative();
     }
 
     /**
@@ -661,7 +665,7 @@ class StatRepository extends CommonRepository
             ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy('s.lead_id');
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {

@@ -4,7 +4,7 @@ use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesComp
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -44,13 +44,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -60,16 +53,13 @@ $container->loadFromExtension('web_profiler', [
     'intercept_redirects' => false,
 ]);
 
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
-]);
-
 $connectionSettings = [
     'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
     'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
     'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
     'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+    'options'  => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
@@ -149,3 +139,6 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
 
 // HTTP client mock handler providing response queue
 $container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+
+$container->register('http_client', \Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);

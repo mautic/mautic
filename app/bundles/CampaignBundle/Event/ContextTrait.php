@@ -9,8 +9,6 @@ trait ContextTrait
     /**
      * Check if an event is applicable.
      *
-     * @param $eventType
-     *
      * @return bool
      */
     public function checkContext($eventType)

@@ -67,8 +67,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $messageId
-     *
      * @return array
      */
     public function getMessageChannels($messageId)
@@ -80,7 +78,7 @@ class MessageRepository extends CommonRepository
             ->setParameter('messageId', $messageId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $channels = [];
         foreach ($results as $result) {
@@ -92,8 +90,6 @@ class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param $channelId
-     *
      * @return array
      */
     public function getChannelMessageByChannelId($channelId)
@@ -105,6 +101,6 @@ class MessageRepository extends CommonRepository
             ->setParameter('channelId', $channelId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        return $q->execute()->fetchAssociative();
+        return $q->executeQuery()->fetchAssociative();
     }
 }

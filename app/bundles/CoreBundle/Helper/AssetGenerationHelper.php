@@ -98,13 +98,13 @@ class AssetGenerationHelper
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
             $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
-            $assetsPath = $this->pathsHelper->getSystemPath('assets');
+            $assetsPath = $this->pathsHelper->getSystemPath('media');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ('prod' == $env) {
-                $loadAll = false; //by default, loading should not be required
+                $loadAll = false; // by default, loading should not be required
 
-                //check for libraries and app files and generate them if they don't exist if in prod environment
+                // check for libraries and app files and generate them if they don't exist if in prod environment
                 $prodFiles = [
                     'css/libraries.css',
                     'css/app.css',
@@ -114,7 +114,7 @@ class AssetGenerationHelper
 
                 foreach ($prodFiles as $file) {
                     if (!file_exists("$assetsFullPath/$file")) {
-                        $loadAll = true; //it's missing so compile it
+                        $loadAll = true; // it's missing so compile it
                         break;
                     }
                 }
@@ -128,7 +128,7 @@ class AssetGenerationHelper
 
                     if (!$forceRegeneration) {
                         while (file_exists($inProgressFile)) {
-                            //dummy loop to prevent conflicts if one process is actively regenerating assets
+                            // dummy loop to prevent conflicts if one process is actively regenerating assets
                         }
                     }
                     file_put_contents($inProgressFile, date('r'));
@@ -152,7 +152,7 @@ class AssetGenerationHelper
 
                 $modifiedLast = [];
 
-                //get a list of all core asset files
+                // get a list of all core asset files
                 $bundles = $this->bundleHelper->getMauticBundles();
 
                 $fileTypes = ['css', 'js'];
@@ -169,7 +169,7 @@ class AssetGenerationHelper
                 }
                 $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
 
-                //combine the files into their corresponding name and put in the root media folder
+                // combine the files into their corresponding name and put in the root media folder
                 if ('prod' == $env) {
                     $checkPaths = [
                         $assetsFullPath,
@@ -182,18 +182,16 @@ class AssetGenerationHelper
                         }
                     });
 
-                    $useMinify = class_exists('\Minify');
-
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
                             $assetFile = "$assetsFullPath/$type/$group.$type";
 
-                            //only refresh if a change has occurred
+                            // only refresh if a change has occurred
                             $modified = ($forceRegeneration || !file_exists($assetFile)) ? true : filemtime($assetFile) < $modifiedLast[$type][$group];
 
                             if ($modified) {
                                 if (file_exists($assetFile)) {
-                                    //delete it
+                                    // delete it
                                     unlink($assetFile);
                                 }
 
@@ -201,33 +199,22 @@ class AssetGenerationHelper
                                     $out = fopen($assetFile, 'w');
 
                                     foreach ($files as $relPath => $details) {
-                                        $cssRel = '../../'.dirname($relPath).'/';
-                                        if ($useMinify) {
-                                            $content = \Minify::combine([$details['fullPath']], [
-                                                'rewriteCssUris'  => false,
-                                                'minifierOptions' => [
-                                                    'text/css' => [
-                                                        'currentDir'          => '',
-                                                        'prependRelativePath' => $cssRel,
-                                                    ],
+                                        $content = (new \Minify(new \Minify_Cache_Null()))->combine([$details['fullPath']], [
+                                            'rewriteCssUris'  => false,
+                                            'minifierOptions' => [
+                                                'text/css' => [
+                                                    'currentDir'          => '',
+                                                    'prependRelativePath' => '../../'.dirname($relPath).'/',
                                                 ],
-                                            ]);
-                                        } else {
-                                            $content = file_get_contents($details['fullPath']);
-                                            $search  = '#url\((?!\s*([\'"]?(((?:https?:)?//)|(?:data\:?:))))\s*([\'"])?#';
-                                            $replace = "url($4{$cssRel}";
-                                            $content = preg_replace($search, $replace, $content);
-                                        }
+                                            ],
+                                        ]);
 
                                         fwrite($out, $content);
                                     }
 
                                     fclose($out);
                                 } else {
-                                    array_walk($files, function (&$file) {
-                                        $file = $file['fullPath'];
-                                    });
-                                    file_put_contents($assetFile, \Minify::combine($files));
+                                    file_put_contents($assetFile, (new \Minify(new \Minify_Cache_Null()))->combine(array_column($files, 'fullPath')));
                                 }
                             }
                         }
@@ -238,7 +225,7 @@ class AssetGenerationHelper
             }
 
             if ('prod' == $env) {
-                //return prod generated assets
+                // return prod generated assets
                 $assets = [
                     'css' => [
                         "{$assetsPath}/css/libraries.css?v{$this->version}",
@@ -356,9 +343,6 @@ class AssetGenerationHelper
 
     /**
      * Find asset overrides in the template.
-     *
-     * @param $env
-     * @param $assets
      *
      * @return array
      */

@@ -62,6 +62,19 @@
         'primary'   : true,
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
+    {% set heatmapButton = {
+        'attr' : {
+            'class'       : 'btn btn-default btn-nospin',
+            'data-toggle' : 'email-heatmap',
+            'data-email'  : email.getId(),
+            'data-target' : '#MauticSharedModal',
+            'href'        : '#',
+            'data-header' : 'mautic.email.heatmap.click_heatmap'|trans,
+        },
+        'iconClass' : 'fa fa-fire',
+        'btnText'   : 'mautic.email.heatmap.click_heatmap'
+    } %}
+    {% set customButtons = customButtons|merge([heatmapButton]) %}
 {% endif %}
 
 
@@ -192,6 +205,12 @@
                                       <span class="fw-b">{{ 'mautic.email.stat.sent'|trans }}</span>
                                   </td>
                                   <td>{{ email.sentCount }}</td>
+                              </tr>
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.email.stat.delivered'|trans }}</span>
+                                  </td>
+                                  <td data-email-stat-delivered-for="{{ email.id }}"><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
                               </tr>
                               <tr>
                                   <td width="20%">

@@ -3,16 +3,18 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -39,6 +41,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 
@@ -142,10 +145,6 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param $aCount
-     * @param $bCount
-     * @param $cCount
-     *
      * @return string
      */
     private function getVariantContent($aCount, $bCount, $cCount)
@@ -261,16 +260,31 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->attributes->set('ignore_mismatch', true);
 
+        $formFactory          = $this->createMock(FormFactoryInterface::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+
         $controller = new PublicController(
-            $mauticSecurity,
-            $this->createMock(UserHelper::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFactory,
+            $fieldHelper,
+            $doctrine,
+            $factory,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $mauticSecurity
         );
         $controller->setContainer($container);
-        $controller->setModelFactory($modelFactory);
-        $controller->setDispatcher($dispatcher);
 
         $response = $controller->indexAction(
             $this->request,
@@ -344,15 +358,33 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->query->set('ct', $clickTrough);
 
+        $formFactory          = $this->createMock(FormFactoryInterface::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+        $mauticSecurity       = $this->createMock(CorePermissions::class);
+
         $controller = new PublicController(
-            $this->createMock(CorePermissions::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFactory,
+            $fieldHelper,
+            $doctrine,
+            $factory,
+            $this->modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $mauticSecurity
         );
         $controller->setContainer($this->internalContainer);
-        $controller->setModelFactory($this->modelFactory);
 
         $response = $controller->redirectAction(
             $this->request,
@@ -366,14 +398,14 @@ class PublicControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testAssetRedirectUrlWithClickThrough(): void
     {
         $redirectId   = 'dummy_redirect_id';
         $clickThrough = 'dummy_click_through';
         $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
-        $targetUrl    = $redirectUrl.'?ct='.$clickThrough;
+        $targetUrl    = 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through%3Fct%3Ddummy_click_through';
 
         $this->redirectModel->expects(self::once())
             ->method('getRedirectById')
@@ -429,15 +461,33 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->query->set('ct', $clickThrough);
 
+        $formFactory          = $this->createMock(FormFactoryInterface::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+        $mauticSecurity       = $this->createMock(CorePermissions::class);
+
         $controller = new PublicController(
-            $this->createMock(CorePermissions::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFactory,
+            $fieldHelper,
+            $doctrine,
+            $factory,
+            $this->modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $mauticSecurity
         );
         $controller->setContainer($this->internalContainer);
-        $controller->setModelFactory($this->modelFactory);
 
         $response = $controller->redirectAction(
             $this->request,
@@ -513,15 +563,30 @@ class PublicControllerTest extends MauticMysqlTestCase
         $contactTracker->method('getContact')
             ->willReturn($contact);
 
+        $formFactory          = $this->createMock(FormFactoryInterface::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+
         $publicController = new PublicController(
-            $security,
-            $this->createMock(UserHelper::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFactory,
+            $fieldHelper,
+            $doctrine,
+            $factory,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $eventDispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $security
         );
-        $publicController->setModelFactory($modelFactory);
-        $publicController->setDispatcher($eventDispatcher);
 
         $response = $publicController->trackingAction(
             $request,
@@ -564,14 +629,31 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('isAnonymous')
             ->willReturn(true);
 
+        $formFactory          = $this->createMock(FormFactoryInterface::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $factory              = $this->createMock(MauticFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $requestStack         = new RequestStack();
+
         $publicController = new PublicController(
-            $security,
-            $this->createMock(UserHelper::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(FormFieldHelper::class),
-            $this->createMock(ManagerRegistry::class)
+            $formFactory,
+            $fieldHelper,
+            $doctrine,
+            $factory,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $security
         );
-        $publicController->setModelFactory($modelFactory);
 
         $response = $publicController->trackingAction(
             $request,

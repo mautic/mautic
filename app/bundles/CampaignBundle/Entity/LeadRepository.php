@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class LeadRepository extends CommonRepository
 {
     use ContactLimiterTrait;
-    use SlaveConnectionTrait;
+    use ReplicaConnectionTrait;
 
     /**
      * Get the details of leads added to a campaign.
@@ -171,7 +171,7 @@ class LeadRepository extends CommonRepository
     public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
     {
         // Main query
-        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $q->select('l.lead_id, l.date_added')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
             ->where(
@@ -190,7 +190,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('l', $q, $limiter);
 
         // Limit to events that have not been executed or scheduled yet
-        $eventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $eventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $eventQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
@@ -206,7 +206,7 @@ class LeadRepository extends CommonRepository
 
         if ($parentDecisionId) {
             // Limit to events  whose grandparent has already been executed
-            $grandparentQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $grandparentQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $grandparentQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
                 ->where(
@@ -221,7 +221,7 @@ class LeadRepository extends CommonRepository
             );
         } else {
             // Limit to events that have no grandparent and any of events was already executed by jump to event
-            $anyEventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $anyEventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $anyEventQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'any_log')
                 ->where(
@@ -267,7 +267,7 @@ class LeadRepository extends CommonRepository
 
         foreach ($decisionIds as $decisionId) {
             // Main query
-            $q = $this->getSlaveConnection()->createQueryBuilder();
+            $q = $this->getReplicaConnection()->createQueryBuilder();
             $q->select('count(*)')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
                 ->where(
@@ -284,7 +284,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
 
             // Limit to events that have not been executed or scheduled yet
-            $eventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $eventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $eventQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
                 ->where(
@@ -349,7 +349,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $contactRotations = [];
         foreach ($results as $result) {
@@ -371,7 +371,7 @@ class LeadRepository extends CommonRepository
             return new CountResult(0, 0, 0);
         }
 
-        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
@@ -410,7 +410,7 @@ class LeadRepository extends CommonRepository
             return [];
         }
 
-        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $qb->select('distinct(ll.lead_id) as id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
@@ -446,7 +446,7 @@ class LeadRepository extends CommonRepository
     {
         $segments = $this->getCampaignSegments($campaignId);
 
-        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $qb->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
@@ -472,7 +472,7 @@ class LeadRepository extends CommonRepository
     {
         $segments = $this->getCampaignSegments($campaignId);
 
-        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb = $this->getReplicaConnection($limiter)->createQueryBuilder();
         $qb->select('cl.lead_id as id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(

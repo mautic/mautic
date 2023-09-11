@@ -72,7 +72,7 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $decision,
@@ -119,7 +119,7 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $event,
@@ -169,14 +169,14 @@ class CampaignBuilderEvent extends Event
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['batchEventName', 'eventName', 'callback']],
             $action,
             ['callback']
         );
 
-        //translate the group
+        // translate the group
         $action['label']       = $this->translator->trans($action['label']);
         $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
 

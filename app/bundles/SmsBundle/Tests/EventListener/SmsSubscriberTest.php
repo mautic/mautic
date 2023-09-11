@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Trackable;
@@ -14,9 +15,17 @@ use PHPUnit\Framework\TestCase;
 
 class SmsSubscriberTest extends TestCase
 {
+    private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+
     private $messageText = 'custom http://mautic.com text';
 
     private $messageUrl = 'http://mautic.com';
+
+    protected function setUp(): void
+    {
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        parent::setUp();
+    }
 
     public function testOnTokenReplacementWithTrackableUrls()
     {
@@ -45,7 +54,8 @@ class SmsSubscriberTest extends TestCase
             $mockTrackableModel,
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
-            $mockSmsHelper
+            $mockSmsHelper,
+            $this->coreParametersHelper
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertNotSame($this->messageText, $tokenReplacementEvent->getContent());
@@ -78,7 +88,8 @@ class SmsSubscriberTest extends TestCase
             $mockTrackableModel,
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
-            $mockSmsHelper
+            $mockSmsHelper,
+            $this->coreParametersHelper
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertSame($this->messageText, $tokenReplacementEvent->getContent());

@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -478,7 +479,7 @@ class CommonRepository extends ServiceEntityRepository
                 $expr = $q->expr()->{$func}($filter['column']);
             } elseif (in_array($func, ['in', 'notIn'])) {
                 $expr = $q->expr()->{$func}($filter['column'], ':'.$unique);
-                $q->setParameter($unique, $filter['value'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                $q->setParameter($unique, $filter['value'], ArrayParameterType::STRING);
             } elseif (in_array($func, ['like', 'notLike'])) {
                 if (isset($filter['strict']) && !$filter['strict']) {
                     if (is_numeric($filter['value'])) {
@@ -603,7 +604,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildWhereClauseFromArray($q, $where);
 
-        $count = $q->execute()->fetchOne();
+        $count = $q->executeQuery()->fetchOne();
 
         if ($select) {
             foreach ($select as &$column) {
@@ -623,7 +624,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildOrderByClauseFromArray($q, $order);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return [
             'total'   => $count,
@@ -647,7 +648,7 @@ class CommonRepository extends ServiceEntityRepository
             ->where($this->getTableAlias().'.id = :id')
             ->setParameter('id', $id);
 
-        $result = $q->execute()->fetchAssociative();
+        $result = $q->executeQuery()->fetchAssociative();
 
         if (isset($result[$column])) {
             return $result[$column];
@@ -694,11 +695,7 @@ class CommonRepository extends ServiceEntityRepository
 
         // Get the label column if necessary
         if (null == $labelColumn) {
-            if ($reflection->hasMethod('getTitle')) {
-                $labelColumn = 'title';
-            } else {
-                $labelColumn = 'name';
-            }
+            $labelColumn = $reflection->hasMethod('getTitle') ? 'title' : 'name';
         }
 
         $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
@@ -709,8 +706,8 @@ class CommonRepository extends ServiceEntityRepository
             $q->where($expr);
         }
 
-        if (!empty($parameters)) {
-            $q->setParameters($parameters);
+        foreach ($parameters as $key => $value) {
+            $q->setParameter($key, $value, is_array($value) ? ArrayParameterType::STRING : null);
         }
 
         // Published only
@@ -725,7 +722,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1776,7 +1773,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function sanitize($sqlAttr, $allowedCharacters = [])
     {
-        return InputHelper::alphanum($sqlAttr, false, false, $allowedCharacters);
+        return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }
 
     private function convertOrmPropertiesToColumns(array &$filters, array $properties)

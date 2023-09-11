@@ -46,7 +46,7 @@ class BroadcastQuery
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -57,7 +57,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchOne();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -93,9 +93,9 @@ class BroadcastQuery
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
                 $statQb->expr()->and(
-                $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                $statQb->expr()->eq('stat.sms_id', $smsId)
-                    )
+                    $statQb->expr()->eq('stat.lead_id', 'l.id'),
+                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                )
             );
 
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));

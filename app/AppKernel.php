@@ -2,7 +2,6 @@
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
-use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,7 +38,7 @@ class AppKernel extends Kernel
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
         defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
-        /*
+        /**
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
          * installed yet, we don't have a database to connect to, causing automatic database platform
          * detection to fail. We use the MAUTIC_DB_SERVER_VERSION constant to temporarily set a server_version
@@ -112,7 +111,6 @@ class AppKernel extends Kernel
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
@@ -158,17 +156,6 @@ class AppKernel extends Kernel
             new Mautic\WebhookBundle\MauticWebhookBundle(),
             new Mautic\CacheBundle\MauticCacheBundle(),
         ];
-
-        $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
-        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
-        switch ($queueProtocol) {
-            case QueueProtocol::RABBITMQ:
-                $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
-                break;
-            case QueueProtocol::BEANSTALKD:
-                $bundles[] = new Leezy\PheanstalkBundle\LeezyPheanstalkBundle();
-                break;
-        }
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getProjectDir().'/plugins';
@@ -226,9 +213,6 @@ class AppKernel extends Kernel
             ->addTag(\Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function boot(): void
     {
         if (true === $this->booted) {
@@ -265,9 +249,6 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
@@ -303,8 +284,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @api
      */
     public function getCacheDir(): string

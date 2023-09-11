@@ -215,7 +215,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('leadId', $lead->getId())
             ->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
-        return (bool) $qb->execute()->fetchOne();
+        return (bool) $qb->executeQuery()->fetchOne();
     }
 
     /**
@@ -275,7 +275,6 @@ class LeadListRepository extends CommonRepository
         $q->select('count(l.lead_id) as thecount, l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
 
-        $expression   = null;
         $countListIds = count($listIds);
 
         if (1 === $countListIds) {
@@ -292,7 +291,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->groupBy('l.leadlist_id');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

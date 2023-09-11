@@ -37,7 +37,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
         $mockOwner = $this->getMockBuilder(User::class)
             ->getMock();
 
-        $mockOwner->expects($this->never()) //$config['to_owner'] is not set
+        $mockOwner->expects($this->never()) // $config['to_owner'] is not set
             ->method('getId')
             ->will($this->returnValue(5));
 

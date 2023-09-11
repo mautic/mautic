@@ -13,6 +13,8 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\PointBundle\Entity\Group;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -205,6 +207,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $frequencyRules;
 
+    /**
+     * @var ArrayCollection<int,GroupContactScore>
+     */
+    private $groupScores;
+
     private $primaryCompany;
 
     /**
@@ -225,6 +232,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
+        $this->groupScores      = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -377,6 +385,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
+        $builder->createOneToMany('groupScores', GroupContactScore::class)
+            ->mappedBy('contact')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
         self::loadFixedFieldMetadata(
             $builder,
             [
@@ -402,8 +416,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -856,8 +868,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set by the repository method when points are updated and requeried directly on the DB side.
-     *
-     * @param $points
      */
     public function setActualPoints($points)
     {
@@ -881,13 +891,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Creates a points change entry.
-     *
-     * @param $type
-     * @param $name
-     * @param $action
-     * @param $pointChanges
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -903,6 +908,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
+        if ($group) {
+            $event->setGroup($group);
+        }
         $this->addPointsChangeLog($event);
     }
 
@@ -920,14 +928,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Creates a points change entry.
-     *
-     * @param $stage
-     * @param $name
-     * @param $action
      */
     public function stageChangeLogEntry($stage, $name, $action)
     {
-        //create a new points change event
+        // create a new points change event
         $event = new StagesChangeLog();
         $event->setStage($stage);
         $event->setEventName($name);
@@ -976,9 +980,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param      $type
-     * @param      $name
-     * @param      $action
      * @param null $company
      */
     public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
@@ -1022,7 +1023,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param      $identifier
      * @param bool $enabled
      * @param bool $mobile
      *
@@ -1131,8 +1131,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set internal storage.
-     *
-     * @param $internal
      */
     public function setInternal($internal)
     {
@@ -1151,8 +1149,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set social cache.
-     *
-     * @param $cache
      */
     public function setSocialCache($cache)
     {
@@ -1361,8 +1357,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set tags.
      *
-     * @param $tags
-     *
      * @return $this
      */
     public function setTags($tags)
@@ -1384,8 +1378,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set utm tags.
-     *
-     * @param $utmTags
      *
      * @return $this
      */
@@ -1999,5 +1991,44 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
 
         return $rules;
+    }
+
+    /**
+     * @return ArrayCollection<int,GroupContactScore>
+     */
+    public function getGroupScores(): Collection
+    {
+        return $this->groupScores;
+    }
+
+    public function getGroupScore(Group $group): ?GroupContactScore
+    {
+        foreach ($this->groupScores as $groupScore) {
+            if ($groupScore->getGroup() === $group) {
+                return $groupScore;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     */
+    public function setGroupScores($groupScores): void
+    {
+        $this->groupScores = $groupScores;
+    }
+
+    public function addGroupScore(GroupContactScore $groupContactScore): Lead
+    {
+        $this->groupScores[] = $groupContactScore;
+
+        return $this;
+    }
+
+    public function removeGroupScore(GroupContactScore $groupContactScore): void
+    {
+        $this->groupScores->removeElement($groupContactScore);
     }
 }

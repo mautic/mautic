@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Validator\Constraints\Blank;
@@ -118,8 +119,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get fields input filter.
      *
-     * @param $type
-     *
      * @return string
      */
     public function getFieldFilter($type)
@@ -136,8 +135,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param       $type
-     * @param       $value
      * @param Field $f
      *
      * @return array
@@ -147,7 +144,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {
             foreach ($this->types[$type]['constraints'] as $constraint => $opts) {
-                //don't check empty values unless the constraint is NotBlank
+                // don't check empty values unless the constraint is NotBlank
                 if (NotBlank::class === $constraint && empty($value)) {
                     continue;
                 }
@@ -187,12 +184,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
-    /**
-     * @param $field
-     * @param $value
-     * @param $formName
-     * @param $formHtml
-     */
     public function populateField($field, $value, $formName, &$formHtml)
     {
         $alias = $field->getAlias();
@@ -205,8 +196,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'url':
             case 'date':
             case 'datetime':
+                if ('tel' === $field->getType()) {
+                    $sanitizedValue = InputHelper::clean($value);
+                } else {
+                    $sanitizedValue = $this->sanitizeValue($value);
+                }
                 if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$this->sanitizeValue($value).'"'
+                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
                         .$match[4].'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }

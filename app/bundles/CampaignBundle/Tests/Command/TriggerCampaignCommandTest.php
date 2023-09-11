@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
@@ -36,7 +35,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForAll()
     {
@@ -82,7 +81,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
@@ -107,7 +106,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(25, $stats);
@@ -203,7 +202,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCampaignExecutionForOne()
     {
@@ -248,7 +247,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(0, $stats);
@@ -274,7 +273,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(1, $stats);
@@ -409,7 +408,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(0, $stats);
@@ -435,7 +434,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
@@ -599,7 +598,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSegmentCacheCount(): void
     {
@@ -620,7 +619,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'lead_tags', 't')
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $tagCounts = [];

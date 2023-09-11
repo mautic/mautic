@@ -12,8 +12,7 @@ return function (ContainerConfigurator $configurator, ContainerBuilder $containe
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public()
-    ;
+        ->public();
 
     $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 

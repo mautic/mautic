@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class User extends FormEntity implements UserInterface, \Serializable, EquatableInterface, PasswordAuthenticatedUserInterface
+class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @var int
@@ -34,14 +34,14 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     /**
      * Used for when updating the password.
      *
-     * @var string
+     * @var ?string
      */
     private $plainPassword;
 
     /**
      * Used for updating account.
      *
-     * @var string
+     * @var ?string
      */
     private $currentPassword;
 
@@ -336,7 +336,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     /**
      * Get plain password.
      *
-     * @return string
+     * @return ?string
      */
     public function getPlainPassword()
     {
@@ -346,7 +346,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     /**
      * Get current password (that a user has typed into a form).
      *
-     * @return string
+     * @return ?string
      */
     public function getCurrentPassword()
     {
@@ -370,28 +370,39 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return $roles;
     }
 
-    public function eraseCredentials()
+    /**
+     * {@inheritdoc}
+     */
+    public function eraseCredentials(): void
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
     }
 
-    public function serialize()
+    /**
+     * @return array<int, mixed>
+     */
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->id,
             $this->username,
             $this->password,
             $this->isPublished(),
-        ]);
+        ];
     }
 
-    public function unserialize($serialized)
+    /**
+     * @param array<int, mixed> $data
+     */
+    public function __unserialize(array $data): void
     {
-        list(
+        [
             $this->id,
             $this->username,
             $this->password,
             $published
-        ) = unserialize($serialized);
+        ] = $data;
         $this->setIsPublished($published);
     }
 

@@ -97,15 +97,41 @@
               </div>
           {% endif %}
 
-          {% if fields.link_shortener_url is defined or fields.max_entity_lock_time is defined %}
+          {% if fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />
             <div class="row">
-                {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
                 {%- if form.max_entity_lock_time is defined %}<div class="col-md-6">{{ form_row(form.max_entity_lock_time) }}</div>{% endif %}
             </div>
           {% endif %}
 
+          {%- if form.shortener_service is defined %}
+              <hr class="text-muted" />
+              <div class="row">
+                  <div class="col-md-6">
+                      {{ form_label(form.shortener_service) }}
+                      {% if form.shortener_service.vars.choices|length > 0 %}
+                          {{ form_widget(form.shortener_service) }}
+                      {% else %}
+                          <div class="row">
+                              <div class="col-xs-12">
+                                  {{ 'mautic.core.config.form.shortener.empty'|trans }}
+                              </div>
+                          </div>
+                      {% endif %}
+                  </div>
+                  {% if form.shortener_service.vars.choices|length > 0 %}
+                      <div class="col-md-3">
+                        {%- if form.shortener_email_enable is defined %}{{ form_row(form.shortener_email_enable) }}{% endif %}
+                      </div>
+                      <div class="col-md-3">
+                          {%- if form.shortener_sms_enable is defined %}{{ form_row(form.shortener_sms_enable) }}{% endif %}
+                      </div>
+                  {% endif %}
+              </div>
+          {% endif %}
+
           {% if fields.transliterate_page_title or fields.load_froala_assets is defined %}
+            <hr class="text-muted" />
             <div class="row">
                 {%- if form.transliterate_page_title is defined %}<div class="col-md-6">{{ form_row(form.transliterate_page_title) }}</div>{% endif %}
                 {%- if form.load_froala_assets is defined %}

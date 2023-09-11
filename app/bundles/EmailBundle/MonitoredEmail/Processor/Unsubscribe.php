@@ -2,20 +2,21 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
+use Mautic\EmailBundle\Mailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Unsubscribe implements ProcessorInterface
 {
     /**
-     * @var \Swift_Transport
+     * @var TransportInterface
      */
     private $transport;
 
@@ -48,7 +49,7 @@ class Unsubscribe implements ProcessorInterface
      * Bounce constructor.
      */
     public function __construct(
-        \Swift_Transport $transport,
+        TransportInterface $transport,
         ContactFinder $contactFinder,
         TranslatorInterface $translator,
         LoggerInterface $logger,
