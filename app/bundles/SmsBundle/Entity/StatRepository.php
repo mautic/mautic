@@ -53,7 +53,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -95,7 +95,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -175,7 +175,7 @@ class StatRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'sms_message_stats')
             ->set('sms_id', (int) $toLeadId)
             ->where('sms_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**

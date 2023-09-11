@@ -53,7 +53,7 @@ trait CustomFieldRepositoryTrait
             }
 
             // get a total count
-            $result = $dq->execute()->fetchAllAssociative();
+            $result = $dq->executeQuery()->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
@@ -73,7 +73,7 @@ trait CustomFieldRepositoryTrait
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 
-            $results = $dq->execute()->fetchAllAssociative();
+            $results = $dq->executeQuery()->fetchAllAssociative();
             if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
                 unset($args['select']); // Our purpose of getting list of ids has already accomplished. We no longer need this.
             }
@@ -190,7 +190,7 @@ trait CustomFieldRepositoryTrait
         }
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
-        $values = $q->execute()->fetchAssociative();
+        $values = $q->executeQuery()->fetchAssociative();
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }
@@ -232,7 +232,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**

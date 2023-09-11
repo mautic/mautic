@@ -17,7 +17,7 @@ class LeadCategoryRepository extends CommonRepository
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')
             ->where('lc.lead_id = :lead')->setParameter('lead', $lead->getId());
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $categories = [];
         foreach ($results as $category) {
