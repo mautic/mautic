@@ -159,9 +159,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->any())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -192,9 +195,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->any())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,

@@ -286,6 +286,9 @@ class ReportSubscriber implements EventSubscriberInterface
             // Ratios are not applicable for individual stats
             unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
 
+            // Click through value are not applicable for individual stats
+            unset($columns['click_through_count'], $columns['click_through_rate'], $columns['click_to_open_rate']);
+
             // Email counts are not applicable for individual stats
             unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
 
@@ -458,17 +461,6 @@ class ReportSubscriber implements EventSubscriberInterface
                         self::CLICK_PREFIX,
                         'es.email_id = cut.channel_id AND es.lead_id = cut.lead_id'
                     );
-                }
-
-                if ($useClickThroughColumns) {
-                    $qbct->select(
-                        'COUNT(DISTINCT ph.lead_id) AS click_through_count',
-                        'cut.channel_id',
-                    )
-                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
-                        ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
-                        ->groupBy('cut.channel_id');
-                    $qb->leftJoin(self::EMAIL_STATS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'es.email_id = ct.channel_id');
                 }
 
                 $event->addCampaignByChannelJoin(
