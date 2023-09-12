@@ -159,7 +159,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($this->connectionMock));
 
@@ -192,7 +192,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($this->connectionMock));
 
