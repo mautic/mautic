@@ -801,29 +801,6 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    // private function joinClickTroughForEmails(QueryBuilder $qb): void
-    // {
-    //    $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
-    //    $phTable = MAUTIC_TABLE_PREFIX.'page_hits';
-    //
-    //    if (!$this->isJoined($qb, $trTable, self::EMAILS_PREFIX, self::TRACKABLE_PREFIX)) {
-    //        $qb->leftJoin(
-    //            self::EMAILS_PREFIX,
-    //            $trTable,
-    //            self::TRACKABLE_PREFIX,
-    //            'e.id = tr.channel_id AND tr.channel = \'email\''
-    //        );
-    //    }
-    //    if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
-    //        $qb->leftJoin(
-    //            self::TRACKABLE_PREFIX,
-    //            $prTable,
-    //            self::REDIRECT_PREFIX,
-    //            'tr.redirect_id = pr.id'
-    //        );
-    //    }
-    // }
-
     private function isJoined($query, $table, $fromAlias, $alias)
     {
         $joins = $query->getQueryParts()['join'];
