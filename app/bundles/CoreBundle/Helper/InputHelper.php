@@ -544,11 +544,9 @@ class InputHelper
      * Clean input evil attributes to prevent XSS
      * Remove any attribute starting with "on" or xmlns or javascript:.
      *
-     * @param string $value
-     *
      * @return string
      */
-    public static function cleanInputAttributes(string $value)
+    public static function cleanInputAttributes(?string $value)
     {
         $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
         // Remove any attribute starting with "on" or javascript used in href, src, value, data, etc.
