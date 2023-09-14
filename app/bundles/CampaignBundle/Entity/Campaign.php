@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
+    public const PRIORITY_NORMAL = 2;
+    public const PRIORITY_HIGH   = 1;
+
     /**
      * @var int
      */
@@ -76,6 +79,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      * @var int
      */
     private $allowRestart = 0;
+
+    private int $priority = self::PRIORITY_NORMAL;
 
     public function __construct()
     {
@@ -142,6 +147,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+
+        $builder->addNamedField('priority', 'integer', 'priority');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -601,6 +608,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->isChanged('allowRestart', $allowRestart);
 
         $this->allowRestart = (int) $allowRestart;
+
+        return $this;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(int $priority): self
+    {
+        $this->isChanged('priority', $priority);
+        $this->priority = $priority;
 
         return $this;
     }

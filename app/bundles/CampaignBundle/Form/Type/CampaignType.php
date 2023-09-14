@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -11,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -68,6 +70,25 @@ class CampaignType extends AbstractType
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'campaign',
         ]);
+
+        $builder->add(
+            'priority',
+            ChoiceType::class,
+            [
+                'choices' => [
+                    'mautic.campaign.priority.normal' => Campaign::PRIORITY_NORMAL,
+                    'mautic.campaign.priority.high'   => Campaign::PRIORITY_HIGH,
+                ],
+                'label'    => 'mautic.campaign.priority',
+                'required' => false,
+                'attr'     => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.campaign.priority.tooltip',
+                ],
+                'data'        => !empty($options['data']) ? $options['data']->getPriority() : Campaign::PRIORITY_NORMAL,
+                'placeholder' => false,
+            ]
+        );
 
         $attr = [];
         if (!empty($options['data']) && $options['data']->getId()) {
