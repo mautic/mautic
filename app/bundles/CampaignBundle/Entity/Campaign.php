@@ -148,7 +148,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
 
-        $builder->addNamedField('priority', 'integer', 'priority');
+        $builder->addField('priority', 'integer', [
+            'default' => 2,
+        ]);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)

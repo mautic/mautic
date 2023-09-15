@@ -609,6 +609,30 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         self::assertEquals(50, $count);
     }
 
+    public function testCampaignExecuteOrderByPriority(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Campaign with high priority');
+        $campaign->setIsPublished(true);
+        $campaign->setPriority(Campaign::PRIORITY_HIGH);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger');
+        $commandTester->assertCommandIsSuccessful();
+        $lines = preg_split('/\r\n|\r|\n/', $commandTester->getDisplay());
+
+        $campaignStartLines = [];
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'Triggering events for campaign')) {
+                $campaignStartLines[] = $line;
+            }
+        }
+
+        // check if the first processed campaign is the campaign with high priority
+        $this->assertEquals("Triggering events for campaign {$campaign->getId()}", $campaignStartLines[0]);
+    }
+
     /**
      * @return array
      */
