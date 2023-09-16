@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
@@ -92,6 +93,10 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                    new Url([
+                        'message'          => 'mautic.core.valid_url_with_protocol_required',
+                        'relativeProtocol' => false,
+                    ]),
                 ],
             ]
         );
