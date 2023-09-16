@@ -19,13 +19,13 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
@@ -79,7 +79,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'site_url',
-            TextType::class,
+            UrlType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -87,16 +87,13 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.site.url.tooltip',
                 ],
+                'default_protocol' => 'https',
                 'constraints' => [
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
-                    new Url([
-                        'message'          => 'mautic.core.valid_url_with_protocol_required',
-                        'relativeProtocol' => false,
-                    ]),
                 ],
             ]
         );
