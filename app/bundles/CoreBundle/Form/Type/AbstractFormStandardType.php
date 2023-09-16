@@ -111,8 +111,15 @@ abstract class AbstractFormStandardType extends AbstractType
             );
 
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
-                $builder->add('publishUp', PublishUpDateType::class, ['attr' => ['readonly' => $readonly]]);
-                $builder->add('publishDown', PublishDownDateType::class, ['attr' => ['readonly' => $readonly]]);
+                $builder_options = [
+                  'attr' => [
+                      'class'       => 'form-control',
+                      'data-toggle' => 'datetime',
+                      'readonly'    => $readonly,
+                    ],
+                ];
+                $builder->add('publishUp', PublishUpDateType::class, $builder_options);
+                $builder->add('publishDown', PublishDownDateType::class, $builder_options);
             }
         }
 
