@@ -96,7 +96,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'event'      => $eventTypeKey,
                         'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => [
-                            'label' => $form->getName(),
+                            'label' => $form->getBlockPrefix(),
                             'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()]),
                         ],
                         'eventType' => $eventTypeName,

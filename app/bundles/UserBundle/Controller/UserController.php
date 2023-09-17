@@ -167,7 +167,7 @@ class UserController extends FormController
                     }
 
                     $this->addFlashMessage('mautic.core.notice.created', [
-                        '%name%'      => $user->getName(),
+                        '%name%'      => $user->getBlockPrefix(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
                             'objectAction' => 'edit',

@@ -342,7 +342,7 @@ class FormController extends CommonFormController
 
                         try {
                             // Set alias to prevent SQL errors
-                            $alias = $model->cleanAlias($entity->getName(), '', 10);
+                            $alias = $model->cleanAlias($entity->getBlockPrefix(), '', 10);
                             $entity->setAlias($alias);
 
                             // Set timestamps
@@ -961,7 +961,7 @@ class FormController extends CommonFormController
         $viewParams = [
             'content'     => $html,
             'stylesheets' => [],
-            'name'        => $form->getName(),
+            'name'        => $form->getBlockPrefix(),
             'metaRobots'  => '<meta name="robots" content="index">',
         ];
 
@@ -987,7 +987,7 @@ class FormController extends CommonFormController
         if (!empty($template)) {
             $logicalName     = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
 
-            $slotsHelper->set('pageTitle', $form->getName());
+            $slotsHelper->set('pageTitle', $form->getBlockPrefix());
 
             $analytics = $analyticsHelper->getCode();
 
@@ -1051,7 +1051,7 @@ class FormController extends CommonFormController
 
             $model->deleteEntity($entity);
 
-            $identifier = $this->translator->trans($entity->getName());
+            $identifier = $this->translator->trans($entity->getBlockPrefix());
             $flashes[]  = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',

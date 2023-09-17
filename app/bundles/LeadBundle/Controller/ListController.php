@@ -523,7 +523,7 @@ class ListController extends FormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => [
-                    '%name%' => $list->getName(),
+                    '%name%' => $list->getBlockPrefix(),
                     '%id%'   => $objectId,
                 ],
             ];

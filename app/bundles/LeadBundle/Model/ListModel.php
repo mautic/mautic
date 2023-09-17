@@ -1257,7 +1257,7 @@ class ListModel extends FormModel
         $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
 
         foreach ($idsNotToBeDeleted as $val) {
-            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getName();
+            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getBlockPrefix();
         }
 
         return $namesNotToBeDeleted;

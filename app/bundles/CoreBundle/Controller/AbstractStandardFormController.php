@@ -306,7 +306,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
             $model->deleteEntity($entity);
 
-            $identifier = $this->translator->trans($entity->getName());
+            $identifier = $this->translator->trans($entity->getBlockPrefix());
             $flashes[]  = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
