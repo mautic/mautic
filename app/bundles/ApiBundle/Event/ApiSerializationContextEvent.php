@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ApiSerializationContextEvent extends CommonEvent
 {
-    /**
-     * @varContext
-     *   The serialization context.
-     */
     protected Context $context;
 
     private Request $request;
