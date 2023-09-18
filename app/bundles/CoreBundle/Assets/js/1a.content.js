@@ -209,7 +209,7 @@ Mautic.generatePageTitle = function(route){
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
+        mQuery('title').html( mQuery('.page-header h3').text() + ' | Mautic' );
     }
 };
 
