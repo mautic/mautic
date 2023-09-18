@@ -24,7 +24,7 @@ class ApiSerializationContextEvent extends CommonEvent
     }
 
     /**
-     * @param Context
+     * Sets the context.
      */
     public function setContext(Context $context): void
     {
