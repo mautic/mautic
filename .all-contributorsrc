@@ -1107,6 +1107,15 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "mallezie",
+      "name": "Tim Mallezie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1926222?v=4",
+      "profile": "https://github.com/mallezie",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

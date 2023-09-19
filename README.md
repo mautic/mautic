@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-117-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-118-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -226,6 +226,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tirtharajghosh"><img src="https://avatars.githubusercontent.com/u/58604532?v=4?s=100" width="100px;" alt="Tirtharaj Ghosh"/><br /><sub><b>Tirtharaj Ghosh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=tirtharajghosh" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.rubnogueira.com"><img src="https://avatars.githubusercontent.com/u/40404708?v=4?s=100" width="100px;" alt="Ruben Nogueira"/><br /><sub><b>Ruben Nogueira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rubnogueira" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://exsesx.dev/"><img src="https://avatars.githubusercontent.com/u/20399517?v=4?s=100" width="100px;" alt="Oleh Vanin"/><br /><sub><b>Oleh Vanin</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aexsesx" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mallezie"><img src="https://avatars.githubusercontent.com/u/1926222?v=4?s=100" width="100px;" alt="Tim Mallezie"/><br /><sub><b>Tim Mallezie</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=mallezie" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
