@@ -562,4 +562,59 @@ class EventController extends CommonFormController
 
         return new JsonResponse($dataArray);
     }
+
+    public function cloneAction(Request $request, $objectId)
+    {
+        $campaignId     = $request->query->get('campaignId');
+        $session        = $request->getSession();
+        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
+        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
+
+        // ajax only for form fields
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(
+                [
+                    'campaign:campaigns:edit',
+                    'campaign:campaigns:create',
+                ],
+                'MATCH_ONE'
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+
+        if ('POST' == $request->getMethod() && null !== $event) {
+            // $events            = $this->eventCollector->getEventsArray();
+            // $event['settings'] = $events[$event['eventType']][$event['type']];
+            // form is valid so process the data
+            $keyId          = 'new'.hash('sha1', uniqid(mt_rand()));
+            $event['id']    = $event['tempId']    = $keyId;
+            $session->set('mautic.campaign.events.clipboard', $event);
+
+            $dataArray = [
+                'mauticContent' => 'campaignEvent',
+                'route'         => false,
+                'eventId'       => $objectId,
+                'event'         => $event,
+            ];
+        } else {
+            $dataArray = ['success' => 0];
+        }
+
+        return new JsonResponse($dataArray);
+    }
+
+    public function pasteAction(Request $request, $objectId)
+    {
+        $campaignId     = $request->query->get('campaignId');
+        $session        = $request->getSession();
+        $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
+        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
+
+        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+
+        return new JsonResponse([0]);
+    }
 }
