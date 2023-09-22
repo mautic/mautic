@@ -1648,6 +1648,7 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 var el = (mQuery(event.target).hasClass('jtk-endpoint')) ? event.target : mQuery(event.target).parents('.jtk-endpoint')[0];
                 Mautic.campaignBuilderAnchorClickedPosition = Mautic.campaignBuilderGetEventPosition(el);
                 Mautic.campaignBuilderUpdateEventList(allowedEvents, false, 'groups');
+                Mautic.campaignBuilderUpdatePasteParameters(allowedEvents, epDetails.eventType, epDetails.anchorName);
             }
 
             // Disable the list items not allowed
@@ -1772,6 +1773,12 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
             }, 10);
         }
     }
+};
+
+Mautic.campaignBuilderUpdatePasteParameters = function (groups, eventType, anchorName) {
+    var $pasteButton = mQuery('#event-paste-button');
+    var updatedUrl = $pasteButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
+    $pasteButton.attr('href', updatedUrl);
 };
 
 /**

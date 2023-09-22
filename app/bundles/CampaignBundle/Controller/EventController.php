@@ -568,7 +568,6 @@ class EventController extends CommonFormController
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
 
         // ajax only for form fields
         if (!$request->isXmlHttpRequest()
@@ -594,6 +593,7 @@ class EventController extends CommonFormController
             $session->set('mautic.campaign.events.clipboard', $event);
 
             $dataArray = [
+                'success'       => 1,
                 'mauticContent' => 'campaignEvent',
                 'route'         => false,
                 'eventId'       => $objectId,
@@ -606,15 +606,83 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    public function pasteAction(Request $request, $objectId)
+    public function pasteAction(Request $request)
     {
         $campaignId     = $request->query->get('campaignId');
+        $anchor         = $request->query->get('anchor');
         $session        = $request->getSession();
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $deletedEvents  = $session->get('mautic.campaign.'.$campaignId.'.events.deleted', []);
+        $event          = $session->get('mautic.campaign.events.clipboard');
+        $keyId          = 'new'.hash('sha1', uniqid(mt_rand()));
+        $event['id']    = $event['tempId'] = $keyId;
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $modifiedEvents[$keyId] = $event;
+        $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
 
-        return new JsonResponse([0]);
+        $type                          = $event['type'];
+        $eventType                     = $event['eventType'];
+        $anchorName                    = $event['anchor'] ?? null;
+        $viewParams                    = ['type' => $type];
+        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
+        $passthroughVars               = [
+            'mauticContent' => 'campaignEvent',
+            'success'       => 1,
+            'route'         => false,
+        ];
+
+        // prevent undefined errors
+        $entity = new Event();
+        $blank  = $entity->convertToArray();
+        $event  = array_merge($blank, $event);
+
+        $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
+            : $event['settings']['template'];
+
+        $passthroughVars['event']     = $event;
+        $passthroughVars['eventId']   = $keyId;
+        $passthroughVars['eventHtml'] = $this->renderView(
+            $template,
+            [
+                'event'      => $event,
+                'id'         => $keyId,
+                'campaignId' => $campaignId,
+            ]
+        );
+        $passthroughVars['eventType'] = $eventType;
+
+        $translator = $this->translator;
+        if ('interval' == $event['triggerMode']) {
+            $label = 'mautic.campaign.connection.trigger.interval.label';
+            if ('no' == $anchorName) {
+                $label .= '_inaction';
+            }
+            $passthroughVars['label'] = $translator->trans(
+                $label,
+                [
+                    '%number%' => $event['triggerInterval'],
+                    '%unit%'   => $translator->trans(
+                        'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
+                        ['%count%' => $event['triggerInterval']]
+                    ),
+                ]
+            );
+        } elseif ('date' == $event['triggerMode']) {
+            /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
+            $dh    = $this->factory->getHelper('twig.date');
+            $label = 'mautic.campaign.connection.trigger.date.label';
+            if ('no' == $anchorName) {
+                $label .= '_inaction';
+            }
+            $passthroughVars['label'] = $translator->trans(
+                $label,
+                [
+                    '%full%' => $dh->toFull($event['triggerDate']),
+                    '%time%' => $dh->toTime($event['triggerDate']),
+                    '%date%' => $dh->toShort($event['triggerDate']),
+                ]
+            );
+        }
+
+        return new JsonResponse($passthroughVars);
     }
 }

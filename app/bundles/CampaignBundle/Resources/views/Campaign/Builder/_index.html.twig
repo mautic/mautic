@@ -3,6 +3,7 @@
     - event
     - campaignId
 #}
+{% set route = route|default('mautic_campaignevent_action') %}
 <div class="hide" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
@@ -67,11 +68,18 @@
                     </div>
                     <div class="panel-body">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-default btn-nospin text-danger" data-type="Condition">
+                        <button class="btn btn-lg btn-default btn-nospin" data-type="Condition">
                             {{ 'mautic.core.select'|trans }}
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mr-0 ml-0 pl-xs pr-xs campaign-group-container col-md-12" id="CampaignPasteContainer">
+                <a id="event-paste-button" data-toggle="ajax" data-target="CampaignEvent_" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'paste', 'campaignId': campaignId, 'anchor': 'none', 'anchorEventType': 'none'}) }}"  class="btn btn-lg btn-default">
+                    <i class="fa fa-copy"></i> {{ 'Paste'|trans }}
+                </a>
             </div>
         </div>
     </div>
