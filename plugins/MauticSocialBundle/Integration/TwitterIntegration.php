@@ -10,12 +10,14 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
  */
 class TwitterIntegration extends SocialIntegration
 {
+    public const NAME = 'Twitter';
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'Twitter';
+        return self::NAME;
     }
 
     /**

@@ -255,7 +255,7 @@
                         {{ 'mautic.lead.lead.tab.notes'|trans }}
                     </a>
                 </li>
-                {% if not isAnonymous %}
+                {% if not isAnonymous and socialProfiles is not empty %}
                     <li class="">
                         <a href="#social-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="SocialCount">
@@ -311,7 +311,7 @@
             <!--/ #notes-container -->
 
             <!-- #social-container -->
-            {% if not isAnonymous %}
+            {% if not isAnonymous and socialProfiles is not empty %}
                 <div class="tab-pane fade bdr-w-0" id="social-container">
                     {{ include('@MauticLead/Social/index.html.twig', {
                         'lead': lead,
