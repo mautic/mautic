@@ -18,7 +18,7 @@ final class Config implements ConfigInterface
     public function isPublished(): bool
     {
         $integration = $this->integrationsHelper->getIntegrationObject(TwitterIntegration::NAME);
+
         return $integration && $integration->getIntegrationSettings()->getIsPublished();
     }
-
 }

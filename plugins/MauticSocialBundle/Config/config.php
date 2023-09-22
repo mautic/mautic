@@ -48,13 +48,13 @@ return [
     'services' => [
         'events' => [
             'mautic.social.formbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.social.integration.config',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.social.integration.config',
                 ],
@@ -239,7 +239,7 @@ return [
                 ],
             ],
             'mautic.social.integration.config' => [
-                'class' => \MauticPlugin\MauticSocialBundle\Integration\Config::class,
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\Config::class,
                 'arguments' => [
                     'mautic.helper.integration',
                 ],

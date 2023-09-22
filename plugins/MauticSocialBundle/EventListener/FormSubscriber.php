@@ -10,7 +10,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-
     private Config $config;
 
     public function __construct(
@@ -18,6 +17,7 @@ class FormSubscriber implements EventSubscriberInterface
     ) {
         $this->config = $config;
     }
+
     /**
      * {@inheritdoc}
      */

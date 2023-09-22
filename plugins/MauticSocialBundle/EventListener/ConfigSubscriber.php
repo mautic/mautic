@@ -11,7 +11,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-
     private Config $config;
 
     public function __construct(
