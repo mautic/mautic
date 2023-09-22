@@ -9,6 +9,7 @@ use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
@@ -1272,6 +1273,13 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     protected function setSerializationContext($view)
     {
         $context = $view->getContext();
+
+        if ($this->dispatcher->hasListeners(ApiEvents::API_PRE_SERIALIZATION_CONTEXT)) {
+            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->request);
+            $this->dispatcher->dispatch(ApiEvents::API_PRE_SERIALIZATION_CONTEXT, $apiSerializationContextEvent);
+            $context = $apiSerializationContextEvent->getContext();
+        }
+
         if (!empty($this->serializerGroups)) {
             $context->setGroups($this->serializerGroups);
         }
@@ -1296,6 +1304,12 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
         // Include null values if a custom select has not been given
         if (!$this->customSelectRequested) {
             $context->setSerializeNull(true);
+        }
+
+        if ($this->dispatcher->hasListeners(ApiEvents::API_POST_SERIALIZATION_CONTEXT)) {
+            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->request);
+            $this->dispatcher->dispatch(ApiEvents::API_POST_SERIALIZATION_CONTEXT, $apiSerializationContextEvent);
+            $context = $apiSerializationContextEvent->getContext();
         }
 
         $view->setContext($context);
