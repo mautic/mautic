@@ -774,13 +774,4 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         return $this->guest;
     }
-
-    public function getUserStatus()
-    {
-        if (1 == $this->isPublished()) {
-            return 'published';
-        } else {
-            return 'unpublished';
-        }
-    }
 }
