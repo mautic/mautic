@@ -245,7 +245,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [facebook]: <https://www.facebook.com/MauticCommunity/>
 [slack]: <https://www.mautic.org/community/get-involved/communication-channels>
 [contributing]: <https://contribute.mautic.org/contributing-to-mautic>
-[contributing-md]: <https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md>
+[contributing-md]: <https://github.com/mautic/mautic/blob/5.x/.github/CONTRIBUTING.md>
 [contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
