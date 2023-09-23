@@ -1116,6 +1116,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "staabm",
+      "name": "Markus Staab",
+      "avatar_url": "https://avatars.githubusercontent.com/u/120441?v=4",
+      "profile": "https://staabm.github.io/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
