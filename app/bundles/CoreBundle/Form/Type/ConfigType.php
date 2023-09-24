@@ -88,7 +88,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.site.url.tooltip',
                 ],
                 'default_protocol' => 'https',
-                'constraints' => [
+                'constraints'      => [
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',
