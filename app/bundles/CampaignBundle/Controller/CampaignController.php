@@ -308,21 +308,22 @@ class CampaignController extends AbstractStandardFormController
         $session->set('mautic.campaign.page', $page);
 
         $viewParameters = [
-            'permissionBase'  => $this->getPermissionBase(),
-            'mauticContent'   => $this->getJsLoadMethodPrefix(),
-            'sessionVar'      => $this->getSessionBase(),
-            'actionRoute'     => $this->getActionRoute(),
-            'indexRoute'      => $this->getIndexRoute(),
-            'tablePrefix'     => $model->getRepository()->getTableAlias(),
-            'modelName'       => $this->getModelName(),
-            'translationBase' => $this->getTranslationBase(),
-            'searchValue'     => $search,
-            'items'           => $items,
-            'totalItems'      => $count,
-            'page'            => $page,
-            'limit'           => $limit,
-            'permissions'     => $permissions,
-            'tmpl'            => $request->get('tmpl', 'index'),
+            'permissionBase'    => $this->getPermissionBase(),
+            'mauticContent'     => $this->getJsLoadMethodPrefix(),
+            'sessionVar'        => $this->getSessionBase(),
+            'actionRoute'       => $this->getActionRoute(),
+            'indexRoute'        => $this->getIndexRoute(),
+            'tablePrefix'       => $model->getRepository()->getTableAlias(),
+            'modelName'         => $this->getModelName(),
+            'translationBase'   => $this->getTranslationBase(),
+            'searchValue'       => $search,
+            'items'             => $items,
+            'totalItems'        => $count,
+            'page'              => $page,
+            'limit'             => $limit,
+            'permissions'       => $permissions,
+            'tmpl'              => $request->get('tmpl', 'index'),
+            'highPriorityValue' => Campaign::PRIORITY_HIGH,
         ];
 
         return $this->delegateView(

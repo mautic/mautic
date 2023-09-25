@@ -83,7 +83,7 @@ class CampaignType extends AbstractType
                 'required' => false,
                 'attr'     => [
                     'class'        => 'form-control',
-                    'tooltip'      => 'mautic.campaign.priority.tooltip',
+                    'tooltip'      => 'mautic.campaign.priority.input.tooltip',
                 ],
                 'data'        => !empty($options['data']) ? $options['data']->getPriority() : Campaign::PRIORITY_NORMAL,
                 'placeholder' => false,

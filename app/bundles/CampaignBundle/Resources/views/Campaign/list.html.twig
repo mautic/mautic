@@ -129,6 +129,12 @@
                                 {{- item.name -}}
                                 {{- customContent('campaign.name', mauticTemplateVars) -}}
                             </a>
+                            {% if item.priority == highPriorityValue %}
+                                <label class="control-label" data-toggle="tooltip"
+                                       data-container="body" data-placement="top" title=""
+                                       data-original-title="{{ 'mautic.campaign.priority.list.tooltip'|trans }}">
+                                    <i class="fa text-danger fa-angle-double-up"></i></label>
+                            {% endif %}
                         </div>
                         {%- if item.description -%}
                             <div class="text-muted mt-4"><small>{{ item.description|purify }}</small></div>
