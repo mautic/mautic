@@ -46,6 +46,7 @@ class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($integration);
         $this->em->flush();
         $this->em->clear();
+
         return $integration;
     }
 }
