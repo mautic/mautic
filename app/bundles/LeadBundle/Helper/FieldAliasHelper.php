@@ -30,7 +30,7 @@ class FieldAliasHelper
         }
 
         // set alias as name if alias is empty
-        $alias = $field->getAlias() ?: $field->getName();
+        $alias = $field->getAlias() ?: $field->getName() ?: '';
 
         // clean the alias
         $alias = $this->fieldModel->cleanAlias($alias, 'f_', 25);
