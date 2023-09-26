@@ -1125,6 +1125,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "code5rick",
+      "name": "code5rick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/131262825?v=4",
+      "profile": "https://github.com/code5rick",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
