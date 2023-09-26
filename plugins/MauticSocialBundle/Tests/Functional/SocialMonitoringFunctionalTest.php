@@ -23,16 +23,17 @@ class SocialMonitoringFunctionalTest extends MauticMysqlTestCase
 
     public function testShowSocialMonitoring(): void
     {
-        //https://github.com/acquia/mc-cs/blob/staging/app/bundles/FormBundle/Model/FormModel.php#L713
-        //https://github.com/acquia/mc-cs/blob/staging/app/bundles/CoreBundle/Menu/MenuBuilder.php#L104
-        $this->markTestSkipped('Menus and Form fields variable are not reinitializing as they are static so not able to test it after enabling twitter.');
         $this->createIntegration();
         $crawler = $this->client->request('GET', '/s/config/edit');
         Assert::assertStringContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
-        Assert::assertStringContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
 
-        $crawler = $this->client->request('GET', '/s/forms/new');
-        Assert::assertStringContainsString('Social login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
+        //https://github.com/acquia/mc-cs/blob/staging/app/bundles/FormBundle/Model/FormModel.php#L713
+        //https://github.com/acquia/mc-cs/blob/staging/app/bundles/CoreBundle/Menu/MenuBuilder.php#L104
+        $this->markTestSkipped('Menus and Form fields variable are not reinitializing as they are static so not able to test it after enabling twitter.');
+
+        //Assert::assertStringContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
+        //$crawler = $this->client->request('GET', '/s/forms/new');
+        //Assert::assertStringContainsString('Social login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
     }
 
     private function createIntegration(): Integration
