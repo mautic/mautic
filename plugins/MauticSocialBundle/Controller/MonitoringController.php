@@ -170,7 +170,7 @@ class MonitoringController extends FormController
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $ipLookupHelper, $entity->getId());
+                        return $this->editAction($request, $ipLookupHelper, $entity->getId(), true);
                     }
 
                     $viewParameters = [
@@ -223,7 +223,7 @@ class MonitoringController extends FormController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
+    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false)
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
             return $this->accessDenied();
@@ -293,7 +293,7 @@ class MonitoringController extends FormController
         );
 
         // /Check for a submitted form and process it
-        if ('POST' === $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
