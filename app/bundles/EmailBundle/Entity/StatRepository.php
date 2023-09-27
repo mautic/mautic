@@ -759,7 +759,7 @@ class StatRepository extends CommonRepository
      *
      * @throws Exception
      */
-    public function getEmailDayStats(Lead $lead): array
+    public function getEmailDayStats(Lead $lead, string $timezoneOffset): array
     {
         $queryBuilder        = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryDaysBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -791,7 +791,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY(date_hit) AS hit_day',
+                        'WEEKDAY('."CONVERT_TZ(date_hit, '+00:00', '$timezoneOffset')".') AS hit_day',
                         'count(id) AS hit_count'
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
@@ -815,7 +815,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY(date_sent) AS sent_day',
+                        'WEEKDAY('."CONVERT_TZ(date_sent, '+00:00', '$timezoneOffset')".') AS sent_day',
                         'count(id) AS sent_count',
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -833,7 +833,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY(date_read) AS read_day',
+                        'WEEKDAY('."CONVERT_TZ(date_read, '+00:00', '$timezoneOffset')".') AS read_day',
                         'count(id) AS read_count',
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -858,7 +858,7 @@ class StatRepository extends CommonRepository
      *
      * @throws Exception
      */
-    public function getEmailTimeStats(Lead $lead): array
+    public function getEmailTimeStats(Lead $lead, string $timezoneOffset): array
     {
         $queryBuilder         = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryHoursBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -890,7 +890,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT(date_hit, '$format') AS hit_hour",
+                        "TIME_FORMAT(CONVERT_TZ(date_hit, '+00:00', '$timezoneOffset'), '$format') AS hit_hour",
                         'count(id) AS hit_count'
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
@@ -915,7 +915,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT($statsAlias.date_sent, '$format') as sent_hour",
+                        "TIME_FORMAT(CONVERT_TZ(date_sent, '+00:00', '$timezoneOffset'), '$format') AS sent_hour",
                         "COUNT($statsAlias.id) AS sent_count"
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -934,7 +934,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT($statsAlias.date_read, '$format') as read_hour",
+                        "TIME_FORMAT(CONVERT_TZ(date_read, '+00:00', '$timezoneOffset'), '$format') AS read_hour",
                         "COUNT($statsAlias.id) AS read_count"
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)

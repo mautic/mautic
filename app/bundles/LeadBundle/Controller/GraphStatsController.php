@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller;
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -80,10 +81,12 @@ class GraphStatsController extends CommonController
     public function getEmailDaysData(Lead $lead): array
     {
         /** @var EmailModel $model */
-        $model          = $this->getModel('email');
-        $statRepository = $model->getStatRepository();
+        $model                 = $this->getModel('email');
+        $statRepository        = $model->getStatRepository();
+        $dateTimeHelper        = new DateTimeHelper();
+        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset();
 
-        $stats       = $statRepository->getEmailDayStats($lead);
+        $stats       = $statRepository->getEmailDayStats($lead, $defaultTimezoneOffset);
 
         $chart  = new BarChart([
             $this->translator->trans('mautic.core.date.monday'),
@@ -110,10 +113,12 @@ class GraphStatsController extends CommonController
     public function getEmailHoursData(Lead $lead): array
     {
         /** @var EmailModel $model */
-        $model          = $this->getModel('email');
-        $statRepository = $model->getStatRepository();
+        $model                 = $this->getModel('email');
+        $statRepository        = $model->getStatRepository();
+        $dateTimeHelper        = new DateTimeHelper();
+        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset();
 
-        $stats = $statRepository->getEmailTimeStats($lead);
+        $stats = $statRepository->getEmailTimeStats($lead, $defaultTimezoneOffset);
 
         $hoursRange = range(0, 23, 1);
         $labels     = [];

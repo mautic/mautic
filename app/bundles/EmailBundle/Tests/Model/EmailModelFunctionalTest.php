@@ -257,7 +257,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
         $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
 
-        $results = $statRepository->getEmailDayStats($lead);
+        $results = $statRepository->getEmailDayStats($lead, '+00:00');
 
         $this->assertCount(7, $results);
         $this->assertSame(
@@ -302,7 +302,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emulateEmailStat($lead, $email, true, new \DateTime('2023-07-31 12:51'), new \DateTime('2023-08-01 14:20'));
         $this->emulateClick($lead, $email, $hits, $uniqueHits, new \DateTime('2023-08-03 17:05'));
 
-        $results = $statRepository->getEmailTimeStats($lead);
+        $results = $statRepository->getEmailTimeStats($lead, '+00:00');
 
         $this->assertCount(24, $results);
         $this->assertSame(
