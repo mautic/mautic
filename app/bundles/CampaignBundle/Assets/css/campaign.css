@@ -47,6 +47,46 @@
     height: 150px;
 }
 
+#CampaignPasteContainer {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+#CampaignPasteContainer::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #00B49C, #4E5D9D, #F86B4F);
+    border-radius: 3px 3px 0 0;
+}
+
+#CampaignPasteContainer .panel-body {
+    height: auto;
+}
+
+#CampaignPasteContainer .panel-body > div {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 296px;
+}
+
+#CampaignPasteContainer .panel-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 150px;
+    height: auto;
+    border-top: none;
+    border-left: 1px solid #ebedf0;
+}
+
 .jtk-endpoint {
     z-index: 1005;
 }
