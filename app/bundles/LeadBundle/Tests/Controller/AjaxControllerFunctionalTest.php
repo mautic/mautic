@@ -351,7 +351,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 

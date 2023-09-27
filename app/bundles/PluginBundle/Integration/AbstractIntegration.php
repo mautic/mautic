@@ -1653,8 +1653,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Takes profile data from an integration and maps it to Mautic's lead fields.
      *
-     * @param array $config
-     * @param null  $object
+     * @param array       $config
+     * @param string|null $object
      *
      * @return array
      */

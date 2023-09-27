@@ -70,7 +70,7 @@ class NotificationRepository extends CommonRepository
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {
-                $qb->execute();
+                $qb->executeStatement();
             }
         }
     }
@@ -155,7 +155,7 @@ class NotificationRepository extends CommonRepository
             ->setParameter('from', $from->format('Y-m-d H:i:s'))
             ->setMaxResults(1);
 
-        return (bool) $qb->execute()
+        return (bool) $qb->executeQuery()
             ->fetchOne();
     }
 }

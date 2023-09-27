@@ -1013,7 +1013,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     )
                 );
             } elseif ($valid && $this->isFormApplied($form)) {
-                return $this->editAction($entity->getId(), true);
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 

@@ -31,7 +31,7 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -110,7 +110,7 @@ class TrackableRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
