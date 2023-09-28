@@ -170,58 +170,7 @@ class EventController extends CommonFormController
         ];
 
         if (!empty($keyId)) {
-            // prevent undefined errors
-            $entity = new Event();
-            $blank  = $entity->convertToArray();
-            $event  = array_merge($blank, $event);
-
-            $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
-                : $event['settings']['template'];
-
-            $passthroughVars['event']     = $event;
-            $passthroughVars['eventId']   = $keyId;
-            $passthroughVars['eventHtml'] = $this->renderView(
-                $template,
-                [
-                    'event'      => $event,
-                    'id'         => $keyId,
-                    'campaignId' => $campaignId,
-                ]
-            );
-            $passthroughVars['eventType'] = $eventType;
-
-            $translator = $this->translator;
-            if ('interval' == $event['triggerMode']) {
-                $label = 'mautic.campaign.connection.trigger.interval.label';
-                if ('no' == $anchorName) {
-                    $label .= '_inaction';
-                }
-                $passthroughVars['label'] = $translator->trans(
-                    $label,
-                    [
-                        '%number%' => $event['triggerInterval'],
-                        '%unit%'   => $translator->trans(
-                            'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                            ['%count%' => $event['triggerInterval']]
-                        ),
-                    ]
-                );
-            } elseif ('date' == $event['triggerMode']) {
-                /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
-                $dh    = $this->factory->getHelper('twig.date');
-                $label = 'mautic.campaign.connection.trigger.date.label';
-                if ('no' == $anchorName) {
-                    $label .= '_inaction';
-                }
-                $passthroughVars['label'] = $translator->trans(
-                    $label,
-                    [
-                        '%full%' => $dh->toFull($event['triggerDate']),
-                        '%time%' => $dh->toTime($event['triggerDate']),
-                        '%date%' => $dh->toShort($event['triggerDate']),
-                    ]
-                );
-            }
+            $passthroughVars = array_merge($passthroughVars, $this->eventViewVars($event, $campaignId, 'new'));
         }
 
         if ($closeModal) {
@@ -375,60 +324,7 @@ class EventController extends CommonFormController
         }
 
         if (!$cancelled && $valid) {
-            // Prevent undefined errors
-            $event    = array_merge((new Event())->convertToArray(), $event);
-            $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
-
-            $passthroughVars = array_merge($passthroughVars, [
-                'event'      => $event,
-                'eventId'    => $objectId,
-                'eventType'  => $event['eventType'],
-                'updateHtml' => $this->renderView(
-                    $template,
-                    [
-                        'event'      => $event,
-                        'id'         => $objectId,
-                        'update'     => true,
-                        'campaignId' => $campaignId,
-                    ]
-                ),
-            ]);
-
-            if (Event::TRIGGER_MODE_INTERVAL === $event['triggerMode']) {
-                $label = 'mautic.campaign.connection.trigger.interval.label';
-
-                if (Event::PATH_INACTION === $event['anchor']) {
-                    $label .= '_inaction';
-                }
-
-                $passthroughVars['label'] = $this->translator->trans(
-                    $label,
-                    [
-                        '%number%' => $event['triggerInterval'],
-                        '%unit%'   => $this->translator->trans(
-                            'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
-                            ['%count%' => $event['triggerInterval']]
-                        ),
-                    ]
-                );
-            }
-
-            if (Event::TRIGGER_MODE_DATE === $event['triggerMode']) {
-                $label = 'mautic.campaign.connection.trigger.date.label';
-
-                if (Event::PATH_INACTION === $event['anchor']) {
-                    $label .= '_inaction';
-                }
-
-                $passthroughVars['label'] = $this->translator->trans(
-                    $label,
-                    [
-                        '%full%' => $this->dateHelper->toFull($event['triggerDate']),
-                        '%time%' => $this->dateHelper->toTime($event['triggerDate']),
-                        '%date%' => $this->dateHelper->toShort($event['triggerDate']),
-                    ]
-                );
-            }
+            $passthroughVars = array_merge($passthroughVars, $this->eventViewVars($event, $campaignId, 'edit'));
         }
 
         // Just close the modal
@@ -608,10 +504,9 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    public function pasteAction(Request $request)
+    public function insertAction(Request $request)
     {
         $campaignId     = $request->query->get('campaignId');
-        $anchor         = $request->query->get('anchor');
         $session        = $request->getSession();
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $event          = $session->get('mautic.campaign.events.clipboard');
@@ -621,70 +516,80 @@ class EventController extends CommonFormController
         $modifiedEvents[$keyId] = $event;
         $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
 
-        $type                          = $event['type'];
         $eventType                     = $event['eventType'];
-        $anchorName                    = $event['anchor'] ?? null;
-        $viewParams                    = ['type' => $type];
-        $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];
         $passthroughVars               = [
             'mauticContent' => 'campaignEvent',
             'success'       => 1,
             'route'         => false,
         ];
 
-        // prevent undefined errors
-        $entity = new Event();
-        $blank  = $entity->convertToArray();
-        $event  = array_merge($blank, $event);
+        $passthroughVars = array_merge($passthroughVars, $this->eventViewVars($event, $campaignId, 'insert'));
 
-        $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
-            : $event['settings']['template'];
+        return new JsonResponse($passthroughVars);
+    }
 
-        $passthroughVars['event']     = $event;
-        $passthroughVars['eventId']   = $keyId;
-        $passthroughVars['eventHtml'] = $this->renderView(
-            $template,
-            [
-                'event'      => $event,
-                'id'         => $keyId,
-                'campaignId' => $campaignId,
-            ]
-        );
-        $passthroughVars['eventType'] = $eventType;
+    /**
+     * @param array<string, mixed> $event
+     */
+    private function eventViewVars(
+        array $event,
+        string $campaignId,
+        string $action
+    ): array {
+        $passThroughVars = [];
+        $event           = array_merge((new Event())->convertToArray(), $event);
+        $template        = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
+        $templateVars    = [
+            'event'      => $event,
+            'id'         => $event['id'],
+            'campaignId' => $campaignId,
+        ];
+        if ('edit' === $action) {
+            $templateVars['update']        = true;
+            $passThroughVars['updateHtml'] = $this->renderView($template, $templateVars);
+        } else {
+            $passThroughVars['eventHtml'] = $this->renderView($template, $templateVars);
+        }
+        $passThroughVars['event']     = $event;
+        $passThroughVars['eventId']   = $event['id'];
+        $passThroughVars['eventType'] = $event['eventType'];
 
-        $translator = $this->translator;
-        if ('interval' == $event['triggerMode']) {
+        if (Event::TRIGGER_MODE_INTERVAL === $event['triggerMode']) {
             $label = 'mautic.campaign.connection.trigger.interval.label';
-            if ('no' == $anchorName) {
+
+            if (Event::PATH_INACTION === $event['anchor']) {
                 $label .= '_inaction';
             }
-            $passthroughVars['label'] = $translator->trans(
+
+            $passThroughVars['label'] = $this->translator->trans(
                 $label,
                 [
                     '%number%' => $event['triggerInterval'],
-                    '%unit%'   => $translator->trans(
+                    '%unit%'   => $this->translator->trans(
                         'mautic.campaign.event.intervalunit.'.$event['triggerIntervalUnit'],
                         ['%count%' => $event['triggerInterval']]
                     ),
                 ]
             );
-        } elseif ('date' == $event['triggerMode']) {
-            /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
-            $dh    = $this->factory->getHelper('twig.date');
+        }
+
+        if (Event::TRIGGER_MODE_DATE === $event['triggerMode']) {
             $label = 'mautic.campaign.connection.trigger.date.label';
-            if ('no' == $anchorName) {
+
+            if (Event::PATH_INACTION === $event['anchor']) {
                 $label .= '_inaction';
             }
-            $passthroughVars['label'] = $translator->trans(
+
+            $passThroughVars['label'] = $this->translator->trans(
                 $label,
                 [
-                    '%full%' => $dh->toFull($event['triggerDate']),
-                    '%time%' => $dh->toTime($event['triggerDate']),
-                    '%date%' => $dh->toShort($event['triggerDate']),
+                    '%full%' => $this->dateHelper->toFull($event['triggerDate']),
+                    '%time%' => $this->dateHelper->toTime($event['triggerDate']),
+                    '%date%' => $this->dateHelper->toShort($event['triggerDate']),
                 ]
             );
         }
 
-        return new JsonResponse($passthroughVars);
+        return $passThroughVars;
     }
 }
