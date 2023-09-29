@@ -35,7 +35,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testDeviceDetectorBotsDetectionTrue(): void
     {
-        $request = new Request();
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
 
         $this->deviceDetector
             ->method('isBot')
