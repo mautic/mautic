@@ -103,7 +103,6 @@ class LeadFieldRepository extends CommonRepository
         return $queryBuilder->getQuery()->execute();
     }
 
-
     /**
      * {@inheritdoc}
      */
