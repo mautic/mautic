@@ -62,6 +62,19 @@
         'primary'   : true,
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
+    {% set heatmapButton = {
+        'attr' : {
+            'class'       : 'btn btn-default btn-nospin',
+            'data-toggle' : 'email-heatmap',
+            'data-email'  : email.getId(),
+            'data-target' : '#MauticSharedModal',
+            'href'        : '#',
+            'data-header' : 'mautic.email.heatmap.click_heatmap'|trans,
+        },
+        'iconClass' : 'fa fa-fire',
+        'btnText'   : 'mautic.email.heatmap.click_heatmap'
+    } %}
+    {% set customButtons = customButtons|merge([heatmapButton]) %}
 {% endif %}
 
 

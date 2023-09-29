@@ -22,6 +22,7 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
@@ -259,7 +260,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('email', $emailId);
 
-        $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+        $type    = (isset($config['email_type'])) ? $config['email_type'] : MailHelper::EMAIL_TYPE_TRANSACTIONAL;
         $options = [
             'source'         => ['campaign.event', $event->getEvent()->getId()],
             'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
@@ -270,7 +271,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
-            'ignoreDNC'      => 'transactional' === $type,
+            'ignoreDNC'      => MailHelper::EMAIL_TYPE_TRANSACTIONAL === $type,
         ];
 
         // Determine if this email is transactional/marketing
@@ -303,7 +304,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $credentialArray[$logId] = $leadCredentials;
         }
 
-        if ('marketing' == $type) {
+        if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
             // Determine if this lead has received the email before and if so, don't send it again
             $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailId);
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "868aa2f25846a2f44aa6ef88303afc03",
+    "content-hash": "7a3a3b1211261cb0931e4b41b97dce4e",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "177f07256b56d5450f55abafc61186487298c0b1"
+                "reference": "c0442e4c4fe84f634585a739320446f18600f161"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5869,6 +5869,7 @@
                 "ramsey/uuid": "^4.7",
                 "simshaun/recurr": "^5.0",
                 "stack/builder": "^1.0",
+                "symfony/amqp-messenger": "~5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",
@@ -5890,7 +5891,7 @@
                 "symfony/intl": "~5.4.0",
                 "symfony/lock": "^5.1",
                 "symfony/mailer": "~5.4",
-                "symfony/messenger": "^5.4",
+                "symfony/messenger": "~5.4",
                 "symfony/mime": "~5.4",
                 "symfony/monolog-bridge": "~5.4.0",
                 "symfony/monolog-bundle": "~3.5.0",
@@ -15647,16 +15648,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.25",
+            "version": "1.10.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "578f4e70d117f9a90699324c555922800ac38d8c"
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/578f4e70d117f9a90699324c555922800ac38d8c",
-                "reference": "578f4e70d117f9a90699324c555922800ac38d8c",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
+                "reference": "2910afdd3fe33e5afd71c09f3fb0d0845b48c410",
                 "shasum": ""
             },
             "require": {
@@ -15705,7 +15706,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-07-06T12:11:37+00:00"
+            "time": "2023-08-22T13:48:25+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -15874,6 +15875,7 @@
                 "issues": "https://github.com/phpstan/phpstan-php-parser/issues",
                 "source": "https://github.com/phpstan/phpstan-php-parser/tree/1.1.0"
             },
+            "abandoned": true,
             "time": "2021-12-16T19:43:32+00:00"
         },
         {
@@ -16422,21 +16424,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.17.5",
+            "version": "0.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f4a5f45c420b797d8e8e9c540e14c8bbdddff62d"
+                "reference": "758ada29b5c80d933f906735d3026520390a2a1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f4a5f45c420b797d8e8e9c540e14c8bbdddff62d",
-                "reference": "f4a5f45c420b797d8e8e9c540e14c8bbdddff62d",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/758ada29b5c80d933f906735d3026520390a2a1d",
+                "reference": "758ada29b5c80d933f906735d3026520390a2a1d",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.20"
+                "phpstan/phpstan": "^1.10.26"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -16448,11 +16450,6 @@
                 "bin/rector"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "0.15-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -16471,7 +16468,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.17.5"
+                "source": "https://github.com/rectorphp/rector/tree/0.18.0"
             },
             "funding": [
                 {
@@ -16479,7 +16476,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-07-12T08:42:12+00:00"
+            "time": "2023-08-17T12:53:22+00:00"
         },
         {
             "name": "sebastian/cli-parser",

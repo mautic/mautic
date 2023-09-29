@@ -54,7 +54,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -70,7 +70,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -85,7 +85,7 @@ class PointsChangeLogRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_points_change_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\Messenger\Transport\TransportFactory;
 
 return function (ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -10,8 +11,9 @@ return function (ContainerConfigurator $configurator) {
         ->autowire()
         ->autoconfigure();
 
-    $services->load('Mautic\\MessengerBundle\\', '../')
-        ->exclude('../{Config,Tests}');
+    $services
+        ->load('Mautic\\MessengerBundle\\', '../')
+        ->exclude('../{Config,Tests,Message}');
 
-    $services->alias(\Symfony\Component\Messenger\Transport\TransportFactory::class, 'messenger.transport_factory');
+    $services->alias(TransportFactory::class, 'messenger.transport_factory');
 };

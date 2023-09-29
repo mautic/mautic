@@ -62,9 +62,18 @@ class ListController extends CommonController
             return $this->accessDenied();
         }
 
+        $this->setListFilters();
+
         $request = $this->getCurrentRequest();
         $search  = InputHelper::clean($request->get('search', ''));
-        $limit   = (int) $request->get('limit', 30);
+
+        $session = $request->getSession();
+        if (empty($page)) {
+            $page = $session->get('mautic.marketplace.package.page', 1);
+        }
+
+        // set limits
+        $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $route   = $this->routeProvider->buildListRoute($page);
 
         return $this->delegateView(
