@@ -78,6 +78,6 @@ if (file_exists($root.'/../local_config/config_override.php')) {
 }
 
 // Allow local settings without committing to git such as swift mailer delivery address overrides
-if (file_exists($root.'/../local_config/config_local.php')) {
-    $loader->import($root.'/../local_config/config_local.php');
+if (file_exists($root.'/../local_config/local.php')) {
+    $loader->import($root.'/../local_config/local.php');
 }
