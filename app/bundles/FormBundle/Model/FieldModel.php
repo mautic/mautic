@@ -2,14 +2,25 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -17,35 +28,34 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
     /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
 
-    public function __construct(LeadFieldModel $leadFieldModel)
+    public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {
         $this->leadFieldModel = $leadFieldModel;
+        $this->requestStack   = $requestStack;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    private function getSession(): SessionInterface
     {
-        $this->session = $session;
+        return $this->requestStack->getSession();
     }
 
     /**
-     * @param object|array<mixed>                 $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object|array<mixed> $entity
+     * @param string|null         $action
+     * @param array               $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if ($action) {
             $options['action'] = $action;
@@ -80,7 +90,7 @@ class FieldModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Field');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
     }
 
     public function getPermissionBase()
@@ -88,7 +98,7 @@ class FieldModel extends CommonFormModel
         return 'form:forms';
     }
 
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Field
     {
         if (null === $id) {
             return new Field();
@@ -100,29 +110,24 @@ class FieldModel extends CommonFormModel
     /**
      * Get the fields saved in session.
      *
-     * @param $formId
-     *
      * @return array
      */
     public function getSessionFields($formId)
     {
-        $fields = $this->session->get('mautic.form.'.$formId.'.fields.modified', []);
-        $remove = $this->session->get('mautic.form.'.$formId.'.fields.deleted', []);
+        $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
+        $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         return array_diff_key($fields, array_flip($remove));
     }
 
     /**
-     * @param $label
-     * @param $aliases
-     *
-     * @return string
+     * @param string[] $aliases
      */
-    public function generateAlias($label, &$aliases)
+    public function generateAlias(string $label, array &$aliases): string
     {
         $alias = $this->cleanAlias($label, 'f_', 25);
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $testAlias = $alias;
 
         $count    = (int) in_array($alias, $aliases);

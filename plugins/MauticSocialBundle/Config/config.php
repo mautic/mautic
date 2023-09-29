@@ -46,17 +46,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.social.model.monitoring' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\MonitoringModel',
-            ],
-            'mautic.social.model.postcount' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
-            ],
-            'mautic.social.model.tweet' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\TweetModel',
-            ],
-        ],
         'others' => [
             'mautic.social.helper.campaign' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper',
@@ -128,28 +117,6 @@ return [
             ],
             'mautic.integration.instagram' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.integration.linkedin' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\LinkedInIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

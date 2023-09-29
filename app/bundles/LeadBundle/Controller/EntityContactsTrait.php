@@ -4,13 +4,14 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 trait EntityContactsTrait
 {
     /**
      * @param string|int              $entityId
      * @param int                     $page
-     * @param string                  $permission
+     * @param string[]|string         $permission
      * @param string                  $sessionVar
      * @param string                  $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
      * @param string|null             $dncChannel         Channel for this entity to get do not contact records for
@@ -29,6 +30,8 @@ trait EntityContactsTrait
      * @return mixed
      */
     protected function generateContactsGrid(
+        Request $request,
+        PageHelperFactoryInterface $pageHelperFactory,
         $entityId,
         $page,
         $permission,
@@ -47,7 +50,7 @@ trait EntityContactsTrait
         \DateTimeInterface $dateFrom = null,
         \DateTimeInterface $dateTo = null
     ) {
-        if ($permission && !$this->get('mautic.security')->isGranted($permission)) {
+        if ($permission && !$this->security->isGranted($permission)) {
             return $this->accessDenied();
         }
 
@@ -58,25 +61,23 @@ trait EntityContactsTrait
         }
 
         // Apply filters
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' == $request->getMethod()) {
             $this->setListFilters($sessionVar.'.contact');
         }
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.'.$sessionVar.'.contact.filter', ''));
-        $this->get('session')->set('mautic.'.$sessionVar.'.contact.filter', $search);
+        $search = $request->get('search', $request->getSession()->get('mautic.'.$sessionVar.'.contact.filter', ''));
+        $request->getSession()->set('mautic.'.$sessionVar.'.contact.filter', $search);
 
-        /** @var PageHelperFactoryInterface $pageHelperFacotry */
-        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
-        $pageHelper        = $pageHelperFacotry->make("mautic.{$sessionVar}", $page);
+        $pageHelper = $pageHelperFactory->make("mautic.{$sessionVar}", $page);
 
         $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $orderBy ?: $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
-        $orderByDir = $orderByDir ?: $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
+        $orderBy    = $orderBy ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
+        $orderByDir = $orderByDir ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
 
-        //set limits
-        $limit = $this->get('session')->get(
+        // set limits
+        $limit = $request->getSession()->get(
             'mautic.'.$sessionVar.'.contact.limit',
-            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
+            $this->coreParametersHelper->get('default_pagelimit')
         );
 
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
@@ -118,7 +119,7 @@ trait EntityContactsTrait
         }
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = $pageHelper->countPage($count);
             $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));
@@ -141,7 +142,7 @@ trait EntityContactsTrait
         // Get DNC for the contact
         $dnc = [];
         if ($dncChannel && $count > 0) {
-            $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getChannelList(
+            $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getChannelList(
                 $dncChannel,
                 array_keys($contacts['results'])
             );

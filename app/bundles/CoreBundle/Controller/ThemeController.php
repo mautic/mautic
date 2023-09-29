@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -18,10 +19,10 @@ class ThemeController extends FormController
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted([
+        // set some permissions
+        $permissions = $this->security->isGranted([
             'core:themes:view',
             'core:themes:create',
             'core:themes:edit',
@@ -32,17 +33,12 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var ThemeHelperInterface $themeHelper */
-        $themeHelper = $this->container->get('mautic.helper.theme');
-        /** @var BuilderIntegrationsHelper $builderIntegrationsHelper */
-        $builderIntegrationsHelper    = $this->container->get('mautic.integrations.helper.builder_integrations');
+        $dir    = $this->factory->getSystemPath('themes', true);
+        $action = $this->generateUrl('mautic_themes_index');
+        $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
 
-        $dir         = $this->factory->getSystemPath('themes', true);
-        $action      = $this->generateUrl('mautic_themes_index');
-        $form        = $this->get('form.factory')->create(ThemeUploadType::class, [], ['action' => $action]);
-
-        if ('POST' == $this->request->getMethod()) {
-            if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
+        if ('POST' === $request->getMethod()) {
+            if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
 
@@ -63,7 +59,7 @@ class ThemeController extends FormController
                                 try {
                                     $fileData->move($dir, $fileName);
                                     $themeHelper->install($dir.'/'.$fileName);
-                                    $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                                    $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
                                 } catch (\Exception $e) {
                                     $form->addError(
                                         new FormError(
@@ -97,7 +93,7 @@ class ThemeController extends FormController
                 'defaultThemes' => $themeHelper->getDefaultThemes(),
                 'form'          => $form->createView(),
                 'permissions'   => $permissions,
-                'security'      => $this->get('mautic.security'),
+                'security'      => $this->security,
             ],
             'contentTemplate' => '@MauticCore/Theme/list.html.twig',
             'passthroughVars' => [
@@ -115,14 +111,12 @@ class ThemeController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction($themeName)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, $themeName)
     {
-        /** @var ThemeHelperInterface $themeHelper */
-        $themeHelper = $this->container->get('mautic.helper.theme');
-        $flashes     = [];
-        $error       = false;
+        $flashes = [];
+        $error   = false;
 
-        if (!$this->get('mautic.security')->isGranted('core:themes:view')) {
+        if (!$this->security->isGranted('core:themes:view')) {
             return $this->accessDenied();
         }
 
@@ -165,7 +159,7 @@ class ThemeController extends FormController
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Length', (string) filesize($zipPath));
 
-        $stream = $this->request->get('stream', 0);
+        $stream = $request->get('stream', 0);
 
         if (!$stream) {
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$themeName.'.zip"');
@@ -181,14 +175,14 @@ class ThemeController extends FormController
      *
      * @param string $themeName
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function deleteAction($themeName)
+    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, $themeName)
     {
         $flashes = [];
 
-        if ('POST' == $this->request->getMethod()) {
-            $flashes = $this->deleteTheme($themeName);
+        if ('POST' === $request->getMethod()) {
+            $flashes = $this->deleteTheme($themeHelper, $themeName);
         }
 
         return $this->postActionRedirect(
@@ -201,17 +195,17 @@ class ThemeController extends FormController
     /**
      * Deletes a group of themes.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request, ThemeHelperInterface $themeHelper)
     {
         $flashes = [];
 
-        if ('POST' == $this->request->getMethod()) {
-            $themeNames = json_decode($this->request->query->get('ids', '{}'));
+        if ('POST' === $request->getMethod()) {
+            $themeNames = json_decode($request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {
-                $flashes = $this->deleteTheme($themeName);
+                $flashes = $this->deleteTheme($themeHelper, $themeName);
             }
         }
 
@@ -227,10 +221,9 @@ class ThemeController extends FormController
      *
      * @return array
      */
-    public function deleteTheme($themeName)
+    public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName)
     {
-        $flashes     = [];
-        $themeHelper = $this->container->get('mautic.helper.theme');
+        $flashes = [];
 
         if (!$themeHelper->exists($themeName)) {
             $flashes[] = [
@@ -238,7 +231,7 @@ class ThemeController extends FormController
                 'msg'     => 'mautic.core.theme.error.notfound',
                 'msgVars' => ['%theme%' => $themeName],
             ];
-        } elseif (!$this->get('mautic.security')->isGranted('core:themes:delete')) {
+        } elseif (!$this->security->isGranted('core:themes:delete')) {
             return $this->accessDenied();
         } elseif (in_array($themeName, $themeHelper->getDefaultThemes())) {
             $flashes[] = [

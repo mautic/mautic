@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\PointBundle\Entity\Group;
 
 /**
  * @extends CommonRepository<PointsChangeLog>
@@ -23,14 +24,15 @@ class PointsChangeLogRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id');
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id, pl.name as groupName')
+            ->leftJoin('lp', MAUTIC_TABLE_PREFIX.Group::TABLE_NAME, 'pl', 'lp.group_id = pl.id');
 
         if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('lp.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('lp.action_name', $query->expr()->literal('%'.$options['search'].'%'))
             ));
@@ -52,7 +54,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -68,7 +70,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -83,11 +85,11 @@ class PointsChangeLogRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_points_change_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

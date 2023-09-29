@@ -101,26 +101,20 @@ final class AuthenticationListener
 
     private function onFailure(Request $request, AuthenticationException $failed): Response
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
-        }
+        $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
 
         return $this->authenticationHandler->onAuthenticationFailure($request, $failed);
     }
 
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null): Response
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
-        }
+        $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUserIdentifier()));
 
         $session = $request->getSession();
         $session->remove(Security::AUTHENTICATION_ERROR);
 
-        if (null !== $this->dispatcher) {
-            $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
-        }
+        $loginEvent = new InteractiveLoginEvent($request, $token);
+        $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
 
         if (null === $response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
@@ -135,6 +129,7 @@ final class AuthenticationListener
     private function setActivePermissionsOnAuthToken(): void
     {
         $token = $this->tokenStorage->getToken();
+        /** @var User|null $user */
         $user  = $token->getUser();
 
         // If no user associated with a token, it's a client credentials grant type. Handle accordingly.

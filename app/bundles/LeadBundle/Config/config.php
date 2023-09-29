@@ -142,7 +142,7 @@ return [
             ],
             'mautic_contact_export_download' => [
                 'path'       => '/contacts/export/download/{fileName}',
-                'controller' => 'MauticLeadBundle:Lead:downloadExport',
+                'controller' => 'Mautic\LeadBundle\Controller\LeadController::downloadExportAction',
             ],
         ],
         'api' => [
@@ -499,6 +499,304 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.lead.model.lead_segment_filter_factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_schema_cache',
+                    '@service_container',
+                    'mautic.lead.model.lead_segment_decorator_factory',
+                ],
+            ],
+            'mautic.tracker.contact' => [
+                'class'     => \Mautic\LeadBundle\Tracker\ContactTracker::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead',
+                    'mautic.lead.service.contact_tracking_service',
+                    'mautic.tracker.device',
+                    'mautic.security',
+                    'monolog.logger.mautic',
+                    'mautic.helper.ip_lookup',
+                    'request_stack',
+                    'mautic.helper.core_parameters',
+                    'event_dispatcher',
+                    'mautic.lead.model.field',
+                ],
+            ],
+            'mautic.tracker.device' => [
+                'class'     => \Mautic\LeadBundle\Tracker\DeviceTracker::class,
+                'arguments' => [
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
+                    'mautic.lead.service.device_tracking_service',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.field.custom_field_column' => [
+                'class'     => Mautic\LeadBundle\Field\CustomFieldColumn::class,
+                'arguments' => [
+                    'mautic.schema.helper.column',
+                    'mautic.lead.field.schema_definition',
+                    'monolog.logger.mautic',
+                    'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.custom_field_index',
+                    'mautic.lead.field.dispatcher.field_column_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.field.custom_field_index' => [
+                'class'     => Mautic\LeadBundle\Field\CustomFieldIndex::class,
+                'arguments' => [
+                    'mautic.schema.helper.index',
+                    'monolog.logger.mautic',
+                    'mautic.lead.field.fields_with_unique_identifier',
+                ],
+            ],
+            'mautic.lead.repository.lead_segment_filter_descriptor' => [
+                'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.service.segment_dependency_tree_factory' => [
+                'class'     => \Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'router',
+                ],
+            ],
+            'mautic.lead.repository.lead_segment_query_builder' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_service' => [
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'mautic.lead.repository.lead_segment_query_builder',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_schema_cache' => [
+                'class'     => \Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.model.relative_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\RelativeDate::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_operator' => [
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class,
+                'arguments' => [
+                    'mautic.lead.provider.fillterOperator',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'mautic.lead.model.lead_segment_decorator_base',
+                    'mautic.lead.model.lead_segment_decorator_custom_mapped',
+                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
+                    'mautic.lead.model.lead_segment_decorator_company',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_base' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_custom_mapped' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_company' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_decorator_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\DateDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+            'mautic.lead.model.lead_segment.decorator.date.optionFactory' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_decorator_date',
+                    'mautic.lead.model.relative_date',
+                    'mautic.lead.model.lead_segment.timezoneResolver',
+                ],
+            ],
+            'mautic.lead.model.lead_segment.timezoneResolver' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.lead.provider.fillterOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\FilterOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.provider.typeOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\TypeOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.provider.fillterOperator',
+                ],
+            ],
+            'mautic.lead.provider.fieldChoices' => [
+                'class'     => \Mautic\LeadBundle\Provider\FieldChoicesProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.provider.formAdjustments' => [
+                'class'     => \Mautic\LeadBundle\Provider\FormAdjustmentsProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.model.random_parameter_name' => [
+                'class' => \Mautic\LeadBundle\Segment\RandomParameterName::class,
+            ],
+            'mautic.lead.segment.operator_options' => [
+                'class' => \Mautic\LeadBundle\Segment\OperatorOptions::class,
+            ],
+            'mautic.lead.reportbundle.fields_builder' => [
+                'class'     => \Mautic\LeadBundle\Report\FieldsBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.list',
+                    'mautic.user.model.user',
+                    'mautic.lead.model.lead',
+                ],
+            ],
+            'mautic.lead.factory.device_detector_factory' => [
+                'class'     => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+                'arguments' => [
+                    'mautic.cache.provider',
+                ],
+            ],
+            'mautic.lead.service.contact_tracking_service' => [
+                'class'     => \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService::class,
+                'arguments' => [
+                    'mautic.helper.cookie',
+                    'mautic.lead.repository.lead_device',
+                    'mautic.lead.repository.lead',
+                    'mautic.lead.repository.merged_records',
+                    'request_stack',
+                ],
+            ],
+            'mautic.lead.service.device_creator_service' => [
+                'class' => \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService::class,
+            ],
+            'mautic.lead.service.device_tracking_service' => [
+                'class'     => \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService::class,
+                'arguments' => [
+                    'mautic.helper.cookie',
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.lead_device',
+                    'mautic.helper.random',
+                    'request_stack',
+                    'mautic.security',
+                ],
+            ],
+
+            'mautic.lead.field.schema_definition' => [
+                'class' => Mautic\LeadBundle\Field\SchemaDefinition::class,
+            ],
+            'mautic.lead.field.dispatcher.field_save_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.field.dispatcher.field_column_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.field.settings.background_settings',
+                ],
+            ],
+            'mautic.lead.field.dispatcher.field_column_background_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.field.fields_with_unique_identifier' => [
+                'class'     => Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                ],
+            ],
+            'mautic.lead.field.field_list' => [
+                'class'     => Mautic\LeadBundle\Field\FieldList::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.field.identifier_fields' => [
+                'class'     => \Mautic\LeadBundle\Field\IdentifierFields::class,
+                'arguments' => [
+                    'mautic.lead.field.fields_with_unique_identifier',
+                    'mautic.lead.field.field_list',
+                ],
+            ],
+            'mautic.lead.field.lead_field_saver' => [
+                'class'     => Mautic\LeadBundle\Field\LeadFieldSaver::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'mautic.lead.field.dispatcher.field_save_dispatcher',
+                ],
+            ],
+            'mautic.lead.field.settings.background_settings' => [
+                'class'     => Mautic\LeadBundle\Field\Settings\BackgroundSettings::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.lead.field.settings.background_service' => [
+                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.field.custom_field_column',
+                    'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
+                    'mautic.lead.field.notification.custom_field',
+                ],
+            ],
+            'mautic.lead.field.notification.custom_field' => [
+                'class'     => Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                    'mautic.user.model.user',
+                    'translator',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -653,21 +951,20 @@ return [
             ],
         ],
         'helpers' => [
-            'mautic.helper.template.avatar' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
+            'mautic.helper.twig.avatar' => [
+                'class'     => Mautic\LeadBundle\Twig\Helper\AvatarHelper::class,
                 'arguments' => [
-                    'templating.helper.assets',
+                    'twig.helper.assets',
                     'mautic.helper.paths',
-                    'mautic.helper.template.gravatar',
-                    'mautic.helper.template.default_avatar',
+                    'mautic.helper.twig.gravatar',
+                    'mautic.helper.twig.default_avatar',
                 ],
                 'alias' => 'lead_avatar',
             ],
-            'mautic.helper.template.default_avatar' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper::class,
+            'mautic.helper.twig.default_avatar' => [
+                'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.paths',
-                    'templating.helper.assets',
+                    'twig.helper.assets',
                 ],
                 'alias' => 'default_avatar',
             ],
@@ -675,405 +972,14 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
                 'arguments' => ['mautic.lead.model.field'],
             ],
-            'mautic.helper.template.dnc_reason' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\DncReasonHelper::class,
+            'mautic.helper.twig.dnc_reason' => [
+                'class'     => Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class,
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],
             'mautic.helper.segment.count.cache' => [
                 'class'     => \Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
                 'arguments' => ['mautic.helper.cache_storage'],
-            ],
-        ],
-        'models' => [
-            'mautic.lead.model.field' => [
-                'class'     => \Mautic\LeadBundle\Model\FieldModel::class,
-                'arguments' => [
-                    'mautic.schema.helper.column',
-                    'mautic.lead.model.list',
-                    'mautic.lead.field.custom_field_column',
-                    'mautic.lead.field.dispatcher.field_save_dispatcher',
-                    'mautic.lead.repository.field',
-                    'mautic.lead.field.fields_with_unique_identifier',
-                    'mautic.lead.field.field_list',
-                    'mautic.lead.field.lead_field_saver',
-                ],
-            ],
-            'mautic.lead.model.list' => [
-                'class'     => \Mautic\LeadBundle\Model\ListModel::class,
-                'arguments' => [
-                    'mautic.category.model.category',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.model.lead_segment_service',
-                    'mautic.lead.segment.stat.chart.query.factory',
-                    'request_stack',
-                    'mautic.helper.segment.count.cache',
-                ],
-            ],
-            'mautic.lead.repository.lead_segment_filter_descriptor' => [
-                'class'     => \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.service.segment_dependency_tree_factory' => [
-                'class'     => \Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'router',
-                ],
-            ],
-            'mautic.lead.repository.lead_segment_query_builder' => [
-                'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.random_parameter_name',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_service' => [
-                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_factory',
-                    'mautic.lead.repository.lead_segment_query_builder',
-                    'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_filter_factory' => [
-                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_schema_cache',
-                    '@service_container',
-                    'mautic.lead.model.lead_segment_decorator_factory',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_schema_cache' => [
-                'class'     => \Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.lead.model.relative_date' => [
-                'class'     => \Mautic\LeadBundle\Segment\RelativeDate::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_filter_operator' => [
-                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class,
-                'arguments' => [
-                    'mautic.lead.provider.fillterOperator',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_factory' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                    'mautic.lead.model.lead_segment_decorator_base',
-                    'mautic.lead.model.lead_segment_decorator_custom_mapped',
-                    'mautic.lead.model.lead_segment.decorator.date.optionFactory',
-                    'mautic.lead.model.lead_segment_decorator_company',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_base' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\BaseDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_custom_mapped' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_company' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_decorator_date' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\DateDecorator::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_operator',
-                    'mautic.lead.repository.lead_segment_filter_descriptor',
-                ],
-            ],
-            'mautic.lead.model.lead_segment.decorator.date.optionFactory' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_decorator_date',
-                    'mautic.lead.model.relative_date',
-                    'mautic.lead.model.lead_segment.timezoneResolver',
-                ],
-            ],
-            'mautic.lead.model.lead_segment.timezoneResolver' => [
-                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.lead.provider.fillterOperator' => [
-                'class'     => \Mautic\LeadBundle\Provider\FilterOperatorProvider::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                ],
-            ],
-            'mautic.lead.provider.typeOperator' => [
-                'class'     => \Mautic\LeadBundle\Provider\TypeOperatorProvider::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.lead.provider.fillterOperator',
-                ],
-            ],
-            'mautic.lead.provider.fieldChoices' => [
-                'class'     => \Mautic\LeadBundle\Provider\FieldChoicesProvider::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.provider.formAdjustments' => [
-                'class'     => \Mautic\LeadBundle\Provider\FormAdjustmentsProvider::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.model.random_parameter_name' => [
-                'class' => \Mautic\LeadBundle\Segment\RandomParameterName::class,
-            ],
-            'mautic.lead.segment.operator_options' => [
-                'class' => \Mautic\LeadBundle\Segment\OperatorOptions::class,
-            ],
-            'mautic.lead.model.note' => [
-                'class' => 'Mautic\LeadBundle\Model\NoteModel',
-            ],
-            'mautic.lead.model.device' => [
-                'class'     => Mautic\LeadBundle\Model\DeviceModel::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead_device',
-                ],
-            ],
-            'mautic.lead.model.company' => [
-                'class'     => 'Mautic\LeadBundle\Model\CompanyModel',
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'session',
-                    'mautic.validator.email',
-                    'mautic.company.deduper',
-                ],
-            ],
-            'mautic.lead.model.import' => [
-                'class'     => Mautic\LeadBundle\Model\ImportModel::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.lead.model.lead',
-                    'mautic.core.model.notification',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.model.company',
-                ],
-            ],
-            'mautic.lead.model.tag' => [
-                'class' => \Mautic\LeadBundle\Model\TagModel::class,
-            ],
-            'mautic.lead.model.company_report_data' => [
-                'class'     => \Mautic\LeadBundle\Model\CompanyReportData::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'translator',
-                ],
-            ],
-            'mautic.lead.reportbundle.fields_builder' => [
-                'class'     => \Mautic\LeadBundle\Report\FieldsBuilder::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.list',
-                    'mautic.user.model.user',
-                    'mautic.lead.model.lead',
-                ],
-            ],
-            'mautic.lead.model.dnc' => [
-                'class'     => \Mautic\LeadBundle\Model\DoNotContact::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.repository.dnc',
-                ],
-            ],
-            'mautic.lead.model.segment.action' => [
-                'class'     => \Mautic\LeadBundle\Model\SegmentActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
-            ],
-            'mautic.lead.factory.device_detector_factory' => [
-                'class'     => \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
-                'arguments' => [
-                  'mautic.cache.provider',
-                ],
-            ],
-            'mautic.lead.service.contact_tracking_service' => [
-                'class'     => \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService::class,
-                'arguments' => [
-                    'mautic.helper.cookie',
-                    'mautic.lead.repository.lead_device',
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.repository.merged_records',
-                    'request_stack',
-                ],
-            ],
-            'mautic.lead.service.device_creator_service' => [
-                'class' => \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService::class,
-            ],
-            'mautic.lead.service.device_tracking_service' => [
-                'class'     => \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService::class,
-                'arguments' => [
-                    'mautic.helper.cookie',
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.repository.lead_device',
-                    'mautic.helper.random',
-                    'request_stack',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.tracker.contact' => [
-                'class'     => \Mautic\LeadBundle\Tracker\ContactTracker::class,
-                'arguments' => [
-                    'mautic.lead.repository.lead',
-                    'mautic.lead.service.contact_tracking_service',
-                    'mautic.tracker.device',
-                    'mautic.security',
-                    'monolog.logger.mautic',
-                    'mautic.helper.ip_lookup',
-                    'request_stack',
-                    'mautic.helper.core_parameters',
-                    'event_dispatcher',
-                    'mautic.lead.model.field',
-                ],
-            ],
-            'mautic.tracker.device' => [
-                'class'     => \Mautic\LeadBundle\Tracker\DeviceTracker::class,
-                'arguments' => [
-                    'mautic.lead.service.device_creator_service',
-                    'mautic.lead.factory.device_detector_factory',
-                    'mautic.lead.service.device_tracking_service',
-                    'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.lead.model.ipaddress' => [
-                'class'     => Mautic\LeadBundle\Model\IpAddressModel::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.lead.field.schema_definition' => [
-                'class' => Mautic\LeadBundle\Field\SchemaDefinition::class,
-            ],
-            'mautic.lead.field.custom_field_column' => [
-                'class'     => Mautic\LeadBundle\Field\CustomFieldColumn::class,
-                'arguments' => [
-                    'mautic.schema.helper.column',
-                    'mautic.lead.field.schema_definition',
-                    'monolog.logger.mautic',
-                    'mautic.lead.field.lead_field_saver',
-                    'mautic.lead.field.custom_field_index',
-                    'mautic.lead.field.dispatcher.field_column_dispatcher',
-                    'translator',
-                ],
-            ],
-            'mautic.lead.field.custom_field_index' => [
-                'class'     => Mautic\LeadBundle\Field\CustomFieldIndex::class,
-                'arguments' => [
-                    'mautic.schema.helper.index',
-                    'monolog.logger.mautic',
-                    'mautic.lead.field.fields_with_unique_identifier',
-                ],
-            ],
-            'mautic.lead.field.dispatcher.field_save_dispatcher' => [
-                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.lead.field.dispatcher.field_column_dispatcher' => [
-                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.lead.field.settings.background_settings',
-                ],
-            ],
-            'mautic.lead.field.dispatcher.field_column_background_dispatcher' => [
-                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.field.fields_with_unique_identifier' => [
-                'class'     => Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::class,
-                'arguments' => [
-                    'mautic.lead.field.field_list',
-                ],
-            ],
-            'mautic.lead.field.field_list' => [
-                'class'     => Mautic\LeadBundle\Field\FieldList::class,
-                'arguments' => [
-                    'mautic.lead.repository.field',
-                    'translator',
-                ],
-            ],
-            'mautic.lead.field.identifier_fields' => [
-                'class'     => \Mautic\LeadBundle\Field\IdentifierFields::class,
-                'arguments' => [
-                    'mautic.lead.field.fields_with_unique_identifier',
-                    'mautic.lead.field.field_list',
-                ],
-            ],
-            'mautic.lead.field.lead_field_saver' => [
-                'class'     => Mautic\LeadBundle\Field\LeadFieldSaver::class,
-                'arguments' => [
-                    'mautic.lead.repository.field',
-                    'mautic.lead.field.dispatcher.field_save_dispatcher',
-                ],
-            ],
-            'mautic.lead.field.settings.background_settings' => [
-                'class'     => Mautic\LeadBundle\Field\Settings\BackgroundSettings::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.lead.field.settings.background_service' => [
-                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.field.custom_field_column',
-                    'mautic.lead.field.lead_field_saver',
-                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
-                    'mautic.lead.field.notification.custom_field',
-                ],
-            ],
-            'mautic.lead.field.notification.custom_field' => [
-                'class'     => Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class,
-                'arguments' => [
-                    'mautic.core.model.notification',
-                    'mautic.user.model.user',
-                    'translator',
-                ],
-            ],
-            'mautic.lead.model.export_scheduler' => [
-                'class'     => \Mautic\LeadBundle\Model\ContactExportSchedulerModel::class,
-                'arguments' => [
-                    'session',
-                    'request_stack',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.export',
-                    'mautic.helper.mailer',
-                ],
             ],
         ],
         'fixtures' => [
@@ -1085,7 +991,7 @@ return [
             'mautic.lead.fixture.contact' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.helper.core_parameters'],
+                'arguments' => ['mautic.helper.core_parameters'],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,
@@ -1095,12 +1001,10 @@ return [
             'mautic.lead.fixture.category' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.lead.fixture.categorizedleadlists' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.lead.fixture.test.page_hit' => [
                 'class'    => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
@@ -1150,7 +1054,7 @@ return [
         'segment_rebuild_time_warning'                                                          => 30,
         'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,
-        'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
+        'contact_export_dir'                                                                    => '%kernel.project_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
     ],
 ];

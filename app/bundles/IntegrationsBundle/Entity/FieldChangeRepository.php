@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -23,7 +24,7 @@ class FieldChangeRepository extends CommonRepository
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('object_type', ':objectType'),
                     $qb->expr()->eq('object_id', ':objectId'),
                     $qb->expr()->in('column_name', ':columnNames')
@@ -32,7 +33,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', $objectId)
             ->setParameter('columnNames', $columnNames, Connection::PARAM_STR_ARRAY)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -42,25 +43,21 @@ class FieldChangeRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $qb->expr()->andX();
+        $expr = CompositeExpression::and($qb->expr()->eq('object_type', ':objectType'), $qb->expr()->eq('object_id', ':objectId'));
         if ($integration) {
-            $expr->add(
+            $expr = $expr->with(
                 $qb->expr()->eq('integration', ':integration')
             );
             $qb->setParameter('integration', $integration);
         }
 
-        $expr->addMultiple([
-            $qb->expr()->eq('object_type', ':objectType'),
-            $qb->expr()->eq('object_id', ':objectId'),
-        ]);
         $qb->setParameter('objectType', $objectType)
             ->setParameter('objectId', (int) $objectId);
 
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where($expr)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -77,7 +74,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('f.object_id')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->lte('f.modified_at', ':toDateTime')
@@ -96,7 +93,8 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results   = $qb->execute()->fetchAll();
+        $results = $qb->executeQuery()->fetchAllAssociative();
+
         $objectIds = [];
         foreach ($results as $result) {
             $objectIds[] = (int) $result['object_id'];
@@ -112,7 +110,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->in('f.object_id', $objectIds)
@@ -122,7 +120,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -138,7 +136,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->eq('f.object_id', ':objectId')
@@ -149,6 +147,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

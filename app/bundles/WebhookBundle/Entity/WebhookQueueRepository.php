@@ -26,7 +26,7 @@ class WebhookQueueRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $idList)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -49,7 +49,7 @@ class WebhookQueueRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
     }
 }

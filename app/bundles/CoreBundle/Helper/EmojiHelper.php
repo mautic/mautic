@@ -11,53 +11,32 @@ class EmojiHelper
 {
     /**
      * Convert to html.
-     *
-     * @param $text
-     * @param $from
-     *
-     * @return mixed
      */
-    public static function toHtml($text, $from = 'emoji')
+    public static function toHtml(string $text, string $from = 'emoji'): string
     {
         return self::emojiConvert($text, $from, 'html');
     }
 
     /**
      * Convert to emoji.
-     *
-     * @param $text
-     * @param $from
-     *
-     * @return mixed
      */
-    public static function toEmoji($text, $from = 'html')
+    public static function toEmoji(string $text, string $from = 'html'): string
     {
         return self::emojiConvert($text, $from, 'emoji');
     }
 
     /**
      * Convert to short code.
-     *
-     * @param        $text
-     * @param string $from
-     *
-     * @return mixed
      */
-    public static function toShort($text, $from = 'emoji')
+    public static function toShort(string $text, string $from = 'emoji'): string
     {
         return self::emojiConvert($text, $from, 'short');
     }
 
     /**
      * Converts emojis.
-     *
-     * @param $text
-     * @param $from
-     * @param $to
-     *
-     * @return mixed
      */
-    private static function emojiConvert($text, $from, $to)
+    private static function emojiConvert(string $text, string $from, string $to): string
     {
         $maps = [];
         switch ($from) {
@@ -114,12 +93,8 @@ class EmojiHelper
 
     /**
      * Remove emojis from text.
-     *
-     * @param $text
-     *
-     * @return mixed
      */
-    private static function removeEmoji($text)
+    private static function removeEmoji(string $text): string
     {
         return preg_replace('/([0-9#][\x{20E3}])|[\x{00ae}\x{00a9}\x{203C}\x{2047}\x{2048}\x{2049}\x{3030}\x{303D}\x{2139}\x{2122}\x{3297}\x{3299}][\x{FE00}-\x{FEFF}]?|[\x{2190}-\x{21FF}][\x{FE00}-\x{FEFF}]?|[\x{2300}-\x{23FF}][\x{FE00}-\x{FEFF}]?|[\x{2460}-\x{24FF}][\x{FE00}-\x{FEFF}]?|[\x{25A0}-\x{25FF}][\x{FE00}-\x{FEFF}]?|[\x{2600}-\x{27BF}][\x{FE00}-\x{FEFF}]?|[\x{2900}-\x{297F}][\x{FE00}-\x{FEFF}]?|[\x{2B00}-\x{2BF0}][\x{FE00}-\x{FEFF}]?|[\x{1F000}-\x{1F6FF}][\x{FE00}-\x{FEFF}]?/u', '', $text);
     }

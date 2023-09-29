@@ -8,11 +8,13 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
@@ -28,6 +30,7 @@ use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -41,6 +44,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -62,6 +66,11 @@ class FormTestAbstract extends TestCase
      */
     protected $fieldHelper;
 
+    /**
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
@@ -79,6 +88,7 @@ class FormTestAbstract extends TestCase
         $formFieldModel        = $this->createMock(FieldModel::class);
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $translator            = $this->createMock(Translator::class);
         $entityManager         = $this->createMock(EntityManager::class);
@@ -103,7 +113,7 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $this->formRepository],
+                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
                     ]
                 )
             );
@@ -115,17 +125,22 @@ class FormTestAbstract extends TestCase
             $formActionModel,
             $formFieldModel,
             $this->fieldHelper,
+            $primaryCompanyHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper,
-            $mappedObjectCollector
+            $mappedObjectCollector,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
-
-        $formModel->setDispatcher($dispatcher);
-        $formModel->setTranslator($translator);
-        $formModel->setEntityManager($entityManager);
 
         return $formModel;
     }
@@ -135,19 +150,27 @@ class FormTestAbstract extends TestCase
      */
     protected function getSubmissionModel()
     {
-        $ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $twigMock                 = $this->createMock(Environment::class);
-        $formModel                = $this->createMock(FormModel::class);
-        $pageModel                = $this->createMock(PageModel::class);
-        $leadModel                = $this->createMock(LeadModel::class);
-        $campaignModel            = $this->createMock(CampaignModel::class);
-        $membershipManager        = $this->createMock(MembershipManager::class);
-        $leadFieldModel           = $this->createMock(LeadFieldModel::class);
-        $companyModel             = $this->createMock(CompanyModel::class);
-        $fieldHelper              = $this->createMock(FormFieldHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcher::class);
-        $translator               = $this->createMock(Translator::class);
-        $dateHelper               = $this->createMock(DateHelper::class);
+        $ipLookupHelper             = $this->createMock(IpLookupHelper::class);
+        $twigMock                   = $this->createMock(Environment::class);
+        $formModel                  = $this->createMock(FormModel::class);
+        $pageModel                  = $this->createMock(PageModel::class);
+        $leadModel                  = $this->createMock(LeadModel::class);
+        $campaignModel              = $this->createMock(CampaignModel::class);
+        $membershipManager          = $this->createMock(MembershipManager::class);
+        $leadFieldModel             = $this->createMock(LeadFieldModel::class);
+        $companyModel               = $this->createMock(CompanyModel::class);
+        $fieldHelper                = $this->createMock(FormFieldHelper::class);
+        $dispatcher                 = $this->createMock(EventDispatcher::class);
+        $translator                 = $this->createMock(Translator::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dateHelper                 = new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $translator,
+            $this->coreParametersHelper
+        );
         $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
@@ -239,13 +262,16 @@ class FormTestAbstract extends TestCase
             new FieldValueTransformer($router),
             $dateHelper,
             $contactTracker,
-            $contactMerger
+            $contactMerger,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $router,
+            $translator,
+            $userHelper,
+            $mockLogger,
+            $this->coreParametersHelper,
         );
-        $submissionModel->setDispatcher($dispatcher);
-        $submissionModel->setTranslator($translator);
-        $submissionModel->setEntityManager($entityManager);
-        $submissionModel->setUserHelper($userHelper);
-        $submissionModel->setLogger($mockLogger);
 
         return $submissionModel;
     }

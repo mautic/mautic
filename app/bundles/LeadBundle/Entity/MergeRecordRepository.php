@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class MergeRecordRepository extends CommonRepository
 {
     /**
-     * @param $id
-     *
      * @return Lead|null
      */
     public function findMergedContact($id)
@@ -21,7 +19,7 @@ class MergeRecordRepository extends CommonRepository
             $contact = $record->getContact();
 
             // Clear these records from the EM so that subsequent fetches don't return deleted entities
-            $this->getEntityManager()->clear(MergeRecord::class);
+            $this->getEntityManager()->detach($record);
 
             return $contact;
         }
@@ -31,9 +29,6 @@ class MergeRecordRepository extends CommonRepository
 
     /**
      * Keep track of subseqent merges by cascading records to the latest lead that was merged into.
-     *
-     * @param $fromId
-     * @param $toId
      */
     public function moveMergeRecord($fromId, $toId)
     {
@@ -41,6 +36,6 @@ class MergeRecordRepository extends CommonRepository
             ->update(MAUTIC_TABLE_PREFIX.'contact_merge_records')
             ->set('contact_id', (int) $toId)
             ->where('contact_id = '.(int) $fromId)
-            ->execute();
+            ->executeQuery();
     }
 }

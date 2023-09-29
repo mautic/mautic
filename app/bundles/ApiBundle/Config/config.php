@@ -56,23 +56,6 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            'mautic.api.oauth2.authorize_controller' => [
-                'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
-                'arguments' => [
-                    'request_stack',
-                    'fos_oauth_server.authorize.form',
-                    'fos_oauth_server.authorize.form.handler.default',
-                    'fos_oauth_server.server',
-                    'security.token_storage',
-                    'router',
-                    'fos_oauth_server.client_manager.default',
-                    'event_dispatcher',
-                    'twig',
-                    'session',
-                ],
-            ],
-        ],
         'helpers' => [
             'mautic.api.helper.entity_result' => [
                 'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
@@ -102,21 +85,9 @@ return [
                 ],
             ],
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
-            'jms_serializer.metadata.annotation_driver'               => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
-            'jms_serializer.metadata.api_metadata_driver'             => [
-                'class' => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
-            ],
-            'mautic.validator.oauthcallback' => [
+            'mautic.validator.oauthcallback'                          => [
                 'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
                 'tag'   => 'validator.constraint_validator',
-            ],
-        ],
-        'models' => [
-            'mautic.api.model.client' => [
-                'class'     => 'Mautic\ApiBundle\Model\ClientModel',
-                'arguments' => [
-                    'request_stack',
-                ],
             ],
         ],
     ],

@@ -24,7 +24,7 @@ class TagRepository extends CommonRepository
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
             ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->execute()->fetch();
+        $delete = $qb->executeQuery()->fetchAssociative();
 
         if (count($delete)) {
             $qb->resetQueryParts();
@@ -32,7 +32,7 @@ class TagRepository extends CommonRepository
                 ->where(
                     $qb->expr()->in('id', $delete)
                 )
-                ->execute();
+                ->executeStatement();
         }
     }
 
@@ -76,8 +76,6 @@ class TagRepository extends CommonRepository
     /**
      * Check Lead tags by Ids.
      *
-     * @param $tags
-     *
      * @return bool
      */
     public function checkLeadByTags(Lead $lead, $tags)
@@ -92,7 +90,7 @@ class TagRepository extends CommonRepository
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('t.tag', ':tags'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -100,7 +98,7 @@ class TagRepository extends CommonRepository
             ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**

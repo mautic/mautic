@@ -7,16 +7,12 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class AbstractFormStandardType.
- */
 abstract class AbstractFormStandardType extends AbstractType
 {
     /**
@@ -115,39 +111,15 @@ abstract class AbstractFormStandardType extends AbstractType
             );
 
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
-                $builder->add(
-                    'publishUp',
-                    DateTimeType::class,
-                    [
-                        'widget'     => 'single_text',
-                        'label'      => 'mautic.core.form.publishup',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class'       => 'form-control',
-                            'data-toggle' => 'datetime',
-                            'readonly'    => $readonly,
-                        ],
-                        'format'     => 'yyyy-MM-dd HH:mm',
-                        'required'   => false,
-                    ]
-                );
-
-                $builder->add(
-                    'publishDown',
-                    DateTimeType::class,
-                    [
-                        'widget'     => 'single_text',
-                        'label'      => 'mautic.core.form.publishdown',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class'       => 'form-control',
-                            'data-toggle' => 'datetime',
-                            'readonly'    => $readonly,
-                        ],
-                        'format'     => 'yyyy-MM-dd HH:mm',
-                        'required'   => false,
-                    ]
-                );
+                $builderOptions = [
+                  'attr' => [
+                      'class'       => 'form-control',
+                      'data-toggle' => 'datetime',
+                      'readonly'    => $readonly,
+                    ],
+                ];
+                $builder->add('publishUp', PublishUpDateType::class, $builderOptions);
+                $builder->add('publishDown', PublishDownDateType::class, $builderOptions);
             }
         }
 

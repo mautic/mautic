@@ -21,7 +21,7 @@ class NotificationRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticNotificationBundle:Notification', 'e', 'e.id');
+            ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'e.id');
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
@@ -40,7 +40,7 @@ class NotificationRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from('MauticNotificationBundle:Notification', 'e');
+            ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -55,7 +55,6 @@ class NotificationRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -68,7 +67,7 @@ class NotificationRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -129,7 +128,7 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -139,7 +138,6 @@ class NotificationRepository extends CommonRepository
     /**
      * Up the click/sent counts.
      *
-     * @param        $id
      * @param string $type
      * @param int    $increaseBy
      */
@@ -152,7 +150,7 @@ class NotificationRepository extends CommonRepository
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
                 ->where('id = '.(int) $id);
 
-            $q->execute();
+            $q->executeStatement();
         } catch (\Exception $exception) {
             // not important
         }

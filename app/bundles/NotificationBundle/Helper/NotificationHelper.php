@@ -4,7 +4,7 @@ namespace Mautic\NotificationBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -70,7 +70,7 @@ class NotificationHelper
     public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
 
         $lead = $repo->getLeadByEmail($notification);
 

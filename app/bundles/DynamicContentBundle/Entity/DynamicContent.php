@@ -3,7 +3,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -37,32 +37,32 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $content;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $utmTags = [];
 
@@ -72,7 +72,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $sentCount = 0;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\DynamicContentBundle\Entity\Stat>
      */
     private $stats;
 
@@ -82,7 +82,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $isCampaignBased = true;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $slotName;
 
@@ -144,7 +144,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->nullable()
             ->build();
 
-        $builder->createField('utmTags', Type::JSON_ARRAY)
+        $builder->createField('utmTags', Types::JSON)
             ->columnName('utm_tags')
             ->nullable()
             ->build();
@@ -183,7 +183,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addConstraint(new Callback([
             'callback' => function (self $dwc, ExecutionContextInterface $context) {
                 if (!$dwc->getIsCampaignBased()) {
-                    $validator = $context->getValidator();
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $dwc->getSlotName(),
                         [
@@ -249,10 +249,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -340,7 +336,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -361,7 +357,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -413,8 +409,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)

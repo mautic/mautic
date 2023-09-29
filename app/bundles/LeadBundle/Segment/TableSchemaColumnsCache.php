@@ -29,8 +29,6 @@ class TableSchemaColumnsCache
     }
 
     /**
-     * @param $tableName
-     *
      * @return array|false
      */
     public function getColumns($tableName)

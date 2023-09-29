@@ -62,7 +62,8 @@ class SegmentCampaignShare
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
-        $campaigns = $q->execute()->fetchAll();
+        $campaigns = $q->executeQuery()->fetchAllAssociative();
+
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
             if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {

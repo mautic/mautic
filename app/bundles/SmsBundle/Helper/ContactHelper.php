@@ -55,14 +55,14 @@ class ContactHelper
         $foundContacts = $qb->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->orX(
+                $qb->expr()->or(
                     'l.mobile IN (:numbers)',
                     'l.phone IN (:numbers)'
                 )
             )
             ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $ids = array_column($foundContacts, 'id');
         if (0 === count($ids)) {

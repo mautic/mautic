@@ -40,17 +40,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.webhook.model.webhook' => [
-                'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'jms_serializer',
-                    'mautic.webhook.http.client',
-                    'event_dispatcher',
-                ],
-            ],
-        ],
         'others' => [
             'mautic.webhook.notificator.webhookkillnotificator' => [
                 'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
@@ -75,7 +64,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\Http\Client::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.guzzle.client',
+                    'mautic.http.client',
                 ],
             ],
         ],

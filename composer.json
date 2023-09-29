@@ -22,29 +22,32 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "^5.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.0",
+    "friendsofphp/php-cs-fixer": "^3.5",
     "http-interop/http-factory-guzzle": "^1.0",
-    "liip/functional-test-bundle": "^4.2",
-    "liip/test-fixtures-bundle": "^2.0",
+    "liip/functional-test-bundle": "^4.3",
+    "liip/test-fixtures-bundle": "^2.6",
     "mautic/transifex": "^5.0",
-    "php-http/mock-client": "^1.4",
-    "phpstan/phpstan": "^1.8.2",
+    "phpstan/extension-installer": "^1.3",
+    "phpstan/phpstan": "^1.10.26",
+    "phpstan/phpstan-deprecation-rules": "^1.1",
+    "phpstan/phpstan-doctrine": "^1.3",
+    "phpstan/phpstan-php-parser": "^1.1",
+    "phpstan/phpstan-phpunit": "^1.3",
+    "phpstan/phpstan-symfony": "^1.3",
     "phpunit/phpunit": "^9.5",
-    "rector/rector": "^0.14",
-    "symfony/browser-kit": "~4.4.0",
-    "symfony/dom-crawler": "~4.4.0",
+    "rector/rector": "^0.18.0",
+    "symfony/browser-kit": "~5.4.0",
+    "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~5.1.0",
-    "symfony/var-dumper": "~4.4.0",
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "webfactory/exceptions-bundle": "~4.3"
+    "symfony/phpunit-bridge": "~5.4.0",
+    "symfony/var-dumper": "~5.4.0",
+    "symfony/web-profiler-bundle": "~5.4.0"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
-    "mautic/plugin-citrix": "self.version",
     "mautic/plugin-clearbit": "self.version",
     "mautic/plugin-cloudstorage": "self.version",
     "mautic/plugin-crm": "self.version",
@@ -88,13 +91,21 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "4.4.x-dev"
+            "mautic/core-lib": "5.0.0-dev"
         }
       }
     },
     {
       "type": "git",
       "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SpBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     }
   ],
   "conflict": {
@@ -103,31 +114,37 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
-    "auto-scripts": {
-      "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"": "script",
-      "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\"": "script"
-    },
+    "githooks": [
+      "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"",
+      "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\""
+    ],
     "post-install-cmd": [
-      "@auto-scripts",
+      "@githooks",
       "@remove-git-submodules",
+      "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "post-update-cmd": [
-      "@auto-scripts",
+      "@githooks",
       "@remove-git-submodules",
+      "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
+    "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
-    "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -v",
+    "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v",
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
+    "npm-ci": "npm ci",
+    "npx-patch-package": "npx patch-package",
     "generate-assets": "bin/console mautic:assets:generate"
   },
   "config": {
     "platform": {
-      "php": "8.0"
+      "php": "8.0.2"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",
@@ -136,7 +153,9 @@
     "allow-plugins": {
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
-      "symfony/flex": true
+      "symfony/flex": true,
+      "phpstan/extension-installer": true,
+      "php-http/discovery": true
     }
   },
   "extra": {

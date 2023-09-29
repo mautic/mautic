@@ -65,7 +65,7 @@ class NotifierTest extends MauticMysqlTestCase
                 $qb->expr()->eq('bundle', $qb->expr()->literal(ExampleIntegration::NAME))
             );
 
-        $this->assertCount(2, $qb->execute()->fetchAll());
+        $this->assertCount(2, $qb->executeQuery()->fetchAllAssociative());
 
         // Contact event log
         $qb = $this->connection->createQueryBuilder();
@@ -77,7 +77,7 @@ class NotifierTest extends MauticMysqlTestCase
                     $qb->expr()->eq('object', $qb->expr()->literal(ExampleIntegration::NAME))
                 )
             );
-        $this->assertCount(1, $qb->execute()->fetchAll());
+        $this->assertCount(1, $qb->executeQuery()->fetchAllAssociative());
 
         // User notifications
         $qb = $this->connection->createQueryBuilder();
@@ -86,6 +86,6 @@ class NotifierTest extends MauticMysqlTestCase
             ->where(
                 $qb->expr()->eq('icon_class', $qb->expr()->literal('fa-refresh'))
             );
-        $this->assertCount(2, $qb->execute()->fetchAll());
+        $this->assertCount(2, $qb->executeQuery()->fetchAllAssociative());
     }
 }

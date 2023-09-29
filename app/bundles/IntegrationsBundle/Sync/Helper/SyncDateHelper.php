@@ -103,8 +103,8 @@ class SyncDateHelper
             )
             ->setParameter('integration', $integration)
             ->setParameter('object', $object)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
 
         if (!$result) {
             return null;

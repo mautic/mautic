@@ -1,10 +1,10 @@
-name: mautic
+name: mautic-ca.5x
 type: php
 docroot: ""
 php_version: "8.0"
 webserver_type: apache-fpm
-router_http_port: "80"
-router_https_port: "443"
+router_http_port: "8080"
+router_https_port: "4433"
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []

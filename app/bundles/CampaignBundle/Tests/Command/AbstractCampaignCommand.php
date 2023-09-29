@@ -71,7 +71,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->eventDate->modify('+'.self::CONDITION_SECONDS.' seconds');
         $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        $this->em->getConnection()->exec($sql);
+        $this->em->getConnection()->executeStatement($sql);
     }
 
     public function beforeTearDown(): void
@@ -103,8 +103,8 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ->join('log', $this->prefix.'leads', 'l', 'l.id = log.lead_id')
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $byEvent = [];
         foreach ($ids as $id) {

@@ -68,7 +68,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
@@ -107,11 +107,11 @@ class PageSubscriber implements EventSubscriberInterface
                         $this->translator->trans('mautic.form.form.pagetoken.notpublished').
                         '</div>';
 
-                    //add the hidden page input
+                    // add the hidden page input
                     $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
                     $formHtml  = preg_replace('#</form>#', $pageInput.'</form>', $formHtml);
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
                     $content = str_replace('{form='.$id.'}', $formHtml, $content);
                 } else {

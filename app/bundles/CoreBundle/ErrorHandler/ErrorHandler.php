@@ -5,10 +5,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Exception\FatalErrorException;
-    use Symfony\Component\Debug\Exception\FatalThrowableError;
-    use Symfony\Component\Debug\Exception\OutOfMemoryException;
     use Symfony\Component\ErrorHandler\Debug;
+    use Symfony\Component\ErrorHandler\Error\FatalError;
+    use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
     class ErrorHandler
@@ -97,9 +96,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this->debugLogger;
         }
 
-        /**
-         * @param $logger
-         */
         public function setDebugLogger($logger)
         {
             $this->debugLogger = $logger;
@@ -119,8 +115,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param        $level
-         * @param        $message
          * @param string $file
          * @param int    $line
          * @param array  $context
@@ -165,7 +159,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $exception
          * @param bool $returnContent
          * @param bool $inTemplate
          *
@@ -217,22 +210,18 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
                         if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
-                            $exception = new OutOfMemoryException(
+                            $exception = new OutOfMemoryError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,
-                                $error['type'],
-                                $error['file'],
-                                $error['line'],
+                                $error,
                                 2,
                                 false
                             );
                         } else {
-                            $exception = new FatalErrorException(
+                            $exception = new FatalError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,
-                                $error['type'],
-                                $error['file'],
-                                $error['line'],
+                                $error,
                                 2,
                                 true
                             );
@@ -247,8 +236,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $exception
-         *
          * @return array
          */
         public static function prepareExceptionForOutput($exception)
@@ -258,7 +245,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
-                    $exception = new FatalThrowableError($exception);
+                    $exception = new FatalError($exception->getMessage(), $exception->getCode(), ['file' => $exception->getFile(), 'line' => $exception->getLine()], 2, true);
                     $inline    = false;
                 } else {
                     return false;
@@ -335,7 +322,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 set_error_handler([self::$handler, 'handleError']);
 
                 // Hide errors by default so we can format them
-                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));
                 ini_set('display_errors', '0');
             }
 
@@ -391,8 +378,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param       $logLevel
-         * @param       $message
          * @param array $context
          * @param null  $debugTrace
          */
@@ -499,7 +484,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             try {
                 // Get the URLs base path
-                $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
+                $base  = str_replace(['index.php'], '', $_SERVER['SCRIPT_NAME']);
 
                 // Determine if there is an asset prefix
                 $root = self::$root;
@@ -514,13 +499,16 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
+                $mediaBase          = $assetPrefix.$base.$paths['media'];
+                $error['mediaBase'] = $mediaBase;
+
                 $assetBase          = $assetPrefix.$base.$paths['assets'];
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
                 $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig               = new \Twig\Environment($loader);
-                // This is the same filter Located at Mautic\CoreBundle\Templating\Twig\Extension\ExceptionExtension;
+                // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
                     $root = realpath(__DIR__.'/../../../../');
 
@@ -545,8 +533,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $bit
-         *
          * @return string
          */
         private function getErrorName($bit)

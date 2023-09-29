@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -138,6 +139,9 @@ class ListType extends AbstractType
                     'constraints'    => [
                         new CircularDependency([
                             'message' => 'mautic.core.segment.circular_dependency_exists',
+                        ]),
+                        new SegmentDate([
+                            'message' => 'mautic.lead.segment.date_invalid',
                         ]),
                     ],
                 ]

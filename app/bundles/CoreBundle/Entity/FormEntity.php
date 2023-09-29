@@ -16,7 +16,7 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 
@@ -31,12 +31,12 @@ class FormEntity extends CommonEntity
     private $createdByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateModified;
 
     /**
-     * var null|int.
+     * @var int|null
      */
     private $modifiedBy;
 
@@ -46,7 +46,7 @@ class FormEntity extends CommonEntity
     private $modifiedByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $checkedOut;
 
@@ -130,8 +130,6 @@ class FormEntity extends CommonEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -181,7 +179,7 @@ class FormEntity extends CommonEntity
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
             if ('published' == $status) {
-                //check to see if there is a category to check
+                // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
                     if (null !== $category && !$category->isPublished()) {
@@ -213,7 +211,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -238,7 +236,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateModified.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateModified()
     {
@@ -262,7 +260,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOut.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCheckedOut()
     {
@@ -323,7 +321,7 @@ class FormEntity extends CommonEntity
     /**
      * Get modifiedBy.
      *
-     * @return User
+     * @return int|null
      */
     public function getModifiedBy()
     {

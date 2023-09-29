@@ -147,7 +147,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              */
             $valueParams = [];
             for ($i = 0; $i < count($value); ++$i) {
-                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
+                $valueParams[$this->generateRandomParameterName()] = $value[$i];
             }
 
             $q->andWhere(
@@ -167,8 +167,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $email
-     *
      * @return Lead[]
      */
     public function getContactsByEmail($email)
@@ -197,7 +195,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
-            ->setParameter(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->setParameter('emails', $emails, Connection::PARAM_STR_ARRAY)
             ->getArrayResult();
 
         return array_map(
@@ -211,7 +209,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param     $uniqueFieldsWithData
      * @param int $leadId
      * @param int $limit
      *
@@ -236,8 +233,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->expr()->in('l.id', ':ids')
         )
             ->setParameter('ids', array_keys($leads))
-            ->orderBy('l.dateAdded', 'DESC')
-            ->addOrderBy('l.id', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('l.id', \Doctrine\Common\Collections\Criteria::DESC);
         $entities = $q->getQuery()
             ->getResult();
 
@@ -296,7 +293,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -313,7 +310,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('email = :search')
             ->setParameter('search', $email);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         if (count($result)) {
             return $all ? $result : $result[0];
@@ -325,7 +322,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get leads by IP address.
      *
-     * @param      $ip
      * @param bool $byId
      *
      * @return array
@@ -337,7 +333,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = ($byId) ? 'i.id' : 'i.ipAddress';
         $q->where($col.' = :ip')
             ->setParameter('ip', $ip)
-            ->orderBy('l.dateAdded', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
         $results = $q->getQuery()->getResult();
 
         /** @var Lead $lead */
@@ -349,8 +345,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $id
-     *
      * @return array
      */
     public function getLead($id)
@@ -359,7 +353,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $fq->select('l.*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where('l.id = '.$id);
-        $results = $fq->execute()->fetchAll();
+        $results = $fq->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0] : [];
     }
@@ -561,7 +555,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $order
      * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
@@ -571,14 +564,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $alias           = $this->getTableAlias();
         $select          = [$alias, 'u', $order];
         $q               = $this->getEntityManager()->createQueryBuilder();
-        $joinIpAddresses = !isset($args['joinIpAddresses']) || true === $args['joinIpAddresses'];
+        $joinIpAddresses = $args['joinIpAddresses'] ?? true;
 
         if ($joinIpAddresses) {
             $select[] = 'i';
         }
 
         $q->select($select)
-            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+            ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 
@@ -616,12 +609,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $contactColumnName = 'lead_id';
         }
 
-        $joinCondition = $qb->expr()->andX(
+        $joinCondition = $qb->expr()->and(
             $qb->expr()->eq($this->getTableAlias().'.id', 'entity.'.$contactColumnName)
         );
 
         if ($entityId && $entityColumnName) {
-            $joinCondition->add(
+            $joinCondition = $joinCondition->with(
                 $qb->expr()->eq("entity.{$entityColumnName}", (int) $entityId)
             );
         }
@@ -647,7 +640,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($filters) {
-            $expr = $qb->expr()->andX();
+            $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
@@ -655,8 +648,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (false === strpos($column, '.')) {
                         $column = "entity.$column";
                     }
-
-                    $expr->add(
+                    if (null === $expr) {
+                        $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
+                        $qb->andWhere($expr);
+                        continue;
+                    }
+                    $expr = $expr->with(
                         $qb->expr()->eq($column, $qb->createNamedParameter($value))
                     );
                     $qb->andWhere($expr);
@@ -680,7 +677,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the "catch all" where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -707,7 +703,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the command where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -716,10 +711,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $command             = $filter->command;
         $string              = $filter->string;
         $unique              = $this->generateRandomParameterName();
-        $returnParameter     = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter     = false; // returning a parameter that is not used will lead to a Doctrine error
         [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
-        //DBAL QueryBuilder does not have an expr()->not() function; boo!!
+        // DBAL QueryBuilder does not have an expr()->not() function; boo!!
 
         // This will be switched by some commands that use join tables as NOT EXISTS queries will be used
         $exprType = ($filter->not) ? 'negate_expr' : 'expr';
@@ -862,9 +857,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 
-                //logic. In query, Sum(manually_removed) should be less than the current)
+                // logic. In query, Sum(manually_removed) should be less than the current)
                 $pluck    = count($imploder);
-                $imploder = (string) (implode(',', $imploder));
+                $imploder = (string) implode(',', $imploder);
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('duplicate.lead_id')
@@ -1036,7 +1031,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return void
      */
-    public function updateLastActive($leadId)
+    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null)
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1044,7 +1039,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return;
         }
 
-        $dt     = new DateTimeHelper();
+        $dt     = new DateTimeHelper($lastActiveDate ?? '');
         $fields = ['last_active' => $dt->toUtcString()];
 
         $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'leads', $fields, ['id' => $leadId]);
@@ -1060,7 +1055,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $result = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('max(id) as max_lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->execute()->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         return $result[0]['max_lead_id'];
     }
@@ -1084,12 +1080,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('u.id = :ownerId')
             ->setParameter('ownerId', (int) $ownerId);
 
-        $result = $q->execute()->fetch();
+        $result = $q->executeQuery()->fetchAssociative();
 
         // Fix the HTML markup
         if (is_array($result)) {
             foreach ($result as &$field) {
-                $field = html_entity_decode($field);
+                $field = is_string($field) ? html_entity_decode($field) : $field;
             }
         }
 
@@ -1112,7 +1108,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'stages', 's');
         $q->join('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.stage_id = s.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('s.id', ':stageIds'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -1120,7 +1116,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -1141,7 +1137,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->join('u', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.owner_id = u.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('u.id', ':ownerIds'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -1149,7 +1145,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('ownerIds', implode(',', $ownerIds))
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -1164,7 +1160,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $qb->expr()->in('l.id', $contactIds)
             );
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         if ($results) {
             $contacts = [];
@@ -1179,7 +1175,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<int, Lead>
      */
     public function getContactCollection(array $ids)
     {
@@ -1209,7 +1205,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -1231,7 +1227,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $qb->expr()->isNotNull($this->getTableAlias().'.date_identified')
         );
 
-        return (int) $qb->execute()->fetchColumn();
+        return (int) $qb->executeQuery()->fetchOne();
     }
 
     /**
@@ -1243,7 +1239,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('count(*)')->from(sprintf('(%s)', $sql), 'sub');
 
-        return (int) $qb->execute()->fetchOne();
+        return (int) $qb->executeQuery()->fetchOne();
     }
 
     /**
@@ -1271,7 +1267,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from($this->getTableName(), $this->getTableAlias());
 
         $qb->where(
-            $qb->expr()->andX(
+            $qb->expr()->and(
                 $qb->expr()->gt("$alias.id", (int) $lastId),
                 $qb->expr()->isNotNull("$alias.date_identified")
             )
@@ -1279,7 +1275,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->orderBy("$alias.id")
             ->setMaxResults(1);
 
-        $next = $qb->execute()->fetchColumn();
+        $next = $qb->executeQuery()->fetchOne();
 
         return ($next) ? $this->getEntity($next) : null;
     }
@@ -1340,7 +1336,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param     $id
      * @param int $tries
      */
     protected function updateContactPoints(array $changes, $id, $tries = 1)
@@ -1360,11 +1355,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         try {
-            $qb->execute();
+            $qb->executeStatement();
         } catch (DriverException $exception) {
             $message = $exception->getMessage();
 
-            if (false !== strpos($message, 'Deadlock') && $tries <= 3) {
+            if (str_contains($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;
 
                 $this->updateContactPoints($changes, $id, $tries);
@@ -1376,8 +1371,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->select('l.points')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where('l.id = '.$id)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
     }
 
     /**
@@ -1402,9 +1397,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    /**
-     * @param $fields
-     */
     protected function prepareDbalFieldsForSave(&$fields)
     {
         // Do not save points as they are handled by postSaveEntity

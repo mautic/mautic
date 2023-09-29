@@ -41,7 +41,7 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->execute()->fetchColumn();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -101,7 +101,6 @@ class AuditLogRepository extends CommonRepository
 
     /**
      * @param array $filters
-     * @param $listOfContacts
      *
      * @return array
      */
@@ -154,11 +153,11 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param null $object
-     * @param null $id
-     * @param int  $limit
-     * @param null $afterDate
-     * @param null $bundle
+     * @param string|null $object
+     * @param string|null $id
+     * @param int         $limit
+     * @param null        $afterDate
+     * @param null        $bundle
      *
      * @return array
      */
@@ -190,7 +189,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', 'DESC')
+        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
@@ -208,7 +207,7 @@ class AuditLogRepository extends CommonRepository
             ->select('MAX(l.date_added) as date_added, MIN(l.id) as id, l.ip_address, l.object_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
-                $sqb->expr()->andX(
+                $sqb->expr()->and(
                     $sqb->expr()->eq('l.bundle', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.object', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
@@ -223,7 +222,7 @@ class AuditLogRepository extends CommonRepository
             $dateTimeHelper = new DateTimeHelper($lead->getDateAdded(), $dateTimeFormat, 'local');
 
             $sqb->andWhere(
-                $sqb->expr()->andX(
+                $sqb->expr()->and(
                     $sqb->expr()->eq('l.object_id', $lead->getId()),
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )

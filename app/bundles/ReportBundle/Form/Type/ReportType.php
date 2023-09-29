@@ -295,7 +295,7 @@ class ReportType extends AbstractType
                 );
             };
 
-            //Scheduler
+            // Scheduler
             $builder->add(
                 'isScheduled',
                 YesNoButtonGroupType::class,
@@ -390,8 +390,8 @@ class ReportType extends AbstractType
             $builder->addEventListener(
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier) {
-                    $data = $event->getData();
-                    $graphs = (isset($data['graphs'])) ? $data['graphs'] : [];
+                    $data    = $event->getData();
+                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
                     $columns = (isset($data['columns'])) ? $data['columns'] : [];
                     $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }

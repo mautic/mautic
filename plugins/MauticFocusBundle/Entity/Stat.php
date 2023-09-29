@@ -29,12 +29,12 @@ class Stat
     private $type;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $typeId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

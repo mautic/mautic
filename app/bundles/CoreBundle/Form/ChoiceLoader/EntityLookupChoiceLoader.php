@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Form\ChoiceLoader;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
@@ -182,8 +183,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $choices
-     *
      * @return array
      */
     protected function prepareChoices($choices)
@@ -222,9 +221,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $modelName
-     * @param $data
-     *
      * @return array|mixed
      */
     protected function fetchChoices($modelName, $data = [])
@@ -255,17 +251,17 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         } elseif (isset($this->options['repo_lookup_method'])) {
             $choices = call_user_func_array([$model->getRepository(), $this->options['repo_lookup_method']], $args);
         } else {
+            // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $expr->andX();
+            $composite = null;
 
             $limit = 100;
             if ($data) {
-                $composite->add(
-                    $expr->in($alias.'.id', $data)
-                );
+                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
+
                 if (count($data) > $limit) {
-                    $limit = $data;
+                    $limit = count($data);
                 }
             }
 

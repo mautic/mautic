@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -60,7 +59,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $entity = null;
         }
 
@@ -195,8 +194,6 @@ class LeadListRepository extends CommonRepository
     /**
      * Check Lead segments by ids.
      *
-     * @param $ids
-     *
      * @return bool
      */
     public function checkLeadSegmentsByIds(Lead $lead, $ids)
@@ -218,7 +215,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('leadId', $lead->getId())
             ->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
-        return (bool) $qb->execute()->fetchOne();
+        return (bool) $qb->executeQuery()->fetchOne();
     }
 
     /**
@@ -233,7 +230,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
             ->orderBy('l.name');
 
@@ -252,7 +249,7 @@ class LeadListRepository extends CommonRepository
 
         $q->select('partial l.{id, name, publicName, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
-            ->setParameter(':true', true, 'boolean')
+            ->setParameter('true', true, 'boolean')
             ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 
@@ -266,11 +263,11 @@ class LeadListRepository extends CommonRepository
      *
      * @return array|int
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function getLeadCount($listIds)
     {
-        if (!(is_array($listIds))) {
+        if (!is_array($listIds)) {
             $listIds = [$listIds];
         }
 
@@ -278,7 +275,6 @@ class LeadListRepository extends CommonRepository
         $q->select('count(l.lead_id) as thecount, l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
 
-        $expression   = null;
         $countListIds = count($listIds);
 
         if (1 === $countListIds) {
@@ -295,7 +291,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->groupBy('l.leadlist_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -323,8 +319,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param $filters
-     *
      * @return array
      */
     public function arrangeFilters($filters)
@@ -354,10 +348,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param      $table
-     * @param      $alias
-     * @param      $column
-     * @param      $value
      * @param null $leadId
      *
      * @return QueryBuilder
@@ -365,45 +355,37 @@ class LeadListRepository extends CommonRepository
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subExpr = $subQb->expr()->andX();
+        $subExpr = [];
+
+        foreach ($subQueryFilters as $subColumn => $subParameter) {
+            $subExpr[] = $subQb->expr()->eq($subColumn, ":$subParameter");
+        }
 
         if ('leads' !== $table) {
-            $subExpr->add(
-                $subQb->expr()->eq($alias.'.lead_id', 'l.id')
-            );
+            $subExpr[] = $subQb->expr()->eq($alias.'.lead_id', 'l.id');
         }
 
         // Specific lead
         if (!empty($leadId)) {
             $columnName = ('leads' === $table) ? 'id' : 'lead_id';
-            $subExpr->add(
-                $subQb->expr()->eq($alias.'.'.$columnName, $leadId)
-            );
-        }
-
-        foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr->add(
-                $subQb->expr()->eq($subColumn, ":$subParameter")
-            );
+            $subExpr[]  = $subQb->expr()->eq($alias.'.'.$columnName, $leadId);
         }
 
         if (null !== $value && !empty($column)) {
             $subFilterParamter = $this->generateRandomParameterName();
             $subFunc           = 'eq';
             if (is_array($value)) {
-                $subFunc = 'in';
-                $subExpr->add(
-                    $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
-                );
+                $subFunc                        = 'in';
+                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr->add(
-                $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
-            );
+            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
         }
+
+        $subQb->expr()->and(...$subExpr);
 
         $subQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.$table, $alias)
@@ -414,7 +396,6 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -432,7 +413,6 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -445,7 +425,7 @@ class LeadListRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
@@ -538,7 +518,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -550,7 +530,7 @@ class LeadListRepository extends CommonRepository
         $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
         $result    = (int) $this->getEntityManager()->getConnection()
             ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
-            ->fetchColumn();
+            ->fetchOne();
 
         return 1 === $result;
     }

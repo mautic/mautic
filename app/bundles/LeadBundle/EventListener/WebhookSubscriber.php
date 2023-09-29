@@ -6,8 +6,10 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -20,7 +22,7 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $webhookModel;
 
-    public function __construct(WebhookModel $webhookModel)
+    public function __construct(WebhookModel $webhookModel, private LeadModel $leadModel)
     {
         $this->webhookModel = $webhookModel;
     }
@@ -31,14 +33,16 @@ class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD           => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE                => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE            => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE              => ['onLeadDelete', 0],
-            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED  => ['onChannelSubscriptionChange', 0],
-            LeadEvents::LEAD_COMPANY_CHANGE           => ['onLeadCompanyChange', 0],
-            LeadEvents::COMPANY_POST_SAVE             => ['onCompanySave', 0],
-            LeadEvents::COMPANY_POST_DELETE           => ['onCompanyDelete', 0],
+            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
+            LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
+            LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],
+            LeadEvents::LEAD_LIST_CHANGE             => ['onSegmentChange', 0],
+            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentChange', 0],
         ];
     }
 
@@ -118,6 +122,15 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'description' => 'mautic.lead.webhook.event.company.deleted_desc',
             ]
         );
+
+        // add checkbox to the webhook contact segment membership changed
+        $event->addEvent(
+            LeadEvents::LEAD_LIST_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.segment.change',
+                'description' => 'mautic.lead.webhook.event.lead.segment.change.desc',
+            ]
+        );
     }
 
     public function onLeadNewUpdate(LeadEvent $event)
@@ -129,8 +142,13 @@ class WebhookSubscriber implements EventSubscriberInterface
         }
 
         $changes = $lead->getChanges(true);
+
+        if (empty($changes)) {
+            return;
+        }
+
         $this->webhookModel->queueWebhooksByType(
-        // Consider this a new contact if it was just identified, otherwise consider it updated
+            // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
                 'contact' => $event->getLead(),
@@ -248,5 +266,23 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'company' => $event->getCompany(),
             ]
         );
+    }
+
+    public function onSegmentChange(ListChangeEvent $changeEvent): void
+    {
+        $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
+        foreach ($contacts as $contact) {
+            if (is_array($contact)) {
+                $contact = $this->leadModel->getEntity($contact['id']);
+            }
+            $this->webhookModel->queueWebhooksByType(
+                LeadEvents::LEAD_LIST_CHANGE,
+                [
+                    'contact'  => $contact,
+                    'segment'  => $changeEvent->getList(),
+                    'action'   => $changeEvent->wasAdded() ? 'added' : 'removed',
+                ]
+            );
+        }
     }
 }

@@ -32,7 +32,38 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, ['noIndex' => [null, true]]];
     }
 
+    public function testGetMappedFieldValues(): void
+    {
+        $form   = $this->createForm();
+        $result = [
+            [
+                'formFieldId'  => null,
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ],
+            [
+                'formFieldId'  => null,
+                'mappedObject' => 'company',
+                'mappedField'  => 'companyemail',
+            ],
+            [
+                'formFieldId'  => null,
+                'mappedObject' => 'company',
+                'mappedField'  => 'companyname',
+            ],
+        ];
+
+        Assert::assertSame($result, $form->getMappedFieldValues());
+    }
+
     public function testGetMappedFieldObjects(): void
+    {
+        $form = $this->createForm();
+
+        Assert::assertSame(['contact', 'company'], $form->getMappedFieldObjects());
+    }
+
+    private function createForm(): Form
     {
         $form           = new Form();
         $contactField   = new Field();
@@ -40,13 +71,16 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         $companyFieldB  = new Field();
         $notMappedField = new Field();
         $contactField->setMappedObject('contact');
+        $contactField->setMappedField('email');
         $companyFieldA->setMappedObject('company');
+        $companyFieldA->setMappedField('companyemail');
         $companyFieldB->setMappedObject('company');
+        $companyFieldB->setMappedField('companyname');
         $form->addField('contact_field_a', $contactField);
         $form->addField('company_field_a', $companyFieldA);
         $form->addField('company_field_b', $companyFieldB);
         $form->addField('not_mapped_field_a', $notMappedField);
 
-        Assert::assertSame(['contact', 'company'], $form->getMappedFieldObjects());
+        return $form;
     }
 }

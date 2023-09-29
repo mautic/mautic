@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -25,6 +26,8 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,11 +36,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class ConfigController extends AbstractFormController
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
     /**
      * @var BasicIntegration|ConfigFormInterface
      */
@@ -49,60 +47,63 @@ class ConfigController extends AbstractFormController
     private $integrationConfiguration;
 
     /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    /**
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, string $integration)
-    {
+    public function editAction(
+        Request $request,
+        ConfigIntegrationsHelper $integrationsHelper,
+        EventDispatcherInterface $dispatcher,
+        FieldValidationHelper $fieldValidator,
+        FormFactoryInterface $formFactory,
+        FormExtension $formExtension,
+        string $integration
+    ) {
         // Check ACL
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
-        // Find the integration
-        /* @var ConfigIntegrationsHelper $integrationsHelper */
-        $this->integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
-
         try {
-            $this->integrationObject        = $this->integrationsHelper->getIntegration($integration);
+            $this->integrationObject        = $integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
         }
 
-        $dispatcher = $this->get('event_dispatcher');
-        $event      = new FormLoadEvent($this->integrationConfiguration);
+        $event = new FormLoadEvent($this->integrationConfiguration);
         $dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
-        // Set the request for private methods
-        $this->request = $request;
-
         // Create the form
-        $form = $this->getForm();
+        $form = $this->getForm($formFactory);
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($form);
+            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $dispatcher, $formFactory, $formExtension, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
         /** @var Session $session */
-        $session = $this->get('session');
+        $session = $request->getSession();
         $session->remove("$integration-fields");
 
-        return $this->showForm($form);
+        return $this->showForm($request, $form, $formExtension);
     }
 
     /**
+     * @param FormInterface<FormInterface> $form
+     *
      * @return JsonResponse|Response
      */
-    private function submitForm(Form $form)
-    {
+    private function submitForm(
+        Request $request,
+        ConfigIntegrationsHelper $integrationsHelper,
+        FieldValidationHelper $fieldValidator,
+        EventDispatcherInterface $eventDispatcher,
+        FormFactoryInterface $formFactory,
+        FormExtension $formExtension,
+        FormInterface $form
+    ) {
         if ($this->isFormCancelled($form)) {
-            return $this->closeForm();
+            return $this->closeForm($request);
         }
 
         // Get the fields before the form binds partial data due to pagination
@@ -110,11 +111,11 @@ class ConfigController extends AbstractFormController
         $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
 
         // Submit the form
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
-            $session       = $this->get('session');
+            $session       = $request->getSession();
             $updatedFields = $session->get("$integration-fields", []);
 
             $fieldMerger = new FieldMergerHelper($this->integrationObject, $fieldMappings);
@@ -125,28 +126,24 @@ class ConfigController extends AbstractFormController
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
 
-            /** @var FieldValidationHelper $fieldValidator */
-            $fieldValidator = $this->get('mautic.integrations.helper.field_validator');
             $fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
             $this->integrationConfiguration->setFeatureSettings($settings);
         }
 
         // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $eventDispatcher = $this->get('event_dispatcher');
-        $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
+        $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
         $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
-        $integrationDetailsPost = $this->request->request->get('integration_details', []);
+        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = !empty($integrationDetailsPost['in_auth']);
         if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm($form);
+            return $this->showForm($request, $form, $formExtension);
         }
 
         // Save the integration configuration
-        $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
+        $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
         $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
@@ -154,22 +151,22 @@ class ConfigController extends AbstractFormController
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($form)) {
             // Regenerate the form
-            $this->resetFieldsInSession();
-            $form = $this->getForm();
+            $this->resetFieldsInSession($request);
+            $form = $this->getForm($formFactory);
 
-            return $this->showForm($form);
+            return $this->showForm($request, $form, $formExtension);
         }
 
         // Otherwise close the modal
-        return $this->closeForm();
+        return $this->closeForm($request);
     }
 
     /**
-     * @return Form
+     * @return FormInterface<FormInterface>
      */
-    private function getForm()
+    private function getForm(FormFactoryInterface $formFactory)
     {
-        return $this->get('form.factory')->create(
+        return $formFactory->create(
             $this->integrationObject->getConfigFormName() ?: IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
@@ -180,27 +177,28 @@ class ConfigController extends AbstractFormController
     }
 
     /**
+     * @param FormInterface<FormInterface> $form
+     *
      * @return JsonResponse|Response
      */
-    private function showForm(Form $form)
+    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $form->createView();
-        $formHelper        = $this->get('templating.helper.form');
+        $formView          = $form->createView();
 
         $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
             $integrationObject instanceof ConfigFormSyncInterface ||
             $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
         $hasFeatureErrors = (
-                $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
-                $formHelper->containsErrors($form['featureSettings']['integration'])
-            ) || (
-                isset($form['featureSettings']['sync']['integration']) &&
-                $formHelper->containsErrors($form['featureSettings']['sync']['integration'])
-            );
+            $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
+            $formExtension->containsErrors($formView['featureSettings']['integration'])
+        ) || (
+            isset($formView['featureSettings']['sync']['integration']) &&
+            $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
+        );
 
-        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formHelper->containsErrors($form['apiKeys']);
+        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
 
         $useSyncFeatures = $integrationObject instanceof ConfigFormSyncInterface;
 
@@ -218,8 +216,8 @@ class ConfigController extends AbstractFormController
             [
                 'viewParameters' => [
                     'integrationObject'   => $integrationObject,
-                    'form'                => $form,
-                    'activeTab'           => $this->request->get('activeTab'),
+                    'form'                => $formView,
+                    'activeTab'           => $request->get('activeTab'),
                     'showFeaturesTab'     => $showFeaturesTab,
                     'hasFeatureErrors'    => $hasFeatureErrors,
                     'hasAuthErrors'       => $hasAuthErrors,
@@ -230,7 +228,7 @@ class ConfigController extends AbstractFormController
                     'useConfigFormNotes'  => $useConfigFormNotes,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
-                    ?: 'Integrations/Config/form.html.twig',
+                    ?: '@Integrations/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',
@@ -243,9 +241,9 @@ class ConfigController extends AbstractFormController
     /**
      * @return JsonResponse
      */
-    private function closeForm()
+    private function closeForm(Request $request)
     {
-        $this->resetFieldsInSession();
+        $this->resetFieldsInSession($request);
 
         $response = [
             'closeModal'    => 1,
@@ -262,10 +260,9 @@ class ConfigController extends AbstractFormController
         return new JsonResponse($response);
     }
 
-    private function resetFieldsInSession(): void
+    private function resetFieldsInSession(Request $request): void
     {
-        /** @var Session $session */
-        $session = $this->get('session');
+        $session = $request->getSession();
         $session->remove("{$this->integrationObject->getName()}-fields");
     }
 }

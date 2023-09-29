@@ -60,7 +60,6 @@ class RedirectRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      */
@@ -76,7 +75,7 @@ class RedirectRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeQuery();
     }
 
     /**
@@ -133,7 +132,7 @@ class RedirectRepository extends CommonRepository
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('cl.company_id', ':companyId'),
                         $sb->expr()->eq('cl.lead_id', 'ph.lead_id')
                     )
@@ -151,7 +150,7 @@ class RedirectRepository extends CommonRepository
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
                         $sb->expr()->eq('lll.manually_removed', 0)
@@ -170,6 +169,6 @@ class RedirectRepository extends CommonRepository
 
         $q->orderBy('hits', 'DESC');
 
-        return $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

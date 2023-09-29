@@ -17,10 +17,10 @@ class PageRepository extends CommonRepository
         $select = ['p'];
 
         if (!empty($args['submissionCount'])) {
-            //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+            // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from('MauticFormBundle:Submission', 'fs')
+                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';
@@ -88,7 +88,7 @@ class PageRepository extends CommonRepository
         }
 
         if ('translation' == $topLevel) {
-            //only get top level pages
+            // only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
         } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
@@ -140,7 +140,7 @@ class PageRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -216,9 +216,6 @@ class PageRepository extends CommonRepository
 
     /**
      * Resets variant_start_date and variant_hits.
-     *
-     * @param $relatedIds
-     * @param $date
      */
     public function resetVariants($relatedIds, $date)
     {
@@ -234,13 +231,12 @@ class PageRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $relatedIds)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Up the hit count.
      *
-     * @param            $id
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant
@@ -261,6 +257,6 @@ class PageRepository extends CommonRepository
             $q->set('variant_hits', 'variant_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 }

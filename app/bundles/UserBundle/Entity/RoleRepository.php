@@ -38,7 +38,7 @@ class RoleRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial r.{id, name}')
-            ->from('MauticUserBundle:Role', 'r');
+            ->from(\Mautic\UserBundle\Entity\Role::class, 'r');
 
         if (!empty($search)) {
             $q->where('r.name LIKE :search')
@@ -77,7 +77,7 @@ class RoleRepository extends CommonRepository
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
@@ -110,8 +110,6 @@ class RoleRepository extends CommonRepository
     /**
      * Get a count of users that belong to the role.
      *
-     * @param $roleIds
-     *
      * @return array
      */
     public function getUserCount($roleIds)
@@ -121,7 +119,7 @@ class RoleRepository extends CommonRepository
         $q->select('count(u.id) as thecount, u.role_id')
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u');
 
-        $returnArray = (is_array($roleIds));
+        $returnArray = is_array($roleIds);
 
         if (!$returnArray) {
             $roleIds = [$roleIds];
@@ -132,7 +130,7 @@ class RoleRepository extends CommonRepository
         )
             ->groupBy('u.role_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

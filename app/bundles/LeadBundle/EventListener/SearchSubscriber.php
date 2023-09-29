@@ -87,7 +87,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $mine      = $this->translator->trans('mautic.core.searchcommand.ismine');
         $filter    = ['string' => $str, 'force' => ''];
 
-        //only show results that are not anonymous so as to not clutter up things
+        // only show results that are not anonymous so as to not clutter up things
         if (false === strpos($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
@@ -98,7 +98,7 @@ class SearchSubscriber implements EventSubscriberInterface
         );
 
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
-            //only show own leads if the user does not have permission to view others
+            // only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
                 $filter['force'] .= " $mine";
             }
@@ -118,14 +118,14 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($leads as $lead) {
                     $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents\Search/global.html.twig',
+                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
                         ['lead' => $lead]
                     );
                 }
 
                 if ($results['count'] > 5) {
                     $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents\Search/global.html.twig',
+                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -361,14 +361,14 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $alias = $event->getAlias();
         $q     = $event->getQueryBuilder();
-        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+        $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
-        $expr->add(sprintf('%s = %s',
+        $expr = $expr->with(sprintf('%s = %s',
             'mq.channel',
             $q->createNamedParameter('email')
         ));
 
-        $expr->add(sprintf('%s IN (%s, %s)',
+        $expr = $expr->with(sprintf('%s IN (%s, %s)',
             'mq.status',
             $q->createNamedParameter(MessageQueue::STATUS_PENDING),
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
@@ -485,13 +485,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $alias = $event->getAlias();
         $q     = $event->getQueryBuilder();
-        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+        $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
         if (isset($config['params'])) {
             $params = (array) $config['params'];
             foreach ($params as $name => $value) {
                 $param = $q->createNamedParameter($value);
-                $expr->add(sprintf('%s = %s', $name, $param));
+                $expr  = $expr->with(sprintf('%s = %s', $name, $param));
             }
         }
 

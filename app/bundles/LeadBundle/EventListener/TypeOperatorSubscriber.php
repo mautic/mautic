@@ -122,9 +122,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $emails);
         $event->setChoicesForFieldAlias('lead_email_sent', $emails);
-        $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
+        $event->setChoicesForFieldAlias('device_type', array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames()));
         $event->setChoicesForFieldAlias('device_brand', array_flip(DeviceParser::$deviceBrands));
-        $event->setChoicesForFieldAlias('device_os', array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
+        $event->setChoicesForFieldAlias('device_os', array_combine(array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());

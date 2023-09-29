@@ -25,13 +25,14 @@ class UserHelper
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->join('u', MAUTIC_TABLE_PREFIX.'roles', 'r', 'r.id = u.role_id')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('r.is_published', 1),
                     $qb->expr()->eq('r.is_admin', 1),
                     $qb->expr()->eq('u.is_published', 1)
                 )
             )
-            ->execute()->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $admins = [];
         foreach ($results as $result) {

@@ -264,7 +264,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $fieldsToUpdate
      * @param array $objects
      *
      * @return array
@@ -342,17 +341,17 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         if ('keys' === $formArea) {
             $builder->add(
-                   self::ACCESS_KEY,
-                   TextType::class,
-                   [
-                       'label'       => 'mautic.hubspot.form.accessKey',
-                       'label_attr'  => ['class' => 'control-label'],
-                       'attr'        => [
-                           'class'    => 'form-control',
-                       ],
-                       'required'    => false,
-                   ]
-               );
+                self::ACCESS_KEY,
+                TextType::class,
+                [
+                    'label'       => 'mautic.hubspot.form.accessKey',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'    => 'form-control',
+                    ],
+                    'required'    => false,
+                ]
+            );
 
             $builder->add(
                 $this->getApiKey(),
@@ -389,9 +388,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $data
-     * @param $object
-     *
      * @return array
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
@@ -444,9 +440,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                         if (is_array($contact)) {
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
-                            if ($contact && !$contact->isNewlyCreated()) { //updated
+                            if ($contact && !$contact->isNewlyCreated()) { // updated
                                 $executed[0] = $executed[0] + 1;
-                            } elseif ($contact && $contact->isNewlyCreated()) { //newly created
+                            } elseif ($contact && $contact->isNewlyCreated()) { // newly created
                                 $executed[1] = $executed[1] + 1;
                             }
 
@@ -489,25 +485,24 @@ class HubspotIntegration extends CrmAbstractIntegration
                 } else {
                     $results['results'] = array_merge($results, $data['results']);
                 }
-                if (isset($results['results'])) {
-                    foreach ($results['results'] as $company) {
-                        if (isset($company['properties'])) {
-                            $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
-                            $company     = $this->getMauticCompany($companyData);
-                            if ($id) {
-                                return $company;
-                            }
-                            if ($company) {
-                                ++$executed;
-                                $this->em->detach($company);
-                            }
+
+                foreach ($results['results'] as $company) {
+                    if (isset($company['properties'])) {
+                        $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
+                        $company     = $this->getMauticCompany($companyData);
+                        if ($id) {
+                            return $company;
+                        }
+                        if ($company) {
+                            ++$executed;
+                            $this->em->detach($company);
                         }
                     }
-                    if (isset($data['hasMore']) and $data['hasMore']) {
-                        $params['offset'] = $data['offset'];
-                        if ($params['offset'] < strtotime($params['start'])) {
-                            $this->getCompanies($params, $id, $executed);
-                        }
+                }
+                if (isset($data['hasMore']) and $data['hasMore']) {
+                    $params['offset'] = $data['offset'];
+                    if ($params['offset'] < strtotime($params['start'])) {
+                        $this->getCompanies($params, $id, $executed);
                     }
                 }
 
@@ -553,7 +548,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+                $stage = $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class)->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();
@@ -563,7 +558,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 if (!$lead->getStage() && $lead->getStage() != $stage) {
                     $lead->setStage($stage);
 
-                    //add a contact stage change log
+                    // add a contact stage change log
                     $log = new StagesChangeLog();
                     $log->setStage($stage);
                     $log->setEventName($stage->getId().':'.$stage->getName());
@@ -596,7 +591,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->em->detach($company);
                     }
                 } catch (\Exception $exception) {
-                    $this->logger->addWarning($exception->getMessage());
+                    $this->logger->warning($exception->getMessage());
 
                     return;
                 }
@@ -624,7 +619,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
 
-        //@todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
+        // @todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
         $updateFields = array_intersect_key(
             $createFields,
             $fieldsToUpdate
@@ -661,7 +656,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
             if (!empty($leadData['vid'])) {
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
                 $integrationEntity     = (empty($integrationId)) ?
                     $this->createIntegrationEntity(
@@ -686,8 +681,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Amend mapped lead data before pushing to CRM.
-     *
-     * @param $mappedData
      */
     public function amendLeadDataBeforePush(&$mappedData)
     {
@@ -697,8 +690,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $object
-     *
      * @return array
      *
      * @throws \Exception

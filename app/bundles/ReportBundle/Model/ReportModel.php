@@ -2,14 +2,18 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -23,11 +27,15 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
@@ -58,10 +66,7 @@ class ReportModel extends FormModel
      */
     protected $channelListHelper;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
     /**
      * @var FieldModel
@@ -90,7 +95,15 @@ class ReportModel extends FormModel
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
         CsvExporter $csvExporter,
-        ExcelExporter $excelExporter
+        ExcelExporter $excelExporter,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        RequestStack $requestStack
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->twig              = $twig;
@@ -99,11 +112,9 @@ class ReportModel extends FormModel
         $this->reportHelper      = $reportHelper;
         $this->csvExporter       = $csvExporter;
         $this->excelExporter     = $excelExporter;
-    }
+        $this->requestStack      = $requestStack;
 
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -124,12 +135,20 @@ class ReportModel extends FormModel
         return 'report:reports';
     }
 
+    protected function getSession(): Session
+    {
+        $session = $this->requestStack->getSession();
+        \assert($session instanceof Session);
+
+        return $session;
+    }
+
     /**
      * {@inheritdoc}
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -212,8 +231,6 @@ class ReportModel extends FormModel
     /**
      * Build the table and graph data.
      *
-     * @param $context
-     *
      * @return mixed
      */
     public function buildAvailableReports($context, ?string $reportSource = null)
@@ -224,7 +241,7 @@ class ReportModel extends FormModel
                 $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
                 $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
-                //build them
+                // build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
@@ -418,16 +435,13 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, Report $report, array $reportData, $handle = null, $page = null)
+    public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
         $date = (new DateTimeHelper())->toLocalString();
         $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                //build the data rows
-                $reportDataResult = new ReportDataResult($reportData);
-
                 if (!is_null($handle)) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
@@ -451,15 +465,9 @@ class ReportModel extends FormModel
                 $content = $this->twig->render(
                     '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData'       => $reportData,
-                        'data'             => $reportData['data'],
-                        'columns'          => $reportData['columns'],
                         'pageTitle'        => $name,
-                        'graphs'           => $reportData['graphs'],
                         'report'           => $report,
-                        'dateFrom'         => $reportData['dateFrom'],
-                        'dateTo'           => $reportData['dateTo'],
-                        'reportDataResult' => new ReportDataResult($reportData),
+                        'reportDataResult' => $reportDataResult,
                     ]
                 );
 
@@ -471,8 +479,8 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportData, $name) {
-                        $this->excelExporter->export($reportData, $name);
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
 
@@ -544,8 +552,8 @@ class ReportModel extends FormModel
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
-        $orderBy    = $this->session->get('mautic.report.'.$entity->getId().'.orderby', '');
-        $orderByDir = $this->session->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
+        $orderBy    = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderby', '');
+        $orderByDir = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
 
         $dataOptions = [
             'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
@@ -562,8 +570,8 @@ class ReportModel extends FormModel
 
         $contentTemplate = $reportGenerator->getContentTemplate();
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        // set what page currently on so that we can return here after form submission/cancellation
+        $this->getSession()->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -616,7 +624,7 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                $limit = $this->getSession()->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];
@@ -639,7 +647,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -676,7 +684,7 @@ class ReportModel extends FormModel
 
         foreach ($data as $keys => $lead) {
             foreach ($lead as $key => $field) {
-                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+                $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
             }
         }
 
@@ -748,7 +756,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->executeQuery()->fetchOne();
     }
 
     /**
@@ -787,11 +795,12 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
-            $this->em->getConnection()->connect('slave');
+        $connection = $this->em->getConnection();
+        if ($connection instanceof PrimaryReadReplicaConnection) {
+            $connection->ensureConnectedToReplica();
         }
 
-        return $this->em->getConnection();
+        return $connection;
     }
 
     protected function isDebugMode(): bool

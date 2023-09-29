@@ -103,53 +103,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.campaign.model.campaign' => [
-                'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.form.model.form',
-                    'mautic.campaign.event_collector',
-                    'mautic.campaign.membership.builder',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.campaign.model.event'     => [
-                'class'     => \Mautic\CampaignBundle\Model\EventModel::class,
-                'arguments' => [
-                    'mautic.user.model.user',
-                    'mautic.core.model.notification',
-                    'mautic.campaign.model.campaign',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.ip_lookup',
-                    'mautic.campaign.executioner.realtime',
-                    'mautic.campaign.executioner.kickoff',
-                    'mautic.campaign.executioner.scheduled',
-                    'mautic.campaign.executioner.inactive',
-                    'mautic.campaign.event_executioner',
-                    'mautic.campaign.event_collector',
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.dispatcher.condition',
-                    'mautic.campaign.dispatcher.decision',
-                    'mautic.campaign.repository.lead_event_log',
-                ],
-            ],
-            'mautic.campaign.model.event_log' => [
-                'class'     => \Mautic\CampaignBundle\Model\EventLogModel::class,
-                'arguments' => [
-                    'mautic.campaign.model.event',
-                    'mautic.campaign.model.campaign',
-                    'mautic.helper.ip_lookup',
-                    'mautic.campaign.scheduler',
-                ],
-            ],
-            'mautic.campaign.model.summary' => [
-                'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
-                'arguments' => [
-                    'mautic.campaign.repository.lead_event_log',
-                ],
-            ],
-        ],
         'repositories' => [
             'mautic.campaign.repository.campaign' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
@@ -415,7 +368,7 @@ return [
                     'mautic.campaign.repository.lead',
                     'mautic.campaign.repository.lead_event_log',
                     'translator',
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                 ],
             ],
             'mautic.campaign.membership.event_dispatcher' => [

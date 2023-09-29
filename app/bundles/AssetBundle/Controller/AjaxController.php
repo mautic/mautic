@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function categoryListAction(Request $request)
+    public function categoryListAction(Request $request)
     {
         $assetModel = $this->getModel('asset');
         \assert($assetModel instanceof AssetModel);
@@ -40,7 +40,7 @@ class AjaxController extends CommonAjaxController
      *
      * @throws \Exception
      */
-    protected function fetchRemoteFilesAction(Request $request)
+    public function fetchRemoteFilesAction(Request $request)
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));

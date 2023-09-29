@@ -38,12 +38,12 @@ class DoNotContact
     private $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -53,7 +53,7 @@ class DoNotContact
     private $reason = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $comments;
 
@@ -93,8 +93,6 @@ class DoNotContact
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -144,7 +142,7 @@ class DoNotContact
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -196,7 +194,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = InputHelper::string($comments);
+        $this->comments = InputHelper::string((string) $comments);
 
         return $this;
     }

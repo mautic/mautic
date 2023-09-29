@@ -11,6 +11,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
@@ -19,7 +20,7 @@ class DynamicContentController extends FormController
      */
     protected function getPermissions()
     {
-        return (array) $this->get('mautic.security')->isGranted(
+        return (array) $this->security->isGranted(
             [
                 'dynamiccontent:dynamiccontents:viewown',
                 'dynamiccontent:dynamiccontents:viewother',
@@ -38,7 +39,7 @@ class DynamicContentController extends FormController
     /**
      * {@inheritdoc}
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
         $model = $this->getModel('dynamicContent');
 
@@ -50,16 +51,16 @@ class DynamicContentController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.dynamicContent.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        // set limits
+        $limit = $request->getSession()->get('mautic.dynamicContent.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
         // fetch
-        $search = $this->request->get('search', $this->get('session')->get('mautic.dynamicContent.filter', ''));
-        $this->get('session')->set('mautic.dynamicContent.filter', $search);
+        $search = $request->get('search', $request->getSession()->get('mautic.dynamicContent.filter', ''));
+        $request->getSession()->set('mautic.dynamicContent.filter', $search);
 
         $filter = [
             'string' => $search,
@@ -69,8 +70,8 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        $orderBy    = $this->get('session')->get('mautic.dynamicContent.orderby', 'e.name');
-        $orderByDir = $this->get('session')->get('mautic.dynamicContent.orderbydir', 'DESC');
+        $orderBy    = $request->getSession()->get('mautic.dynamicContent.orderby', 'e.name');
+        $orderByDir = $request->getSession()->get('mautic.dynamicContent.orderbydir', 'DESC');
 
         $entities = $model->getEntities(
             [
@@ -82,12 +83,12 @@ class DynamicContentController extends FormController
             ]
         );
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.dynamicContent.page', $page);
+        // set what page currently on so that we can return here after form submission/cancellation
+        $request->getSession()->set('mautic.dynamicContent.page', $page);
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        //retrieve a list of categories
+        // retrieve a list of categories
         $pageModel  = $this->getModel('page');
         \assert($pageModel instanceof PageModel);
         $categories = $pageModel->getLookupResults('category', '', 0);
@@ -117,9 +118,9 @@ class DynamicContentController extends FormController
     /**
      * {@inheritdoc}
      */
-    public function newAction($entity = null)
+    public function newAction(Request $request, $entity = null)
     {
-        if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')) {
+        if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             return $this->accessDenied();
         }
 
@@ -129,15 +130,15 @@ class DynamicContentController extends FormController
 
         $model = $this->getModel('dynamicContent');
         \assert($model instanceof DynamicContentModel);
-        $method       = $this->request->getMethod();
-        $page         = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        $method       = $request->getMethod();
+        $page         = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $retUrl       = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
         $action       = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'new']);
-        $dwc          = $this->request->request->get('dwc', []);
+        $dwc          = $request->request->get('dwc') ?? [];
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
-            : $this->request->get('updateSelect', false);
-        $form         = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
+            : $request->get('updateSelect', false);
+        $form         = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -146,7 +147,7 @@ class DynamicContentController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -169,8 +170,8 @@ class DynamicContentController extends FormController
                         $retUrl   = $this->generateUrl('mautic_dynamicContent_action', $viewParameters);
                         $template = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::viewAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
-                        return $this->editAction($entity->getId(), true);
+                        // return edit view so that all the session stuff is loaded
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             } else {
@@ -208,7 +209,7 @@ class DynamicContentController extends FormController
                     ]
                 );
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($entity->getId(), true);
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 
@@ -228,17 +229,16 @@ class DynamicContentController extends FormController
     /**
      * Generate's edit form and processes post data.
      *
-     * @param            $objectId
      * @param bool|false $ignorePost
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         /** @var DynamicContentModel $model */
         $model  = $this->getModel('dynamicContent');
         $entity = $model->getEntity($objectId);
-        $page   = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        $page   = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $retUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
 
         $postActionVars = [
@@ -266,32 +266,32 @@ class DynamicContentController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
+        } elseif (!$this->security->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'dynamicContent');
         }
 
         $action       = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $method       = $this->request->getMethod();
-        $dwc          = $this->request->request->get('dwc', []);
+        $method       = $request->getMethod();
+        $dwc          = $request->request->get('dwc') ?? [];
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
-            : $this->request->get('updateSelect', false);
+            : $request->get('updateSelect', false);
 
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -307,15 +307,15 @@ class DynamicContentController extends FormController
                     );
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                return $this->viewAction($entity->getId());
+                return $this->viewAction($request, $entity->getId());
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -342,18 +342,18 @@ class DynamicContentController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, $objectId)
     {
         $model = $this->getModel('dynamicContent');
         \assert($model instanceof DynamicContentModel);
-        $security = $this->get('mautic.security');
+        $security = $this->security;
         $entity   = $model->getEntity($objectId);
 
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        // set the page we came from
+        $page = $request->getSession()->get('mautic.dynamicContent.page', 1);
 
         if (null === $entity) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
 
             return $this->postActionRedirect(
@@ -393,9 +393,9 @@ class DynamicContentController extends FormController
         $logs          = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
-        $dateRangeValues = $this->request->get('daterange', []);
+        $dateRangeValues = $request->get('daterange', []);
         $action          = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -420,7 +420,7 @@ class DynamicContentController extends FormController
                     'entity'       => $entity,
                     'permissions'  => $this->getPermissions(),
                     'logs'         => $logs,
-                    'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
+                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
                     'translations' => [
                         'parent'   => $translationParent,
                         'children' => $translationChildren,
@@ -436,8 +436,6 @@ class DynamicContentController extends FormController
     /**
      * Clone an entity.
      *
-     * @param $objectId
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
@@ -446,8 +444,8 @@ class DynamicContentController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
-                || !$this->get('mautic.security')->hasEntityAccess(
+            if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')
+                || !$this->security->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
@@ -465,13 +463,11 @@ class DynamicContentController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        $page      = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        $page      = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
         $flashes   = [];
 
@@ -485,7 +481,7 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $this->request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model  = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
             $entity = $model->getEntity($objectId);
@@ -498,7 +494,7 @@ class DynamicContentController extends FormController
                 ];
 
                 return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
-            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            } elseif (!$this->security->hasEntityAccess(
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
                 $entity->getCreatedBy()
@@ -519,7 +515,7 @@ class DynamicContentController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
     }
@@ -527,11 +523,11 @@ class DynamicContentController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        $page      = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        $page      = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
         $flashes   = [];
 
@@ -545,10 +541,10 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $this->request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
-            $ids = json_decode($this->request->query->get('ids', '{}'));
+            $ids = json_decode($request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
@@ -562,7 +558,7 @@ class DynamicContentController extends FormController
                         'msg'     => 'mautic.dynamicContent.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->hasEntityAccess(
+                } elseif (!$this->security->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
@@ -588,7 +584,7 @@ class DynamicContentController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
     }

@@ -46,7 +46,7 @@ class BroadcastQuery
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -57,7 +57,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchColumn();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -67,12 +67,12 @@ class BroadcastQuery
     {
         $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
-            $this->query->expr()->orX(
-                $this->query->expr()->orX(
+            $this->query->expr()->or(
+                $this->query->expr()->or(
                     $this->query->expr()->isNotNull('l.mobile'),
                     $this->query->expr()->neq('l.mobile', $this->query->expr()->literal(''))
                 ),
-                $this->query->expr()->orX(
+                $this->query->expr()->or(
                     $this->query->expr()->isNotNull('l.phone'),
                     $this->query->expr()->neq('l.phone', $this->query->expr()->literal(''))
                 )
@@ -92,10 +92,10 @@ class BroadcastQuery
         $statQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
-                $statQb->expr()->andX(
-                $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                $statQb->expr()->eq('stat.sms_id', $smsId)
-                    )
+                $statQb->expr()->and(
+                    $statQb->expr()->eq('stat.lead_id', 'l.id'),
+                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                )
             );
 
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));
@@ -108,7 +108,7 @@ class BroadcastQuery
         $dncQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->andX(
+                $dncQb->expr()->and(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('sms'))
                 )
@@ -123,7 +123,7 @@ class BroadcastQuery
         $mqQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
-                $mqQb->expr()->andX(
+                $mqQb->expr()->and(
                     $mqQb->expr()->eq('mq.lead_id', 'l.id'),
                     $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))

@@ -40,16 +40,6 @@ return [
         ],
     ],
     'services' => [
-        'models' => [
-            'mautic.dashboard.model.dashboard' => [
-                'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                    'symfony.filesystem',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.dashboard.widget' => [
                 'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
@@ -62,7 +52,7 @@ return [
         ],
     ],
     'parameters' => [
-        'dashboard_import_dir'      => '%kernel.project_dir%/media/dashboards',
-        'dashboard_import_user_dir' => null,
+        'dashboard_import_dir'      => '%kernel.project_dir%/app/assets/dashboards',
+        'dashboard_import_user_dir' => '%kernel.project_dir%/media/dashboards',
     ],
 ];

@@ -9,8 +9,8 @@ use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -160,7 +160,11 @@ class FormSubscriber implements EventSubscriberInterface
             'message'       => $message,
             'messengerMode' => $messengerMode,
         ]    = $event->getPostSubmitCallback('asset.download_file');
-        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]).'&stream=0';
+
+        $url = $this->assetModel->generateUrl($asset, true, [
+            'lead'    => $event->getLead() ? $event->getLead()->getId() : null,
+            'channel' => ['form' => $form->getId()],
+            ]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);

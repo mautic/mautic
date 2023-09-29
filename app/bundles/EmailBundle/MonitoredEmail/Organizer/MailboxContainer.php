@@ -34,10 +34,6 @@ class MailboxContainer
         $this->config = $config;
     }
 
-    /**
-     * @param $criteria
-     * @param $mailbox
-     */
     public function addCriteria($criteria, $mailbox)
     {
         if (!isset($this->criteria[$criteria])) {

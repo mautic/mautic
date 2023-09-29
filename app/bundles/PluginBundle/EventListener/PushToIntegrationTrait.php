@@ -35,9 +35,6 @@ trait PushToIntegrationTrait
         static::$integrationHelper = $integrationHelper;
     }
 
-    /**
-     * @param $lead
-     */
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
     {
         return static::pushIt($config, $lead, $errors);
@@ -45,10 +42,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
-     *
-     * @param $config
-     * @param $lead
-     * @param $errors
      *
      * @return bool
      */

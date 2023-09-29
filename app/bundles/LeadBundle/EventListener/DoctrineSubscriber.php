@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
@@ -11,7 +12,7 @@ use Monolog\Logger;
 /**
  * Class DoctrineSubscriber.
  */
-class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
+class DoctrineSubscriber implements EventSubscriber
 {
     /**
      * @var Logger
@@ -53,19 +54,20 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             foreach ($objects as $object => $tableName) {
                 $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
-                //get a list of fields
+                // get a list of fields
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute()->fetchAll();
+                    ->executeQuery()
+                    ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && 'email' != $f['alias']) {
+                    if ($f['is_unique'] && 'email' !== $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
@@ -112,8 +114,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             if (defined('MAUTIC_INSTALLER')) {
                 return;
             }
-            //table doesn't exist or something bad happened so oh well
-            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
+            // table doesn't exist or something bad happened so oh well
+            $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }

@@ -2,25 +2,20 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
-use Mautic\PageBundle\Entity\PageRepository;
-use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
-use Mautic\PageBundle\Model\PageModel;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
-use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
@@ -35,51 +30,21 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 
-    public function testOnPageHitWhenCalledAcknowledgesHit()
-    {
-        $dispatcher = new EventDispatcher();
-        $subscriber = $this->getPageSubscriber();
-
-        $dispatcher->addSubscriber($subscriber);
-
-        $payload = $this->getNonEmptyPayload();
-        $event   = new QueueConsumerEvent($payload);
-
-        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
-
-        $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
-    }
-
-    public function testOnPageHitWhenCalledRejectsBadHit()
-    {
-        $dispatcher = new EventDispatcher();
-        $subscriber = $this->getPageSubscriber();
-
-        $dispatcher->addSubscriber($subscriber);
-
-        $payload = $this->getEmptyPayload();
-        $event   = new QueueConsumerEvent($payload);
-
-        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
-
-        $this->assertEquals($event->getResult(), QueueConsumerResults::REJECT);
-    }
-
     /**
      * Get page subscriber with mocked dependencies.
-     *
-     * @return PageSubscriber
      */
-    protected function getPageSubscriber()
+    protected function getPageSubscriber(): PageSubscriber
     {
-        $assetsHelperMock   = $this->createMock(AssetsHelper::class);
+        /** @var Packages&MockObject $packagesMock */
+        $packagesMock = $this->createMock(Packages::class);
+
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        $assetsHelperMock   = new AssetsHelper($packagesMock, $coreParametersHelper);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
-        $pageModelMock      = $this->createMock(PageModel::class);
-        $logger             = $this->createMock(Logger::class);
         $hitRepository      = $this->createMock(HitRepository::class);
-        $pageRepository     = $this->createMock(PageRepository::class);
-        $redirectRepository = $this->createMock(RedirectRepository::class);
         $contactRepository  = $this->createMock(LeadRepository::class);
         $hitMock            = $this->createMock(Hit::class);
         $leadMock           = $this->createMock(Lead::class);
@@ -92,27 +57,19 @@ class PageSubscriberTest extends TestCase
             ->method('find')
             ->will($this->returnValue($leadMock));
 
-        $pageSubscriber = new PageSubscriber(
+        return new PageSubscriber(
             $assetsHelperMock,
             $ipLookupHelperMock,
-            $auditLogModelMock,
-            $pageModelMock,
-            $logger,
-            $hitRepository,
-            $pageRepository,
-            $redirectRepository,
-            $contactRepository
+            $auditLogModelMock
         );
-
-        return $pageSubscriber;
     }
 
     /**
      * Get non empty payload, having a Request and non-null entity IDs.
      *
-     * @return array
+     * @return array<string, bool|int|MockObject>
      */
-    protected function getNonEmptyPayload()
+    protected function getNonEmptyPayload(): array
     {
         $requestMock = $this->createMock(Request::class);
 
@@ -128,9 +85,9 @@ class PageSubscriberTest extends TestCase
     /**
      * Get empty payload with all null entity IDs.
      *
-     * @return array
+     * @return array<string, null>
      */
-    protected function getEmptyPayload()
+    protected function getEmptyPayload(): array
     {
         return array_fill_keys(['request', 'isNew', 'hitId', 'pageId', 'leadId'], null);
     }

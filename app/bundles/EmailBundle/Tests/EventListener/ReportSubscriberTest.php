@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -21,6 +22,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -51,12 +53,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $report;
 
     /**
-     * @var ChannelListHelper|MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 
     /**
-     * @var MockObject|ChannelListHelper
+     * @var MockObject|QueryBuilder
      */
     private $queryBuilder;
 
@@ -84,9 +86,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->fieldsBuilderMock
         );
 
-        $this->report            = $this->createMock(Report::class);
-        $this->channelListHelper = $this->createMock(ChannelListHelper::class);
-        $this->queryBuilder      = new QueryBuilder($this->connectionMock);
+        $this->report             = $this->createMock(Report::class);
+        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
@@ -211,13 +213,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph(): void
     {
-        $eventMock        = $this->createMock(ReportGraphEvent::class);
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $chartQueryMock   = $this->createMock(ChartQuery::class);
-        $statementMock    = $this->createMock(Statement::class);
-        $translatorMock   = $this->createMock(TranslatorInterface::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $resultMock        = $this->createMock(Result::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
 
-        $queryBuilderMock->method('execute')->willReturn($statementMock);
+        $queryBuilderMock->method('execute')->willReturn($resultMock);
+        $resultMock->method('fetchOne')->willReturn([]);
 
         $eventMock->expects($this->once())
             ->method('getRequestedGraphs')
@@ -265,9 +268,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportBuilderWithEmailSentContext(): void
     {
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
-        $channelListHelper = $this->createMock(ChannelListHelper::class);
-        $reportHelper      = $this->createMock(ReportHelper::class);
+        $translatorMock     = $this->createMock(TranslatorInterface::class);
+        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())
@@ -296,7 +298,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $event = new ReportBuilderEvent($translatorMock, $channelListHelper, ReportSubscriber::CONTEXT_EMAIL_STATS, [], $reportHelper);
+        $event = new ReportBuilderEvent($translatorMock, $this->channelListHelper, ReportSubscriber::CONTEXT_EMAIL_STATS, [], $reportHelper);
         $this->subscriber->onReportBuilder($event);
         $tables = $event->getTables();
 

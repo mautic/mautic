@@ -43,20 +43,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.focus.model.focus' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Model\FocusModel::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.page.model.trackable',
-                    'twig',
-                    'event_dispatcher',
-                    'mautic.lead.model.field',
-                    'mautic.tracker.contact',
-                    'twig',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.focus.helper.token' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
@@ -73,6 +59,18 @@ return [
                 ],
             ],
         ],
+//        'repositories' => [
+//            'mautic.focus.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//            'mautic.focus.stat.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\StatRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//        ]
     ],
 
     'menu' => [

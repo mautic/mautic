@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class StatDeviceRepository extends CommonRepository
 {
     /**
-     * @param           $emailIds
      * @param \DateTime $fromDate
      *
      * @return array
@@ -36,20 +35,20 @@ class StatDeviceRepository extends CommonRepository
         $qb->groupBy('es.list_id, d.device');
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $qb->andWhere(
                 $qb->expr()->gte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
         if (null !== $toDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($toDate);
             $qb->andWhere(
                 $qb->expr()->lte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
 
-        return $qb->execute()->fetchAll();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

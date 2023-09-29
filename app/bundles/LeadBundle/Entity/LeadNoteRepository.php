@@ -26,10 +26,6 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $filter
-     * @param $noteTypes
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -62,8 +58,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -72,7 +66,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -89,7 +82,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -98,7 +90,7 @@ class LeadNoteRepository extends CommonRepository
         $command                 = $filter->command;
         $string                  = $filter->string;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
@@ -165,9 +157,6 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -175,6 +164,6 @@ class LeadNoteRepository extends CommonRepository
             ->update(MAUTIC_TABLE_PREFIX.'lead_notes')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

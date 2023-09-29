@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
+use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
@@ -16,6 +20,8 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FullObjectReportBuilder
@@ -73,7 +79,7 @@ class FullObjectReportBuilder
 
                 if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
                     $idChunks = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($requestedObjectDAO->getObject()), $limit);
-                    $idChunk  = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                    $idChunk  = $idChunks[$requestDAO->getSyncIteration() - 1] ?? [];
                     $event->setIds($idChunk);
                 } else {
                     $event->setDateRange(
@@ -106,9 +112,17 @@ class FullObjectReportBuilder
         return $syncReport;
     }
 
+    /**
+     * @throws ObjectNotFoundException
+     */
     private function processObjects(ObjectDAO $requestedObjectDAO, ReportDAO $syncReport, array $foundObjects): void
     {
         $fields = $requestedObjectDAO->getFields();
+
+        if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD)) {
+            $event = new InternalObjectFindByIdEvent($this->objectProvider->getObjectByName($requestedObjectDAO->getObject()));
+        }
+
         foreach ($foundObjects as $object) {
             $modifiedDateTime = new \DateTime(
                 !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
@@ -116,6 +130,24 @@ class FullObjectReportBuilder
             );
             $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
             $syncReport->addObject($reportObjectDAO);
+
+            if (isset($event)) {
+                // Update object id rather than creating the event again.
+                $event->setId((int) $object['id']);
+                $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD);
+
+                if (!$event->getEntity()) {
+                    // Object not found, continue.
+                    continue;
+                }
+
+                try {
+                    $this->dispatchBeforeFieldChangesEvent($syncReport->getIntegration(), $event->getEntity());
+                } catch (InvalidValueException $e) {
+                    // Object is not eligible, continue.
+                    continue;
+                }
+            }
 
             foreach ($fields as $field) {
                 try {
@@ -131,5 +163,35 @@ class FullObjectReportBuilder
                 }
             }
         }
+    }
+
+    /**
+     * @throws InvalidValueException
+     */
+    private function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
+    {
+        if ($object instanceof Lead) {
+            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD)) {
+                $this->dispatcher->dispatch(
+                    new InternalContactEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD
+                );
+            }
+
+            return;
+        }
+
+        if ($object instanceof Company) {
+            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD)) {
+                $this->dispatcher->dispatch(
+                    new InternalCompanyEvent($integrationName, $object),
+                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD
+                );
+            }
+
+            return;
+        }
+
+        throw new InvalidValueException('An object type should be specified. None matches.');
     }
 }

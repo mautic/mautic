@@ -2,12 +2,22 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
@@ -21,14 +31,12 @@ class BatchContactController extends AbstractFormController
      */
     private $categoryModel;
 
-    /**
-     * Initialize object props here to simulate constructor
-     * and make the future controller refactoring easier.
-     */
-    public function initialize(ControllerEvent $event)
+    public function __construct(ContactActionModel $actionModel, CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->actionModel   = $this->container->get('mautic.category.model.contact.action');
-        $this->categoryModel = $this->container->get('mautic.category.model.category');
+        $this->actionModel   = $actionModel;
+        $this->categoryModel = $categoryModel;
+
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -36,9 +44,9 @@ class BatchContactController extends AbstractFormController
      *
      * @return JsonResponse
      */
-    public function execAction()
+    public function execAction(Request $request)
     {
-        $params = $this->request->get('lead_batch');
+        $params = $request->get('lead_batch');
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
@@ -49,11 +57,11 @@ class BatchContactController extends AbstractFormController
             $this->actionModel->addContactsToCategories($contactIds, $categoriesToAdd);
             $this->actionModel->removeContactsFromCategories($contactIds, $categoriesToRemove);
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%'     => count($ids),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([

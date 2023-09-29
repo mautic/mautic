@@ -32,7 +32,6 @@
     "mautic/core-project-message": "4.x-dev",
     "mautic/core-lib": "*",
     "mautic/grapes-js-builder-bundle": "*",
-    "mautic/plugin-citrix": "*",
     "mautic/plugin-clearbit": "*",
     "mautic/plugin-cloudstorage": "*",
     "mautic/plugin-crm": "*",
@@ -66,10 +65,34 @@
     "mautic/theme-vibrant": "*",
     "mautic/theme-trulypersonal": "*"
   },
+  "scripts": {
+    "post-install-cmd": [
+      "@fix-permissions",
+      "@generate-assets"
+    ],
+    "post-update-cmd": [
+      "@fix-permissions",
+      "@generate-assets"
+    ],
+    "fix-permissions": "chmod 750 ./bin/console",
+    "generate-assets": [
+      "npm ci",
+      "npx patch-package",
+      "bin/console mautic:assets:generate"
+    ]
+  },
   "repositories": [
     {
       "type": "git",
       "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SpBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     },
     {
         "type": "path",

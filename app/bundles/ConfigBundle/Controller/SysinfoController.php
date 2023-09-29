@@ -2,13 +2,32 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use function assert;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SysinfoController extends FormController
 {
+    private SysinfoModel $sysinfoModel;
+
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, SysinfoModel $sysinfoModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    {
+        $this->sysinfoModel = $sysinfoModel;
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -18,17 +37,14 @@ class SysinfoController extends FormController
             return $this->accessDenied();
         }
 
-        $model = $this->get('mautic.config.model.sysinfo');
-        assert($model instanceof SysinfoModel);
-
         return $this->delegateView([
             'viewParameters' => [
-                'phpInfo'         => $model->getPhpInfo(),
-                'requirements'    => $model->getRequirements(),
-                'recommendations' => $model->getRecommendations(),
-                'folders'         => $model->getFolders(),
-                'log'             => $model->getLogTail(200),
-                'dbInfo'          => $model->getDbInfo(),
+                'phpInfo'         => $this->sysinfoModel->getPhpInfo(),
+                'requirements'    => $this->sysinfoModel->getRequirements(),
+                'recommendations' => $this->sysinfoModel->getRecommendations(),
+                'folders'         => $this->sysinfoModel->getFolders(),
+                'log'             => $this->sysinfoModel->getLogTail(200),
+                'dbInfo'          => $this->sysinfoModel->getDbInfo(),
             ],
             'contentTemplate' => '@MauticConfig/Sysinfo/index.html.twig',
             'passthroughVars' => [

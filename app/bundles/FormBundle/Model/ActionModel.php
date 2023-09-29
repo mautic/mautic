@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Model;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @extends CommonFormModel<Action>
@@ -18,7 +19,7 @@ class ActionModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Action');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
     }
 
     /**
@@ -42,12 +43,11 @@ class ActionModel extends CommonFormModel
     }
 
     /**
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
+     * @param object $entity
+     * @param null   $action
+     * @param array  $options
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');

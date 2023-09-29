@@ -2,25 +2,28 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\SegmentActionModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
-    private $actionModel;
-
-    private $segmentModel;
-
-    /**
-     * Initialize object props here to simulate constructor
-     * and make the future controller refactoring easier.
-     */
-    public function initialize(ControllerEvent $event)
+    public function __construct(private SegmentActionModel $segmentActionModel, private ListModel $segmentModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->actionModel  = $this->container->get('mautic.lead.model.segment.action');
-        $this->segmentModel = $this->container->get('mautic.lead.model.list');
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -28,9 +31,9 @@ class BatchSegmentController extends AbstractFormController
      *
      * @return JsonResponse
      */
-    public function setAction()
+    public function setAction(Request $request)
     {
-        $params     = $this->request->get('lead_batch', []);
+        $params     = $request->get('lead_batch', []);
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($contactIds && is_array($contactIds)) {
@@ -38,18 +41,18 @@ class BatchSegmentController extends AbstractFormController
             $segmentsToRemove = $params['remove'] ?? [];
 
             if ($segmentsToAdd) {
-                $this->actionModel->addContacts($contactIds, $segmentsToAdd);
+                $this->segmentActionModel->addContacts($contactIds, $segmentsToAdd);
             }
 
             if ($segmentsToRemove) {
-                $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+                $this->segmentActionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%' => count($contactIds),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([
