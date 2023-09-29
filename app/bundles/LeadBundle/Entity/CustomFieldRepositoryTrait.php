@@ -418,7 +418,7 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('object', $object);
         }
 
-        return $fq->execute()->fetchAll() ?: [];
+        return $fq->executeQuery()->fetchAllAssociative() ?: [];
     }
 
     /**
