@@ -70,7 +70,6 @@ class EventController extends CommonFormController
             $type                 = $event['type'];
             $eventType            = $event['eventType'];
             $campaignId           = $event['campaignId'];
-            $anchorName           = $event['anchor'];
             $event['triggerDate'] = (!empty($event['triggerDate'])) ? $this->factory->getDate($event['triggerDate'])->getDateTime() : null;
         } else {
             $type       = $request->query->get('type');
@@ -126,7 +125,7 @@ class EventController extends CommonFormController
                     $success = 1;
 
                     // form is valid so process the data
-                    $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+                    $keyId = 'new'.hash('sha1', uniqid((string) mt_rand()));
 
                     // save the properties to session
                     $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');
@@ -461,7 +460,7 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, string $objectId): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
@@ -484,9 +483,9 @@ class EventController extends CommonFormController
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ('POST' == $request->getMethod() && null !== $event) {
-            $keyId          = 'new'.hash('sha1', uniqid(mt_rand()));
+            $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
             $event['id']    = $event['tempId']    = $keyId;
-            $session->set('mautic.campaign.events.clipboard', $event);
+            $session->set('mautic.campaign.events.clone.storage', $event);
 
             $dataArray = [
                 'success'       => 1,
@@ -504,56 +503,73 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    public function insertAction(Request $request)
+    public function insertAction(Request $request): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
-        $event          = $session->get('mautic.campaign.events.clipboard');
-        $keyId          = 'new'.hash('sha1', uniqid(mt_rand()));
+        $event          = $session->get('mautic.campaign.events.clone.storage');
+
+        if (empty($event)) {
+            return new JsonResponse([
+                'error' => $this->translator->trans('mautic.campaign.event.clone.request.missing'),
+            ], 400);
+        }
+        $session->remove('mautic.campaign.events.clone.storage');
+
+        $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
         $event['id']    = $event['tempId'] = $keyId;
 
         $modifiedEvents[$keyId] = $event;
         $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
 
-        $eventType                     = $event['eventType'];
-        $passthroughVars               = [
-            'mauticContent' => 'campaignEvent',
-            'success'       => 1,
-            'route'         => false,
+        $passThroughVars               = [
+            'mauticContent'     => 'campaignEvent',
+            'clearCloneStorage' => true,
+            'success'           => 1,
+            'route'             => false,
         ];
 
-        $passthroughVars = array_merge($passthroughVars, $this->eventViewVars($event, $campaignId, 'insert'));
+        $passThroughVars = array_merge($passThroughVars, $this->eventViewVars($event, $campaignId, 'insert'));
 
-        return new JsonResponse($passthroughVars);
+        return new JsonResponse($passThroughVars);
     }
 
     /**
      * @param array<string, mixed> $event
+     *
+     * @return array<string, mixed>
      */
     private function eventViewVars(
         array $event,
         string $campaignId,
         string $action
     ): array {
-        $passThroughVars = [];
-        $event           = array_merge((new Event())->convertToArray(), $event);
-        $template        = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
-        $templateVars    = [
+        // Merge default event properties with provided event data
+        $event = array_merge((new Event())->convertToArray(), $event);
+
+        // Determine the template
+        $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
+
+        // Prepare common template variables
+        $templateVars = [
             'event'      => $event,
             'id'         => $event['id'],
             'campaignId' => $campaignId,
         ];
-        if ('edit' === $action) {
-            $templateVars['update']        = true;
-            $passThroughVars['updateHtml'] = $this->renderView($template, $templateVars);
-        } else {
-            $passThroughVars['eventHtml'] = $this->renderView($template, $templateVars);
-        }
-        $passThroughVars['event']     = $event;
-        $passThroughVars['eventId']   = $event['id'];
-        $passThroughVars['eventType'] = $event['eventType'];
 
+        // Render the template and store it in the appropriate variable
+        $passThroughKey                   = ('edit' === $action) ? 'updateHtml' : 'eventHtml';
+        $passThroughVars[$passThroughKey] = $this->renderView($template, $templateVars);
+
+        // Pass through event-related variables
+        $passThroughVars += [
+            'event'     => $event,
+            'eventId'   => $event['id'],
+            'eventType' => $event['eventType'],
+        ];
+
+        // Handle trigger mode interval
         if (Event::TRIGGER_MODE_INTERVAL === $event['triggerMode']) {
             $label = 'mautic.campaign.connection.trigger.interval.label';
 
@@ -573,6 +589,7 @@ class EventController extends CommonFormController
             );
         }
 
+        // Handle trigger mode date
         if (Event::TRIGGER_MODE_DATE === $event['triggerMode']) {
             $label = 'mautic.campaign.connection.trigger.date.label';
 

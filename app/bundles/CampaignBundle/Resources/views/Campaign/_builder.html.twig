@@ -70,4 +70,5 @@
     Mautic.campaignBuilderCanvasSources = {% if campaignSources is not empty %}{{ campaignSources|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderCanvasEvents = {% if campaignEvents is not empty %}{{ campaignEvents|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
     Mautic.campaignBuilderConnectionRestrictions = {% if eventSettings['connectionRestrictions'] is not empty %}{{ eventSettings['connectionRestrictions']|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}{% else %}{}{% endif %};
+    Mautic.campaignBuilderHasEventClone = {% if hasEventClone %}true{% else %}false{% endif %};
 </script>

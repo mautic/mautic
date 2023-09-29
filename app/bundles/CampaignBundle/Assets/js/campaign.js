@@ -82,8 +82,7 @@ Mautic.campaignOnLoad = function (container, response) {
             // Hide events list
 
             if (!mQuery('#CampaignEvent_newsource').length) {
-                // Hide the CampaignEventPanel if visible
-                mQuery('#CampaignEventPanel').addClass('hide');
+                Mautic.hideCampaignEventPanel();
             }
 
             // Get the option clicked
@@ -109,8 +108,7 @@ Mautic.campaignOnLoad = function (container, response) {
 
         mQuery('#CampaignCanvas').on('click', function(event) {
             if (!mQuery(event.target).parents('#CampaignCanvas').length && !mQuery('#CampaignEvent_newsource').length) {
-                // Hide the CampaignEventPanel if visible
-                mQuery('#CampaignEventPanel').addClass('hide');
+                Mautic.hideCampaignEventPanel();
             }
         });
 
@@ -126,6 +124,14 @@ Mautic.campaignOnLoad = function (container, response) {
         window.addEventListener('storage', function(event) {
             if (event.key === 'mautic_campaign_event_clone') {
                 Mautic.campaignBuilderUpdateEventCloneDescription();
+            }
+        });
+
+        mQuery(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+            var path = settings.url.split('?')[0];
+
+            if (path === "/s/campaigns/events/insert") {
+                Mautic.campaignEventInsertOnError(event, jqxhr);
             }
         });
     }
@@ -205,6 +211,18 @@ Mautic.campaignEventCloneOnLoad = function(container, response) {
         'sourceCampaignId': response['campaignId'],
         'sourceCampaignName': response['campaignName'],
     });
+    const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.campaign.event.clone.success'));
+    Mautic.setFlashes(flashMessage);
+    Mautic.campaignBuilderUpdateEventCloneDescription();
+};
+
+Mautic.campaignEventInsertOnError = function (event, jqxhr) {
+    Mautic.clearCampaignEventClone();
+    Mautic.hideCampaignEventPanel();
+    if (jqxhr.responseJSON.error) {
+        const flashMessage = Mautic.addFlashMessage(jqxhr.responseJSON.error);
+        Mautic.setFlashes(flashMessage);
+    }
 };
 
 /**
@@ -306,6 +324,11 @@ Mautic.campaignEventOnLoad = function (container, response) {
                 domEventId+'_top'
             ]
         });
+    }
+
+    if (response.hasOwnProperty('clearCloneStorage')) {
+        Mautic.hideCampaignEventPanel();
+        Mautic.clearCampaignEventClone();
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
@@ -418,7 +441,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             var y = mQuery('#CampaignEvent_newsource').position().top;
 
             mQuery('#CampaignEvent_newsource').attr('id', 'CampaignEvent_newsource_hide');
-            mQuery('#CampaignEventPanel').addClass('hide');
+            Mautic.hideCampaignEventPanel();
             var autoConnect = false;
         } else {
             //append content
@@ -1767,6 +1790,13 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
         mQuery('#CampaignEventPanel').removeClass('hide');
         mQuery('#CampaignEventPanelGroups').removeClass('hide');
         mQuery('#CampaignEventPanelLists').addClass('hide');
+
+        if (Mautic.hasCampaignEventClone()) {
+            mQuery('#CampaignPasteContainer').removeClass('hide');
+        } else {
+            mQuery('#CampaignPasteContainer').addClass('hide');
+        }
+
     } else {
         var leftPos = (forcePosition) ? forcePosition.left : Mautic.campaignBuilderAnchorClickedPosition.left - 125;
         var topPos  = (forcePosition) ? forcePosition.top : Mautic.campaignBuilderAnchorClickedPosition.top + 25;
@@ -2175,10 +2205,20 @@ Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
 Mautic.hasCampaignEventClone = function() {
     return localStorage.getItem("mautic_campaign_event_clone") !== null;
 }
+
 Mautic.getCampaignEventClone = function() {
     var eventClone = localStorage.getItem("mautic_campaign_event_clone");
     return eventClone === null ? null : JSON.parse(eventClone);
 }
+
 Mautic.setCampaignEventClone = function(data) {
     localStorage.setItem("mautic_campaign_event_clone", JSON.stringify(data));
+}
+
+Mautic.clearCampaignEventClone = function() {
+    localStorage.removeItem("mautic_campaign_event_clone");
+}
+
+Mautic.hideCampaignEventPanel = function() {
+    mQuery('#CampaignEventPanel').addClass('hide');
 }
