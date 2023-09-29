@@ -33,22 +33,28 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
 
-    public function testDeviceDetectorBotsDetection(): void
+    public function testDeviceDetectorBotsDetectionTrue(): void
     {
         $request = new Request();
-        $this->deviceDetector->expects($this->once())
-            ->method('isBot')
-            ->willReturn(false);
 
-        $ip = $this->getIpHelper($request);
-        $this->assertTrue($ip->getIpAddress()->isTrackable());
-
-        $this->deviceDetector->expects($this->once())
+        $this->deviceDetector
             ->method('isBot')
             ->willReturn(true);
 
         $ip = $this->getIpHelper($request);
         $this->assertFalse($ip->getIpAddress()->isTrackable());
+    }
+
+    public function testDeviceDetectorBotsDetectionFalse(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(false);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertTrue($ip->getIpAddress()->isTrackable());
     }
 
     /**
@@ -127,8 +133,8 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $request
-     * @param null $mockCoreParametersHelper
+     * @param Request|null $request
+     * @param null         $mockCoreParametersHelper
      *
      * @return IpLookupHelper
      */
