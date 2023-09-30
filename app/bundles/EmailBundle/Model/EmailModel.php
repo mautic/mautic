@@ -516,15 +516,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $firstTime = true;
             $stat->setIsRead(true);
             $stat->setDateRead($readDateTime->getDateTime());
-
-            // Only up counts if associated with both an email and lead
-            if ($email && $lead) {
-                try {
-                    $this->getRepository()->upCount($email->getId(), 'read', 1, $email->isVariant());
-                } catch (\Exception $exception) {
-                    error_log($exception);
-                }
-            }
         }
 
         if ($viaBrowser) {
@@ -548,11 +539,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
+        $this->em->persist($stat);
+
+        // Only up counts if associated with both an email and lead
+        if ($firstTime && $email && $lead) {
+            try {
+                $this->getRepository()->incrementRead($email->getId(), $stat->getId(), $email->isVariant());
+            } catch (\Exception $exception) {
+                error_log($exception);
+            }
+        }
         if ($email) {
             $this->em->persist($email);
         }
-
-        $this->em->persist($stat);
 
         // Flush the email stat entity in different transactions than the device stat entity to avoid deadlocks.
         if ($throwDoctrineExceptions) {
@@ -1581,7 +1580,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $strikes = 3;
             while ($strikes >= 0) {
                 try {
-                    $this->getRepository()->upCount($emailId, 'sent', $count, $emailSettings[$emailId]['isVariant']);
+                    $this->getRepository()->upCountSent($emailId, (int) $count, (bool) $emailSettings[$emailId]['isVariant']);
                     break;
                 } catch (\Exception $exception) {
                     error_log($exception);

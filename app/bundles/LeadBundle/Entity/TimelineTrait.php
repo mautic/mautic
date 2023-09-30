@@ -85,7 +85,7 @@ trait TimelineTrait
             }
         }
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here
@@ -117,7 +117,7 @@ trait TimelineTrait
                 ->setMaxResults(null)
                 ->select('count(*)');
 
-            $total = $query->execute()->fetchOne();
+            $total = $query->executeQuery()->fetchOne();
 
             return [
                 'total'   => $total,

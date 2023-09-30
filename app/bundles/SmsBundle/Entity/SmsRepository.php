@@ -194,7 +194,7 @@ class SmsRepository extends CommonRepository
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
                 ->where('id = '.(int) $id);
 
-            $q->execute();
+            $q->executeStatement();
         } catch (\Exception $exception) {
             // not important
         }
