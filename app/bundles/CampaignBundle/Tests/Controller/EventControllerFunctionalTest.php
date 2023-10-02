@@ -176,4 +176,69 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('updateHtml', $responseData);
         $this->assertArrayNotHasKey('eventHtml', $responseData);
     }
+
+    public function testCloneWorkflow(): void
+    {
+        $uri = '/s/campaigns/events/new?type=lead.changepoints&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=no&anchorEventType=condition';
+        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+
+        // Get the form HTML element out of the response, fill it in and submit.
+        $responseData = json_decode($response->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
+        $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
+        $form->setValues(
+            [
+                'campaignevent[canvasSettings][droppedX]'   => '863',
+                'campaignevent[canvasSettings][droppedY]'   => '363',
+                'campaignevent[name]'                       => '',
+                'campaignevent[triggerMode]'                => 'date',
+                'campaignevent[triggerDate]'                => '2023-09-27 21:37',
+                'campaignevent[triggerInterval]'            => '1',
+                'campaignevent[triggerIntervalUnit]'        => 'd',
+                'campaignevent[triggerHour]'                => '',
+                'campaignevent[triggerRestrictedStartHour]' => '',
+                'campaignevent[triggerRestrictedStopHour]'  => '',
+                'campaignevent[anchor]'                     => 'no',
+                'campaignevent[properties][points]'         => '21',
+                'campaignevent[properties][group]'          => '',
+                'campaignevent[type]'                       => 'lead.changepoints',
+                'campaignevent[eventType]'                  => 'action',
+                'campaignevent[anchorEventType]'            => 'condition',
+                'campaignevent[campaignId]'                 => 'mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775',
+            ]
+        );
+
+        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $eventId = $responseData['event']['id'];
+
+        // CLONE EVENT
+        $uri = "/s/campaigns/events/clone/{$eventId}?campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775";
+        $this->client->request('POST', $uri, [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame('campaignEventClone', $responseData['mauticContent']);
+        $this->assertSame('Adjust contact points', $responseData['eventName']);
+        $this->assertSame('New campaign', $responseData['campaignName']);
+
+        // INSERT EVENT
+        $uri = "/s/campaigns/events/insert/{$eventId}?campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775";
+        $this->client->request('POST', $uri, [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
+        $this->assertSame('action', $responseData['eventType']);
+        $this->assertSame('campaignEvent', $responseData['mauticContent']);
+        $this->assertTrue($responseData['clearCloneStorage']);
+        $this->assertNotEquals($eventId, $responseData['eventId']);
+        $this->assertNotEmpty($responseData['eventHtml']);
+    }
 }

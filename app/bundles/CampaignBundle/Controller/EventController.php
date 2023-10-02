@@ -493,8 +493,8 @@ class EventController extends CommonFormController
                 'route'         => false,
                 'eventId'       => $objectId,
                 'eventName'     => $event['name'],
-                'campaignId'    => $campaign->getId(),
-                'campaignName'  => $campaign->getName(),
+                'campaignId'    => $campaign ? $campaign->getId() : $campaignId,
+                'campaignName'  => $campaign ? $campaign->getName() : $this->translator->trans('mautic.campaign.event.clone.new.campaign'),
             ];
         } else {
             $dataArray = ['success' => 0];
