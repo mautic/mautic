@@ -132,7 +132,7 @@ class StatRepository extends CommonRepository
             ->select('s.id, s.lead_id, s.type, s.date_added, f.id as focus_id, f.name as focus_name')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'focus', 'f', 's.focus_id=f.id');
 
-        $q->where($q->expr()->andX(
+        $q->where($q->expr()->and(
             $q->expr()->eq('s.lead_id', (int) $leadId),
             $q->expr()->eq('s.type', ':type')
         ));
@@ -140,7 +140,7 @@ class StatRepository extends CommonRepository
         $q->setParameter('type', $type);
 
         if (isset($options['search']) && $options['search']) {
-            $q->andWhere($q->expr()->orX(
+            $q->andWhere($q->expr()->or(
                 $q->expr()->like('f.name', $q->expr()->literal($options['search'].'%')),
                 $q->expr()->eq('s.type', $q->expr()->literal($options['search']))
             ));
