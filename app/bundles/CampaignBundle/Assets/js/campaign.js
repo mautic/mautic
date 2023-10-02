@@ -1764,6 +1764,9 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
         }
     });
 
+    mQuery('#CampaignEventPanelGroups').removeClass('groups-enabled-1 groups-enabled-2 groups-enabled-3')
+    mQuery('#CampaignEventPanelGroups').addClass('groups-enabled-' + groups.length)
+
     if (inGroupsView) {
         mQuery.each(groups, function (key, theGroup) {
             mQuery('#'+theGroup+'GroupSelector').removeClass(

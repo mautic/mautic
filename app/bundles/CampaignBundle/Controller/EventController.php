@@ -557,6 +557,9 @@ class EventController extends CommonFormController
             'id'         => $event['id'],
             'campaignId' => $campaignId,
         ];
+        if ('edit' === $action) {
+            $templateVars['update']        = true;
+        }
 
         // Render the template and store it in the appropriate variable
         $passThroughKey                   = ('edit' === $action) ? 'updateHtml' : 'eventHtml';
