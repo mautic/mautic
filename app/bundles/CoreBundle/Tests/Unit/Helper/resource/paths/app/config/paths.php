@@ -11,7 +11,7 @@ $paths = [
     'asset_prefix' => '',
     'plugins'      => 'plugins',
     'translations' => 'translations',
-    'local_config' => __DIR__.'/../../local_config/local.php',
+    'local_config' => __DIR__.'/../../config/local.php',
 ];
 
 // allow easy overrides of the above

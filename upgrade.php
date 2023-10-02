@@ -192,9 +192,9 @@ function get_local_config()
         $localParameters = $parameters;
 
         // check for parameter overrides
-        if (file_exists(MAUTIC_APP_ROOT.'/../local_config/parameters_local.php')) {
+        if (file_exists(MAUTIC_APP_ROOT.'/../config/parameters_local.php')) {
             /** @var array<string, mixed> $parameters */
-            include MAUTIC_APP_ROOT.'/../local_config/parameters_local.php';
+            include MAUTIC_APP_ROOT.'/../config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
 

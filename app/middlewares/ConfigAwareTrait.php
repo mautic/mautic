@@ -31,8 +31,8 @@ trait ConfigAwareTrait
         }
 
         // check for parameter overrides
-        if (file_exists($root.'/../local_config/parameters_local.php')) {
-            include $root.'/../local_config/parameters_local.php';
+        if (file_exists($root.'/../config/parameters_local.php')) {
+            include $root.'/../config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
 

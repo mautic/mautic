@@ -118,8 +118,8 @@ $container->loadFromExtension('liip_test_fixtures', [
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists($root.'/../local_config/config_override.php')) {
-    $loader->import($root.'/../local_config/config_override.php');
+if (file_exists($root.'/../config/config_override.php')) {
+    $loader->import($root.'/../config/config_override.php');
 }
 
 // Add required parameters

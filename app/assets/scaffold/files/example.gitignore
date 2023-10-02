@@ -49,10 +49,12 @@
 /var/tmp/*
 !/var/tmp/.gitkeep
 
-/local_config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
 /app/config/parameters_defaults.php
+
+/config/*
+!/config/.gitkeep
 
 /vendor/*
 !/vendor/.htaccess

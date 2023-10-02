@@ -4,8 +4,8 @@ $root = $container->getParameter('kernel.project_dir').'/app';
 
 $loader->import('config.php');
 
-if (file_exists($root.'/../local_config/security_local.php')) {
-    $loader->import($root.'/../local_config/security_local.php');
+if (file_exists($root.'/../config/security_local.php')) {
+    $loader->import($root.'/../config/security_local.php');
 } else {
     $loader->import('security.php');
 }
@@ -73,11 +73,11 @@ $container->loadFromExtension('twig', [
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists($root.'/../local_config/config_override.php')) {
-    $loader->import($root.'/../local_config/config_override.php');
+if (file_exists($root.'/../config/config_override.php')) {
+    $loader->import($root.'/../config/config_override.php');
 }
 
 // Allow local settings without committing to git such as swift mailer delivery address overrides
-if (file_exists($root.'/../local_config/local.php')) {
-    $loader->import($root.'/../local_config/local.php');
+if (file_exists($root.'/../config/local.php')) {
+    $loader->import($root.'/../config/local.php');
 }

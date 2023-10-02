@@ -200,8 +200,8 @@ class AppKernel extends Kernel
         }
 
         // Check for local bundle inclusion
-        if (file_exists($this->getProjectDir().'/local_config/bundles_local.php')) {
-            include $this->getProjectDir().'/local_config/bundles_local.php';
+        if (file_exists($this->getProjectDir().'/config/bundles_local.php')) {
+            include $this->getProjectDir().'/config/bundles_local.php';
         }
 
         return $bundles;

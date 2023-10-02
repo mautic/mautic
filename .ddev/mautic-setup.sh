@@ -8,7 +8,7 @@ setup_mautic() {
     printf "Installing Mautic Composer dependencies...\n"
     composer install
 
-    cp ./.ddev/local.config.php.dist ./local_config/local.php
+    cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
 
     printf "Installing Mautic...\n"

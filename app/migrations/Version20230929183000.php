@@ -29,7 +29,7 @@ final class Version20230929183000 extends AbstractMauticMigration
         $pathsHelper = $this->container->get('mautic.helper.paths');
 
         $appConfigDir   = $pathsHelper->getRootPath().'/app/config';
-        $localConfigDir = $pathsHelper->getVendorRootPath().'/local_config';
+        $localConfigDir = $pathsHelper->getVendorRootPath().'/config';
 
         $matches = glob($appConfigDir.'/*local.php');
 
@@ -46,7 +46,7 @@ final class Version20230929183000 extends AbstractMauticMigration
         $pathsHelper = $this->container->get('mautic.helper.paths');
 
         $appConfigDir   = $pathsHelper->getRootPath().'/app/config';
-        $localConfigDir = $pathsHelper->getVendorRootPath().'/local_config';
+        $localConfigDir = $pathsHelper->getVendorRootPath().'/config';
 
         return [$appConfigDir, $localConfigDir];
     }
