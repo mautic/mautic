@@ -15879,6 +15879,7 @@
                 "issues": "https://github.com/phpstan/phpstan-php-parser/issues",
                 "source": "https://github.com/phpstan/phpstan-php-parser/tree/1.1.0"
             },
+            "abandoned": true,
             "time": "2021-12-16T19:43:32+00:00"
         },
         {

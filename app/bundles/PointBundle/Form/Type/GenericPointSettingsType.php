@@ -31,7 +31,7 @@ class GenericPointSettingsType extends AbstractType
                     new NotEqualTo(
                         [
                             'value'   => '0',
-                            'message' => 'mautic.core.required.value',
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                 ],
