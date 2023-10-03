@@ -77,7 +77,7 @@ class LeadSubscriberTest extends CommonMocks
     public function testShowFocusItem()
     {
         $lead = $this->getLead();
-        $date = new DateTime();
+        $date = new \DateTime();
 
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
@@ -106,7 +106,7 @@ class LeadSubscriberTest extends CommonMocks
     public function testClickFocusItem(): void
     {
         $lead = $this->getLead();
-        $date = new DateTime();
+        $date = new \DateTime();
 
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
@@ -128,7 +128,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
 
-    private function mockFocusModelGetStatsByLead(string $statType, string $focusName, string $method, DateTime $date): void
+    private function mockFocusModelGetStatsByLead(string $statType, string $focusName, string $method, \DateTime $date): void
     {
         $stats = [
             'results'=> [
@@ -158,7 +158,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, DateTime $date, Lead $lead): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, Lead $lead): array
     {
         $leadEventLogId = 1;
 
