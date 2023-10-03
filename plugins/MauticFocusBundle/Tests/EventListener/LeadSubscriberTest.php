@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\EventListener;
 
-use DateTime;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
