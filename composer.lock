@@ -5820,7 +5820,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "367fa883d69ed6bc9f43976587d9801d79188875"
+                "reference": "246ee3f646d0b58f44ab8b6a9a8ffd34a59bdfbb"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5927,8 +5927,6 @@
                         "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
                         "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
                         "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
-                        "[project-root]/assets/ckeditor/src/ckeditor.ts": "assets/scaffold/files/ckeditor/src/ckeditor.ts",
-                        "[project-root]/assets/ckeditor/src/TokenPlugin.js": "assets/scaffold/files/ckeditor/src/TokenPlugin.js",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",

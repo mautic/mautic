@@ -21,7 +21,7 @@ class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
         $this->filesystem = self::getContainer()->get('mautic.filesystem');
         $pathHelper       = self::getContainer()->get('mautic.helper.paths');
 
-        $this->ckeditorFilePath = $pathHelper->getVendorRootPath().'/assets/ckeditor/build/';
+        $this->ckeditorFilePath = $pathHelper->getVendorRootPath().'/media/libraries/ckeditor/';
     }
 
     public function testAssetGenerateCommand(): void

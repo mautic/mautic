@@ -51,7 +51,7 @@ EOT
             return Command::FAILURE;
         }
 
-        $ckeditorFile = $this->pathsHelper->getVendorRootPath().'/assets/ckeditor/build/ckeditor.js';
+        $ckeditorFile = $this->pathsHelper->getVendorRootPath().'/media/libraries/ckeditor/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
 
