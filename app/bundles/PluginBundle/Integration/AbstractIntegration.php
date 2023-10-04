@@ -858,7 +858,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $internalEntityId,
         array $internal = null,
         $persist = true
-    ) {
+    ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
         $entity = new IntegrationEntity();

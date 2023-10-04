@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use MatthiasMullie\Minify;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -69,24 +70,19 @@ EOT
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
         foreach (['mediaelementplayer', 'modal'] as $css_file) {
-            file_put_contents(
-                $mediaDir.'/css/'.$css_file.'.min.css',
-                (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/css/'.$css_file.'.css'])
-            );
+            $minifier = new Minify\CSS($assetsDir.'/css/'.$css_file.'.css');
+            $minifier->minify($mediaDir.'/css/'.$css_file.'.min.css');
         }
 
         // Minify Mautic Form SDK
-        file_put_contents(
-            $mediaDir.'/js/mautic-form-tmp.js',
-            (new \Minify(new \Minify_Cache_Null()))->combine([$assetsDir.'/js/mautic-form-src.js'])
-        );
+        $minifier = new Minify\JS($assetsDir.'/js/mautic-form-src.js');
+        $minifier->minify($mediaDir.'/js/mautic-form.js');
+
         // Fix the MauticSDK loader
         file_put_contents(
             $mediaDir.'/js/mautic-form.js',
-            str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form-tmp.js'))
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'", file_get_contents($mediaDir.'/js/mautic-form.js'))
         );
-        // Remove temp file.
-        unlink($mediaDir.'/js/mautic-form-tmp.js');
 
         // Check that the production assets were correctly generated.
         $productionAssets = [
