@@ -145,7 +145,7 @@ class AssetsHelperTest extends TestCase
         $ckEditorScripts = $method->invokeArgs($this->assetHelper, []);
         Assert::assertEquals(
             [
-                "assets/ckeditor/build/ckeditor.js?v{$version}",
+                "media/libraries/ckeditor/ckeditor.js?v{$version}",
             ],
             $ckEditorScripts
         );
