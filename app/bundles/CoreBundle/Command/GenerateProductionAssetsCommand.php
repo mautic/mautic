@@ -44,6 +44,9 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+
         // Check that the directory node_modules exists.
         $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
@@ -52,7 +55,7 @@ EOT
             return Command::FAILURE;
         }
 
-        $ckeditorFile = $this->pathsHelper->getVendorRootPath().'/media/libraries/ckeditor/ckeditor.js';
+        $ckeditorFile = $mediaDir.'/libraries/ckeditor/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
 
@@ -63,9 +66,6 @@ EOT
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
-
-        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
-        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
