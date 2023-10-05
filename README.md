@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-117-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-121-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -226,6 +226,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tirtharajghosh"><img src="https://avatars.githubusercontent.com/u/58604532?v=4?s=100" width="100px;" alt="Tirtharaj Ghosh"/><br /><sub><b>Tirtharaj Ghosh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=tirtharajghosh" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.rubnogueira.com"><img src="https://avatars.githubusercontent.com/u/40404708?v=4?s=100" width="100px;" alt="Ruben Nogueira"/><br /><sub><b>Ruben Nogueira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rubnogueira" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://exsesx.dev/"><img src="https://avatars.githubusercontent.com/u/20399517?v=4?s=100" width="100px;" alt="Oleh Vanin"/><br /><sub><b>Oleh Vanin</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aexsesx" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mallezie"><img src="https://avatars.githubusercontent.com/u/1926222?v=4?s=100" width="100px;" alt="Tim Mallezie"/><br /><sub><b>Tim Mallezie</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=mallezie" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://staabm.github.io/"><img src="https://avatars.githubusercontent.com/u/120441?v=4?s=100" width="100px;" alt="Markus Staab"/><br /><sub><b>Markus Staab</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=staabm" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/code5rick"><img src="https://avatars.githubusercontent.com/u/131262825?v=4?s=100" width="100px;" alt="code5rick"/><br /><sub><b>code5rick</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Acode5rick" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jcrandell7"><img src="https://avatars.githubusercontent.com/u/59890399?v=4?s=100" width="100px;" alt="jcrandell7"/><br /><sub><b>jcrandell7</b></sub></a><br /><a href="#userTesting-jcrandell7" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
@@ -243,7 +249,7 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [facebook]: <https://www.facebook.com/MauticCommunity/>
 [slack]: <https://www.mautic.org/community/get-involved/communication-channels>
 [contributing]: <https://contribute.mautic.org/contributing-to-mautic>
-[contributing-md]: <https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md>
+[contributing-md]: <https://github.com/mautic/mautic/blob/5.x/.github/CONTRIBUTING.md>
 [contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>

@@ -96,6 +96,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
     * Removed onlyForBC themes: coffee, Mauve, nature
+    * Replaced asset minification library `mrclay/minify` with `matthiasmullie/minify` for faster asset generation.
 
 ### QueueBundle removed in favor symfony's messenger, see: [readme](app/bundles/MessengerBundle/README.md)
  * **Related configuration** is no longer valid. 
