@@ -80,13 +80,12 @@ jobs:
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-        rm -rf var/cache
-
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+  
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
+        rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
