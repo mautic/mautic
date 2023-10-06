@@ -61,6 +61,8 @@
 !/bin/.htaccess
 !/bin/console
 
+/assets/ckeditor/build/*
+
 /bundles
 /node_modules
 /build/coverage
@@ -92,7 +94,6 @@
 /media/js/mautic-form.js
 /media/js/froogaloop.min.js
 /media/js/jquery.min.js
-/media/js/ckeditor4/*
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle

@@ -44,6 +44,9 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+
         // Check that the directory node_modules exists.
         $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
@@ -52,13 +55,17 @@ EOT
             return Command::FAILURE;
         }
 
+        $ckeditorFile = $mediaDir.'/libraries/ckeditor/ckeditor.js';
+        if (!$this->filesystem->exists($ckeditorFile)) {
+            $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
+
+            return Command::FAILURE;
+        }
+
         $this->installElFinderAssets();
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
-
-        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
-        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
@@ -87,8 +94,6 @@ EOT
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
-            'js/ckeditor4/ckeditor.js',
-            'js/ckeditor4/adapters/jquery.js',
             'js/jquery.min.js',
             'js/froogaloop.min.js',
         ];
@@ -119,7 +124,6 @@ EOT
      */
     private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
     {
-        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
         $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
         $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
     }
