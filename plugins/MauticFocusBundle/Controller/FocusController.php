@@ -182,7 +182,7 @@ class FocusController extends AbstractStandardFormController
                     $trackables = $trackableModel->getTrackableList('focus', $item->getId());
                 }
 
-                $cacheItem->set([$stats, $trackables]);
+                $cacheItem->set([$stats, $trackables ?? null]);
                 $cacheItem->expiresAfter($cacheTimeout * 60);
                 $cacheItem->tag("focus.{$item->getId()}");
                 $this->cacheProvider->save($cacheItem);
