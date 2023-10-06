@@ -391,10 +391,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Returns the lead ID if any.
-     *
-     * @return int|null
      */
-    public function getLeadId()
+    public function getLeadId(): ?int
     {
         return ($this->lead instanceof Lead) ? $this->lead->getId() : null;
     }
