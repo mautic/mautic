@@ -71,10 +71,8 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * Make sure that on timeline entry is created for a lead
      * that was displayed Focus Item.
-     *
-     * @return void
      */
-    public function testShowFocusItem()
+    public function testShowFocusItem(): void
     {
         $lead = $this->getLead();
         $date = new \DateTime();
@@ -99,7 +97,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
 
-    public function testShowFocusItemWhenNoLead()
+    public function testShowFocusItemWhenNoLead(): void
     {
         $date = new \DateTime();
 
