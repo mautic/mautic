@@ -238,7 +238,7 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param int $limit
+     * @return array
      */
     public function getAuditLogsForUser(User $user, $limit = 15)
     {
