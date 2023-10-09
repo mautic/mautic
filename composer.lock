@@ -5915,7 +5915,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "d98e938c86b6f60b04109f8dceaecf71d20d117a"
+                "reference": "66f120043e9ae43168b735317d756b7f287ace1c"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6036,7 +6036,8 @@
                         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
+                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
+                        "[web-root]/config/.gitkeep": "assets/scaffold/files/gitkeep"
                     }
                 }
             },
