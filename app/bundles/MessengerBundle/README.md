@@ -27,7 +27,7 @@ Currently, 2 messages are defined.
  * [PageHitNotification](app/bundles/MessengerBundle/Message/PageHitNotification.php)
 
 ## Configuring transports
-> there is new serializer available, that uses JSON and has smaller payload than native php **'messenger.transport.jms_serializer'** that is recommended to use. You can place the following configuration sample to any config file where `$container` is available. For example `config/local.php`
+> there is new serializer available, that uses JSON and has smaller payload than native php **'messenger.transport.jms_serializer'** that is recommended to use. You can place the following configuration sample to any config file where `$container` is available. For example `config/config_local.php`
 ```php
 $container->loadFromExtension('framework', [
     'messenger' => [
