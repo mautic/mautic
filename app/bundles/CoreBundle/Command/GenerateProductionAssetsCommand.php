@@ -116,7 +116,7 @@ EOT
         return Command::SUCCESS;
     }
 
-    private function installElFinderAssets($mediaDir): void
+    private function installElFinderAssets(string $mediaDir): void
     {
         $command = $this->getApplication()->find('elfinder:install');
 
