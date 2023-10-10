@@ -45,7 +45,7 @@ class AppKernel extends Kernel
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getApplicationDir() . '/app', false);
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app', false);
             define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
@@ -249,11 +249,12 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
-    protected function prepareContainer(ContainerBuilder $container) {
+    protected function prepareContainer(ContainerBuilder $container)
+    {
         $container->setParameter('mautic.application_dir', $this->getApplicationDir());
         $container->setParameter('mautic.project_dir', $this->getProjectDir());
 
-        parent::prepareContainer( $container);
+        parent::prepareContainer($container);
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
