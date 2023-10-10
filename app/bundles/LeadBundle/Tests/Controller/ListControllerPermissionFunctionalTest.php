@@ -446,7 +446,40 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('1 lists have been deleted!', $crawler->html());
     }
 
-    public function testBatchDeleteSegmentWhenDeletingLockedAndRequiredByOthers(): void
+    public function testBatchDeleteSegmentWhenDeletingLocked(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-a',
+            'email'         => 'user-delete-a@mautic-test.com',
+            'first-name'    => 'user-delete-a',
+            'last-name'     => 'user-delete-a',
+            'role'          => [
+                'name'      => 'perm_user_delete_a',
+                'perm'      => 'lead:lists',
+                'bitwise'   => 82,
+            ],
+        ]);
+
+        $segmentC = $this->createSegment('Segment List C', $user);
+        $segmentC->setCheckedOut(new \DateTime());
+        $segmentC->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentC);
+        $this->em->flush();
+
+        $this->loginOtherUser($user->getUsername());
+
+        $segmentIds = [
+            $segmentC->getId(),
+        ];
+
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // The segment $segmentC is being locked by user other than logged-in.
+        $this->assertStringContainsString("{$segmentC->getName()} is currently checked out by", $crawler->html());
+    }
+
+    public function testBatchDeleteSegmentWhenDeletingRequiredByOthers(): void
     {
         $user = $this->createUser([
             'user-name'     => 'user-delete-a',
@@ -478,17 +511,10 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segmentB = $this->createSegment('Segment List with filter', $user, $filter);
         $this->assertSame($filter, $segmentB->getFilters(), 'Filters');
 
-        $segmentC = $this->createSegment('Segment List C', $user);
-        $segmentC->setCheckedOut(new \DateTime());
-        $segmentC->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentC);
-        $this->em->flush();
-
         $this->loginOtherUser($user->getUsername());
 
         $segmentIds = [
             $segmentA->getId(),
-            $segmentC->getId(),
         ];
 
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
@@ -496,9 +522,6 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
         // The segment $segmentA is used as filter in $segmentB.
         $this->assertStringContainsString("{$segmentA->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
-
-        // The segment $segmentC is being locked by user other than logged-in.
-        $this->assertStringContainsString("{$segmentC->getName()} is currently checked out by", $crawler->html());
     }
 
     public function testViewSegment(): void
