@@ -26,6 +26,11 @@ class AppKernel extends Kernel
     private $parameterLoader;
 
     /**
+     * @var string
+     */
+    private $projectDir;
+
+    /**
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
      *
@@ -52,7 +57,7 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
@@ -249,7 +254,7 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
-    protected function prepareContainer(ContainerBuilder $container)
+    protected function prepareContainer(ContainerBuilder $container): void
     {
         $container->setParameter('mautic.application_dir', $this->getApplicationDir());
         $container->setParameter('mautic.project_dir', $this->getProjectDir());
