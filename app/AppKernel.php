@@ -291,10 +291,27 @@ class AppKernel extends Kernel
         return dirname(__DIR__);
     }
 
-    public function getProjectDir(): string
+    public function getProjectDir()
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
-        return dirname($reflection->getFileName(), 3);
+        if (null === $this->projectDir) {
+            $r = new \ReflectionObject($this);
+
+            if (!is_file($dir = $r->getFileName())) {
+                throw new \LogicException(sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
+            }
+
+            // We need 1 level deeper than the parent method, as the app folder contains a composer.json file
+            $dir = $rootDir = \dirname($dir, 2);
+            while (!is_file($dir.'/composer.json')) {
+                if ($dir === \dirname($dir)) {
+                    return $this->projectDir = $rootDir;
+                }
+                $dir = \dirname($dir);
+            }
+            $this->projectDir = $dir;
+        }
+
+        return $this->projectDir;
     }
 
     /**
