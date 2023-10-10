@@ -111,6 +111,11 @@ class LeadApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    protected function getTotalCountTtl(): ?int
+    {
+        return $this->coreParametersHelper->get('contact_api_count_cache_ttl', 5);
+    }
+
     /**
      * Obtains a list of custom fields.
      *
