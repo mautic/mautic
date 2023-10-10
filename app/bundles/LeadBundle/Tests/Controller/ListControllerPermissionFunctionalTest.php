@@ -362,7 +362,62 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testBatchDeleteSegmentForDeletingSelfOthersAndNonExistingAndLocked(): void
+    public function testBatchDeleteSegmentWhenUserDoNotHavePermission(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-a',
+            'email'         => 'user-delete-a@mautic-test.com',
+            'first-name'    => 'user-delete-a',
+            'last-name'     => 'user-delete-a',
+            'role'          => [
+                'name'      => 'perm_user_delete_a',
+                'perm'      => 'lead:lists',
+                'bitwise'   => 82,
+            ],
+        ]);
+
+        $this->loginOtherUser($user->getUsername());
+
+        $segmentIds = [
+            $this->segmentA->getId(),
+        ];
+
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // The logged-in user do not have permission to delete the segment $this->segmentA.
+        $this->assertStringContainsString('You do not have access to the requested area/action.', $crawler->text());
+    }
+
+    public function testBatchDeleteSegmentWhenUserDoNotHavePermissionAndSegmentIsInvalid(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-a',
+            'email'         => 'user-delete-a@mautic-test.com',
+            'first-name'    => 'user-delete-a',
+            'last-name'     => 'user-delete-a',
+            'role'          => [
+                'name'      => 'perm_user_delete_a',
+                'perm'      => 'lead:lists',
+                'bitwise'   => 82,
+            ],
+        ]);
+
+        $this->loginOtherUser($user->getUsername());
+
+        $segmentIds = [
+            101
+        ];
+
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+
+        // The segment 101 is invalid.
+        $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
+    }
+
+    public function testBatchDeleteSegmentWhenUserHavePermission(): void
     {
         $user = $this->createUser([
             'user-name'     => 'user-delete-a',
@@ -377,7 +432,36 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $segmentA  = $this->createSegment('Segment List A', $user);
-        $segmentB  = $this->createSegment('Segment List B', $user);
+        $this->em->flush();
+
+        $this->loginOtherUser($user->getUsername());
+
+        $segmentIds = [
+            $segmentA->getId(),
+        ];
+
+        $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        // Only one segments is deleted.
+        $this->assertStringContainsString('1 lists have been deleted!', $crawler->html());
+    }
+
+    public function testBatchDeleteSegmentWhenDeletingLockedAndRequiredByOthers(): void
+    {
+        $user = $this->createUser([
+            'user-name'     => 'user-delete-a',
+            'email'         => 'user-delete-a@mautic-test.com',
+            'first-name'    => 'user-delete-a',
+            'last-name'     => 'user-delete-a',
+            'role'          => [
+                'name'      => 'perm_user_delete_a',
+                'perm'      => 'lead:lists',
+                'bitwise'   => 82,
+            ],
+        ]);
+
+        $segmentA  = $this->createSegment('Segment List A', $user);
 
         $filter = [[
             'object'     => 'lead',
@@ -386,41 +470,36 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [
-                'filter' => [$segmentB->getId()],
+                'filter' => [$segmentA->getId()],
             ],
             'display'   => '',
-            'filter'    => [$segmentB->getId()],
+            'filter'    => [$segmentA->getId()],
         ]];
 
-        $segmentC = $this->createSegment('Segment List with filter', $user, $filter);
-        $this->assertSame($filter, $segmentC->getFilters(), 'Filters');
+        $segmentB = $this->createSegment('Segment List with filter', $user, $filter);
+        $this->assertSame($filter, $segmentB->getFilters(), 'Filters');
 
-        $segmentD = $this->createSegment('Segment List D', $user);
-        $segmentD->setCheckedOut(new \DateTime());
-        $segmentD->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentD);
+        $segmentC = $this->createSegment('Segment List C', $user);
+        $segmentC->setCheckedOut(new \DateTime());
+        $segmentC->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentC);
         $this->em->flush();
 
         $this->loginOtherUser($user->getUsername());
 
-        $segmentIds = [$this->segmentA->getId(), 101, $segmentA->getId(), $segmentB->getId(), $segmentD->getId()];
+        $segmentIds = [
+            $segmentA->getId(),
+            $segmentC->getId()
+        ];
+
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/batchDelete?ids='.json_encode($segmentIds));
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        // The logged-in user do not have permission to delete the segment $this->segmentA.
-        $this->assertStringContainsString('You do not have access to the requested area/action.', $crawler->text());
+        // The segment $segmentA is used as filter in $segmentB.
+        $this->assertStringContainsString("{$segmentA->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
 
-        // The segment 101 is invalid.
-        $this->assertStringContainsString('No list with an id of 101 was found!', $crawler->text());
-
-        // The segment $segmentB is used as filter in $segmentC.
-        $this->assertStringContainsString("{$segmentB->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
-
-        // The segment $segmentD is being locked by user other than logged-in.
-        $this->assertStringContainsString("{$segmentD->getName()} is currently checked out by", $crawler->html());
-
-        // Only one segments is deleted.
-        $this->assertStringContainsString('1 lists have been deleted!', $crawler->html());
+        // The segment $segmentC is being locked by user other than logged-in.
+        $this->assertStringContainsString("{$segmentC->getName()} is currently checked out by", $crawler->html());
     }
 
     public function testViewSegment(): void
@@ -528,7 +607,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordEncoderInterface $encoder */
-        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
 
         $this->em->persist($user);
@@ -555,6 +634,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName($name);
+        $segment->setPublicName($name);
         $segment->setAlias(str_shuffle('abcdefghijklmnopqrstuvwxyz'));
         $segment->setCreatedBy($user);
 

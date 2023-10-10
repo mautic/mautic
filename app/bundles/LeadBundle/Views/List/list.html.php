@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 // Check to see if the entire page should be displayed or just main content
