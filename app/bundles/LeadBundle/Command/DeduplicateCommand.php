@@ -94,7 +94,7 @@ EOT
         $contactIdChunks = array_chunk($contactIds, $batch);
         foreach ($contactIdChunks as $contactIdBatch) {
             $command = [
-                $this->params->get('kernel.project_dir').'/bin/console',
+                $this->params->get('mautic.project_dir').'/bin/console',
                 DeduplicateIdsCommand::NAME,
                 '--contact-ids',
                 implode(',', $contactIdBatch),

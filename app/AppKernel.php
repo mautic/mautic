@@ -45,7 +45,7 @@ class AppKernel extends Kernel
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getApplicationDir() . '/app', false);
             define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
@@ -158,7 +158,7 @@ class AppKernel extends Kernel
         ];
 
         // dynamically register Mautic Plugin Bundles
-        $searchPath = $this->getProjectDir().'/plugins';
+        $searchPath = $this->getApplicationDir().'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -249,9 +249,16 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
+    protected function prepareContainer(ContainerBuilder $container) {
+        $container->setParameter('mautic.application_dir', $this->getApplicationDir());
+        $container->setParameter('mautic.project_dir', $this->getProjectDir());
+
+        parent::prepareContainer( $container);
+    }
+
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
+        $loader->load($this->getApplicationDir().'/app/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
@@ -278,9 +285,15 @@ class AppKernel extends Kernel
         return $this->installed;
     }
 
-    public function getProjectDir(): string
+    public function getApplicationDir(): string
     {
         return dirname(__DIR__);
+    }
+
+    public function getProjectDir(): string
+    {
+        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        return dirname($reflection->getFileName(), 3);
     }
 
     /**
@@ -311,7 +324,7 @@ class AppKernel extends Kernel
      */
     public function getLocalConfigFile(): string
     {
-        return ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app');
+        return ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app');
     }
 
     private function getParameterLoader(): ParameterLoader

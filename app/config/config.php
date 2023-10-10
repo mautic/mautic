@@ -8,7 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.project_dir').'/app';
+$root        = $container->getParameter('mautic.application_dir').'/app';
+$projectRoot = $container->getParameter('mautic.project_dir');
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
@@ -52,7 +53,7 @@ if (defined('MAUTIC_INSTALLER')) {
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.project_dir%/app/config/routing.php',
+        'resource'            => '%mautic.application_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -183,14 +184,14 @@ $container->loadFromExtension('doctrine', [
 // MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
     'migrations_paths' => [
-        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+        'Mautic\\Migrations' => '%mautic.application_dir%/app/migrations',
     ],
     'storage' => [
         'table_storage' => [
             'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
         ],
     ],
-    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
+    'custom_template' => '%mautic.application_dir%/app/migrations/Migration.template',
 ]);
 
 // KnpMenu Configuration
