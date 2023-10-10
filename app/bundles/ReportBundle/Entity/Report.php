@@ -741,7 +741,7 @@ class Report extends FormEntity implements SchedulerInterface
 
     public function getScheduleTimezone(): ?string
     {
-        return $this->scheduleTimezone ?: '00:00';
+        return $this->scheduleTimezone;
     }
 
     public function setScheduleTimezone(?string $scheduleTimezone): void
