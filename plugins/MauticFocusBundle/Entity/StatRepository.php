@@ -104,9 +104,9 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsViewByLead(?int $leadId, array $options = []): array
+    public function getStatsViewByLead(?int $leadId=null, array $options = []): array
     {
-        return $this->getStatsByLeadAndType($leadId, Stat::TYPE_NOTIFICATION, $options);
+        return $this->getStatsByLeadAndType(Stat::TYPE_NOTIFICATION, $leadId, $options);
     }
 
     /**
@@ -114,9 +114,9 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsClickByLead(?int $leadId, array $options = []): array
+    public function getStatsClickByLead(?int $leadId=null, array $options = []): array
     {
-        return $this->getStatsByLeadAndType($leadId, Stat::TYPE_CLICK, $options);
+        return $this->getStatsByLeadAndType(Stat::TYPE_CLICK, $leadId, $options);
     }
 
     /**
@@ -124,7 +124,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    private function getStatsByLeadAndType(?int $leadId, string $type, array $options = []): array
+    private function getStatsByLeadAndType(string $type, ?int $leadId=null, array $options = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
