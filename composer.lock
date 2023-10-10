@@ -5915,7 +5915,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "66f120043e9ae43168b735317d756b7f287ace1c"
+                "reference": "a4edc0cf8e3990bdce31e4cd1858da3aab9c9fdd"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6026,6 +6026,7 @@
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
                         "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
                         "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
@@ -6036,8 +6037,7 @@
                         "[web-root]/media/files/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/files/images.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
-                        "[web-root]/config/.gitkeep": "assets/scaffold/files/gitkeep"
+                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
                     }
                 }
             },
