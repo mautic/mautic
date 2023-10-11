@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 // Include path settings
 $root        = $container->getParameter('mautic.application_dir').'/app';
-$projectRoot = $container->getParameter('mautic.project_dir');
+$projectRoot = $container->getParameter('kernel.project_dir');
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';

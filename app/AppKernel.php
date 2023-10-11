@@ -257,7 +257,6 @@ class AppKernel extends Kernel
     protected function prepareContainer(ContainerBuilder $container): void
     {
         $container->setParameter('mautic.application_dir', $this->getApplicationDir());
-        $container->setParameter('mautic.project_dir', $this->getProjectDir());
 
         parent::prepareContainer($container);
     }

@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Loader;
 
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -12,6 +13,11 @@ class ParameterLoader
      * @var string
      */
     private $rootPath;
+
+    /**
+     * @var string
+     */
+    private $configBaseDir;
 
     /**
      * @var ParameterBag
@@ -35,7 +41,8 @@ class ParameterLoader
 
     public function __construct(string $configRootPath = __DIR__.'/../../../')
     {
-        $this->rootPath = $configRootPath;
+        $this->rootPath      = $configRootPath;
+        $this->configBaseDir = $this->getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -89,8 +96,7 @@ class ParameterLoader
 
     public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
     {
-        $root = realpath($root);
-
+        $root        = realpath($root);
         $projectRoot = self::getProjectDirByRoot($root);
 
         /** @var array<string> $paths */
@@ -105,7 +111,15 @@ class ParameterLoader
             return $projectRoot.'/config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
+        $newConfigPath = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
+        $oldConfigPath = str_replace('%kernel.project_dir%', $root, $paths['local_config']);
+
+        $paths['local_config'] = $newConfigPath;
+
+        // Check if the local config files are still present in the /app/config dir, instead of the /config dir
+        if (!file_exists($newConfigPath) && file_exists($oldConfigPath)) {
+            $paths['local_config'] = $oldConfigPath;
+        }
 
         if ($updateDefaultParameters) {
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
@@ -189,7 +203,22 @@ class ParameterLoader
 
     private function getLocalParametersFile(): string
     {
-        return $this->getProjectDirByRoot($this->rootPath).'/config/parameters_local.php';
+        // load the local parameter file from the same dir as the local config file.
+        return $this->configBaseDir.'/config/parameters_local.php';
+    }
+
+    public static function getLocalConfigBaseDir(string $root): string
+    {
+        $projectDir      = self::getProjectDirByRoot($root);
+        $localConfigFile = self::getLocalConfigFile($root, false);
+
+        if (Path::isBasePath($root, $localConfigFile)) {
+            return $root;
+        } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
+            return $projectDir;
+        }
+
+        return $root;
     }
 
     public static function getProjectDirByRoot(string $root): string

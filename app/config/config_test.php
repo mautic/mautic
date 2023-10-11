@@ -1,13 +1,15 @@
 <?php
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('mautic.application_dir').'/app';
+$root          = $container->getParameter('mautic.application_dir').'/app';
+$configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
 
 $loader->import('config.php');
 
@@ -118,8 +120,8 @@ $container->loadFromExtension('liip_test_fixtures', [
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists($root.'/../config/config_override.php')) {
-    $loader->import($root.'/../config/config_override.php');
+if (file_exists($configBaseDir.'/config/config_override.php')) {
+    $loader->import($configBaseDir.'/config/config_override.php');
 }
 
 // Add required parameters

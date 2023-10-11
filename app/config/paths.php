@@ -12,8 +12,10 @@ $paths = [
 ];
 
 // allow easy overrides of the above
-if (file_exists($root.'../config/paths_local.php')) {
-    include $root.'../config/paths_local.php';
+if (file_exists($projectRoot.'/config/paths_local.php')) {
+    include $projectRoot.'/config/paths_local.php';
+} elseif (file_exists($root.'/config/paths_local.php')) {
+    include $root.'/config/paths_local.php';
 }
 
 // fixed
