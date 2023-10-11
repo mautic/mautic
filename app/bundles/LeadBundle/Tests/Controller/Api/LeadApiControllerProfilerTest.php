@@ -65,7 +65,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<string,mixed> $where
+     * @param array<string,mixed> $queryParams
      */
     private function getContacts(int $expectedCount, array $queryParams = []): void
     {
