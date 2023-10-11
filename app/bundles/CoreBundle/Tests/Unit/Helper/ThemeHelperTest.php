@@ -17,6 +17,8 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -294,9 +296,7 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Finder {
-                /**
-                 * @var \SplFileInfo[]
-                 */
+                /** @var SplFileInfo[] */
                 private array $dirs = [];
 
                 public function __construct()
@@ -306,12 +306,15 @@ class ThemeHelperTest extends TestCase
                 public function in($dirs)
                 {
                     $this->dirs = [
-                        new \SplFileInfo('origin-template-dir'),
+                        new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
                     ];
 
                     return $this;
                 }
 
+                /**
+                 * @return \ArrayIterator<int,SplFileInfo>
+                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -391,7 +394,7 @@ class ThemeHelperTest extends TestCase
             },
             new class() extends Finder {
                 /**
-                 * @var \SplFileInfo[]
+                 * @var SplFileInfo[]
                  */
                 private array $dirs = [];
 
@@ -402,13 +405,16 @@ class ThemeHelperTest extends TestCase
                 public function in($dirs)
                 {
                     $this->dirs = [
-                        new \SplFileInfo('origin-template-dir'),
+                        new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
                     ];
 
                     return $this;
                 }
 
-                public function getIterator()
+                /**
+                 * @return \ArrayIterator<int,SplFileInfo>
+                 */
+                public function getIterator(): \ArrayIterator
                 {
                     return new \ArrayIterator($this->dirs);
                 }
@@ -538,6 +544,32 @@ class ThemeHelperTest extends TestCase
 
     public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
     {
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturn(__DIR__.'/resource/themes');
+
+        Assert::assertTrue($this->themeHelper->exists('theme-legacy-email'));
+    }
+
+    public function testExistsReturnsFalseIfThemeDoesNotExist(): void
+    {
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturn(__DIR__.'/resource/themes');
+
+        Assert::assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
+    }
+
+    public function testDefaultThemeNotShouldNotGetRemoved(): void
+    {
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturn(__DIR__.'/resource/themes');
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->exactly(5))
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, true, true, true, true);
+
+        $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
+
         $themeHelper = new ThemeHelper(
             new class() extends PathsHelper {
                 public function __construct()
@@ -573,5 +605,17 @@ class ThemeHelperTest extends TestCase
         );
 
         Assert::assertSame('mautic_code_mode', $themeHelper->getCurrentTheme('mautic_code_mode', 'foo'));
+        // custom theme name - theme-legacy-email
+        $themeHelper->delete('theme-legacy-email');
+        Assert::assertTrue($themeHelper->exists('theme-legacy-email'));
+    }
+
+    public function testDeleteThemeThrowsExceptionIfThemeDoesNotExist(): void
+    {
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturn(__DIR__.'/resource/themes');
+
+        $this->expectException(FileNotFoundException::class);
+        $this->themeHelper->delete('theme-legacy-email-foo');
     }
 }

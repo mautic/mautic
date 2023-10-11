@@ -18571,3 +18571,8 @@ html body .fr-gatedvideo-overlay {
   z-index: 9999;
   display: none;
 }
+.disabled-row {
+  opacity: 0.6;
+  pointer-events: none;
+  background-color: #f2f2f2;
+}

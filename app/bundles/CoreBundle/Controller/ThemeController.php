@@ -2,10 +2,13 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -272,5 +275,88 @@ class ThemeController extends FormController
                 'mauticContent' => 'theme',
             ],
         ];
+    }
+
+    /**
+     * Change default theme's visibility.
+     */
+    public function visibilityAction(string $themeName): Response
+    {
+        if (!$this->get('mautic.security')->isGranted('core:themes:view')) {
+            return $this->accessDenied();
+        }
+
+        $flashes = [];
+
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $flashes = $this->visibility($themeName);
+        }
+
+        return $this->postActionRedirect(
+            array_merge($this->getIndexPostActionVars(), [
+                'flashes' => $flashes,
+            ])
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function visibility(string $themeName): array
+    {
+        /** @var ThemeHelperInterface $themeHelper */
+        $themeHelper = $this->container->get('mautic.helper.theme');
+
+        if (!$themeHelper->exists($themeName)) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.error.notfound',
+                    'msgVars' => ['%theme%' => $themeName],
+                ],
+            ];
+        }
+
+        if (!in_array($themeName, $themeHelper->getDefaultThemes())) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.cannot.change.visibility',
+                    'msgVars' => ['%theme%' => $themeName],
+                ],
+            ];
+        }
+
+        $flashes = [];
+
+        try {
+            $theme = $themeHelper->getTheme($themeName);
+            $themeHelper->toggleVisibility($themeName);
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.core.theme.visibility.changed',
+                'msgVars' => ['%theme%' => $theme->getName()],
+            ];
+        } catch (IOException $e) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => 'Failed to change the theme visibility'],
+            ];
+        } catch (BadConfigurationException $e) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => sprintf('Theme %s not configured properly: builder property in the config.json', $themeName)],
+            ];
+        } catch (FileNotFoundException $e) {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.core.theme.visibility.error',
+                'msgVars' => ['%error%' => sprintf('Theme %s not found', $themeName)],
+            ];
+        }
+
+        return $flashes;
     }
 }
