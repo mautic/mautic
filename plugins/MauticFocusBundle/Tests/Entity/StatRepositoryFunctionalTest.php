@@ -19,7 +19,7 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');  // self::$container->get('mautic.focus.model.focus');
+        $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');
         $this->setTestsData($this->createLead(), $this->focusModel);
     }
 
