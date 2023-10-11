@@ -91,6 +91,8 @@ class ParameterLoader
     {
         $root = realpath($root);
 
+        $projectRoot = self::getProjectDirByRoot($root);
+
         /** @var array<string> $paths */
         $paths = [];
         include $root.'/config/paths.php';
@@ -103,7 +105,7 @@ class ParameterLoader
             return $root.'/../config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.project_dir%', $root.'/..', $paths['local_config']);
+        $paths['local_config'] = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
 
         if ($updateDefaultParameters) {
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
@@ -187,6 +189,19 @@ class ParameterLoader
 
     private function getLocalParametersFile(): string
     {
-        return $this->rootPath.'/../config/parameters_local.php';
+        return $this->getProjectDirByRoot($this->rootPath).'/config/parameters_local.php';
+    }
+
+    public static function getProjectDirByRoot(string $root): string
+    {
+        $dir = $rootDir = \dirname($root, 1);
+        while (!is_file($dir.'/composer.json')) {
+            if ($dir === \dirname($dir)) {
+                return $$rootDir;
+            }
+            $dir = \dirname($dir);
+        }
+
+        return $dir;
     }
 }
