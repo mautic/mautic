@@ -55,12 +55,12 @@ trait CustomFieldRepositoryTrait
 
             //get a total count
             if (!empty($args['totalCountTtl'])) {
-                $statement = ResultCacheHelper::executeCachedDbalQuery($dq, new ResultCacheOptions($object, $args['totalCountTtl']));
-                $result    = $statement->fetchAllAssociative();
+                $statement = ResultCacheHelper::executeCachedDbalQuery($dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
             } else {
-                $result = $dq->execute()->fetchAllAssociative();
+                $statement = $dq->execute();
             }
 
+            $result = $statement->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
