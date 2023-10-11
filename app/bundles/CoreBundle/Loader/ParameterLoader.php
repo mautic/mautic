@@ -99,10 +99,10 @@ class ParameterLoader
 
         if (!isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
-                self::$defaultParameters['local_config_path'] = $root.'/../config/local.php';
+                self::$defaultParameters['local_config_path'] = $projectRoot.'/config/local.php';
             }
 
-            return $root.'/../config/local.php';
+            return $projectRoot.'/config/local.php';
         }
 
         $paths['local_config'] = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
