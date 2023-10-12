@@ -3,7 +3,6 @@
 namespace Mautic\Middleware;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use PhpParser\Node\Param;
 
 trait ConfigAwareTrait
 {
