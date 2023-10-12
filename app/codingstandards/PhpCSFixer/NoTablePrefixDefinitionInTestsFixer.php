@@ -50,8 +50,8 @@ class NoTablePrefixDefinitionInTestsFixer extends AbstractFixer
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-          'Test should not define the `MAUTIC_TABLE_PREFIX` const.',
-          [new CodeSample("<?php
+            'Test should not define the `MAUTIC_TABLE_PREFIX` const.',
+            [new CodeSample("<?php
 
 class ExampleTest {
     public function setUp(): void
@@ -60,7 +60,7 @@ class ExampleTest {
     }
 }
 "),
-            new CodeSample("<?php
+                new CodeSample("<?php
 
 class ExampleTest {
     public function setUp(): void

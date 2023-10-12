@@ -189,7 +189,7 @@ function get_local_config()
 
         $localParameters = $parameters;
 
-        //check for parameter overrides
+        // check for parameter overrides
         if (file_exists(MAUTIC_APP_ROOT.'/config/parameters_local.php')) {
             /** @var $parameters */
             include MAUTIC_APP_ROOT.'/config/parameters_local.php';
@@ -238,8 +238,6 @@ function clear_mautic_cache()
 }
 
 /**
- * @param $command
- *
  * @return array
  *
  * @throws Exception
@@ -1039,8 +1037,6 @@ function make_request($url, $method = 'GET', $data = null)
 
 /**
  * Wrap content in some HTML.
- *
- * @param $content
  */
 function html_body($content)
 {
