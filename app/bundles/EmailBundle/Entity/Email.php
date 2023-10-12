@@ -220,6 +220,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->variantStartDate = null;
         $this->emailType        = null;
         $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->publishUp        = null;
+        $this->publishDown      = null;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
