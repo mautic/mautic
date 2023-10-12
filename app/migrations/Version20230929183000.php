@@ -34,7 +34,7 @@ final class Version20230929183000 extends AbstractMauticMigration
         $matches = glob($appConfigDir.'/*local.php');
 
         foreach ($matches as $file) {
-            rename($file, $localConfigDir.pathinfo($file, PATHINFO_BASENAME));
+            rename($file, $localConfigDir.'/'.pathinfo($file, PATHINFO_BASENAME));
         }
     }
 
