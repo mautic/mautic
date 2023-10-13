@@ -209,11 +209,12 @@ class ParameterLoader
 
     public static function getLocalConfigBaseDir(string $root): string
     {
-        $projectDir      = self::getProjectDirByRoot($root);
+        $rootDir         = Path::canonicalize($root);
+        $projectDir      = self::getProjectDirByRoot($rootDir);
         $localConfigFile = self::getLocalConfigFile($root, false);
 
-        if (Path::isBasePath($root, $localConfigFile)) {
-            return $root;
+        if (Path::isBasePath($rootDir, $localConfigFile)) {
+            return $rootDir;
         } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
             return $projectDir;
         }
