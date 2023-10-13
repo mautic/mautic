@@ -95,4 +95,4 @@ foreach ($allDataAttrs as $k => $v) {
 <i class="fa fa-fw <?php echo $size; ?> <?php echo $icon; ?> <?php echo $clickAction; ?> <?php echo $idClass; ?> toggle-publish-status"
    title="<?php echo $text; ?>"
     <?php echo $dataAttributes; ?>
-   <?php if (!isset($disableToggle)) : ?>onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>
+   <?php if (empty($disableToggle)) : ?>onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>
