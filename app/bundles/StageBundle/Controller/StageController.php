@@ -4,6 +4,7 @@ namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\StageBundle\Cache\StageCountCache;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -18,7 +19,7 @@ class StageController extends AbstractFormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, StageCountCache $stageCountCache, $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -44,7 +45,7 @@ class StageController extends AbstractFormController
         $start      = $pageHelper->getStart();
         $search     = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
+        $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.weight');
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
         $stageModel = $this->getModel('stage');
         \assert($stageModel instanceof StageModel);
@@ -94,6 +95,7 @@ class StageController extends AbstractFormController
                     'limit'       => $limit,
                     'permissions' => $permissions,
                     'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'leadCounts'  => $stageCountCache->getCountsFromCache($stages),
                 ],
                 'contentTemplate' => '@MauticStage/Stage/list.html.twig',
                 'passthroughVars' => [
