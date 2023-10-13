@@ -54,6 +54,9 @@
 /app/config/paths_local.php
 /app/config/parameters_defaults.php
 
+/config/*
+!/config/.gitkeep
+
 /vendor/*
 !/vendor/.htaccess
 
