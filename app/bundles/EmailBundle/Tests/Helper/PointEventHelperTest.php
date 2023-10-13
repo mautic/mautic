@@ -53,8 +53,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
         $mock = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getModel'])
-            ->getMock()
-        ;
+            ->getMock();
 
         $mock->expects($this->any())
             ->method('getModel')
@@ -77,8 +76,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
     {
         $mock = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         return $mock;
     }
@@ -96,8 +94,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
         $mock = $this->getMockBuilder(EmailModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntity', 'sendEmail'])
-            ->getMock()
-        ;
+            ->getMock();
 
         $mock->expects($this->any())
             ->method('getEntity')

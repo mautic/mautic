@@ -23,7 +23,7 @@ jobs:
       matrix:
         php-versions: ['8.0', '8.1']
         db-types: ['mysql', 'mariadb']
-  
+
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
@@ -80,13 +80,12 @@ jobs:
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-        rm -rf var/cache
-        
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+  
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
+        rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
@@ -175,10 +174,9 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-    
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
@@ -242,9 +240,9 @@ jobs:
           ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer update --lock --no-plugins --no-scripts 2> /dev/null
-          git diff composer.lock > /tmp/diff_command_output.txt
+          git diff -I'"plugin-api-version": "[0-9\.]+"' > /tmp/diff_command_output.txt
           if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
-            echo "The composer.lock file doens't correspond with the changes in the composer.json file"
+            echo "The composer.lock file doesn't correspond with the changes in the composer.json file"
             echo "Please run following command locally"
             echo "composer update --lock"
             echo ""

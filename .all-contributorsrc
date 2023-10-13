@@ -1098,6 +1098,51 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "exsesx",
+      "name": "Oleh Vanin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399517?v=4",
+      "profile": "https://exsesx.dev/",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "mallezie",
+      "name": "Tim Mallezie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1926222?v=4",
+      "profile": "https://github.com/mallezie",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "staabm",
+      "name": "Markus Staab",
+      "avatar_url": "https://avatars.githubusercontent.com/u/120441?v=4",
+      "profile": "https://staabm.github.io/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "code5rick",
+      "name": "code5rick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/131262825?v=4",
+      "profile": "https://github.com/code5rick",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jcrandell7",
+      "name": "jcrandell7",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59890399?v=4",
+      "profile": "https://github.com/jcrandell7",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,

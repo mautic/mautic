@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
+use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -497,7 +498,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function getNewLeadsAction(Request $request)
+    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary)
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');
@@ -569,15 +570,17 @@ class AjaxController extends CommonAjaxController
                 $indexMode          = $request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->render(
-                    "MauticLeadBundle:Lead:{$template}.html.twig",
+                    "@MauticLead/Lead/{$template}.html.twig",
                     [
                         'items'         => $results['results'],
                         'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
                         'permissions'   => $permissions,
                         'security'      => $this->security,
                         'highlight'     => true,
+                        'currentList'   => null,
+                        'columns'       => $contactColumnsDictionary->getColumns(),
                     ]
-                );
+                )->getContent();
                 $dataArray['indexMode'] = $indexMode;
                 $dataArray['maxId']     = $maxLeadId;
                 $dataArray['success']   = 1;

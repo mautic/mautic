@@ -211,7 +211,7 @@ class InstallController extends CommonController
                     'tmpl'           => $tmpl,
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
-                    'appRoot'        => $this->coreParametersHelper->get('kernel.project_dir').'/app',
+                    'appRoot'        => $this->coreParametersHelper->get('mautic.application_dir').'/app',
                     'cacheDir'       => $this->coreParametersHelper->get('kernel.cache_dir'),
                     'logDir'         => $this->coreParametersHelper->get('kernel.logs_dir'),
                     'configFile'     => $pathsHelper->getSystemPath('local_config'),

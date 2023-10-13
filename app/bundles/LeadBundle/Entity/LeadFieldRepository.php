@@ -46,7 +46,7 @@ class LeadFieldRepository extends CommonRepository
             )->setParameter('object', $object);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $aliases = [];
         foreach ($results as $item) {
@@ -89,7 +89,7 @@ class LeadFieldRepository extends CommonRepository
             ->where('f.is_published = :published')
             ->setParameter('published', true, 'boolean')
             ->addOrderBy('f.field_order', 'asc');
-        $results = $fq->execute()->fetchAllAssociative();
+        $results = $fq->executeQuery()->fetchAllAssociative();
 
         return array_column($results, null, 'alias');
     }
@@ -146,7 +146,7 @@ class LeadFieldRepository extends CommonRepository
                 ->where($qb->expr()->eq('object', ':object'))
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
-                ->execute()
+                ->executeQuery()
                 ->fetchAllAssociative();
     }
 
@@ -226,7 +226,7 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('lead', (int) $lead)
                 ->setParameter('value', $value);
 
-            $result = $q->execute()->fetchAssociative();
+            $result = $q->executeQuery()->fetchAssociative();
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
@@ -352,7 +352,7 @@ class LeadFieldRepository extends CommonRepository
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);
             }
-            $result = $q->execute()->fetchAssociative();
+            $result = $q->executeQuery()->fetchAssociative();
 
             return !empty($result['id']);
         }
@@ -382,7 +382,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $result = $q->execute()->fetchAssociative();
+        $result = $q->executeQuery()->fetchAssociative();
 
         return !empty($result['id']);
     }
@@ -413,7 +413,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('month', $value->format('m'))
             ->setParameter('day', $value->format('d'));
 
-        $result = $q->execute()->fetchAssociative();
+        $result = $q->executeQuery()->fetchAssociative();
 
         return !empty($result['id']);
     }

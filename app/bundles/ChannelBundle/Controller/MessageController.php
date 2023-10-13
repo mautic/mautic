@@ -196,7 +196,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId)
     {
         return $this->deleteStandard($request, $objectId);
     }

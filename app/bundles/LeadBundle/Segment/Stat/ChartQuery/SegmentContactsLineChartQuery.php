@@ -168,7 +168,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
             ->setFirstResult(0)
             ->setMaxResults(1);
 
-        return $subQuery->execute()->fetchOne();
+        return $subQuery->executeQuery()->fetchOne();
     }
 
     /**
