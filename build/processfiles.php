@@ -130,11 +130,6 @@ system('find . -type f -name build.properties -exec rm -f {} \\;');
 system('find . -type f -name build.xml -exec rm -f {} \\;');
 system('find . -type f -name Gruntfile.js -exec rm -f {} \\;');
 
-// Delete composer files
-system('find . -type f -name composer.json -exec rm -f {} \\;');
-system('find . -type f -name composer.lock -exec rm -f {} \\;');
-system('find . -type f -name package.json -exec rm -f {} \\;');
-
 // Delete MD files
 system('find vendor/ -type f -name "*.md" -exec rm -f {} \\;');
 system('find vendor/ -type f -name "*.mdown" -exec rm -f {} \\;');
