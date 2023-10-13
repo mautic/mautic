@@ -141,7 +141,7 @@ system('find vendor/ -type f -name "*.mdown" -exec rm -f {} \\;');
 system('find vendor/ -type f -name "*.markdown" -exec rm -f {} \\;');
 
 // Find git special files
-system('find . -name ".git*" -prune -exec rm -rf {} \\;');
+system('find . -name ".git*" -not -wholename "./config/.gitkeep" -prune -exec rm -rf {} \\;');
 
 // Find any .DS_Store files and nuke them
 system('find . -name .DS_Store -exec rm -rf {} \\;');
