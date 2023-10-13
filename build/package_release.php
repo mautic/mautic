@@ -74,7 +74,7 @@ if (!isset($args['repackage'])) {
     // In this step, we'll compile a list of files that may have been deleted so our update script can remove them
     // First, get a list of git tags since the minimal version.
     ob_start();
-    passthru($systemGit.' for-each-ref --sort=creatordate --format \'%(refname)\' refs/tags | cut -d\/ -f3 | sed -n \'/^'.$minimalVersion.'$/,${p;/^'.$gitSource.'$/q}\' | sed \'$d\'', $tags);
+    passthru($systemGit.' for-each-ref --sort=creatordate --format \'%(refname)\' refs/tags | cut -d\/ -f3 | sed \'/-/!{s/$/_/}\' | sort -V | sed \'s/_$//\' | sed -n \'/^'.$minimalVersion.'$/,${p;/^'.$gitSource.'$/q}\' | sed \'$d\'', $tags);
     $tags = explode("\n", trim(ob_get_clean()));
 
     // Only add deleted files to our list; new and modified files will be covered by the archive
