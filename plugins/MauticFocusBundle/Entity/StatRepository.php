@@ -104,9 +104,9 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsViewByLead(int $leadId, array $options = []): array
+    public function getStatsViewByLead(?int $leadId=null, array $options = []): array
     {
-        return $this->getStatsByLeadAndType($leadId, Stat::TYPE_NOTIFICATION, $options);
+        return $this->getStatsByLeadAndType(Stat::TYPE_NOTIFICATION, $leadId, $options);
     }
 
     /**
@@ -114,9 +114,9 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsClickByLead(int $leadId, array $options = []): array
+    public function getStatsClickByLead(?int $leadId=null, array $options = []): array
     {
-        return $this->getStatsByLeadAndType($leadId, Stat::TYPE_CLICK, $options);
+        return $this->getStatsByLeadAndType(Stat::TYPE_CLICK, $leadId, $options);
     }
 
     /**
@@ -124,7 +124,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    private function getStatsByLeadAndType(int $leadId, string $type, array $options = []): array
+    private function getStatsByLeadAndType(string $type, ?int $leadId=null, array $options = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -132,10 +132,11 @@ class StatRepository extends CommonRepository
             ->select('s.id, s.lead_id, s.type, s.date_added, f.id as focus_id, f.name as focus_name')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'focus', 'f', 's.focus_id=f.id');
 
-        $q->where($q->expr()->and(
-            $q->expr()->eq('s.lead_id', (int) $leadId),
-            $q->expr()->eq('s.type', ':type')
-        ));
+        $q->where($q->expr()->eq('s.type', ':type'));
+
+        if ($leadId) {
+            $q->andWhere($q->expr()->eq('s.lead_id', (int) $leadId));
+        }
 
         $q->setParameter('type', $type);
 

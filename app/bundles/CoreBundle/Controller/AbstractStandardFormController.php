@@ -257,6 +257,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $newEntity = clone $entity;
 
             if ($arguments = $this->afterEntityClone($newEntity, $entity)) {
+                array_unshift($arguments, $request);
+
                 return call_user_func_array([$this, 'editAction'], $arguments);
             } else {
                 return $this->editAction($request, $newEntity, true);

@@ -76,6 +76,7 @@
 /upgrade
 /upgrade_errors.txt
 
+/media/libraries/ckeditor/*
 /media/bundles/*
 /media/dashboards/*
 !/media/dashboards/*.json
@@ -92,6 +93,8 @@
 !/media/images/.htaccess
 /media/css/app.css
 /media/css/libraries.css
+/media/css/mediaelementplayer.min.css
+/media/css/modal.min.css
 /media/js/app.js
 /media/js/libraries.js
 /media/js/mautic-form.js
