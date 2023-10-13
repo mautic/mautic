@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class CredentialsStoreTest extends TestCase
 {
-    private string $cacheDir = __DIR__.'/../../../../../../../var/cache/test';
+    private string $cacheDir;
 
     /**
      * @var CoreParametersHelper|MockObject
@@ -20,6 +20,7 @@ class CredentialsStoreTest extends TestCase
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->cacheDir             = dirname((new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 3);
     }
 
     public function testEmptyArrayReturnedIfEntityIdsDoNotMatch()
