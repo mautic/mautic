@@ -87,6 +87,13 @@ if (!isset($args['repackage'])) {
         'plugins/GrapesJsBuilderBundle/' => true,
     ];
 
+    // Ensure the generated media files don't end up in the deleted files by explicitly adding them to the release files.
+    foreach (['css', 'js', 'libraries/ckeditor', 'libraries/ckeditor/translations'] as $dir) {
+        $files = array_diff(scandir(__DIR__.'/packaging/media/'.$dir), array('..', '.'));
+        array_walk($files, function(&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
+        $releaseFiles = array_merge($releaseFiles, $files);
+    }
+
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
 
@@ -122,11 +129,9 @@ if (!isset($args['repackage'])) {
 
     // Include assets just in case they weren't
     $assetFiles = [
-        'media/css/app.css'       => true,
-        'media/css/libraries.css' => true,
-        'media/js/app.js'         => true,
-        'media/js/libraries.js'   => true,
-        'media/js/mautic-form.js' => true,
+        'media/css/'      => true,
+        'media/js/'       => true,
+        'media/libraries/' => true,
     ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
 
