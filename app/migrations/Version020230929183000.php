@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Move config files that contain local config to a folder outside the application data.
  */
-final class Version20230929183000 extends AbstractMauticMigration
+final class Version020230929183000 extends AbstractMauticMigration
 {
     public function preUp(Schema $schema): void
     {
