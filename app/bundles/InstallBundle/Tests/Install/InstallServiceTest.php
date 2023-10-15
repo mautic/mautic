@@ -72,9 +72,9 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+              __DIR__.'/../../../../../',
             );
 
         $this->assertFalse($this->installer->checkIfInstalled());
@@ -84,12 +84,12 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+                __DIR__.'/../../../../../',
             );
 
-        $this->configurator->expects($this->once())
+        $this->configurator->expects($this->exactly(2))
             ->method('getParameters')
             ->willReturn(
                 []
@@ -110,12 +110,12 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+              __DIR__.'/../../../../../',
             );
 
-        $this->configurator->expects($this->once())
+        $this->configurator->expects($this->exactly(2))
             ->method('getParameters')
             ->willReturn(
                 ['db_driver' => 'test']
