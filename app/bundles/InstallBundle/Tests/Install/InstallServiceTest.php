@@ -74,7 +74,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->with('root', false)
             ->willReturn(
-              __DIR__.'/../../../../../',
+                __DIR__.'/../../../../../',
             );
 
         $this->assertFalse($this->installer->checkIfInstalled());
@@ -112,7 +112,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->with('root', false)
             ->willReturn(
-              __DIR__.'/../../../../../',
+                __DIR__.'/../../../../../',
             );
 
         $this->configurator->expects($this->exactly(2))

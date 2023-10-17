@@ -89,8 +89,8 @@ if (!isset($args['repackage'])) {
 
     // Ensure the generated media files don't end up in the deleted files by explicitly adding them to the release files.
     foreach (['css', 'js', 'libraries/ckeditor', 'libraries/ckeditor/translations'] as $dir) {
-        $files = array_diff(scandir(__DIR__.'/packaging/media/'.$dir), array('..', '.'));
-        array_walk($files, function(&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
+        $files = array_diff(scandir(__DIR__.'/packaging/media/'.$dir), ['..', '.']);
+        array_walk($files, function (&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
     }
 
@@ -129,8 +129,8 @@ if (!isset($args['repackage'])) {
 
     // Include assets just in case they weren't
     $assetFiles = [
-        'media/css/'      => true,
-        'media/js/'       => true,
+        'media/css/'       => true,
+        'media/js/'        => true,
         'media/libraries/' => true,
     ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
