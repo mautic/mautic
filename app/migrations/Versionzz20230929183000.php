@@ -14,7 +14,7 @@ final class Versionzz20230929183000 extends AbstractMauticMigration
 {
     public function preUp(Schema $schema): void
     {
-        [$appConfigDir, ] = $this->getConfigDirs();
+        [$appConfigDir] = $this->getConfigDirs();
 
         $matches = glob($appConfigDir.'/*local.php');
 
