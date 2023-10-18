@@ -10,12 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private Config $config;
-
-    public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
+    public function __construct(private Config $config)
+    {
     }
 
     /**

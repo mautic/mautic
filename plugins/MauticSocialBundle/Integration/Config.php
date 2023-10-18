@@ -8,11 +8,8 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 final class Config
 {
-    private IntegrationHelper $integrationsHelper;
-
-    public function __construct(IntegrationHelper $integrationsHelper)
+    public function __construct(private IntegrationHelper $integrationsHelper)
     {
-        $this->integrationsHelper = $integrationsHelper;
     }
 
     public function isPublished(): bool
