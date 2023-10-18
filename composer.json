@@ -138,7 +138,7 @@
     "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v",
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
-    "npm-ci": "npm ci",
+    "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
     "generate-assets": "bin/console mautic:assets:generate"
   },
