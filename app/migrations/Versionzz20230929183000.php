@@ -10,11 +10,11 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Move config files that contain local config to a folder outside the application data.
  */
-final class Version020230929183000 extends AbstractMauticMigration
+final class Versionzz20230929183000 extends AbstractMauticMigration
 {
     public function preUp(Schema $schema): void
     {
-        [$appConfigDir, $localConfigDir] = $this->getConfigDirs();
+        [$appConfigDir, ] = $this->getConfigDirs();
 
         $matches = glob($appConfigDir.'/*local.php');
 
