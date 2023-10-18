@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -46,9 +47,12 @@ EOT
     {
         $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
         $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+        $vendorDir = $this->pathsHelper->getVendorRootPath();
+
+        $relativeMediaPath = Path::makeRelative($mediaDir, $vendorDir);
 
         // Check that the directory node_modules exists.
-        $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
+        $nodeModulesDir = $vendorDir.'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
             $output->writeln('<error>'.$this->translator->trans("{$nodeModulesDir} does not exist. Execute `npm install` to generate it.").'</error>');
 
@@ -62,7 +66,7 @@ EOT
             return Command::FAILURE;
         }
 
-        $this->installElFinderAssets();
+        $this->installElFinderAssets($relativeMediaPath);
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
@@ -112,11 +116,11 @@ EOT
         return Command::SUCCESS;
     }
 
-    private function installElFinderAssets(): void
+    private function installElFinderAssets(string $mediaDir): void
     {
         $command = $this->getApplication()->find('elfinder:install');
 
-        $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
+        $command->run(new ArrayInput(['--docroot' => $mediaDir]), new NullOutput());
     }
 
     /**

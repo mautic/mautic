@@ -154,7 +154,7 @@ jobs:
       run: |
         unzip -q ${{ needs.release.outputs.mautic-version }}.zip -d ./mautic-testing
         mkdir -p ./mautic-testing/var/logs
-        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        cp ./.github/ci-files/local.php ./mautic-testing/config/local.php
         cd ./mautic-testing
         php bin/console mautic:install --force http://localhost
 
@@ -202,7 +202,7 @@ jobs:
         curl -sSL https://github.com/mautic/mautic/releases/download/${{ env.MAUTIC_MINIMUM_VERSION }}/${{ env.MAUTIC_MINIMUM_VERSION }}.zip -o ${{ env.MAUTIC_MINIMUM_VERSION }}.zip
         unzip -q ${{ env.MAUTIC_MINIMUM_VERSION }}.zip -d ./mautic-testing
         mkdir -p ./mautic-testing/var/logs
-        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        cp ./.github/ci-files/local.php ./mautic-testing/config/local.php
         cd ./mautic-testing
         php bin/console mautic:install --force http://localhost
     

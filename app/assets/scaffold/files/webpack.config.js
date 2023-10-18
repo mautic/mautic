@@ -23,6 +23,10 @@ if (!fs.existsSync('app/release_metadata.json')) {
 module.exports = {
 	devtool: 'source-map',
 	performance: { hints: false },
+	cache: {
+		type: 'filesystem',
+		cacheDirectory: path.resolve(__dirname, 'var/cache/js/webpack'),
+	},
 
 	entry: path.resolve( __dirname, webroot + 'app/assets/libraries/ckeditor/src', 'ckeditor.ts' ),
 
@@ -56,5 +60,10 @@ module.exports = {
 
 	resolve: {
 		extensions: [ '.ts', '.js', '.json' ]
+	},
+	optimization: {
+		removeAvailableModules: false,
+		removeEmptyChunks: false,
+		splitChunks: false,
 	}
 };

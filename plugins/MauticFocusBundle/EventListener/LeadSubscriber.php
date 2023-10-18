@@ -54,9 +54,10 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $event->addSerializerGroup('focusList');
 
-        $contactId        = $event->getLead()->getId();
-        $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($contactId, $event->getQueryOptions());
-        $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($contactId, $event->getQueryOptions());
+        $leadId = $event->getLeadId();
+
+        $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($leadId, $event->getQueryOptions());
+        $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($leadId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             $icon     = 'fa-search';
@@ -80,7 +81,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
                             'timestamp'       => $statsView['date_added'],
                             'icon'            => $icon,
-                            'contactId'       => $contactId,
+                            'contactId'       => $leadId,
                         ]
                     );
                 }
