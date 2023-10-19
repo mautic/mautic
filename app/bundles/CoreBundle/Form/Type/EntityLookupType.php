@@ -60,8 +60,9 @@ class EntityLookupType extends AbstractType
         // Let the form builder notify us about initial/submitted choices
         $formModifier = function (FormEvent $event) {
             $options = $event->getForm()->getConfig()->getOptions();
-            $this->choiceLoaders[$options['model']]->setOptions($options);
-            $this->choiceLoaders[$options['model']]->onFormPostSetData($event);
+            $model   = $this->getModelName($options);
+            $this->choiceLoaders[$model]->setOptions($options);
+            $this->choiceLoaders[$model]->onFormPostSetData($event);
         };
 
         $builder->addEventListener(
@@ -92,14 +93,16 @@ class EntityLookupType extends AbstractType
                 'entity_id_column'       => 'id',
                 'choice_loader'          => function (Options $options) {
                     // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
-                    $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader(
-                        $this->modelFactory,
-                        $this->translator,
-                        $this->connection,
-                        $options
-                    );
+                    // if you have multiple lookup fields with same type then use different - 2 'key' for all fields
+                    $model = $this->getModelName($options);
+                    $this->choiceLoaders[$model] = new EntityLookupChoiceLoader(
+                            $this->modelFactory,
+                            $this->translator,
+                            $this->connection,
+                            $options
+                        );
 
-                    return $this->choiceLoaders[$options['model']];
+                    return $this->choiceLoaders[$model];
                 },
                 'choice_translation_domain' => false,
                 'expanded'                  => false,
@@ -143,5 +146,18 @@ class EntityLookupType extends AbstractType
         }
 
         $view->vars['attr'] = array_merge($view->vars['attr'], $attr);
+    }
+
+    /**
+     * @param Options|array<mixed> $options
+     */
+    private function getModelName($options): string
+    {
+        $key = $options['key'] ?? null;
+        if (!$key) {
+            return $options['model'];
+        }
+
+        return sprintf('%s.%s', $options['model'], $key);
     }
 }
