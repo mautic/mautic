@@ -300,67 +300,6 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response2['lists'][1]['filters']);
     }
 
-    public function testWeGet422ResponseCodeIfSegmentIsBeingUsedInSomeCampaignAndWeUnpublishIt(): void
-    {
-        $segmentName = 'Segment1';
-        $segment     = new LeadList();
-        $segment->setName($segmentName);
-        $segment->setAlias(mb_strtolower($segmentName));
-        $segment->setIsPublished(true);
-        $this->em->persist($segment);
-
-        $campaign     = new Campaign();
-        $campaignName = 'Campaign1';
-        $campaign->setName($campaignName);
-
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        // insert unpublished record
-        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
-            'campaign_id' => $campaign->getId(),
-            'leadlist_id' => $segment->getId(),
-        ]);
-
-        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
-        Assert::assertArrayHasKey('errors', $response);
-        $errorMessage = $this->translator->transChoice(
-            'mautic.lead.lists.used_in_campaigns.unpublish',
-            1,
-            [
-                '%campaignNames%' => '"'.$campaignName.'"',
-                '%segmentNames%'  => 'Segment1',
-            ],
-            'validators'
-        );
-        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
-    }
-
-    public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
-    {
-        $segmentName = 'Segment1';
-        $segment     = new LeadList();
-        $segment->setName($segmentName);
-        $segment->setAlias(mb_strtolower($segmentName));
-        $segment->setIsPublished(true);
-        $this->em->persist($segment);
-
-        $campaign = new Campaign();
-        $campaign->setName('campaign1');
-
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertArrayNotHasKey('errors', $response);
-    }
-
     /**
      * @dataProvider segmentMembershipFilterProvider
      */

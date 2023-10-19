@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Form\Validator\Constraints;
 use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
-use RecursiveIteratorIterator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -46,8 +45,8 @@ class CircularDependencyValidator extends ConstraintValidator
         $segmentIdsToCheck = array_map(fn (IntNode $child) => $child->getValue(), $directChildren);
 
         foreach ($directChildren as $directChildNode) {
-            /** @var RecursiveIteratorIterator<IntNode> $iterator */
-            $iterator = new RecursiveIteratorIterator($directChildNode, RecursiveIteratorIterator::LEAVES_ONLY);
+            /** @var \RecursiveIteratorIterator<IntNode> $iterator */
+            $iterator = new \RecursiveIteratorIterator($directChildNode, \RecursiveIteratorIterator::LEAVES_ONLY);
             foreach ($iterator as $childNode) {
                 if (in_array($childNode->getValue(), $segmentIdsToCheck)) {
                     $this->context->buildViolation($constraint->message)
