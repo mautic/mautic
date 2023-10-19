@@ -251,7 +251,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
         $metadata->addPropertyConstraint('plainPassword', new Assert\Regex(
             [
-                'pattern'        => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+                'pattern'        => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).{8,}$/',
                 'message'        => 'mautic.user.user.password.regex',
                 'groups'         => ['CheckPassword'],
             ]
