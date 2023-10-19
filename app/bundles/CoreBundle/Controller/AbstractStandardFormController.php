@@ -265,7 +265,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             }
         }
 
-        return $this->newAction();
+        return $this->newAction($request);
     }
 
     /**
