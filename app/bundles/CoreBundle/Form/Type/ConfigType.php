@@ -43,11 +43,6 @@ class ConfigType extends AbstractType
     private $langHelper;
 
     /**
-     * @var array
-     */
-    private $supportedLanguages;
-
-    /**
      * @var IpLookupFactory
      */
     private $ipLookupFactory;
@@ -69,7 +64,6 @@ class ConfigType extends AbstractType
         $this->langHelper          = $langHelper;
         $this->ipLookupFactory     = $ipLookupFactory;
         $this->ipLookup            = $ipLookup;
-        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
         $this->shortenerFactory    = $shortenerFactory;
     }
 

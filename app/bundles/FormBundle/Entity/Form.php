@@ -807,10 +807,7 @@ class Form extends FormEntity
      */
     public function setLanguage($language)
     {
-        if (method_exists($this, 'isChanged')) {
-            $this->isChanged('language', $language);
-        }
-
+        $this->isChanged('language', $language);
         $this->language = $language;
 
         return $this;

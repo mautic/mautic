@@ -44,6 +44,9 @@ class LanguageHelper
         $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
     }
 
+    /**
+     * @return array<string>
+     */
     public function getSupportedLanguages(): array
     {
         if (!empty($this->supportedLanguages)) {
