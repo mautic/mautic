@@ -384,6 +384,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     ],
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Create form with lead.changetags action:
