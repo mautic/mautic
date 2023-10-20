@@ -5915,7 +5915,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "da134d91fea36de48552772ce0144b2278ee175a"
+                "reference": "a4edc0cf8e3990bdce31e4cd1858da3aab9c9fdd"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6020,10 +6020,13 @@
                         "[project-root]/.env": "assets/scaffold/files/.env",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[project-root]/modernizr-config.json": "assets/scaffold/files/modernizr-config.json",
+                        "[project-root]/webpack.config.js": "assets/scaffold/files/webpack.config.js",
+                        "[project-root]/tsconfig.json": "assets/scaffold/files/tsconfig.json",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
+                        "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
                         "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
                         "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",

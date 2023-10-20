@@ -17,7 +17,8 @@ class BundleMetadataBuilderTest extends TestCase
     protected function setUp(): void
     {
         // Used in paths_helper
-        $root = __DIR__.'/../../../../../../../app';
+        $root        = __DIR__.'/../../../../../../../app';
+        $projectRoot = __DIR__.'/../../../../../../../';
 
         $paths = [];
         include __DIR__.'/../../../../../../config/paths_helper.php';
