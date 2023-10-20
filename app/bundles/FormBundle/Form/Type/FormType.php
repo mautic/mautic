@@ -154,9 +154,9 @@ class FormType extends AbstractType
 
         $builder->add('postAction', ChoiceType::class, [
             'choices' => [
-                'mautic.form.form.postaction.return'   => 'return',
-                'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.return'   => 'return',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
@@ -173,7 +173,10 @@ class FormType extends AbstractType
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'attr'       => [
+                'class'         => 'form-control',
+                 'data-hide-on' => '{"mauticform_postAction":"return"}',
+            ],
             'required'   => $required,
         ]);
 
