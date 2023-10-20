@@ -996,7 +996,7 @@ class ReportSubscriber implements EventSubscriberInterface
         unset($data);
     }
 
-    public function onEndReportGenerate(ReportGeneratorEvent $event)
+    public function onEndReportGenerate(ReportGeneratorEvent $event): void
     {
         if ($event->hasColumn('l.created_by') || $event->hasFilter('l.created_by')) {
             $event->addUsersLeftJoin(FieldsBuilder::PREFIX_CREATED_BY, 'created_by');

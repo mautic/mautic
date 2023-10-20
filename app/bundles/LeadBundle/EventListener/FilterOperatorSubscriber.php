@@ -147,18 +147,14 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'select',
                     'list' => $this->userModel->getOwnerListChoices(),
                 ],
-                'operators' => $this->typeOperatorProvider->getOperatorChoiceList(
-                    [
-                        'include' => [
-                            '=',
-                            '!=',
-                            'empty',
-                            '!empty',
-                            'in',
-                            '!in',
-                        ],
-                    ]
-                ),
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
+                    OperatorOptions::EQUAL_TO,
+                    OperatorOptions::NOT_EQUAL_TO,
+                    OperatorOptions::EMPTY,
+                    OperatorOptions::NOT_EMPTY,
+                    OperatorOptions::IN,
+                    OperatorOptions::NOT_IN,
+                ]),
                 'object'    => 'lead',
             ],
             'points' => [

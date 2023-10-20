@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,11 @@ final class FilterOperatorSubscriberTest extends TestCase
      */
     private $subscriber;
 
+    /**
+     * @var MockObject|UserModel
+     */
+    private $userModel;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -61,13 +67,15 @@ final class FilterOperatorSubscriberTest extends TestCase
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->userModel            = $this->createMock(UserModel::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
             $this->operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,
-            $this->translator
+            $this->translator,
+            $this->userModel
         );
     }
 

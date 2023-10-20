@@ -323,7 +323,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add company left join.
      */
-    public function addUsersLeftJoin(string $prefix = 'u', string $column = 'owner_id')
+    public function addUsersLeftJoin(string $prefix = 'u', string $column = 'owner_id'): void
     {
         $queryBuilder     = $this->getQueryBuilder();
         $joinedLeadTables = $queryBuilder->getQueryParts()['join']['l'] ?? [];
