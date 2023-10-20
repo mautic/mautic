@@ -14,6 +14,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -34,7 +35,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         LeadFieldRepository $leadFieldRepository,
         TypeOperatorProviderInterface $typeOperatorProvider,
         FieldChoicesProviderInterface $fieldChoicesProvider,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        private UserModel $userModel
     ) {
         $this->operatorOptions      = $operatorOptions;
         $this->leadFieldRepository  = $leadFieldRepository;
@@ -137,6 +139,26 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'callback' => 'activateSegmentFilterTypeahead',
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('lookup_id'),
+                'object'    => 'lead',
+            ],
+            'created_by' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.created_by'),
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->userModel->getOwnerListChoices(),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorChoiceList(
+                    [
+                        'include' => [
+                            '=',
+                            '!=',
+                            'empty',
+                            '!empty',
+                            'in',
+                            '!in',
+                        ],
+                    ]
+                ),
                 'object'    => 'lead',
             ],
             'points' => [
