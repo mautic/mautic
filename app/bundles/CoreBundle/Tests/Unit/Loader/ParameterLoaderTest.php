@@ -12,7 +12,7 @@ class ParameterLoaderTest extends TestCase
         $envParameters = json_encode(['default_daterange_filter' => '-1 day']);
         putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
 
-        $loader = new ParameterLoader(__DIR__.'/TestRoot');
+        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
         $loader->loadIntoEnvironment();
 
         $parameterBag = $loader->getParameterBag();
@@ -28,7 +28,7 @@ class ParameterLoaderTest extends TestCase
 
     public function testDefaultParametersAreLoaded(): void
     {
-        $loader = new ParameterLoader(__DIR__.'/TestRoot');
+        $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
         $this->assertIsArray($loader->getDefaultParameters());
         $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
     }

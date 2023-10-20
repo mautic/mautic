@@ -11,14 +11,14 @@ trait TimelineTrait
 {
     /**
      * @param QueryBuilder $query                 DBAL QueryBuilder
-     * @param array        $options               Query optons from LeadTimelineEvent
+     * @param array<mixed> $options               Query optons from LeadTimelineEvent
      * @param string       $eventNameColumn       Name of column to sort event name by
      * @param string       $timestampColumn       Name of column to sort timestamp by
-     * @param array        $serializedColumns     Array of columns to unserialize
-     * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
-     * @param null         $resultsParserCallback Callback to custom parse results
+     * @param array<mixed> $serializedColumns     Array of columns to unserialize
+     * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
+     * @param mixed|null   $resultsParserCallback Callback to custom parse results
      *
-     * @return array
+     * @return array<mixed>
      */
     private function getTimelineResults(
         QueryBuilder $query,
