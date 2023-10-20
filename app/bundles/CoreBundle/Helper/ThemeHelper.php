@@ -506,7 +506,11 @@ class ThemeHelper implements ThemeHelperInterface
                 continue;
             }
 
-            $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
+            $configJson = $this->filesystem->readFile($theme->getRealPath().'/config.json');
+            if (mb_check_encoding($configJson, 'UTF-8')) {
+                $configJson = utf8_encode($configJson);
+            }
+            $config = json_decode($configJson, true);
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
                 continue;
