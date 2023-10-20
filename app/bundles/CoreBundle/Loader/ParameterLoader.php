@@ -227,7 +227,7 @@ class ParameterLoader
         $dir = $rootDir = \dirname($root, 1);
         while (!is_file($dir.'/composer.json')) {
             if ($dir === \dirname($dir)) {
-                return $$rootDir;
+                return $rootDir;
             }
             $dir = \dirname($dir);
         }
