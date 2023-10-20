@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -64,5 +65,38 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
+    }
+
+    public function testLanguageForm(): void
+    {
+        $formPayload = [
+            'name'     => 'Test Form',
+            'formType' => 'campaign',
+            'language' => 'fr',
+            'fields'   => [
+               [
+                    'label'      => 'Email',
+                    'alias'      => 'email',
+                    'type'       => 'email',
+                    'leadField'  => 'email',
+                    'isRequired' => true,
+                ], [
+                    'label' => 'Submit',
+                    'alias' => 'submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $response = json_decode($clientResponse->getContent(), true);
+        $form     = $response['form'];
+        $formId   = $form['id'];
+
+        $crawler = $this->client->request('GET', '/form/'.$form['id']);
+        $this->assertStringContainsString('Merci de patienter...', $crawler->html());
+        $this->assertStringContainsString('Ceci est requis.', $crawler->html());
     }
 }
