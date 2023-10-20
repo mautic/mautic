@@ -58,6 +58,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Creating the form via API so it would create the submission table.
