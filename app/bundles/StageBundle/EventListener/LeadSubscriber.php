@@ -60,7 +60,7 @@ class LeadSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onLeadPostSave(LeadEvent $event)
+    public function onLeadPostSave(LeadEvent $event): void
     {
         $changes = $event->getChanges()['stage'] ?? null;
         if (is_array($changes)) {

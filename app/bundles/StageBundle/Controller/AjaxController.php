@@ -55,14 +55,11 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
-    protected function getLeadCountAction(Request $request): JsonResponse
+    public function getLeadCountAction(Request $request, StageCountCache $countCache): JsonResponse
     {
         $id = (int) InputHelper::clean($request->request->get('id'));
-
-        /** @var StageCountCache $councCache */
-        $countCache   = $this->get('mautic.stage.cache.stage_count');
 
         $leadCount = $countCache->getStageContactCount($id);
 
@@ -75,9 +72,8 @@ class AjaxController extends CommonAjaxController
     private function prepareJsonResponse(int $leadCount): array
     {
         return [
-            'html' => $this->translator->transChoice(
+            'html' => $this->translator->trans(
                 'mautic.lead.list.viewleads_count',
-                $leadCount,
                 ['%count%' => $leadCount]
             ),
             'leadCount' => $leadCount,
