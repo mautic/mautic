@@ -78,7 +78,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
             [
-                'mauticform[name]'        => 'Test',
+                'mauticform[name]' => 'Test',
             ]
         );
         $crawler = $this->client->submit($form);
