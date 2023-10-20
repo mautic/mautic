@@ -29,7 +29,7 @@ class StageCountCache
     public function incrementStageContactCount(int $stageId): void
     {
         $item  = $this->cacheProvider->getCacheAdapter()->getItem($this->generateCacheKey($stageId));
-        $count = $item->get() ?? $this->getStageContactCount($stageId);
+        $count = $item->get() ?? ($this->getStageContactCount($stageId) - 1);
         if ($count > -1) {
             $item->set($count + 1);
             $this->cacheProvider->getCacheAdapter()->save($item);
@@ -39,7 +39,7 @@ class StageCountCache
     public function decrementStageContactCount(int $stageId): void
     {
         $item  = $this->cacheProvider->getCacheAdapter()->getItem($this->generateCacheKey($stageId));
-        $count = $item->get();
+        $count = $item->get() ?? ($this->getStageContactCount($stageId) + 1);
         if ($count > 0) {
             $value = $count - 1;
             $item->set($value);
