@@ -20,7 +20,7 @@ class Form extends FormEntity
      */
     private $id;
 
-    private ?string $language;
+    private ?string $language = null;
 
     /**
      * @var string
