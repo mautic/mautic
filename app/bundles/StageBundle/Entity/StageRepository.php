@@ -62,7 +62,7 @@ class StageRepository extends CommonRepository
                 $q->expr()->eq('l.stage_id', $stageId)
             );
 
-        return (int) $q->executeQuery()->fetchFirstColumn();
+        return (int) $q->executeQuery()->fetchOne();
     }
 
     /**
