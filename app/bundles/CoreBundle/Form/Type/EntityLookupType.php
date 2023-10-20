@@ -82,7 +82,7 @@ class EntityLookupType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);
-        $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments']);
+        $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments', 'model_key']);
         $resolver->setDefaults(
             [
                 'modal_route'            => false,
@@ -153,7 +153,7 @@ class EntityLookupType extends AbstractType
      */
     private function getModelName($options): string
     {
-        $key = $options['key'] ?? null;
+        $key = $options['model_key'] ?? null;
         if (!$key) {
             return $options['model'];
         }
