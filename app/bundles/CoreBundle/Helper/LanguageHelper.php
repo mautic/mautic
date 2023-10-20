@@ -385,6 +385,9 @@ class LanguageHelper
         }
     }
 
+    /**
+     * @return array<string>
+     */
     public function getLanguageChoices(): array
     {
         // Get the list of available languages
