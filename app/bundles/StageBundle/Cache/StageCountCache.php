@@ -47,6 +47,13 @@ class StageCountCache
         }
     }
 
+    /**
+     * @template T
+     *
+     * @param Paginator<T> $stages
+     *
+     * @return array<int>
+     */
     public function getCountsFromCache(Paginator $stages): array
     {
         $counts = [];
