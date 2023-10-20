@@ -208,7 +208,7 @@ class ConfigType extends AbstractType
             'locale',
             ChoiceType::class,
             [
-                'choices'           => $this->getLanguageChoices(),
+                'choices'           => $this->langHelper->getLanguageChoices(),
                 'label'             => 'mautic.core.config.form.locale',
                 'required'          => false,
                 'attr'              => [
@@ -744,24 +744,6 @@ class ConfigType extends AbstractType
     public function getBlockPrefix()
     {
         return 'coreconfig';
-    }
-
-    private function getLanguageChoices(): array
-    {
-        // Get the list of available languages
-        $languages   = $this->langHelper->fetchLanguages(false, false);
-        $choices     = [];
-
-        foreach ($languages as $code => $langData) {
-            $choices[$langData['name']] = $code;
-        }
-
-        $choices = array_merge($choices, array_flip($this->supportedLanguages));
-
-        // Alpha sort the languages by name
-        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
-
-        return $choices;
     }
 
     private function getIpServicesChoices(): array

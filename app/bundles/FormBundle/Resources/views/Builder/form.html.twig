@@ -74,6 +74,7 @@
                         'mappedFields': mappedFields,
                         'inBuilder': inBuilder,
                         'fields': fields,
+                      'language': form.getLanguage()
                   }) -}}
               {%- endif -%}
 
@@ -108,6 +109,8 @@
                           'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
+                           'language': form.getLanguage()
+
                   }) -}}
                   {%- else -%}                    
                   {{- include(template, {
@@ -118,6 +121,8 @@
                           'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
+                           'language': form.getLanguage()
+
                   }) -}}
                 {%- endif -%}                    
                   <!-- end: "{{ theme }}{{ template }}" -->

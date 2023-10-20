@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Form\AbstractType;
@@ -27,7 +28,7 @@ class FormType extends AbstractType
      */
     private $security;
 
-    public function __construct(CorePermissions $security)
+    public function __construct(CorePermissions $security, private LanguageHelper $langHelper)
     {
         $this->security = $security;
     }
@@ -46,6 +47,21 @@ class FormType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
+
+        $builder->add(
+            'language',
+            ChoiceType::class,
+            [
+                'choices'           => $this->langHelper->getLanguageChoices(),
+                'label'             => 'mautic.core.config.form.locale',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.form.locale.tooltip',
+                ],
+                'placeholder'       => '',
+            ]
+        );
 
         $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',

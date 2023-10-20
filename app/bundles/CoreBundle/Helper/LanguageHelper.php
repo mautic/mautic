@@ -381,4 +381,22 @@ class LanguageHelper
             $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
         }
     }
+
+    public function getLanguageChoices(): array
+    {
+        // Get the list of available languages
+        $languages   = $this->fetchLanguages(false, false);
+        $choices     = [];
+
+        foreach ($languages as $code => $langData) {
+            $choices[$langData['name']] = $code;
+        }
+
+        $choices = array_merge($choices, array_flip($this->getSupportedLanguages()));
+
+        // Alpha sort the languages by name
+        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $choices;
+    }
 }
