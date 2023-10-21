@@ -46,7 +46,7 @@ class FormUploader
                 $result[$alias]  = $fileName;
                 $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
                 $this->fixRotationJPG($uploadedFile);
-                $uploadedFiles[] =$uploadedFile;
+                $uploadedFiles[] = $uploadedFile;
             }
             $submission->setResults($result);
         } catch (FileUploadException $e) {
