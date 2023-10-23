@@ -448,7 +448,7 @@ class ThemeHelperTest extends TestCase
         Assert::assertArrayHasKey('theme-legacy-all', $themes);
     }
 
-    public function testCustomThemesConfigurationCorrectlyIsCorrectlyDecoded()
+    public function testCustomThemesConfigurationCorrectlyIsCorrectlyDecoded(): void
     {
         $this->pathsHelper
             ->method('getSystemPath')
@@ -461,7 +461,7 @@ class ThemeHelperTest extends TestCase
                 ));
 
         $jsonFromFile = json_decode(file_get_contents(__DIR__.'/resource/themes/theme-legacy-french/config.json'), true);
-        /** @var ThemeHelper $themeHelper */
+
         $config = $this->themeHelper->getTheme('theme-legacy-french')->getConfig();
         $this->assertEquals(utf8_decode($jsonFromFile['name']), $config['name']);
     }
@@ -500,13 +500,6 @@ class ThemeHelperTest extends TestCase
 
         $themes = $this->themeHelper->getInstalledThemes();
         Assert::assertCount(5, $themes);
-
-        $this->markTestSkipped('I am not sure of the relation between directory and name');
-
-        // Test that a list of themes are returned by default
-        $themeKeys   = array_keys($themes);
-        $themeValues = array_values($themes);
-        Assert::assertSame($themeKeys, $themeValues);
     }
 
     public function testExtendedThemeDetailsAreReturned(): void
@@ -552,7 +545,7 @@ class ThemeHelperTest extends TestCase
 
         // this should return cached results
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
+        Assert::assertCount(5, $themes);
         Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
         Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
 
