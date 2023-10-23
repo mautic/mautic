@@ -508,9 +508,10 @@ class ThemeHelper implements ThemeHelperInterface
 
             $configJson = $this->filesystem->readFile($theme->getRealPath().'/config.json');
             if (mb_check_encoding($configJson, 'UTF-8')) {
-                $configJson = utf8_encode($configJson);
+                $configJson = utf8_decode($configJson);
             }
-            $config = json_decode($configJson, true);
+
+            $config = json_decode($configJson, true, 512, JSON_ERROR_UTF8);
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
                 continue;

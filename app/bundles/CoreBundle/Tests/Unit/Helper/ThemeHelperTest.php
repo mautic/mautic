@@ -448,6 +448,26 @@ class ThemeHelperTest extends TestCase
         Assert::assertArrayHasKey('theme-legacy-all', $themes);
     }
 
+    public function testCustomThemesConfigurationCorrectlyIsCorrectlyDecoded()
+    {
+        $this->pathsHelper
+            ->method('getSystemPath')
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array('themes_root', false, ''),
+                        array('themes', false, __DIR__.'/resource/themes')
+                    )
+                ))
+        ;
+
+        $jsonFromFile = json_decode(file_get_contents(__DIR__.'/resource/themes/theme-legacy-french/config.json'), true);
+        /** @var ThemeHelper $themeHelper */
+        $config = $this->themeHelper->getTheme('theme-legacy-french')->getConfig();
+        $this->assertEquals(utf8_decode($jsonFromFile['name']), $config['name']);
+
+    }
+
     public function testCustomThemesAreReturnedForFeatureIfCustomBuilderIsEnabled(): void
     {
         $mockBuilder = $this->createMock(BuilderInterface::class);

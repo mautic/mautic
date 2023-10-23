@@ -17,12 +17,16 @@ final class Version20221128145933 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->container->get('mautic.helper.integration');
-        $integration       = $integrationHelper->getIntegrationObject('Twilio');
-        $settings          = $integration->getIntegrationSettings()->getFeatureSettings();
-        if (empty($settings['disable_trackable_urls'])) {
-            throw new SkipMigration('Schema includes this migration');
+        try {
+            /** @var IntegrationHelper $integrationHelper */
+            $integrationHelper = $this->container->get('mautic.helper.integration');
+            $integration       = $integrationHelper->getIntegrationObject('Twilio');
+            $settings          = $integration->getIntegrationSettings()->getFeatureSettings();
+            if (empty($settings['disable_trackable_urls'])) {
+                throw new SkipMigration('Schema includes this migration');
+            }
+        } catch (\Exception) {
+            throw new SkipMigration('Integration not published');
         }
     }
 
