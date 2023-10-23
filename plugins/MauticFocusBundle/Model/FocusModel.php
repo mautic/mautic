@@ -4,10 +4,12 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use MatthiasMullie\Minify;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -206,9 +208,9 @@ class FocusModel extends FormModel
 
             $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
-                'js'    => \Minify_HTML::minify($javascript),
-                'focus' => \Minify_HTML::minify($content['focus']),
-                'form'  => \Minify_HTML::minify($content['form']),
+                'js'    => (new Minify\JS($javascript))->minify(),
+                'focus' => InputHelper::minifyHTML($content['focus']),
+                'form'  => InputHelper::minifyHTML($content['form']),
             ];
 
             if (!$byPassCache) {
