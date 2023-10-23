@@ -9,6 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 class EmailTest extends TestCase
 {
+    public function testCloneResetPublishDates(): void
+    {
+        $email = new Email();
+        $email->setPublishUp(new \DateTime());
+        $email->setPublishDown(new \DateTime());
+        $emailClone = clone $email;
+        $this->assertNull($emailClone->getPublishUp());
+        $this->assertNull($emailClone->getPublishDown());
+    }
+
     public function testCloneResetPlainText(): void
     {
         $email = new Email();
