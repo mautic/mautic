@@ -249,13 +249,29 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ]
         ));
 
-        $metadata->addPropertyConstraint('plainPassword', new Assert\Regex(
-            [
-                'pattern'        => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).{8,}$/',
-                'message'        => 'mautic.user.user.password.regex',
-                'groups'         => ['CheckPassword'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('plainPassword', new Assert\Regex([
+            'pattern' => '/[A-Z]/',
+            'message' => 'mautic.user.user.password.uppercase',
+            'groups'  => ['CheckPassword'],
+        ]));
+
+        $metadata->addPropertyConstraint('plainPassword', new Assert\Regex([
+            'pattern' => '/[a-z]/',
+            'message' => 'mautic.user.user.password.lowercase',
+            'groups'  => ['CheckPassword'],
+        ]));
+
+        $metadata->addPropertyConstraint('plainPassword', new Assert\Regex([
+            'pattern' => '/[0-9]/',
+            'message' => 'mautic.user.user.password.number',
+            'groups'  => ['CheckPassword'],
+        ]));
+
+        $metadata->addPropertyConstraint('plainPassword', new Assert\Regex([
+            'pattern' => '/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/',
+            'message' => 'mautic.user.user.password.special',
+            'groups'  => ['CheckPassword'],
+        ]));
 
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
