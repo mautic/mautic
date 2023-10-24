@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Model;
 
-use Mautic\UserBundle\Entity\User;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordStrengthEstimatorModel
@@ -29,14 +19,11 @@ class PasswordStrengthEstimatorModel
         'company',
     ];
 
-    /**
-     * @var PasswordStrengthEstimator
-     */
-    private $passwordStrengthEstimator;
+    private PasswordStrengthEstimator $passwordStrengthEstimator;
 
-    public function __construct(PasswordStrengthEstimator $passwordStrengthEstimator)
+    public function __construct()
     {
-        $this->passwordStrengthEstimator = $passwordStrengthEstimator;
+        $this->passwordStrengthEstimator = new PasswordStrengthEstimator();
     }
 
     public function validate(?string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = self::DICTIONARY): bool
