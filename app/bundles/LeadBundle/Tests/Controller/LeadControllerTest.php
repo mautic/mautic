@@ -83,9 +83,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadCategoryData::class]);
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertTrue($clientResponse->isOk(), $this->client->getResponse()->getContent());
 
-        $form = $crawler->filterXPath('//form[@name="leadlist"]')->form();
+        $formWrapper = $crawler->filterXPath('//form[@name="leadlist"]');
+        $this->assertSame(1, $formWrapper->count(), $this->client->getResponse()->getContent());
+
+        $form = $formWrapper->form();
         $form->setValues(
             [
                 'leadlist[name]'               => 'Segment 1',
