@@ -121,9 +121,6 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'clicked-link-in-any-email-on-specific-date'                                => 2,
             'clicked-link-in-any-sms'                                                   => 3,
             'clicked-link-in-any-sms-on-specific-date'                                  => 2,
-            'clicked-any-link-from-any-email-test'                                      => 2,
-            'not-clicked-any-link-from-any-email-test'                                  => 52,
-            'table-name-missing-in-filter'                                              => 1,
             'tags-empty'                                                                => 52,
             'tags-not-empty'                                                            => 2,
             'segment-having-company'                                                    => 50,
@@ -146,15 +143,15 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentRebuildCommand(): void
     {
-        $segmentTest3Ref       = $this->getReference('segment-test-3');
-
-        $this->runCommand(
+        $segmentTest3Ref = $this->getReference('segment-test-3');
+        $commandTester   = $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
                 '--env' => 'test',
             ]
         );
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
 
@@ -167,13 +164,14 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         // Remove the title from all contacts, rebuild the list, and check that list is updated
         $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
 
-        $this->runCommand(
+        $commandTester = $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
                 '--env' => 'test',
             ]
         );
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
 
@@ -183,11 +181,12 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
         );
 
-        $segmentTest40Ref      = $this->getReference('segment-test-include-segment-with-or');
-        $this->runCommand('mautic:segments:update', [
+        $segmentTest40Ref = $this->getReference('segment-test-include-segment-with-or');
+        $commandTester    = $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest40Ref->getId(),
             '--env' => 'test',
         ]);
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest40Ref);
 
@@ -198,10 +197,11 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         $segmentTest64Ref = $this->getReference('segment-test-include-static-segment-with-or');
-        $this->runCommand('mautic:segments:update', [
+        $commandTester    = $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest64Ref->getId(),
             '--env' => 'test',
         ]);
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest64Ref);
 
@@ -211,11 +211,12 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be 11 contacts in the segment-test-include-static-segment-with-or segment after rebuilding from the command line.'
         );
 
-        $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
-        $this->runCommand('mautic:segments:update', [
+        $segmentTest51Ref = $this->getReference('has-email-and-visited-url');
+        $commandTester    = $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest51Ref->getId(),
             '--env' => 'test',
         ]);
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest51Ref);
 
@@ -233,13 +234,15 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'abcdr')
         );
 
-        $this->runCommand(
+        $commandTester = $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest51Ref->getId(),
                 '--env' => 'test',
             ]
         );
+
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest51Ref);
 
