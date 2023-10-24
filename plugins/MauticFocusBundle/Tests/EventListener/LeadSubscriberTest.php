@@ -71,10 +71,8 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * Make sure that on timeline entry is created for a lead
      * that was displayed Focus Item.
-     *
-     * @return void
      */
-    public function testShowFocusItem()
+    public function testShowFocusItem(): void
     {
         $lead = $this->getLead();
         $date = new \DateTime();
@@ -86,6 +84,30 @@ class LeadSubscriberTest extends CommonMocks
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
+        $subscriber = new LeadSubscriber(
+            $this->translator,
+            $this->router,
+            $this->focusModel
+        );
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+
+        $this->assertSame([$timelineEvent], $leadEvent->getEvents());
+    }
+
+    public function testShowFocusItemWhenNoLead(): void
+    {
+        $date = new \DateTime();
+
+        $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
+
+        $timelineEvent = $this->getTimelineEvent(
+            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date
+        );
+
+        $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->router,
@@ -115,6 +137,30 @@ class LeadSubscriberTest extends CommonMocks
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
+        $subscriber = new LeadSubscriber(
+            $this->translator,
+            $this->router,
+            $this->focusModel
+        );
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
+
+        $this->assertSame([$timelineEvent], $leadEvent->getEvents());
+    }
+
+    public function testClickFocusItemWhenNoLead(): void
+    {
+        $date = new \DateTime();
+
+        $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
+
+        $timelineEvent = $this->getTimelineEvent(
+            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date
+        );
+
+        $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
             $this->router,
@@ -158,7 +204,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, Lead $lead): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
     {
         $leadEventLogId = 1;
 
@@ -172,7 +218,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
             'icon'            => 'fa-search',
-            'contactId'       => $lead->getId(),
+            'contactId'       => $lead?->getId(),
         ];
     }
 }

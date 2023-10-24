@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -44,21 +45,31 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
+        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
+        $vendorDir = $this->pathsHelper->getVendorRootPath();
+
+        $relativeMediaPath = Path::makeRelative($mediaDir, $vendorDir);
+
         // Check that the directory node_modules exists.
-        $nodeModulesDir = $this->pathsHelper->getVendorRootPath().'/node_modules';
+        $nodeModulesDir = $vendorDir.'/node_modules';
         if (!$this->filesystem->exists($nodeModulesDir)) {
             $output->writeln('<error>'.$this->translator->trans("{$nodeModulesDir} does not exist. Execute `npm install` to generate it.").'</error>');
 
             return Command::FAILURE;
         }
 
-        $this->installElFinderAssets();
+        $ckeditorFile = $mediaDir.'/libraries/ckeditor/ckeditor.js';
+        if (!$this->filesystem->exists($ckeditorFile)) {
+            $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
+
+            return Command::FAILURE;
+        }
+
+        $this->installElFinderAssets($relativeMediaPath);
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
-
-        $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
-        $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
@@ -87,8 +98,6 @@ EOT
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
-            'js/ckeditor4/ckeditor.js',
-            'js/ckeditor4/adapters/jquery.js',
             'js/jquery.min.js',
             'js/froogaloop.min.js',
         ];
@@ -107,11 +116,11 @@ EOT
         return Command::SUCCESS;
     }
 
-    private function installElFinderAssets(): void
+    private function installElFinderAssets(string $mediaDir): void
     {
         $command = $this->getApplication()->find('elfinder:install');
 
-        $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
+        $command->run(new ArrayInput(['--docroot' => $mediaDir]), new NullOutput());
     }
 
     /**
@@ -119,7 +128,6 @@ EOT
      */
     private function moveExtraLibraries(string $nodeModulesDir, string $assetsDir): void
     {
-        $this->filesystem->mirror("{$nodeModulesDir}/ckeditor4", "{$assetsDir}/js/ckeditor4");
         $this->filesystem->copy("{$nodeModulesDir}/jquery/dist/jquery.min.js", "{$assetsDir}/js/jquery.min.js");
         $this->filesystem->copy("{$nodeModulesDir}/vimeo-froogaloop2/javascript/froogaloop.min.js", "{$assetsDir}/js/froogaloop.min.js");
     }

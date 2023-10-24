@@ -20,7 +20,7 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\TranslationsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         $container->addCompilerPass(new Compiler\TranslationLoaderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
         $container->addCompilerPass(new Compiler\ModelPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\UpdateStepPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1020);
+        $container->addCompilerPass(new Compiler\UpdateStepPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\PermissionsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\ServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
