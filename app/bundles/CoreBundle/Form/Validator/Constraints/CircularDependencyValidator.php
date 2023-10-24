@@ -27,7 +27,7 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @param LeadList $segment
+     * @param LeadList|mixed $segment
      */
     public function validate($segment, Constraint $constraint)
     {
@@ -42,7 +42,7 @@ class CircularDependencyValidator extends ConstraintValidator
         $parentNode     = $this->segmentDependencyTreeFactory->buildTree($segment);
         $directChildren = $parentNode->getChildrenArray();
 
-        $segmentIdsToCheck = array_map(fn (IntNode $child) => $child->getValue(), $directChildren);
+        $segmentIdsToCheck = array_map(fn ($child) => $child->getValue(), $directChildren);
 
         foreach ($directChildren as $directChildNode) {
             /** @var \RecursiveIteratorIterator<IntNode> $iterator */
