@@ -18,4 +18,12 @@ class EmailTest extends TestCase
         $this->assertNull($emailClone->getPublishUp());
         $this->assertNull($emailClone->getPublishDown());
     }
+
+    public function testCloneResetPlainText(): void
+    {
+        $email = new Email();
+        $email->setPlainText('foo');
+        $emailClone = clone $email;
+        $this->assertNull($emailClone->getPlainText());
+    }
 }
