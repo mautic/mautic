@@ -272,13 +272,6 @@ return [
                 'arguments' => \Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
-            'mautic.user.repository.company' => [
-                'class'     => \Mautic\LeadBundle\Entity\CompanyRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\Company::class,
-                ],
-            ],
         ],
         'fixtures' => [
             'mautic.user.fixture.role' => [

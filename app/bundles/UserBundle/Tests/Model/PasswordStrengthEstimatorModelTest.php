@@ -2,18 +2,10 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
@@ -23,26 +15,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
-    /**
-     * @var PasswordEncoderInterface
-     */
-    private $passwordEncoder;
+    private PasswordEncoderInterface $passwordEncoder;
 
-    /**
-     * @var RoleRepository
-     */
-    private $roleRepository;
+    private RoleRepository $roleRepository;
 
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ValidatorInterface $validator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->passwordEncoder = $this->getContainer()->get('security.encoder_factory');
-        $this->roleRepository  = $this->em->getRepository('MauticUserBundle:Role');
+        $this->roleRepository  = $this->em->getRepository(Role::class);
         $this->validator       = $this->getContainer()->get('validator');
     }
 
