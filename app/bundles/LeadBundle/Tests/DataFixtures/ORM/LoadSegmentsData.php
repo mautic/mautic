@@ -87,7 +87,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'display'  => '',
                     ],
                 ],
-                'populate' => false,
+                'populate' => true,
             ],
             [ // ID 5
                 'name'     => 'Segment Test 4',
