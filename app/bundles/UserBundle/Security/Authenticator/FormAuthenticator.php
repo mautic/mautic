@@ -138,7 +138,6 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
                 if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION)) {
                     $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION);
                 }
-
             } elseif ($authEvent->isFailed()) {
                 throw new AuthenticationException($authEvent->getFailedAuthenticationMessage());
             }

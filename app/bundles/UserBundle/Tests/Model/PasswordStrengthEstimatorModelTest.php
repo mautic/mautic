@@ -10,12 +10,12 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
-    private PasswordEncoderInterface $passwordEncoder;
+    private EncoderFactory $passwordEncoder;
 
     private RoleRepository $roleRepository;
 
