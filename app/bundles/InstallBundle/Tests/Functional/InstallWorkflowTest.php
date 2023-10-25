@@ -87,7 +87,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
 
         $form['install_user_step[username]']->setValue('admin');
-        $form['install_user_step[password]']->setValue('maut!cR0cks');
+        $form['install_user_step[password]']->setValue('maut!cR000cks');
         $form['install_user_step[firstname]']->setValue('admin');
         $form['install_user_step[lastname]']->setValue('mautic');
         $form['install_user_step[email]']->setValue('mautic@example.com');
