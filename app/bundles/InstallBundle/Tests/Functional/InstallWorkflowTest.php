@@ -95,7 +95,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $heading = $crawler->filter('.panel-body.text-center h5');
-        Assert::assertSame(1, $heading->count(), $this->client->getResponse()->getContent());
+        Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
 
         $successText = $heading->text();
         Assert::assertStringContainsString('Mautic is installed', $successText);

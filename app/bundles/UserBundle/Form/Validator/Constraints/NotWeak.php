@@ -15,7 +15,7 @@ class NotWeak extends Constraint
         self::TOO_WEAK => 'PASSWORD_TOO_WEAK_ERROR',
     ];
 
-    public $message = 'This password is too weak. Consider using a stronger password.';
+    public string $message = 'This password is too weak. Consider using a stronger password.';
 
-    public $score = PasswordStrengthEstimatorModel::MINIMUM_PASSWORD_STRENGTH_ALLOWED;
+    public int $score = PasswordStrengthEstimatorModel::MINIMUM_PASSWORD_STRENGTH_ALLOWED;
 }

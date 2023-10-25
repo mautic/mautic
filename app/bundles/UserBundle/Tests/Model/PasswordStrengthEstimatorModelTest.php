@@ -11,6 +11,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
@@ -44,6 +45,7 @@ class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
         $violations                    = $this->validator->validate($user);
         $hasNotWeakConstraintViolation = false;
 
+        /** @var ConstraintViolation $violation */
         foreach ($violations as $violation) {
             $hasNotWeakConstraintViolation |= $violation->getConstraint() instanceof NotWeak;
         }

@@ -10,7 +10,7 @@ use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PasswordSubscriber implements EventSubscriberInterface
+final class PasswordSubscriber implements EventSubscriberInterface
 {
     public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {
@@ -25,10 +25,7 @@ class PasswordSubscriber implements EventSubscriberInterface
 
     public function onUserFormAuthentication(AuthenticationEvent $authenticationEvent): void
     {
-        $userPassword = $authenticationEvent->getToken()->getCredentials();
-        if (!is_string($userPassword)) {
-            return;
-        }
+        $userPassword = $authenticationEvent->getToken()->getCredentials(); /* @phpstan-ignore-line getCredentials() is deprecated since Symfony 5.4, refactoring needed */
 
         if (!$this->passwordStrengthEstimatorModel->validate($userPassword)) {
             throw new WeakPasswordException();

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\EventListener;
 
-use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use Mautic\UserBundle\Exception\WeakPasswordException;
@@ -12,48 +11,29 @@ use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Router;
-use ZxcvbnPhp\Zxcvbn;
 
 class PasswordSubscriberTest extends TestCase
 {
-    /**
-     * @var PasswordSubscriber
-     */
-    private $passwordSubscriber;
+    private PasswordSubscriber $passwordSubscriber;
+
+    private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel;
 
     /**
-     * @var PasswordStrengthEstimatorModel
-     */
-    private $passwordStrengthEstimatorModel;
-
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var AuthenticationEvent
+     * @var MockObject&AuthenticationEvent
      */
     private $authenticationEvent;
 
     /**
-     * @var PluginToken
+     * @var MockObject&PluginToken
      */
     private $pluginToken;
 
     protected function setUp(): void
     {
-        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel(new Zxcvbn());
-        $this->userRepository                 = $this->createMock(UserRepository::class);
-        $this->router                         = $this->createMock(Router::class);
-        $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel, $this->userRepository, $this->router);
+        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel();
+        $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel);
         $this->authenticationEvent            = $this->createMock(AuthenticationEvent::class);
         $this->pluginToken                    = $this->createMock(PluginToken::class);
 

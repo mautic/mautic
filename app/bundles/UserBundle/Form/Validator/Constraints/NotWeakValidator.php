@@ -8,18 +8,11 @@ use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class NotWeakValidator extends ConstraintValidator
 {
-    /**
-     * @var PasswordStrengthEstimator
-     */
-    private $passwordStrengthEstimatorModel;
-
-    public function __construct(PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
+    public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {
-        $this->passwordStrengthEstimatorModel = $passwordStrengthEstimatorModel;
     }
 
     public function validate($value, Constraint $constraint): void

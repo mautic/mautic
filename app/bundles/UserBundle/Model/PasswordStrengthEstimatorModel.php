@@ -26,11 +26,19 @@ class PasswordStrengthEstimatorModel
         $this->passwordStrengthEstimator = new PasswordStrengthEstimator();
     }
 
+    /**
+     * @param string[] $dictionary
+     */
     public function validate(?string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = self::DICTIONARY): bool
     {
         return $score <= $this->passwordStrengthEstimator->passwordStrength($password, $this->sanitazeDictionary($dictionary))['score'];
     }
 
+    /**
+     * @param string[] $dictionary
+     *
+     * @return string[]
+     */
     private function sanitazeDictionary(array $dictionary): array
     {
         return array_unique(array_filter($dictionary));

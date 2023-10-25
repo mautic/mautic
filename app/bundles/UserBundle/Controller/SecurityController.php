@@ -76,7 +76,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
         if (null !== $error) {
             if ($error instanceof WeakPasswordException) {
-                $this->addFlash('mautic.user.auth.error.weakpassword', [], FlashBag::LEVEL_ERROR);
+                $this->addFlash(FlashBag::LEVEL_ERROR, 'mautic.user.auth.error.weakpassword');
 
                 return $this->forward('MauticUserBundle:Public:passwordReset');
             } elseif ($error instanceof Exception\BadCredentialsException) {
