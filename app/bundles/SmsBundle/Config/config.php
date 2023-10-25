@@ -195,6 +195,11 @@ return [
             ],
         ],
     ],
+    'categories' => [
+        'sms' => [
+            'label' => 'mautic.sms.sms',
+        ],
+    ],
     'parameters' => [
         'sms_enabled'                                                      => false,
         'sms_username'                                                     => null,
