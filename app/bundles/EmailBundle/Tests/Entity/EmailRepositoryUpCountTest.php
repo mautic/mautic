@@ -36,6 +36,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock->expects($this->never())
             ->method('update');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45, 'sent', 0);
     }
 
@@ -54,8 +55,9 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
             ->with('id = 45');
 
         $this->queryBuilderMock->expects($this->once())
-            ->method('execute');
+            ->method('executeStatement');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 
@@ -76,30 +78,34 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
             ->with('id = 45');
 
         $this->queryBuilderMock->expects($this->once())
-            ->method('execute');
+            ->method('executeStatement');
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45, 'read', 2, true);
     }
 
     public function testUpCountWithTwoErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
-            ->method('execute')
+            ->method('executeStatement')
             ->willReturnOnConsecutiveCalls(
                 $this->throwException(new DBALException()),
-                $this->throwException(new DBALException())
+                $this->throwException(new DBALException()),
+                0
             );
 
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 
     public function testUpCountWithFourErrors(): void
     {
         $this->queryBuilderMock->expects($this->exactly(3))
-            ->method('execute')
+            ->method('executeStatement')
             ->will($this->throwException(new DBALException()));
 
         $this->expectException(DBALException::class);
+        /** @phpstan-ignore-next-line */
         $this->repo->upCount(45);
     }
 }

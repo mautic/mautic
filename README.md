@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-112-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-122-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -219,7 +219,20 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MohHeader"><img src="https://avatars.githubusercontent.com/u/3213925?v=4?s=100" width="100px;" alt="Mohammed Header"/><br /><sub><b>Mohammed Header</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MohHeader" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/danadelion"><img src="https://avatars.githubusercontent.com/u/78448517?v=4?s=100" width="100px;" alt="Dana Linhartová"/><br /><sub><b>Dana Linhartová</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=danadelion" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thanks"><img src="https://avatars.githubusercontent.com/u/1121545?v=4?s=100" width="100px;" alt="Thanks"/><br /><sub><b>Thanks</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Thanks" title="Tests">⚠️</a></td>
+    </tr>
+    <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/PatrickJenkner"><img src="https://avatars.githubusercontent.com/u/139468697?v=4?s=100" width="100px;" alt="Patrick"/><br /><sub><b>Patrick</b></sub></a><br /><a href="#userTesting-PatrickJenkner" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://tomasvotruba.com"><img src="https://avatars.githubusercontent.com/u/924196?v=4?s=100" width="100px;" alt="Tomas Votruba"/><br /><sub><b>Tomas Votruba</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TomasVotruba" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tirtharajghosh"><img src="https://avatars.githubusercontent.com/u/58604532?v=4?s=100" width="100px;" alt="Tirtharaj Ghosh"/><br /><sub><b>Tirtharaj Ghosh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=tirtharajghosh" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.rubnogueira.com"><img src="https://avatars.githubusercontent.com/u/40404708?v=4?s=100" width="100px;" alt="Ruben Nogueira"/><br /><sub><b>Ruben Nogueira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=rubnogueira" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://exsesx.dev/"><img src="https://avatars.githubusercontent.com/u/20399517?v=4?s=100" width="100px;" alt="Oleh Vanin"/><br /><sub><b>Oleh Vanin</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aexsesx" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mallezie"><img src="https://avatars.githubusercontent.com/u/1926222?v=4?s=100" width="100px;" alt="Tim Mallezie"/><br /><sub><b>Tim Mallezie</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=mallezie" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://staabm.github.io/"><img src="https://avatars.githubusercontent.com/u/120441?v=4?s=100" width="100px;" alt="Markus Staab"/><br /><sub><b>Markus Staab</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=staabm" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/code5rick"><img src="https://avatars.githubusercontent.com/u/131262825?v=4?s=100" width="100px;" alt="code5rick"/><br /><sub><b>code5rick</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Acode5rick" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jcrandell7"><img src="https://avatars.githubusercontent.com/u/59890399?v=4?s=100" width="100px;" alt="jcrandell7"/><br /><sub><b>jcrandell7</b></sub></a><br /><a href="#userTesting-jcrandell7" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/driskell"><img src="https://avatars.githubusercontent.com/u/939815?v=4?s=100" width="100px;" alt="Jason Woods"/><br /><sub><b>Jason Woods</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=driskell" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -237,14 +250,14 @@ This project follows the [all-contributors][all-contributors] specification. Con
 [facebook]: <https://www.facebook.com/MauticCommunity/>
 [slack]: <https://www.mautic.org/community/get-involved/communication-channels>
 [contributing]: <https://contribute.mautic.org/contributing-to-mautic>
-[contributing-md]: <https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md>
+[contributing-md]: <https://github.com/mautic/mautic/blob/5.x/.github/CONTRIBUTING.md>
 [contribute-developer]: <https://contribute.mautic.org/contributing-to-mautic/developer>
 [t1-issues]: <https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AT1>
 [download-mautic]: <https://www.mautic.org/download>
 [tagged-release]: <https://github.com/mautic/mautic/releases>
 [composer]: <http://getcomposer.org/>
 [download-zip]: <https://github.com/mautic/mautic/archive/refs/heads/features.zip>
-[ddev-mautic]: <https://kb.mautic.org/knowledgebase/development/how-to-install-mautic-using-ddev>
+[ddev-mautic]: <https://kb.mautic.org/article/how-to-set-up-a-mautic-instance-for-testing-locally-with-ddev.html>
 [troubleshooting]: <https://docs.mautic.org/en/troubleshooting>
 [community]: <https://www.mautic.org/community>
 [mautic-docs]: <https://docs.mautic.org>

@@ -69,7 +69,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 ->where(
                     $qb->expr()->lte('log.date_added', ':date')
                 )
-                ->execute()
+                ->executeQuery()
                 ->fetchOne();
         } else {
             $qb->select('log.id')
@@ -83,7 +83,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
-                $ids = array_column($qb->execute()->fetchAllAssociative(), 'id');
+                $ids = array_column($qb->executeQuery()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($ids)) {
                     break;
@@ -95,7 +95,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'id', $ids
                       )
                   )
-                  ->execute();
+                  ->executeStatement();
             }
         }
 

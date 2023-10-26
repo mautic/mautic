@@ -58,7 +58,7 @@ class CacheController extends CommonController
         $this->allowlist->clearCache();
 
         return $this->forward(
-            'MarketplaceBundle:Package\List:list'
+            'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction'
         );
     }
 }

@@ -63,7 +63,7 @@ class AggregatorType extends AbstractType
                 'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [
-                    'class' => 'form-control filter-columns',
+                    'class' => 'form-control',
                 ],
             ]
         );

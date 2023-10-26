@@ -111,7 +111,7 @@ class ReferenceResolverTest extends TestCase
             ->willReturnOnConsecutiveCalls(...$returnValues);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->method('execute')
+        $queryBuilder->method('executeQuery')
             ->willReturn($result);
 
         return $queryBuilder;

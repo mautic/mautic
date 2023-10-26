@@ -61,7 +61,7 @@ class ContactHelper
                 )
             )
             ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $ids = array_column($foundContacts, 'id');

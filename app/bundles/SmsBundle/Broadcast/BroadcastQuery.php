@@ -46,7 +46,7 @@ class BroadcastQuery
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -57,7 +57,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchOne();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
