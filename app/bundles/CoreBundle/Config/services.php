@@ -51,6 +51,12 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
     $services->alias('mautic.helper.assetgeneration', \Mautic\CoreBundle\Helper\AssetGenerationHelper::class);
+    $services->alias('twig.helper.slots', \Mautic\CoreBundle\Twig\Helper\SlotsHelper::class);
 
     $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
+
+    $services->get(\Mautic\CoreBundle\Model\NotificationModel::class)->call('setDisableUpdates', ['%mautic.security.disableUpdates%']);
+    $services->alias('mautic.core.model.auditlog', \Mautic\CoreBundle\Model\AuditLogModel::class);
+    $services->alias('mautic.core.model.notification', \Mautic\CoreBundle\Model\NotificationModel::class);
+    $services->alias('mautic.core.model.form', \Mautic\CoreBundle\Model\FormModel::class);
 };

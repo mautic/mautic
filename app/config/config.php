@@ -8,7 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.project_dir').'/app';
+$root        = $container->getParameter('mautic.application_dir').'/app';
+$projectRoot = $container->getParameter('kernel.project_dir');
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
@@ -52,7 +53,7 @@ if (defined('MAUTIC_INSTALLER')) {
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.project_dir%/app/config/routing.php',
+        'resource'            => '%mautic.application_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -77,29 +78,29 @@ $container->loadFromExtension('framework', [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
-        'failure_transport' => 'failed_default',
-        'transports'        => [
-            'email_transport' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
-                ],
+        'failure_transport'  => 'failed',
+        'transports'         => [
+            'email' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
-                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
-                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
-                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
-                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
-            'failed_default' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
-                'options'        => [
-                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_failed_default',
+            'hit' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
+                'retry_strategy' => [
+                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
+            'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email_transport',
+            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            \Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
+            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
+            \Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
+            \Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
         ],
     ],
 
@@ -132,7 +133,6 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
     'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
@@ -184,14 +184,14 @@ $container->loadFromExtension('doctrine', [
 // MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
     'migrations_paths' => [
-        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+        'Mautic\\Migrations' => '%mautic.application_dir%/app/migrations',
     ],
     'storage' => [
         'table_storage' => [
             'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
         ],
     ],
-    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
+    'custom_template' => '%mautic.application_dir%/app/migrations/Migration.template',
 ]);
 
 // KnpMenu Configuration

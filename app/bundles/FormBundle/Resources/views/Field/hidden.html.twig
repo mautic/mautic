@@ -106,7 +106,7 @@
           'data-validate': field.alias,
           'data-validation-type': field.type,
   }) %}
-  {% if field.properties.multiple is not empty %}
+  {% if field.properties.multiple is defined and field.properties.multiple is not empty %}
     {% set containerAttributes = containerAttributes|merge({
             'data-validate-multiple': 'true',
     }) %}

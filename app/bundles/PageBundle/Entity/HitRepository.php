@@ -32,8 +32,6 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = null;
-
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
             $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
@@ -57,7 +55,7 @@ class HitRepository extends CommonRepository
         $q->select('u.is_unique')
             ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
-        return (bool) $q->execute()->fetchOne();
+        return (bool) $q->executeQuery()->fetchOne();
     }
 
     /**
@@ -152,7 +150,7 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $hits = [];
         foreach ($results as $r) {
@@ -257,7 +255,7 @@ class HitRepository extends CommonRepository
         } else {
             $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->execute()->fetchAssociative();
+        $result = $sq->executeQuery()->fetchAssociative();
 
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
@@ -280,7 +278,7 @@ class HitRepository extends CommonRepository
         $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $return = [];
@@ -315,7 +313,7 @@ class HitRepository extends CommonRepository
             ->where($expr)
             ->groupBy('h.page_id');
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $p) {
             $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
@@ -386,7 +384,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         // loop to structure
         $times  = [];
@@ -434,7 +432,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $times = [];
 
@@ -478,7 +476,7 @@ class HitRepository extends CommonRepository
             ->set('date_left', ':datetime')
             ->where('id = '.(int) $lastHitId)
             ->setParameter('datetime', $dt->toUtcString());
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -501,7 +499,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -530,7 +528,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
@@ -546,7 +544,7 @@ class HitRepository extends CommonRepository
                 'newTrackingId' => $newTrackingId,
                 'oldTrackingId' => $oldTrackingId,
             ])
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -558,6 +556,6 @@ class HitRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

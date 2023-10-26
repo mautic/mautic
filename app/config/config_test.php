@@ -1,10 +1,16 @@
 <?php
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
+// Include path settings
+$root          = $container->getParameter('mautic.application_dir').'/app';
+$configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
+
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -19,9 +25,9 @@ $container->loadFromExtension('twig', [
     'debug'            => '%kernel.debug%',
     'strict_variables' => true,
     'paths'            => [
-        '%kernel.project_dir%/app/bundles'                  => 'bundles',
-        '%kernel.project_dir%/app/bundles/CoreBundle'       => 'MauticCore',
-        '%kernel.project_dir%/themes'                       => 'themes',
+        '%mautic.application_dir%/app/bundles'                  => 'bundles',
+        '%mautic.application_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%mautic.application_dir%/themes'                       => 'themes',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
@@ -43,16 +49,6 @@ $container->loadFromExtension('framework', [
     ],
     'csrf_protection' => [
         'enabled' => true,
-    ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
-    'mailer' => [
-        'dsn' => 'null://null',
     ],
 ]);
 
@@ -124,8 +120,8 @@ $container->loadFromExtension('liip_test_fixtures', [
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists(__DIR__.'/config_override.php')) {
-    $loader->import('config_override.php');
+if (file_exists($configBaseDir.'/config/config_override.php')) {
+    $loader->import($configBaseDir.'/config/config_override.php');
 }
 
 // Add required parameters
@@ -149,3 +145,6 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
 
 // HTTP client mock handler providing response queue
 $container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+
+$container->register('http_client', \Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);

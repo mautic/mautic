@@ -2,9 +2,8 @@
 
 namespace Mautic\CoreBundle\Loader;
 
-use Mautic\EmailBundle\Loader\EnvVars\MailerEnvLoader;
-use Mautic\MessengerBundle\Loader\EnvVars\MessengerEnvLoader;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -14,6 +13,11 @@ class ParameterLoader
      * @var string
      */
     private $rootPath;
+
+    /**
+     * @var string
+     */
+    private $configBaseDir;
 
     /**
      * @var ParameterBag
@@ -37,7 +41,8 @@ class ParameterLoader
 
     public function __construct(string $configRootPath = __DIR__.'/../../../')
     {
-        $this->rootPath = $configRootPath;
+        $this->rootPath      = $configRootPath;
+        $this->configBaseDir = $this->getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -78,8 +83,6 @@ class ParameterLoader
         EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        MessengerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
-        MailerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
         $dotenv = new Dotenv(MAUTIC_ENV);
@@ -93,7 +96,8 @@ class ParameterLoader
 
     public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
     {
-        $root = realpath($root);
+        $root        = realpath($root);
+        $projectRoot = self::getProjectDirByRoot($root);
 
         /** @var array<string> $paths */
         $paths = [];
@@ -101,13 +105,21 @@ class ParameterLoader
 
         if (!isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
-                self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
+                self::$defaultParameters['local_config_path'] = $projectRoot.'/config/local.php';
             }
 
-            return $root.'/config/local.php';
+            return $projectRoot.'/config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.project_dir%', $root.'/..', $paths['local_config']);
+        $newConfigPath = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
+        $oldConfigPath = str_replace('%kernel.project_dir%', $root, $paths['local_config']);
+
+        $paths['local_config'] = $newConfigPath;
+
+        // Check if the local config files are still present in the /app/config dir, instead of the /config dir
+        if (!file_exists($newConfigPath) && file_exists($oldConfigPath)) {
+            $paths['local_config'] = $oldConfigPath;
+        }
 
         if ($updateDefaultParameters) {
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
@@ -191,6 +203,35 @@ class ParameterLoader
 
     private function getLocalParametersFile(): string
     {
-        return $this->rootPath.'/config/parameters_local.php';
+        // load the local parameter file from the same dir as the local config file.
+        return $this->configBaseDir.'/config/parameters_local.php';
+    }
+
+    public static function getLocalConfigBaseDir(string $root): string
+    {
+        $rootDir         = Path::canonicalize($root);
+        $projectDir      = self::getProjectDirByRoot($rootDir);
+        $localConfigFile = self::getLocalConfigFile($root, false);
+
+        if (Path::isBasePath($rootDir, $localConfigFile)) {
+            return $rootDir;
+        } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
+            return $projectDir;
+        }
+
+        return $root;
+    }
+
+    public static function getProjectDirByRoot(string $root): string
+    {
+        $dir = $rootDir = \dirname($root, 1);
+        while (!is_file($dir.'/composer.json')) {
+            if ($dir === \dirname($dir)) {
+                return $rootDir;
+            }
+            $dir = \dirname($dir);
+        }
+
+        return $dir;
     }
 }

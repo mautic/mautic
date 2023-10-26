@@ -14,7 +14,6 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'                        => null,
                 'mailer_from_name'                      => 'Mautic',
                 'mailer_from_email'                     => 'email@yoursite.com',
                 'mailer_return_path'                    => null,
@@ -22,8 +21,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
                 'mailer_append_tracking_pixel'          => true,
                 'mailer_convert_embed_images'           => false,
                 'mailer_dsn'                            => 'smtp://null:25',
-                'messenger_type'                        => 'async',
-                'messenger_dsn'                         => 'doctrine://default',
+                'messenger_dsn_email'                   => 'doctrine://default',
                 'messenger_retry_strategy_max_retries'  => 3,
                 'messenger_retry_strategy_delay'        => 1000,
                 'messenger_retry_strategy_multiplier'   => 2,

@@ -41,6 +41,10 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,
         'site_url'                          => 'https://localhost',
+        'mailer_dsn'                        => 'null://null',
+        'messenger_dsn_email'               => 'in-memory://default',
+        'messenger_dsn_hit'                 => 'sync://',
+        'messenger_dsn_failed'              => 'in-memory://default',
     ];
 
     protected AbstractDatabaseTool $databaseTool;

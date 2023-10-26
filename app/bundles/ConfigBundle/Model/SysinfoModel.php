@@ -5,6 +5,7 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -110,7 +111,7 @@ class SysinfoModel
         }
 
         $importantFolders = [
-            $this->pathsHelper->getSystemPath('local_config'),
+            ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
             $this->coreParametersHelper->get('cache_path'),
             $this->coreParametersHelper->get('log_path'),
             $this->coreParametersHelper->get('upload_dir'),

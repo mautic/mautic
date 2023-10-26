@@ -19,7 +19,7 @@ class ListLeadRepository extends CommonRepository
             ->select('l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $lists = [];
@@ -35,15 +35,15 @@ class ListLeadRepository extends CommonRepository
         if (!empty($lists)) {
             $q->andWhere(
                 $q->expr()->notIn('leadlist_id', $lists)
-            )->execute();
+            )->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
                 ->where('lead_id = '.(int) $fromLeadId)
-                ->execute();
+                ->executeStatement();
         } else {
-            $q->execute();
+            $q->executeStatement();
         }
     }
 

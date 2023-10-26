@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -11,10 +12,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -26,6 +30,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -34,12 +39,14 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
-use Mautic\QueueBundle\Queue\QueueName;
-use Mautic\QueueBundle\Queue\QueueService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -92,16 +99,6 @@ class PageModel extends FormModel
     protected $dateTimeHelper;
 
     /**
-     * @var QueueService
-     */
-    protected $queueService;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var DeviceTracker
      */
     private $deviceTracker;
@@ -115,6 +112,7 @@ class PageModel extends FormModel
      * @var ContactTracker
      */
     private $contactTracker;
+    private MessageBusInterface $messageBus;
 
     private ContactRequestHelper $contactRequestHelper;
 
@@ -125,12 +123,19 @@ class PageModel extends FormModel
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
-        QueueService $queueService,
+        MessageBusInterface $messageBus,
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper
+        ContactRequestHelper $contactRequestHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -139,12 +144,13 @@ class PageModel extends FormModel
         $this->pageRedirectModel    = $pageRedirectModel;
         $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
-        $this->queueService         = $queueService;
         $this->companyModel         = $companyModel;
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->contactRequestHelper = $contactRequestHelper;
+        $this->messageBus           = $messageBus;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function setCatInUrl($catInUrl)
@@ -171,25 +177,17 @@ class PageModel extends FormModel
         return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'page:pages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter()
     {
         return 'getTitle';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Page $entity
      * @param bool $unlock
      */
@@ -253,8 +251,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
@@ -277,8 +273,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Page|null
      */
     public function getEntity($id = null)
@@ -297,8 +291,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
@@ -441,13 +433,12 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Page|Redirect $page
-     * @param string|int    $code
-     * @param array         $query
+     * @param string|int $code
+     * @param array      $query
      *
      * @throws \Exception
      */
-    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -515,6 +506,8 @@ class PageModel extends FormModel
                     ['exception' => $exception]
                 );
             }
+
+            return;
         }
 
         // save hit to the cookie to use to update the exit time
@@ -526,17 +519,20 @@ class PageModel extends FormModel
             );
         }
 
-        if ($this->queueService->isQueueEnabled()) {
-            $msg = [
-                'hitId'         => $hit->getId(),
-                'pageId'        => $page ? $page->getId() : null,
-                'request'       => $request,
-                'leadId'        => $lead ? $lead->getId() : null,
-                'isNew'         => $this->deviceTracker->wasDeviceChanged(),
-                'isRedirect'    => ($page instanceof Redirect),
-            ];
-            $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
-        } else {
+        $message = new PageHitNotification(
+            $hit->getId(),
+            $request,
+            $this->deviceTracker->wasDeviceChanged(),
+            $page instanceof Redirect,
+            $page?->getId(),
+            $lead->getId()
+        );
+
+        try {
+            $this->messageBus->dispatch($message);
+        } catch (\Exception $exception) {
+            $this->logger->error('Failed to dispatch a message to messenger. '.$exception->getMessage());
+            // Fallback measure
             $this->processPageHit($hit, $page, $request, $lead, $this->deviceTracker->wasDeviceChanged());
         }
     }
@@ -544,14 +540,17 @@ class PageModel extends FormModel
     /**
      * Process page hit.
      *
-     * @param Page|Redirect $page
-     * @param bool          $trackingNewlyGenerated
-     * @param bool          $activeRequest
-     *
      * @throws \Exception
      */
-    public function processPageHit(Hit $hit, $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
-    {
+    public function processPageHit(
+        Hit $hit,
+        Redirect|Page|null $page,
+        Request $request,
+        Lead $lead,
+        bool $trackingNewlyGenerated,
+        bool $activeRequest = true,
+        \DateTimeInterface $hitDate = null
+    ): void {
         // Store Page/Redirect association
         if ($page) {
             if ($page instanceof Page) {
@@ -587,7 +586,7 @@ class PageModel extends FormModel
             }
         }
 
-        $query = $hit->getQuery() ? $hit->getQuery() : [];
+        $query = $hit->getQuery() ?: [];
 
         if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
             // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
@@ -730,6 +729,28 @@ class PageModel extends FormModel
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
+
+        if (null !== $hitDate) {
+            if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
+                try {
+                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+                } catch (\Exception $e) {
+                    $data = [
+                        'unique'             => ($isUnique ? 'true' : 'false'),
+                        'lead'               => $lead->getId(),
+                        'page'               => $page->getId(),
+                        'hit'                => $hit->getId(),
+                        'lastActiveOriginal' => $lead->getLastActive(),
+                        'newLastActive'      => $hitDate,
+                    ];
+
+                    $this->logger->error(
+                        'Failed to update event time due to '.$e->getMessage(),
+                        ['context' => $data, 'exception' => (array) $e]
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -778,8 +799,6 @@ class PageModel extends FormModel
 
     /**
      * Get number of page bounces.
-     *
-     * @param \DateTime $fromDate
      *
      * @return int
      */
@@ -937,7 +956,7 @@ class PageModel extends FormModel
             ->setParameter('date_to', $dateTo->format('Y-m-d 23:59:59'));
         $q->groupBy('ds.device');
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $chart   = new PieChart();
 
@@ -960,11 +979,9 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) pages.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */

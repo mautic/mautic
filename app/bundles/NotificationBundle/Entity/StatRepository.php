@@ -52,7 +52,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -94,7 +94,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -127,7 +127,7 @@ class StatRepository extends CommonRepository
 
         $q->andWhere('is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
@@ -244,7 +244,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.notification_id');
 
         // get a total number of sent notifications first
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $counts = [];
 
@@ -264,7 +264,7 @@ class StatRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
             ->set('notification_id', (int) $toLeadId)
             ->where('notification_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**

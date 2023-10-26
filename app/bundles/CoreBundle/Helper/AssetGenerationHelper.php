@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
 class AssetGenerationHelper
@@ -98,7 +99,7 @@ class AssetGenerationHelper
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
             $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
-            $assetsPath = $this->pathsHelper->getSystemPath('assets');
+            $assetsPath = $this->pathsHelper->getSystemPath('media');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ('prod' == $env) {
@@ -196,25 +197,11 @@ class AssetGenerationHelper
                                 }
 
                                 if ('css' == $type) {
-                                    $out = fopen($assetFile, 'w');
-
-                                    foreach ($files as $relPath => $details) {
-                                        $content = (new \Minify(new \Minify_Cache_Null()))->combine([$details['fullPath']], [
-                                            'rewriteCssUris'  => false,
-                                            'minifierOptions' => [
-                                                'text/css' => [
-                                                    'currentDir'          => '',
-                                                    'prependRelativePath' => '../../'.dirname($relPath).'/',
-                                                ],
-                                            ],
-                                        ]);
-
-                                        fwrite($out, $content);
-                                    }
-
-                                    fclose($out);
+                                    $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 } else {
-                                    file_put_contents($assetFile, (new \Minify(new \Minify_Cache_Null()))->combine(array_column($files, 'fullPath')));
+                                    $minifier = new Minify\JS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 }
                             }
                         }

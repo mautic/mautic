@@ -3,11 +3,16 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\RequestTrait;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
@@ -22,9 +27,11 @@ use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -36,11 +43,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
     use DefaultValueTrait;
     use RequestTrait;
-
-    /**
-     * @var Session
-     */
-    protected $session;
 
     /**
      * @var FieldModel
@@ -70,17 +72,18 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @var CompanyDeduper
      */
-    private $companyDeduper;
+    protected $companyDeduper;
 
     /**
      * CompanyModel constructor.
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, CompanyDeduper $companyDeduper)
+    public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel = $leadFieldModel;
-        $this->session        = $session;
         $this->emailValidator = $validator;
         $this->companyDeduper = $companyDeduper;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -447,10 +450,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             // make sure they are ints
             $searchForCompanies = [];
             foreach ($companies as &$l) {
-                $l = (int) $l;
-                if (!isset($companyLeadRemove[$l])) {
-                    $searchForCompanies[] = $l;
-                }
+                $l                    = (int) $l;
+                $searchForCompanies[] = $l;
             }
             if (!empty($searchForCompanies)) {
                 $companyEntities = $this->getEntities(

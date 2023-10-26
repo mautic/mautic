@@ -23,7 +23,7 @@ jobs:
       matrix:
         php-versions: ['8.0', '8.1']
         db-types: ['mysql', 'mariadb']
-  
+
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
@@ -80,13 +80,12 @@ jobs:
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-        rm -rf var/cache
-        
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+  
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
+        rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
@@ -101,6 +100,7 @@ jobs:
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
@@ -163,6 +163,15 @@ jobs:
           ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
           ${{ runner.os }}-phpstan-
 
+    - name: NPM Cache
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/js
+        key: ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}
+          ${{ runner.os }}-js-
+
     - name: Get changed files
       id: changed-files
       uses: tj-actions/changed-files@v35
@@ -174,17 +183,17 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-    
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
+      env:
+        NPM_CONFIG_CACHE: ./var/cache/js/npm
+
     - name: Run ${{ matrix.commands }}
       run: |
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           export SYMFONY_ENV=dev
           export APP_ENV=dev
           export APP_DEBUG=1
-          APP_ENV=test APP_DEBUG=1 bin/console       
           composer phpstan -- --no-progress
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
@@ -234,24 +243,17 @@ jobs:
           cp ../.github/ci-files/composer.json ./
           composer install
 
-          # install NPM packages
-          npm install
-
-          # test if console works by generating assets for next step
-          php ./bin/console mautic:assets:generate
-
-          echo "All production assets were generated sucessfully."
-          
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
           test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
-
-          php ./bin/console cache:clear
+          
+          # test if console is executable
+          ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer update --lock --no-plugins --no-scripts 2> /dev/null
-          git diff composer.lock > /tmp/diff_command_output.txt
+          git diff -I'"plugin-api-version": "[0-9\.]+"' > /tmp/diff_command_output.txt
           if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
-            echo "The composer.lock file doens't correspond with the changes in the composer.json file"
+            echo "The composer.lock file doesn't correspond with the changes in the composer.json file"
             echo "Please run following command locally"
             echo "composer update --lock"
             echo ""

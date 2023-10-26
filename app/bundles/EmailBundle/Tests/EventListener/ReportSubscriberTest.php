@@ -159,9 +159,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -192,9 +195,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -269,7 +275,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnReportBuilderWithEmailSentContext(): void
     {
         $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper();
+        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())

@@ -46,21 +46,4 @@ return [
             ],
         ],
     ],
-
-    'services' => [
-        'models' => [
-            'mautic.category.model.category' => [
-                'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-            'mautic.category.model.contact.action' => [
-                'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
-            ],
-        ],
-    ],
 ];

@@ -4,12 +4,16 @@ namespace Mautic\ReportBundle\Model;
 
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -23,11 +27,15 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
@@ -58,10 +66,7 @@ class ReportModel extends FormModel
      */
     protected $channelListHelper;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    private RequestStack $requestStack;
 
     /**
      * @var FieldModel
@@ -90,7 +95,15 @@ class ReportModel extends FormModel
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
         CsvExporter $csvExporter,
-        ExcelExporter $excelExporter
+        ExcelExporter $excelExporter,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        RequestStack $requestStack
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->twig              = $twig;
@@ -99,11 +112,9 @@ class ReportModel extends FormModel
         $this->reportHelper      = $reportHelper;
         $this->csvExporter       = $csvExporter;
         $this->excelExporter     = $excelExporter;
-    }
+        $this->requestStack      = $requestStack;
 
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -122,6 +133,14 @@ class ReportModel extends FormModel
     public function getPermissionBase()
     {
         return 'report:reports';
+    }
+
+    protected function getSession(): Session
+    {
+        $session = $this->requestStack->getSession();
+        \assert($session instanceof Session);
+
+        return $session;
     }
 
     /**
@@ -533,8 +552,8 @@ class ReportModel extends FormModel
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
-        $orderBy    = $this->session->get('mautic.report.'.$entity->getId().'.orderby', '');
-        $orderByDir = $this->session->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
+        $orderBy    = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderby', '');
+        $orderByDir = $this->getSession()->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
 
         $dataOptions = [
             'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
@@ -552,7 +571,7 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         // set what page currently on so that we can return here after form submission/cancellation
-        $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        $this->getSession()->set('mautic.report.'.$entity->getId().'.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -605,7 +624,7 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                $limit = $this->getSession()->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];
@@ -737,7 +756,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchOne();
+        return (int) $countQb->executeQuery()->fetchOne();
     }
 
     /**

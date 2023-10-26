@@ -29,8 +29,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['mailer_from_email'] = 'admin@mautic-community.test';
-        $this->configParams['messenger_type']    = 'testEmailSendToContactSync' === $this->getName() ? 'sync' : 'async';
+        $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
 
         parent::setUp();
     }
@@ -349,7 +349,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Delete all company associations for this test because the fixures have mismatching data to start with
         $this->connection->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
-            ->execute();
+            ->executeStatement();
 
         // Test a single company is added and is set as primary
         $this->assertCompanyAssociation([1], 1);
@@ -389,7 +389,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed, cl.date_last_exited')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -398,7 +398,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $this->connection->createQueryBuilder()
             ->select('ll.id', 'll.name', 'll.category_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -482,7 +482,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testEmailSendToContactSync(): void
     {
-        $contact = $this->createContact('contact@an.email');
+        $contact     = $this->createContact('contact@an.email');
+        $replyTo     = 'reply@mautic-community.test';
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
@@ -491,8 +492,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
             [
-                'lead_quickemail[subject]' => 'Ahoy {contactfield=email}',
-                'lead_quickemail[body]'    => 'Your email is <b>{contactfield=email}</b>',
+                'lead_quickemail[subject]'        => 'Ahoy {contactfield=email}',
+                'lead_quickemail[body]'           => 'Your email is <b>{contactfield=email}</b>',
+                'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
         $crawler = $this->client->submit($form);
@@ -514,7 +516,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame($contact->getEmail(), $email->getTo()[0]->getAddress());
         Assert::assertCount(1, $email->getReplyTo());
         Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
+        Assert::assertSame($replyTo, $email->getReplyTo()[0]->getAddress());
     }
 
     public function testEmailSendToContactAsync(): void
@@ -635,7 +637,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
             ->where("cl.lead_id = {$leadId}")
             ->orderBy('cl.company_id')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -645,7 +647,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('l.company')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 
@@ -785,5 +787,36 @@ class LeadControllerTest extends MauticMysqlTestCase
             'objectId' => $contact->getId(),
             'action'   => $action,
         ]);
+    }
+
+    public function testAllAssociatedCompaniesShouldBeFetchedOnContactEditAction(): void
+    {
+        $contact = $this->createContact('test-contact@a.email');
+
+        // Create more than 100 companies and attached to lead
+        $companyLimit = 102;
+        $counter      = 1;
+        while ($companyLimit >= $counter) {
+            $company = new Company();
+            $company->setName('TestCompany'.$counter);
+            $this->em->persist($company);
+
+            ++$counter;
+
+            $this->createLeadCompany($contact, $company);
+        }
+
+        $this->em->flush();
+
+        // verify that all companies are attached to contact
+        $companies  = $this->getCompanyLeads($contact->getId());
+        Assert::assertCount($companyLimit, $companies);
+
+        $crawler       = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());
+        $saveButton    = $crawler->selectButton('lead[buttons][save]');
+        $form          = $saveButton->form();
+        $leadCompanies = $form['lead[companies]']->getValue();
+
+        Assert::assertCount($companyLimit, $leadCompanies);
     }
 }

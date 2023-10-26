@@ -547,10 +547,7 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        if (textStatus === 'abort' || textStatus.includes('error')) {
-            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
-            Mautic.setFlashes(flashMessage);
-
+        if (textStatus == 'abort') {
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
             Mautic.stopIconSpinPostEvent();
@@ -566,6 +563,9 @@ var Mautic = {
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
         } else if (typeof(request.responseText) !== 'undefined') {
+            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
+            Mautic.setFlashes(flashMessage);
+
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
