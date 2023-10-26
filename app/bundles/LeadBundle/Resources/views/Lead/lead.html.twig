@@ -462,7 +462,7 @@
                         {% for event in upcomingEvents %}
                             {% set metadata = serializerDecode(event.metadata) %}
                             {% set errors = false %}
-                            {% if metadata.errors is not empty %}
+                            {% if metadata.errors is defined and metadata.errors is not empty %}
                                 {% set errors = metadata.errors is iterable ? metadata.errors|join('<br/>') : metadata.errors %}
                             {% endif %}
                             <li class="media">
@@ -473,7 +473,7 @@
                                     {{ 'mautic.lead.lead.upcoming.event.triggered.at'|trans({
                                           '%event%': event.event_name,
                                           '%link%': '<a href="'~path('mautic_campaign_action', {'objectAction': 'view', 'objectId': event.campaign_id})~'" data-toggle="ajax">'~event.campaign_name~'</a>',
-                                    }) }}
+                                    })|purify }}
                                     {% if errors is not empty %}
                                       <i class="fa fa-warning text-danger" data-toggle="tooltip" title="{{ errors|purify }}"></i>
                                     {% endif %}

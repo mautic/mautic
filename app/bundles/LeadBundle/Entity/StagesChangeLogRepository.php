@@ -50,7 +50,7 @@ class StagesChangeLogRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -70,7 +70,7 @@ class StagesChangeLogRepository extends CommonRepository
             ->setParameter('value', $leadId)
             ->orderBy('date_added', 'DESC');
 
-        $result = $query->execute()->fetchAssociative();
+        $result = $query->executeQuery()->fetchAssociative();
 
         return (isset($result['stage'])) ? (int) $result['stage'] : null;
     }

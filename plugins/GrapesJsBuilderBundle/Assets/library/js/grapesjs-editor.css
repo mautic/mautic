@@ -1,3 +1,5 @@
-html, body, [data-gjs-type=wrapper] {
-    height: auto !important;
+html,
+body,
+[data-gjs-type='wrapper'] {
+  height: auto !important;
 }

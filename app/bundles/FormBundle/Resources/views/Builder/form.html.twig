@@ -66,29 +66,15 @@
                       {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif %}
                 
-                {%- if theme is empty -%}                    
-                  <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ f.type ~ '.html.twig', {
-                          'field': f.convertToArray,
-                          'id': f.alias,
-                          'formName': formName,
-                          'fieldPage': (pageCount - 1),
-                          'mappedFields': mappedFields,
-                          'inBuilder': inBuilder,
-                          'fields': fields,
+                  {{- include([theme ~ f.type ~ '.html.twig', template], {
+                        'field': f.convertToArray,
+                        'id': f.alias,
+                        'formName': formName,
+                        'fieldPage': (pageCount - 1),
+                        'mappedFields': mappedFields,
+                        'inBuilder': inBuilder,
+                        'fields': fields,
                   }) -}}
-                  {%- else -%}                    
-                  {{- include(template, {
-                          'field': f.convertToArray,
-                          'id': f.alias,
-                          'formName': formName,
-                          'fieldPage': (pageCount - 1),
-                          'mappedFields': mappedFields,
-                          'inBuilder': inBuilder,
-                          'fields': fields,
-                  }) -}}
-                {%- endif -%}                    
-                  <!-- end: "{{ theme }}{{ template }}" -->
               {%- endif -%}
 
               {%- set parentField = f -%}
