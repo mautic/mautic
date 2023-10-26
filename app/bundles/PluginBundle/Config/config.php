@@ -58,6 +58,24 @@ return [
     ],
 
     'services' => [
+        'events' => [
+            'mautic.plugin.formbundle.subscriber' => [
+                'class'       => \Mautic\PluginBundle\EventListener\FormSubscriber::class,
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
+                ],
+            ],
+            'mautic.plugin.campaignbundle.subscriber' => [
+                'class'       => \Mautic\PluginBundle\EventListener\CampaignSubscriber::class,
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
+                ],
+            ],
+        ],
         'other' => [
             'mautic.helper.integration' => [
                 'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
