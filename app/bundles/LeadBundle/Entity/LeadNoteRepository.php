@@ -164,6 +164,6 @@ class LeadNoteRepository extends CommonRepository
             ->update(MAUTIC_TABLE_PREFIX.'lead_notes')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

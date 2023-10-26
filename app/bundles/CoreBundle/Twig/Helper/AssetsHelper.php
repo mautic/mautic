@@ -527,12 +527,10 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base = 'media/js/ckeditor4/';
+        $base    = 'media/libraries/ckeditor/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
-            $base.'adapters/jquery.js?v'.$this->version,
-            'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v'.$this->version,
         ];
     }
 

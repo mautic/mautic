@@ -384,6 +384,11 @@ class UtmTag
         return $this;
     }
 
+    public function hasUtmTags(): bool
+    {
+        return !empty($this->utmCampaign) || !empty($this->utmSource) || !empty($this->utmMedium) || !empty($this->utmContent) || !empty($this->utmTerm);
+    }
+
     /**
      * Available fields and it's setters.
      *

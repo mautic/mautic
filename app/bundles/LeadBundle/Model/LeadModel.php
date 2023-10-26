@@ -384,7 +384,7 @@ class LeadModel extends FormModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface<object>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */

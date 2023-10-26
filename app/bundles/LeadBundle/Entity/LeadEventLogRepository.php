@@ -134,7 +134,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_event_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**

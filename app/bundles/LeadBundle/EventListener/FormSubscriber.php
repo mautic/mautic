@@ -284,8 +284,10 @@ class FormSubscriber implements EventSubscriberInterface
         $utmValues->setUtmSource($queryArray['utm_source'] ?? $queryReferer['utm_source'] ?? null);
         $utmValues->setUtmTerm($queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? null);
 
-        $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
-        $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
+        if ($utmValues->hasUtmTags()) {
+            $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
+            $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
+        }
     }
 
     public function onFormSubmitActionScoreContactsCompanies(SubmissionEvent $event): void

@@ -33,7 +33,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', $objectId)
             ->setParameter('columnNames', $columnNames, Connection::PARAM_STR_ARRAY)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -57,7 +57,7 @@ class FieldChangeRepository extends CommonRepository
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where($expr)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -93,7 +93,7 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $objectIds = [];
         foreach ($results as $result) {
@@ -120,7 +120,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -147,6 +147,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

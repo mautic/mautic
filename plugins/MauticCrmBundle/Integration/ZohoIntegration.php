@@ -484,9 +484,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
-                if (!array_key_exists('page', $oparams)) {
-                    $oparams['page'] = 1;
-                }
+                $oparams['page'] = 1;
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
@@ -559,9 +557,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
-                if (!array_key_exists('page', $oparams)) {
-                    $oparams['page'] = 1;
-                }
+                $oparams['page'] = 1;
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
