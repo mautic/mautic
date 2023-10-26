@@ -1,5 +1,7 @@
 <?php
 
+// NOTE 2022-08-11 - This file can only be deleted once the ConfigBundle has been migrated to Twig as well
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic

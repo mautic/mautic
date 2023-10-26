@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup_mautic() {
-    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
@@ -44,7 +44,7 @@ then
     printf "\nAnswer [yes/no]: "
     read MAUTIC_PREF
 
-    if [[ $MAUTIC_PREF == "yes" ]]
+    if [ $MAUTIC_PREF == "yes" ] || [ -n $GITPOD_HEADLESS ];
     then
         printf "Okay, setting up your Mautic instance... 🚀\n"
         echo "ddev-managed" > ./.ddev/mautic-preference

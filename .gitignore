@@ -5,6 +5,7 @@
 !.gitkeep
 !.ddev
 !.php-cs-fixer.php
+!.github/ci-files/.my.cnf
 .ddev/mautic-preference
 /.ddev/docker-compose.host-docker-internal.yaml
 !.gitpod.Dockerfile

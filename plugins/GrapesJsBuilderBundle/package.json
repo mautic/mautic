@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "dependencies": {
-    "grapesjs": "^0.17.22",
-    "grapesjs-mjml": "^0.5.5",
+    "grapesjs": "^0.17.29",
+    "grapesjs-mjml": "^0.5.8",
     "grapesjs-parser-postcss": "^0.1.1",
     "grapesjs-plugin-ckeditor": "^0.0.10",
     "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#main",
@@ -35,21 +35,21 @@
     "grapesjs-preset-webpage": "^0.1.11"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.15.0",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.7",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/plugin-transform-runtime": "^7.16.8",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb": "^18.2.1",
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.24.1",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-prettier": "^3.4.1",
-    "eslint-plugin-react": "^7.24.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "parcel-bundler": "^1.12.4",
-    "prettier": "^2.3.2",
-    "sass": "^1.38.1"
+    "prettier": "^2.5.1",
+    "sass": "^1.48.0"
   }
 }

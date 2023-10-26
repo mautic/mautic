@@ -2,17 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
@@ -178,6 +170,25 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentField->method('getId')->willReturn($parentFieldId);
         $parentField->method('getAlias')->willReturn($parentFieldAlias);
         $data = [$parentFieldAlias => [0]];
+
+        $this->assertTrue($field->showForConditionalField($data));
+    }
+
+    public function testShowForConditionalFieldWithParentAndAliasAndInValueMatchesSpecialCharacters(): void
+    {
+        $parentFieldId    = '55';
+        $parentFieldAlias = 'field_a';
+        $field            = new Field();
+        $parentField      = $this->createMock(Field::class);
+        $form             = new Form();
+        $form->addField(0, $parentField);
+        $field->setForm($form);
+        $field->setParent($parentFieldId);
+        $specialValue = 'čé+äà>&"';
+        $field->setConditions(['expr' => 'in', 'values' => [InputHelper::string($specialValue)]]);
+        $parentField->method('getId')->willReturn($parentFieldId);
+        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        $data = [$parentFieldAlias => [$specialValue]];
 
         $this->assertTrue($field->showForConditionalField($data));
     }

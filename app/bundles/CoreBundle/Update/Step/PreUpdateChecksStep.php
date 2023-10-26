@@ -38,6 +38,14 @@ final class PreUpdateChecksStep implements StepInterface
      */
     public function execute(ProgressBar $progressBar, InputInterface $input, OutputInterface $output): void
     {
+        /**
+         * We can't easily fetch data about an update package without unzipping it first, so for now
+         * we skip the pre-update checks if the user manually provides an update package.
+         */
+        if (!empty($input->getOption('update-package'))) {
+            return;
+        }
+
         $results = $this->updateHelper->runPreUpdateChecks();
         $errors  = [];
 

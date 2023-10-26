@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
@@ -44,6 +35,8 @@ class WebhookModel extends FormModel
     const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;
+
+    public const WEBHOOK_LOG_MAX = 1000;
 
     /**
      * Whet queue mode is turned on.
@@ -432,25 +425,26 @@ class WebhookModel extends FormModel
      * @param int    $statusCode
      * @param float  $runtime    in seconds
      * @param string $note
+     *                           $runtime variable unit is in seconds
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
-        $log = new Log();
-
-        if ($webhook->getId()) {
-            $log->setWebhook($webhook);
-            $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        if (!$webhook->getId()) {
+            return;
         }
 
+        if (!$this->coreParametersHelper->get('clean_webhook_logs_in_background')) {
+            $this->getLogRepository()->removeLimitExceedLogs($webhook->getId(), $this->logMax);
+        }
+
+        $log = new Log();
+        $log->setWebhook($webhook);
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
-
-        if ($webhook->getId()) {
-            $this->saveEntity($webhook);
-        }
+        $this->saveEntity($webhook);
     }
 
     /**
@@ -676,7 +670,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }

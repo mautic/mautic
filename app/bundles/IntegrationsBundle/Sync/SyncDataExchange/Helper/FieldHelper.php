@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -172,7 +163,7 @@ class FieldHelper
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
         if (Contact::NAME !== $objectName) {
-            uasort($this->syncFields[$objectName], 'strnatcmp');
+            uksort($this->syncFields[$objectName], 'strnatcmp');
 
             return $this->syncFields[$objectName];
         }
@@ -186,7 +177,7 @@ class FieldHelper
         // Add the timeline link
         $this->syncFields[$objectName]['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
 
-        uasort($this->syncFields[$objectName], 'strnatcmp');
+        uksort($this->syncFields[$objectName], 'strnatcmp');
 
         return $this->syncFields[$objectName];
     }

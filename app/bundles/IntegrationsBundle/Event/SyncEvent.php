@@ -2,42 +2,26 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Event;
 
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
-    /** @var string */
-    private $integrationName;
     /**
-     * @var \DateTimeInterface|null
+     * @var InputOptionsDAO
      */
-    private $fromDateTime;
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $toDateTime;
+    private $inputOptionsDAO;
 
-    public function __construct(string $integrationName, ?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null)
+    public function __construct(InputOptionsDAO $inputOptionsDAO)
     {
-        $this->integrationName = $integrationName;
-        $this->fromDateTime    = $fromDateTime;
-        $this->toDateTime      = $toDateTime;
+        $this->inputOptionsDAO = $inputOptionsDAO;
     }
 
     public function getIntegrationName(): string
     {
-        return $this->integrationName;
+        return $this->inputOptionsDAO->getIntegration();
     }
 
     public function isIntegration(string $integrationName): bool
@@ -47,11 +31,16 @@ class SyncEvent extends Event
 
     public function getFromDateTime(): ?\DateTimeInterface
     {
-        return $this->fromDateTime;
+        return $this->inputOptionsDAO->getStartDateTime();
     }
 
     public function getToDateTime(): ?\DateTimeInterface
     {
-        return $this->toDateTime;
+        return $this->inputOptionsDAO->getEndDateTime();
+    }
+
+    public function getInputOptions(): InputOptionsDAO
+    {
+        return $this->inputOptionsDAO;
     }
 }

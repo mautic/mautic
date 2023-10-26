@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle;
 
 /**
@@ -76,6 +67,8 @@ final class CoreEvents
      * The event listener receives a Mautic\CoreBundle\Event\SidebarCanvasEvent instance.
      *
      * @var string
+     *
+     * @deprecated Deprecated in Mautic 4.3. Will be removed in Mautic 5.0
      */
     const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
 
@@ -158,6 +151,8 @@ final class CoreEvents
      * The event listener receives a Mautic\CoreBundle\Event\CustomFormEvent instance.
      *
      * @var string
+     *
+     * @deprecated since Mautic 4 because it is not used anywhere
      */
     const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
 

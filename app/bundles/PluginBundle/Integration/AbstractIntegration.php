@@ -1,20 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -58,6 +51,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
+ *
+ * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
@@ -87,8 +82,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Used for notifications.
+     *
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
-    protected ?array $adminUsers;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
     protected array $notifications = [];
     protected ?string $lastIntegrationError;
@@ -480,7 +477,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         foreach ($keys as $name => $key) {
             $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
             if (false === $key) {
-                return [];
+                continue;
             }
             $decrypted[$name] = $key;
         }
@@ -673,7 +670,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Make a basic call using cURL to get the data.
      *
-     * @param        $url
+     * @param string $url
      * @param array  $parameters
      * @param string $method
      * @param array  $settings   Set $settings['return_raw'] to receive a ResponseInterface
@@ -788,14 +785,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $options[CURLOPT_SSL_VERIFYPEER] = $settings['ssl_verifypeer'];
         }
 
-        /**
-         * Because so many integrations extend this class and mautic.http.client is not in the
-         * constructor at the time of writing, let's just create a new client here. In addition,
-         * we add some custom cURL options.
-         */
-        $client = new Client(['handler' => HandlerStack::create(new CurlHandler([
-            'options' => $options,
-        ]))]);
+        $client = $this->makeHttpClient($options);
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
         // HTTP library requires that headers are in key => value pairs
@@ -818,23 +808,24 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             switch ($method) {
                 case 'GET':
                     $result = $client->get($url, [
-                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    $result = $client->request($method, $url, [
-                        \GuzzleHttp\RequestOptions::FORM_PARAMS => $parameters,
-                        \GuzzleHttp\RequestOptions::HEADERS     => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                    $payloadKey = is_string($parameters) ? RequestOptions::BODY : RequestOptions::FORM_PARAMS;
+                    $result     = $client->request($method, $url, [
+                        $payloadKey             => $parameters,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
                 case 'DELETE':
                     $result = $client->delete($url, [
-                        \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                        \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
                     ]);
                     break;
             }
@@ -1751,7 +1742,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -2389,15 +2380,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null  $entity
-     * @param array $params
-     * @param bool  $ignoreEntityChanges
+     * @param CommonEntity|null $entity
+     * @param array             $params
+     * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
@@ -2535,5 +2526,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {
         return $records;
+    }
+
+    /**
+     * Because so many integrations extend this class and mautic.http.client is not in the
+     * constructor at the time of writing, let's just create a new client here. In addition,
+     * we add some custom cURL options.
+     *
+     * @param mixed[] $options
+     */
+    protected function makeHttpClient(array $options): Client
+    {
+        return new Client(['handler' => HandlerStack::create(new CurlHandler([
+            'options' => $options,
+        ]))]);
     }
 }

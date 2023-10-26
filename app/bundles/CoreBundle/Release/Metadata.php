@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Release;
 
 class Metadata implements \JsonSerializable
@@ -47,7 +38,7 @@ class Metadata implements \JsonSerializable
         $this->minSupportedMySqlVersion     = $metadata['minimum_mysql_version'] ?? '';
         $this->minSupportedMariaDbVersion   = $metadata['minimum_mariadb_version'] ?? '';
 
-        preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?([a-z0-9\-\.]+)?$#', $this->version, $match);
+        preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?(.*+)?$#', $this->version, $match);
         $this->majorVersion = $match[1];
         $this->minorVersion = $match[2];
         $this->patchVersion = $match[3];

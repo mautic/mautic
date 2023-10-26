@@ -56,7 +56,7 @@
                 replaceArgs.data['style'] = typeof(replaceArgs.data['style']) == 'undefined' ? 'embed' : replaceArgs.data['style'] ;
                 if (Core.debug()) console.log(replaceArgs.data['style']+' Mautic Form: '+replaceText);
 
-                //display form accoding with style
+                //display form according with style
                 switch (replaceArgs.data['style'])
                 {
                     case 'modal':

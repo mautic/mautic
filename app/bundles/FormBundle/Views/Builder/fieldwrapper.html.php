@@ -110,9 +110,8 @@ if (!isset($inBuilder)) {
                 <?php if (!empty($field['showAfterXSubmissions'])): ?>
                     <i class="fa fa-refresh" aria-hidden="true"></i>
                     <span class="inline-spacer">
-            <?php echo $view['translator']->transChoice(
+            <?php echo $view['translator']->trans(
                 'mautic.form.field.hide.if.submission.count',
-                (int) $field['showAfterXSubmissions'],
                 ['%count%' => (int) $field['showAfterXSubmissions']]
             ); ?>
         </span>

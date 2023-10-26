@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -465,7 +456,7 @@ class PublicController extends CommonFormController
         $query = $this->request->query->all();
 
         // Unset the clickthrough from the URL query
-        $ct = $query['ct'];
+        $ct = $query['ct'] ?? null;
         unset($query['ct']);
 
         // Tak on anything left to the URL
@@ -476,38 +467,41 @@ class PublicController extends CommonFormController
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
-        if ($ipAddress->isTrackable()) {
-            // Search replace lead fields in the URL
-            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
 
-            /** @var PageModel $pageModel */
-            $pageModel = $this->getModel('page');
+        if (isset($ct)) {
+            if ($ipAddress->isTrackable()) {
+                // Search replace lead fields in the URL
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
 
-            try {
-                $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
-            } catch (InvalidDecodedStringException $e) {
-                // Invalid ct value so we must unset it
-                // and process the request without it
+                /** @var PageModel $pageModel */
+                $pageModel = $this->getModel('page');
 
-                $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                try {
+                    $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
+                    $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                } catch (InvalidDecodedStringException $e) {
+                    // Invalid ct value so we must unset it
+                    // and process the request without it
 
-                $this->request->request->set('ct', '');
-                $this->request->query->set('ct', '');
-                $lead = $leadModel->getContactFromRequest();
-                $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+
+                    $this->request->request->set('ct', '');
+                    $this->request->query->set('ct', '');
+                    $lead = $leadModel->getContactFromRequest();
+                    $pageModel->hitPage($redirect, $this->request, 200, $lead);
+                }
+
+                /** @var PrimaryCompanyHelper $primaryCompanyHelper */
+                $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
+                $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
+
+                $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
-            /** @var PrimaryCompanyHelper $primaryCompanyHelper */
-            $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
-            $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-
-            $url = TokenHelper::findLeadTokens($url, $leadArray, true);
-        }
-
-        if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
-            $url .= '?ct='.$ct;
+            if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+                $url .= '?ct='.$ct;
+            }
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

@@ -6,6 +6,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * Index should return status code 200.
      */
@@ -45,7 +47,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'mauticform[name]'        => 'Test',
-                'mauticform[renderStyle]' => '',
+                'mauticform[renderStyle]' => '0',
             ]
         );
         $crawler = $this->client->submit($form);
@@ -54,7 +56,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
             [
-                'mauticform[renderStyle]' => '',
+                'mauticform[renderStyle]' => '0',
             ]
         );
 

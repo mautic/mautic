@@ -47,6 +47,10 @@ class GrapesJsBuilderModel extends AbstractCommonModel
      */
     public function addOrEditEntity(Email $email)
     {
+        if ($this->emailModel->isUpdatingTranslationChildren()) {
+            return;
+        }
+
         $grapesJsBuilder = $this->getRepository()->findOneBy(['email' => $email]);
 
         if (!$grapesJsBuilder) {

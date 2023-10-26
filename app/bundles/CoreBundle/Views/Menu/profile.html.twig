@@ -1,0 +1,25 @@
+{% set inline = menuRender('profile') %}
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+        <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
+        <span class="caret ml-xs"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
+                <i class="fa fa-user fs-14"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('mautic_user_logout') }}">
+                <i class="fa fa-sign-out fs-14"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
+            </a>
+        </li>
+
+        {% if inline %}
+        <li role="separator" class="divider"></li>
+        {{ inline }}
+        {% endif %}
+    </ul>
+</li>

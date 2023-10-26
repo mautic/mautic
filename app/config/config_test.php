@@ -124,10 +124,6 @@ $container->loadFromExtension('liip_test_fixtures', [
     'keep_database_and_schema' => true,
 ]);
 
-// Enable api by default
-$container->setParameter('mautic.api_enabled', true);
-$container->setParameter('mautic.api_enable_basic_auth', true);
-
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks

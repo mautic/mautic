@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
@@ -92,7 +83,7 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
+            'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -19,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class FieldChangeRepositoryTest extends TestCase
 {
-    public function testWhereQueryPartForFindingChangesForSingleObject()
+    public function testWhereQueryPartForFindingChangesForSingleObject(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $dbalMock = new DBALMocker($this);
         $metadata = $this->createMock(ClassMetadata::class);
 

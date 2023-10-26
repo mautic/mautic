@@ -1,23 +1,34 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testBatchNewEndpointDoesNotCreateDuplicates()
+    protected function setUp(): void
+    {
+        // Disable API just for specific test.
+        $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
+
+        parent::setUp();
+    }
+
+    public function testDisabledApi(): void
+    {
+        $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals(
+            '{"errors":[{"message":"API disabled. You need to enable the API in the API settings of Mautic\u0027s Configuration.","code":403,"type":"api_disabled"}]}',
+            $clientResponse->getContent()
+        );
+    }
+
+    public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
         $payload = [
             [
@@ -203,7 +214,57 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][2]['owner']);
     }
 
-    public function testSingleNewEndpointCreateAndUpdate()
+    /**
+     * If there are some entities to return then the response returns a hash table (JSON object),
+     * So for response with no entities we must also return a JSON object because some languages
+     * decode it differently then emtpty array.
+     */
+    public function testEmptyResponseReturnsJsonObject(): void
+    {
+        $this->client->request('GET', '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
+        $clientResponse = $this->client->getResponse();
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
+    }
+
+    public function testBatchEditEndpoint(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('batcheditcontact1@gmail.com');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $payload = [
+            ['email' => 'batcheditcontact1-updated@gmail.com', 'id' => $contact->getId()],
+        ];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
+        $this->assertEquals($contact->getId(), $response['contacts'][0]['id']);
+        $this->assertEquals('batcheditcontact1-updated@gmail.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
+    public function testBatchEditEndpointWithRubbishId(): void
+    {
+        $payload = [
+            ['email' => 'batchemail1@email.com', 'id' => 'rubbish'],
+        ];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
+        $this->assertGreaterThanOrEqual(1, $response['contacts'][0]['id']);
+        $this->assertEquals('batchemail1@email.com', $response['contacts'][0]['fields']['all']['email']);
+    }
+
+    public function testSingleNewEndpointCreateAndUpdate(): void
     {
         $payload = [
             'email'            => 'apiemail1@email.com',
@@ -375,10 +436,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test creating a new contact with doNotContact information.
      * The API response should include DNC information.
-     *
-     * @return void
      */
-    public function testSingleNewEndpointCreateAndDeleteWithDnc()
+    public function testSingleNewEndpointCreateAndDeleteWithDnc(): void
     {
         $payload = [
             'email'            => 'apidnc@email.com',
@@ -414,7 +473,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
-    public function testBachdDncAddAndRemove()
+    public function testBatchDncAddAndRemove(): void
     {
         // Create contact
         $emailAddress = uniqid('', false).'@mautic.com';
@@ -478,7 +537,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
-    public function testAddAndRemoveDncToExistingContact()
+    public function testAddAndRemoveDncToExistingContact(): void
     {
         // Create contact
         $payload = [

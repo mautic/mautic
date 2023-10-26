@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
 class SchemaDefinition
@@ -32,7 +23,7 @@ class SchemaDefinition
                 ],
             ];
         }
-
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -52,6 +43,7 @@ class SchemaDefinition
             case 'multiselect':
             case 'region':
             case 'tel':
+            case 'url':
                 $schemaType = 'string';
                 break;
             case 'text':
@@ -61,10 +53,14 @@ class SchemaDefinition
                 $schemaType = 'text';
         }
 
+        if ('string' === $schemaType) {
+            $schemaLength = 191;
+        }
+
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 

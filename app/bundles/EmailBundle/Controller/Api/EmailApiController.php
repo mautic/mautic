@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller\Api;
 
 use Doctrine\ORM\EntityNotFoundException;
@@ -140,6 +131,10 @@ class EmailApiController extends CommonApiController
             }
 
             $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
+            // Set owner_id to support the "Owner is mailer" feature
+            if ($lead->getOwner()) {
+                $leadFields['owner_id'] = $lead->getOwner()->getId();
+            }
 
             $result = $this->model->sendEmail(
                 $entity,

@@ -1,16 +1,9 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -79,11 +72,16 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     private function reduceToSegmentIds(array $filters)
     {
-        $segmentFilters = array_filter($filters, function ($v) {
-            return 'leadlist' == $v['type'];
+        $segmentFilters = array_filter($filters, function (array $filter) {
+            return 'leadlist' === $filter['type']
+                && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
         });
 
-        $segentIdsInFilter = array_column($segmentFilters, 'filter');
+        $segentIdsInFilter = array_map(function (array $filter) {
+            $bcValue = $filter['filter'] ?? [];
+
+            return $filter['properties']['filter'] ?? $bcValue;
+        }, $segmentFilters);
 
         return $this->flatten($segentIdsInFilter);
     }
