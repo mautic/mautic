@@ -13,6 +13,7 @@ use Mautic\UserBundle\UserEvents;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PasswordSubscriberTest extends TestCase
 {
@@ -30,9 +31,15 @@ class PasswordSubscriberTest extends TestCase
      */
     private $pluginToken;
 
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
     protected function setUp(): void
     {
-        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel();
+        $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
+        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel($this->dispatcher);
         $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel);
         $this->authenticationEvent            = $this->createMock(AuthenticationEvent::class);
         $this->pluginToken                    = $this->createMock(PluginToken::class);
@@ -42,7 +49,7 @@ class PasswordSubscriberTest extends TestCase
             ->willReturn($this->pluginToken);
     }
 
-    public function testThatItIsSubcribedToEvents(): void
+    public function testThatItIsSubscribedToEvents(): void
     {
         Assert::assertArrayHasKey(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION, PasswordSubscriber::getSubscribedEvents());
     }

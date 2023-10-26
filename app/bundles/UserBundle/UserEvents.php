@@ -138,4 +138,14 @@ final class UserEvents
      * @var string
      */
     public const USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION ='mautic.user_form_post_local_password_authentication';
+
+    /**
+     * The mautic.user_password_strength_validation event is dispatched after mautic checks if user's password meets the strength requirements
+     * This can be used to add custom password requirements.
+     *
+     * The event listener receives a Mautic\UserBundle\Event\PasswordStrengthValidateEvent instance.
+     *
+     * @var string
+     */
+    public const USER_PASSWORD_STRENGTH_VALIDATION = 'mautic.user_password_strength_validation';
 }

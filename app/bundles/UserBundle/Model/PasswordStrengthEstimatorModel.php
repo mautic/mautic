@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Model;
 
+use Mautic\UserBundle\Event\PasswordStrengthValidateEvent;
+use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordStrengthEstimatorModel
@@ -21,7 +24,7 @@ class PasswordStrengthEstimatorModel
 
     private PasswordStrengthEstimator $passwordStrengthEstimator;
 
-    public function __construct()
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
         $this->passwordStrengthEstimator = new PasswordStrengthEstimator();
     }
@@ -31,7 +34,12 @@ class PasswordStrengthEstimatorModel
      */
     public function validate(?string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = self::DICTIONARY): bool
     {
-        return $score <= $this->passwordStrengthEstimator->passwordStrength($password, $this->sanitizeDictionary($dictionary))['score'];
+        $isValid = $score <= $this->passwordStrengthEstimator->passwordStrength($password, $this->sanitizeDictionary($dictionary))['score'];
+
+        $passwordStrengthValidateEvent = new PasswordStrengthValidateEvent($isValid, $password);
+        $this->dispatcher->dispatch($passwordStrengthValidateEvent, UserEvents::USER_PASSWORD_STRENGTH_VALIDATION);
+
+        return $passwordStrengthValidateEvent->isValid();
     }
 
     /**
