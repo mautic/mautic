@@ -148,6 +148,7 @@ class ReportRepository extends CommonRepository
         if (empty($entity->getScheduleTimezone())) {
             $entity->setScheduleTimezone('UTC');
         }
+
         return parent::saveEntity($entity, $flush);
     }
 }
