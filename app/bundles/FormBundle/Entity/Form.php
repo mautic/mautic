@@ -313,6 +313,7 @@ class Form extends FormEntity
                     'postActionProperty',
                     'noIndex',
                     'formAttributes',
+                    'language',
                 ]
             )
             ->build();
