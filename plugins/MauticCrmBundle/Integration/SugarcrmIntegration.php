@@ -730,10 +730,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             return empty($error);
         } else {
-            if ($this->isConfigured()) {
-                // SugarCRM 7 uses password grant type so login each time to ensure session is valid
-                $this->authCallback();
-            }
+            // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+            $this->authCallback();
 
             return parent::isAuthorized();
         }

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -211,10 +212,10 @@ class InstallController extends CommonController
                     'tmpl'           => $tmpl,
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
-                    'appRoot'        => $this->coreParametersHelper->get('kernel.project_dir').'/app',
+                    'appRoot'        => $this->coreParametersHelper->get('mautic.application_dir').'/app',
                     'cacheDir'       => $this->coreParametersHelper->get('kernel.cache_dir'),
                     'logDir'         => $this->coreParametersHelper->get('kernel.logs_dir'),
-                    'configFile'     => $pathsHelper->getSystemPath('local_config'),
+                    'configFile'     => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
                     'completedSteps' => $completedSteps,
                 ],
                 'contentTemplate' => $step->getTemplate(),
@@ -263,7 +264,7 @@ class InstallController extends CommonController
                 'viewParameters' => [
                     'welcome_url' => $welcomeUrl,
                     'parameters'  => $this->configurator->render(),
-                    'config_path' => $pathsHelper->getSystemPath('local_config'),
+                    'config_path' => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
                     'is_writable' => $this->configurator->isFileWritable(),
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,

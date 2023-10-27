@@ -93,6 +93,12 @@
                             <a href="{{ path('mautic_report_view', {'objectId': item.id}) }}" data-toggle="ajax">
                                 {{ item.name|e }}
                             </a>
+                            {% if item.isScheduled %}
+                                <label class="control-label" data-toggle="tooltip"
+                                       data-container="body" data-placement="top" title=""
+                                       data-original-title="{{ 'mautic.report.is.scheduled'|trans }}">
+                                    <i class="fa fa-fw fa-send-o"></i></label>
+                            {% endif %}
                         </div>
                         {% if item.description %}
                             <div class="text-muted mt-4">
