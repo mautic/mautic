@@ -67,8 +67,8 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
         self::EMAIL_STATS_PREFIX.'.date_sent' => [
             'label'          => 'mautic.email.report.stat.date_sent',
-            'type'           => 'date',
-            'groupByFormula' => 'DATE('.self::EMAIL_STATS_PREFIX.'.generated_date_sent)',
+            'type'           => 'datetime',
+            'groupByFormula' => 'DATE('.self::EMAIL_STATS_PREFIX.'.date_sent)',
         ],
         self::EMAIL_STATS_PREFIX.'.is_read' => [
             'label' => 'mautic.email.report.stat.is_read',
