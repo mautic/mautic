@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<ScheduleSendType>
+ */
 class ScheduleSendType extends AbstractType
 {
     public function __construct(private TranslatorInterface $translator)
