@@ -272,7 +272,6 @@ class EmailController extends FormController
         $model    = $this->getModel('email');
         $security = $this->security;
 
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.email.page', 1);
@@ -1330,7 +1329,7 @@ class EmailController extends FormController
         );
     }
 
-    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, $objectId)
+    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
     {
         /** @var Email $entity */
         $entity = $model->getEntity($objectId);
@@ -1369,7 +1368,7 @@ class EmailController extends FormController
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
                 $data = $form->getData();
-                if ($form->get('buttons')->has('apply') && $form->get('buttons')->get('apply')->isClicked()) {
+                if ($form->get('buttons')->has('apply') && $this->getFormButton($form, ['apply'])->isClicked()) {
                     $entity->setPublishUp(null);
                     $entity->setPublishDown(null);
                     $entity->setContinueSending(null);
@@ -1424,7 +1423,6 @@ class EmailController extends FormController
     {
         $model = $this->getModel('email');
         \assert($model instanceof EmailModel);
-        /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
         // not found or not allowed
