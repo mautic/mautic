@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,6 +70,9 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testLanguageForm(): void
     {
+        /** @var LanguageHelper $languageHelper */
+        $languageHelper = $this->getContainer()->get('mautic.helper.language');
+
         $formPayload = [
             'name'     => 'Test Form',
             'formType' => 'campaign',
@@ -90,7 +94,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), json_encode($languageHelper->getLanguageChoices()));
         $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];
