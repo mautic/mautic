@@ -24,15 +24,32 @@ final class SegmentDateValidator extends ConstraintValidator
             if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'])) {
                 $segmentFilter  = $this->contactSegmentFilterFactory->factorSegmentFilter($filter);
                 $parameterValue = $segmentFilter->getParameterValue();
+
                 if (is_array($parameterValue)) {
                     continue;
                 }
 
-                $dateString = str_replace('%', '', $parameterValue);
+                if (in_array($filter['operator'] ?? '', ['regexp', '!regexp', 'like', '!like', 'startsWith', 'endsWith', 'contains'])) {
+                    continue;
+                }
 
-                $format = 'Y-m-d';
+                if (null === $parameterValue) {
+                    continue;
+                }
 
-                $dateTime = \DateTime::createFromFormat($format, $dateString);
+                if (str_contains($parameterValue, '%')) {
+                    return;
+                }
+
+                $formats  = ['Y-m-d', 'Y-m-d H:i', 'Y-m-d H:i:s'];
+
+                foreach ($formats as $fmt) {
+                    $dateTime = \DateTime::createFromFormat($fmt, $parameterValue);
+                    if (false !== $dateTime) {
+                        break;
+                    }
+                }
+
                 if (false === $dateTime) {
                     $this->context->addViolation($this->translator->trans('mautic.lead.segment.date_invalid', ['%value%' => $parameterValue], 'validators'));
 
