@@ -439,11 +439,12 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
