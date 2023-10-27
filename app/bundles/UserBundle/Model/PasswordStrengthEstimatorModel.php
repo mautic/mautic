@@ -39,7 +39,7 @@ class PasswordStrengthEstimatorModel
         $passwordStrengthValidateEvent = new PasswordStrengthValidateEvent($isValid, $password);
         $this->dispatcher->dispatch($passwordStrengthValidateEvent, UserEvents::USER_PASSWORD_STRENGTH_VALIDATION);
 
-        return $passwordStrengthValidateEvent->isValid();
+        return $passwordStrengthValidateEvent->isValid;
     }
 
     /**
