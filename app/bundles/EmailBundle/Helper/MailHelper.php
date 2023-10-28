@@ -31,16 +31,13 @@ use Twig\Environment;
  */
 class MailHelper
 {
-    public const QUEUE_RESET_TO = 'RESET_TO';
-
-    public const QUEUE_FULL_RESET = 'FULL_RESET';
-
-    public const QUEUE_DO_NOTHING = 'DO_NOTHING';
-
-    public const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
-
-    public const QUEUE_RETURN_ERRORS = 'RETURN_ERRORS';
-
+    public const QUEUE_RESET_TO           = 'RESET_TO';
+    public const QUEUE_FULL_RESET         = 'FULL_RESET';
+    public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+    public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+    public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+    public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+    public const EMAIL_TYPE_MARKETING     = 'marketing';
     /**
      * @var MauticFactory
      */
@@ -710,7 +707,7 @@ class MailHelper
         }
 
         // Parts (plaintext)
-        $textBody     = $message->getTextBody();
+        $textBody     = $message->getTextBody() ?? '';
         $bodyReplaced = str_ireplace($search, $replace, $textBody);
         if ($textBody != $bodyReplaced) {
             $textBody = strip_tags($bodyReplaced);
@@ -1120,8 +1117,11 @@ class MailHelper
     public function setReplyTo($addresses, $name = null)
     {
         try {
-            $name = $this->cleanName($name);
-            $this->message->replyTo(new Address($addresses, $name ?? ''));
+            $name      = $this->cleanName($name);
+            $addresses = (array) $addresses; // This will cast $addresses to an array
+            foreach ($addresses as $address) {
+                $this->message->replyTo(new Address($address, $name ?? ''));
+            }
         } catch (\Exception $e) {
             $this->logError($e, 'reply to');
         }
@@ -1177,8 +1177,8 @@ class MailHelper
     }
 
     /**
-     * @param null $idHash
-     * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
+     * @param string|null $idHash
+     * @param bool        $statToBeGenerated Pass false if a stat entry is not to be created
      */
     public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
@@ -1325,13 +1325,11 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $BCcontent  = $email->getContent();
+        $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml) && !empty($BCcontent)) {
-            $template = $email->getTemplate();
+        if (empty($customHtml) && $template) {
             if (empty($slots)) {
-                $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
 
@@ -1413,7 +1411,7 @@ class MailHelper
 
         // Personal and transactional emails do not contain unsubscribe header
         $email = $this->getEmail();
-        if (empty($email) || 'transactional' === $this->getEmailType()) {
+        if (empty($email) || self::EMAIL_TYPE_TRANSACTIONAL === $this->getEmailType()) {
             return $headers;
         }
 

@@ -64,7 +64,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
-            $rows = $qb->execute()->fetchOne();
+            $rows = $qb->executeQuery()->fetchOne();
         } else {
             $subQb = $this->db->createQueryBuilder();
             $subQb->select('id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -86,7 +86,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             while (true) {
                 $subQb->setMaxResults(10000)->setFirstResult($loop * 10000);
 
-                $leadsIds = array_column($subQb->execute()->fetchAllAssociative(), 'id');
+                $leadsIds = array_column($subQb->executeQuery()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($leadsIds)) {
                     break;
@@ -98,7 +98,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'lead_id', $leadsIds
                       )
                   )
-                  ->execute();
+                  ->executeStatement();
                 ++$loop;
             }
         }

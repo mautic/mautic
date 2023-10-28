@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
@@ -11,7 +12,7 @@ use Monolog\Logger;
 /**
  * Class DoctrineSubscriber.
  */
-class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
+class DoctrineSubscriber implements EventSubscriber
 {
     /**
      * @var Logger
@@ -59,14 +60,14 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute()
+                    ->executeQuery()
                     ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && 'email' != $f['alias']) {
+                    if ($f['is_unique'] && 'email' !== $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));

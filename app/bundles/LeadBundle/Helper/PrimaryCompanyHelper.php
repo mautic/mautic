@@ -21,7 +21,7 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
     {

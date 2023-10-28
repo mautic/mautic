@@ -451,7 +451,7 @@ class ImportController extends FormController
 
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
-                        $this->addFlashMessage('mautic.'.$object.'.batch.import.created');
+                        $this->addFlashMessage('mautic.lead.batch.import.created');
                         $this->resetImport($object);
 
                         return $this->indexAction($request);

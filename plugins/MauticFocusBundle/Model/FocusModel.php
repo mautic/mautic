@@ -4,10 +4,12 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use MatthiasMullie\Minify;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -150,9 +152,9 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null $id
+     * @param int|null $id
      *
-     * @return Focus
+     * @return Focus|null
      */
     public function getEntity($id = null)
     {
@@ -192,18 +194,7 @@ class FocusModel extends FormModel
 
             $url = '';
             if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
-                $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focusArray['properties']['content']['link_url'],
-                    'focus',
-                    $focusArray['id']
-                );
-
-                $url = $this->trackableModel->generateTrackableUrl(
-                    $trackable,
-                    ['channel' => ['focus', $focusArray['id']]],
-                    false,
-                    $focus->getUtmTags()
-                );
+                $url = $focusArray['properties']['content']['link_url'];
             }
 
             $javascript = $this->twig->render(
@@ -217,9 +208,9 @@ class FocusModel extends FormModel
 
             $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
-                'js'    => \Minify_HTML::minify($javascript),
-                'focus' => \Minify_HTML::minify($content['focus']),
-                'form'  => \Minify_HTML::minify($content['form']),
+                'js'    => (new Minify\JS($javascript))->minify(),
+                'focus' => InputHelper::minifyHTML($content['focus']),
+                'form'  => InputHelper::minifyHTML($content['form']),
             ];
 
             if (!$byPassCache) {
@@ -338,7 +329,7 @@ class FocusModel extends FormModel
      * Add a stat entry.
      *
      * @param mixed                                         $type
-     * @param null                                          $data
+     * @param mixed                                         $data
      * @param array<int|string|array<int|string>>|Lead|null $lead
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
@@ -477,5 +468,20 @@ class FocusModel extends FormModel
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    public function getViewsCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getViewsCount($focus->getId());
+    }
+
+    public function getUniqueViewsCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getUniqueViewsCount($focus->getId());
+    }
+
+    public function getClickThroughCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getClickThroughCount($focus->getId());
     }
 }

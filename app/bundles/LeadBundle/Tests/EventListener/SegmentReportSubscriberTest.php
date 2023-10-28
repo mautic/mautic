@@ -22,7 +22,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $translatorMock                   = $this->createMock(TranslatorInterface::class);
         $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $reportHelperMock                 = new ReportHelper();
+        $reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
         $reportMock                       = $this->createMock(Report::class);
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
@@ -74,7 +74,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.', 'lll.')
             ->willReturn($filterColumns);
 
-        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper());
+        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper($this->createMock(EventDispatcherInterface::class)));
 
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);

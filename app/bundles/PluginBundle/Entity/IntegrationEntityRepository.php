@@ -101,7 +101,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -132,7 +132,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setMaxResults(1);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -288,7 +288,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $leads   = [];
 
@@ -404,7 +404,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if (false === $limit) {
             return (int) $results[0]['total'];
@@ -451,9 +451,9 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->execute()->fetchAllAssociative();
-            $plugins = array_map(function ($i) {
-                return "'${i['name']}'";
+            $rows    = $pq->executeQuery()->fetchAllAssociative();
+            $plugins = array_map(static function ($i) {
+                return "'{$i['name']}'";
             }, $rows);
             if (count($plugins) > 0) {
                 $q->andWhere($q->expr()->in('i.integration', $plugins));
@@ -484,7 +484,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('integrationEntity', $integrationEntity);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if (false === $limit && count($results) > 0) {
             return (int) $results[0]['total'];
@@ -506,7 +506,7 @@ class IntegrationEntityRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('entity', $internalEntityType.'-deleted')
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -522,7 +522,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
     }
 
     public function updateErrorLeads($internalEntity, $leadId)
@@ -536,7 +536,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
 
         $z = $this->_em->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -547,6 +547,6 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
     }
 }

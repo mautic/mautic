@@ -273,7 +273,7 @@ class CategoryController extends AbstractFormController
             ]);
         } elseif (!empty($valid)) {
             // return edit view to prevent duplicates
-            return $this->editAction($bundle, $entity->getId(), true);
+            return $this->editAction($request, $bundle, $entity->getId(), true);
         } else {
             return $this->ajaxAction(
                 $request,

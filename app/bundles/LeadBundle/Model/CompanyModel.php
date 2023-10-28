@@ -450,10 +450,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             // make sure they are ints
             $searchForCompanies = [];
             foreach ($companies as &$l) {
-                $l = (int) $l;
-                if (!isset($companyLeadRemove[$l])) {
-                    $searchForCompanies[] = $l;
-                }
+                $l                    = (int) $l;
+                $searchForCompanies[] = $l;
             }
             if (!empty($searchForCompanies)) {
                 $companyEntities = $this->getEntities(

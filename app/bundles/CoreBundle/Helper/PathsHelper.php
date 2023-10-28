@@ -60,6 +60,7 @@ class PathsHelper
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
+        $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();
         $this->theme                  = $coreParametersHelper->get('theme');
         $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
@@ -119,6 +120,11 @@ class PathsHelper
     public function getAssetsPath(): string
     {
         return $this->getSystemPath('assets', true);
+    }
+
+    public function getMediaPath(): string
+    {
+        return $this->getSystemPath('media', true);
     }
 
     public function getCoreBundlesPath(): string

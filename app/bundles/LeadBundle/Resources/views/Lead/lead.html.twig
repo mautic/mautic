@@ -384,6 +384,28 @@
                     {{ lead.stage.name|purify }}<hr>
                 {% endif %}
             </div>
+
+            {% if lead.groupScores is not empty %}
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {{ 'mautic.lead.groups.panel.title'|trans }}
+                    </div>
+                </div>
+
+                <div class="panel-body pt-sm group-points-panel">
+                    {% for groupScore in lead.groupScores %}
+                        <div class="row">
+                            <h6 class="fw-sb col-md-6">
+                                {{ groupScore.group.name }}
+                            </h6>
+                            <p class="text-muted col-md-6">
+                                {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% if doNotContact %}
                 {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
             {% endif %}
@@ -440,7 +462,7 @@
                         {% for event in upcomingEvents %}
                             {% set metadata = serializerDecode(event.metadata) %}
                             {% set errors = false %}
-                            {% if metadata.errors is not empty %}
+                            {% if metadata.errors is defined and metadata.errors is not empty %}
                                 {% set errors = metadata.errors is iterable ? metadata.errors|join('<br/>') : metadata.errors %}
                             {% endif %}
                             <li class="media">
@@ -451,7 +473,7 @@
                                     {{ 'mautic.lead.lead.upcoming.event.triggered.at'|trans({
                                           '%event%': event.event_name,
                                           '%link%': '<a href="'~path('mautic_campaign_action', {'objectAction': 'view', 'objectId': event.campaign_id})~'" data-toggle="ajax">'~event.campaign_name~'</a>',
-                                    }) }}
+                                    })|purify }}
                                     {% if errors is not empty %}
                                       <i class="fa fa-warning text-danger" data-toggle="tooltip" title="{{ errors|purify }}"></i>
                                     {% endif %}

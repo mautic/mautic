@@ -18,15 +18,18 @@ use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -36,6 +39,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|LeadModel
      */
     private $leadModelMock;
+
+    /**
+     * @var MockObject|FieldModel
+     */
+    private $leadFieldModelMock;
 
     /**
      * @var MockObject|StageModel
@@ -171,6 +179,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
+        $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
         $this->stageModelMock                   = $this->createMock(StageModel::class);
         $this->campaignModelMock                = $this->createMock(CampaignModel::class);
         $this->eventCollectorMock               = $this->createMock(EventCollector::class);
@@ -181,7 +190,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelperMock                 = new ReportHelper();
+        $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
@@ -192,6 +201,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportMock                       = $this->createMock(Report::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
+            $this->leadFieldModelMock,
             $this->stageModelMock,
             $this->campaignModelMock,
             $this->eventCollectorMock,
@@ -215,7 +225,30 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock->expects($this->any())
             ->method('getQueryPart')
-            ->willReturn([['alias' => 'lp']]);
+            ->willReturnCallback(function ($input) {
+                if ('join' === $input) {
+                    return [
+                        'lp' => [[
+                            'joinType'      => 'left',
+                            'joinTable'     => 'leads',
+                            'joinAlias'     => 'l',
+                            'joinCondition' => 'l.id = lp.lead_id',
+                        ]],
+                        'l' => [[
+                            'joinType'      => 'inner',
+                            'joinTable'     => 'lead_list_leads',
+                            'joinAlias'     => 's',
+                            'joinCondition' => 's.lead_id = l.id',
+                        ]],
+                    ];
+                }
+
+                if ('where' === $input) {
+                    return '(lp.date_added IS NULL OR (lp.date_added BETWEEN :dateFrom AND :dateTo)) AND (s.leadlist_id = :i3csleadlistid))';
+                }
+
+                return [['alias' => 'lp']];
+            });
 
         $this->queryBuilderMock->expects($this->any())
             ->method('from')
@@ -612,6 +645,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
                         ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
                         'i.ip_address' => [
                             'label' => '',
                             'type'  => 'string',
@@ -659,6 +702,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
+                        ],
+                        'pl.id' => [
+                            'alias' => 'group_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'group_name',
+                            'label' => '',
+                            'type'  => 'string',
                         ],
                     ],
                     'group' => 'contacts',
@@ -1013,5 +1066,89 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ]]);
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
         $this->reportSubscriber->onReportDisplay($this->reportDataEventMock);
+    }
+
+    public function testOnReportColumnCollectForCompany(): void
+    {
+        $companyFields  = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+            'companies_lead.is_primary' => [
+                'label' => 'mautic.lead.report.company.is_primary',
+                'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
+            ],
+        ];
+
+        $columns        = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+        ];
+
+        $columnCollectEvent = new ColumnCollectEvent('company');
+
+        $this->companyReportDataMock->expects($this->once())
+            ->method('getCompanyData')
+            ->willReturn($companyFields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
+
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+    }
+
+    public function testOnReportColumnCollectForContact(): void
+    {
+        $publishedFields = [
+            [
+                'label'  => 'Email',
+                'type'   => 'string',
+                'alias'  => 'email',
+            ],
+            [
+                'label'  => 'Firstname',
+                'type'   => 'string',
+                'alias'  => 'firstname',
+            ],
+        ];
+
+        $columns          = [
+            'l.email'     => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'email',
+            ],
+            'l.firstname' => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'firstname',
+            ],
+            'l.id'        => [
+                'label'   => 'mautic.lead.report.contact_id',
+                'type'    => 'int',
+                'link'    => 'mautic_contact_action',
+                'alias'   => 'contactId',
+            ],
+        ];
+
+        $columnCollectEvent = new ColumnCollectEvent('contact');
+
+        $this->leadFieldModelMock->expects($this->once())
+            ->method('getPublishedFieldArrays')
+            ->willReturn($publishedFields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
+
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
     }
 }
