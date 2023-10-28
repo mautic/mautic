@@ -322,7 +322,7 @@ class CategoryController extends AbstractFormController
             $postActionVars = [
                 'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
                 'viewParameters'  => $viewParams,
-                'contentTemplate' => '@MauticCategory/Category/index.html.twig',
+                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',
