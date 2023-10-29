@@ -120,7 +120,6 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals([
             [
                 'id'                 => $leadIds[0],
-                'date_added1'        => '2020-02-07 20:29:02',
                 'device'             => 'desktop',
                 'device_os_name'     => 'Windows',
                 'device_os_version'  => '10',
@@ -128,10 +127,10 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
                 'client_info'        => 'Firefox',
                 'device_brand'       => '',
                 'device_model'       => '',
+                'date_added2'        => '2020-02-07 20:29:02',
             ],
             [
                 'id'                 => $leadIds[1],
-                'date_added1'        => '2020-02-26 22:29:02',
                 'device'             => 'desktop',
                 'device_os_name'     => 'Ubuntu',
                 'device_os_version'  => '',
@@ -139,10 +138,10 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
                 'client_info'        => 'Firefox',
                 'device_brand'       => '',
                 'device_model'       => '',
+                'date_added2'        => '2020-02-26 22:29:02',
             ],
             [
                 'id'                 => $leadIds[1],
-                'date_added1'        => '2022-09-21 07:36:48',
                 'device'             => 'smartphone',
                 'device_os_name'     => 'Android',
                 'device_os_version'  => '8.0',
@@ -150,6 +149,7 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
                 'client_info'        => 'Chrome Mobile',
                 'device_brand'       => 'Salaxy S0',
                 'device_model'       => 'NoPhone',
+                'date_added2'        => '2022-09-21 07:36:48',
             ],
         ], $result['data']);
     }
