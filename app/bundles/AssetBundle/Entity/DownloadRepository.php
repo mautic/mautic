@@ -70,9 +70,9 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of assets ordered by it's download count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
+     * @param int                               $limit
+     * @param int                               $offset
      *
      * @return array
      *
@@ -87,15 +87,15 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->fetchAllAssociative();
     }
 
     /**
      * Get list of asset referrals ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
+     * @param int                               $limit
+     * @param int                               $offset
      *
      * @return array
      *
@@ -110,13 +110,13 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->fetchAllAssociative();
     }
 
     /**
      * Get pie graph data for http statuses.
      *
-     * @param QueryBuilder $query
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
      *
      * @return array
      *
@@ -129,7 +129,7 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->fetchAllAssociative();
 
         $chart   = new PieChart();
 
@@ -141,9 +141,9 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
+     * @return array<int, mixed>
      *
-     * @return mixed
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
     {
@@ -185,7 +185,9 @@ class DownloadRepository extends CommonRepository
      *
      * @param \DateTime $fromDate
      *
-     * @return mixed
+     * @return array<int, mixed>
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
     {
