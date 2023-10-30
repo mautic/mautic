@@ -1368,7 +1368,7 @@ class EmailController extends FormController
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
                 $data = $form->getData();
-                if ($form->get('buttons')->has('apply') && $form->get('buttons')->get('apply')->isClicked()) {
+                if ($form->get('buttons')->has('apply') && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
                     $entity->setPublishUp(null);
                     $entity->setPublishDown(null);
                     $entity->setContinueSending(null);
