@@ -449,7 +449,7 @@ class TriggerController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('point.trigger');
         $entity = $model->getEntity($objectId);
@@ -463,7 +463,7 @@ class TriggerController extends FormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**
