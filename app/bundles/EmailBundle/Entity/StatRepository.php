@@ -516,8 +516,12 @@ class StatRepository extends CommonRepository
 
         $results = $query->execute()->fetchAssociative();
 
-        $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
-        unset($results['sent']);
+        if ($results) {
+            $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
+            unset($results['sent']);
+        } else {
+            $results['ignored'] = $results['sent'] = $results['read'] = $results['failed']  = 0;
+        }
 
         return $results;
     }
