@@ -224,4 +224,35 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(0, $pendingCountQuery);
     }
+
+    public function testSendEmailForImportCustomEmailTemplate(): void
+    {
+        $email = new Email();
+        $email->setName('Test Email C');
+        $email->setSubject('Test Email C Subject');
+        $email->setTemplate('blank');
+        $email->setEmailType('template');
+
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+
+        $this->em->persist($email);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        // Create the member now.
+        $payload = [
+            'action'   => 'lead:getEmailTemplate',
+            'template' => $email->getId(),
+        ];
+
+        $this->client->request('GET', '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(1, $response['success']);
+        $this->assertNotEmpty($response['subject']);
+        $this->assertEquals($email->getSubject(), $response['subject']);
+        $this->assertNotEmpty($response['body']);
+    }
 }
