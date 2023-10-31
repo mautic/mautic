@@ -184,12 +184,6 @@ return [
                     'mautic.email.repository.stat',
                 ],
             ],
-            'mautic.email.helper.request.storage' => [
-                'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
-                'arguments' => [
-                    'mautic.helper.cache_storage',
-                ],
-            ],
             'mautic.email.helper.stats_collection' => [
                 'class'     => \Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
                 'arguments' => [
