@@ -466,8 +466,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
-        $this->assertArrayHasKey('success', $sendResponse);
-        $this->assertArrayHasKey('trackingHash', $sendResponse);
+        $this->assertArrayHasKey('success', $sendResponse, $clientResponse->getContent());
+        $this->assertArrayHasKey('trackingHash', $sendResponse, $clientResponse->getContent());
     }
 
     private function createSegment(string $name, string $alias): LeadList
