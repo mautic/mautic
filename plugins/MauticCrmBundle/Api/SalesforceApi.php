@@ -520,7 +520,17 @@ class SalesforceApi extends CrmApi
             }
 
             foreach ($response as $lineItem) {
-                if (is_array($lineItem) && !empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
+                if (!is_array($lineItem)) {
+                    continue;
+                }
+                $lineItemForInvalidSession              = $lineItem;
+                $lineItemForInvalidSession['errorCode'] = 'INVALID_SESSION_ID';
+                if (!empty($lineItemForInvalidSession['message']) && false !== strpos($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
+                    $errors[] = $error;
+                    continue;
+                }
+
+                if (!empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
                     $errors[] = $error;
                 }
             }
@@ -603,11 +613,11 @@ class SalesforceApi extends CrmApi
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
         $value = str_replace('\\', '\\\\', $value);
 
-        // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
         // Apply general formatting/cleanup
         $value = $this->integration->cleanPushData($value);
+
+        // Escape single quotes
+        $value = str_replace("'", "\'", $value);
 
         return $value;
     }

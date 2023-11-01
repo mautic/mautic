@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Loader;
 
 use Symfony\Component\Finder\Finder;
@@ -48,6 +39,11 @@ class ParameterLoader
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
         $this->createParameterBags();
+    }
+
+    public function getDefaultParameters(): array
+    {
+        return self::$defaultParameters;
     }
 
     public function getParameterBag(): ParameterBag

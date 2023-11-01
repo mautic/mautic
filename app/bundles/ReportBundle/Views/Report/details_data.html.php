@@ -127,18 +127,16 @@ $graphContent = $view->render(
                                                 }
                                                 ?>
                                                 <?php
-                                                if ($cellVal) {
-                                                    switch ($cellType) {
-                                                        case 'datetime':
-                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
-                                                            break;
-                                                        case 'date':
-                                                            echo $view['date']->toShort($cellVal, 'UTC');
-                                                            break;
-                                                        default:
-                                                            echo $view['formatter']->_($cellVal, $cellType);
-                                                            break;
-                                                    }
+                                                switch ($cellType) {
+                                                    case 'datetime':
+                                                        echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                        break;
+                                                    case 'date':
+                                                        echo $view['date']->toShort($cellVal, 'UTC');
+                                                        break;
+                                                    default:
+                                                        echo $view['formatter']->_($cellVal, $cellType);
+                                                        break;
                                                 }
                                                 ?>
                                                 <?php if ($closeLink): ?></a><?php endif; ?>

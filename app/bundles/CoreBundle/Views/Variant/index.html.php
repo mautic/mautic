@@ -11,7 +11,8 @@
 if (!isset($nameGetter)) {
     $nameGetter = 'getName';
 }
-$totalWeight = 0;
+$totalWeight   = 0;
+$abStatsHeader = $view['translator']->trans('mautic.core.ab_test.stats');
 ?>
 <?php if (!empty($variants['properties'])): ?>
 <?php if (null != $variants['parent']->getVariantStartDate()): ?>
@@ -37,7 +38,7 @@ $totalWeight = 0;
     <!-- button -->
     <div class="col-xs-2 va-m text-right">
         <a href="#" data-toggle="modal" data-target="#abStatsModal" class="btn btn-primary">
-            <?php echo $view['translator']->trans('mautic.core.ab_test.stats'); ?>
+            <?php echo $abStatsHeader; ?>
         </a>
     </div>
 </div>
@@ -85,7 +86,7 @@ $totalWeight = 0;
     'MauticCoreBundle:Helper:modal.html.php',
     [
         'id'     => 'abStatsModal',
-        'header' => false,
+        'header' => $abStatsHeader,
         'body'   => (isset($abTestResults['supportTemplate'])) ? $view->render(
             $abTestResults['supportTemplate'],
             ['results' => $abTestResults, 'variants' => $variants]

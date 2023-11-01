@@ -40,6 +40,7 @@
             </li>
             <?php endforeach; ?>
         </ul>
+        <?php echo '<!-- recent activity logs '.PHP_EOL.json_encode(\Mautic\CoreBundle\Helper\InputHelper::clean($logs), JSON_PRETTY_PRINT).PHP_EOL.' -->'; ?>
         <?php endif; ?>
     </div>
 </div>

@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-nature",
+            "directory": "themes/nature",
+            "target": "git@github.com:mautic/theme-nature.git"
+        }
+    ]
+}

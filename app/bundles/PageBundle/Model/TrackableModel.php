@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -367,26 +358,10 @@ class TrackableModel extends AbstractCommonModel
         libxml_use_internal_errors($libxmlPreviousState);
         $links = $dom->getElementsByTagName('a');
 
-        $trackableUrls = [];
+        $xpath = new \DOMXpath($dom);
+        $maps  = $xpath->query('//map/area');
 
-        /** @var \DOMElement $link */
-        foreach ($links as $link) {
-            $url = $link->getAttribute('href');
-
-            // Check for a do not track
-            if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
-
-                continue;
-            }
-
-            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
-                $trackableUrls[$urlKey]  = $urlValue;
-            }
-        }
-
-        return $trackableUrls;
+        return array_merge($this->extractTrackables($links), $this->extractTrackables($maps));
     }
 
     /**
@@ -926,5 +901,37 @@ class TrackableModel extends AbstractCommonModel
         $this->leadFieldRepository->detachEntities($fieldEntities);
 
         return $this->contactFieldUrlTokens;
+    }
+
+    /**
+     * @param \DOMNodeList<\DOMNode> $links
+     *
+     * @return array<string, string>
+     */
+    private function extractTrackables(\DOMNodeList $links): array
+    {
+        $trackableUrls = [];
+        /** @var \DOMElement $link */
+        foreach ($links as $link) {
+            $url = $link->getAttribute('href');
+
+            if ('' === $url) {
+                continue;
+            }
+
+            // Check for a do not track
+            if ($link->hasAttribute('mautic:disable-tracking')) {
+                $this->doNotTrack[$url] = $url;
+
+                continue;
+            }
+
+            if ($preparedUrl = $this->prepareUrlForTracking($url)) {
+                [$urlKey, $urlValue]     = $preparedUrl;
+                $trackableUrls[$urlKey]  = $urlValue;
+            }
+        }
+
+        return $trackableUrls;
     }
 }

@@ -504,7 +504,7 @@ class SugarcrmApi extends CrmApi
                 //'deleted'     => 0,
                 //'favorites'   => false,
             ];
-            $data = $this->request('Users/filter', $parameters, 'POST', 'Users');
+            $data = $this->request('Users/filter', $parameters, 'GET', 'Users');
 
             if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
                 $type = 'BYEMAIL';
@@ -692,7 +692,7 @@ class SugarcrmApi extends CrmApi
                     //'favorites'   => false,
                 ];
 
-                return $this->request("$object/filter", $parameters, 'POST', $object);
+                return $this->request("$object/filter", $parameters, 'GET', $object);
             }
         }
     }

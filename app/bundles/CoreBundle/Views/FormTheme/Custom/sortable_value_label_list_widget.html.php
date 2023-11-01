@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
+<?php if (!is_array($form['label']->vars['value']) && !is_array($form['value']->vars['value'])): ?>
 <div class="input-group sortable-no-reorder">
     <?php if (!empty($preaddon)): ?>
     <span class="input-group-addon preaddon" <?php foreach ($preaddonAttr as $k => $v) {
@@ -36,3 +36,4 @@
     </span>
     <?php endif; ?>
 </div>
+<?php endif; ?>

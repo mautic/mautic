@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -19,6 +10,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -764,11 +756,12 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     }
 
     /**
-     * @param        $parameters
-     * @param bool   $prepareForSerialization
-     * @param string $requestIdColumn
-     * @param null   $model
-     * @param bool   $returnWithOriginalKeys
+     * @param mixed[] $parameters
+     * @param mixed[] $errors
+     * @param bool    $prepareForSerialization
+     * @param string  $requestIdColumn
+     * @param null    $model
+     * @param bool    $returnWithOriginalKeys
      *
      * @return array|mixed
      */
@@ -815,6 +808,10 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
         if ($returnWithOriginalKeys) {
             if ($entities instanceof Paginator) {
                 $entities = $entities->getIterator()->getArrayCopy();
+            }
+
+            if ($entities instanceof \ArrayObject) {
+                $entities = $entities->getArrayCopy();
             }
 
             return $idHelper->orderByOriginalKey($entities);
@@ -951,8 +948,8 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     }
 
     /**
-     * @param      $results
-     * @param null $callback
+     * @param array<mixed[]> $results
+     * @param callable|null  $callback
      *
      * @return array($entities, $totalCount)
      */
@@ -965,6 +962,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
             $totalCount = count($results);
         }
 
+        /**
+         * @var EntityResultHelper
+         */
         $entityResultHelper = $this->get('mautic.api.helper.entity_result');
 
         $entities = $entityResultHelper->getArray($results, $callback);
@@ -975,9 +975,9 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
-     * @param $parameters
-     * @param $entity
-     * @param $action
+     * @param mixed[] $parameters
+     * @param object  $entity
+     * @param string  $action
      *
      * @return mixed
      */

@@ -108,9 +108,8 @@ endif;
                         'mautic_user_index',
                         ['search' => $view['translator']->trans('mautic.user.user.searchcommand.role').':&quot;'.$item->getName().'&quot;']
                     ); ?>" data-toggle="ajax"<?php echo (0 == $userCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
-                        <?php echo $view['translator']->transChoice(
+                        <?php echo $view['translator']->trans(
                             'mautic.user.role.list.viewusers_count',
-                            $userCounts[$item->getId()],
                             ['%count%' => $userCounts[$item->getId()]]
                         ); ?>
                     </a>

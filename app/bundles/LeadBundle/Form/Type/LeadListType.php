@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
@@ -33,21 +24,21 @@ class LeadListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-                'choices'           => function (Options $options) {
-                    $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
-                    $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
+            'choices' => function (Options $options) {
+                $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
+                $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 
-                    $choices = [];
-                    foreach ($lists as $l) {
-                        if (empty($options['preference_center_only'])) {
-                            $choices[$l['name']] = $l['id'];
-                        } else {
-                            $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
-                        }
+                $choices = [];
+                foreach ($lists as $l) {
+                    if (empty($options['preference_center_only'])) {
+                        $choices[$l['name']] = $l['id'];
+                    } else {
+                        $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
                     }
+                }
 
-                    return $choices;
-                },
+                return $choices;
+            },
             'global_only'            => false,
             'preference_center_only' => false,
             'required'               => false,

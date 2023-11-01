@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\Controller;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -110,6 +101,12 @@ class CommonApiControllerTest extends CampaignTestAbstract
     public function testGetBatchEntities(): void
     {
         $controller = new class() extends CommonApiController {
+            /**
+             * @param mixed[] $parameters
+             * @param mixed[] $errors
+             *
+             * @return mixed[]
+             */
             public function testGetBatchEntities(array $parameters, array $errors, AbstractCommonModel $model): ?array
             {
                 return $this->getBatchEntities($parameters, $errors, false, 'id', $model);

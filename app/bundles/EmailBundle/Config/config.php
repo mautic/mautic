@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -324,6 +315,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.theme',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
@@ -847,6 +839,9 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'event_dispatcher',
+                    'mautic.lead.validator.custom_field',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
@@ -895,6 +890,14 @@ return [
                 'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.email.validator.email_or_token_list_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                    'mautic.lead.validator.custom_field',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],

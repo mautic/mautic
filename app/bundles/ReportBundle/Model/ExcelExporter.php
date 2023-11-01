@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
@@ -37,7 +28,7 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(array $reportData, $name)
+    public function export(array $reportData, $name, string $output = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
@@ -50,26 +41,16 @@ class ExcelExporter
         try {
             $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
-
             $objPHPExcel->createSheet();
-
-            $header = [];
-
             $reportDataResult = new ReportDataResult($reportData);
+
             //build the data rows
             foreach ($reportDataResult->getData() as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
-                    if (0 === $count) {
-                        //set the header
-                        foreach ($reportData['columns'] as $c) {
-                            if ($c['alias'] == $k) {
-                                $header[] = $c['label'];
-                                break;
-                            }
-                        }
-                    }
-                    $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
+                    $type      = $reportDataResult->getType($k);
+                    $formatted = htmlspecialchars_decode($this->formatterHelper->_($v, $type, true), ENT_QUOTES);
+                    $row[]     = $formatted;
                 }
 
                 if (0 === $count) {
@@ -86,7 +67,7 @@ class ExcelExporter
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
 
-            $objWriter->save('php://output');
+            $objWriter->save($output);
         } catch (Exception $e) {
             throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }

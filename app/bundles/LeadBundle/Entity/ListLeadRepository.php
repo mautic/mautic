@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -53,5 +44,26 @@ class ListLeadRepository extends CommonRepository
         } else {
             $q->execute();
         }
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    public function getContactsCountBySegment(int $segmentId, array $filters = []): int
+    {
+        $qb = $this->createQueryBuilder('ll');
+        $qb->select('count(ll.list) as count')
+            ->where('ll.list = :segmentId')
+            ->setParameter('segmentId', $segmentId);
+
+        if (!empty($filters)) {
+            foreach ($filters as $colName => $val) {
+                $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
+                $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
+                $qb->setParameter($entityFieldName, $val);
+            }
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

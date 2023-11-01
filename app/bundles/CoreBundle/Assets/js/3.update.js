@@ -31,8 +31,43 @@ Mautic.processUpdate = function (container, step, state) {
             });
             break;
 
-        // Download the update package
+        // Run pre-update checks
         case 2:
+            mQuery.ajax({
+                showLoadingBar: true,
+                url: mauticAjaxUrl + '?action=core:updateRunChecks',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.redirect) {
+                        window.location = response.redirect;
+                    } else {
+                        mQuery('td[id=update-step-running-checks-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
+
+                        if (response.success) {
+                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-downloading-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
+                            Mautic.processUpdate(container, step + 1, state);
+                        } else {
+                            console.log(response.errors);
+                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
+                            mQuery('div#main-update-panel div.panel-body').prepend(`<div class="alert alert-danger">
+                                <p>${response.message}</p>
+                                <ul>
+                                    ${response.errors.map(error => `<li>${error}</li>`).join("")}
+                                </ul>
+                                </div>`);
+                        }
+                    }
+                },
+                error: function (request, textStatus, errorThrown) {
+                    Mautic.processAjaxError(request, textStatus, errorThrown);
+                }
+            });
+            break;
+
+        // Download the update package
+        case 3:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: mauticAjaxUrl + '?action=core:updateDownloadPackage',
@@ -61,7 +96,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Extract the update package
-        case 3:
+        case 4:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: mauticAjaxUrl + '?action=core:updateExtractPackage',
@@ -90,7 +125,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Move the updated bundles into production
-        case 4:
+        case 5:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: baseUrl + 'upgrade/upgrade.php?task=moveBundles&updateState=' + state,
@@ -126,7 +161,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Move the rest of core into production
-        case 5:
+        case 6:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: baseUrl + 'upgrade/upgrade.php?task=moveCore&updateState=' + state,
@@ -162,7 +197,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Move the vendors into production
-        case 6:
+        case 7:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: baseUrl + 'upgrade/upgrade.php?task=moveVendors&updateState=' + state,
@@ -198,7 +233,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Clear the application cache
-        case 7:
+        case 8:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: baseUrl + 'upgrade/upgrade.php?task=clearCache&updateState=' + state,
@@ -239,7 +274,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Migrate the database
-        case 8:
+        case 9:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: mauticAjaxUrl + '?action=core:updateDatabaseMigration&finalize=1',
@@ -273,7 +308,7 @@ Mautic.processUpdate = function (container, step, state) {
             break;
 
         // Finalize update
-        case 9:
+        case 10:
             mQuery.ajax({
                 showLoadingBar: true,
                 url: mauticAjaxUrl + '?action=core:updateFinalization',

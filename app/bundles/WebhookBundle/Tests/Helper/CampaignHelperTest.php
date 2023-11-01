@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -106,9 +97,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::BODY    => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
-                \GuzzleHttp\RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic'],
-                \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
+                \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
             ])
             ->willReturn(new Response(200));
 
@@ -124,9 +115,15 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::BODY    => json_encode(['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']),
-                \GuzzleHttp\RequestOptions::HEADERS => ['test' => 'tee', 'company' => 'Mautic', 'content-type' => 'application/json'],
+                \GuzzleHttp\RequestOptions::HEADERS => [
+                    'test'         => 'tee',
+                    'company'      => 'Mautic',
+                    'content-type' => 'application/json',
+                ],
                 \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                \GuzzleHttp\RequestOptions::BODY    => json_encode(
+                    ['test' => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']
+                ),
             ])
             ->willReturn(new Response(200));
 

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$type  = (!empty($isLookup)) ? 'lookup' : 'select';
+$type  = $type ?? 'select';
 $value = (isset($value)) ? $value : '';
 if (!isset($form) || !$form->vars['value']) {
     $html = str_replace(['properties_'.$type.'_template', 'leadfield_properties'], ['properties', 'leadfield_properties_template'], $selectTemplate);

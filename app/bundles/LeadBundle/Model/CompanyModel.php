@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -23,6 +14,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
@@ -397,7 +389,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $contactAdded     = true;
                 $persistCompany[] = $companyLead;
                 $dispatchEvents[] = $companyId;
-                $companyName      = $companyLeadAdd[$companyId]->getName();
+
+                if (!$companyName) {
+                    // CompanyLeadRepository::saveEntities will set the first company of the batch as primary so
+                    // use the first company name to ensure they match
+                    $companyName = $companyLeadAdd[$companyId]->getName();
+                }
             }
         }
 
@@ -406,11 +403,16 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($companyName)) {
+            // Set the contact's primary company to the first company added in the batch
+            // This must happen before LeadEvents::LEAD_COMPANY_CHANGE to ensure the Lead::getCompany has the correct value
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
                 $lead->addUpdatedField('company', $companyName)
                     ->setDateModified(new \DateTime());
-                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+
+                /** @var LeadRepository */
+                $leadRepository = $this->em->getRepository(Lead::class);
+                $leadRepository->saveEntity($lead);
             }
         }
 
@@ -488,11 +490,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $deleteCompany  = [];
         $dispatchEvents = [];
 
+        $primaryRemoved = false;
         foreach ($companies as $companyId) {
             if (!isset($companyLeadRemove[$companyId])) {
                 continue;
             }
 
+            /** @var CompanyLead $companyLead */
             $companyLead = $this->getCompanyLeadRepository()->findOneBy(
                 [
                     'lead'    => $lead,
@@ -505,9 +509,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 continue;
             }
 
-            //lead was manually added and now manually removed or was not manually added and now being removed
+            // Lead was manually added and now manually removed or was not manually added and now being removed
             $deleteCompanyLead[] = $companyLead;
             $dispatchEvents[]    = $companyId;
+
+            // Update the Lead's primary company name if removed from the primary company
+            if (!$primaryRemoved) {
+                $primaryRemoved = $companyLead->getPrimary();
+            }
 
             unset($companyLead);
         }
@@ -516,12 +525,18 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->deleteEntities($deleteCompanyLead);
         }
 
+        if ($primaryRemoved) {
+            // Set the contact's primary company to a remaining company or empty it out if none are left
+            // This must happen before LeadEvents::LEAD_COMPANY_CHANGE to ensure the Lead::getCompany has the correct value
+            $this->updateContactAfterPrimaryCompanyWasRemoved($lead);
+        }
+
         // Clear CompanyLead entities from Doctrine memory
         $this->em->clear(CompanyLead::class);
 
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
-            foreach ($dispatchEvents as $listId) {
-                $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$listId], false);
+            foreach ($dispatchEvents as $companyId) {
+                $event = new LeadChangeCompanyEvent($lead, $companyLeadRemove[$companyId], false);
                 $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
 
                 unset($event);
@@ -534,10 +549,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
-     * @param $start
+     * @param string         $type
+     * @param mixed[]|string $filter
+     * @param int            $limit
+     * @param int            $start
      *
      * @return array
      */
@@ -755,10 +770,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param null  $owner
-     * @param bool  $skipIfExists
+     * @param mixed[] $fields
+     * @param mixed[] $data
+     * @param null    $owner
+     * @param bool    $skipIfExists
      *
      * @return bool|null
      *
@@ -784,7 +799,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $data
      * @param null  $owner
      *
-     * @return bool|null
+     * @return Company|null
      *
      * @throws \Exception
      */
@@ -905,5 +920,34 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         return $fieldData;
+    }
+
+    private function updateContactAfterPrimaryCompanyWasRemoved(Lead $lead): void
+    {
+        $primaryCompanyName = '';
+
+        // Find another company to make primary if applicable
+        $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
+        if (count($leadCompanies)) {
+            $newPrimaryArray   = reset($leadCompanies);
+            $newPrimaryCompany = $this->em->getReference(Company::class, $newPrimaryArray['company_id']);
+
+            /** @var CompanyLead $companyLead */
+            $companyLead = $this->getCompanyLeadRepository()->findOneBy(
+                [
+                    'lead'    => $lead,
+                    'company' => $newPrimaryCompany,
+                ]
+            );
+
+            $companyLead->setPrimary(true);
+            $this->getCompanyLeadRepository()->saveEntity($companyLead);
+
+            $primaryCompanyName = $newPrimaryArray['companyname'];
+        }
+
+        $lead->addUpdatedField('company', $primaryCompanyName)
+            ->setDateModified(new \DateTime());
+        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
     }
 }

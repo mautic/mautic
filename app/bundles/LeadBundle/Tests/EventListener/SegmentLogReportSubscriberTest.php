@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -33,7 +24,6 @@ class SegmentLogReportSubscriberTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
 
@@ -42,7 +32,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilder()
+    public function testOnReportBuilder(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -79,7 +69,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $this->assertCount(1, $setTables);
     }
 
-    public function testOnReportGenerate()
+    public function testOnReportGenerate(): void
     {
         // Mock query builder
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)

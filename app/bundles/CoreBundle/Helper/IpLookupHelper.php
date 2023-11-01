@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
@@ -170,10 +161,6 @@ class IpLookupHelper
             }
 
             $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
-            if ('prod' === MAUTIC_ENV) {
-                // Do not track internal IPs
-                $doNotTrack = array_merge($doNotTrack, ['127.0.0.1', '::1']);
-            }
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 

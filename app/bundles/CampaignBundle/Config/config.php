@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -125,10 +116,7 @@ return [
             'mautic.campaign.leadbundle.subscriber'     => [
                 'class'     => \Mautic\CampaignBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
-                    'mautic.campaign.membership.manager',
                     'mautic.campaign.event_collector',
-                    'mautic.campaign.model.campaign',
-                    'mautic.lead.model.lead',
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
@@ -196,7 +184,10 @@ return [
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.security',
+                'arguments' => [
+                    'mautic.security',
+                    'translator',
+                ],
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
@@ -262,12 +253,18 @@ return [
                 ],
             ],
             'mautic.campaign.model.event_log' => [
-                'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
+                'class'     => \Mautic\CampaignBundle\Model\EventLogModel::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
                     'mautic.helper.ip_lookup',
                     'mautic.campaign.scheduler',
+                ],
+            ],
+            'mautic.campaign.model.summary' => [
+                'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead_event_log',
                 ],
             ],
         ],
@@ -298,6 +295,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\CampaignBundle\Entity\LeadEventLog::class,
+                ],
+            ],
+            'mautic.campaign.repository.summary' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\CampaignBundle\Entity\Summary::class,
                 ],
             ],
         ],
@@ -355,6 +359,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.lead',
+                    'mautic.campaign.model.summary',
                 ],
             ],
             'mautic.campaign.event_collector' => [
@@ -455,7 +460,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
-                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
@@ -469,6 +474,12 @@ return [
                     'mautic.campaign.event_executioner',
                 ],
             ],
+            'mautic.campaign.helper.decision' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                ],
+            ],
             'mautic.campaign.helper.inactivity' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class,
                 'arguments' => [
@@ -477,6 +488,7 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.event',
                     'monolog.logger.mautic',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.helper.removed_contact_tracker' => [
@@ -489,6 +501,7 @@ return [
                     'mautic.core.model.notification',
                     'translator',
                     'router',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // @deprecated 2.13.0 for BC support; to be removed in 3.0
@@ -559,6 +572,8 @@ return [
                     'mautic.campaign.executioner.inactive',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.lead.model.list',
+                    'mautic.helper.segment.count.cache',
                 ],
                 'tag' => 'console.command',
             ],
@@ -591,6 +606,14 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.campaign.command.summarize' => [
+                'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.campaign.model.summary',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
@@ -611,5 +634,7 @@ return [
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',
+        'campaign_use_summary'              => 0,
+        'campaign_by_range'                 => 0,
     ],
 ];

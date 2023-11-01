@@ -2,32 +2,65 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&DynamicContentModel
+     */
+    private $mockModel;
+
+    /**
+     * @var MockObject&RealTimeExecutioner
+     */
+    private $realTimeExecutioner;
+
+    /**
+     * @var MockObject&EventDispatcher
+     */
+    private $mockDispatcher;
+
+    /**
+     * @var MockObject&LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var DynamicContentHelper
+     */
+    private $helper;
+
+    protected function setUp(): void
+    {
+        $this->mockModel           = $this->createMock(DynamicContentModel::class);
+        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
+        $this->leadModel           = $this->createMock(LeadModel::class);
+        $this->helper              = new DynamicContentHelper(
+            $this->mockModel,
+            $this->realTimeExecutioner,
+            $this->mockDispatcher,
+            $this->leadModel
+        );
+    }
+
     public function testGetDwcBySlotNameWithPublished(): void
     {
-        $mockModel = $this->getMockBuilder(DynamicContentModel::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getEntities'])
-            ->getMock();
-
-        $mockModel->expects($this->exactly(2))
+        $this->mockModel->expects($this->exactly(2))
             ->method('getEntities')
             ->withConsecutive(
                 [
@@ -66,15 +99,194 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
-        $mockDispatcher      = $this->createMock(EventDispatcher::class);
-
-        $fixture = new DynamicContentHelper($mockModel, $realTimeExecutioner, $mockDispatcher);
-
         // Only get published
-        $this->assertTrue($fixture->getDwcsBySlotName('test', true));
+        $this->assertTrue($this->helper->getDwcsBySlotName('test', true));
 
         // Get all
-        $this->assertFalse($fixture->getDwcsBySlotName('secondtest'));
+        $this->assertFalse($this->helper->getDwcsBySlotName('secondtest'));
+    }
+
+    public function testGetDynamicContentSlotForLeadWithListenerFindingMatch(): void
+    {
+        $slotName = 'test';
+        $contact  = new Lead();
+        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+
+        $slot = new DynamicContent();
+        $slot->setName($slotName);
+        $slot->setIsCampaignBased(false);
+        // Setting filter that is not known to Mautic, but is for a plugin.
+        $slot->setFilters([['field' => 'unicorn', 'type' => 'text', 'operator' => '=', 'filter' => 'magic']]);
+        $slot->setContent('<p>test</p>');
+
+        $this->mockModel->method('getEntities')
+            ->willReturn([$slot]);
+
+        $this->mockModel->method('getTranslatedEntity')
+            ->willReturn([$slot, $slot]);
+
+        $this->leadModel->method('getEntity')
+            ->with(123)
+            ->willReturn($contact);
+
+        $this->mockDispatcher->method('hasListeners')->willReturn(true);
+        $this->mockDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
+                    $this->callback(
+                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
+                            $this->assertSame($contact, $event->getContact());
+                            $this->assertSame($slot->getFilters(), $event->getFilters());
+
+                            $event->setIsEvaluated(true);
+                            $event->setIsMatched(true); // Match found in a subscriber.
+
+                            return true;
+                        }
+                    ),
+                    ],
+                [
+                    DynamicContentEvents::TOKEN_REPLACEMENT,
+                    $this->callback(
+                        function (TokenReplacementEvent $event) use ($contact, $slot) {
+                            $this->assertSame($contact, $event->getLead());
+                            $this->assertSame($slot->getContent(), $event->getContent());
+
+                            return true;
+                        }
+                    ),
+                ]
+            );
+
+        Assert::assertSame(
+            '<p>test</p>',
+            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
+        );
+    }
+
+    public function testGetDynamicContentSlotForLeadWithListenerNotFindingMatch(): void
+    {
+        $slotName = 'test';
+        $contact  = new Lead();
+        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+
+        $slot = new DynamicContent();
+        $slot->setName($slotName);
+        $slot->setIsCampaignBased(false);
+        // Setting filter that is not known to Mautic, nor any plugin.
+        $slot->setFilters([['field' => 'unicorn', 'type' => 'text', 'operator' => '=', 'filter' => 'magic']]);
+        $slot->setContent('<p>test</p>');
+
+        $this->mockModel->method('getEntities')
+            ->willReturn([$slot]);
+
+        $this->mockModel->method('getTranslatedEntity')
+            ->willReturn([$slot, $slot]);
+
+        $this->leadModel->method('getEntity')
+            ->with(123)
+            ->willReturn($contact);
+
+        $this->mockDispatcher->method('hasListeners')->willReturn(true);
+        $this->mockDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE,
+                    $this->callback(
+                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
+                            $this->assertSame($contact, $event->getContact());
+                            $this->assertSame($slot->getFilters(), $event->getFilters());
+
+                            // Match not found in any subscriber.
+
+                            return true;
+                        }
+                    ),
+                ]
+            );
+
+        Assert::assertSame(
+            '', // No content returned as the filter did not match anything.
+            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
+        );
+    }
+
+    public function testGetDynamicContentSlotForLeadWithNoListenerWithMatchingFilter(): void
+    {
+        $slotName = 'test';
+        $contact  = new Lead();
+        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+
+        $slot = new DynamicContent();
+        $slot->setName($slotName);
+        $slot->setIsCampaignBased(false);
+        $slot->setFilters([['field' => 'email', 'type' => 'email', 'operator' => '=', 'filter' => 'ma@ka.t']]);
+        $slot->setContent('<p>test</p>');
+
+        $this->mockModel->method('getEntities')
+            ->willReturn([$slot]);
+
+        $this->mockModel->method('getTranslatedEntity')
+            ->willReturn([$slot, $slot]);
+
+        $this->leadModel->method('getEntity')
+            ->with(123)
+            ->willReturn($contact);
+
+        $this->mockDispatcher->method('hasListeners')->willReturn(false);
+        $this->mockDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    DynamicContentEvents::TOKEN_REPLACEMENT,
+                    $this->callback(
+                        function (TokenReplacementEvent $event) use ($contact, $slot) {
+                            $this->assertSame($contact, $event->getLead());
+                            $this->assertSame($slot->getContent(), $event->getContent());
+
+                            return true;
+                        }
+                    ),
+                ]
+            );
+
+        Assert::assertSame(
+            '<p>test</p>',
+            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
+        );
+    }
+
+    public function testGetDynamicContentSlotForLeadWithNoListenerWithNotMatchingFilter(): void
+    {
+        $slotName = 'test';
+        $contact  = new Lead();
+        $contact->setFields(['email' => 'ma@ka.t', 'id' => 123]);
+
+        $slot = new DynamicContent();
+        $slot->setName($slotName);
+        $slot->setIsCampaignBased(false);
+        $slot->setFilters([['field' => 'email', 'type' => 'email', 'operator' => '=', 'filter' => 'uni@co.rn']]);
+        $slot->setContent('<p>test</p>');
+
+        $this->mockModel->method('getEntities')
+            ->willReturn([$slot]);
+
+        $this->mockModel->method('getTranslatedEntity')
+            ->willReturn([$slot, $slot]);
+
+        $this->leadModel->method('getEntity')
+            ->with(123)
+            ->willReturn($contact);
+
+        $this->mockDispatcher->method('hasListeners')->willReturn(false);
+        $this->mockDispatcher->expects($this->never())->method('dispatch');
+
+        Assert::assertSame(
+            '',
+            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
+        );
     }
 }

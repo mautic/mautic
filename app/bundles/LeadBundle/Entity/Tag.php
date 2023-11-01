@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -30,6 +21,11 @@ class Tag
     private $tag;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @param string $tag
      * @param bool   $clean
      */
@@ -47,6 +43,7 @@ class Tag
 
         $builder->addId();
         $builder->addField('tag', Type::STRING);
+        $builder->addNamedField('description', Type::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
@@ -56,6 +53,7 @@ class Tag
                 [
                     'id',
                     'tag',
+                    'description',
                 ]
             )
             ->build();
@@ -90,12 +88,32 @@ class Tag
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return Tag
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
      * @param string $tag
      *
      * @return Tag
      */
     protected function validateTag($tag)
     {
-        return InputHelper::clean($tag);
+        return InputHelper::string(trim($tag));
     }
 }

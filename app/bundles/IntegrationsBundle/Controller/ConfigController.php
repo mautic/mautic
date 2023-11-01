@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -151,11 +142,10 @@ class ConfigController extends AbstractFormController
         $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
         $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
 
-        // Show the form if there are errors
-        if (!$this->form->isValid() && (!$this->integrationObject instanceof ConfigFormAuthorizeButtonInterface || $this->integrationObject->isAuthorized())) {
-            // Invalid form data
-            // Integration IS NOT instance of ConfigFormAuthorizeButtonInterface
-            // Integration IS instance of ConfigFormAuthorizeButtonInterface and IS authorized
+        // Show the form if there are errors and the plugin is published or the authorized button was clicked
+        $integrationDetailsPost = $this->request->request->get('integration_details', []);
+        $authorize              = !empty($integrationDetailsPost['in_auth']);
+        if (!$this->form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
             return $this->showForm();
         }
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -113,16 +104,10 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('jo^hn@gmail.com');
     }
 
-    public function testValidateEmailWithApostropheInTheMailboxPortion()
-    {
-        $this->expectException(InvalidEmailException::class);
-        $this->emailValidator->validate('jo\'hn@gmail.com');
-    }
-
     public function testValidateEmailWithApostropheInTheDomainPortion()
     {
         $this->expectException(InvalidEmailException::class);
-        $this->emailValidator->validate('jo\'hn@gmail.com');
+        $this->emailValidator->validate('john@gm\'ail.com');
     }
 
     public function testValidateEmailWithSemicolonInIt()

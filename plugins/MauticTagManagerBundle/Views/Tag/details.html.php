@@ -26,7 +26,6 @@ $view['slots']->set(
                 'edit'   => $view['security']->isGranted('tagManager:tagManager:edit'),
                 'delete' => $view['security']->isGranted('tagManager:tagManager:delete'),
                 'close'  => $view['security']->isGranted('tagManager:tagManager:edit'),
-                'clone'  => $view['security']->isGranted('tagManager:tagManager:create'),
             ],
             'routeBase' => 'tagmanager',
         ]
@@ -44,9 +43,11 @@ $view['slots']->set(
             <!-- sms detail collapseable toggler -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
+                    
                     <div class="col-xs-10">
-                        <div class="text-white dark-sm mb-0"><?php echo $tag->getTag(); ?></div>
+                        <div class="text-white dark-sm mb-0"><?php echo $tag->getDescription(); ?></div>
                     </div>
+
                 </div>
             </div>
             <div class="collapse" id="sms-details">
@@ -54,10 +55,10 @@ $view['slots']->set(
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:details.html.php',
-                                ['entity' => $tag]
-                            ); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.id'); ?></span></td>
+                                <td><?php echo $tag->getId(); ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
@@ -95,7 +86,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -257,7 +247,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );
@@ -350,7 +339,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -511,7 +499,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );
