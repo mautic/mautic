@@ -142,7 +142,6 @@ class EmailApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            /** @var Lead $lead */
             $lead = $this->checkLeadAccess($leadId, 'edit');
             if ($lead instanceof Response) {
                 return $lead;
@@ -197,7 +196,12 @@ class EmailApiController extends CommonApiController
         return $this->notFound();
     }
 
-    public function sendCustomEmailAction($contactId)
+    /**
+     * @param int $contactId
+     *
+     * @return array<string>|Lead|Response
+     */
+    public function sendCustomEmailAction($contactId, MailHelper $mailHelper, Request $request): array|Lead|Response
     {
         /** @var Lead $lead */
         $lead = $this->checkLeadAccess($contactId, 'edit');
@@ -211,15 +215,12 @@ class EmailApiController extends CommonApiController
 
         $response = ['success' => false];
 
-        /** @var MailHelper $mailer */
-        $mailer = $this->get('mautic.helper.mailer')->getMailer();
-
-        $mailer->setTo(
+        $mailHelper->setTo(
             $lead->getEmail(),
             sprintf('%s %s', $lead->getFirstname(), $lead->getLastname())
         );
 
-        $params = $this->request->request->all();
+        $params = $request->request->all();
 
         $fromEmail = $params['fromEmail'] ?? null;
 
@@ -227,13 +228,13 @@ class EmailApiController extends CommonApiController
             return $this->badRequest('mautic.email.error.from.email.required');
         }
 
-        $mailer->setFrom(
+        $mailHelper->setFrom(
             $fromEmail,
             $params['fromName'] ?? null
         );
 
         if ($replyToEmail = $params['replyToEmail'] ?? null) {
-            $mailer->setReplyTo(
+            $mailHelper->setReplyTo(
                 $replyToEmail,
                 $params['replyToName'] ?? null
             );
@@ -246,7 +247,7 @@ class EmailApiController extends CommonApiController
         }
 
         $subject = EmojiHelper::toHtml($subject);
-        $mailer->setSubject($subject);
+        $mailHelper->setSubject($subject);
 
         $content = $params['content'] ?? null;
 
@@ -255,16 +256,15 @@ class EmailApiController extends CommonApiController
         }
 
         // Set Content
-        $mailer->setBody($content);
-        $mailer->parsePlainText($content);
-        $mailer->setLead($lead->getProfileFields());
-        $mailer->setIdHash();
-        $mailer->setSource(['api', 0]);
+        $mailHelper->setBody($content);
+        $mailHelper->parsePlainText($content);
+        $mailHelper->setLead($lead->getProfileFields());
+        $mailHelper->setIdHash();
+        $mailHelper->setSource(['api', 0]);
 
-        if ($mailer->send(true, false, false)) {
-            /** @var Stat $stat */
-            $stat                     = $mailer->createEmailStat();
-            $response['trackingHash'] = ($stat && $stat->getTrackingHash()) ? $stat->getTrackingHash() : 0;
+        if ($mailHelper->send(true, false)) {
+            $stat                     = $mailHelper->createEmailStat();
+            $response['trackingHash'] = $stat->getTrackingHash();
             $response['success']      = true;
         }
 
