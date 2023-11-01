@@ -37,6 +37,11 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendLeadAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_sendcustomcontactemail' => [
+                'path'       => '/emails/contact/{contactId}/send/custom',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendCustomEmail',
+                'method'     => 'POST',
+            ],
             'mautic_api_reply' => [
                 'path'       => '/emails/reply/{trackingHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
