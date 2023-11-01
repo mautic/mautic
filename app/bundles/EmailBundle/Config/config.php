@@ -39,7 +39,7 @@ return [
             ],
             'mautic_api_sendcustomcontactemail' => [
                 'path'       => '/emails/contact/{contactId}/send/custom',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendCustomEmail',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendCustomEmailAction',
                 'method'     => 'POST',
             ],
             'mautic_api_reply' => [
