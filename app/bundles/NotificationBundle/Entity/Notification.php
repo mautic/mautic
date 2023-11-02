@@ -221,6 +221,24 @@ class Notification extends FormEntity
             )
         );
 
+        $metadata->addPropertyConstraint(
+            'heading',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.title.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'message',
+            new NotBlank(
+                [
+                    'message' => 'mautic.lead.email.body.required',
+                ]
+            )
+        );
+
         $metadata->addConstraint(new Callback([
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
