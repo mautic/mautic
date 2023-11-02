@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
+final class PasswordStrengthEstimatorModelTest extends MauticMysqlTestCase
 {
     private EncoderFactory $passwordEncoder;
 

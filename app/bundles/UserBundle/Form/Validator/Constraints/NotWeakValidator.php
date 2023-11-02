@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class NotWeakValidator extends ConstraintValidator
+final class NotWeakValidator extends ConstraintValidator
 {
     public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {

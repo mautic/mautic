@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PasswordSubscriberTest extends TestCase
+final class PasswordSubscriberTest extends TestCase
 {
     private PasswordSubscriber $passwordSubscriber;
 

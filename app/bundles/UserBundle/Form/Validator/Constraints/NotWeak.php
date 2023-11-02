@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Form\Validator\Constraints;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Symfony\Component\Validator\Constraint;
 
-class NotWeak extends Constraint
+final class NotWeak extends Constraint
 {
     public const TOO_WEAK = 'f61e730a-284e-11eb-adc1-0242ac120002';
 

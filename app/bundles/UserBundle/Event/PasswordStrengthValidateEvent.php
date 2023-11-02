@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PasswordStrengthValidateEvent extends Event
+final class PasswordStrengthValidateEvent extends Event
 {
     public function __construct(
         public bool $isValid,
