@@ -98,7 +98,10 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
+                    ],
                 ]
             )
         );

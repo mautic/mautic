@@ -791,6 +791,13 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
     }
 };
 
+Mautic.copySubjectToName = function(elemSubject) {
+    let elemName = mQuery("#emailform_name");
+    if (elemName.val() === "") {
+        elemName.val(elemSubject.val());
+    }
+};
+
 Mautic.loadEmailDeliveredStat = function($el) {
     var emailId = $el.data('email-stat-delivered-for');
     Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
