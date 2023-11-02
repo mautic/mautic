@@ -23,6 +23,7 @@ use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
@@ -118,6 +119,7 @@ class PublicController extends CommonFormController
     public function unsubscribeAction(
         Request $request,
         ContactTracker $contactTracker,
+        PageModel $pageModel,
         $idHash
     ) {
         // Find the email
@@ -263,6 +265,7 @@ class PublicController extends CommonFormController
                             $lead->getPrimaryIdentifier(),
                             $html
                         );
+                        $pageModel->hitPage($prefCenter, $request, 200, $lead);
                     } else {
                         unset($html);
                     }
