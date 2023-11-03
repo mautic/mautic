@@ -18,6 +18,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     private $leads = [];
 
+    protected $useCleanupRollback = false;
+
     /**
      * Test creates: contacts, segment
      * Test rebuilds segment
@@ -25,14 +27,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     public function testSegments(): void
     {
-        $field = new LeadField();
-        $field->setType('datetime');
-        $field->setObject('company');
-        $field->setAlias('companydatetime');
-        $field->setName('Company datetime');
-        $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
-        $fieldModel->saveEntity($field);
+        $this->createCustomCompanyDateField();
 
         foreach ($this->getSegmentsProvider() as $scenario) {
             $this->runTestSegments($scenario['contacts'], $scenario['segment']);
@@ -191,5 +186,16 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
                 ['field' => 'companydatetime', 'object' => 'company',  'operator' => 'empty', 'value' => null, 'glue' => 'and', 'type' => 'datetime'],
             ],
         ];
+    }
+
+    protected function createCustomCompanyDateField(): void
+    {
+        $field = new LeadField();
+        $field->setType('datetime');
+        $field->setObject('company');
+        $field->setAlias('companydatetime');
+        $field->setName('Company datetime');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
     }
 }
