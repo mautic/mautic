@@ -23,7 +23,7 @@ class ExceptionController extends CommonController
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
-        if (0 === $code) {
+        if (0 === $code || 1 === $code) {   // 1 is thrown by e.g. assertions
             // thrown exception that didn't set a code
             $code = 500;
         }
