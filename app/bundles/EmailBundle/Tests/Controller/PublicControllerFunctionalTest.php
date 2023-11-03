@@ -143,7 +143,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $page->setAlias('Preference-center');
         $page->setIsPublished(true);
         $page->setIsPreferenceCenter(true);
-        $page->setContent('<html><body>{saveprefsbutton}</body></html>');
+        $page->setCustomHtml('<html><body>{saveprefsbutton}</body></html>');
         $this->em->persist($page);
 
         return $page;
