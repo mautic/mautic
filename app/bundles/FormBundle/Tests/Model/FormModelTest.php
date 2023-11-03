@@ -382,7 +382,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $this->formModel->getEntity(5);
 
-        $this->assertSame(['lunch?', 'dinner?'], $formField->getProperties()['list']['list']);
+        $this->assertSame([['label' => 'lunch?', 'value' => 0], ['label' => 'dinner?', 'value' => 1]], $formField->getProperties()['list']['list']);
     }
 
     public function testGetEntityForSyncedCountryField(): void
