@@ -59,19 +59,31 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
+                $parts      = [
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
+                ];
+                if ($filter->doesColumnSupportEmptyValue()) {
+                    $parts[] = $queryBuilder->expr()->eq(
+                        $tableAlias.'.'.$filter->getField(),
+                        $queryBuilder->expr()->literal('')
+                    );
+                }
                 $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
-                    [
-                        $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                        $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
-                    ]
+                    $parts
                 );
                 break;
             case 'notEmpty':
+                $parts     = [
+                    $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
+                ];
+                if ($filter->doesColumnSupportEmptyValue()) {
+                    $parts[] = $queryBuilder->expr()->neq(
+                        $tableAlias.'.'.$filter->getField(),
+                        $queryBuilder->expr()->literal('')
+                    );
+                }
                 $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
-                    [
-                        $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
-                        $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
-                    ]
+                    $parts
                 );
 
                 break;
