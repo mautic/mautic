@@ -12,7 +12,6 @@ use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
-use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -66,16 +65,18 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactPreferencesLandingPageTracking(): void
     {
-        $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead, $this->getPreferencesCenterLandingPage());
+        $lead                 = $this->createLead();
+        $preferenceCenterPage = $this->getPreferencesCenterLandingPage();
+        $stat                 = $this->getStat(null, $lead, $preferenceCenterPage);
 
         $this->em->flush();
 
         $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        /** @var PageRepository $pageRepository */
-        $pageRepository = $this->em->getRepository(Page::class);
-        $this->assertSame(1, $pageRepository->getEntity($stat->getEmail()->getPreferenceCenter()->getId())->getHits(), $this->client->getResponse()->getContent());
+        $this->em->clear(Page::class);
+
+        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
     }
 
     public function testContactPreferencesSaveMessage(): void
