@@ -41,7 +41,7 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->execute()->fetchOne();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -101,7 +101,6 @@ class AuditLogRepository extends CommonRepository
 
     /**
      * @param array $filters
-     * @param $listOfContacts
      *
      * @return array
      */

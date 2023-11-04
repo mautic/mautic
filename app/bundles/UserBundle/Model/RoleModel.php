@@ -21,7 +21,6 @@ class RoleModel extends FormModel
     public function getRepository(): RoleRepository
     {
         $result = $this->em->getRepository(Role::class);
-        \assert($result instanceof RoleRepository);
 
         return $result;
     }
@@ -48,8 +47,8 @@ class RoleModel extends FormModel
         $isNew = ($entity->getId()) ? 0 : 1;
 
         if (!$isNew) {
-            //delete all existing
-            $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
+            // delete all existing
+            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -66,7 +65,7 @@ class RoleModel extends FormModel
             return;
         }
 
-        //set permissions if applicable and if the user is not an admin
+        // set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
             $this->security->generatePermissions($rawPermissions) :
             [];
@@ -89,7 +88,7 @@ class RoleModel extends FormModel
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
+        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }

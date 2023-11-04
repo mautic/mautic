@@ -21,22 +21,22 @@ class Focus extends FormEntity
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $editor;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $html;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $htmlMode;
 
@@ -53,7 +53,7 @@ class Focus extends FormEntity
     private $type;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $website;
 
@@ -80,12 +80,12 @@ class Focus extends FormEntity
     private $utmTags = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $form;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cache;
 
@@ -130,7 +130,8 @@ class Focus extends FormEntity
             ->setCustomRepositoryClass('MauticPlugin\MauticFocusBundle\Entity\FocusRepository')
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
-            ->addIndex(['form_id'], 'focus_form');
+            ->addIndex(['form_id'], 'focus_form')
+            ->addIndex(['name'], 'focus_name');
 
         $builder->addIdColumns();
 
@@ -167,8 +168,6 @@ class Focus extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {

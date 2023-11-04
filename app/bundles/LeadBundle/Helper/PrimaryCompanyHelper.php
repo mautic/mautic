@@ -21,7 +21,7 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
     {
@@ -32,8 +32,6 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param $contactId
-     *
      * @return array
      */
     public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields)

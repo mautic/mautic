@@ -24,7 +24,7 @@ class ExceptionController extends CommonController
         $code           = $exception->getStatusCode();
 
         if (0 === $code) {
-            //thrown exception that didn't set a code
+            // thrown exception that didn't set a code
             $code = 500;
         }
 

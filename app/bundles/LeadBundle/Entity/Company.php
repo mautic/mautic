@@ -23,12 +23,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $score = 0;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -131,8 +131,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -181,30 +179,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             'state',
             'country',
         ];
-    }
-
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
-    {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('owner' == $prop) {
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
-            }
-        } else {
-            parent::isChanged($prop, $val);
-        }
     }
 
     /**

@@ -296,11 +296,9 @@ class EventScheduler
 
     public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
-        if (null !== $event) {
-            if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
-                // Event has days in week specified. Needs to be recalculated to the next day configured
-                return true;
-            }
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            // Event has days in week specified. Needs to be recalculated to the next day configured
+            return true;
         }
 
         return $this->shouldSchedule($executionDate, $now);
@@ -383,7 +381,7 @@ class EventScheduler
             // Add it to the queue to persist to the DB
             $this->eventLogger->queueToPersist($log);
 
-            //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
+            // lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
                 .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')

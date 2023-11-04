@@ -1,3 +1,4 @@
+const ckEditors = new Map();
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -189,7 +190,7 @@ Mautic.generatePageTitle = function(route){
 
     if (-1 !== route.indexOf('timeline')) {
         return
-    } else if (-1 !== route.indexOf('view')) {
+    } else if (-1 !== route.indexOf('/view')) {
         //loading view of module title
         var currentModule = route.split('/')[3];
 
@@ -209,7 +210,7 @@ Mautic.generatePageTitle = function(route){
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
+        mQuery('title').html( mQuery('.page-header h3').text() + ' | Mautic' );
     }
 };
 
@@ -248,8 +249,7 @@ Mautic.processPageContent = function (response) {
 
         if (response.route) {
             //update URL in address bar
-            MauticVars.manualStateChange = false;
-            History.pushState(null, "Mautic", response.route);
+            history.pushState(null, "Mautic", response.route);
 
             //update Title
             Mautic.generatePageTitle( response.route );
@@ -583,25 +583,26 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
-    if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
+    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             mQuery(this).froalaEditor();
         });
     } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
-            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
+
+            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'TokenPlugin', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
+            let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
             }
 
             let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                 ckEditorToolbar = maxButtons;
             }
-            
+
             Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
         });
     }
@@ -718,7 +719,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
 Mautic.setDynamicContentEditors = function(container) {
     // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
-    if (mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
+    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
         console.log('[Builder] Using Froala for the Dynamic Content editor (legacy)');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             mQuery(this).froalaEditor();
@@ -727,11 +728,11 @@ Mautic.setDynamicContentEditors = function(container) {
         console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
-            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
+            const maxButtons = [ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']
+            let minButtons = ['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+                minButtons = ['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize'];
             }
 
             let ckEditorToolbar = minButtons;
@@ -812,12 +813,14 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (Mautic.getActiveBuilderName() === 'legacy') {
+        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
             mQuery('textarea').froalaEditor('destroy');
         } else {
-            for(name in CKEDITOR.instances)
-            {
-                CKEDITOR.instances[name].destroy(false);
+            if (ckEditors.size > 0) {
+                ckEditors.forEach(function(value, key, map){
+                    map.get(key).destroy()
+                })
+                ckEditors.clear();
             }
         }
 

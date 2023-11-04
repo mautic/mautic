@@ -8,7 +8,7 @@ use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PublicController extends FormController
 {
@@ -24,10 +24,10 @@ class PublicController extends FormController
         $action = $this->generateUrl('mautic_user_passwordreset');
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
@@ -55,7 +55,7 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordEncoderInterface $encoder): mixed
+    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): mixed
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->getModel('user');
@@ -69,10 +69,10 @@ class PublicController extends FormController
             $request->getSession()->set('resetToken', $token);
         }
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 /** @var User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
@@ -86,7 +86,7 @@ class PublicController extends FormController
                         $resetToken = $request->getSession()->get('resetToken');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
+                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 

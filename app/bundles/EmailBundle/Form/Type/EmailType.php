@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -92,7 +91,6 @@ class EmailType extends AbstractType
             ]
         );
 
-        $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
                 'subject',
@@ -102,7 +100,7 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
         $builder->add(
@@ -264,10 +262,10 @@ class EmailType extends AbstractType
                         'rows'                 => '15',
                     ],
                 ]
-            )->addModelTransformer($emojiTransformer)
+            )
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\FormBundle\Entity\Form::class, 'id');
         $builder->add(
             $builder->create(
                 'unsubscribeForm',
@@ -288,7 +286,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
         $builder->add(
             $builder->create(
                 'preferenceCenter',
@@ -309,7 +307,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticEmailBundle:Email');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -421,7 +419,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -456,7 +454,7 @@ class EmailType extends AbstractType
 
         $transformer = new IdToEntityModelTransformer(
             $this->em,
-            'MauticAssetBundle:Asset',
+            \Mautic\AssetBundle\Entity\Asset::class,
             'id',
             true
         );

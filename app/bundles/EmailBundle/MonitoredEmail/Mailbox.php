@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
 use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
-use stdClass;
 
 class Mailbox
 {
@@ -204,14 +203,12 @@ class Mailbox
 
         return
             !empty($this->settings['host']) && !empty($this->settings['port']) && !empty($this->settings['user'])
-            && !empty($this->settings['password'])
-        ;
+            && !empty($this->settings['password']);
     }
 
     /**
      * Switch to another configured monitored mailbox.
      *
-     * @param        $bundle
      * @param string $mailbox
      *
      * @throws MailboxException
@@ -259,8 +256,6 @@ class Mailbox
     }
 
     /**
-     * @param $settings
-     *
      * @return array
      */
     public function getImapPath($settings)
@@ -293,7 +288,6 @@ class Mailbox
     /**
      * Get settings.
      *
-     * @param        $bundle
      * @param string $mailbox
      *
      * @return mixed
@@ -339,8 +333,6 @@ class Mailbox
 
     /**
      * Switch to another box.
-     *
-     * @param $folder
      */
     public function switchFolder($folder)
     {
@@ -415,7 +407,7 @@ class Mailbox
      *  Nmsgs - number of mails in the mailbox
      *  Recent - number of recent mails in the mailbox
      *
-     * @return stdClass
+     * @return \stdClass
      */
     public function checkMailbox()
     {
@@ -438,7 +430,7 @@ class Mailbox
      * This function returns an object containing status information.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
      *
-     * @return stdClass if the box doesn't exist
+     * @return \stdClass if the box doesn't exist
      */
     public function statusMailbox()
     {
@@ -548,7 +540,6 @@ class Mailbox
     /**
      * Save mail body.
      *
-     * @param        $mailId
      * @param string $filename
      *
      * @return bool
@@ -561,8 +552,6 @@ class Mailbox
     /**
      * Marks mails listed in mailId for deletion.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function deleteMail($mailId)
@@ -572,9 +561,6 @@ class Mailbox
 
     /**
      * Move mail to another box.
-     *
-     * @param $mailId
-     * @param $mailBox
      *
      * @return bool
      */
@@ -596,8 +582,6 @@ class Mailbox
     /**
      * Add the flag \Seen to a mail.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function markMailAsRead($mailId)
@@ -607,8 +591,6 @@ class Mailbox
 
     /**
      * Remove the flag \Seen from a mail.
-     *
-     * @param $mailId
      *
      * @return bool
      */
@@ -620,8 +602,6 @@ class Mailbox
     /**
      * Add the flag \Flagged to a mail.
      *
-     * @param $mailId
-     *
      * @return bool
      */
     public function markMailAsImportant($mailId)
@@ -631,8 +611,6 @@ class Mailbox
 
     /**
      * Add the flag \Seen to a mails.
-     *
-     * @param $mailIds
      *
      * @return bool
      */
@@ -644,8 +622,6 @@ class Mailbox
     /**
      * Remove the flag \Seen from some mails.
      *
-     * @param $mailIds
-     *
      * @return bool
      */
     public function markMailsAsUnread(array $mailIds)
@@ -655,8 +631,6 @@ class Mailbox
 
     /**
      * Add the flag \Flagged to some mails.
-     *
-     * @param $mailIds
      *
      * @return bool
      */
@@ -827,7 +801,6 @@ class Mailbox
     /**
      * Get mail data.
      *
-     * @param      $mailId
      * @param bool $markAsSeen
      *
      * @return Message
@@ -912,8 +885,6 @@ class Mailbox
     }
 
     /**
-     * @param            $partStructure
-     * @param            $partNum
      * @param bool|true  $markAsSeen
      * @param bool|false $isDsn
      * @param bool|false $isFbl
@@ -1051,8 +1022,6 @@ class Mailbox
     }
 
     /**
-     * @param $partStructure
-     *
      * @return array
      */
     protected function getParameters($partStructure)
@@ -1078,7 +1047,6 @@ class Mailbox
     }
 
     /**
-     * @param        $string
      * @param string $charset
      *
      * @return string
@@ -1098,8 +1066,6 @@ class Mailbox
     }
 
     /**
-     * @param $string
-     *
      * @return bool
      */
     protected function isUrlEncoded($string)
@@ -1111,7 +1077,6 @@ class Mailbox
     }
 
     /**
-     * @param        $string
      * @param string $charset
      *
      * @return string

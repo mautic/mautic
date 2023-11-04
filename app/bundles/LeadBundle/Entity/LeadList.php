@@ -24,27 +24,27 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $publicName;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $alias;
 
@@ -64,7 +64,7 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
     private $leads;
 
@@ -395,7 +395,7 @@ class LeadList extends FormEntity
     {
         return array_map(
             function (array $filter) {
-                $filter['filter'] = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
+                $filter['filter']  = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
                 $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
 
                 return $filter;

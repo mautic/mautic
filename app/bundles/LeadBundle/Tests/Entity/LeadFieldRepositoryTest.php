@@ -72,7 +72,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderAlias->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementAliasResult);
 
         // No company column found. Therefore it's a contact field.
@@ -110,7 +110,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderCompare->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementCompareResult);
 
         // No contact ID was found by the value so the result should be false.
@@ -165,7 +165,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderAlias->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementAliasResult);
 
         // A company column found. Therefore it's a company field.
@@ -210,7 +210,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderCompare->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementCompareResult);
 
         // A contact ID was found by the value so the result should be true.

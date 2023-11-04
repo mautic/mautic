@@ -17,8 +17,6 @@ trait FieldsTypeTrait
 {
     /**
      * @param string $fieldObject
-     * @param $limit
-     * @param $start
      */
     protected function buildFormFields(
         FormBuilderInterface $builder,
@@ -32,16 +30,16 @@ trait FieldsTypeTrait
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
-                $form = $event->getForm();
-                $index = 0;
-                $choices = [];
+                $form           = $event->getForm();
+                $index          = 0;
+                $choices        = [];
                 $requiredFields = [];
                 $optionalFields = [];
-                $group = [];
-                $fieldData = $event->getData();
+                $group          = [];
+                $fieldData      = $event->getData();
 
                 foreach ($mauticFields as $key => $value) {
-                    if (is_array($mauticFields)) {
+                    if (is_array($value)) {
                         $mauticFields[$key] = array_flip($value);
                     }
                 }
@@ -54,8 +52,8 @@ trait FieldsTypeTrait
                             if (!isset($choices[$details['group']])) {
                                 $choices[$details['group']] = [];
                             }
-                            $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                            $group[$field] = $groupName = $details['group'];
+                            $label           = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
+                            $group[$field]   = $groupName = $details['group'];
                             $choices[$field] = $label;
                         } else {
                             $choices[$field] = $details['label'];
@@ -114,7 +112,7 @@ trait FieldsTypeTrait
                 }
 
                 $paginatedFields = array_slice($fields, $start, $limit);
-                $fieldsName = 'leadFields';
+                $fieldsName      = 'leadFields';
                 if ($fieldObject) {
                     $fieldsName = $fieldObject.'Fields';
                 }
@@ -123,7 +121,7 @@ trait FieldsTypeTrait
                 }
 
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData[$fieldsName][$field]);
+                    $matched  = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || 'Email' == $choices[$field]);
                     ++$index;
                     $form->add(
@@ -151,13 +149,13 @@ trait FieldsTypeTrait
                         }
 
                         $forceDirection = false;
-                        $disabled = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
-                        $data = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
+                        $disabled       = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
+                        $data           = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
 
                         // Force to use just one way for certainly fields
                         if (isset($fields[$field]['update_mautic'])) {
-                            $data = (bool) $fields[$field]['update_mautic'];
-                            $disabled = true;
+                            $data           = (bool) $fields[$field]['update_mautic'];
+                            $disabled       = true;
                             $forceDirection = true;
                         }
 
@@ -183,8 +181,8 @@ trait FieldsTypeTrait
                     }
 
                     if (!$fieldObject) {
-                        $mauticFields['mautic.lead.report.contact_id'] = 'mauticContactId';
-                        $mauticFields['mautic.plugin.integration.contact.timeline.link'] = 'mauticContactTimelineLink';
+                        $mauticFields['mautic.lead.report.contact_id']                        = 'mauticContactId';
+                        $mauticFields['mautic.plugin.integration.contact.timeline.link']      = 'mauticContactTimelineLink';
                         $mauticFields['mautic.plugin.integration.contact.donotcontact.email'] = 'mauticContactIsContactableByEmail';
                     }
 

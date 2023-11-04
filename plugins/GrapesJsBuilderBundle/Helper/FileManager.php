@@ -45,8 +45,6 @@ class FileManager
     }
 
     /**
-     * @param $request
-     *
      * @return array
      */
     public function uploadFiles($request)
@@ -96,8 +94,6 @@ class FileManager
     }
 
     /**
-     * @param $fileName
-     *
      * @return string
      */
     public function getFullUrl($fileName, $separator = '/')

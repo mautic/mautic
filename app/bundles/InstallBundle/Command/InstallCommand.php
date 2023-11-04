@@ -41,8 +41,7 @@ class InstallCommand extends Command
     {
         $this
             ->setName(self::COMMAND)
-            ->setDescription('Installs Mautic')
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from app/config/local.php and command line options/arguments, where the latter takes precedence.')
+            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -170,7 +169,7 @@ class InstallCommand extends Command
         if ($this->installer->checkIfInstalled()) {
             $output->writeln('Mautic already installed');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $output->writeln([
@@ -358,7 +357,7 @@ class InstallCommand extends Command
             '================',
         ]);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
@@ -453,4 +452,5 @@ class InstallCommand extends Command
             $output->writeln("  - [$type] $message");
         }
     }
+    protected static $defaultDescription = 'Installs Mautic';
 }

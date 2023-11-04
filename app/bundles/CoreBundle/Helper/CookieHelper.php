@@ -100,6 +100,6 @@ class CookieHelper implements EventSubscriberInterface
             return $this->request;
         }
 
-        return $this->request = $this->requestStack->getMasterRequest();
+        return $this->request = $this->requestStack->getMainRequest();
     }
 }

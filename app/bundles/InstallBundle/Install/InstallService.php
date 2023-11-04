@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
@@ -25,7 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -54,7 +55,7 @@ class InstallService
 
     private ValidatorInterface $validator;
 
-    private UserPasswordEncoder $encoder;
+    private UserPasswordHasher $hasher;
 
     private FixturesLoaderInterface $fixturesLoader;
 
@@ -66,7 +67,7 @@ class InstallService
         TranslatorInterface $translator,
         KernelInterface $kernel,
         ValidatorInterface $validator,
-        UserPasswordEncoder $encoder,
+        UserPasswordHasher $hasher,
         FixturesLoaderInterface $fixturesLoader
     ) {
         $this->configurator   = $configurator;
@@ -76,7 +77,7 @@ class InstallService
         $this->translator     = $translator;
         $this->kernel         = $kernel;
         $this->validator      = $validator;
-        $this->encoder        = $encoder;
+        $this->hasher         = $hasher;
         $this->fixturesLoader = $fixturesLoader;
     }
 
@@ -114,7 +115,7 @@ class InstallService
      */
     private function localConfig(): string
     {
-        return (string) $this->pathsHelper->getSystemPath('local_config', false);
+        return ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app');
     }
 
     /**
@@ -401,7 +402,7 @@ class InstallService
     {
         $entityManager = $this->entityManager;
 
-        //ensure the username and email are unique
+        // ensure the username and email are unique
         try {
             /** @var User $existingUser */
             $existingUser = $entityManager->getRepository(User::class)->find(1);
@@ -460,13 +461,13 @@ class InstallService
             return $messages;
         }
 
-        $encoder = $this->encoder;
+        $hasher = $this->hasher;
 
         $user->setFirstName(InputHelper::clean($data['firstname']));
         $user->setLastName(InputHelper::clean($data['lastname']));
         $user->setUsername(InputHelper::clean($data['username']));
         $user->setEmail(InputHelper::email($data['email']));
-        $user->setPassword($encoder->encodePassword($user, $data['password']));
+        $user->setPassword($hasher->hashPassword($user, $data['password']));
 
         $adminRole = null;
         try {

@@ -30,44 +30,44 @@ class UtmTag
     private $query = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $referer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmCampaign;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmContent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmMedium;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmSource;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmTerm;
 
@@ -94,8 +94,6 @@ class UtmTag
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -384,6 +382,11 @@ class UtmTag
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    public function hasUtmTags(): bool
+    {
+        return !empty($this->utmCampaign) || !empty($this->utmSource) || !empty($this->utmMedium) || !empty($this->utmContent) || !empty($this->utmTerm);
     }
 
     /**

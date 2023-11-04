@@ -29,7 +29,7 @@ class Stat
     private $type;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $typeId;
 
@@ -38,6 +38,9 @@ class Stat
      */
     private $dateAdded;
 
+    /**
+     * @var ?Lead
+     */
     private $lead;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -154,7 +157,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return ?Lead
      */
     public function getLead()
     {

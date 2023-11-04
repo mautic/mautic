@@ -1264,10 +1264,10 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        if (Mautic.getActiveBuilderName() === 'legacy') {
+        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
             mQuery(bodyEl).froalaEditor('html.set', response.body);
         } else {
-            mQuery(bodyEl).ckeditorGet().setData(response.body);
+            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
         }
 
         mQuery(bodyEl).val(response.body);

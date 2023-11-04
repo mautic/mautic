@@ -1,10 +1,16 @@
 <?php
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
+// Include path settings
+$root          = $container->getParameter('mautic.application_dir').'/app';
+$configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
+
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -13,15 +19,15 @@ EnvLoader::load();
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
-//Twig Configuration
+// Twig Configuration
 $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',
     'strict_variables' => true,
     'paths'            => [
-        '%kernel.project_dir%/app/bundles'                  => 'bundles',
-        '%kernel.project_dir%/app/bundles/CoreBundle'       => 'MauticCore',
-        '%kernel.project_dir%/themes'                       => 'themes',
+        '%mautic.application_dir%/app/bundles'                  => 'bundles',
+        '%mautic.application_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%mautic.application_dir%/themes'                       => 'themes',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
@@ -44,13 +50,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'messenger' => [
-        'transports' => [
-            'email_transport' => [
-                'dsn'            => 'in-memory://',
-            ],
-        ],
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -60,16 +59,13 @@ $container->loadFromExtension('web_profiler', [
     'intercept_redirects' => false,
 ]);
 
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
-]);
-
 $connectionSettings = [
     'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
     'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
     'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
     'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+    'options'  => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
@@ -124,8 +120,8 @@ $container->loadFromExtension('liip_test_fixtures', [
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists(__DIR__.'/config_override.php')) {
-    $loader->import('config_override.php');
+if (file_exists($configBaseDir.'/config/config_override.php')) {
+    $loader->import($configBaseDir.'/config/config_override.php');
 }
 
 // Add required parameters
@@ -149,3 +145,6 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
 
 // HTTP client mock handler providing response queue
 $container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+
+$container->register('http_client', \Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);

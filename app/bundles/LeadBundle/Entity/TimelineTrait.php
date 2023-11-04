@@ -11,14 +11,14 @@ trait TimelineTrait
 {
     /**
      * @param QueryBuilder $query                 DBAL QueryBuilder
-     * @param array        $options               Query optons from LeadTimelineEvent
+     * @param array<mixed> $options               Query optons from LeadTimelineEvent
      * @param string       $eventNameColumn       Name of column to sort event name by
      * @param string       $timestampColumn       Name of column to sort timestamp by
-     * @param array        $serializedColumns     Array of columns to unserialize
-     * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
-     * @param null         $resultsParserCallback Callback to custom parse results
+     * @param array<mixed> $serializedColumns     Array of columns to unserialize
+     * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
+     * @param mixed|null   $resultsParserCallback Callback to custom parse results
      *
-     * @return array
+     * @return array<mixed>
      */
     private function getTimelineResults(
         QueryBuilder $query,
@@ -85,7 +85,7 @@ trait TimelineTrait
             }
         }
 
-        $results = $query->execute()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here
@@ -113,11 +113,11 @@ trait TimelineTrait
         if (!empty($options['paginated'])) {
             // Get a total count along with results
             $query->resetQueryParts(['select', 'orderBy'])
-                ->setFirstResult(null)
+                ->setFirstResult(0)
                 ->setMaxResults(null)
                 ->select('count(*)');
 
-            $total = $query->execute()->fetchOne();
+            $total = $query->executeQuery()->fetchOne();
 
             return [
                 'total'   => $total,

@@ -531,8 +531,6 @@ class PlainTextHelper
     }
 
     /**
-     * @param            $text
-     * @param            $width
      * @param string     $breakline
      * @param bool|false $cut
      *

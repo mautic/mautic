@@ -391,10 +391,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Returns the lead ID if any.
-     *
-     * @return int|null
      */
-    public function getLeadId()
+    public function getLeadId(): ?int
     {
         return ($this->lead instanceof Lead) ? $this->lead->getId() : null;
     }
@@ -402,7 +400,6 @@ class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included.
      *
-     * @param      $eventType
      * @param bool $inclusive
      *
      * @return bool
@@ -514,9 +511,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
-     *
-     * @param $eventType
-     * @param $count
      */
     public function subtractFromCounter($eventType, $count = 1)
     {
@@ -559,8 +553,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Add a serializer group for API formatting.
-     *
-     * @param $group
      */
     public function addSerializerGroup($group)
     {

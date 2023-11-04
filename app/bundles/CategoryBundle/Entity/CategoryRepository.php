@@ -27,7 +27,6 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param        $bundle
      * @param string $search
      * @param int    $limit
      * @param int    $start
@@ -72,7 +71,6 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */
@@ -86,7 +84,6 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
      *
      * @return array
      */

@@ -23,7 +23,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    private $kernelRoot;
+    private $projectDir;
 
     /**
      * @var OpenSSLCipher
@@ -51,7 +51,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $site_url;
+    public $site_url = '';
 
     /**
      * Recommended minimum memory limit for Mautic.
@@ -74,7 +74,7 @@ class CheckStep implements StepInterface
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->kernelRoot       = $projectDir.'/app';
+        $this->projectDir       = $projectDir;
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
@@ -100,9 +100,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 
-        // Allow for the vendor folder to live
-        // above the application folder.
-        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer') && !is_dir(dirname($this->kernelRoot).'/../vendor/composer')) {
+        if (!is_dir($this->projectDir.'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 
@@ -110,11 +108,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
@@ -219,7 +217,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if ('https' !== substr($this->site_url, 0, 5)) {
+        if (!$this->site_url || 'https' !== substr($this->site_url, 0, 5)) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
@@ -273,7 +271,7 @@ class CheckStep implements StepInterface
 
         foreach ($data as $key => $value) {
             // Exclude keys from the config
-            if (!in_array($key, ['configIsWritable', 'kernelRoot'])) {
+            if (!in_array($key, ['configIsWritable', 'projectDir'])) {
                 $parameters[$key] = $value;
             }
         }

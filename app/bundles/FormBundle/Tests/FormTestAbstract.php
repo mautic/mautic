@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -29,6 +30,7 @@ use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -42,6 +44,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -85,6 +88,7 @@ class FormTestAbstract extends TestCase
         $formFieldModel        = $this->createMock(FieldModel::class);
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $translator            = $this->createMock(Translator::class);
         $entityManager         = $this->createMock(EntityManager::class);
@@ -109,7 +113,7 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $this->formRepository],
+                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
                     ]
                 )
             );
@@ -121,17 +125,22 @@ class FormTestAbstract extends TestCase
             $formActionModel,
             $formFieldModel,
             $this->fieldHelper,
+            $primaryCompanyHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper,
-            $mappedObjectCollector
+            $mappedObjectCollector,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
-
-        $formModel->setDispatcher($dispatcher);
-        $formModel->setTranslator($translator);
-        $formModel->setEntityManager($entityManager);
 
         return $formModel;
     }
@@ -253,13 +262,16 @@ class FormTestAbstract extends TestCase
             new FieldValueTransformer($router),
             $dateHelper,
             $contactTracker,
-            $contactMerger
+            $contactMerger,
+            $entityManager,
+            $this->createMock(CorePermissions::class),
+            $dispatcher,
+            $router,
+            $translator,
+            $userHelper,
+            $mockLogger,
+            $this->coreParametersHelper,
         );
-        $submissionModel->setDispatcher($dispatcher);
-        $submissionModel->setTranslator($translator);
-        $submissionModel->setEntityManager($entityManager);
-        $submissionModel->setUserHelper($userHelper);
-        $submissionModel->setLogger($mockLogger);
 
         return $submissionModel;
     }

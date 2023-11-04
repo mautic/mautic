@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
 class AssetGenerationHelper
@@ -11,13 +12,11 @@ class AssetGenerationHelper
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
-        'historyjs/scripts/bundled-uncompressed/html4+html5/jquery.history.js', // Needed for ajaxyfying the UI.
         'js-cookie/src/js.cookie.js', // Needed for cookies.
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
         'moment/min/moment.min.js', // Needed for date/time formatting.
-        // 'jquery-color/dist/jquery.color.js', // I can't find why is this needed. Added in https://github.com/mautic/mautic/commit/918000351e8c7657b01ef132e22c097942cf0e99. Uncoment this if we find the place. Delete this dependency after some time.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
         'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
         'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
@@ -35,22 +34,54 @@ class AssetGenerationHelper
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
         'chart.js/dist/Chart.js', // Needed for the charts.
         'mousetrap/mousetrap.js',
-        'jquery/dist/jquery.js',
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
-        // TODO: Add the rest of the libraries here.
+        'modernizr/modernizr-mautic-dist.js',
+        'jquery.quicksearch/src/jquery.quicksearch.js',
+        'jquery-ui/ui/version.js',
+        'jquery-ui/ui/widget.js',
+        'jquery-ui/ui/plugin.js',
+        'jquery-ui/ui/position.js',
+        'jquery-ui/ui/data.js',
+        'jquery-ui/ui/disable-selection.js',
+        'jquery-ui/ui/focusable.js',
+        'jquery-ui/ui/form-reset-mixin.js',
+        'jquery-ui/ui/jquery-patch.js',
+        'jquery-ui/ui/keycode.js',
+        'jquery-ui/ui/labels.js',
+        'jquery-ui/ui/scroll-parent.js',
+        'jquery-ui/ui/tabbable.js',
+        'jquery-ui/ui/unique-id.js',
+        'jquery-ui/ui/effect.js',
+        'jquery-ui/ui/safe-blur.js', // needed for the legacy builder
+        'jquery-ui/ui/widgets/mouse.js',
+        'jquery-ui/ui/widgets/draggable.js',
+        'jquery-ui/ui/widgets/droppable.js',
+        'jquery-ui/ui/widgets/selectable.js',
+        'jquery-ui/ui/widgets/sortable.js',
+        'jquery-ui/ui/vendor/jquery-color/jquery.color.js',
+        'jquery-ui/ui/effects/effect-drop.js',
+        'jquery-ui/ui/effects/effect-fade.js',
+        'jquery-ui/ui/effects/effect-size.js',
+        'jquery-ui/ui/effects/effect-slide.js',
+        'jquery-ui/ui/effects/effect-transfer.js',
+        'jquery-ui/ui/safe-active-element.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/button.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/resizable.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/slider.js', // needed for ElFinder
+        'jquery-ui/ui/widgets/controlgroup.js', // needed for ElFinder
     ];
 
-    private BundleHelper $bundleHelper;
-    private PathsHelper $pathsHelper;
     private string $version;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
-    {
-        $this->bundleHelper = $bundleHelper;
-        $this->pathsHelper  = $pathsHelper;
-        $this->version      = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        AppVersion $appVersion
+    ) {
+        $this->version = substr(hash('sha1', $coreParametersHelper->get('secret_key').$appVersion->getVersion()), 0, 8);
     }
 
     /**
@@ -68,13 +99,13 @@ class AssetGenerationHelper
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
             $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
-            $assetsPath = $this->pathsHelper->getSystemPath('assets');
+            $assetsPath = $this->pathsHelper->getSystemPath('media');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ('prod' == $env) {
-                $loadAll = false; //by default, loading should not be required
+                $loadAll = false; // by default, loading should not be required
 
-                //check for libraries and app files and generate them if they don't exist if in prod environment
+                // check for libraries and app files and generate them if they don't exist if in prod environment
                 $prodFiles = [
                     'css/libraries.css',
                     'css/app.css',
@@ -84,7 +115,7 @@ class AssetGenerationHelper
 
                 foreach ($prodFiles as $file) {
                     if (!file_exists("$assetsFullPath/$file")) {
-                        $loadAll = true; //it's missing so compile it
+                        $loadAll = true; // it's missing so compile it
                         break;
                     }
                 }
@@ -98,7 +129,7 @@ class AssetGenerationHelper
 
                     if (!$forceRegeneration) {
                         while (file_exists($inProgressFile)) {
-                            //dummy loop to prevent conflicts if one process is actively regenerating assets
+                            // dummy loop to prevent conflicts if one process is actively regenerating assets
                         }
                     }
                     file_put_contents($inProgressFile, date('r'));
@@ -106,7 +137,7 @@ class AssetGenerationHelper
 
                 foreach (self::NODE_MODULES as $path) {
                     $relPath  = "node_modules/{$path}";
-                    $fullPath = "{$this->pathsHelper->getRootPath()}/{$relPath}";
+                    $fullPath = "{$this->pathsHelper->getVendorRootPath()}/{$relPath}";
                     $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
                     $details  = [
                         'fullPath' => $fullPath,
@@ -122,7 +153,7 @@ class AssetGenerationHelper
 
                 $modifiedLast = [];
 
-                //get a list of all core asset files
+                // get a list of all core asset files
                 $bundles = $this->bundleHelper->getMauticBundles();
 
                 $fileTypes = ['css', 'js'];
@@ -139,7 +170,7 @@ class AssetGenerationHelper
                 }
                 $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
 
-                //combine the files into their corresponding name and put in the root media folder
+                // combine the files into their corresponding name and put in the root media folder
                 if ('prod' == $env) {
                     $checkPaths = [
                         $assetsFullPath,
@@ -152,52 +183,25 @@ class AssetGenerationHelper
                         }
                     });
 
-                    $useMinify = class_exists('\Minify');
-
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
                             $assetFile = "$assetsFullPath/$type/$group.$type";
 
-                            //only refresh if a change has occurred
+                            // only refresh if a change has occurred
                             $modified = ($forceRegeneration || !file_exists($assetFile)) ? true : filemtime($assetFile) < $modifiedLast[$type][$group];
 
                             if ($modified) {
                                 if (file_exists($assetFile)) {
-                                    //delete it
+                                    // delete it
                                     unlink($assetFile);
                                 }
 
                                 if ('css' == $type) {
-                                    $out = fopen($assetFile, 'w');
-
-                                    foreach ($files as $relPath => $details) {
-                                        $cssRel = '../../'.dirname($relPath).'/';
-                                        if ($useMinify) {
-                                            $content = \Minify::combine([$details['fullPath']], [
-                                                'rewriteCssUris'  => false,
-                                                'minifierOptions' => [
-                                                    'text/css' => [
-                                                        'currentDir'          => '',
-                                                        'prependRelativePath' => $cssRel,
-                                                    ],
-                                                ],
-                                            ]);
-                                        } else {
-                                            $content = file_get_contents($details['fullPath']);
-                                            $search  = '#url\((?!\s*([\'"]?(((?:https?:)?//)|(?:data\:?:))))\s*([\'"])?#';
-                                            $replace = "url($4{$cssRel}";
-                                            $content = preg_replace($search, $replace, $content);
-                                        }
-
-                                        fwrite($out, $content);
-                                    }
-
-                                    fclose($out);
+                                    $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 } else {
-                                    array_walk($files, function (&$file) {
-                                        $file = $file['fullPath'];
-                                    });
-                                    file_put_contents($assetFile, \Minify::combine($files));
+                                    $minifier = new Minify\JS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 }
                             }
                         }
@@ -208,7 +212,7 @@ class AssetGenerationHelper
             }
 
             if ('prod' == $env) {
-                //return prod generated assets
+                // return prod generated assets
                 $assets = [
                     'css' => [
                         "{$assetsPath}/css/libraries.css?v{$this->version}",
@@ -326,9 +330,6 @@ class AssetGenerationHelper
 
     /**
      * Find asset overrides in the template.
-     *
-     * @param $env
-     * @param $assets
      *
      * @return array
      */

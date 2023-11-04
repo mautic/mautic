@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -45,11 +46,6 @@ final class AssetsHelper
     private $version;
 
     /**
-     * @var Packages
-     */
-    private $packages;
-
-    /**
      * @var string
      */
     private $siteUrl;
@@ -62,9 +58,8 @@ final class AssetsHelper
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
     private InstallService $installService;
 
-    public function __construct(Packages $packages)
+    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->packages = $packages;
     }
 
     /**
@@ -91,6 +86,36 @@ final class AssetsHelper
     public function getImagesPath(bool $absolute = false): string
     {
         return $this->pathsHelper->getSystemPath('images', $absolute);
+    }
+
+    /**
+     * Returns the path to an asset that may be overridden in the media folder.
+     *
+     * This function is meant for assets that may be overridden in the media folder.
+     * This could be logo's, country flags, ...
+     * So to be able to override an asset, it has to exist in the assets folder.
+     *
+     * @param string     $path
+     * @param bool|false $absolute
+     *
+     * @return string|bool
+     */
+    public function getOverridableUrl($path, $absolute = false)
+    {
+        $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
+        $assetsPath = $this->pathsHelper->getSystemPath('assets', false);
+
+        if (!file_exists($this->pathsHelper->getAssetsPath().DIRECTORY_SEPARATOR.$path)) {
+            return false;
+        }
+
+        if (file_exists($this->pathsHelper->getMediaPath().DIRECTORY_SEPARATOR.$path)) {
+            $path = $mediaPath.DIRECTORY_SEPARATOR.$path;
+        } else {
+            $path = $assetsPath.DIRECTORY_SEPARATOR.$path;
+        }
+
+        return $this->getUrl($path, null, null, $absolute);
     }
 
     /**
@@ -174,7 +199,7 @@ final class AssetsHelper
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
-                //special place for these so that declarations and scripts can be mingled
+                // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
                 if (!isset($assets['scripts'][$location])) {
@@ -209,7 +234,7 @@ final class AssetsHelper
     public function addScriptDeclaration($script, $location = 'head')
     {
         if ('head' == $location) {
-            //special place for these so that declarations and scripts can be mingled
+            // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
             if (!isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
@@ -502,22 +527,24 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base = 'node_modules/ckeditor4/';
+        $base    = 'media/libraries/ckeditor/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
-            $base.'adapters/jquery.js?v'.$this->version,
-            'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v'.$this->version,
         ];
     }
 
     /**
      * Load Froala JS source files.
      *
-     * @return array<string>
+     * @return string[]
      */
-    public function getFroalaScripts()
+    public function getFroalaScripts(): array
     {
+        if (!$this->coreParametersHelper->get('load_froala_assets')) {
+            return [];
+        }
+
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/froala/';
         $plugins = $base.'plugins/';
 
@@ -544,7 +571,7 @@ final class AssetsHelper
             $plugins.'quote.js?v'.$this->version,
             $plugins.'table.js?v'.$this->version,
             $plugins.'url.js?v'.$this->version,
-            //$plugins . 'video.js?v' . $this->version,
+            // $plugins . 'video.js?v' . $this->version,
             $plugins.'gatedvideo.js?v'.$this->version,
             $plugins.'token.js?v'.$this->version,
             $plugins.'dynamic_content.js?v'.$this->version,
@@ -675,13 +702,8 @@ final class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $flagPath = $this->pathsHelper->getSystemPath('assets', true).'/images/flags/';
-        $relpath  = $this->pathsHelper->getSystemPath('assets').'/images/flags/';
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = '';
-        if (file_exists($flagPath.$country.'.png')) {
-            $flagImg = $this->getUrl($relpath.$country.'.png');
-        }
+        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;
@@ -748,8 +770,6 @@ final class AssetsHelper
     }
 
     /**
-     * @param $string
-     *
      * @return string
      */
     private function escape(string $string)

@@ -5,6 +5,7 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -71,7 +72,7 @@ class SysinfoModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
-            //ensure TZ is set back to default
+            // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
@@ -110,18 +111,13 @@ class SysinfoModel
         }
 
         $importantFolders = [
-            $this->pathsHelper->getSystemPath('local_config'),
+            ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
             $this->coreParametersHelper->get('cache_path'),
             $this->coreParametersHelper->get('log_path'),
             $this->coreParametersHelper->get('upload_dir'),
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
-
-        // Show the spool folder only if the email queue is configured
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
-        }
 
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
@@ -156,7 +152,7 @@ class SysinfoModel
     {
         return [
             'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
-            'driver'   => $this->connection->getDriver()->getName(),
+            'driver'   => $this->connection->getParams()['driver'],
             'platform' => get_class($this->connection->getDatabasePlatform()),
         ];
     }
@@ -164,7 +160,6 @@ class SysinfoModel
     /**
      * Method to tail (a few last rows) of a file.
      *
-     * @param     $filename
      * @param int $lines
      * @param int $buffer
      *

@@ -65,15 +65,6 @@ return [
                 ],
             ],
         ],
-        'models'  => [
-            'grapesjsbuilder.model' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.email.model.email',
-                ],
-            ],
-        ],
         'helpers' => [
             'grapesjsbuilder.helper.filemanager' => [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
