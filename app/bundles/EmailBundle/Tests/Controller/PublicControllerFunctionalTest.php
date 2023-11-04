@@ -11,9 +11,9 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\PageBundle\Entity\Page;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
