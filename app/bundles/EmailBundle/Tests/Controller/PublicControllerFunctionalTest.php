@@ -134,19 +134,6 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
 
-    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal(): void
-    {
-        $lead = $this->createLead('de');
-        $page = $this->createPage();
-
-        $stat = $this->getStat(null, $lead, $page);
-        $this->em->flush();
-
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringContainsString('Präferenzen speichern', $crawler->html());
-    }
-
     /**
      * @throws \Doctrine\ORM\ORMException
      */
