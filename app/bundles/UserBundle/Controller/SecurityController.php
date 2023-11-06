@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
 {
@@ -43,7 +44,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper)
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator)
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -76,9 +77,9 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
         if (null !== $error) {
             if ($error instanceof WeakPasswordException) {
-                $this->addFlash(FlashBag::LEVEL_ERROR, 'mautic.user.auth.error.weakpassword');
+                $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 
-                return $this->forward('MauticUserBundle:Public:passwordReset');
+                return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
             } elseif ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
