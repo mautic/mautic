@@ -94,13 +94,13 @@ class EntityLookupType extends AbstractType
                 'choice_loader'          => function (Options $options) {
                     // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
                     // if you have multiple lookup fields with same type then use different - 2 'key' for all fields
-                    $model = $this->getModelName($options);
+                    $model                       = $this->getModelName($options);
                     $this->choiceLoaders[$model] = new EntityLookupChoiceLoader(
-                            $this->modelFactory,
-                            $this->translator,
-                            $this->connection,
-                            $options
-                        );
+                        $this->modelFactory,
+                        $this->translator,
+                        $this->connection,
+                        $options
+                    );
 
                     return $this->choiceLoaders[$model];
                 },
@@ -149,7 +149,7 @@ class EntityLookupType extends AbstractType
     }
 
     /**
-     * @param Options|array<mixed> $options
+     * @param Options<mixed[]>|array<mixed> $options
      */
     private function getModelName($options): string
     {
