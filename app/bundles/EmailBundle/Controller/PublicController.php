@@ -284,7 +284,7 @@ class PublicController extends CommonFormController
                                 ),
                             ]
                         )
-                    );
+                    )->getContent();
                 }
                 $message = $html;
             }
