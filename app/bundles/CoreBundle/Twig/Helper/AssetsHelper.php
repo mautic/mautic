@@ -696,9 +696,13 @@ final class AssetsHelper
     }
 
     /**
-     * Returns the country flag image or false if not found.
+     * @param string $country
+     * @param bool   $urlOnly
+     * @param string $class
+     *
+     * @return string|bool
      */
-    public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string|bool
+    public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
         try {
             $country = Countries::getName(strtoupper($country));
@@ -706,11 +710,9 @@ final class AssetsHelper
         }
 
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png')
-            ?: $this->getOverridableUrl('images/flags/Default.jpg')
-        ;
+        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
 
-        return $urlOnly ? $flagImg : '<img src="'.$flagImg.'" class="'.$class.'" />';
+        return false === $flagImg ? false : (true === $urlOnly ? $flagImg : '<img src="'.$flagImg.'" class="'.$class.'" />');
     }
 
     /**
