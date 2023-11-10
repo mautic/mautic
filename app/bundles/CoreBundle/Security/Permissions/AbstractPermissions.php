@@ -305,9 +305,10 @@ abstract class AbstractPermissions
     }
 
     /**
-     * Add custom permissions.
+     * @param string            $level
+     * @param array<int|string> $permissions
      */
-    protected function addCustomPermission($level, $permissions)
+    protected function addCustomPermission($level, $permissions): void
     {
         $this->permissions[$level] = $permissions;
     }
@@ -315,11 +316,10 @@ abstract class AbstractPermissions
     /**
      * Adds a custom permission to the form builder, i.e. config only bundles.
      *
-     * @param string               $bundle
-     * @param FormBuilderInterface $builder
-     * @param array                $data
+     * @param array<string> $choices
+     * @param array<string> $data
      */
-    protected function addCustomFormFields($bundle, $level, &$builder, $label, $choices, $data)
+    protected function addCustomFormFields(string $bundle, string $level, FormBuilderInterface &$builder, string $label, array $choices, array $data): void
     {
         $builder->add("$bundle:$level", PermissionListType::class, [
             'choices' => $choices,
