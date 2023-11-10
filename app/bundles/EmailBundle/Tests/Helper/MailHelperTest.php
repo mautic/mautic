@@ -338,7 +338,7 @@ class MailHelperTest extends TestCase
     public function testEmailHeadersAreSet(): void
     {
         $parameterMap = [
-            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test',  'custom-mautic-header' => '{contactfield=email}']],
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test',  'custom-mautic-header' => '{contactfield=email}', 'Reply-to' => '{contactfield=email}']],
         ];
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
@@ -361,6 +361,7 @@ class MailHelperTest extends TestCase
 
         /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
+
         foreach ($headers as $header) {
             if ('X-Mautic-Test' === $header->getName() || 'X-Mautic-Test2' === $header->getName()) {
                 $customHeadersFounds[] = $header->getName();
@@ -374,9 +375,14 @@ class MailHelperTest extends TestCase
                 $customHeadersFounds[] = $header->getName();
                 $this->assertEquals($this->contacts[0]['email'], $header->getBody());
             }
+
+            if ('Reply-To' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertCount(1, $header->getBody());
+            }
         }
 
-        $this->assertCount(5, $customHeadersFounds);
+        $this->assertCount(6, $customHeadersFounds);
     }
 
     public function testUnsubscribeHeader(): void
