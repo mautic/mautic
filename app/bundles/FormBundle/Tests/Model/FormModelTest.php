@@ -24,9 +24,9 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -112,6 +112,11 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     private $fieldHelper;
 
     /**
+     * @var MockObject&PrimaryCompanyHelper
+     */
+    private $primaryCompanyHelper;
+
+    /**
      * @var MockObject&MappedObjectCollectorInterface
      */
     private $mappedObjectCollector;
@@ -130,6 +135,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formFieldModel        = $this->createMock(FieldModel::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
+        $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $this->dispatcher            = $this->createMock(EventDispatcher::class);
         $this->translator            = $this->createMock(Translator::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
@@ -158,6 +164,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->formActionModel,
             $this->formFieldModel,
             $this->fieldHelper,
+            $this->primaryCompanyHelper,
             $this->leadFieldModel,
             $this->formUploaderMock,
             $this->contactTracker,
@@ -600,14 +607,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formHtml   = '<html>';
         $form       = new Form();
         $emailField = new Field();
-        $contact    = new class() extends Lead {
-            public function getFieldValue($field, $group = null)
-            {
-                Assert::assertSame('email', $field);
-
-                return '';
-            }
-        };
+        $contact    = new Lead();
         $emailField->setMappedField('email');
         $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
@@ -627,25 +627,55 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formHtml   = '<html>';
         $form       = new Form();
         $emailField = new Field();
-        $contact    = new class() extends Lead {
-            public function getFieldValue($field, $group = null)
-            {
-                Assert::assertSame('email', $field);
+        $contact    = new Lead();
 
-                return 'john@doe.email';
-            }
-        };
         $emailField->setMappedField('email');
         $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
+        $contactCompanyData = [
+            'email' => 'john@doe.email',
+        ];
+
         $this->contactTracker->method('getContact')
             ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
 
         $this->fieldHelper->expects($this->once())
             ->method('populateField')
             ->with($emailField, 'john@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithCompany(): void
+    {
+        $formHtml    = '<html>';
+        $form        = new Form();
+        $companyname = new Field();
+        $contact     = new Lead();
+
+        $companyname->setMappedField('companyname');
+        $companyname->setMappedObject('company');
+        $companyname->setIsAutoFill(true);
+        $form->addField(123, $companyname);
+
+        $contactCompanyData = [
+            'companyname' => 'Mautic',
+        ];
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($companyname, 'Mautic', 'form-', $formHtml);
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }

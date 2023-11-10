@@ -1,95 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Helper\RequestStorageHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
+/**
+ * @deprecated as unused. To be removed in Mautic 6.0.
+ */
+class RequestStorageHelperTest extends MauticMysqlTestCase
 {
-    private $cacheStorageMock;
-    private $helper;
+    private RequestStorageHelper $helper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->cacheStorageMock = $this->createMock(CacheStorageHelper::class);
-        $this->helper           = new RequestStorageHelper($this->cacheStorageMock);
+        $this->helper = $this->getContainer()->get(RequestStorageHelper::class);
     }
 
-    public function testStoreRequest()
+    public function testStoreRequest(): void
     {
-        $payload = ['some' => 'values'];
+        $key = $this->helper->storeRequest(NullTransport::class, new Request([], ['some' => 'values']));
 
-        $this->cacheStorageMock->expects($this->once())
-            ->method('set')
-            ->with($this->anything(), $payload);
-
-        $key = $this->helper->storeRequest(NullTransport::class, new Request([], $payload));
-
-        $this->assertStringStartsWith(NullTransport::class, $key);
-        $this->assertEquals(88, strlen($key));
-    }
-
-    public function testStoreRequestWithLongTansportName()
-    {
-        $payload           = ['some' => 'values'];
-        $longTransportName = '';
-
-        for ($i = 0; $i < 5; ++$i) {
-            $longTransportName .= NullTransport::class;
-        }
-
-        $this->cacheStorageMock->expects($this->never())
-            ->method('set');
-
-        $this->expectException(\LengthException::class);
-        $key = $this->helper->storeRequest($longTransportName, new Request([], $payload));
-    }
-
-    public function testGetRequest()
-    {
-        $payload = ['some' => 'values'];
-        $key     = NullTransport::class.':webhook_request:5b43832134cfb0.36545510';
-
-        $this->cacheStorageMock->expects($this->once())
-            ->method('get')
-            ->with($key)
-            ->willReturn($payload);
+        $this->assertStringStartsWith('Symfony|Component|Mailer|Transport|NullTransport', $key);
 
         $request = $this->helper->getRequest($key);
-
-        $this->assertInstanceOf(Request::class, $request);
-        $this->assertEquals($payload, $request->request->all());
+        $this->assertEquals(['some' => 'values'], $request->request->all());
     }
 
-    public function testGetRequestIfNotFound()
+    public function testDeleteRequest(): void
     {
-        $payload = ['some' => 'values'];
-        $key     = NullTransport::class.':webhook_request:5b43832134cfb0.36545510';
+        $key = $this->helper->storeRequest(NullTransport::class, new Request([], ['some' => 'values']));
 
-        $this->cacheStorageMock->expects($this->once())
-            ->method('get')
-            ->with($key)
-            ->willReturn(false);
+        $request = $this->helper->getRequest($key);
+        $this->assertEquals(['some' => 'values'], $request->request->all());
+
+        $this->helper->deleteCachedRequest($key);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Request with key '{$key}' was not found.");
+        $request = $this->helper->getRequest($key);
+    }
+
+    public function testGetRequestIfNotFound(): void
+    {
+        $key = NullTransport::class.';webhook_request;5b43832134cfb0.36545510';
 
         $this->expectException(\UnexpectedValueException::class);
         $this->helper->getRequest($key);
     }
 
-    public function testGetTransportNameFromKey()
+    public function testGetTransportNameFromKey(): void
     {
-        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey(NullTransport::class.':webhook_request:5b43832134cfb0.36545510'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey(NullTransport::class.';webhook_request;5b43832134cfb0.36545510'));
     }
 
     /**
      * The StorageHelper will add '%mautic.db_table_prefix%' as a prefix to each cache key.
      */
-    public function testGetTransportNameFromKeyWithGlobalPrefix()
+    public function testGetTransportNameFromKeyWithGlobalPrefix(): void
     {
-        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey('mautic:Symfony|Component|Mailer|Transport|NullTransport:webhook_request:5bfbe8ce671198.00044461'));
+        $this->assertEquals(NullTransport::class, $this->helper->getTransportNameFromKey('mautic:Symfony|Component|Mailer|Transport|NullTransport;webhook_request;5bfbe8ce671198.00044461'));
     }
 }

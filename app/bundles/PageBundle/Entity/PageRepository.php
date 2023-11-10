@@ -231,7 +231,7 @@ class PageRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $relatedIds)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
@@ -257,6 +257,6 @@ class PageRepository extends CommonRepository
             $q->set('variant_hits', 'variant_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 }

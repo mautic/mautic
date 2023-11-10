@@ -127,7 +127,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model  = $this->getModel('report');
@@ -149,7 +149,7 @@ class ReportController extends FormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**

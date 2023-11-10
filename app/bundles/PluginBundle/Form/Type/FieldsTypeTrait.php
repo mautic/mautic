@@ -39,7 +39,7 @@ trait FieldsTypeTrait
                 $fieldData      = $event->getData();
 
                 foreach ($mauticFields as $key => $value) {
-                    if (is_array($mauticFields)) {
+                    if (is_array($value)) {
                         $mauticFields[$key] = array_flip($value);
                     }
                 }

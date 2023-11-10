@@ -261,7 +261,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                 $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
 
                 if (count($data) > $limit) {
-                    $limit = $data;
+                    $limit = count($data);
                 }
             }
 

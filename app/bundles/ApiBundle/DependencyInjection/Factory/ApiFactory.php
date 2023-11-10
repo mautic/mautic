@@ -21,8 +21,7 @@ class ApiFactory implements SecurityFactoryInterface
         $providerId = 'security.authentication.provider.mautic_api.'.$id;
         $container
             ->setDefinition($providerId, new ChildDefinition('mautic_api.security.authentication.provider'))
-            ->replaceArgument(0, new Reference($userProvider))
-        ;
+            ->replaceArgument(0, new Reference($userProvider));
 
         $listenerId = 'security.authentication.listener.mautic_api.'.$id;
         $container->setDefinition($listenerId, new ChildDefinition('mautic_api.security.authentication.listener'));
