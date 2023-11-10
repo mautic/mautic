@@ -2014,13 +2014,20 @@ class MailHelper
 
         // Set custom headers
         if (!empty($headers)) {
+            $tokens = $this->getTokens();
+            // Replace tokens
             $messageHeaders = $this->message->getHeaders();
             foreach ($headers as $headerKey => $headerValue) {
-                if ($messageHeaders->has($headerKey)) {
-                    $header = $messageHeaders->get($headerKey);
-                    $header->setBody($headerValue);
-                } else {
-                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                $headerValue = str_ireplace(array_keys($tokens), $tokens, $headerValue);
+                try {
+                    if ($messageHeaders->has($headerKey)) {
+                        $header = $messageHeaders->get($headerKey);
+                        $header->setBody($headerValue);
+                    } else {
+                        $messageHeaders->addTextHeader($headerKey, $headerValue);
+                    }
+                } catch (\Swift_RfcComplianceException $complianceException) {
+                    $messageHeaders->remove($headerKey);
                 }
             }
         }
