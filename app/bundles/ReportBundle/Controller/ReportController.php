@@ -685,7 +685,7 @@ class ReportController extends FormController
                     ),
                     'dateRangeForm'          => $dateRangeForm->createView(),
                     'dynamicFilterForm'      => $dynamicFilterForm->createView(),
-                    'enableExportPermission' => !$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('report:export:enable', 'MATCH_ALL'),
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [
@@ -776,7 +776,7 @@ class ReportController extends FormController
             );
         } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
-        } elseif (!$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('report:export:enable', 'MATCH_ONE')) {
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 

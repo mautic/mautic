@@ -30,7 +30,6 @@ class ButtonSubscriber implements EventSubscriberInterface
         if (!str_contains($event->getRoute(), 'mautic_contact_index')) {
             return;
         }
-
         $exportRoute = $this->router->generate('mautic_contact_action', ['objectAction' => 'batchExport']);
 
         $event->addButton(

@@ -171,7 +171,7 @@ class ResultController extends CommonFormController
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
-                    'enableExportPermission'=> !$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('form:export:enable', 'MATCH_ALL'),
+                    'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('form:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => '@MauticForm/Result/list.html.twig',
                 'passthroughVars' => [
@@ -280,7 +280,7 @@ class ResultController extends CommonFormController
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
-        if (!$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('form:export:enable', 'MATCH_ONE')) {
+        if (!$this->security->isAdmin() && !$this->security->isGranted('form:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
