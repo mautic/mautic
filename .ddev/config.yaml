@@ -1,4 +1,4 @@
-name: mautic
+name: mautic5
 type: php
 docroot: ""
 php_version: "8.0"
@@ -13,7 +13,7 @@ mysql_version: ""
 provider: default
 use_dns_when_possible: true
 composer_version: "2"
-webimage_extra_packages: [php8.0-imap]
+webimage_extra_packages: [php8.0-imap, php8.0-amqp]
 hooks:
   post-start:
     # Fix line endings on Windows
