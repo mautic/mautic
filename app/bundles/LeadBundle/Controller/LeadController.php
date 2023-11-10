@@ -1947,6 +1947,8 @@ class LeadController extends FormController
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
+        } elseif (!$this->get('mautic.security')->isAdmin() && $this->get('mautic.security')->isGranted('lead:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
         }
 
         $fileType = $request->get('filetype', 'csv');

@@ -22,17 +22,19 @@
 
 {% block actions %}
   {% set buttons = [] %}
-  {% set buttons = buttons|merge([{
-      'attr': {
-          'target': '_new',
-          'data-toggle': '',
-          'class': 'btn btn-default btn-nospin',
-          'href': path('mautic_form_export', {'objectId': form.id, 'format': 'html'}),
-      },
-      'btnText': 'mautic.form.result.export.html'|trans,
-      'iconClass': 'fa fa-file-code-o',
-      'primary': true,
-  }]) %}
+    {% if enableExportPermission is not empty %}
+      {% set buttons = buttons|merge([{
+          'attr': {
+              'target': '_new',
+              'data-toggle': '',
+              'class': 'btn btn-default btn-nospin',
+              'href': path('mautic_form_export', {'objectId': form.id, 'format': 'html'}),
+          },
+          'btnText': 'mautic.form.result.export.html'|trans,
+          'iconClass': 'fa fa-file-code-o',
+          'primary': true,
+      }]) %}
+    {% endif %}
 
   {% set buttons = buttons|merge([{
       'attr': {

@@ -562,6 +562,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'router',
+                    'mautic.security',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
