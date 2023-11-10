@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -2037,7 +2038,7 @@ class MailHelper
                     } else {
                         $messageHeaders->addHeader($headerKey, $headerValue);
                     }
-                } catch (\Swift_RfcComplianceException $complianceException) {
+                } catch (RfcComplianceException $complianceException) {
                     $messageHeaders->remove($headerKey);
                 }
             }
