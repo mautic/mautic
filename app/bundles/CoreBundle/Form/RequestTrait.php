@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
@@ -50,6 +49,7 @@ trait RequestTrait
             }
 
             $type = $child->getConfig()->getType();
+            // @phpstan-ignore-next-line
             if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
