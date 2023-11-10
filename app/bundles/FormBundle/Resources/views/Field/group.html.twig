@@ -20,8 +20,7 @@
 {% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
 {% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
 {% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
-{%
-    if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
+{% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
   {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
   {% if field.properties.multiple is defined %}
     {% set inputName = inputName ~ '[]' %}
