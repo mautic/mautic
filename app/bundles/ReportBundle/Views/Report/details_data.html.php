@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Loader\ParameterLoader;
+
 if ('index' == $tmpl) {
     $view->extend('MauticReportBundle:Report:details.html.php');
 }
@@ -21,6 +24,7 @@ $aggregatorCount      = count($aggregatorOrder);
 $groupBy              = $report->getGroupBy();
 $groupByCount         = count($groupBy);
 $startCount           = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
+$timezone             = (new ParameterLoader())->getParameterBag()->get('default_timezone');
 function getTotal($a, $f, $t, $allrows, $ac)
 {
     switch ($f) {
@@ -130,10 +134,10 @@ $graphContent = $view->render(
                                                 if ('' !== $cellVal && !is_null($cellVal)) {
                                                     switch ($cellType) {
                                                         case 'datetime':
-                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                            echo $view['date']->toFullConcat($cellVal, $timezone);
                                                             break;
                                                         case 'date':
-                                                            echo $view['date']->toShort($cellVal, 'UTC');
+                                                            echo $view['date']->toShort($cellVal, $timezone);
                                                             break;
                                                         default:
                                                             echo $view['formatter']->_($cellVal, $cellType);
