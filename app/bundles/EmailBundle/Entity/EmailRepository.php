@@ -25,7 +25,7 @@ class EmailRepository extends CommonRepository
         $q->select('l.id, l.email')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
         if ($leadIds) {
@@ -57,7 +57,7 @@ class EmailRepository extends CommonRepository
         $q->select('dnc.*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
