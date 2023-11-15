@@ -1,7 +1,8 @@
-{% if form is defined and form.lead_channels.preferred_channel is defined%}
-    {% if showContactPreferredChannels is defined and showContactPreferredChannels %}
-        <div class="preferred_channel text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
-    {% else %}
+{% if form is defined %}
+    {% if form.lead_channels.preferred_channel is defined %}
+        {% if showContactPreferredChannels is defined and showContactPreferredChannels %}
+            <div class="preferred_channel text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
+        {% endif %}
         {% do form.lead_channels.preferred_channel.setRendered(true) %}
     {% endif %}
 {% else %}
