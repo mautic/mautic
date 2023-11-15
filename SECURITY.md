@@ -31,7 +31,7 @@ If you discover or learn about a potential error, weakness, or threat that can c
 
 To make your report please submit it as a private disclosure at [https://github.com/mautic/mautic/security](https://github.com/mautic/mautic/security). You can also create a private fork to provide a fix, if you're able to do so. See the documentation from GitHub on [privately reporting a security issue](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability).
 
-Do not post it in GitHub as an issue or a Pull Request, on the forums, or or discuss it in Slack.
+Do not post it in GitHub as an issue or a Pull Request, on the forums, or discuss it in Slack.
 
 [Read more: How to report a security issue with Mautic](https://www.mautic.org/mautic-security-team/how-to-report-a-security-issue)
 
