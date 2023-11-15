@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-123-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-124-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -224,6 +224,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jcrandell7"><img src="https://avatars.githubusercontent.com/u/59890399?v=4?s=100" width="100px;" alt="jcrandell7"/><br /><sub><b>jcrandell7</b></sub></a><br /><a href="#userTesting-jcrandell7" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/driskell"><img src="https://avatars.githubusercontent.com/u/939815?v=4?s=100" width="100px;" alt="Jason Woods"/><br /><sub><b>Jason Woods</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=driskell" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://enkhjargal.me"><img src="https://avatars.githubusercontent.com/u/2686495?v=4?s=100" width="100px;" alt="Enkhjargal Lkhagvaa"/><br /><sub><b>Enkhjargal Lkhagvaa</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aenkhjargal" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alexbusu-motork"><img src="https://avatars.githubusercontent.com/u/149699605?v=4?s=100" width="100px;" alt="alexbusu-motork"/><br /><sub><b>alexbusu-motork</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aalexbusu-motork" title="Reviewed Pull Requests">👀</a></td>
     </tr>
   </tbody>
 </table>
