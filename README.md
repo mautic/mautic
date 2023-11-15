@@ -26,17 +26,7 @@ Installing and using Mautic
 
 ## Supported Versions
 
-| Branch | RC Release | Initial Release | Active Support Until | Security Support Until*
-|--|--|--|--|--|
-|2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
-|2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
-|3.x   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
-|3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 30 Nov 2020
-|3.2   | 23 Nov 2020 | 30 Nov 2020 | 16 Feb 2021 | 22 Feb 2021
-|3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 24 May 2021
-|4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | three months after version 5 release date
-
-`*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
+Please check the latest supported versions on the [Mautic Releases](https://www.mautic.org/mautic-releases) page.
 
 ## Software Downloads
 The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
