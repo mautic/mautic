@@ -1170,6 +1170,15 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "davidgorges",
+      "name": "David Gorges",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3885619?v=4",
+      "profile": "http://www.davidgorges.de",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
