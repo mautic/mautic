@@ -108,10 +108,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         if ('notRegexp' === $operator) {
-            $expressions = $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->and($expressions),
+            $expressions = [$queryBuilder->expr()->or(
+                $queryBuilder->expr()->and(...$expressions),
                 $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-            );
+            )];
         }
 
         $event->addExpression($event->getQueryBuilder()->expr()->and(...$expressions));
