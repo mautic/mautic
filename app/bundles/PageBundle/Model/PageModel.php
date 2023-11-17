@@ -441,7 +441,7 @@ class PageModel extends FormModel
     public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
         // Don't skew results with user hits
-        if (!$this->security->isAnonymous()) {
+        if (!$this->security->isAnonymous() || ($page instanceof Page && $page->isTrackingDisabled())) {
             return;
         }
 

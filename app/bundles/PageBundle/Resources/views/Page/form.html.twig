@@ -120,6 +120,8 @@
               {% endif %}
 
               {{ form_row(form.noIndex) }}
+              {{ form_row(form.trackingDisabled) }}
+
               <div class="template-fields {% if not template %}hide{% endif %}">
                   {{ form_row(form.metaDescription) }}
               </div>
