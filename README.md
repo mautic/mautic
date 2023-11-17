@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-122-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-125-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -26,17 +26,7 @@ Installing and using Mautic
 
 ## Supported Versions
 
-| Branch | RC Release | Initial Release | Active Support Until | Security Support Until*
-|--|--|--|--|--|
-|2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
-|2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
-|3.x   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
-|3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 30 Nov 2020
-|3.2   | 23 Nov 2020 | 30 Nov 2020 | 16 Feb 2021 | 22 Feb 2021
-|3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 24 May 2021
-|4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | three months after version 5 release date
-
-`*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
+Please check the latest supported versions on the [Mautic Releases](https://www.mautic.org/mautic-releases) page.
 
 ## Software Downloads
 The GitHub version is recommended for both development and testing. The production package (including all libraries) is available at [mautic.org/download][download-mautic].
@@ -233,6 +223,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/code5rick"><img src="https://avatars.githubusercontent.com/u/131262825?v=4?s=100" width="100px;" alt="code5rick"/><br /><sub><b>code5rick</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Acode5rick" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jcrandell7"><img src="https://avatars.githubusercontent.com/u/59890399?v=4?s=100" width="100px;" alt="jcrandell7"/><br /><sub><b>jcrandell7</b></sub></a><br /><a href="#userTesting-jcrandell7" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/driskell"><img src="https://avatars.githubusercontent.com/u/939815?v=4?s=100" width="100px;" alt="Jason Woods"/><br /><sub><b>Jason Woods</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=driskell" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://enkhjargal.me"><img src="https://avatars.githubusercontent.com/u/2686495?v=4?s=100" width="100px;" alt="Enkhjargal Lkhagvaa"/><br /><sub><b>Enkhjargal Lkhagvaa</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aenkhjargal" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alexbusu-motork"><img src="https://avatars.githubusercontent.com/u/149699605?v=4?s=100" width="100px;" alt="alexbusu-motork"/><br /><sub><b>alexbusu-motork</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aalexbusu-motork" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.davidgorges.de"><img src="https://avatars.githubusercontent.com/u/3885619?v=4?s=100" width="100px;" alt="David Gorges"/><br /><sub><b>David Gorges</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Adavidgorges" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=davidgorges" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

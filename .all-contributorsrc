@@ -1152,6 +1152,34 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "enkhjargal",
+      "name": "Enkhjargal Lkhagvaa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2686495?v=4",
+      "profile": "http://enkhjargal.me",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "alexbusu-motork",
+      "name": "alexbusu-motork",
+      "avatar_url": "https://avatars.githubusercontent.com/u/149699605?v=4",
+      "profile": "https://github.com/alexbusu-motork",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "davidgorges",
+      "name": "David Gorges",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3885619?v=4",
+      "profile": "http://www.davidgorges.de",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
