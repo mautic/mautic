@@ -40,6 +40,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
+                'empty_data' => '',
             ]
         );
 
