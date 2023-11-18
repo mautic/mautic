@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -676,34 +677,13 @@ class MailHelper
         // Headers
         /** @var HeaderInterface $header */
         foreach ($message->getHeaders()->all() as $header) {
-            $headerBody = $header->getBody();
-            if ($headerBody instanceof \DateTimeInterface) {
-                // It's not possible to replace tokens in \DateTime objects
-                // because they can't contain tokens
+            // It only makes sense to tokenize headers that can be interpreted as text.
+            if (!$header instanceof UnstructuredHeader) {
                 continue;
             }
-
-            $updated = false;
-            if (is_array($headerBody)) {
-                $bodyReplaced = [];
-                foreach ($headerBody as $key => $value) {
-                    $count1             = $count2             = 0;
-                    $key                = is_string($key) ? str_ireplace($search, $replace, $key, $count1) : $key;
-                    $value              = is_string($value) ? str_ireplace($search, $replace, $value, $count2) : $value;
-                    $bodyReplaced[$key] = $value;
-                    if ($count1 + $count2) {
-                        $updated = true;
-                    }
-                }
-            } else {
-                $bodyReplaced = str_ireplace($search, $replace, $headerBody, $updated);
-            }
-
-            if (!empty($updated)) {
-                $header->setBody($bodyReplaced);
-            }
-
-            unset($headerBody, $bodyReplaced);
+            $headerBody   = $header->getBody();
+            $bodyReplaced = str_ireplace($search, $replace, $headerBody);
+            $header->setBody($bodyReplaced);
         }
 
         // Parts (plaintext)
