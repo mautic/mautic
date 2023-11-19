@@ -155,11 +155,11 @@ class AssetExtension extends AbstractExtension
     }
 
     /**
-     * @see AssetsHelper::getCountryFlag()
+     * @see Mautic\CoreBundle\Twig\Helper\AssetsHelper::getCountryFlag
      */
     public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
     {
-        return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class) ?: '';
+        return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
     }
 
     public function getBaseUrl(): string
