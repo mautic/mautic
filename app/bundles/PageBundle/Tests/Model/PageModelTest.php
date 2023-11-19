@@ -35,7 +35,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testHitPageDoesntProcessWhenTrackingIsDisabled()
+    public function testHitPageDoesntProcessWhenTrackingIsDisabled(): void
     {
         $hit     = new Hit();
         $page    = new Page();
@@ -54,12 +54,9 @@ class PageModelTest extends PageTestAbstract
         $pageModel->expects($this->once())->method('getHitQuery');
         $pageModel->hitPage($page, $request, 200, $contact, []);
 
-
         $page->setTrackingDisabled(true);
         $pageModel->expects($this->never())->method('getHitQuery');
         $pageModel->hitPage($page, $request, 200, $contact, []);
-
-
     }
 
     public function testUtf8CharsInTitleWithTransletirationDisabled()

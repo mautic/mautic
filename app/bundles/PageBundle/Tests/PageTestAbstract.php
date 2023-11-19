@@ -22,7 +22,6 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -48,6 +47,9 @@ class PageTestAbstract extends TestCase
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
     }
 
+    /**
+     * @return PageModel|array<mixed>
+     */
     protected function getPageModel($transliterationEnabled = true, bool $constructorArgumentsOnly = false): PageModel|array
     {
         $cookieHelper = $this
@@ -151,7 +153,7 @@ class PageTestAbstract extends TestCase
         $corePermissionsMock = $this->createMock(CorePermissions::class);
         $corePermissionsMock->expects($this->any())->method('isAnonymous')->willReturn(true);
 
-        $pageModelArguments = [ $cookieHelper,
+        $pageModelArguments = [$cookieHelper,
                                 $ipLookupHelper,
                                 $leadModel,
                                 $leadFieldModel,
@@ -169,7 +171,7 @@ class PageTestAbstract extends TestCase
                                 $this->router,
                                 $translator,
                                 $userHelper,
-                                $this->createMock(LoggerInterface::class)
+                                $this->createMock(LoggerInterface::class),
         ];
 
         return $constructorArgumentsOnly
