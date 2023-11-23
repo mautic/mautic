@@ -241,7 +241,7 @@ class PublicController extends CommonFormController
                         $this->dispatcher
                             ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
-                        if (!$session->has($successSessionName)) {
+                        if (!$session->has($successSessionName) || empty($session->get($successSessionName))) {
                             $successMessageDataSlots       = [
                                 'data-slot="successmessage"',
                                 'class="pref-successmessage"',
