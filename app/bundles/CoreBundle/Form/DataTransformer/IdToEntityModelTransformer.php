@@ -86,8 +86,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
 
             $entity = $this->em
                 ->getRepository($this->repository)
-                ->findOneBy([$this->id => $id])
-            ;
+                ->findOneBy([$this->id => $id]);
 
             if (null === $entity) {
                 throw new TransformationFailedException(sprintf('An entity with a/an '.$this->id.' of "%s" does not exist!', $id));

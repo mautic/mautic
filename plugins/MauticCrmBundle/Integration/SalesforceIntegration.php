@@ -1584,11 +1584,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $this->logger->debug('SALESFORCE: pushLeadToCampaign '.var_export($request, true));
 
-            if (!empty($request)) {
-                $result = $this->getApiHelper()->syncMauticToSalesforce($request);
+            $result = $this->getApiHelper()->syncMauticToSalesforce($request);
 
-                return (bool) array_sum($this->processCompositeResponse($result['compositeResponse']));
-            }
+            return (bool) array_sum($this->processCompositeResponse($result['compositeResponse']));
         }
 
         return false;

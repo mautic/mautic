@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -54,8 +55,8 @@ class EmailSendType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'mautic.email.send.emailtype.transactional' => 'transactional',
-                        'mautic.email.send.emailtype.marketing'     => 'marketing',
+                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                        'mautic.email.send.emailtype.marketing'     => MailHelper::EMAIL_TYPE_MARKETING,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
@@ -63,7 +64,7 @@ class EmailSendType extends AbstractType
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data' => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type'],
+                    'data' => (!isset($options['data']['email_type'])) ? MailHelper::EMAIL_TYPE_TRANSACTIONAL : $options['data']['email_type'],
                 ]
             );
         }

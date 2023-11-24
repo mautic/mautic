@@ -62,7 +62,7 @@ class SegmentCampaignShare
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
-        $campaigns = $q->execute()->fetchAllAssociative();
+        $campaigns = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists

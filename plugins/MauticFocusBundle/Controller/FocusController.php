@@ -180,12 +180,12 @@ class FocusController extends AbstractStandardFormController
                     $trackableModel = $this->getModel('page.trackable');
                     \assert($trackableModel instanceof TrackableModel);
                     $trackables = $trackableModel->getTrackableList('focus', $item->getId());
-                }
 
-                $cacheItem->set([$stats, $trackables]);
-                $cacheItem->expiresAfter($cacheTimeout * 60);
-                $cacheItem->tag("focus.{$item->getId()}");
-                $this->cacheProvider->save($cacheItem);
+                    $cacheItem->set([$stats, $trackables]);
+                    $cacheItem->expiresAfter($cacheTimeout * 60);
+                    $cacheItem->tag("focus.{$item->getId()}");
+                    $this->cacheProvider->save($cacheItem);
+                }
             }
 
             $args['viewParameters']['stats']                 = $stats;

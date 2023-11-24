@@ -73,7 +73,7 @@ class IpAddressModel
         $qb->setParameter('ipId', $ipAddress->getId());
 
         try {
-            $qb->execute();
+            $qb->executeStatement();
         } catch (UniqueConstraintViolationException $e) {
             $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Unique constraint)");
         } catch (ForeignKeyConstraintViolationException $e) {

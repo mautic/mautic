@@ -70,30 +70,28 @@ class ReportExporter
     {
         $report = $scheduler->getReport();
 
-        if (!is_null($scheduler->getScheduleDate())) {
-            $dateTo = clone $scheduler->getScheduleDate();
-            $dateTo->setTime(0, 0, 0);
+        $dateTo = clone $scheduler->getScheduleDate();
+        $dateTo->setTime(0, 0, 0);
 
-            $dateFrom = clone $dateTo;
-            switch ($report->getScheduleUnit()) {
-                case SchedulerEnum::UNIT_NOW:
-                    $dateFrom->sub(new \DateInterval('P10Y'));
-                    $this->schedulerModel->turnOffScheduler($report);
-                    break;
-                case SchedulerEnum::UNIT_DAILY:
-                    $dateFrom->sub(new \DateInterval('P1D'));
-                    break;
-                case SchedulerEnum::UNIT_WEEKLY:
-                    $dateFrom->sub(new \DateInterval('P7D'));
-                    break;
-                case SchedulerEnum::UNIT_MONTHLY:
-                    $dateFrom->sub(new \DateInterval('P1M'));
-                    break;
-            }
-
-            $this->reportExportOptions->setDateFrom($dateFrom);
-            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
+        $dateFrom = clone $dateTo;
+        switch ($report->getScheduleUnit()) {
+            case SchedulerEnum::UNIT_NOW:
+                $dateFrom->sub(new \DateInterval('P10Y'));
+                $this->schedulerModel->turnOffScheduler($report);
+                break;
+            case SchedulerEnum::UNIT_DAILY:
+                $dateFrom->sub(new \DateInterval('P1D'));
+                break;
+            case SchedulerEnum::UNIT_WEEKLY:
+                $dateFrom->sub(new \DateInterval('P7D'));
+                break;
+            case SchedulerEnum::UNIT_MONTHLY:
+                $dateFrom->sub(new \DateInterval('P1M'));
+                break;
         }
+
+        $this->reportExportOptions->setDateFrom($dateFrom);
+        $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
 
         // just published reports, but schedule continue
         if ($report->isPublished()) {

@@ -53,7 +53,7 @@ class PathsHelperTest extends TestCase
 
     public function testGetLocalConfigFile()
     {
-        $this->assertEquals(__DIR__.'/resource/paths/app/config/local.php', $this->helper->getLocalConfigurationFile());
+        $this->assertEquals(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
     }
 
     public function testGetCachePath()

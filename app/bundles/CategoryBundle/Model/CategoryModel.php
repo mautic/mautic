@@ -179,10 +179,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults($bundle, $filter = '', $limit = 10)
+    public function getLookupResults($bundle, $filter = '', $limit = 10): array
     {
         static $results = [];
 

@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -78,7 +79,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'site_url',
-            TextType::class,
+            UrlType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -86,7 +87,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.site.url.tooltip',
                 ],
-                'constraints' => [
+                'default_protocol' => 'https',
+                'constraints'      => [
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',

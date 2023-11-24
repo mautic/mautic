@@ -130,7 +130,8 @@ class Focus extends FormEntity
             ->setCustomRepositoryClass('MauticPlugin\MauticFocusBundle\Entity\FocusRepository')
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
-            ->addIndex(['form_id'], 'focus_form');
+            ->addIndex(['form_id'], 'focus_form')
+            ->addIndex(['name'], 'focus_name');
 
         $builder->addIdColumns();
 

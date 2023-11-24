@@ -559,10 +559,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    /**
-     * @return IntegrationEntity|object|null
-     */
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
+    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
@@ -638,16 +635,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
                 if (isset($config['push_activities']) and true == $config['push_activities']) {
-                    $savedEntities = $this->createActivity($config['campaign_task'], $id, $lead->getId());
-                    if ($savedEntities) {
-                        $integrationEntities[] = $savedEntities;
+                    $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                    if ($savedEntity instanceof IntegrationEntity) {
+                        $integrationEntities[] = $savedEntity;
                     }
                 }
 
-                if (!empty($integrationEntities)) {
-                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
-                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
-                }
+                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
             }
@@ -1021,11 +1016,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return IntegrationEntity|null
-     *
      * @throws ApiErrorException
      */
-    public function createActivity($config, $cwContactId, $leadId)
+    public function createActivity($config, $cwContactId, $leadId): ?IntegrationEntity
     {
         if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [
