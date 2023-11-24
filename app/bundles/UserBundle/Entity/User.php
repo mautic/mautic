@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\EquatableInterface;
@@ -245,6 +246,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             [
                 'min'        => 6,
                 'minMessage' => 'mautic.user.user.password.minlength',
+                'groups'     => ['CheckPassword'],
+            ]
+        ));
+
+        $metadata->addPropertyConstraint('plainPassword', new NotWeak(
+            [
+                'message'    => 'mautic.user.user.password.weak',
                 'groups'     => ['CheckPassword'],
             ]
         ));
