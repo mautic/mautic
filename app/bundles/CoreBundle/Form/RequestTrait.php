@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
@@ -116,7 +115,7 @@ trait RequestTrait
                 case DateTimeType::class:
                 case DateType::class:
                 case TimeType::class:
-                    if ('' === $params[$name] || null === $params[$name]) {
+                    if ('' === $params[$name]) {
                         break;
                     }
 
@@ -185,7 +184,7 @@ trait RequestTrait
             case 'datetime':
             case 'date':
             case 'time':
-                if ('' === $fieldData[$leadField['alias']] || null === $fieldData[$leadField['alias']]) {
+                if ('' === $fieldData[$leadField['alias']]) {
                     return;
                 }
 
