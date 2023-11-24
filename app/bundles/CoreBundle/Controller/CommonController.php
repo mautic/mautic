@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -202,6 +204,16 @@ class CommonController extends AbstractController implements MauticController
 
         $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
         $response = new Response('', $code);
+
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $template, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $template   = $event->getTemplate();
+            $parameters = $event->getVars();
+        }
 
         return $this->render($template, $parameters, $response);
     }
