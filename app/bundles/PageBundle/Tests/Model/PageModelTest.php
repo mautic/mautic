@@ -44,17 +44,24 @@ class PageModelTest extends PageTestAbstract
 
         $pageModelArguments = $this->getPageModel(true, true);
 
-        $pageModel = $this->getMockBuilder(PageModel::class)->setConstructorArgs($pageModelArguments)
-             ->setMethodsExcept(['hitPage'])
-             ->getMock();
+        $pageModel = $this->getMockBuilder(PageModel::class)
+                          ->setConstructorArgs($pageModelArguments)
+                          ->onlyMethods(['getHitQuery'])
+                          ->enableOriginalClone()
+                          ->getMock();
 
         $hit->setIpAddress(new IpAddress());
         $hit->setQuery(['page_title' => 'Test Page']);
 
-        $pageModel->expects($this->once())->method('getHitQuery');
+        // Check if tracking is enabled and getHitQuery is called
+        $pageModel->expects($this->once())->method('getHitQuery')
+                  ->willReturn(['page_title' => 'Test Page']);
+
         $pageModel->hitPage($page, $request, 200, $contact, []);
 
+        // Check if getHitQuery is not called when tracking is disabled
         $page->setTrackingDisabled(true);
+
         $pageModel->expects($this->never())->method('getHitQuery');
         $pageModel->hitPage($page, $request, 200, $contact, []);
     }
