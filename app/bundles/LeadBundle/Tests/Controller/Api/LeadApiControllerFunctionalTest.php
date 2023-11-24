@@ -291,6 +291,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'preferred_locale' => 'es_SV',
             'timezone'         => 'America/Chicago',
             'owner'            => 1,
+            'last_active'      => '2019-01-01 00:00:00',
         ];
 
         $this->client->request('POST', '/api/contacts/new', $payload);
@@ -838,5 +839,65 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('DELETE', "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    public function testOverwriteWithBlankAndResetFields(): void
+    {
+        $payload = [
+            'email'            => 'apiemail2@email.com',
+            'firstname'        => 'API',
+            'lastname'         => 'Test',
+            'address1'         => '123 Main St',
+            'preferred_locale' => 'en_US',
+            'timezone'         => 'America/New_York',
+            'last_active'      => '2022-01-01 00:00:00',
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+        $this->assertEquals($payload['last_active'], $response['contact']['fields']['all']['last_active']);
+
+        // without overwriteWithBlank, last_active is not set to null
+        $payload['last_active'] = '';
+        $payload['address1']    = '';
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertNotEmpty($response['contact']['fields']['all']['last_active']);
+        $this->assertNotEmpty($response['contact']['fields']['all']['address1']);
+
+        // with overwriteWithBlank, last_active should be set to null
+        $payload['overwriteWithBlank'] = true;
+        $payload['last_active']        = '';
+        $payload['address1']           = '';
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEmpty($response['contact']['fields']['all']['last_active']);
+        $this->assertEmpty($response['contact']['fields']['all']['address1']);
+
+        // Let's test the PATCH operation with last_active reset and overwriteWithBlank
+        $payload = [
+            'last_active'        => '',
+            'address1'           => '',
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contactId),
+            $payload
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEmpty($response['contact']['fields']['all']['last_active']);
+        $this->assertEmpty($response['contact']['fields']['all']['address1']);
     }
 }
