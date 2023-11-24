@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
@@ -70,6 +71,14 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testLanguageForm(): void
     {
+        $translationsPath = __DIR__.'/resource/language/fr';
+        $languagePath     = __DIR__.'/../../../../../translations/fr';
+        $filesystem       = new Filesystem();
+
+        // copy all from $translationsPath to $languagePath
+        $filesystem->mirror($translationsPath, $languagePath);
+        // check If copy was ok
+
         /** @var LanguageHelper $languageHelper */
         $languageHelper = $this->getContainer()->get('mautic.helper.language');
 
@@ -93,14 +102,15 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
-
+        $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), json_encode($languageHelper->getLanguageChoices()));
-        $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];
 
         $crawler = $this->client->request('GET', '/form/'.$form['id']);
         $this->assertStringContainsString('Merci de patienter...', $crawler->html());
         $this->assertStringContainsString('Ceci est requis.', $crawler->html());
+
+        $filesystem->remove($languagePath);
     }
 }
