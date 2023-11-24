@@ -45,7 +45,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content   = $event->getContent();
-        $contact   = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        $contact   = $this->security->isAnonymous() && !$event->isTrackingDisabled() ? $this->contactTracker->getContact() : null;
 
         $tokenList = $this->dateTokenHelper->getTokens($content, $contact ? $contact->getTimezone() : null);
         $event->setContent(str_replace(array_keys($tokenList), $tokenList, $content));

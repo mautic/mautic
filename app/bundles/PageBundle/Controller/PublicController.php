@@ -73,7 +73,11 @@ class PublicController extends CommonFormController
 
             $lead  = null;
             $query = null;
-            if (!$userAccess) {
+
+            //  If tracking is disabled for this page, don't track the hit and don't create a lead
+            $trackingDisabled = $entity instanceof Page && $entity->isTrackingDisabled();
+
+            if (!$userAccess && !$trackingDisabled) {
                 // Extract the lead from the request so it can be used to determine language if applicable
                 $query = $model->getHitQuery($request, $entity);
                 $lead  = $contactRequestHelper->getContactFromQuery($query);
@@ -281,7 +285,7 @@ class PublicController extends CommonFormController
                 'mautic_js'
             );
 
-            $event = new PageDisplayEvent($content, $entity);
+            $event = new PageDisplayEvent($content, $entity, [], $trackingDisabled);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 

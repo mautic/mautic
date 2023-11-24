@@ -194,7 +194,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function decodeTokens(PageDisplayEvent $event)
     {
-        $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        $lead = $this->security->isAnonymous() && !$event->isTrackingDisabled() ? $this->contactTracker->getContact() : null;
         if (!$lead) {
             return;
         }

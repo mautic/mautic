@@ -89,7 +89,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $page    = $event->getPage();
-        $lead    = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        $lead    = $this->security->isAnonymous() && !$event->isTrackingDisabled() ? $this->contactTracker->getContact() : null;
         $leadId  = $lead ? $lead->getId() : null;
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();

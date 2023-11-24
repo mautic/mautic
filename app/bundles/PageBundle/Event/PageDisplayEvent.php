@@ -28,7 +28,7 @@ class PageDisplayEvent extends Event
     /**
      * PageDisplayEvent constructor.
      */
-    public function __construct($content, Page $page, array $params = [])
+    public function __construct($content, Page $page, array $params = [], private bool $trackingDisabled = false)
     {
         $this->page    = $page;
         $this->content = $content;
@@ -83,5 +83,19 @@ class PageDisplayEvent extends Event
     public function setParams($params)
     {
         $this->params = $params;
+    }
+
+    /** If tracking is disabled no record for user should be created. */
+    public function isTrackingDisabled(): bool
+    {
+        return $this->trackingDisabled;
+    }
+
+    /** If tracking is disabled no record for user should be created. */
+    public function setTrackingDisabled(bool $trackingDisabled = true): PageDisplayEvent
+    {
+        $this->trackingDisabled = $trackingDisabled;
+
+        return $this;
     }
 }
