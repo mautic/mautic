@@ -1180,6 +1180,16 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "notz",
+      "name": "Gernot Pansy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/697251?v=4",
+      "profile": "https://github.com/notz",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
