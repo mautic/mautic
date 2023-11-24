@@ -873,6 +873,11 @@ return [
             'display_name' => 'IP2Location Web Service',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup',
         ],
+        'ipapi' => [
+            'display_name' => 'IP API',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IpapiLookup',
+        ],
+
     ],
 
     'parameters' => [
