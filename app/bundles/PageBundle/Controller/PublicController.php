@@ -430,7 +430,7 @@ class PublicController extends CommonFormController
         ContactRequestHelper $contactRequestHelper,
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
-        LoggerInterface $mauticLogger,
+        LoggerInterface $logger,
         PageModel $pageModel,
         $redirectId,
         ?string $ct = null
