@@ -222,6 +222,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
         $expectedValues =
             [
+                'datetime'  => '',
                 'datetime2' => '2023-01-01 21:00',
             ];
 
