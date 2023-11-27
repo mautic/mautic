@@ -1,7 +1,8 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="Account options" aria-label="Manage account and logout" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
-        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}" alt="Profile picture"></span>
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="{% trans %}mautic.core.account.options.title{% endtrans %}"
+    aria-label="{% trans %}mautic.core.account.manage.logout{% endtrans %}" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
+        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}" alt="{% trans %}mautic.core.profile.picture.alt{% endtrans %}"></span>
         <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
         <span class="caret ml-xs"></span>
     </a>

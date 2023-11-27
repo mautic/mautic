@@ -19,10 +19,12 @@
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
               'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
+              'aria-label': 'mautic.lead.lead.menu.quickadd'|trans,
           },
           'iconClass': 'fa fa-bolt',
           'btnText': 'mautic.lead.lead.menu.quickadd',
           'primary': true,
+          'aria-hidden': true,
       }]) %}
 
       {% if permissions['lead:imports:create'] %}
@@ -82,6 +84,7 @@
               'id': 'liveModeButton',
               'data-toggle': false,
               'data-max-id': maxLeadId,
+              'aria-label': 'mautic.lead.lead.live_update.aria_label'|trans,
           },
           'tooltip': 'mautic.lead.lead.live_update'|trans,
           'iconClass': 'fa fa-bolt',
@@ -95,6 +98,7 @@
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',
                 'data-anonymous': 'mautic.lead.lead.searchcommand.isanonymous'|trans,
+                'aria-label': 'mautic.lead.lead.anonymous_leads'|trans,
             },
             'tooltip': 'mautic.lead.lead.anonymous_leads'|trans,
             'iconClass': 'fa fa-user-secret',

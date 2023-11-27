@@ -3,7 +3,7 @@
         <h4>{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" title="Actions" aria-label="Open card options menu" role="button" tabindex="0" aria-haspopup="true">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" title="{% trans %}mautic.card.actions.title{% endtrans %}" aria-label="{% trans %}mautic.card.actions.aria_label{% endtrans %}" role="button" tabindex="0" aria-haspopup="true">
                     <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">

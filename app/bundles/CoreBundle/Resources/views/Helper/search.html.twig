@@ -8,7 +8,7 @@
 <div class="input-group">
     {% if searchHelp is defined and searchHelp is not empty %}
     <div class="input-group-btn">
-        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help" title="Search help" aria-label="Open search help" role="button" tabindex="0" aria-haspopup="true">
+        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help" title="{% trans %}mautic.core.search.help{% endtrans %}" aria-label="{% trans %}mautic.core.search.openhelp{% endtrans %}" role="button" tabindex="0" aria-haspopup="true">
             <i class="fa fa-question-circle" aria-hidden="true"></i>
         </button>
     </div>
