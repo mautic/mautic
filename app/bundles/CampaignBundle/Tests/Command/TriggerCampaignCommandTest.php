@@ -597,7 +597,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertLessThan(10, $tDiff, 'The campaign rebuild takes more than 10 seconds, probably an infinite loop.');
     }
 
-    public function testCampaignExecuteOrderByPriority(): void
+    public function testCampaignExecuteOrderByDateCreatedDesc(): void
     {
         $oldCampaign = $this->createCampaign('Some old campaign');
         $oldCampaign->setDateAdded(new \DateTime('2019-01-03 03:54:25'));
@@ -616,7 +616,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             }
         }
 
-        // check if the first processed campaign is the campaign with high priority
+        // check if the new campaign processed first
         $this->assertEquals("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
     }
 
