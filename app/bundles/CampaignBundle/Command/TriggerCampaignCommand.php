@@ -234,7 +234,11 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         // All published campaigns
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
+        $campaigns = $this->campaignRepository->getEntities([
+            'iterator_mode' => true,
+            'orderBy'       => 'c.dateAdded',
+            'orderByDir'    => 'DESC',
+        ]);
 
         while (false !== ($next = $campaigns->next())) {
             // Key is ID and not 0
