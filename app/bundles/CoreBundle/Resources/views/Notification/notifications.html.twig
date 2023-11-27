@@ -1,7 +1,7 @@
 <li class="dropdown dropdown-custom" id="notificationsDropdown">
     <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown" title="{% trans %}mautic.core.notifications{% endtrans %}" aria-label="{% trans %}mautic.core.notifications.dropdown{% endtrans %}" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
-        <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
+        <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk" aria-hidden="true"></i></span>
         <span class="fa fa-bell fs-16" aria-hidden="true"></span>
     </a>
     <div class="dropdown-menu">
@@ -9,7 +9,7 @@
             <div class="panel-heading">
                 <div class="panel-title">
                     <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
-                        <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
+                        <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times" aria-hidden="true"></i></a>
                     </h6>
                 </div>
             </div>

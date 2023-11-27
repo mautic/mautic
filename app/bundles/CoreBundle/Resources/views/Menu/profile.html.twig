@@ -9,12 +9,12 @@
     <ul class="dropdown-menu dropdown-menu-right" role="menu">
         <li role="presentation">
             <a href="{{ path('mautic_user_account') }}" data-toggle="ajax" role="menuitem">
-                <i class="fa fa-user fs-14"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
+                <i class="fa fa-user fs-14" aria-hidden="true"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
             </a>
         </li>
         <li role="presentation">
             <a href="{{ path('mautic_user_logout') }}" role="menuitem">
-                <i class="fa fa-sign-out fs-14"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
+                <i class="fa fa-sign-out fs-14" aria-hidden="true"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
             </a>
         </li>
 

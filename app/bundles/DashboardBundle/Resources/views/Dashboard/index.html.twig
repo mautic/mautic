@@ -85,7 +85,7 @@
       <div id="dashboard-widgets" class="dashboard-widgets cards">
           {% for widget in widgets %}
               <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
-                  <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  <div class="spinner"><i class="fa fa-spin fa-spinner" aria-hidden="true"></i></div>
               </div>
           {% endfor %}
       </div>
@@ -97,7 +97,7 @@
                   <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
               </div>
               <div class="col-xs-9">
-                  <h4><i class="fa fa-quote-left"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="fa fa-quote-right"></i></h4>
+                  <h4><i class="fa fa-quote-left" aria-hidden="true"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="fa fa-quote-right" aria-hidden="true"></i></h4>
                   <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
                   <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'}) }}" class="btn btn-success">
                       Apply the default dashboard

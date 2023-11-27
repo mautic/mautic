@@ -59,7 +59,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <button type="{{ type is defined ? type|escape : 'button' }}"
     {{ block('button_attributes') }}>
     {% if form.vars.attr.icon is defined and form.vars.attr.icon is not empty %}
-    <i class="{{ form.vars.attr.icon }} "></i>
+    <i class="{{ form.vars.attr.icon }}" aria-hidden="true"></i>
     {% endif %}
     {{ label|trans({}, translation_domain)|escape }}
 </button>
@@ -203,7 +203,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
 {% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
-{{ label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="fa fa-question-circle"></i>' : '' }}</label>
+{{ label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="fa fa-question-circle" aria-hidden="true"></i>' : '' }}</label>
 {% endif %}
 {% endblock form_label %}
 

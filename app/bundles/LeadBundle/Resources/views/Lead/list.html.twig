@@ -53,12 +53,12 @@
   <div class="btn-group ml-5 sr-only ">
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
         <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-default">
-            <i class="fa fa-fw fa-table"></i>
+            <i class="fa fa-fw fa-table" aria-hidden="true"></i>
         </a>
       </span>
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
         <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-default">
-          <i class="fa fa-fw fa-th-large"></i>
+          <i class="fa fa-fw fa-th-large" aria-hidden="true"></i>
         </a>
       </span>
   </div>
