@@ -20,6 +20,16 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     private SmtpTransport $transport;
 
+    protected function getContact(): Lead
+    {
+        $contact = new Lead();
+        $contact->setFirstName('Jane');
+        $contact->setLastName('Doe');
+        $contact->setEmail('jane@api.test');
+
+        return $contact;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -252,10 +262,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         // Create a contact:
-        $contact = new Lead();
-        $contact->setFirstName('Jane');
-        $contact->setLastName('Doe');
-        $contact->setEmail('jane@api.test');
+        $contact = $this->getContact();
         $contact->setOwner($user);
         $this->em->persist($contact);
 
@@ -440,6 +447,27 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         $this->assertCount(3, $responseData['emails']);
         $this->assertSame([$email1->getId(), $email2->getId(), $email3->getId()], array_keys($responseData['emails']));
+    }
+
+    public function testSendCustomEmail(): void
+    {
+        $contact = $this->getContact();
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        // Send to segment:
+        $params              = [];
+        $params['fromEmail'] = 'test@test.com';
+        $params['fromName']  = 'Test tester';
+        $params['subject']   = 'xxx';
+        $params['content']   = 'custom content';
+
+        $this->client->request('POST', "/api/emails/contact/{$contact->getId()}/send/custom", $params);
+        $clientResponse = $this->client->getResponse();
+        $sendResponse   = json_decode($clientResponse->getContent(), true);
+
+        $this->assertArrayHasKey('success', $sendResponse, $clientResponse->getContent());
+        $this->assertArrayHasKey('trackingHash', $sendResponse, $clientResponse->getContent());
     }
 
     private function createSegment(string $name, string $alias): LeadList
