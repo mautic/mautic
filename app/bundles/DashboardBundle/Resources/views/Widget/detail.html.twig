@@ -6,14 +6,14 @@
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" title="{% trans %}mautic.card.actions.title{% endtrans %}" aria-label="{% trans %}mautic.card.actions.aria_label{% endtrans %}" role="button" tabindex="0" aria-haspopup="true">
                     <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
                             data-target="#MauticSharedModal"
                             data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}"
                             class="edit-widget"
-                            aria-label="Edit card" role="button" tabindex="0">
+                            aria-label="Edit card" role="menuitem" tabindex="0">
                             <i class="fa fa-pencil" aria-hidden="true"></i> Edit
                         </a>
                     </li>
@@ -33,7 +33,7 @@
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
                             class="remove-widget"
-                            aria-label="Remove card" role="button" tabindex="0">
+                            aria-label="Remove card" role="menuitem" tabindex="0">
                             <i class="fa fa-remove" aria-hidden="true"></i> Remove
                         </a>
                     </li>

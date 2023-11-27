@@ -1,19 +1,19 @@
 {% set inline = menuRender('profile') %}
-<li class="dropdown">
+<li class="dropdown" role="presentation">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="{% trans %}mautic.core.account.options.title{% endtrans %}"
-    aria-label="{% trans %}mautic.core.account.manage.logout{% endtrans %}" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
+    aria-label="{% trans %}mautic.core.account.manage.logout{% endtrans %} {{ app.getUser().getName() }}" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
         <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}" alt="{% trans %}mautic.core.profile.picture.alt{% endtrans %}"></span>
         <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
         <span class="caret ml-xs"></span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-right">
-        <li>
-            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
+    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+        <li role="presentation">
+            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax" role="menuitem">
                 <i class="fa fa-user fs-14"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
             </a>
         </li>
-        <li>
-            <a href="{{ path('mautic_user_logout') }}">
+        <li role="presentation">
+            <a href="{{ path('mautic_user_logout') }}" role="menuitem">
                 <i class="fa fa-sign-out fs-14"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
             </a>
         </li>

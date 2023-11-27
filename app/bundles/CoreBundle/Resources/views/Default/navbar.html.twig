@@ -19,9 +19,9 @@
     <!--/ end: left nav -->
 
     <!-- start: right nav -->
-    <ul class="nav navbar-nav navbar-right">
+    <ul class="nav navbar-nav navbar-right" role="menu">
         {{ include('@MauticCore/Menu/profile.html.twig') }}
-        <li>
+        <li role="presentation">
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl" class="sidebar-toggle" title="{% trans %}mautic.core.toggle.sidebar{% endtrans %}" aria-label="{% trans %}mautic.core.toggle.sidebar{% endtrans %}" role="button" tabindex="0" aria-haspopup="false">
                 <i class="fa fa-cog fs-16" aria-hidden="true"></i>
             </a>
