@@ -1,7 +1,7 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="Account options" aria-label="Manage account and logout" role="button" tabindex="0" aria-haspopup="true"  aria-expanded="false">
+        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}" alt="Profile picture"></span>
         <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
         <span class="caret ml-xs"></span>
     </a>

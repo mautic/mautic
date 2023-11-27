@@ -8,16 +8,16 @@
 <div class="input-group">
     {% if searchHelp is defined and searchHelp is not empty %}
     <div class="input-group-btn">
-        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
-            <i class="fa fa-question-circle"></i>
+        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help" title="Search help" aria-label="Open search help" role="button" tabindex="0" aria-haspopup="true">
+            <i class="fa fa-question-circle" aria-hidden="true"></i>
         </button>
     </div>
     {% endif %}
 
     <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ searchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
     <div class="input-group-btn">
-        <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="{{ id }}">
-            <i class="fa fa-search fa-fw"></i>
+        <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="{{ id }}" title="Search" aria-label="Search button" role="button" tabindex="0" aria-haspopup="false" >
+            <i class="fa fa-search fa-fw" aria-hidden="true"></i>
         </button>
     </div>
 </div>
