@@ -57,13 +57,47 @@
                         'class'      : 'col-stage-name',
                         'default'    : true,
                     }) -}}
-                    {{- include('@MauticCore/Helper/tableheader.html.twig',
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
                         'orderBy'    : 'c.title',
                         'text'       : 'mautic.core.category',
                         'class'      : 'visible-md visible-lg col-stage-category',
                     }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar': 'stage',
+                        'text': 'mautic.stage.action.weight',
+                        'class': 'visible-md visible-lg col-stage-weight',
+                        'orderBy': 's.weight',
+                        'default': true
+                    }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar': 'stage',
+                        'text': 'mautic.lead.list.thead.leadcount',
+                        'class': 'visible-md visible-lg col-stage-leadcount'
+                    }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar': 'stage',
+                        'text': 'mautic.lead.import.label.dateAdded',
+                        'orderBy': 's.dateAdded',
+                        'class': 'visible-md visible-lg col-stage-dateAdded'
+                    }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar': 'stage',
+                        'text': 'mautic.core.createdby',
+                        'orderBy': 's.createdByUser',
+                        'class': 'visible-md visible-lg col-stage-createdByUser'
+                    }) -}}
+
                     {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
@@ -119,6 +153,23 @@
                         <span>{{ catName }}</span>
                         </span>
                     </td>
+
+                    <td class="visible-md visible-lg">{{ item.getWeight() }}</td>
+
+                    {% set searchCommand = 'mautic.lead.lead.searchcommand.stage'|trans ~ ':' ~ item.getName() %}
+                    {% set leadCountText = 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]|default(0)}) %}
+
+                    <td class="visible-md visible-lg">
+                        <a class="label label-primary col-count" data-id="{{ item.getId() }}" href="{{ path('mautic_contact_index', {'search': searchCommand}) }}" data-toggle="ajax">
+                            {{ leadCountText }}
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg" title="{{ item.dateAdded ? item.dateAdded|date('F j, Y H:i:s') : '' }}">
+                        {{ item.getDateAdded() ? item.getDateAdded()|date('F j, Y') : '' }}
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.getCreatedByUser()|e }}</td>
+
+
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
