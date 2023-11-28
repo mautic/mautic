@@ -2,7 +2,7 @@
 
     {# Top menu level start #}
     {% if item.isRoot() %}
-        <ul class="nav mt-10" data-toggle="menu">
+        <ul class="nav mt-10" data-toggle="menu" role="navigation">
     {% else %}
         {# get attributes from item + the ones passed from parent #}
         {% set ulAttributes = item.getChildrenAttributes() %}
@@ -15,19 +15,19 @@
     {% for child in item.getChildren() %}
 
         {% if child.isDisplayed() %}
-            
+
             {% set showChildren = (child.hasChildren() and child.getDisplayChildren() ? true : false) %}
             {% set liAttributes = child.getAttributes() %}
             {% set isAncestor = matcher.isAncestor(child, options['matchingDepth']) %}
 
             {# save default classes for the item #}
             {% set liClasses = (liAttributes.class is defined) ? liAttributes.class ~ ' nav-group' : 'nav-group' %}
-           
+
             {# fetch classes from options and merge with the default classes #}
             {% set liAttributes = liAttributes|merge(buildMenuClasses(child, matcher, options, liClasses)) %}
 
             {# Menu item start #}
-            <li{{ parseMenuAttributes(liAttributes) }}>
+            <li{{ parseMenuAttributes(liAttributes) }} role="presentation">
 
                 {% set linkAttributes = child.getLinkAttributes() %}
                 {% set extras = child.getExtras() %}
@@ -36,7 +36,7 @@
 
                 {% if (showChildren) %}
                     {# Main item #}
-                    <a href="javascript:void(0);" data-target="#{{linkAttributes['id']}}_child" data-toggle="submenu" data-parent=".nav" {{parseMenuAttributes(linkAttributes)}}">
+                    <a href="javascript:void(0);" data-target="#{{linkAttributes['id']}}_child" data-toggle="submenu" data-parent=".nav" {{parseMenuAttributes(linkAttributes)}} role="menuitem" aria-haspopup="true" aria-label="{{ child.getLabel() | trans | purify }}">
                         <span class="arrow pull-right text-right"></span>
                 {% else %}
                     {# Submenu item #}
@@ -45,7 +45,7 @@
                     {% if (linkAttributes.target is not defined or linkAttributes.target is empty) %}
                         {% set linkAttributes = linkAttributes|merge({'data-toggle': 'ajax'}) %}
                     {% endif %}
-                    <a href="{{url}}"{{ parseMenuAttributes(linkAttributes) }}>
+                    <a href="{{url}}"{{ parseMenuAttributes(linkAttributes) }} role="menuitem" tabindex="0" aria-label="{{ child.getLabel() | trans | purify }}">
                 {% endif %}
 
                 {% if (extras.iconClass is defined and extras.iconClass is not empty) %}
@@ -58,12 +58,12 @@
 
                     {% set labelClasses = labelClasses ~ ' text' ~ labelPull %}
                     {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}
-                    
+
                         <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
 
                     </a>
                 {# Menu link end #}
-                
+
                 {# Submenu items start #}
                 {% if showChildren %}
                     {% set optionsDepth = (options['depth'] is defined and options['depth'] is not empty) ? (--options['depth']) : null %}
@@ -74,7 +74,7 @@
                     }) %}
 
                     {% set levelClass = isAncestor ? 'nav-submenu collapse in' : 'nav-submenu collapse' %}
-                    
+
                     {# include a class and id for children #}
 
                     {{ include('@MauticCore/Menu/main.html.twig', {
@@ -86,11 +86,11 @@
                         'options': options,
                         'matcher': matcher,
                     }) }}
-                
+
                 {% endif %}
 
                 {# Submenu items end #}
-                
+
             {# Menu item end #}
             </li>
 
@@ -101,5 +101,5 @@
 
     {# Top menu level end#}
     </ul>
-    
+
 {% endif %}
