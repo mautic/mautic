@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-127-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-128-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -230,6 +230,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/andersonjeccel"><img src="https://avatars.githubusercontent.com/u/116097999?v=4?s=100" width="100px;" alt="andersonjeccel"/><br /><sub><b>andersonjeccel</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=andersonjeccel" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/category"><img src="https://avatars.githubusercontent.com/u/73515469?v=4?s=100" width="100px;" alt="category"/><br /><sub><b>category</b></sub></a><br /><a href="#a11y-category" title="Accessibility">️️️️♿️</a></td>
     </tr>
   </tbody>
 </table>
