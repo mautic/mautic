@@ -1199,6 +1199,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "category",
+      "name": "category",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73515469?v=4",
+      "profile": "https://github.com/category",
+      "contributions": [
+        "a11y"
+      ]
     }
   ],
   "contributorsPerLine": 7,
