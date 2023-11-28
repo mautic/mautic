@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-126-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-127-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -227,6 +227,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/alexbusu-motork"><img src="https://avatars.githubusercontent.com/u/149699605?v=4?s=100" width="100px;" alt="alexbusu-motork"/><br /><sub><b>alexbusu-motork</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Aalexbusu-motork" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.davidgorges.de"><img src="https://avatars.githubusercontent.com/u/3885619?v=4?s=100" width="100px;" alt="David Gorges"/><br /><sub><b>David Gorges</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Adavidgorges" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=davidgorges" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/notz"><img src="https://avatars.githubusercontent.com/u/697251?v=4?s=100" width="100px;" alt="Gernot Pansy"/><br /><sub><b>Gernot Pansy</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Anotz" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=notz" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/andersonjeccel"><img src="https://avatars.githubusercontent.com/u/116097999?v=4?s=100" width="100px;" alt="andersonjeccel"/><br /><sub><b>andersonjeccel</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=andersonjeccel" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
