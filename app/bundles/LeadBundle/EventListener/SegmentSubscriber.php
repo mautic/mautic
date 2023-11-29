@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

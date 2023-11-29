@@ -16,30 +16,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TriggerModel
-     */
-    private $triggerModel;
+    private \Mautic\PointBundle\Model\TriggerModel $triggerModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var PointsChangeLogRepository
-     */
-    private $pointsChangeLogRepository;
+    private \Mautic\LeadBundle\Entity\PointsChangeLogRepository $pointsChangeLogRepository;
 
-    /**
-     * @var LeadPointLogRepository
-     */
-    private $leadPointLogRepository;
+    private \Mautic\PointBundle\Entity\LeadPointLogRepository $leadPointLogRepository;
 
-    /**
-     * @var LeadTriggerLogRepository
-     */
-    private $leadTriggerLogRepository;
+    private \Mautic\PointBundle\Entity\LeadTriggerLogRepository $leadTriggerLogRepository;
 
     public function __construct(
         TriggerModel $triggerModel,

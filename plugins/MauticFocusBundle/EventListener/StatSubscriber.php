@@ -13,15 +13,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(FocusModel $model, RequestStack $requestStack)
     {

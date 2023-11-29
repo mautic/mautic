@@ -13,10 +13,7 @@ class WebhookBuilderEvent extends Event
      */
     private $events = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

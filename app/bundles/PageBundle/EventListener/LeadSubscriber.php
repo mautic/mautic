@@ -19,20 +19,11 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var VideoModel
-     */
-    private $pageVideoModel;
+    private \Mautic\PageBundle\Model\VideoModel $pageVideoModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var RouterInterface

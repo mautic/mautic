@@ -41,10 +41,7 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_GROUP_SCORE,
     ];
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
     public function __construct(FieldsBuilder $fieldsBuilder)
     {

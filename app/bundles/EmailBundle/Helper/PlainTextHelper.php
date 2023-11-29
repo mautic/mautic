@@ -196,21 +196,8 @@ class PlainTextHelper
 
     /**
      * Various configuration options (able to be set in the constructor).
-     *
-     * @var array
      */
-    protected $options = [
-        'do_links' => 'inline', // 'none'
-        // 'inline' (show links inline)
-        // 'nextline' (show links on the next line)
-        // 'table' (if a table of link URLs should be listed after the text.
-
-        'width' => 70,          //  Maximum width of the formatted text, in columns.
-        //  Set this value to 0 (or less) to ignore word wrapping
-        //  and not constrain text to a fixed-width column.
-
-        'base_url' => '',
-    ];
+    protected array $options;
 
     /**
      * @param string $html    Source HTML

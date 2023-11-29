@@ -11,25 +11,13 @@ use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface $deviceCreatorService;
 
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
+    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface $deviceDetectorFactory;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var bool

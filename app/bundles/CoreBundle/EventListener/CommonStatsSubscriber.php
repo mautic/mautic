@@ -27,15 +27,9 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    protected \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(
         CorePermissions $security,

@@ -9,20 +9,14 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateRelativeInterval implements FilterDecoratorInterface
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
 
     /**
      * @var string
      */
     private $originalValue;
 
-    /**
-     * @var DateOptionParameters
-     */
-    private $dateOptionParameters;
+    private \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters $dateOptionParameters;
 
     /**
      * @param string $originalValue

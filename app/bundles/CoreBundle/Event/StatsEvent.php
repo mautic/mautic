@@ -14,10 +14,8 @@ class StatsEvent extends Event
 {
     /**
      * Database table containing statistical data available to get the results from.
-     *
-     * @var string
      */
-    protected $table;
+    protected string $table;
 
     /**
      * Array of columns to fetch.
@@ -28,17 +26,13 @@ class StatsEvent extends Event
 
     /**
      * The page where to start with.
-     *
-     * @var int
      */
-    protected $start;
+    protected int $start;
 
     /**
      * The rows per page limit.
-     *
-     * @var int
      */
-    protected $limit;
+    protected int $limit;
 
     /**
      * Database tables which the subscribers already asked for.
@@ -54,10 +48,8 @@ class StatsEvent extends Event
 
     /**
      * Array of order by statements.
-     *
-     * @var array
      */
-    protected $order = [];
+    protected array $order;
 
     /**
      * Array of where filters.
@@ -87,10 +79,7 @@ class StatsEvent extends Event
      */
     protected $repository;
 
-    /**
-     * @var User
-     */
-    protected $user;
+    protected \Mautic\UserBundle\Entity\User $user;
 
     /**
      * StatsEvent constructor.

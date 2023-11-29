@@ -11,20 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $model;
+    private \Mautic\EmailBundle\Model\EmailModel $model;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
     {

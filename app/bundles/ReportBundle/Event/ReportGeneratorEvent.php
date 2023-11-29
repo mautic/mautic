@@ -23,10 +23,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * QueryBuilder object.
-     *
-     * @var QueryBuilder
      */
-    private $queryBuilder;
+    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
 
     /**
      * contentTemplate.
@@ -45,10 +43,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $filterExpression;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var array|null

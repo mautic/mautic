@@ -56,37 +56,19 @@ class ReportModel extends FormModel
      */
     protected $defaultPageLimit;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
+    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     private RequestStack $requestStack;
 
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var ReportHelper
-     */
-    protected $reportHelper;
+    protected \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
+    private \Mautic\ReportBundle\Model\CsvExporter $csvExporter;
 
-    /**
-     * @var ExcelExporter
-     */
-    private $excelExporter;
+    private \Mautic\ReportBundle\Model\ExcelExporter $excelExporter;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

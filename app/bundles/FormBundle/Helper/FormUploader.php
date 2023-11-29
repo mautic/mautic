@@ -12,15 +12,9 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
+    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
     {

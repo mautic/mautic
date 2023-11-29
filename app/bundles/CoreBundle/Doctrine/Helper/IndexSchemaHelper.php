@@ -10,10 +10,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 
 class IndexSchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var string
@@ -23,7 +20,7 @@ class IndexSchemaHelper
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema

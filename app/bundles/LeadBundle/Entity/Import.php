@@ -107,15 +107,9 @@ class Import extends FormEntity
      */
     private $ignoredCount = 0;
 
-    /**
-     * @var int
-     */
-    private $priority;
+    private int $priority;
 
-    /**
-     * @var int
-     */
-    private $status;
+    private int $status;
 
     /**
      * @var \DateTimeInterface

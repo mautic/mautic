@@ -6,15 +6,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ParseEmailEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $messages;
+    private array $messages;
 
-    /**
-     * @var array
-     */
-    private $keys;
+    private array $keys;
 
     /**
      * @var array

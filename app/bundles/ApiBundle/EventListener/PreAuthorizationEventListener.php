@@ -10,20 +10,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PreAuthorizationEventListener
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    private $mauticSecurity;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $mauticSecurity;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {

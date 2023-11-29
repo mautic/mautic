@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(IntegrationHelper $integrationHelper)
     {

@@ -11,20 +11,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
+    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
     {

@@ -17,30 +17,15 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     public function __construct(
         FieldsBuilder $fieldsBuilder,

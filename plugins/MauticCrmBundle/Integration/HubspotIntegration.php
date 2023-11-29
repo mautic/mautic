@@ -37,10 +37,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 {
     public const ACCESS_KEY = 'accessKey';
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,

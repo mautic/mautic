@@ -27,20 +27,14 @@ class LeadListFilteringEvent extends CommonEvent
      */
     protected $queryBuilder;
 
-    /**
-     * @var bool
-     */
-    protected $isFilteringDone;
+    protected bool $isFilteringDone;
 
     /**
      * @var string
      */
     protected $alias;
 
-    /**
-     * @var string
-     */
-    protected $subQuery;
+    protected string $subQuery;
 
     /**
      * @var string

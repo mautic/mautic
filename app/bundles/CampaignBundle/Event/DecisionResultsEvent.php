@@ -10,20 +10,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class DecisionResultsEvent extends Event
 {
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
+    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
 
     /**
      * @var ArrayCollection|LeadEventLog[]
      */
     private $eventLogs;
 
-    /**
-     * @var EvaluatedContacts
-     */
-    private $evaluatedContacts;
+    private \Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts $evaluatedContacts;
 
     public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {

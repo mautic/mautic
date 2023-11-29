@@ -25,15 +25,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class VideoModel extends FormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

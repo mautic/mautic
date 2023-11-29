@@ -29,35 +29,17 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadChangeEventDispatcher
-     */
-    private $leadEventDispatcher;
+    private \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher $leadEventDispatcher;
 
-    /**
-     * @var DncReasonHelper
-     */
-    private $dncReasonHelper;
+    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var RouterInterface

@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -19,35 +18,17 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepo;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
+    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(
         LeadModel $leadModel,

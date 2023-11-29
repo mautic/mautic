@@ -12,15 +12,12 @@ use Mautic\CoreBundle\Exception\SchemaException;
  */
 class ColumnSchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var string

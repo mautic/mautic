@@ -13,10 +13,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
 {
-    /**
-     * @var array
-     */
-    private $filters;
+    private array $filters;
 
     /**
      * @var int

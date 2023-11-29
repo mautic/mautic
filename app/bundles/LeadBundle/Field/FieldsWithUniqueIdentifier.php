@@ -11,10 +11,7 @@ class FieldsWithUniqueIdentifier
      */
     private $uniqueIdentifierFields = [];
 
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
+    private \Mautic\LeadBundle\Field\FieldList $fieldList;
 
     public function __construct(FieldList $fieldList)
     {

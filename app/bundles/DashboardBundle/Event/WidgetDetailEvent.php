@@ -19,9 +19,9 @@ class WidgetDetailEvent extends CommonEvent
     protected $cacheDir;
     protected $uniqueCacheDir;
     protected $cacheTimeout;
-    protected $startTime = 0;
+    protected float $startTime;
     protected $loadTime  = 0;
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var CorePermissions

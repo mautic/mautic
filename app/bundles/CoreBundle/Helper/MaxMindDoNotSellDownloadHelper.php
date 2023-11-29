@@ -18,15 +18,9 @@ class MaxMindDoNotSellDownloadHelper
      */
     private $auth;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
+    private \Symfony\Contracts\HttpClient\HttpClientInterface $httpClient;
 
     /**
      * @var string

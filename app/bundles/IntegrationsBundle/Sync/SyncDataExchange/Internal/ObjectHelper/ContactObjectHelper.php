@@ -23,35 +23,20 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $model;
+    private \Mautic\LeadBundle\Model\LeadModel $model;
 
-    /**
-     * @var LeadRepository
-     */
-    private $repository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $repository;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
     /**
      * @var array
      */
     private $availableFields;
 
-    /**
-     * @var DoNotContactModel
-     */
-    private $dncModel;
+    private DoNotContactModel $dncModel;
 
     public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
     {

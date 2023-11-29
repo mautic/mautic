@@ -8,20 +8,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class RequestDAO
 {
-    /**
-     * @var int
-     */
-    private $syncIteration;
+    private int $syncIteration;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var string
-     */
-    private $syncToIntegration;
+    private string $syncToIntegration;
 
     /**
      * @var ObjectDAO[]

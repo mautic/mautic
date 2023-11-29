@@ -18,10 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationConfigType extends AbstractType
 {
-    /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $integrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper $integrationsHelper;
 
     public function __construct(ConfigIntegrationsHelper $integrationsHelper)
     {

@@ -9,20 +9,14 @@ use Ramsey\Uuid\Uuid;
 
 class EmailReply
 {
-    /**
-     * @var string
-     */
-    private $id;
+    private string $id;
 
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private \Mautic\EmailBundle\Entity\Stat $stat;
 
     /**
      * @var \DateTimeInterface
      */
-    private $dateReplied;
+    private \DateTime $dateReplied;
 
     /**
      * @var string

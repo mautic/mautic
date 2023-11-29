@@ -17,10 +17,7 @@ class MenuEvent extends Event
      */
     protected $type;
 
-    /**
-     * @var MenuHelper
-     */
-    protected $helper;
+    protected \Mautic\CoreBundle\Menu\MenuHelper $helper;
 
     /**
      * @param string $type

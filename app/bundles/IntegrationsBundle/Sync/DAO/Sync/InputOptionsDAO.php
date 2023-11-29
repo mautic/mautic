@@ -15,45 +15,21 @@ class InputOptionsDAO
      */
     private $integration;
 
-    /**
-     * @var bool
-     */
-    private $firstTimeSync;
+    private bool $firstTimeSync;
 
-    /**
-     * @var bool
-     */
-    private $disablePush;
+    private bool $disablePush;
 
-    /**
-     * @var bool
-     */
-    private $disablePull;
+    private bool $disablePull;
 
-    /**
-     * @var bool
-     */
-    private $disableActivityPush;
+    private bool $disableActivityPush;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $mauticObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $mauticObjectIds;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $integrationObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $integrationObjectIds;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $startDateTime;
+    private ?\DateTimeInterface $startDateTime;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $endDateTime;
+    private ?\DateTimeInterface $endDateTime;
 
     private array $options;
 

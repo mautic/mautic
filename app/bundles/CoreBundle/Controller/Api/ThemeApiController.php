@@ -28,10 +28,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ThemeApiController extends CommonApiController
 {
-    /**
-     * @var ThemeHelper
-     */
-    protected $themeHelper;
+    protected \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
 
     public function __construct(
         CorePermissions $security,

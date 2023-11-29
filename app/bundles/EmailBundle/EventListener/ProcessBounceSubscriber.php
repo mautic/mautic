@@ -13,10 +13,7 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'bounces';
 
-    /**
-     * @var Bounce
-     */
-    private $bouncer;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce $bouncer;
 
     /**
      * @return array

@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomAssetsEvent extends Event
 {
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
     public function __construct(AssetsHelper $assetsHelper)
     {

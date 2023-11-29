@@ -27,10 +27,7 @@ class ReportDAO
      */
     private $remappedObjects = [];
 
-    /**
-     * @var RelationsDAO
-     */
-    private $relationsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
 
     public function __construct($integration)
     {

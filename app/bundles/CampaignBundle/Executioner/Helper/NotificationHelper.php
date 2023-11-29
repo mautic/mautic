@@ -14,30 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private \Symfony\Component\Routing\Router $router;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         UserModel $userModel,

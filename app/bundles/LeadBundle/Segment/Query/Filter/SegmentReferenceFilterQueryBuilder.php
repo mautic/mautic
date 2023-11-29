@@ -17,20 +17,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @var ContactSegmentQueryBuilder
-     */
-    private $leadSegmentQueryBuilder;
+    private \Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder $leadSegmentQueryBuilder;
 
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $leadSegmentFilterFactory;
+    private \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory $leadSegmentFilterFactory;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(
         RandomParameterName $randomParameterNameService,

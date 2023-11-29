@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailReplyRepository
-     */
-    private $emailReplyRepository;
+    private \Mautic\EmailBundle\Entity\EmailReplyRepository $emailReplyRepository;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         EmailReplyRepository $emailReplyRepository,

@@ -17,30 +17,15 @@ use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
+    private \MauticPlugin\GrapesJsBuilderBundle\Integration\Config $config;
 
-    /**
-     * @var GrapesJsBuilderModel
-     */
-    private $grapesJsBuilderModel;
+    private \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel $grapesJsBuilderModel;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * InjectCustomContentSubscriber constructor.

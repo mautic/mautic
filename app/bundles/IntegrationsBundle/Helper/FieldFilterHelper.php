@@ -19,10 +19,7 @@ class FieldFilterHelper
      */
     private $filteredFields = [];
 
-    /**
-     * @var ConfigFormSyncInterface
-     */
-    private $integrationObject;
+    private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject;
 
     public function __construct(ConfigFormSyncInterface $integrationObject)
     {

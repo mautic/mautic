@@ -11,20 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class RemoveDeletedFilesStep implements StepInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var string
-     */
-    private $appRoot;
+    private string $appRoot;
 
     public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, LoggerInterface $logger)
     {

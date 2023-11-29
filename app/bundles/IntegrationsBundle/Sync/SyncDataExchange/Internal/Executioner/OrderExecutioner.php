@@ -19,30 +19,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutioner
 {
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
-    /**
-     * @var ReferenceResolverInterface
-     */
-    private $referenceResolver;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolverInterface $referenceResolver;
 
-    /**
-     * @var FieldValidatorInterface
-     */
-    private $fieldValidator;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidatorInterface $fieldValidator;
 
     public function __construct(
         MappingHelper $mappingHelper,

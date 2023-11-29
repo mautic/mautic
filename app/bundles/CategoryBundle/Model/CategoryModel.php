@@ -26,10 +26,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CategoryModel extends FormModel
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {

@@ -13,40 +13,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationHelper
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    protected \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var Router
-     */
-    protected $router;
+    protected \Symfony\Bundle\FrameworkBundle\Routing\Router $router;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var \Mautic\LeadBundle\Model\DoNotContact
-     */
-    private $doNotContact;
+    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
 
     public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {

@@ -11,20 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
-    /**
-     * @var Mailbox
-     */
-    private $imapHelper;
+    private \Mautic\EmailBundle\MonitoredEmail\Mailbox $imapHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var array

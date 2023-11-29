@@ -14,15 +14,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

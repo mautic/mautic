@@ -32,15 +32,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class UserModel extends FormModel
 {
-    /**
-     * @var MailHelper
-     */
-    protected $mailHelper;
+    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
 
-    /**
-     * @var UserTokenServiceInterface
-     */
-    private $userTokenService;
+    private \Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface $userTokenService;
 
     public function __construct(
         MailHelper $mailHelper,

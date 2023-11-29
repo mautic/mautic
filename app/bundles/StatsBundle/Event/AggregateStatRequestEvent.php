@@ -13,25 +13,13 @@ class AggregateStatRequestEvent extends Event
      */
     private $statName;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $fromDateTime;
+    private \DateTimeInterface $fromDateTime;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $toDateTime;
+    private \DateTimeInterface $toDateTime;
 
-    /**
-     * @var StatCollection
-     */
-    private $statCollection;
+    private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
 
-    /**
-     * @var FetchOptions
-     */
-    private $options;
+    private \Mautic\StatsBundle\Event\Options\FetchOptions $options;
 
     /**
      * AggregateStatRequestEvent constructor.

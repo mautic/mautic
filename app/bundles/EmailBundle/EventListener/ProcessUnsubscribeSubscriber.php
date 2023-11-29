@@ -15,15 +15,9 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'unsubscribes';
 
-    /**
-     * @var Unsubscribe
-     */
-    private $unsubscriber;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe $unsubscriber;
 
-    /**
-     * @var FeedbackLoop
-     */
-    private $looper;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop $looper;
 
     /**
      * @return array

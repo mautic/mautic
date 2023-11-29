@@ -10,20 +10,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UpdateSchemaStep implements StepInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
+    private ?object $kernel;
 
     public function __construct(TranslatorInterface $translator, ContainerInterface $container)
     {

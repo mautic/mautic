@@ -11,25 +11,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class TrackingHelper
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    protected \Symfony\Component\HttpFoundation\Session\Session $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         Session $session,

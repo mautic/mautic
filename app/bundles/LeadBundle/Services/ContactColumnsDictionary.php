@@ -8,11 +8,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactColumnsDictionary
 {
-    protected $fieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     private $fieldList = [];
 

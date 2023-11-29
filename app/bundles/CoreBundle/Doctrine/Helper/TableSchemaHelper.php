@@ -13,25 +13,19 @@ use Mautic\CoreBundle\Exception\SchemaException;
  */
 class TableSchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var string
      */
     protected $prefix;
 
-    /**
-     * @var ColumnSchemaHelper
-     */
-    protected $columnHelper;
+    protected \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnHelper;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema

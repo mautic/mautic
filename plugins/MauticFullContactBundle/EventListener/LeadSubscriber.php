@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LookupHelper
-     */
-    private $lookupHelper;
+    private \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper $lookupHelper;
 
     public function __construct(LookupHelper $lookupHelper)
     {

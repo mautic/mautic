@@ -23,10 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportType extends AbstractType
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
+    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
 
     public function __construct(ReportModel $reportModel)
     {

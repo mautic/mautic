@@ -8,10 +8,7 @@ use Mautic\FormBundle\Model\FormModel;
 
 class PropertiesAccessor
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
 
     public function __construct(FormModel $formModel)
     {

@@ -55,28 +55,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead:leads:viewother',
     ];
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
+    protected \Mautic\LeadBundle\Model\ListModel $leadListModel;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /** @var DateHelper */
-    protected $dateHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
     public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator, DateHelper $dateHelper)
     {

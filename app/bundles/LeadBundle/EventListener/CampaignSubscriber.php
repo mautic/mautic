@@ -46,50 +46,23 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var FieldModel
-     */
-    private $leadFieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var PointGroupModel
-     */
-    private $groupModel;
+    private \Mautic\PointBundle\Model\PointGroupModel $groupModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var FilterOperatorProvider
-     */
-    private $filterOperatorProvider;
+    private \Mautic\LeadBundle\Provider\FilterOperatorProvider $filterOperatorProvider;
 
     /**
      * @var array

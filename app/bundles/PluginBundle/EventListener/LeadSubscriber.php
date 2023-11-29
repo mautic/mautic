@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PluginModel
-     */
-    private $pluginModel;
+    private \Mautic\PluginBundle\Model\PluginModel $pluginModel;
 
     public function __construct(PluginModel $pluginModel)
     {

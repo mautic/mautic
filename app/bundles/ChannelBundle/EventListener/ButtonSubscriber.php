@@ -11,15 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(RouterInterface $router, TranslatorInterface $translator)
     {

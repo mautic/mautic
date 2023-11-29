@@ -19,25 +19,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityLookupType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * @var ModelFactory<object>
      */
-    private $modelFactory;
+    private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     /**
      * @var EntityLookupChoiceLoader[]

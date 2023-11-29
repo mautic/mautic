@@ -16,25 +16,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
+    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
 
-    /**
-     * @var StatHelper
-     */
-    private $statHelper;
+    private \Mautic\EmailBundle\Stat\StatHelper $statHelper;
 
-    /**
-     * @var DoNotContact
-     */
-    private $dncModel;
+    private \Mautic\LeadBundle\Model\DoNotContact $dncModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var string|null

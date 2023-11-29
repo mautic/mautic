@@ -19,8 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
-    /** @var MonitoringModel */
-    private $monitoringModel;
+    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
 
     public function __construct(MonitoringModel $monitoringModel)
     {

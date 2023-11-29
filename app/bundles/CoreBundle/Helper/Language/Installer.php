@@ -22,10 +22,7 @@ class Installer
      */
     private $installDirectory;
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private \Symfony\Component\Filesystem\Filesystem $filesystem;
 
     /**
      * Installer constructor.

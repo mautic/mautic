@@ -10,25 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
+    private \Mautic\CoreBundle\Helper\FileProperties $fileProperties;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router;
 
     public function __construct(
         TranslatorInterface $translator,

@@ -16,20 +16,11 @@ class FileManager
 {
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
+    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
     /**
      * FileManager constructor.

@@ -11,10 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GatedVideoType extends SlotType
 {
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
+    private \Mautic\FormBundle\Entity\FormRepository $formRepository;
 
     public function __construct(FormRepository $formRepository)
     {

@@ -26,10 +26,7 @@ class AuthenticationEvent extends Event
      */
     protected $user;
 
-    /**
-     * @var TokenInterface
-     */
-    protected $token;
+    protected \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token;
 
     /**
      * @var bool
@@ -44,12 +41,9 @@ class AuthenticationEvent extends Event
     /**
      * @var UserProvider
      */
-    protected $userProvider;
+    protected \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider;
 
-    /**
-     * @var bool
-     */
-    protected $isFormLogin;
+    protected bool $isFormLogin;
 
     /**
      * @var bool
@@ -63,10 +57,7 @@ class AuthenticationEvent extends Event
 
     protected $integrations;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * Message to display to user if there is a failed authentication.

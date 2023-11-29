@@ -29,15 +29,9 @@ class MessageQueueModel extends FormModel
     /** @var string A default message reschedule interval */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {

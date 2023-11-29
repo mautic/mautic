@@ -15,20 +15,11 @@ use Twig\Environment;
 
 class RequestSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
+    private \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $tokenManager;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(
         CsrfTokenManagerInterface $tokenManager,

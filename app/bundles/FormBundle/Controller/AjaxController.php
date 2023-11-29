@@ -22,15 +22,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
+    private \Mautic\FormBundle\Collector\FieldCollectorInterface $fieldCollector;
 
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
 
     public function __construct(FieldCollectorInterface $fieldCollector, AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {

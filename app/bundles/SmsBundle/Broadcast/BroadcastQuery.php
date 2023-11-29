@@ -13,15 +13,9 @@ class BroadcastQuery
 {
     use ContactLimiterTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
+    private \Mautic\SmsBundle\Model\SmsModel $smsModel;
 
     /**
      * @var \Doctrine\DBAL\Query\QueryBuilder

@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use Mautic\UserBundle\Entity\User;
 
 class PathsHelper
 {
@@ -17,45 +16,24 @@ class PathsHelper
      */
     private $theme;
 
-    /**
-     * @var string
-     */
-    private $imagePath;
+    private string $imagePath;
 
-    /**
-     * @var string
-     */
-    private $dashboardImportDir;
+    private string $dashboardImportDir;
 
-    /**
-     * @var string
-     */
-    private $dashboardUserImportDir;
+    private string $dashboardUserImportDir;
 
-    /**
-     * @var string
-     */
-    private $kernelCacheDir;
+    private string $kernelCacheDir;
 
-    /**
-     * @var string
-     */
-    private $kernelLogsDir;
+    private string $kernelLogsDir;
 
-    /**
-     * @var string
-     */
-    private $kernelRootDir;
+    private string $kernelRootDir;
 
     /**
      * @var mixed
      */
-    private $temporaryDir;
+    private string $temporaryDir;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private ?\Mautic\UserBundle\Entity\User $user;
 
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {

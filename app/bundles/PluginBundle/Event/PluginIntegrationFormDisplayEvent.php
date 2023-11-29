@@ -9,7 +9,7 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
     /**
      * @var string
      */
-    private $settings = [];
+    private array $settings;
 
     public function __construct(UnifiedIntegrationInterface $integration, array $settings)
     {

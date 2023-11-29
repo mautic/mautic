@@ -4,20 +4,11 @@ namespace Mautic\CampaignBundle\Entity\Result;
 
 class CountResult
 {
-    /**
-     * @var int
-     */
-    private $count;
+    private int $count;
 
-    /**
-     * @var int
-     */
-    private $minId;
+    private int $minId;
 
-    /**
-     * @var int
-     */
-    private $maxId;
+    private int $maxId;
 
     public function __construct($count, $minId, $maxId)
     {

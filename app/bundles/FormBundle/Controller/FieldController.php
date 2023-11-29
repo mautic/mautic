@@ -32,15 +32,9 @@ class FieldController extends CommonFormController
 
     private FieldModel $formFieldModel;
 
-    /**
-     * @var MappedObjectCollectorInterface
-     */
-    private $mappedObjectCollector;
+    private \Mautic\FormBundle\Collector\MappedObjectCollectorInterface $mappedObjectCollector;
 
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector;
 
     public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {

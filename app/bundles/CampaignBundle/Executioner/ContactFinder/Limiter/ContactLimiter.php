@@ -9,7 +9,7 @@ class ContactLimiter
     /**
      * @var int|null
      */
-    private $batchLimit;
+    private int $batchLimit;
 
     /**
      * @var int|null
@@ -31,10 +31,7 @@ class ContactLimiter
      */
     private $maxContactId;
 
-    /**
-     * @var array
-     */
-    private $contactIdList;
+    private array $contactIdList;
 
     /**
      * @var int|null

@@ -14,10 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RouteHelper
 {
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
     /**
      * @var RouEventDispatcherInterfaceter

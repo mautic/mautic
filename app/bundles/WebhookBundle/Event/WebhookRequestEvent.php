@@ -9,25 +9,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WebhookRequestEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $url;
+    private string $url;
 
-    /**
-     * @var array
-     */
-    private $headers;
+    private array $headers;
 
-    /**
-     * @var array
-     */
-    private $payload;
+    private array $payload;
 
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private \Mautic\LeadBundle\Entity\Lead $contact;
 
     public function __construct(Lead $contact, string $url, array $headers, array $payload)
     {

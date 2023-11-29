@@ -77,10 +77,7 @@ class SubmissionEvent extends CommonEvent
      */
     private $context;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @var array|Response|null

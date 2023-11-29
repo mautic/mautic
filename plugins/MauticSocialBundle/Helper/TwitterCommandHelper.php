@@ -16,35 +16,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var MonitoringModel
-     */
-    private $monitoringModel;
+    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
 
-    /**
-     * @var PostCountModel
-     */
-    private $postCountModel;
+    private \MauticPlugin\MauticSocialBundle\Model\PostCountModel $postCountModel;
 
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
     /**
      * @var OutputInterface

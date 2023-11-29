@@ -10,10 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectFindEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
 
     /**
      * @var int[]

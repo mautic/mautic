@@ -10,7 +10,7 @@ class LeadChangeCompanyEvent extends Event
 {
     private $lead;
     private $leads;
-    private $company;
+    private \Mautic\LeadBundle\Entity\Company $company;
     private $added;
 
     public function __construct($leads, Company $company, $added = true)

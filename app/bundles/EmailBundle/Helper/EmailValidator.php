@@ -10,15 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidator
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {

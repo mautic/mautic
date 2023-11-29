@@ -11,15 +11,9 @@ use Psr\Log\LoggerInterface;
 
 class DoctrineGeneratedColumnsListener
 {
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    protected $generatedColumnsProvider;
+    protected \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(GeneratedColumnsProviderInterface $generatedColumnsProvider, LoggerInterface $logger)
     {

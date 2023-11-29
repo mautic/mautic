@@ -14,20 +14,11 @@ use Twig\Environment;
 
 class ThemeHelper implements ThemeHelperInterface
 {
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var array|mixed
@@ -54,25 +45,13 @@ class ThemeHelper implements ThemeHelperInterface
      */
     private $themeHelpers = [];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var BuilderIntegrationsHelper
-     */
-    private $builderIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper $builderIntegrationsHelper;
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
 
-    /**
-     * @var Finder
-     */
-    private $finder;
+    private \Symfony\Component\Finder\Finder $finder;
 
     /**
      * @var bool

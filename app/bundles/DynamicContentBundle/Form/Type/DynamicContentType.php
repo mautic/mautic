@@ -35,21 +35,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentType extends AbstractType
 {
-    private $em;
-    private $translator;
+    private \Doctrine\ORM\EntityManager $em;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
     private $fieldChoices;
-    private $countryChoices;
-    private $regionChoices;
-    private $timezoneChoices;
-    private $localeChoices;
-    private $deviceTypesChoices;
-    private $deviceBrandsChoices;
-    private $deviceOsChoices;
+    private array $countryChoices;
+    private array $regionChoices;
+    private array $timezoneChoices;
+    private array $localeChoices;
+    private array $deviceTypesChoices;
+    private array $deviceBrandsChoices;
+    private array $deviceOsChoices;
     private $tagChoices = [];
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @throws \InvalidArgumentException

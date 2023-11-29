@@ -14,20 +14,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignEventHelper
-     */
-    private $campaignEventHelper;
+    private \MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper $campaignEventHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         CampaignEventHelper $campaignEventHelper,

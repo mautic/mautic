@@ -16,25 +16,13 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private \Symfony\Component\Routing\Router $router;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper $contactObjectHelper;
 
     /**
      * @var array

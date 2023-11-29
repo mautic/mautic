@@ -14,15 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {

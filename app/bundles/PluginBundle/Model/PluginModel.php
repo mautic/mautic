@@ -21,15 +21,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
     public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {

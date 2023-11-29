@@ -11,9 +11,9 @@ use Doctrine\DBAL\Connection;
  */
 abstract class AbstractFormatter
 {
-    protected $db;
-    protected $platform;
-    protected $name;
+    protected \Doctrine\DBAL\Connection $db;
+    protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+    protected string $name;
 
     /**
      * @return AbstractFormatter

@@ -6,10 +6,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactActionModel
 {
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
+    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
 
     public function __construct(LeadModel $contactModel)
     {

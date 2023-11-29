@@ -64,85 +64,37 @@ use Twig\Environment;
  */
 class SubmissionModel extends CommonFormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
+    protected \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
+    protected \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var MembershipManager
-     */
-    protected $membershipManager;
+    protected \Mautic\CampaignBundle\Membership\MembershipManager $membershipManager;
 
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
+    protected LeadFieldModel $leadFieldModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
+    protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper;
 
-    /**
-     * @var UploadFieldValidator
-     */
-    private $uploadFieldValidator;
+    private \Mautic\FormBundle\Validator\UploadFieldValidator $uploadFieldValidator;
 
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
+    private \Mautic\FormBundle\Helper\FormUploader $formUploader;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
 
-    /**
-     * @var FieldValueTransformer
-     */
-    private $fieldValueTransformer;
+    private \Mautic\FormBundle\Event\Service\FieldValueTransformer $fieldValueTransformer;
 
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     private ContactMerger $contactMerger;
 

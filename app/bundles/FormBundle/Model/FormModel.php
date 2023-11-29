@@ -43,65 +43,29 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    protected $themeHelper;
+    protected \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
-    /**
-     * @var ActionModel
-     */
-    protected $formActionModel;
+    protected \Mautic\FormBundle\Model\ActionModel $formActionModel;
 
-    /**
-     * @var FieldModel
-     */
-    protected $formFieldModel;
+    protected \Mautic\FormBundle\Model\FieldModel $formFieldModel;
 
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
+    protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper;
 
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
+    protected LeadFieldModel $leadFieldModel;
 
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
+    private \Mautic\FormBundle\Helper\FormUploader $formUploader;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
+    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
 
-    /**
-     * @var TableSchemaHelper
-     */
-    private $tableSchemaHelper;
+    private \Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper $tableSchemaHelper;
 
-    /**
-     * @var MappedObjectCollectorInterface
-     */
-    private $mappedObjectCollector;
+    private \Mautic\FormBundle\Collector\MappedObjectCollectorInterface $mappedObjectCollector;
 
     public function __construct(
         RequestStack $requestStack,

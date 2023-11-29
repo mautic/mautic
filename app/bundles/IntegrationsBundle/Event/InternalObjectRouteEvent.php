@@ -9,15 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectRouteEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private int $id;
 
     /**
      * @var string|null

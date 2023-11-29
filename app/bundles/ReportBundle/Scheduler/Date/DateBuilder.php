@@ -11,10 +11,7 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 class DateBuilder
 {
-    /**
-     * @var SchedulerBuilder
-     */
-    private $schedulerBuilder;
+    private \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder $schedulerBuilder;
 
     public function __construct(SchedulerBuilder $schedulerBuilder)
     {

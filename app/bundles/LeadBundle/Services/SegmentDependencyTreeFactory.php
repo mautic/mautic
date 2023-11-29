@@ -12,15 +12,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SegmentDependencyTreeFactory
 {
-    /**
-     * @var ListModel
-     */
-    private $segmentModel;
+    private \Mautic\LeadBundle\Model\ListModel $segmentModel;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * @var int[]

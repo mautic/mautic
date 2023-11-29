@@ -13,15 +13,9 @@ class ConfigType extends AbstractType
 {
     public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
 
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
     {

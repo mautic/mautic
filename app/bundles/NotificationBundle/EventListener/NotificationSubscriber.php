@@ -16,25 +16,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotificationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
+    private PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
+    private AssetTokenHelper $assetTokenHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
     {

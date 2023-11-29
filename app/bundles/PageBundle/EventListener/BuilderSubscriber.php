@@ -36,45 +36,21 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TokenHelper
-     */
-    private $tokenHelper;
+    private \Mautic\PageBundle\Helper\TokenHelper $tokenHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
     private $pageTokenRegex      = '{pagelink=(.*?)}';
     private $dwcTokenRegex       = '{dwc=(.*?)}';
     private $langBarRegex        = '{langbar}';

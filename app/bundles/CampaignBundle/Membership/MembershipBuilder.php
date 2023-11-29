@@ -14,25 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
-    /**
-     * @var MembershipManager
-     */
-    private $manager;
+    private \Mautic\CampaignBundle\Membership\MembershipManager $manager;
 
-    /**
-     * @var CampaignLeadRepository
-     */
-    private $campaignLeadRepository;
+    private CampaignLeadRepository $campaignLeadRepository;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var Campaign

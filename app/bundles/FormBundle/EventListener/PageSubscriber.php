@@ -16,25 +16,13 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(
         FormModel $formModel,

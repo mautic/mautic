@@ -19,10 +19,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper $valueHelper;
 
     /**
      * @var ReportDAO

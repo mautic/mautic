@@ -24,60 +24,33 @@ use Psr\Log\LoggerInterface;
 
 class EventExecutioner
 {
-    /**
-     * @var ActionExecutioner
-     */
-    private $actionExecutioner;
+    private \Mautic\CampaignBundle\Executioner\Event\ActionExecutioner $actionExecutioner;
 
-    /**
-     * @var ConditionExecutioner
-     */
-    private $conditionExecutioner;
+    private \Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner $conditionExecutioner;
 
-    /**
-     * @var DecisionExecutioner
-     */
-    private $decisionExecutioner;
+    private \Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner $decisionExecutioner;
 
-    /**
-     * @var EventCollector
-     */
-    private $collector;
+    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
 
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
+    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
     /**
      * @var Responses
      */
     private $responses;
 
-    /**
-     * @var RemovedContactTracker
-     */
-    private $removedContactTracker;
+    private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
 
     /**
      * @var \DateTimeInterface
      */
-    private $executionDate;
+    private \DateTime $executionDate;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
     public function __construct(
         EventCollector $eventCollector,

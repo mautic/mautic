@@ -33,17 +33,12 @@ class LeadTimelineEvent extends Event
      */
     protected $filters = [];
 
-    /**
-     * @var array|null
-     */
-    protected $orderBy;
+    protected ?array $orderBy;
 
     /**
      * Lead entity for the lead the timeline is being generated for.
-     *
-     * @var Lead
      */
-    protected $lead;
+    protected ?\Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var array<string, int>

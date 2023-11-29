@@ -13,10 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
+    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
 
     public function __construct(RealTimeExecutioner $realTimeExecutioner)
     {

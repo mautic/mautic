@@ -21,15 +21,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ContactActionModel
-     */
-    private $actionModel;
+    private \Mautic\CategoryBundle\Model\ContactActionModel $actionModel;
 
-    /**
-     * @var CategoryModel
-     */
-    private $categoryModel;
+    private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
     public function __construct(ContactActionModel $actionModel, CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {

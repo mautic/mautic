@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Accessor;
 
 class ConfigAccessor
 {
-    private $config;
+    private array $config;
 
     public function __construct(array $config)
     {

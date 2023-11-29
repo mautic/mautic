@@ -17,18 +17,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Mautic\DynamicContentBundle\Model\DynamicContentModel $dynamicContentModel;
+    private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(DynamicContentModel $dynamicContentModel, SessionInterface $session, EventDispatcherInterface $dispatcher)
     {

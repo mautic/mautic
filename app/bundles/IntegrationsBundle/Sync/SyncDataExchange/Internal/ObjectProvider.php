@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ObjectProvider
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /**
      * Cached internal objects.

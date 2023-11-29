@@ -30,22 +30,13 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @param LeadModel
      */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    protected $leadFieldRepository;
+    protected \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
     private DoNotContact $doNotContact;
 

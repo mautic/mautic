@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    private $connectwiseIntegration;
+    private \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration $connectwiseIntegration;
 
     public function __construct(ConnectwiseIntegration $connectwiseIntegration)
     {

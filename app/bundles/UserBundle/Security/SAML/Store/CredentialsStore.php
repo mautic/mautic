@@ -11,15 +11,9 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class CredentialsStore implements CredentialStoreInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var string
-     */
-    private $entityId;
+    private string $entityId;
 
     /**
      * @var X509Credential|null

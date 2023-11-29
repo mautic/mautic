@@ -63,55 +63,25 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
+    protected \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var RedirectModel
-     */
-    protected $pageRedirectModel;
+    protected \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var DateTimeHelper
-     */
-    protected $dateTimeHelper;
+    protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
+    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
 
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
     private MessageBusInterface $messageBus;
 
     private ContactRequestHelper $contactRequestHelper;

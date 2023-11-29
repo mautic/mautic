@@ -13,30 +13,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FeedbackLoop implements ProcessorInterface
 {
-    /**
-     * @var ContactFinder
-     */
-    private $contactFinder;
+    private \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var Message
      */
     private $message;
 
-    /**
-     * @var DoNotContactModel
-     */
-    private $doNotContact;
+    private DoNotContactModel $doNotContact;
 
     public function __construct(
         ContactFinder $contactFinder,

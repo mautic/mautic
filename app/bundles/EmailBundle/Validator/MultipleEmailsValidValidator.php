@@ -10,10 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class MultipleEmailsValidValidator extends ConstraintValidator
 {
-    /**
-     * @var EmailValidator
-     */
-    private $emailValidator;
+    private \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
 
     public function __construct(EmailValidator $emailValidator)
     {

@@ -4,10 +4,7 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 abstract class AbstractEventAccessor
 {
-    /**
-     * @var array
-     */
-    protected $config = [];
+    protected array $config;
 
     /**
      * @var array

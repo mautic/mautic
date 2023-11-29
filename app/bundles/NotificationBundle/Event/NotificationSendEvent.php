@@ -14,10 +14,7 @@ class NotificationSendEvent extends CommonEvent
 
     protected $heading;
 
-    /**
-     * @var Lead
-     */
-    protected $lead;
+    protected \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @param string $message

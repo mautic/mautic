@@ -9,15 +9,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectOwnerEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
 
     /**
      * @var int[]
      */
-    private $objectIds;
+    private array $objectIds;
 
     /**
      * Format: [object_id => owner_id].

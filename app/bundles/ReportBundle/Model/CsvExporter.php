@@ -9,15 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CsvExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     private TranslatorInterface $translator;
 

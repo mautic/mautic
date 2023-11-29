@@ -13,10 +13,7 @@ class StageBuilderEvent extends Event
      */
     private $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

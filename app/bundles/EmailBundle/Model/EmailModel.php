@@ -77,50 +77,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use BuilderModelTrait;
     use FilterTrait;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    protected $themeHelper;
+    protected \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
-    /**
-     * @var Mailbox
-     */
-    protected $mailboxHelper;
+    protected \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper;
 
-    /**
-     * @var MailHelper
-     */
-    protected $mailHelper;
+    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
+    protected \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueueModel;
+    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
 
     /**
      * @var bool
@@ -132,40 +105,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $emailSettings = [];
 
-    /**
-     * @var SendEmailToContact
-     */
-    protected $sendModel;
+    protected \Mautic\EmailBundle\Model\SendEmailToContact $sendModel;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
+    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
 
-    /**
-     * @var RedirectRepository
-     */
-    private $redirectRepository;
+    private \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository;
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var DNC
-     */
-    private $doNotContact;
+    private DNC $doNotContact;
 
-    /**
-     * @var StatsCollectionHelper
-     */
-    private $statsCollectionHelper;
+    private \Mautic\EmailBundle\Helper\StatsCollectionHelper $statsCollectionHelper;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

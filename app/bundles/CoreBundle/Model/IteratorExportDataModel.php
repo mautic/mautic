@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 
 class IteratorExportDataModel implements \Iterator
 {
-    private $position;
-    private $model;
-    private $args;
+    private int $position;
+    private \Mautic\CoreBundle\Model\AbstractCommonModel $model;
+    private array $args;
     private $callback;
-    private $total;
+    private int $total;
     private $data;
     private $totalResult;
     private bool $skipOrdering;

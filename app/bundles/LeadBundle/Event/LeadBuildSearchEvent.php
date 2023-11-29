@@ -12,10 +12,7 @@ class LeadBuildSearchEvent extends CommonEvent
      */
     protected $string;
 
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
+    protected \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
 
     /**
      * @var string
@@ -27,35 +24,20 @@ class LeadBuildSearchEvent extends CommonEvent
      */
     protected $command;
 
-    /**
-     * @var string
-     */
-    protected $subQuery;
+    protected string $subQuery;
 
     /**
      * @var bool
      */
     protected $negate;
 
-    /**
-     * @var bool
-     */
-    protected $isSearchDone;
+    protected bool $isSearchDone;
 
-    /**
-     * @var bool
-     */
-    protected $returnParameters;
+    protected bool $returnParameters;
 
-    /**
-     * @var bool
-     */
-    protected $strict;
+    protected bool $strict;
 
-    /**
-     * @var array
-     */
-    protected $parameters;
+    protected array $parameters;
 
     /**
      * @param string $string

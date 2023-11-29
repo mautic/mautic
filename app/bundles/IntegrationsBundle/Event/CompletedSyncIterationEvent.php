@@ -11,25 +11,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CompletedSyncIterationEvent extends Event
 {
-    /**
-     * @var OrderResultsDAO
-     */
-    private $orderResultsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO $orderResultsDAO;
 
-    /**
-     * @var int
-     */
-    private $iteration;
+    private int $iteration;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO;
 
     public function __construct(
         OrderResultsDAO $orderResultsDAO,

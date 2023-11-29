@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageActionListType extends AbstractType
 {
-    private $model;
+    private \Mautic\StageBundle\Model\StageModel $model;
 
     public function __construct(StageModel $model)
     {

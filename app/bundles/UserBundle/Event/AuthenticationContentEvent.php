@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AuthenticationContentEvent extends Event
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @var array

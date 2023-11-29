@@ -15,25 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryListType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var CategoryModel
-     */
-    private $model;
+    private \Mautic\CategoryBundle\Model\CategoryModel $model;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
     {

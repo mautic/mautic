@@ -56,15 +56,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private \Mautic\LeadBundle\Helper\SegmentCountCacheHelper $segmentCountCacheHelper;
 
     public function __construct(
         CampaignRepository $campaignRepository,

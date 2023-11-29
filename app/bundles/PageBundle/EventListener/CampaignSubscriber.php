@@ -18,20 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
+    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
+    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
 
     public function __construct(
         LeadModel $leadModel,

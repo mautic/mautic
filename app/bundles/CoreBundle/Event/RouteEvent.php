@@ -8,15 +8,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class RouteEvent extends Event
 {
-    /**
-     * @var Loader
-     */
-    protected $loader;
+    protected \Symfony\Component\Config\Loader\Loader $loader;
 
-    /**
-     * @var RouteCollection
-     */
-    protected $collection;
+    protected \Symfony\Component\Routing\RouteCollection $collection;
 
     /**
      * @var string

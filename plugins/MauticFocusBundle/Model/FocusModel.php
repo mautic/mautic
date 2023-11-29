@@ -37,30 +37,15 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var \Mautic\FormBundle\Model\FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     /**
      * FocusModel constructor.

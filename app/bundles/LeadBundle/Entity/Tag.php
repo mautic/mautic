@@ -15,10 +15,7 @@ class Tag
      */
     private $id;
 
-    /**
-     * @var string
-     */
-    private $tag;
+    private ?string $tag;
 
     /**
      * @var string|null

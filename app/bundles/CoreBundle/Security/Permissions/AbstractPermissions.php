@@ -12,10 +12,7 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
-    /**
-     * @var array
-     */
-    protected $params = [];
+    protected array $params;
 
     public function __construct(array $params)
     {

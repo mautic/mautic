@@ -21,25 +21,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactTracker
 {
     use DefaultValueTrait;
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var ContactTrackingServiceInterface
-     */
-    private $contactTrackingService;
+    private \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface $contactTrackingService;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
+    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     /**
      * @var Lead|null
@@ -51,30 +39,15 @@ class ContactTracker
      */
     private $trackedContact;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /**
      * @var FieldModel

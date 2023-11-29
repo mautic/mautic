@@ -12,30 +12,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissions
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var array
-     */
-    private $bundles;
+    private array $bundles;
 
-    /**
-     * @var array
-     */
-    private $pluginBundles;
+    private array $pluginBundles;
 
     /**
      * @var array

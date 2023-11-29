@@ -19,10 +19,7 @@ class StatsCollectionHelper
 
     public const GENERAL_STAT_PREFIX = 'email';
 
-    /**
-     * @var StatHelperContainer
-     */
-    private $helperContainer;
+    private \Mautic\EmailBundle\Stats\StatHelperContainer $helperContainer;
 
     public function __construct(StatHelperContainer $helperContainer)
     {

@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Helper;
 
 class BundleHelper
 {
-    private $coreBundles   = [];
-    private $pluginBundles = [];
-    private $allBundles    = [];
+    private array $coreBundles;
+    private array $pluginBundles;
+    private array $allBundles;
 
     public function __construct(array $coreBundles, array $pluginBundles)
     {

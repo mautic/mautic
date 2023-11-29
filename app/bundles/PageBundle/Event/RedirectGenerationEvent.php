@@ -7,15 +7,9 @@ use Mautic\PageBundle\Entity\Redirect;
 
 class RedirectGenerationEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    private $clickthrough;
+    private array $clickthrough;
 
-    /**
-     * @var Redirect
-     */
-    private $redirect;
+    private \Mautic\PageBundle\Entity\Redirect $redirect;
 
     public function __construct(Redirect $redirect, array $clickthrough)
     {

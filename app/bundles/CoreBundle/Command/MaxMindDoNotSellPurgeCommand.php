@@ -18,20 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MaxMindDoNotSellPurgeCommand extends Command
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var MaxMindDoNotSellList
-     */
-    private $doNotSellList;
+    private \Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList $doNotSellList;
 
     /**
      * @var LeadRepository
      */
-    private $leadRepository;
+    private \Doctrine\ORM\EntityRepository $leadRepository;
 
     public function __construct(EntityManager $em, MaxMindDoNotSellList $doNotSellList)
     {

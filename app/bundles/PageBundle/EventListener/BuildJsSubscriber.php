@@ -12,20 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
+    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
     {

@@ -14,10 +14,8 @@ class ChartQuery extends AbstractChart
 {
     /**
      * Doctrine's Connetion object.
-     *
-     * @var Connection
      */
-    protected $connection;
+    protected \Doctrine\DBAL\Connection $connection;
 
     private DateTimeHelper $dateTimeHelper;
 

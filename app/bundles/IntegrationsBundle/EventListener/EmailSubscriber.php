@@ -26,30 +26,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var TokenParser
-     */
-    protected $tokenParser;
+    protected \Mautic\IntegrationsBundle\Helper\TokenParser $tokenParser;
 
-    /**
-     * @var ObjectMappingRepository
-     */
-    protected $objectMappingRepository;
+    protected \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository $objectMappingRepository;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(
         TranslatorInterface $translator,

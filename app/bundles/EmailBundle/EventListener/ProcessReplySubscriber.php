@@ -16,15 +16,9 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     public const FOLDER_KEY = 'replies';
     public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
-    /**
-     * @var Reply
-     */
-    private $replier;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Reply $replier;
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cache;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cache;
 
     /**
      * @return array

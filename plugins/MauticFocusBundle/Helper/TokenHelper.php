@@ -11,20 +11,11 @@ class TokenHelper
 {
     private $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    protected $model;
+    protected \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(FocusModel $model, RouterInterface $router, CorePermissions $security)
     {

@@ -38,30 +38,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel
 {
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
+    protected \Mautic\LeadBundle\Model\ListModel $leadListModel;
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
+    private \Mautic\CampaignBundle\EventCollector\EventCollector $eventCollector;
 
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
+    private \Mautic\CampaignBundle\Membership\MembershipBuilder $membershipBuilder;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         ListModel $leadListModel,

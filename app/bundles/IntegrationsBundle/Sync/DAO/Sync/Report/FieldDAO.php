@@ -12,25 +12,16 @@ class FieldDAO
     public const FIELD_REQUIRED  = 'required';
     public const FIELD_UNCHANGED = 'unchanged';
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $value;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $value;
 
     /**
      * @var \DateTimeInterface|null
      */
     private $changeDateTime;
 
-    /**
-     * @var string
-     */
-    private $state;
+    private string $state;
 
     public function __construct(string $name, NormalizedValueDAO $value, string $state = self::FIELD_CHANGED)
     {

@@ -4,10 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 class SegmentActionModel
 {
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
+    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
 
     public function __construct(LeadModel $contactModel)
     {

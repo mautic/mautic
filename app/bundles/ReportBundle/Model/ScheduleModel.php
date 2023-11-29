@@ -14,17 +14,11 @@ class ScheduleModel
     /**
      * @var SchedulerRepository
      */
-    private $schedulerRepository;
+    private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    /**
-     * @var SchedulerPlanner
-     */
-    private $schedulerPlanner;
+    private \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner $schedulerPlanner;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
     {

@@ -36,14 +36,11 @@ class MailHelper
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
     public const EMAIL_TYPE_MARKETING     = 'marketing';
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
 
     protected MailerInterface $mailer;
 
-    protected $transport;
+    protected \Symfony\Component\Mailer\Transport\TransportInterface $transport;
 
     /**
      * @var Environment

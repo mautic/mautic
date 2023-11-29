@@ -19,10 +19,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ExceptionListener extends ErrorListener
 {
-    /**
-     * @var Router
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\Router $router;
 
     /**
      * @param LoggerInterface $controller

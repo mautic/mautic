@@ -28,10 +28,7 @@ class FormBuilderEvent extends Event
      */
     private $validators = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
