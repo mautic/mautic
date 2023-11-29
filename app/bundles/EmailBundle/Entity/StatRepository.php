@@ -54,10 +54,8 @@ class StatRepository extends CommonRepository
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
-        if ($result) {
-            foreach ($result as $row) {
-                $data[$row['date_hit']] = $row['url'];
-            }
+        foreach ($result as $row) {
+            $data[$row['date_hit']] = $row['url'];
         }
 
         return $data;

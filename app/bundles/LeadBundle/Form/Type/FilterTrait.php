@@ -350,11 +350,9 @@ trait FilterTrait
                 ]
             );
         } else {
-            if (!empty($customOptions['constraints'])) {
-                foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if ('NotBlank' === get_class($constraint)) {
-                        array_splice($customOptions['constraints'], $i, 1);
-                    }
+            foreach ($customOptions['constraints'] as $i => $constraint) {
+                if ('NotBlank' === get_class($constraint)) {
+                    array_splice($customOptions['constraints'], $i, 1);
                 }
             }
             $form->add(

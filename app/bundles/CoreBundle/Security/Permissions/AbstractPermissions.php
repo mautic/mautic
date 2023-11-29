@@ -248,12 +248,10 @@ abstract class AbstractPermissions
                         $required = ['viewown'];
                         break;
                 }
-                if (!empty($required)) {
-                    foreach ($required as $r) {
-                        list($ignore, $r) = $this->getSynonym($level, $r);
-                        if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
-                            $perms[] = $r;
-                        }
+                foreach ($required as $r) {
+                    list($ignore, $r) = $this->getSynonym($level, $r);
+                    if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
+                        $perms[] = $r;
                     }
                 }
             }

@@ -97,27 +97,25 @@ class MessageQueueModel extends FormModel
         );
 
         $queuedContacts = [];
-        if (!empty($dontSendTo)) {
-            foreach ($dontSendTo as $frequencyRuleMet) {
-                // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
-                $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
-                if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
-                    $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
-                } else {
-                    // Queue this message to be processed by frequency and priority
-                    $this->queue(
-                        [$leads[$frequencyRuleMet['lead_id']]],
-                        $channel,
-                        $channelId,
-                        $scheduleInterval,
-                        $attempts,
-                        $priority,
-                        $campaignEventId
-                    );
-                }
-                $queuedContacts[$frequencyRuleMet['lead_id']] = $frequencyRuleMet['lead_id'];
-                unset($leads[$frequencyRuleMet['lead_id']]);
+        foreach ($dontSendTo as $frequencyRuleMet) {
+            // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
+            $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
+            if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
+                $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
+            } else {
+                // Queue this message to be processed by frequency and priority
+                $this->queue(
+                    [$leads[$frequencyRuleMet['lead_id']]],
+                    $channel,
+                    $channelId,
+                    $scheduleInterval,
+                    $attempts,
+                    $priority,
+                    $campaignEventId
+                );
             }
+            $queuedContacts[$frequencyRuleMet['lead_id']] = $frequencyRuleMet['lead_id'];
+            unset($leads[$frequencyRuleMet['lead_id']]);
         }
 
         return $queuedContacts;

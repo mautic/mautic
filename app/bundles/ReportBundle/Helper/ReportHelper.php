@@ -112,11 +112,9 @@ final class ReportHelper
             unset($columns[$prefix.'id']['link']);
         }
 
-        if (!empty($removeColumns)) {
-            foreach ($removeColumns as $c) {
-                if (isset($columns[$prefix.$c])) {
-                    unset($columns[$prefix.$c]);
-                }
+        foreach ($removeColumns as $c) {
+            if (isset($columns[$prefix.$c])) {
+                unset($columns[$prefix.$c]);
             }
         }
 

@@ -1541,12 +1541,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         0,
                         [$campaignMembers[$memberId]]
                     );
-                    if ($existingCampaignMember) {
-                        foreach ($existingCampaignMember as $member) {
-                            $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
-                            $referenceId       = $integrationEntity->getId();
-                            $internalLeadId    = $integrationEntity->getInternalEntityId();
-                        }
+                    foreach ($existingCampaignMember as $member) {
+                        $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
+                        $referenceId       = $integrationEntity->getId();
+                        $internalLeadId    = $integrationEntity->getInternalEntityId();
                     }
                     $id = !empty($lead->getId()) ? $lead->getId() : '';
                     $id .= '-CampaignMember'.$campaignMembers[$memberId];

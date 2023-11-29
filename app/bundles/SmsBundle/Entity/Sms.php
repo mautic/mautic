@@ -180,12 +180,10 @@ class Sms extends FormEntity
                         ]
                     );
 
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                ->atPath('lists')
-                                ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                            ->atPath('lists')
+                            ->addViolation();
                     }
                 }
             },

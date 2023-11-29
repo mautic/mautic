@@ -858,14 +858,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $choices   = [];
         $campaigns = $this->getCampaigns();
 
-        if (!empty($campaigns)) {
-            foreach ($campaigns as $campaign) {
-                if (isset($campaign['id'])) {
-                    $choices[] = [
-                        'value' => $campaign['id'],
-                        'label' => $campaign['name'],
-                    ];
-                }
+        foreach ($campaigns as $campaign) {
+            if (isset($campaign['id'])) {
+                $choices[] = [
+                    'value' => $campaign['id'],
+                    'label' => $campaign['name'],
+                ];
             }
         }
 

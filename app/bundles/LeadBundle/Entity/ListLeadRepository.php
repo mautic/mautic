@@ -57,12 +57,10 @@ class ListLeadRepository extends CommonRepository
             ->where('ll.list = :segmentId')
             ->setParameter('segmentId', $segmentId);
 
-        if (!empty($filters)) {
-            foreach ($filters as $colName => $val) {
-                $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
-                $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
-                $qb->setParameter($entityFieldName, $val);
-            }
+        foreach ($filters as $colName => $val) {
+            $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
+            $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
+            $qb->setParameter($entityFieldName, $val);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

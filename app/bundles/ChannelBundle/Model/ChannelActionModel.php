@@ -78,10 +78,6 @@ class ChannelActionModel
         $allChannels = $this->contactModel->getPreferenceChannels();
         $dncChannels = array_diff($allChannels, $subscribedChannels);
 
-        if (empty($dncChannels)) {
-            return;
-        }
-
         foreach ($dncChannels as $channel) {
             $this->doNotContact->addDncForContact(
                 $contact->getId(),
