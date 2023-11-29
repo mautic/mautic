@@ -1017,10 +1017,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Extract script from html.
-     *
-     * @return array
      */
-    private function extractScriptTag($html)
+    private function extractScriptTag($html): array
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();

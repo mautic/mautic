@@ -51,10 +51,7 @@ class SegmentDependencies
         $this->reportModel       = $reportModel;
     }
 
-    /**
-     * @return array
-     */
-    public function getChannelsIds($segmentId)
+    public function getChannelsIds($segmentId): array
     {
         $usage   = [];
         $usage[] = [

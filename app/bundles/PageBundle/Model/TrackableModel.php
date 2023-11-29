@@ -270,7 +270,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<string, Redirect|Trackable>
      */
-    protected function createTrackingTokens(array $entities)
+    protected function createTrackingTokens(array $entities): array
     {
         $tokens = [];
         foreach ($entities as $trackable) {
@@ -372,10 +372,8 @@ class TrackableModel extends AbstractCommonModel
      * Find URLs in plain text and parse into trackables.
      *
      * @param string $text Plain text content
-     *
-     * @return array
      */
-    protected function extractTrackablesFromText($text)
+    protected function extractTrackablesFromText($text): array
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
         $text = strip_tags($text);

@@ -610,10 +610,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -673,10 +671,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -1831,10 +1827,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string $comments
      * @param bool   $flush
      * @param null   $leadId
-     *
-     * @return array
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -2205,10 +2199,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -2351,10 +2343,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmailsIdsWithDependenciesOnSegment($segmentId)
+    public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities =  $this->getEntities(
             [

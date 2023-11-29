@@ -289,11 +289,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1216,10 +1214,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array  $fields
      * @param array  $keys
      * @param string $object
-     *
-     * @return array
      */
-    public function cleanSugarData($fields, $keys, $object)
+    public function cleanSugarData($fields, $keys, $object): array
     {
         $leadFields = [];
 

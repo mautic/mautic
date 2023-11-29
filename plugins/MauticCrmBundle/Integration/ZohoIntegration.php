@@ -162,10 +162,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null): array
     {
         if ('company' === $object) {
             $object = 'Accounts';
@@ -599,10 +597,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param array $data
      * @param array $config
      * @param null  $object
-     *
-     * @return array
      */
-    public function populateMauticLeadData($data, $config = [], $object = 'Leads')
+    public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
     {
         // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);

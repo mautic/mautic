@@ -233,10 +233,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $cwFields;
     }
 
-    /**
-     * @return array
-     */
-    public function setFields($fields)
+    public function setFields($fields): array
     {
         $cwFields = [];
 
@@ -847,11 +844,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getCampaignChoices()
+    public function getCampaignChoices(): array
     {
         $choices   = [];
         $campaigns = $this->getCampaigns();
@@ -951,10 +946,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getRecordList($records, $index = null)
+    public function getRecordList($records, $index = null): array
     {
         $recordList = [];
 
@@ -972,11 +964,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getActivityTypes()
+    public function getActivityTypes(): array
     {
         $activities   = [];
         $cwActivities = $this->getApiHelper()->getActivityTypes();
@@ -991,11 +981,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getMembers()
+    public function getMembers(): array
     {
         $members   = [];
         $cwMembers = $this->getApiHelper()->getMembers();

@@ -437,10 +437,8 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * Validates that an array of submission IDs belong to a specific form.
-     *
-     * @return array
      */
-    public function validateSubmissions($ids, $formId)
+    public function validateSubmissions($ids, $formId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')

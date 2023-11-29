@@ -13,10 +13,7 @@ class TokenHelper
         $this->model = $model;
     }
 
-    /**
-     * @return array
-     */
-    public function findAssetTokens($content, $clickthrough = [])
+    public function findAssetTokens($content, $clickthrough = []): array
     {
         $tokens = [];
 

@@ -117,7 +117,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();

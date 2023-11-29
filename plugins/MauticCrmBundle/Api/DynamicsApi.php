@@ -207,10 +207,8 @@ class DynamicsApi extends CrmApi
 
     /**
      * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
-     *
-     * @return array
      */
-    public function parseRawHttpResponse(ResponseInterface $response)
+    public function parseRawHttpResponse(ResponseInterface $response): array
     {
         $a_data      = [];
         $input       = $response->getBody();

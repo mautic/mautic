@@ -110,10 +110,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns metadata for all plugins.
-     *
-     * @return array
      */
-    public function getPluginsMetadata()
+    public function getPluginsMetadata(): array
     {
         $allMetadata     = $this->em->getMetadataFactory()->getAllMetadata();
         $pluginsMetadata = [];
@@ -135,10 +133,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns all tables of installed plugins.
-     *
-     * @return array
      */
-    public function getInstalledPluginTables(array $pluginsMetadata)
+    public function getInstalledPluginTables(array $pluginsMetadata): array
     {
         $currentSchema          = $this->em->getConnection()->getSchemaManager()->createSchema();
         $installedPluginsTables = [];
@@ -162,10 +158,8 @@ class PluginModel extends FormModel
 
     /**
      * Generates new Schema objects for all installed plugins.
-     *
-     * @return array
      */
-    public function createPluginSchemas(array $installedPluginsTables)
+    public function createPluginSchemas(array $installedPluginsTables): array
     {
         $installedPluginsSchemas = [];
         foreach ($installedPluginsTables as $bundleName => $tables) {

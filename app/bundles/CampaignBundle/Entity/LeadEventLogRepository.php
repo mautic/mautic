@@ -470,10 +470,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * @param int $campaignId
-     *
-     * @return array
      */
-    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter)
+    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter): array
     {
         $now = clone $date;
         $now->setTimezone(new \DateTimeZone('UTC'));
@@ -509,10 +507,7 @@ class LeadEventLogRepository extends CommonRepository
         return $events;
     }
 
-    /**
-     * @return array
-     */
-    public function getDatesExecuted($eventId, array $contactIds)
+    public function getDatesExecuted($eventId, array $contactIds): array
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')

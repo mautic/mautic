@@ -299,10 +299,8 @@ trait CustomFieldRepositoryTrait
      * @param array  $values
      * @param bool   $byGroup
      * @param string $object
-     *
-     * @return array
      */
-    protected function formatFieldValues($values, $byGroup = true, $object = 'lead')
+    protected function formatFieldValues($values, $byGroup = true, $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 

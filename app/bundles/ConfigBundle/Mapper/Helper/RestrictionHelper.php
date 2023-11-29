@@ -6,10 +6,8 @@ class RestrictionHelper
 {
     /**
      * Ensure that the array has string indexes for congruency with a nested array similar to ['db_host', 'monitored_email' => ['EmailBundle_bounces'];.
-     *
-     * @return array
      */
-    public static function prepareRestrictions(array $restrictedParameters)
+    public static function prepareRestrictions(array $restrictedParameters): array
     {
         $prepared = [];
         foreach ($restrictedParameters as $key => $value) {

@@ -9,7 +9,10 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class IntegrationRepository extends CommonRepository
 {
-    public function getIntegrations()
+    /**
+     * @return mixed[]
+     */
+    public function getIntegrations(): array
     {
         $services = $this->createQueryBuilder('i')
             ->join('i.plugin', 'p')
@@ -26,8 +29,10 @@ class IntegrationRepository extends CommonRepository
 
     /**
      * Get core (no plugin) integrations.
+     *
+     * @return mixed[]
      */
-    public function getCoreIntegrations()
+    public function getCoreIntegrations(): array
     {
         $services = $this->createQueryBuilder('i')
             ->getQuery()

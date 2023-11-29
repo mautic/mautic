@@ -37,10 +37,8 @@ class StatRepository extends CommonRepository
 
     /**
      * @param null $listId
-     *
-     * @return array
      */
-    public function getSentStats($smsId, $listId = null)
+    public function getSentStats($smsId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')

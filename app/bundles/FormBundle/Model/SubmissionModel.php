@@ -1018,7 +1018,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields) {
+        $getCompanyData = function ($currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company'=> 'company']);

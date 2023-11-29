@@ -59,10 +59,8 @@ class PointRepository extends CommonRepository
     /**
      * @param string $type
      * @param int    $leadId
-     *
-     * @return array
      */
-    public function getCompletedLeadActions($type, $leadId)
+    public function getCompletedLeadActions($type, $leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
@@ -91,10 +89,8 @@ class PointRepository extends CommonRepository
 
     /**
      * @param int $leadId
-     *
-     * @return array
      */
-    public function getCompletedLeadActionsByLeadId($leadId)
+    public function getCompletedLeadActionsByLeadId($leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')

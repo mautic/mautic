@@ -261,10 +261,8 @@ class EventRepository extends CommonRepository
 
     /**
      * Get an array of events that have been triggered by this lead.
-     *
-     * @return array
      */
-    public function getLeadTriggeredEvents($leadId)
+    public function getLeadTriggeredEvents($leadId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')

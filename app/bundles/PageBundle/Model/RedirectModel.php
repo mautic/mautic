@@ -92,10 +92,8 @@ class RedirectModel extends FormModel
 
     /**
      * Generate UTMs params for url.
-     *
-     * @return array
      */
-    public function getUtmTagsForUrl($rawUtmTags)
+    public function getUtmTagsForUrl($rawUtmTags): array
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {

@@ -212,10 +212,8 @@ class FieldsBuilder
     /**
      * @param LeadField[] $fields
      * @param string      $prefix
-     *
-     * @return array
      */
-    private function getFieldColumns($fields, $prefix)
+    private function getFieldColumns($fields, $prefix): array
     {
         $prefix = $this->sanitizePrefix($prefix);
 

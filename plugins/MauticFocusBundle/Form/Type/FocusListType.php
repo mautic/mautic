@@ -27,7 +27,7 @@ class FocusListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
+                'choices' => function (Options $options): array {
                     $choices = [];
 
                     $list = $this->repo->getFocusList($options['data']);
