@@ -9,9 +9,6 @@ use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\NotificationEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignConditionSubscriber.
- */
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     /**

@@ -4,9 +4,6 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationKeyEvent.
- */
 class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
     /**

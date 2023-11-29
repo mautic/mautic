@@ -16,25 +16,23 @@ trait FormErrorMessagesTrait
     {
         $msg = '';
 
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
+        foreach ($formErrors as $key => $error) {
+            if (!$error) {
+                continue;
+            }
 
-                if ($msg) {
-                    $msg .= ', ';
-                }
+            if ($msg) {
+                $msg .= ', ';
+            }
 
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
+            if (is_string($key)) {
+                $msg .= $key.': ';
+            }
 
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
+            if (is_array($error)) {
+                $msg .= $this->getFormErrorMessage($error);
+            } else {
+                $msg .= $error;
             }
         }
 

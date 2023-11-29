@@ -28,6 +28,5 @@ class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterfac
 
     public function getOrder()
     {
-        // TODO: Implement getOrder() method.
     }
 }

@@ -9,9 +9,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 
-/**
- * Class Event.
- */
 class Event implements ChannelInterface
 {
     public const TYPE_DECISION  = 'decision';

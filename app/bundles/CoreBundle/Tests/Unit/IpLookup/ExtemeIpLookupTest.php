@@ -6,9 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
-/**
- * Class ExtremeIpLookupTest.
- */
 class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';

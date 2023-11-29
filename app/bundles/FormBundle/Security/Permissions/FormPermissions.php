@@ -5,9 +5,6 @@ namespace Mautic\FormBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class FormPermissions.
- */
 class FormPermissions extends AbstractPermissions
 {
     /**

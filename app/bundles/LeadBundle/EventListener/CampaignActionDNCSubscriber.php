@@ -25,9 +25,6 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
      */
     private $leadModel;
 
-    /**
-     * CampaignActionDNCSubscriber constructor.
-     */
     public function __construct(DoNotContact $doNotContact, LeadModel $leadModel)
     {
         $this->doNotContact = $doNotContact;

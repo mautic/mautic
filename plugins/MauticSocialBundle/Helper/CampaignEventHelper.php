@@ -146,7 +146,7 @@ class CampaignEventHelper
         );
 
         /**
-         * @var string
+         * @var string    $token
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {

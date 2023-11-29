@@ -7,9 +7,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * Class BuilderTokenHelper.
- */
 class BuilderTokenHelper
 {
     private $isConfigured = false;

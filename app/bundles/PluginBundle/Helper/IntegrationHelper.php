@@ -540,7 +540,7 @@ class IntegrationHelper
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
 
             /**
-             * @var string
+             * @var string                                               $integration
              * @var \Mautic\PluginBundle\Integration\AbstractIntegration $details
              */
             foreach ($socialIntegrations as $integration => $details) {

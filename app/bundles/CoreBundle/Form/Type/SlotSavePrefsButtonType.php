@@ -7,9 +7,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SlotButtonType.
- */
 class SlotSavePrefsButtonType extends SlotType
 {
     /**
@@ -17,9 +14,6 @@ class SlotSavePrefsButtonType extends SlotType
      */
     private $translator;
 
-    /**
-     * ConfigType constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

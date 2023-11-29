@@ -5,9 +5,6 @@ namespace Mautic\NotificationBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class NotificationPermissions.
- */
 class NotificationPermissions extends AbstractPermissions
 {
     /**

@@ -1391,10 +1391,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         // uncheck
         // If DNC doesn't exist set to 1
-        if (!empty($sugarDncKeys)) {
-            foreach ($sugarDncKeys as $sugarDncKey) {
-                $body[] = ['name' => $sugarDncKey, 'value' => 0];
-            }
+        foreach ($sugarDncKeys as $sugarDncKey) {
+            $body[] = ['name' => $sugarDncKey, 'value' => 0];
         }
     }
 

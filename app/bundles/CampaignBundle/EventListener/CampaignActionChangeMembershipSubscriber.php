@@ -23,9 +23,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
      */
     private $campaignModel;
 
-    /**
-     * CampaignActionChangeMembershipSubscriber constructor.
-     */
     public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
     {
         $this->membershipManager = $membershipManager;

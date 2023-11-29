@@ -10,9 +10,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Class UpdateController.
- */
 class UpdateController extends CommonController
 {
     /**

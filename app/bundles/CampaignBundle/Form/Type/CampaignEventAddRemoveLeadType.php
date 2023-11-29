@@ -6,9 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class CampaignEventAddRemoveLeadType.
- */
 class CampaignEventAddRemoveLeadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

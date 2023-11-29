@@ -29,9 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonController
 {
     /**

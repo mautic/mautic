@@ -6,9 +6,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LeadListQueryBuilderGeneratedEvent.
- */
 class LeadListQueryBuilderGeneratedEvent extends Event
 {
     /**

@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Email.
- */
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
 {
     use VariantEntityTrait;
@@ -229,9 +226,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         parent::__clone();
     }
 
-    /**
-     * Email constructor.
-     */
     public function __construct()
     {
         $this->lists               = new ArrayCollection();
@@ -385,12 +379,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                ->atPath('lists')
-                                ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                            ->atPath('lists')
+                            ->addViolation();
                     }
                 }
 

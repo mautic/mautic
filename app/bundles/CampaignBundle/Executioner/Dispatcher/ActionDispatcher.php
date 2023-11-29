@@ -46,9 +46,6 @@ class ActionDispatcher
      */
     private $legacyDispatcher;
 
-    /**
-     * EventDispatcher constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger,

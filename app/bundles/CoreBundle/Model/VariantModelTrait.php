@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Model;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
-/**
- * Class VariantModelTrait.
- */
 trait VariantModelTrait
 {
     /**

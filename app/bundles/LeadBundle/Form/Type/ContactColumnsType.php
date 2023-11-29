@@ -11,9 +11,6 @@ class ContactColumnsType extends AbstractType
 {
     private $columnsDictionary;
 
-    /**
-     * ContactColumnsType constructor.
-     */
     public function __construct(ContactColumnsDictionary $columnsDictionary)
     {
         $this->columnsDictionary = $columnsDictionary;

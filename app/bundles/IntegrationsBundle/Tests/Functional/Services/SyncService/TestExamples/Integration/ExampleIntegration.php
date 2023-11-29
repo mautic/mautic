@@ -31,9 +31,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
      */
     private $syncDataExchange;
 
-    /**
-     * ExampleIntegration constructor.
-     */
     public function __construct(ExampleSyncDataExchange $syncDataExchange)
     {
         $this->syncDataExchange = $syncDataExchange;

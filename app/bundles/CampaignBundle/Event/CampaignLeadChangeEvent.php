@@ -6,9 +6,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CampaignLeadChangeEvent.
- */
 class CampaignLeadChangeEvent extends Event
 {
     /**
@@ -31,9 +28,6 @@ class CampaignLeadChangeEvent extends Event
      */
     private $action;
 
-    /**
-     * CampaignLeadChangeEvent constructor.
-     */
     public function __construct(Campaign $campaign, $leads, $action)
     {
         $this->campaign = $campaign;

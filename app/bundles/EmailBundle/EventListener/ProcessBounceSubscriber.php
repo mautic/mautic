@@ -29,9 +29,6 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * EmailBounceSubscriber constructor.
-     */
     public function __construct(Bounce $bouncer)
     {
         $this->bouncer = $bouncer;

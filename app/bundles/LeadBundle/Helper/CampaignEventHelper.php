@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 
-/**
- * Class CampaignEventHelper.
- */
 class CampaignEventHelper
 {
     /**

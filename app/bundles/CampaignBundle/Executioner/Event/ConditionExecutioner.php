@@ -21,9 +21,6 @@ class ConditionExecutioner implements EventInterface
      */
     private $dispatcher;
 
-    /**
-     * ConditionExecutioner constructor.
-     */
     public function __construct(ConditionDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;

@@ -29,9 +29,6 @@ abstract class AbstractEventAccessor
      */
     private $extraProperties = [];
 
-    /**
-     * AbstractEventAccessor constructor.
-     */
     public function __construct(array $config)
     {
         $this->config = $config;

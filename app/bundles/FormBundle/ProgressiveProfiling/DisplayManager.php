@@ -22,9 +22,6 @@ class DisplayManager
      */
     private $displayCounter;
 
-    /**
-     * DisplayManager constructor.
-     */
     public function __construct(Form $form, array $viewOnlyFields = [])
     {
         $this->form           = $form;
@@ -64,9 +61,9 @@ class DisplayManager
      */
     private function shouldDisplayNotAlwaysDisplayField(Field $field)
     {
-        /** @var Field $fieldFromArray */
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
+            /** @var Field $fieldFromArray */
             if (in_array($field->getType(), $this->viewOnlyFields)) {
                 continue;
             }

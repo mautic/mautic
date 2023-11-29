@@ -25,9 +25,6 @@ class DecisionResultsEvent extends Event
      */
     private $evaluatedContacts;
 
-    /**
-     * DecisionResultsEvent constructor.
-     */
     public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {
         $this->eventConfig       = $config;

@@ -181,13 +181,11 @@ trait FrequencyRuleTrait
                 }
             }
             $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
-            if (!empty($dncChannels)) {
-                foreach ($dncChannels as $channel) {
-                    if ($currentChannelId) {
-                        $channel = [$channel => $currentChannelId];
-                    }
-                    $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
+            foreach ($dncChannels as $channel) {
+                if ($currentChannelId) {
+                    $channel = [$channel => $currentChannelId];
                 }
+                $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
             }
         }
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);

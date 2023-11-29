@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * Class CoreParametersHelper.
- */
 class CoreParametersHelper
 {
     /**

@@ -11,9 +11,6 @@ final class AnalyticsHelper
      */
     private $code;
 
-    /**
-     * AnalyticsHelper constructor.
-     */
     public function __construct(CoreParametersHelper $parametersHelper)
     {
         $this->code = htmlspecialchars_decode((string) $parametersHelper->get('google_analytics'));

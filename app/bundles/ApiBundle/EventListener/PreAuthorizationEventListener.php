@@ -25,9 +25,6 @@ class PreAuthorizationEventListener
      */
     private $translator;
 
-    /**
-     * PreAuthorizationEventListener constructor.
-     */
     public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {
         $this->em             = $entityManager;

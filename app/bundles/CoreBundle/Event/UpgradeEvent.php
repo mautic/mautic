@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class BuilderEvent.
- */
 class UpgradeEvent extends Event
 {
     /**

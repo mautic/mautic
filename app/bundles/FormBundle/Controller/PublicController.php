@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PublicController.
- */
 class PublicController extends CommonFormController
 {
     /**
@@ -324,10 +321,8 @@ class PublicController extends CommonFormController
             $assetsHelper = $this->factory->getHelper('template.assets');
             $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
 
-            if (!empty($customStylesheets)) {
-                foreach ($customStylesheets as $css) {
-                    $assetsHelper->addStylesheet($css);
-                }
+            foreach ($customStylesheets as $css) {
+                $assetsHelper->addStylesheet($css);
             }
 
             $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());

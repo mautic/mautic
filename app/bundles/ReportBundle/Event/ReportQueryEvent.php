@@ -5,9 +5,6 @@ namespace Mautic\ReportBundle\Event;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-/**
- * Class ReportDataEvent.
- */
 class ReportQueryEvent extends AbstractReportEvent
 {
     /**
@@ -25,9 +22,6 @@ class ReportQueryEvent extends AbstractReportEvent
      */
     private $totalResults = 0;
 
-    /**
-     * ReportDataEvent constructor.
-     */
     public function __construct(Report $report, QueryBuilder $query, $totalResults, array $options)
     {
         $this->context      = $report->getSource();

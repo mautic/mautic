@@ -5,9 +5,6 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class CampaignEvent.
- */
 class CampaignEvent extends CommonEvent
 {
     /**

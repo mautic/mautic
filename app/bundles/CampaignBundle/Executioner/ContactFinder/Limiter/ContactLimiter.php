@@ -4,9 +4,6 @@ namespace Mautic\CampaignBundle\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
-/**
- * Class ContactLimiter.
- */
 class ContactLimiter
 {
     /**

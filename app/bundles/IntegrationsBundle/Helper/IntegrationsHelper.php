@@ -41,9 +41,6 @@ class IntegrationsHelper
      */
     private $decryptedIntegrationConfigurations = [];
 
-    /**
-     * IntegrationsHelper constructor.
-     */
     public function __construct(
         IntegrationRepository $integrationRepository,
         EncryptionService $encryptionService,

@@ -25,9 +25,6 @@ class ContactFinder
      */
     private $logger;
 
-    /**
-     * ContactFinder constructor.
-     */
     public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
     {
         $this->statRepository = $statRepository;

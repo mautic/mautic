@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Event;
 use MatthiasMullie\Minify;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class BuildJsEvent.
- */
 class BuildJsEvent extends Event
 {
     /**

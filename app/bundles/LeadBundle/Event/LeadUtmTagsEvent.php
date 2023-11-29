@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class PointsChangeEvent.
- */
 class LeadUtmTagsEvent extends CommonEvent
 {
     protected $utmtags;

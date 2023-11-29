@@ -12,9 +12,6 @@ class MessageQueueBatchProcessEvent extends Event
 
     private $channelId;
 
-    /**
-     * MessageQueueBatchProcessEvent constructor.
-     */
     public function __construct(array $messages, $channel, $channelId)
     {
         $this->messages  = $messages;

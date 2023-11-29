@@ -6,9 +6,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LeadCompanyChangeEvent.
- */
 class LeadChangeCompanyEvent extends Event
 {
     private $lead;

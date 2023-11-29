@@ -22,9 +22,6 @@ class DisplayCounter
      */
     private $form;
 
-    /**
-     * DisplayCounter constructor.
-     */
     public function __construct(Form $form)
     {
         $this->form = $form;

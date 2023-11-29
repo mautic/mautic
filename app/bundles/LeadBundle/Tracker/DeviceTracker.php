@@ -41,9 +41,6 @@ class DeviceTracker
      */
     private $trackedDevice = [];
 
-    /**
-     * DeviceTracker constructor.
-     */
     public function __construct(
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,

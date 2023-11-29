@@ -6,9 +6,6 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class SlotImageType.
- */
 class SlotSeparatorType extends SlotType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

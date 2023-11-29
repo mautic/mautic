@@ -24,9 +24,6 @@ class StatsCollectionHelper
      */
     private $helperContainer;
 
-    /**
-     * StatsCollectionHelper constructor.
-     */
     public function __construct(StatHelperContainer $helperContainer)
     {
         $this->helperContainer = $helperContainer;

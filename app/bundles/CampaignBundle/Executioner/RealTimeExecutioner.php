@@ -81,9 +81,6 @@ class RealTimeExecutioner
      */
     private $decisionHelper;
 
-    /**
-     * RealTimeExecutioner constructor.
-     */
     public function __construct(
         LoggerInterface $logger,
         LeadModel $leadModel,

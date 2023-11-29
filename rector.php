@@ -58,6 +58,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
         \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
         \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
         \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,

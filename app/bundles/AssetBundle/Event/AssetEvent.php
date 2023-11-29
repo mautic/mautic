@@ -5,9 +5,6 @@ namespace Mautic\AssetBundle\Event;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class AssetEvent.
- */
 class AssetEvent extends CommonEvent
 {
     /**

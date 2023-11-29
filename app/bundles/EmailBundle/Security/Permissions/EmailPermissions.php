@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class EmailPermissions.
- */
 class EmailPermissions extends AbstractPermissions
 {
     /**

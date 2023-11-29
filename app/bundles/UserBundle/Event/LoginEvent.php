@@ -5,9 +5,6 @@ namespace Mautic\UserBundle\Event;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LoginEvent.
- */
 class LoginEvent extends Event
 {
     /**

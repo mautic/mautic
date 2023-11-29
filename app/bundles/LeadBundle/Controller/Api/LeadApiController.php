@@ -563,10 +563,8 @@ class LeadApiController extends CommonApiController
         }
 
         // keep existing tags
-        if (count($entity->getTags()) > 0) {
-            foreach ($entity->getTags() as $tag) {
-                $parameters['tags'][] = $tag->getId();
-            }
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
         }
 
         // keep existing owner if it is not set or should be reset to null

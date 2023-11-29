@@ -5,9 +5,6 @@ namespace Mautic\PageBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PointActionHelper.
- */
 class PointActionHelper
 {
     /**

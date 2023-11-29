@@ -9,9 +9,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class DynamicContentSendType.
- */
 class DynamicContentSendType extends AbstractType
 {
     /**
@@ -19,9 +16,6 @@ class DynamicContentSendType extends AbstractType
      */
     protected $router;
 
-    /**
-     * DynamicContentSendType constructor.
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;

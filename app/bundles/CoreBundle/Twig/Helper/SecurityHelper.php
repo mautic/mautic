@@ -35,9 +35,6 @@ final class SecurityHelper
      */
     private $tokenManager;
 
-    /**
-     * SecurityHelper constructor.
-     */
     public function __construct(
         CorePermissions $security,
         RequestStack $requestStack,

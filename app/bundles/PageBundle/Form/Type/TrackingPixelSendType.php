@@ -9,9 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class TrackingPixelSendType.
- */
 class TrackingPixelSendType extends AbstractType
 {
     /**
@@ -19,9 +16,6 @@ class TrackingPixelSendType extends AbstractType
      */
     protected $trackingHelper;
 
-    /**
-     * TrackingPixelSendType constructor.
-     */
     public function __construct(TrackingHelper $trackingHelper)
     {
         $this->trackingHelper = $trackingHelper;

@@ -27,7 +27,6 @@ use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -356,7 +355,6 @@ class FocusModel extends FormModel
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
-                /** @var Request $data */
                 $typeId = null;
                 break;
             case Stat::TYPE_CLICK:

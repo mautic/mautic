@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class DatetimeToStringTransformer.
- */
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
     /**

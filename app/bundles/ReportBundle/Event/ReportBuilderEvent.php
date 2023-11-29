@@ -8,9 +8,6 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ReportBuilderEvent.
- */
 class ReportBuilderEvent extends AbstractReportEvent
 {
     /**

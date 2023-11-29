@@ -7,9 +7,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class FrequencyRule.
- */
 class FrequencyRule extends CommonEntity
 {
     public const TIME_DAY   = 'DAY';

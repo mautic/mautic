@@ -734,11 +734,11 @@ final class AssetsHelper
     }
 
     /**
-     * @param string $siteUrl
+     * @param ?string $siteUrl can be null on installation
      */
     public function setSiteUrl($siteUrl): void
     {
-        if ('/' === substr($siteUrl, -1)) {
+        if ($siteUrl && '/' === substr($siteUrl, -1)) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 

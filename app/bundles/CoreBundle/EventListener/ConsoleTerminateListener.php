@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
-/**
- * Class ConsoleTerminateListener.
- */
 class ConsoleTerminateListener
 {
     /**

@@ -8,9 +8,6 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class DsnParser.
- */
 class DsnParser
 {
     /**

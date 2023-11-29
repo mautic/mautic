@@ -5,9 +5,6 @@ namespace Mautic\PageBundle\Event;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class PageDisplayEvent.
- */
 class PageDisplayEvent extends Event
 {
     /**
@@ -25,9 +22,6 @@ class PageDisplayEvent extends Event
      */
     private $params;
 
-    /**
-     * PageDisplayEvent constructor.
-     */
     public function __construct($content, Page $page, array $params = [])
     {
         $this->page    = $page;

@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WidgetDetailEvent.
- */
 class WidgetDetailEvent extends CommonEvent
 {
     protected $widget;

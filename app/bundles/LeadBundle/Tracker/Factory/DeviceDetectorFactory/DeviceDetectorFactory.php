@@ -6,9 +6,6 @@ use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
 use Mautic\CacheBundle\Cache\CacheProvider;
 
-/**
- * Class DeviceDetectorFactory.
- */
 final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     private CacheProvider $cacheProvider;

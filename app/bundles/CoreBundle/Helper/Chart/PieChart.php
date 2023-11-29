@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-/**
- * Class PieChart.
- */
 class PieChart extends AbstractChart implements ChartInterface
 {
     /**

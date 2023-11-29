@@ -23,9 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RedirectModel extends FormModel
 {
-    /**
-     * RedirectModel constructor.
-     */
     public function __construct(
         EntityManagerInterface $em,
         CorePermissions $security,

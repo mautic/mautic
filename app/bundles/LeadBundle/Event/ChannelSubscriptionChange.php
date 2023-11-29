@@ -28,9 +28,6 @@ class ChannelSubscriptionChange extends Event
      */
     private $newStatus;
 
-    /**
-     * ContactStatusChange constructor.
-     */
     public function __construct(Lead $lead, $channel, $oldStatus, $newStatus)
     {
         $this->lead      = $lead;

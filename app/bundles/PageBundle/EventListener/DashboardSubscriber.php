@@ -137,21 +137,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['title'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                            [
-                                'value' => $page['hits'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['title'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                        [
+                            'value' => $page['hits'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -183,18 +181,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['name'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['name'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([

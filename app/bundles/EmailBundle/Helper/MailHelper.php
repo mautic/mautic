@@ -27,9 +27,6 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-/**
- * Class MailHelper.
- */
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
@@ -393,17 +390,15 @@ class MailHelper
             }
 
             // Attach assets
-            if (!empty($this->assets)) {
-                /** @var \Mautic\AssetBundle\Entity\Asset $asset */
-                foreach ($this->assets as $asset) {
-                    if (!in_array($asset->getId(), $this->attachedAssets)) {
-                        $this->attachedAssets[] = $asset->getId();
-                        $this->attachFile(
-                            $asset->getFilePath(),
-                            $asset->getOriginalFileName(),
-                            $asset->getMime()
-                        );
-                    }
+            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            foreach ($this->assets as $asset) {
+                if (!in_array($asset->getId(), $this->attachedAssets)) {
+                    $this->attachedAssets[] = $asset->getId();
+                    $this->attachFile(
+                        $asset->getFilePath(),
+                        $asset->getOriginalFileName(),
+                        $asset->getMime()
+                    );
                 }
             }
 
@@ -770,9 +765,6 @@ class MailHelper
         unset($content);
     }
 
-    /**
-     * Set subject.
-     */
     public function setSubject($subject)
     {
         $this->subject = $subject;
@@ -1436,9 +1428,6 @@ class MailHelper
         $this->globalTokens = array_merge($this->globalTokens, $tokens);
     }
 
-    /**
-     * Set tokens.
-     */
     public function setTokens(array $tokens)
     {
         $this->globalTokens = $tokens;
