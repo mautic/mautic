@@ -13,10 +13,8 @@ class IpAddress
 {
     /**
      * Set by factory of configured IPs to not track.
-     *
-     * @var array
      */
-    private $doNotTrack = [];
+    private array $doNotTrack = [];
 
     /**
      * @var int
