@@ -40,10 +40,6 @@ class MailboxOrganizer
         $criteriaRequested      = $this->event->getCriteriaRequests();
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();
 
-        /**
-         * @var string
-         * @var ConfigAccessor $config
-         */
         foreach ($this->mailboxes as $name => $config) {
             // Switch mailbox to get information
             if (!$config->isConfigured()) {

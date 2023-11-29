@@ -181,7 +181,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
             $objects               = $data['data'];
-            /** @var array $rows */
             $integrationEntities = [];
             /** @var array $objects */
             foreach ($objects as $recordId => $entityData) {

@@ -178,10 +178,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $utmTags = $dwc->getUtmTags();
             }
 
-            /**
-             * @var string
-             * @var Trackable $trackable
-             */
             foreach ($trackables as $token => $trackable) {
                 $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags);
             }

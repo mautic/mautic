@@ -539,7 +539,6 @@ class LeadSubscriber implements EventSubscriberInterface
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
 
-        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
@@ -603,7 +602,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        /** @var LeadEventLogRepository */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
         $imports      = $eventLogRepo->getEvents(
             $event->getLead(),
@@ -660,7 +658,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        /** @var LeadEventLogRepository */
         $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);
         $apiSingleEvents = $eventLogRepo->getEvents(
             $event->getLead(),

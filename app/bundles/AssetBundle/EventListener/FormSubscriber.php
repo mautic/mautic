@@ -148,12 +148,6 @@ class FormSubscriber implements EventSubscriberInterface
          */
         $event->stopPropagation();
 
-        /**
-         * @var Form
-         * @var Asset  $asset
-         * @var string $message
-         * @var bool   $messengerMode
-         */
         [
             'form'          => $form,
             'asset'         => $asset,

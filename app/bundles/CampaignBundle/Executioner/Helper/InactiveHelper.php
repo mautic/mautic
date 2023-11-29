@@ -69,10 +69,6 @@ class InactiveHelper
      */
     public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions)
     {
-        /**
-         * @var int
-         * @var Event $decision
-         */
         foreach ($decisions as $key => $decision) {
             $negativeChildren = $decision->getNegativeChildren();
             if (!$negativeChildren->count()) {

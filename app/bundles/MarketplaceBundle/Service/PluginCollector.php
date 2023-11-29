@@ -95,7 +95,6 @@ class PluginCollector
             ];
         }
 
-        /** @var array<int,AllowlistEntry[]> */
         $chunks = array_chunk($this->allowlistedPackages, $limit);
         // Array keys start at 0 but page numbers start at 1
         $pageChunk = $page - 1;

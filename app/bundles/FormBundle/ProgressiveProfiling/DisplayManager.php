@@ -64,7 +64,6 @@ class DisplayManager
      */
     private function shouldDisplayNotAlwaysDisplayField(Field $field)
     {
-        /** @var Field $fieldFromArray */
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
             if (in_array($field->getType(), $this->viewOnlyFields)) {

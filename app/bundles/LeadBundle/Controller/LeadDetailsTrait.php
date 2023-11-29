@@ -347,7 +347,6 @@ trait LeadDetailsTrait
         foreach ($contacts as $contact) {
             $model = $this->getModel('lead.lead');
 
-            /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             if (!isset($contact['lead_id'])) {
                 continue;
             }

@@ -49,7 +49,6 @@ class PointEventHelper
         if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 

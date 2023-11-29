@@ -179,7 +179,6 @@ class ParameterLoader
         // Force local specific params
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
-            /** @var array<string, mixed> $parameters */
             include $localParametersFile;
 
             // override default with forced

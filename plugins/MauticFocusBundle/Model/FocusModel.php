@@ -356,7 +356,6 @@ class FocusModel extends FormModel
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
-                /** @var Request $data */
                 $typeId = null;
                 break;
             case Stat::TYPE_CLICK:
