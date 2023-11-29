@@ -39,14 +39,14 @@ class TableSchemaHelper
     protected $schema;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $dropTables = [];
+    protected array $dropTables = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $addTables;
+    protected array $addTables = [];
 
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
