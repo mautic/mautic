@@ -180,6 +180,7 @@ class ParameterLoader
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
             include $localParametersFile;
+            /** @var array<string, mixed> $parameters */
 
             // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
