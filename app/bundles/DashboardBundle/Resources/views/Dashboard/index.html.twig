@@ -16,6 +16,9 @@
                   'data-target': '#MauticSharedModal',
                   'href': path('mautic_dashboard_action', {'objectAction': 'new'}),
                   'data-header': 'mautic.dashboard.widget.add'|trans,
+                  'aria-label': 'mautic.dashboard.widget.add'|trans,
+                  'role': 'button',
+                  'tabindex': '0',
               },
               'iconClass': 'fa fa-plus',
               'btnText': 'mautic.dashboard.widget.add',
@@ -26,8 +29,13 @@
                   'href': 'javascript:void()',
                   'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
                   'data-toggle': '',
+                  'title': 'mautic.dashboard.save.layout.title'|trans,
+                  'aria-label': 'mautic.dashboard.save.layout.aria_label'|trans,
+                  'role': 'button',
+                  'tabindex': '0',
               },
               'iconClass': 'fa fa-save',
+              'aria-hidden': 'true',
               'btnText': 'mautic.core.form.save',
           },
           {
@@ -36,6 +44,8 @@
                   'href': 'javascript:void()',
                   'onclick': "Mautic.exportDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"', '"~path('mautic_dashboard_action', {'objectAction': 'export'})~"');",
                   'data-toggle': '',
+                  'role': 'button',
+                  'tabindex': '0',
               },
               'iconClass': 'fa fa-cloud-download',
               'btnText': 'mautic.dashboard.export.widgets',
@@ -45,6 +55,8 @@
                   'class': 'btn btn-default',
                   'href': path('mautic_dashboard_action', {'objectAction': 'import'}),
                   'data-header': 'mautic.dashboard.widget.import'|trans,
+                  'role': 'button',
+                  'tabindex': '0',
               },
               'iconClass': 'fa fa-cloud-upload',
               'btnText': 'mautic.dashboard.widget.import',
@@ -73,7 +85,7 @@
       <div id="dashboard-widgets" class="dashboard-widgets cards">
           {% for widget in widgets %}
               <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
-                  <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  <div class="spinner"><i class="fa fa-spin fa-spinner" aria-hidden="true"></i></div>
               </div>
           {% endfor %}
       </div>
@@ -85,7 +97,7 @@
                   <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
               </div>
               <div class="col-xs-9">
-                  <h4><i class="fa fa-quote-left"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="fa fa-quote-right"></i></h4>
+                  <h4><i class="fa fa-quote-left" aria-hidden="true"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="fa fa-quote-right" aria-hidden="true"></i></h4>
                   <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
                   <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'}) }}" class="btn btn-success">
                       Apply the default dashboard

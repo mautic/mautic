@@ -190,7 +190,7 @@
             <div class="tab-pane fade in bdr-w-0 page-list"
                  id="leads-container"
                  data-target-url="{{ path('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
-                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                <div class="spinner"><i class="fa fa-spin fa-spinner" aria-hidden="true"></i></div>
                 <div class="clearfix"></div>
             </div>
             {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}

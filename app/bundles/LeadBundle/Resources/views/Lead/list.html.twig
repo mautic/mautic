@@ -19,10 +19,12 @@
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
               'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
+              'aria-label': 'mautic.lead.lead.menu.quickadd'|trans,
           },
           'iconClass': 'fa fa-bolt',
           'btnText': 'mautic.lead.lead.menu.quickadd',
           'primary': true,
+          'aria-hidden': true,
       }]) %}
 
       {% if permissions['lead:imports:create'] %}
@@ -51,12 +53,12 @@
   <div class="btn-group ml-5 sr-only ">
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
         <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-default">
-            <i class="fa fa-fw fa-table"></i>
+            <i class="fa fa-fw fa-table" aria-hidden="true"></i>
         </a>
       </span>
       <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
         <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-default">
-          <i class="fa fa-fw fa-th-large"></i>
+          <i class="fa fa-fw fa-th-large" aria-hidden="true"></i>
         </a>
       </span>
   </div>
@@ -82,6 +84,7 @@
               'id': 'liveModeButton',
               'data-toggle': false,
               'data-max-id': maxLeadId,
+              'aria-label': 'mautic.lead.lead.live_update.aria_label'|trans,
           },
           'tooltip': 'mautic.lead.lead.live_update'|trans,
           'iconClass': 'fa fa-bolt',
@@ -95,6 +98,7 @@
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',
                 'data-anonymous': 'mautic.lead.lead.searchcommand.isanonymous'|trans,
+                'aria-label': 'mautic.lead.lead.anonymous_leads'|trans,
             },
             'tooltip': 'mautic.lead.lead.anonymous_leads'|trans,
             'iconClass': 'fa fa-user-secret',
