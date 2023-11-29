@@ -148,8 +148,6 @@ class Interval implements ScheduleModeInterface
 
     /**
      * Checks if an event has a relative time configured.
-     *
-     * @return bool
      */
     public function isContactSpecificExecutionDateRequired(Event $event): bool
     {

@@ -128,10 +128,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $filter;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return false;
     }

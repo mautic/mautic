@@ -202,8 +202,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function getDataPriority(): bool
     {
@@ -212,8 +210,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function updateDncByDate(): bool
     {
@@ -1598,9 +1594,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return mb_strtolower($this->cleanPushData($email));
     }
 
-    /**
-     * @return bool
-     */
     protected function getMauticContactsToUpdate(
         &$checkEmailsInSF,
         $mauticLeadFieldString,
@@ -2953,9 +2946,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return bool
-     */
     protected function getMauticRecordsToUpdate(
         &$checkIdsInSF,
         $mauticEntityFieldString,

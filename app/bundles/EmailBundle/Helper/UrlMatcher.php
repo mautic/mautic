@@ -4,9 +4,6 @@ namespace Mautic\EmailBundle\Helper;
 
 class UrlMatcher
 {
-    /**
-     * @return bool
-     */
     public static function hasMatch(array $urlsToCheckAgainst, $urlToFind): bool
     {
         $urlToFind = self::sanitizeUrl($urlToFind);

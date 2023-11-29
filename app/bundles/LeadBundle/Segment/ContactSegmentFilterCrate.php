@@ -75,17 +75,11 @@ class ContactSegmentFilterCrate
         return $this->field;
     }
 
-    /**
-     * @return bool
-     */
     public function isContactType(): bool
     {
         return self::CONTACT_OBJECT === $this->object;
     }
 
-    /**
-     * @return bool
-     */
     public function isCompanyType(): bool
     {
         return self::COMPANY_OBJECT === $this->object;
@@ -119,33 +113,21 @@ class ContactSegmentFilterCrate
         return $this->operator;
     }
 
-    /**
-     * @return bool
-     */
     public function isBooleanType(): bool
     {
         return 'boolean' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
     public function isNumberType(): bool
     {
         return 'number' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
     public function isDateType(): bool
     {
         return 'date' === $this->getType() || $this->hasTimeParts();
     }
 
-    /**
-     * @return bool
-     */
     public function hasTimeParts(): bool
     {
         return 'datetime' === $this->getType();
@@ -153,8 +135,6 @@ class ContactSegmentFilterCrate
 
     /**
      * Filter value could be used directly - no modification (like regex etc.) needed.
-     *
-     * @return bool
      */
     public function filterValueDoNotNeedAdjustment(): bool
     {

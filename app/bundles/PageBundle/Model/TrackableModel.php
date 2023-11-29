@@ -483,8 +483,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Determines if a URL/token is in the do not track list.
-     *
-     * @return bool
      */
     protected function isInDoNotTrack($url): bool
     {
@@ -539,8 +537,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * @param bool $forceScheme
-     *
-     * @return bool
      */
     protected function isValidUrl($url, $forceScheme = true): bool
     {
@@ -806,9 +802,6 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    /**
-     * @return bool
-     */
     private function isContactFieldToken($token): bool
     {
         return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');

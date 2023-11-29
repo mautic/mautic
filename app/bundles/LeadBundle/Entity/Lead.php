@@ -1195,9 +1195,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         );
     }
 
-    /**
-     * @return bool
-     */
     public function wasAnonymous(): bool
     {
         return null == $this->dateIdentified && false === $this->isAnonymous();

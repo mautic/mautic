@@ -791,9 +791,6 @@ class Form extends FormEntity
         return $this->formAttributes;
     }
 
-    /**
-     * @return bool
-     */
     public function isStandalone(): bool
     {
         return 'campaign' != $this->formType;

@@ -120,9 +120,6 @@ class IcontactIntegration extends EmailAbstractIntegration
         return parent::makeRequest($url, $parameters, $method, $settings);
     }
 
-    /**
-     * @return bool
-     */
     public function isAuthorized(): bool
     {
         $keys = $this->getRequiredKeyFields();
@@ -195,8 +192,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @param array                          $config
-     *
-     * @return bool
      */
     public function pushLead($lead, $config = []): bool
     {

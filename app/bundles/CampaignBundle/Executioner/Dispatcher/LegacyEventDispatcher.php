@@ -304,9 +304,6 @@ class LegacyEventDispatcher
         $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
     }
 
-    /**
-     * @return bool
-     */
     private function isFailed($result): bool
     {
         return

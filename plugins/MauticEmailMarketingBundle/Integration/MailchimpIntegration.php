@@ -143,8 +143,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
     /**
      * @param array $config
-     *
-     * @return bool
      */
     public function pushLead($lead, $config = []): bool
     {

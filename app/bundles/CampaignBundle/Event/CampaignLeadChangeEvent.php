@@ -81,8 +81,6 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was removed from the campaign.
-     *
-     * @return bool
      */
     public function wasRemoved(): bool
     {
@@ -91,8 +89,6 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was added to the campaign.
-     *
-     * @return bool
      */
     public function wasAdded(): bool
     {

@@ -184,8 +184,6 @@ class Mailbox
      * @param null $bundleKey
      * @param null $folderKey
      *
-     * @return bool
-     *
      * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null): bool
@@ -386,8 +384,6 @@ class Mailbox
 
     /**
      * Check if the stream is connected.
-     *
-     * @return bool
      */
     protected function isConnected(): bool
     {
@@ -558,8 +554,6 @@ class Mailbox
 
     /**
      * Move mail to another box.
-     *
-     * @return bool
      */
     public function moveMail($mailId, $mailBox): bool
     {
@@ -1062,9 +1056,6 @@ class Mailbox
         return $newString;
     }
 
-    /**
-     * @return bool
-     */
     protected function isUrlEncoded($string): bool
     {
         $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);

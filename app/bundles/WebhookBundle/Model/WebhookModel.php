@@ -299,8 +299,6 @@ class WebhookModel extends FormModel
 
     /**
      * @param WebhookQueue $queue
-     *
-     * @return bool
      */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null): bool
     {

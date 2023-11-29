@@ -11,8 +11,6 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
 {
     /**
      * @param string $secret
-     *
-     * @return bool
      */
     public function isSecretUnique($secret): bool
     {
@@ -25,9 +23,6 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         return 0 === count($tokens);
     }
 
-    /**
-     * @return bool
-     */
     public function verify(UserToken $token): bool
     {
         /** @var UserToken[] $userTokens */

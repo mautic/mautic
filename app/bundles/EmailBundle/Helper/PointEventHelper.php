@@ -7,9 +7,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PointEventHelper
 {
-    /**
-     * @return int
-     */
     public static function validateEmail($eventDetails, $action): bool
     {
         if (null === $eventDetails) {

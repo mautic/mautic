@@ -269,8 +269,6 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
     protected function handleParametersChecks($name, $value): bool
     {
@@ -280,8 +278,6 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
     protected function handleRequestChecks($name, $value): bool
     {

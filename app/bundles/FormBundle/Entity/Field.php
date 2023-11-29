@@ -807,8 +807,6 @@ class Field
      * @param array|null $submissions
      * @param Lead       $lead
      * @param Form       $form
-     *
-     * @return bool
      */
     public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
     {
@@ -856,8 +854,6 @@ class Field
      * Was field displayed.
      *
      * @param mixed[] $data
-     *
-     * @return bool
      */
     public function showForConditionalField(array $data): bool
     {
@@ -893,17 +889,11 @@ class Field
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isCaptchaType(): bool
     {
         return 'captcha' === $this->type;
     }
 
-    /**
-     * @return bool
-     */
     public function isFileType(): bool
     {
         return 'file' === $this->type;

@@ -176,8 +176,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function getDataPriority(): bool
     {
@@ -870,9 +868,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $choices;
     }
 
-    /**
-     * @return bool
-     */
     public function getCampaignMembers($campaignId): bool
     {
         if (!$this->isAuthorized()) {

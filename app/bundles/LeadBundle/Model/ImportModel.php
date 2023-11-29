@@ -281,8 +281,6 @@ class ImportModel extends FormModel
      * Import the CSV file from configuration in the $import entity.
      *
      * @param int $limit Number of records to import before delaying the import
-     *
-     * @return bool
      */
     public function process(Import $import, Progress $progress, $limit = 0): bool
     {
@@ -440,8 +438,6 @@ class ImportModel extends FormModel
      * If it is more, return true.
      *
      * @param int $headerCount
-     *
-     * @return bool
      */
     public function hasMoreValuesThanColumns(array &$data, $headerCount): bool
     {

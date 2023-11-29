@@ -345,8 +345,6 @@ class Webhook extends FormEntity
      * Takes a trigger (event type) and builds the Event object form it if it doesn't exist already.
      *
      * @param string $key
-     *
-     * @return bool
      */
     public function addTrigger($key): bool
     {
@@ -366,8 +364,6 @@ class Webhook extends FormEntity
      * Check if an event exists comared to its type.
      *
      * @param string $key
-     *
-     * @return bool
      */
     public function eventExists($key): bool
     {

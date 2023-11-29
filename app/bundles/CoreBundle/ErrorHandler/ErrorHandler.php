@@ -119,8 +119,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          * @param int    $line
          * @param array  $context
          *
-         * @return bool
-         *
          * @throws \ErrorException
          */
         public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool

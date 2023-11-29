@@ -124,9 +124,6 @@ class TrackingHelper
         return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
     }
 
-    /**
-     * @return bool
-     */
     protected function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;

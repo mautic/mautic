@@ -83,9 +83,6 @@ class Bounce implements ProcessorInterface
         $this->doNotContact   = $doNotContact;
     }
 
-    /**
-     * @return bool
-     */
     public function process(Message $message): bool
     {
         $this->message = $message;

@@ -59,9 +59,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
         return openssl_random_pseudo_bytes($this->getInitVectorSize());
     }
 
-    /**
-     * @return bool
-     */
     public function isSupported(): bool
     {
         if (!extension_loaded('openssl')) {

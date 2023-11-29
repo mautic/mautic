@@ -121,9 +121,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->item;
     }
 
-    /**
-     * @return bool
-     */
     public function checkLocationContext($location): bool
     {
         if (null !== $location) {

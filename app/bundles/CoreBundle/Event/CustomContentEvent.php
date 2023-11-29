@@ -47,8 +47,6 @@ class CustomContentEvent extends Event
      *
      * @param string      $viewName
      * @param string|null $context
-     *
-     * @return bool
      */
     public function checkContext($viewName, $context): bool
     {

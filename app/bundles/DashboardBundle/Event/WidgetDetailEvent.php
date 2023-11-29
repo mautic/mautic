@@ -215,8 +215,6 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Checks the cache for the widget data.
      * If cache exists, it sets the TemplateData.
-     *
-     * @return string
      */
     public function isCached(): bool
     {

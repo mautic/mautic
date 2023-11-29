@@ -112,8 +112,6 @@ class StatsEvent extends Event
      * Returns if event is for this table.
      *
      * @param CommonRepository<object>|null $repository
-     *
-     * @return bool
      */
     public function isLookingForTable($table, CommonRepository $repository = null): bool
     {

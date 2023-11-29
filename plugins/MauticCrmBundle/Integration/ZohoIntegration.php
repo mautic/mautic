@@ -1151,7 +1151,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getDataPriority(): bool
+    public function getDataPriority()
     {
         return true;
     }

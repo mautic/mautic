@@ -207,8 +207,6 @@ class TableSchemaHelper
      * @param string $table
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
     public function checkTableExists($table, $throwException = false): bool

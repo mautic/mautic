@@ -705,8 +705,6 @@ class LeadApiController extends CommonApiController
      * Helper method to be used in FrequencyRuleTrait.
      *
      * @param Form $form
-     *
-     * @return bool
      */
     protected function isFormCancelled($form = null): bool
     {
@@ -717,8 +715,6 @@ class LeadApiController extends CommonApiController
      * Helper method to be used in FrequencyRuleTrait.
      *
      * @param array $data
-     *
-     * @return bool
      */
     protected function isFormValid(Form $form, array $data = null): bool
     {

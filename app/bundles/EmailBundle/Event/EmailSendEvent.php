@@ -303,8 +303,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it.
-     *
-     * @return bool
      */
     public function shouldAppendClickthrough(): bool
     {

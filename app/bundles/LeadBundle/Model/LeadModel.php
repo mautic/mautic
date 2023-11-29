@@ -2107,9 +2107,6 @@ class LeadModel extends FormModel
         return $event->getEventCounter();
     }
 
-    /**
-     * @return bool
-     */
     public function addToCompany(Lead $lead, $company): bool
     {
         // check if lead is in company already

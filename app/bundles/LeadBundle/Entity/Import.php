@@ -214,8 +214,6 @@ class Import extends FormEntity
 
     /**
      * Checks if the import has everything needed to proceed.
-     *
-     * @return bool
      */
     public function canProceed(): bool
     {

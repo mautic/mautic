@@ -198,8 +198,6 @@ class ColumnSchemaHelper
      * @param string $column
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
     public function checkColumnExists($column, $throwException = false): bool

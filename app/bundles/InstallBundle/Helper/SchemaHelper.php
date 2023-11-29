@@ -87,8 +87,6 @@ class SchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function createDatabase(): bool
@@ -126,7 +124,7 @@ class SchemaHelper
      * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
-    public function installSchema(): bool
+    public function installSchema()
     {
         $sm = $this->db->getSchemaManager();
 

@@ -182,8 +182,6 @@ class ContactSegmentFilter
 
     /**
      * Whether the filter references another ContactSegment.
-     *
-     * @return bool
      */
     public function isContactSegmentReference(): bool
     {

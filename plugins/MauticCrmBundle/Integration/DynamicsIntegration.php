@@ -184,8 +184,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function getDataPriority(): bool
     {

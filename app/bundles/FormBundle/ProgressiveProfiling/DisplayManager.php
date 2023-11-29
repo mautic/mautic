@@ -56,9 +56,6 @@ class DisplayManager
         }
     }
 
-    /**
-     * @return bool
-     */
     private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
     {
         $fields = $this->form->getFields()->toArray();
@@ -78,9 +75,6 @@ class DisplayManager
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function useProgressiveProfilingLimit(): bool
     {
         return '' != $this->form->getProgressiveProfilingLimit();

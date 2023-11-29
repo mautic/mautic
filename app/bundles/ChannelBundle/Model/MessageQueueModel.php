@@ -131,8 +131,6 @@ class MessageQueueModel extends FormModel
      * @param int      $priority
      * @param int|null $campaignEventId
      * @param array    $options
-     *
-     * @return bool
      */
     public function queue(
         $leads,

@@ -658,8 +658,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function getDataPriority(): bool
     {

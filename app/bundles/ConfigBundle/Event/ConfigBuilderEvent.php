@@ -52,8 +52,6 @@ class ConfigBuilderEvent extends Event
      * Remove a form to the forms array.
      *
      * @param string $formAlias
-     *
-     * @return bool
      */
     public function removeForm($formAlias): bool
     {
