@@ -1200,6 +1200,16 @@
         "code",
         "a11y"
       ]
+    },
+    {
+      "login": "pasxel",
+      "name": "Alexei Pl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1814849?v=4",
+      "profile": "https://github.com/pasxel",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
