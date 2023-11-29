@@ -11177,16 +11177,6 @@ parameters:
 			path: app/bundles/CoreBundle/Doctrine/Helper/TableSchemaHelper.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Doctrine\\\\Helper\\\\TableSchemaHelper\\:\\:\\$addTables type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Helper/TableSchemaHelper.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Doctrine\\\\Helper\\\\TableSchemaHelper\\:\\:\\$dropTables type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Helper/TableSchemaHelper.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/Helper/TableSchemaHelper.php
@@ -30585,11 +30575,6 @@ parameters:
 			path: app/bundles/InstallBundle/Configurator/Step/CheckStep.php
 
 		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\CheckStep\\:\\:update\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/CheckStep.php
-
-		-
 			message: "#^Argument of an invalid type Mautic\\\\CoreBundle\\\\Configurator\\\\Step\\\\StepInterface supplied for foreach, only iterables are supported\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Configurator/Step/DoctrineStep.php
@@ -30611,11 +30596,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\DoctrineStep\\:\\:getDrivers\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/DoctrineStep.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\DoctrineStep\\:\\:update\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Configurator/Step/DoctrineStep.php
 
@@ -36280,11 +36260,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/Lead.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\:\\:generateChannelRules\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\:\\:generateChannelRules\\(\\) has parameter \\$dncRules with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Lead.php
@@ -36741,11 +36716,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadCategory\\:\\:setManuallyRemoved\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadCategory.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadCategoryRepository\\:\\:getLeadCategories\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadCategoryRepository.php
 
 		-
 			message: """
@@ -38754,11 +38724,6 @@ parameters:
 			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\LeadTimelineEvent\\:\\:getEventCounter\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\LeadTimelineEvent\\:\\:getEventFilters\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
@@ -39216,7 +39181,7 @@ parameters:
 
 		-
 			message: "#^If condition is always true\\.$#"
-			count: 2
+			count: 1
 			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
 		-
@@ -40597,11 +40562,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\CompanyType\\:\\:getFormFields\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\CompanyType\\:\\:getFormFields\\(\\) has parameter \\$object with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
@@ -40950,11 +40910,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/LeadType.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\LeadType\\:\\:getFormFields\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/LeadType.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\LeadType\\:\\:getFormFields\\(\\) has parameter \\$object with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/LeadType.php
@@ -41135,11 +41090,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/UpdateCompanyActionType.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\UpdateCompanyActionType\\:\\:getFormFields\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/UpdateCompanyActionType.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\UpdateCompanyActionType\\:\\:getFormFields\\(\\) has parameter \\$object with no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/UpdateCompanyActionType.php
@@ -41161,11 +41111,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\UpdateLeadActionType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/UpdateLeadActionType.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\UpdateLeadActionType\\:\\:getFormFields\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/UpdateLeadActionType.php
 
@@ -51280,11 +51225,6 @@ parameters:
 			path: app/bundles/PluginBundle/Entity/IntegrationEntityRepository.php
 
 		-
-			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\IntegrationEntityRepository\\:\\:findLeadsToUpdate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Entity/IntegrationEntityRepository.php
-
-		-
 			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\IntegrationEntityRepository\\:\\:findLeadsToUpdate\\(\\) has parameter \\$excludeIntegrationIds with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Entity/IntegrationEntityRepository.php
@@ -51463,16 +51403,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between false and int will always evaluate to false\\.$#"
 			count: 6
 			path: app/bundles/PluginBundle/Entity/IntegrationEntityRepository.php
-
-		-
-			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\IntegrationRepository\\:\\:getCoreIntegrations\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Entity/IntegrationRepository.php
-
-		-
-			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\IntegrationRepository\\:\\:getIntegrations\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Entity/IntegrationRepository.php
 
 		-
 			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\Plugin\\:\\:loadMetadata\\(\\) has no return type specified\\.$#"
@@ -53409,11 +53339,6 @@ parameters:
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
 
 		-
-			message: "#^Method Mautic\\\\PluginBundle\\\\Model\\\\IntegrationEntityModel\\:\\:getRecordList\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
 			message: "#^Method Mautic\\\\PluginBundle\\\\Model\\\\IntegrationEntityModel\\:\\:getRecordList\\(\\) has parameter \\$integrationObject with no type specified\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
@@ -54397,11 +54322,6 @@ parameters:
 			path: app/bundles/PointBundle/Event/PointBuilderEvent.php
 
 		-
-			message: "#^Method Mautic\\\\PointBundle\\\\Event\\\\PointBuilderEvent\\:\\:getActionChoices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PointBundle/Event/PointBuilderEvent.php
-
-		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Event\\\\PointBuilderEvent\\:\\:getActionList\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Event/PointBuilderEvent.php
@@ -55348,11 +55268,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\ReportBundle\\\\Event\\\\ReportBuilderEvent\\:\\:getCategoryColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/ReportBundle/Event/ReportBuilderEvent.php
-
-		-
-			message: "#^Method Mautic\\\\ReportBundle\\\\Event\\\\ReportBuilderEvent\\:\\:getChannelColumns\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/ReportBundle/Event/ReportBuilderEvent.php
 
@@ -58365,11 +58280,6 @@ parameters:
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
 
 		-
-			message: "#^Method Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:getActionChoices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
-
-		-
 			message: "#^Method Mautic\\\\StageBundle\\\\Event\\\\StageBuilderEvent\\:\\:getActionList\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
@@ -60689,17 +60599,7 @@ parameters:
 			path: app/bundles/WebhookBundle/Controller/AjaxController.php
 
 		-
-			message: "#^Method Mautic\\\\WebhookBundle\\\\Controller\\\\AjaxController\\:\\:getPayloadPaths\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/AjaxController.php
-
-		-
 			message: "#^Method Mautic\\\\WebhookBundle\\\\Controller\\\\AjaxController\\:\\:getPayloadPaths\\(\\) has parameter \\$types with no type specified\\.$#"
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Method Mautic\\\\WebhookBundle\\\\Controller\\\\AjaxController\\:\\:loadPayloads\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/WebhookBundle/Controller/AjaxController.php
 
