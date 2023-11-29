@@ -13,6 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
+    private const FEATURE_PUSH_LEAD = 'push_lead';
+
     public function __construct(
         private PluginModel $pluginModel,
         private IntegrationRepository $integrationRepository
@@ -72,7 +74,9 @@ class LeadSubscriber implements EventSubscriberInterface
         $integrations = $this->integrationRepository->getIntegrations();
         foreach ($integrations as $integration) {
             /** @var Integration $integration */
-            if ($integration->getIsPublished() && !empty($integration->getApiKeys())) {
+            $supportedFeatures = $integration->getSupportedFeatures();
+
+            if ($integration->getIsPublished() && !empty($integration->getApiKeys()) && in_array(self::FEATURE_PUSH_LEAD, $supportedFeatures)) {
                 return true;
             }
         }

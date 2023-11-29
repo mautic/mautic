@@ -70,6 +70,7 @@ class LeadSubscriberTest extends TestCase
         $integration = new Integration();
         $integration->setIsPublished(true);
         $integration->setApiKeys(['key' => 'some']);
+        $integration->setSupportedFeatures(['push_lead']);
 
         $this->integrationRepository->expects($this->once())
             ->method('getIntegrations')
