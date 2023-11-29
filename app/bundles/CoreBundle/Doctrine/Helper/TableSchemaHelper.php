@@ -41,7 +41,7 @@ class TableSchemaHelper
     /**
      * @var array
      */
-    protected $dropTables;
+    protected $dropTables = [];
 
     /**
      * @var array
