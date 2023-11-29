@@ -54,10 +54,8 @@ trait PushToIntegrationTrait
         $services = static::$integrationHelper->getIntegrationObjects($integration);
         $success  = true;
 
-        /**
-         * @var AbstractIntegration $s
-         */
         foreach ($services as $s) {
+            /** @var AbstractIntegration $s */
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;

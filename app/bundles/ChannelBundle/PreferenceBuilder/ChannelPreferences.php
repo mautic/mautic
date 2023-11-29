@@ -68,10 +68,8 @@ class ChannelPreferences
      */
     public function removeLog(LeadEventLog $log)
     {
-        /**
-         * @var ArrayCollection|LeadEventLog[] $logs
-         */
         foreach ($this->organizedByPriority as $logs) {
+            /** @var ArrayCollection<int, LeadEventLog> $logs */
             $logs->remove($log->getId());
         }
 
