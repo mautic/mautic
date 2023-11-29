@@ -57,13 +57,11 @@ class MappingHelper
     }
 
     /**
-     * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      */
-    public function findMauticObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ObjectDAO $integrationObjectDAO)
+    public function findMauticObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ObjectDAO $integrationObjectDAO): ObjectDAO
     {
         // Check if this contact is already tracked
         if ($internalObject = $this->objectMappingRepository->getInternalObject(
@@ -157,11 +155,9 @@ class MappingHelper
     }
 
     /**
-     * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      */
-    public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO)
+    public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO): ObjectDAO
     {
         if ($integrationObject = $this->objectMappingRepository->getIntegrationObject(
             $integration,

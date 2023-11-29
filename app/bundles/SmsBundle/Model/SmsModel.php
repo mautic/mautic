@@ -386,11 +386,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param bool $persist
      * @param null $listId
      *
-     * @return Stat
-     *
      * @throws \Exception
      */
-    public function createStatEntry(Sms $sms, Lead $lead, $source = null, $persist = true, $listId = null)
+    public function createStatEntry(Sms $sms, Lead $lead, $source = null, $persist = true, $listId = null): Stat
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());

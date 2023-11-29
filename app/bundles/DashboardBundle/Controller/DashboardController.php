@@ -94,7 +94,7 @@ class DashboardController extends AbstractFormController
     /**
      * @return JsonResponse|Response
      */
-    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId)
+    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
@@ -343,10 +343,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Exports the widgets of current user into a json file and downloads it.
-     *
-     * @return JsonResponse
      */
-    public function exportAction(Request $request)
+    public function exportAction(Request $request): JsonResponse
     {
         $dashboardModel = $this->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);

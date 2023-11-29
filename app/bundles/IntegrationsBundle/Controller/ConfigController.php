@@ -238,10 +238,7 @@ class ConfigController extends AbstractFormController
         );
     }
 
-    /**
-     * @return JsonResponse
-     */
-    private function closeForm(Request $request)
+    private function closeForm(Request $request): JsonResponse
     {
         $this->resetFieldsInSession($request);
 

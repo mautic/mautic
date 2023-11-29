@@ -1717,10 +1717,8 @@ class MailHelper
      * @param bool|true   $persist
      * @param string|null $emailAddress
      * @param null        $listId
-     *
-     * @return Stat
      */
-    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
         // create a stat
         $stat = new Stat();

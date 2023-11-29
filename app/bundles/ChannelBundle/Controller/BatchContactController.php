@@ -60,10 +60,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * Execute the batch action.
-     *
-     * @return JsonResponse
      */
-    public function setAction(Request $request)
+    public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);

@@ -18,11 +18,9 @@ final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
     /**
      * @param string $userAgent
      *
-     * @return DeviceDetector
-     *
      * @throws \Exception
      */
-    public function create($userAgent)
+    public function create($userAgent): DeviceDetector
     {
         $detector = new DeviceDetector((string) $userAgent);
         $bridge   = new PSR6Bridge($this->cacheProvider->getCacheAdapter());

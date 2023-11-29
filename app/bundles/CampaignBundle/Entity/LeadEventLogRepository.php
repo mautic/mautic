@@ -444,11 +444,9 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @return ArrayCollection
-     *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduledByIds(array $ids)
+    public function getScheduledByIds(array $ids): ArrayCollection
     {
         $this->getReplicaConnection();
         $q = $this->createQueryBuilder('o');

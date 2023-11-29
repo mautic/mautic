@@ -27,11 +27,9 @@ class ConditionExecutioner implements EventInterface
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
         \assert($config instanceof ConditionAccessor);
         $evaluatedContacts = new EvaluatedContacts();

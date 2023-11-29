@@ -1761,10 +1761,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
      *
      * @param string $idHash
-     *
-     * @return EmailSendEvent
      */
-    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = [])
+    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = []): EmailSendEvent
     {
         $event = new EmailSendEvent(
             null,

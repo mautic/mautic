@@ -261,10 +261,8 @@ class WebhookModel extends FormModel
 
     /**
      * Creates a WebhookQueue entity, sets the date and returns the created entity.
-     *
-     * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = [])
+    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = []): WebhookQueue
     {
         $serializedPayload = $this->serializeData($payload, $serializationGroups);
 

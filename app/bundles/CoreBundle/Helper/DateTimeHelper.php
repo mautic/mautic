@@ -278,11 +278,9 @@ class DateTimeHelper
      * @param int    $interval
      * @param string $unit
      *
-     * @return \DateInterval
-     *
      * @throws \Exception
      */
-    public function buildInterval($interval, $unit)
+    public function buildInterval($interval, $unit): \DateInterval
     {
         $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
         $unit          = strtoupper($unit);

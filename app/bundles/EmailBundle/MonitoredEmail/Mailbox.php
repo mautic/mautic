@@ -799,10 +799,8 @@ class Mailbox
      * Get mail data.
      *
      * @param bool $markAsSeen
-     *
-     * @return Message
      */
-    public function getMail($mailId, $markAsSeen = true)
+    public function getMail($mailId, $markAsSeen = true): Message
     {
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);

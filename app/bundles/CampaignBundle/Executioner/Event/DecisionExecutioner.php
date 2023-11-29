@@ -62,11 +62,9 @@ class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
         \assert($config instanceof DecisionAccessor);
         $evaluatedContacts = new EvaluatedContacts();

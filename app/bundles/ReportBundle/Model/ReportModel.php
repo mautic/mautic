@@ -337,7 +337,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context, $isGroupBy = false)
+    public function getColumnList($context, $isGroupBy = false): \stdClass
     {
         $tableData           = $this->getTableData($context);
         $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
@@ -368,7 +368,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
      */
-    public function getFilterList($context = 'all')
+    public function getFilterList($context = 'all'): \stdClass
     {
         $tableData = $this->getTableData($context);
 
@@ -404,7 +404,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], choiceHtml = '']
      */
-    public function getGraphList($context = 'all')
+    public function getGraphList($context = 'all'): \stdClass
     {
         $graphData          = $this->getGraphData($context);
         $return             = new \stdClass();

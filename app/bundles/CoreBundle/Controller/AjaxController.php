@@ -36,11 +36,9 @@ class AjaxController extends CommonController
      * @param int   $statusCode
      * @param bool  $addIgnoreWdt
      *
-     * @return JsonResponse
-     *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true)
+    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 

@@ -28,10 +28,8 @@ class BatchSegmentController extends AbstractFormController
 
     /**
      * API for batch action.
-     *
-     * @return JsonResponse
      */
-    public function setAction(Request $request)
+    public function setAction(Request $request): JsonResponse
     {
         $params     = $request->get('lead_batch', []);
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);

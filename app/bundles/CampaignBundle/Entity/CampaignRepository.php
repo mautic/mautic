@@ -325,10 +325,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return CountResult
-     */
-    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter)
+    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter): CountResult
     {
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
 

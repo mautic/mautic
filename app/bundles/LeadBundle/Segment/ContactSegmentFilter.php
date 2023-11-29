@@ -206,18 +206,12 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getNullValue();
     }
 
-    /**
-     * @return DoNotContactParts
-     */
-    public function getDoNotContactParts()
+    public function getDoNotContactParts(): DoNotContactParts
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 
-    /**
-     * @return IntegrationCampaignParts
-     */
-    public function getIntegrationCampaignParts()
+    public function getIntegrationCampaignParts(): IntegrationCampaignParts
     {
         return new IntegrationCampaignParts($this->getParameterValue());
     }

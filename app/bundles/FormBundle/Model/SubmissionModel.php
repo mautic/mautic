@@ -968,11 +968,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * Create/update lead from form submit.
      *
-     * @return Lead
-     *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();

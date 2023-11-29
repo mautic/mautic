@@ -41,10 +41,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * Adds or removes categories to multiple contacts defined by contact ID.
-     *
-     * @return JsonResponse
      */
-    public function execAction(Request $request)
+    public function execAction(Request $request): JsonResponse
     {
         $params = $request->get('lead_batch');
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);

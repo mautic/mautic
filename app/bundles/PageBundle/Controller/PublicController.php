@@ -617,10 +617,8 @@ class PublicController extends CommonFormController
 
     /**
      * Get the ID of the currently tracked Contact.
-     *
-     * @return JsonResponse
      */
-    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker)
+    public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
     {
         $data = [];
         if ($this->security->isAnonymous()) {

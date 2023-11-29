@@ -93,10 +93,7 @@ class FieldBuilder
         return $this->addCustomField($field, $defaultState);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addContactIdField(string $field)
+    private function addContactIdField(string $field): ReportFieldDAO
     {
         $normalizedValue = new NormalizedValueDAO(
             NormalizedValueDAO::INT_TYPE,
@@ -106,10 +103,7 @@ class FieldBuilder
         return new ReportFieldDAO($field, $normalizedValue);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function createOwnerIdReportFieldDAO(string $field, int $ownerId)
+    private function createOwnerIdReportFieldDAO(string $field, int $ownerId): ReportFieldDAO
     {
         return new ReportFieldDAO(
             $field,
@@ -120,10 +114,7 @@ class FieldBuilder
         );
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addDoNotContactField(string $field)
+    private function addDoNotContactField(string $field): ReportFieldDAO
     {
         $channel = str_replace('mautic_internal_dnc_', '', $field);
 
@@ -135,10 +126,7 @@ class FieldBuilder
         return new ReportFieldDAO($field, $normalizedValue);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addContactTimelineField(string $integration, string $field)
+    private function addContactTimelineField(string $integration, string $field): ReportFieldDAO
     {
         $normalizedValue = new NormalizedValueDAO(
             NormalizedValueDAO::URL_TYPE,
@@ -156,11 +144,9 @@ class FieldBuilder
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
-    private function addCustomField(string $field, string $defaultState)
+    private function addCustomField(string $field, string $defaultState): ReportFieldDAO
     {
         // The rest should be Mautic custom fields and if not, just ignore
         $mauticFields = $this->fieldHelper->getFieldList($this->requestObject->getObject());
