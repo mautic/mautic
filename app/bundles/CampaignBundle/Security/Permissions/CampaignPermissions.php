@@ -5,9 +5,6 @@ namespace Mautic\CampaignBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignPermissions.
- */
 class CampaignPermissions extends AbstractPermissions
 {
     /**

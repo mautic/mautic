@@ -5,9 +5,6 @@ namespace Mautic\WebhookBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\WebhookBundle\Entity\Webhook;
 
-/**
- * Class WebhookEvent.
- */
 class WebhookEvent extends CommonEvent
 {
     /**

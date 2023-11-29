@@ -25,9 +25,6 @@ class ContactHelper
      */
     private $phoneNumberHelper;
 
-    /**
-     * ContactHelper constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         Connection $connection,

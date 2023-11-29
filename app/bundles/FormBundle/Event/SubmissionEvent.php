@@ -92,9 +92,6 @@ class SubmissionEvent extends CommonEvent
      */
     private $postSubmitPayload;
 
-    /**
-     * SubmissionEvent constructor.
-     */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
         $this->entity  = $submission;

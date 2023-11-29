@@ -504,7 +504,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
                 :
                 $this->prepareEntityResultsToArray($entities);
 
-        // Set errors
         if ($idHelper->hasErrors()) {
             foreach ($idHelper->getErrors() as $key => $error) {
                 $this->setBatchError($key, $error, Response::HTTP_BAD_REQUEST, $errors);

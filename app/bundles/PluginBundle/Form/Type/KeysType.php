@@ -10,9 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * Class SocialMediaKeysType.
- */
 class KeysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

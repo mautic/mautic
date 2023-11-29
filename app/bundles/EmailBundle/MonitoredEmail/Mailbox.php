@@ -154,9 +154,6 @@ class Mailbox
 
     private $folders = [];
 
-    /**
-     * Mailbox constructor.
-     */
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
         $this->mailboxes = $parametersHelper->get('monitored_email', []);

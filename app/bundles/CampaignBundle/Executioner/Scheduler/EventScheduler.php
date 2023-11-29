@@ -57,9 +57,6 @@ class EventScheduler
      */
     private $coreParametersHelper;
 
-    /**
-     * EventScheduler constructor.
-     */
     public function __construct(
         LoggerInterface $logger,
         EventLogger $eventLogger,

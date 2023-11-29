@@ -28,9 +28,6 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
      */
     private $em;
 
-    /**
-     * TimelineEventLogSegmentSubscriber constructor.
-     */
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         UserHelper $userHelper,

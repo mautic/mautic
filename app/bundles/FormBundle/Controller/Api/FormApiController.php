@@ -145,7 +145,6 @@ class FormApiController extends CommonApiController
             $entity->setAlias($alias);
         }
 
-        // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
         if (!$entity->getId()) {

@@ -39,9 +39,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $pageTrackableModel;
 
-    /**
-     * NotificationModel constructor.
-     */
     public function __construct(
         TrackableModel $pageTrackableModel,
         EntityManager $em,

@@ -22,9 +22,6 @@ class ReplyController extends AbstractController
      */
     private $replyHelper;
 
-    /**
-     * ReplyController constructor.
-     */
     public function __construct(HandlerContainer $callbackHandler, ReplyHelper $replyHelper)
     {
         $this->callbackHandler = $callbackHandler;

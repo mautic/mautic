@@ -9,9 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-/**
- * Class FilterType.
- */
 class DateRangeType extends AbstractType
 {
     /**
@@ -24,9 +21,6 @@ class DateRangeType extends AbstractType
      */
     private $coreParametersHelper;
 
-    /**
-     * DateRangeType constructor.
-     */
     public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
         $this->session              = $session;

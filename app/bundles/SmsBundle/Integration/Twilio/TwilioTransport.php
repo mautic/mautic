@@ -29,9 +29,6 @@ class TwilioTransport implements TransportInterface
      */
     private $client;
 
-    /**
-     * TwilioTransport constructor.
-     */
     public function __construct(Configuration $configuration, LoggerInterface $logger)
     {
         $this->logger        = $logger;

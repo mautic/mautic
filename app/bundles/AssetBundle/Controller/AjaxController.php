@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     /**

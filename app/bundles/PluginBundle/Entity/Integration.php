@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Integration.
- */
 class Integration extends CommonEntity
 {
     /**

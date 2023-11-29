@@ -41,9 +41,6 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     private $requestStack;
 
-    /**
-     * ContactTrackingService constructor.
-     */
     public function __construct(
         CookieHelper $cookieHelper,
         LeadDeviceRepository $leadDeviceRepository,

@@ -74,9 +74,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     protected $companyDeduper;
 
-    /**
-     * CompanyModel constructor.
-     */
     public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel = $leadFieldModel;

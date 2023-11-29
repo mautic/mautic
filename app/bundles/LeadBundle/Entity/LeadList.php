@@ -218,9 +218,6 @@ class LeadList extends FormEntity
         return $this->description;
     }
 
-    /**
-     * Set category.
-     */
     public function setCategory(Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
@@ -229,9 +226,6 @@ class LeadList extends FormEntity
         return $this;
     }
 
-    /**
-     * Get category.
-     */
     public function getCategory(): ?Category
     {
         return $this->category;

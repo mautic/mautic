@@ -14,9 +14,6 @@ class UserMapper implements UsernameMapperInterface
      */
     private $attributes;
 
-    /**
-     * UserMapper constructor.
-     */
     public function __construct(array $attributes)
     {
         $this->attributes = $attributes;

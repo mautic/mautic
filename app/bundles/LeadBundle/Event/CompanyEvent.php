@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Company;
 
-/**
- * Class CompanyEvent.
- */
 class CompanyEvent extends CommonEvent
 {
     /**

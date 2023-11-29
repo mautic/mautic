@@ -8,9 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FormFieldTextType.
- */
 class FormFieldTelType extends AbstractType
 {
     /**
@@ -18,9 +15,6 @@ class FormFieldTelType extends AbstractType
      */
     private $translator;
 
-    /**
-     * FormFieldTelType constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

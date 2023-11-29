@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Widget.
- */
 class Widget extends FormEntity
 {
     /**

@@ -531,7 +531,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('c')
             ->from(Company::class, 'c');

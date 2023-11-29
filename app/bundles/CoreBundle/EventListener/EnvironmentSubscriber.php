@@ -32,9 +32,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Set timezone.
-     */
     public function onKernelRequestSetTimezone(RequestEvent $event)
     {
         $request = $event->getRequest();
@@ -42,7 +39,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Set date/time
         date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
     }
 

@@ -4,9 +4,6 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationFormDisplayEvent.
- */
 class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
 {
     /**

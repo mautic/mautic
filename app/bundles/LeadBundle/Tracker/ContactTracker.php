@@ -81,9 +81,6 @@ class ContactTracker
      */
     private $leadFieldModel;
 
-    /**
-     * ContactTracker constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         ContactTrackingServiceInterface $contactTrackingService,

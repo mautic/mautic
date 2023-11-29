@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AccessToken.
- */
 class AccessToken extends BaseAccessToken
 {
     public static function loadMetadata(ORM\ClassMetadata $metadata)

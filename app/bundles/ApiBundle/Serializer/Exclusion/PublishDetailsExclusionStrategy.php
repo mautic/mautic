@@ -9,9 +9,6 @@ namespace Mautic\ApiBundle\Serializer\Exclusion;
  */
 class PublishDetailsExclusionStrategy extends FieldExclusionStrategy
 {
-    /**
-     * PublishDetailsExclusionStrategy constructor.
-     */
     public function __construct()
     {
         parent::__construct(

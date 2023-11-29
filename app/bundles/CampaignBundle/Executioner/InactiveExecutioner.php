@@ -83,9 +83,6 @@ class InactiveExecutioner implements ExecutionerInterface
 
     protected ?\DateTime $now = null;
 
-    /**
-     * InactiveExecutioner constructor.
-     */
     public function __construct(
         InactiveContactFinder $inactiveContactFinder,
         LoggerInterface $logger,

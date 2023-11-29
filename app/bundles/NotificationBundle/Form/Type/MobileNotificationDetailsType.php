@@ -19,9 +19,6 @@ class MobileNotificationDetailsType extends AbstractType
      */
     protected $integrationHelper;
 
-    /**
-     * MobileNotificationDetailsType constructor.
-     */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;

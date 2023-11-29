@@ -26,9 +26,6 @@ class MailboxContainer
      */
     protected $messages = [];
 
-    /**
-     * MailboxAccessor constructor.
-     */
     public function __construct(ConfigAccessor $config)
     {
         $this->config = $config;

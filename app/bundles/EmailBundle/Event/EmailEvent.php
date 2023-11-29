@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-/**
- * Class EmailEvent.
- */
 class EmailEvent extends CommonEvent
 {
     /**

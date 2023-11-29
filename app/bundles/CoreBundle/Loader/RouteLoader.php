@@ -9,9 +9,6 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Class RouteLoader.
- */
 class RouteLoader extends Loader
 {
     /**
@@ -23,9 +20,6 @@ class RouteLoader extends Loader
      */
     private $coreParameters;
 
-    /**
-     * RouteLoader constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
     {
         $this->dispatcher     = $dispatcher;

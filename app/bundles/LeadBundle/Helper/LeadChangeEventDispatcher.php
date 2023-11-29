@@ -25,9 +25,6 @@ class LeadChangeEventDispatcher
      */
     private $changes;
 
-    /**
-     * LeadChangeEventDispatcher constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

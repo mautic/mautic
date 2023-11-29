@@ -86,9 +86,6 @@ class SendEmailToContact
      */
     private $contact = [];
 
-    /**
-     * SendEmailToContact constructor.
-     */
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {
         $this->mailer     = $mailer;

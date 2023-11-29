@@ -5,9 +5,6 @@ namespace Mautic\ApiBundle\Event;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class ClientEvent.
- */
 class ClientEvent extends CommonEvent
 {
     private string $apiMode;

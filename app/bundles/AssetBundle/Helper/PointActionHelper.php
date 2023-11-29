@@ -2,9 +2,6 @@
 
 namespace Mautic\AssetBundle\Helper;
 
-/**
- * Class PointActionHelper.
- */
 class PointActionHelper
 {
     /**

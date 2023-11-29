@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class RemoteAssetBrowseEvent.
- */
 class RemoteAssetBrowseEvent extends CommonEvent
 {
     /**

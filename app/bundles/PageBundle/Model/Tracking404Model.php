@@ -25,9 +25,6 @@ class Tracking404Model
      */
     private $coreParametersHelper;
 
-    /**
-     * Tracking404Model constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         ContactTracker $contactTracker,

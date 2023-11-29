@@ -23,9 +23,6 @@ class MailboxOrganizer
      */
     protected $containers = [];
 
-    /**
-     * MailboxOrganizer constructor.
-     */
     public function __construct(ParseEmailEvent $event, array $mailboxes)
     {
         $this->event     = $event;

@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class PointEventHelper.
- */
 class PointEventHelper
 {
     /**

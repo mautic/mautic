@@ -5,9 +5,6 @@ namespace Mautic\StageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\StageBundle\Entity\Stage;
 
-/**
- * Class StageEvent.
- */
 class StageEvent extends CommonEvent
 {
     /**

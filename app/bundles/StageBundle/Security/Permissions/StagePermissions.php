@@ -5,9 +5,6 @@ namespace Mautic\StageBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class StagePermissions.
- */
 class StagePermissions extends AbstractPermissions
 {
     /**

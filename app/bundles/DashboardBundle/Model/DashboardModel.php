@@ -36,9 +36,6 @@ class DashboardModel extends FormModel
 
     private Filesystem $filesystem;
 
-    /**
-     * DashboardModel constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,

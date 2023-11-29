@@ -12,9 +12,6 @@ class Parser
      */
     protected $message;
 
-    /**
-     * Parser constructor.
-     */
     public function __construct(Message $message)
     {
         $this->message = $message;

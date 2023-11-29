@@ -15,9 +15,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SubmitActionEmailType.
- */
 class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
@@ -33,9 +30,6 @@ class SubmitActionEmailType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    /**
-     * SubmitActionEmailType constructor.
-     */
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator           = $translator;

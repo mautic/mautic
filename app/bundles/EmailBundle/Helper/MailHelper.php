@@ -27,9 +27,6 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-/**
- * Class MailHelper.
- */
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
@@ -770,9 +767,6 @@ class MailHelper
         unset($content);
     }
 
-    /**
-     * Set subject.
-     */
     public function setSubject($subject)
     {
         $this->subject = $subject;
@@ -1436,9 +1430,6 @@ class MailHelper
         $this->globalTokens = array_merge($this->globalTokens, $tokens);
     }
 
-    /**
-     * Set tokens.
-     */
     public function setTokens(array $tokens)
     {
         $this->globalTokens = $tokens;

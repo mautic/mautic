@@ -13,9 +13,6 @@ class EncryptionService
      */
     private $encryptionHelper;
 
-    /**
-     * EncryptionService constructor.
-     */
     public function __construct(EncryptionHelper $encryptionHelper)
     {
         $this->encryptionHelper = $encryptionHelper;

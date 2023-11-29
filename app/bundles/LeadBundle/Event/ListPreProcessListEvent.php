@@ -4,9 +4,6 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class ListPreProcessListEvent.
- */
 class ListPreProcessListEvent extends CommonEvent
 {
     /**

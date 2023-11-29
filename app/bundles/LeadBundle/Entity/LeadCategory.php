@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class LeadCategory.
- */
 class LeadCategory
 {
     /**

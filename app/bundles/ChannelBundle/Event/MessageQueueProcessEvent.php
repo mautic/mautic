@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class MessageQueueProcessEvent extends CommonEvent
 {
-    /**
-     * MessageQueueEvent constructor.
-     */
     public function __construct(MessageQueue $entity)
     {
         $this->entity = $entity;

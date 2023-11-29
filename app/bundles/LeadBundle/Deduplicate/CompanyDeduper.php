@@ -15,9 +15,6 @@ class CompanyDeduper
      */
     private $companyRepository;
 
-    /**
-     * DedupModel constructor.
-     */
     public function __construct(FieldModel $fieldModel, CompanyRepository $companyRepository)
     {
         $this->fieldModel        = $fieldModel;

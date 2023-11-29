@@ -34,7 +34,6 @@ class NoteController extends FormController
 
         $session = $request->getSession();
 
-        // set limits
         $limit = $session->get(
             'mautic.lead.'.$lead->getId().'.note.limit',
             $this->coreParametersHelper->get('default_pagelimit')

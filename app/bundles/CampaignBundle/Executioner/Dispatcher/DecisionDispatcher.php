@@ -23,9 +23,6 @@ class DecisionDispatcher
      */
     private $legacyDispatcher;
 
-    /**
-     * DecisionDispatcher constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         LegacyEventDispatcher $legacyDispatcher

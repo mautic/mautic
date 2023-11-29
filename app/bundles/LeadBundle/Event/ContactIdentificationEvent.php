@@ -22,9 +22,6 @@ class ContactIdentificationEvent extends Event
      */
     private $identifiedByChannel;
 
-    /**
-     * ContactIdentificationEvent constructor.
-     */
     public function __construct(array $clickthrough)
     {
         $this->clickthrough = $clickthrough;

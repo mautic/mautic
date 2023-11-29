@@ -6,9 +6,6 @@ class ConfigAccessor
 {
     private $config;
 
-    /**
-     * ConfigAccessor constructor.
-     */
     public function __construct(array $config)
     {
         $this->config = $config;

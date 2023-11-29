@@ -34,6 +34,5 @@ class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixt
 
     public function getOrder()
     {
-        // TODO: Implement getOrder() method.
     }
 }

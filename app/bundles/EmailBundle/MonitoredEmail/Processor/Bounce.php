@@ -65,9 +65,6 @@ class Bounce implements ProcessorInterface
      */
     protected $doNotContact;
 
-    /**
-     * Bounce constructor.
-     */
     public function __construct(
         TransportInterface $transport,
         ContactFinder $contactFinder,

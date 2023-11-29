@@ -85,7 +85,7 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model   = $this->getModel('lead');
         $session = $request->getSession();
-        // set limits
+
         $limit = $session->get('mautic.lead.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -1422,11 +1422,9 @@ class LeadController extends FormController
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
-                        // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
 
-                        // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
 

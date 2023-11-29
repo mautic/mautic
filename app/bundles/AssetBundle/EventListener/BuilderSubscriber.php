@@ -40,9 +40,6 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $builderTokenHelperFactory;
 
-    /**
-     * BuilderSubscriber constructor.
-     */
     public function __construct(
         CorePermissions $security,
         TokenHelper $tokenHelper,

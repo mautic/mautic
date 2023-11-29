@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class SearchStringHelper.
- */
 class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;

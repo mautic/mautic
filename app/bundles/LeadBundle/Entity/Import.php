@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Import.
- */
 class Import extends FormEntity
 {
     /** ===== Statuses: ===== */

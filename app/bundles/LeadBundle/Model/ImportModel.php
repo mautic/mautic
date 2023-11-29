@@ -68,9 +68,6 @@ class ImportModel extends FormModel
      */
     protected $leadEventLogRepo;
 
-    /**
-     * ImportModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         LeadModel $leadModel,

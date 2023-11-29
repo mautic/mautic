@@ -5,9 +5,6 @@ namespace Mautic\FormBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventFormSubmitType.
- */
 class CampaignEventFormSubmitType extends AbstractType
 {
     /**

@@ -72,7 +72,6 @@ class ListController extends CommonController
             $page = $session->get('mautic.marketplace.package.page', 1);
         }
 
-        // set limits
         $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $route   = $this->routeProvider->buildListRoute($page);
 

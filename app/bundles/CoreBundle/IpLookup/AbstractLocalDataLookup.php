@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 
-/**
- * Class AbstractLocalDataLookup.
- */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**

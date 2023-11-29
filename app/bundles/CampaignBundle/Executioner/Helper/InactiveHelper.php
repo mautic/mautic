@@ -45,9 +45,6 @@ class InactiveHelper
      */
     private $earliestInactiveDate;
 
-    /**
-     * InactiveHelper constructor.
-     */
     public function __construct(
         EventScheduler $scheduler,
         InactiveContactFinder $inactiveContactFinder,

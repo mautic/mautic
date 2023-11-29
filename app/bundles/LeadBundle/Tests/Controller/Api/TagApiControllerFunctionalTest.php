@@ -39,7 +39,6 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($tagId, $response['tag']['id'], 'ID of the created tag does not match with the edited one.');
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
-        // Get tag
         $this->client->request('GET', "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);

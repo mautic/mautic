@@ -4,9 +4,6 @@ namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\ORM\EntityManager;
 
-/**
- * Class TableSchemaColumnsCache.
- */
 class TableSchemaColumnsCache
 {
     /**
@@ -19,9 +16,6 @@ class TableSchemaColumnsCache
      */
     private $cache;
 
-    /**
-     * TableSchemaColumnsCache constructor.
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
