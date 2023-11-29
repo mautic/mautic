@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class TweetController.
- */
 class TweetController extends FormController
 {
     /**

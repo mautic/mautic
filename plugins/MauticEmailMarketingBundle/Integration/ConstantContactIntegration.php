@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
-/**
- * Class ConstantContactIntegration.
- */
 class ConstantContactIntegration extends EmailAbstractIntegration
 {
     /**

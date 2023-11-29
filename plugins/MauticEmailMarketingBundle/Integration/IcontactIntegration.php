@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-/**
- * Class IcontactIntegration.
- */
 class IcontactIntegration extends EmailAbstractIntegration
 {
     /**

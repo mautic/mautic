@@ -31,9 +31,6 @@ class FileManager
      */
     private $pathsHelper;
 
-    /**
-     * FileManager constructor.
-     */
     public function __construct(
         FileUploader $fileUploader,
         CoreParametersHelper $coreParametersHelper,

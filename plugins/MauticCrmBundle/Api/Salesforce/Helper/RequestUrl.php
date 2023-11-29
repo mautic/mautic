@@ -2,9 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper;
 
-/**
- * Class RequestUrl.
- */
 class RequestUrl
 {
     /**

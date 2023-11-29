@@ -2,9 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-/**
- * Class InstagramIntegration.
- */
 class InstagramIntegration extends SocialIntegration
 {
     /**

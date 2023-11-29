@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
-/**
- * Class FocusEvent.
- */
 class FocusEvent extends CommonEvent
 {
     /**

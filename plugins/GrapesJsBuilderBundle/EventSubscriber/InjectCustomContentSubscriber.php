@@ -42,9 +42,6 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * InjectCustomContentSubscriber constructor.
-     */
     public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, Environment $twig, RequestStack $requestStack, RouterInterface $router)
     {
         $this->config               = $config;

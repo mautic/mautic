@@ -6,9 +6,6 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-/**
- * Class EmailAbstractIntegration.
- */
 abstract class EmailAbstractIntegration extends AbstractIntegration
 {
     protected $pushContactLink = false;
