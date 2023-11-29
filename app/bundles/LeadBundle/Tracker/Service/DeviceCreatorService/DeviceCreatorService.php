@@ -8,9 +8,6 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 final class DeviceCreatorService implements DeviceCreatorServiceInterface
 {
-    /**
-     * @return LeadDevice|null Null is returned if device can't be detected
-     */
     public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead): LeadDevice
     {
         $device = new LeadDevice();

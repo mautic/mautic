@@ -26,10 +26,8 @@ class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
         $model   = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -91,9 +89,6 @@ class DashboardController extends AbstractFormController
         ]);
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
     public function widgetAction(Request $request, WidgetService $widgetService, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {

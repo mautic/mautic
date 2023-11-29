@@ -26,7 +26,7 @@ class ClientRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return Paginator<Client>
      */
     public function getEntities(array $args = []): Paginator
     {
