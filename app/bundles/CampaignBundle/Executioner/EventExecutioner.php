@@ -383,6 +383,10 @@ class EventExecutioner
 
     private function checkForRemovedContacts(ArrayCollection $logs)
     {
+        /**
+         * @var int          $key
+         * @var LeadEventLog $log
+         */
         foreach ($logs as $key => $log) {
             // Use the deleted ID if the contact was removed by the delete contact action
             $contact    = $log->getLead();

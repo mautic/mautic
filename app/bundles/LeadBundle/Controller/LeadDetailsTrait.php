@@ -345,11 +345,13 @@ trait LeadDetailsTrait
         $engagements = [0, 0, 0, 0, 0, 0];
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
+            /** @var LeadModel $model */
             $model = $this->getModel('lead.lead');
 
             if (!isset($contact['lead_id'])) {
                 continue;
             }
+
             $lead = $model->getEntity($contact['lead_id']);
             $model->getRepository()->refetchEntity($lead);
             if (!$lead instanceof Lead) {

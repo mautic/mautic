@@ -150,10 +150,7 @@ class EventLogger
         return $logs;
     }
 
-    /**
-     * @return $this
-     */
-    public function persistCollection(ArrayCollection $collection)
+    public function persistCollection(ArrayCollection $collection): self
     {
         if (!$collection->count()) {
             return $this;
@@ -165,20 +162,14 @@ class EventLogger
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function clearCollection(ArrayCollection $collection)
+    public function clearCollection(ArrayCollection $collection): self
     {
         $this->leadEventLogRepository->detachEntities($collection->getValues());
 
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function extractContactsFromLogs(ArrayCollection $logs)
+    public function extractContactsFromLogs(ArrayCollection $logs): ArrayCollection
     {
         $contacts = new ArrayCollection();
 

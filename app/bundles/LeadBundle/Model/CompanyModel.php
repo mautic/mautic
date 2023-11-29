@@ -412,6 +412,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $lead->addUpdatedField('company', $companyName)
                     ->setDateModified(new \DateTime());
 
+                /** @var LeadRepository $leadRepository */
                 $leadRepository = $this->em->getRepository(Lead::class);
                 $leadRepository->saveEntity($lead);
             }

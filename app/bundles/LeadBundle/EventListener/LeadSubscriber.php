@@ -602,6 +602,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
         $imports      = $eventLogRepo->getEvents(
             $event->getLead(),
@@ -658,6 +659,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);
         $apiSingleEvents = $eventLogRepo->getEvents(
             $event->getLead(),

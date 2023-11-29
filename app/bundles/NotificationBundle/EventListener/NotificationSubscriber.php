@@ -111,6 +111,10 @@ class NotificationSubscriber implements EventSubscriberInterface
                 $clickthrough['channel'][1]
             );
 
+            /**
+             * @var string    $token
+             * @var Trackable $trackable
+             */
             foreach ($trackables as $token => $trackable) {
                 $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
             }

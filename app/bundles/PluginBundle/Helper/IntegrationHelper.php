@@ -539,6 +539,10 @@ class IntegrationHelper
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
 
+            /**
+             * @var string                                               $integration
+             * @var \Mautic\PluginBundle\Integration\AbstractIntegration $details
+             */
             foreach ($socialIntegrations as $integration => $details) {
                 /** @var \Mautic\PluginBundle\Entity\Integration $settings */
                 $settings = $details->getIntegrationSettings();

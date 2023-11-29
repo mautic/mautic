@@ -66,6 +66,7 @@ class DisplayManager
     {
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
+            /** @var Field $fieldFromArray */
             if (in_array($field->getType(), $this->viewOnlyFields)) {
                 continue;
             }

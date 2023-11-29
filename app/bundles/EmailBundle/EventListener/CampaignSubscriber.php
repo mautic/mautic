@@ -357,6 +357,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         $contacts = $event->getContacts();
         $pending  = $event->getPending();
 
+        /**
+         * @var int  $logId
+         * @var Lead $contact
+         */
         foreach ($contacts as $logId => $contact) {
             try {
                 $this->sendEmailToUser->sendEmailToUsers($config, $contact);
