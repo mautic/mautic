@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class BuilderEvent.
- */
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];

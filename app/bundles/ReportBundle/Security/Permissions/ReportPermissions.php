@@ -5,9 +5,6 @@ namespace Mautic\ReportBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ReportPermissions.
- */
 class ReportPermissions extends AbstractPermissions
 {
     /**

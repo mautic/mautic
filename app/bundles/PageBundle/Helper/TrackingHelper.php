@@ -9,9 +9,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class TrackinHelper.
- */
 class TrackingHelper
 {
     /**
@@ -34,9 +31,6 @@ class TrackingHelper
      */
     protected $contactTracker;
 
-    /**
-     * BuildJsSubscriber constructor.
-     */
     public function __construct(
         Session $session,
         CoreParametersHelper $coreParametersHelper,

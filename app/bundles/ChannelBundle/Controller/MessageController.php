@@ -23,9 +23,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MessageController.
- */
 class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;

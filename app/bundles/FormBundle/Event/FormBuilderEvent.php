@@ -9,9 +9,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FormBuilderEvent.
- */
 class FormBuilderEvent extends Event
 {
     use ComponentValidationTrait;

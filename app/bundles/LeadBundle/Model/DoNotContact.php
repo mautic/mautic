@@ -21,9 +21,6 @@ class DoNotContact implements MauticModelInterface
      */
     protected $dncRepo;
 
-    /**
-     * DoNotContact constructor.
-     */
     public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
     {
         $this->leadModel = $leadModel;

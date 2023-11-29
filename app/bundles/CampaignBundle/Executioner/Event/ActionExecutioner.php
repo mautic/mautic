@@ -26,9 +26,6 @@ class ActionExecutioner implements EventInterface
      */
     private $eventLogger;
 
-    /**
-     * ActionExecutioner constructor.
-     */
     public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {
         $this->dispatcher         = $dispatcher;

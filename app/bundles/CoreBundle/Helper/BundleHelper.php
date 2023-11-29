@@ -2,18 +2,12 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class BundleHelper.
- */
 class BundleHelper
 {
     private $coreBundles   = [];
     private $pluginBundles = [];
     private $allBundles    = [];
 
-    /**
-     * BundleHelper constructor.
-     */
     public function __construct(array $coreBundles, array $pluginBundles)
     {
         $this->coreBundles   = $coreBundles;

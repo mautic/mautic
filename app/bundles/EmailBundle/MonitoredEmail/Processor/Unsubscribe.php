@@ -45,9 +45,6 @@ class Unsubscribe implements ProcessorInterface
      */
     private $doNotContact;
 
-    /**
-     * Bounce constructor.
-     */
     public function __construct(
         TransportInterface $transport,
         ContactFinder $contactFinder,

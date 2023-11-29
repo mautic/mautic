@@ -7,9 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Plugin.
- */
 class Plugin extends CommonEntity
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";

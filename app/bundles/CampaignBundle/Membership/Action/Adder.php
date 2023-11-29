@@ -23,9 +23,6 @@ class Adder
      */
     private $leadEventLogRepository;
 
-    /**
-     * Adder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
         $this->leadRepository         = $leadRepository;

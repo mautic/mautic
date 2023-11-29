@@ -26,9 +26,6 @@ class CredentialsStore implements CredentialStoreInterface
      */
     private $credentials;
 
-    /**
-     * CredentialsStore constructor.
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
     {
         $this->coreParametersHelper = $coreParametersHelper;

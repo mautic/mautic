@@ -7,9 +7,6 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
- * Class IdToEntityModelTransformer.
- */
 class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**

@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class GlobalSearchEvent.
- */
 class GlobalSearchEvent extends Event
 {
     /**

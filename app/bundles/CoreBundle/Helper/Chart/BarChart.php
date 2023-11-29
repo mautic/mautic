@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-/**
- * Class BarChart.
- */
 class BarChart extends AbstractChart implements ChartInterface
 {
     /**

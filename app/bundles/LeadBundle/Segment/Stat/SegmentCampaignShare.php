@@ -23,9 +23,6 @@ class SegmentCampaignShare
      */
     private $entityManager;
 
-    /**
-     * SegmentCampaignShare constructor.
-     */
     public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
     {
         $this->campaignModel      = $campaignModel;

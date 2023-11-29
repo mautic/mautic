@@ -17,9 +17,6 @@ class GroupExecutionDateDAO
      */
     private $contacts;
 
-    /**
-     * GroupExecutionDateDAO constructor.
-     */
     public function __construct(\DateTimeInterface $executionDate)
     {
         $this->executionDate = $executionDate;

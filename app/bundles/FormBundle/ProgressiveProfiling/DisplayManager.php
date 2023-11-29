@@ -22,9 +22,6 @@ class DisplayManager
      */
     private $displayCounter;
 
-    /**
-     * DisplayManager constructor.
-     */
     public function __construct(Form $form, array $viewOnlyFields = [])
     {
         $this->form           = $form;

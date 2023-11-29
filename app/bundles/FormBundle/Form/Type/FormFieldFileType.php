@@ -14,9 +14,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FormFieldFileType.
- */
 class FormFieldFileType extends AbstractType
 {
     public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';

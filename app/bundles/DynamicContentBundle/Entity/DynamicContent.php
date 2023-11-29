@@ -86,9 +86,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     private $slotName;
 
-    /**
-     * DynamicContent constructor.
-     */
     public function __construct()
     {
         $this->stats               = new ArrayCollection();

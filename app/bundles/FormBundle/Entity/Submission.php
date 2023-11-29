@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class Submission.
- */
 class Submission
 {
     /**

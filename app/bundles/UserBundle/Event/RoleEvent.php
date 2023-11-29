@@ -5,9 +5,6 @@ namespace Mautic\UserBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\Role;
 
-/**
- * Class RoleEvent.
- */
 class RoleEvent extends CommonEvent
 {
     /**

@@ -15,9 +15,6 @@ class TrackingSubscriber implements EventSubscriberInterface
      */
     private $statRepository;
 
-    /**
-     * TrackingSubscriber constructor.
-     */
     public function __construct(StatRepository $statRepository)
     {
         $this->statRepository = $statRepository;

@@ -6,9 +6,6 @@ use DeviceDetector\DeviceDetector;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class DeviceCreatorService.
- */
 final class DeviceCreatorService implements DeviceCreatorServiceInterface
 {
     /**

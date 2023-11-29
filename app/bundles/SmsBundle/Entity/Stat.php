@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     /**

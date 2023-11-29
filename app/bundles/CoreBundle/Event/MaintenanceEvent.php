@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class MaintenanceEvent.
- */
 class MaintenanceEvent extends Event
 {
     /**

@@ -38,9 +38,6 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * ProcessReplySubscriber constructor.
-     */
     public function __construct(Reply $replier, CacheStorageHelper $cache)
     {
         $this->replier = $replier;

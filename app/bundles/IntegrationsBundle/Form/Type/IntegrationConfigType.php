@@ -23,9 +23,6 @@ class IntegrationConfigType extends AbstractType
      */
     private $integrationsHelper;
 
-    /**
-     * IntegrationConfigType constructor.
-     */
     public function __construct(ConfigIntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;

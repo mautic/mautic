@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class CsvHelper.
- */
 class CsvHelper
 {
     /**

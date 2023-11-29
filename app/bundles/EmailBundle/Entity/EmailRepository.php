@@ -123,6 +123,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');

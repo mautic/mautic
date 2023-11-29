@@ -51,9 +51,6 @@ class ReportGenerator
      */
     private $channelListHelper;
 
-    /**
-     * ReportGenerator constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
     {
         $this->db                = $db;

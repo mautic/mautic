@@ -60,9 +60,6 @@ class LegacyEventDispatcher
      */
     private $contactTracker;
 
-    /**
-     * LegacyEventDispatcher constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         EventScheduler $scheduler,

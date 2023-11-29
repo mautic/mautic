@@ -6,9 +6,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-/**
- * Class IdentifyCompanyHelper.
- */
 class IdentifyCompanyHelper
 {
     /**

@@ -2,9 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition;
 
-/**
- * Class Type.
- */
 final class Type
 {
     public const AUTOREPLY    = 'autoreply';

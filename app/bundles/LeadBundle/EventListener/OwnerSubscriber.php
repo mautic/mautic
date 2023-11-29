@@ -33,9 +33,6 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
-    /**
-     * OwnerSubscriber constructor.
-     */
     public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
     {
         $this->translator = $translator;

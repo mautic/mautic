@@ -14,9 +14,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Notification.
- */
 class Notification extends FormEntity
 {
     /**
@@ -124,9 +121,6 @@ class Notification extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Notification constructor.
-     */
     public function __construct()
     {
         $this->lists = new ArrayCollection();

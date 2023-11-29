@@ -31,9 +31,6 @@ class Interval implements ScheduleModeInterface
      */
     private $defaultTimezone;
 
-    /**
-     * Interval constructor.
-     */
     public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
     {
         $this->logger               = $logger;

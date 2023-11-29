@@ -5,9 +5,6 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PageEvent.
- */
 class PageEvent extends CommonEvent
 {
     /**

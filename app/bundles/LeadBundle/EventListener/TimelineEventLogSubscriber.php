@@ -12,9 +12,6 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * TimelineEventLogSubscriber constructor.
-     */
     public function __construct(
         Translator $translator,
         LeadEventLogRepository $leadEventLogRepository

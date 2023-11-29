@@ -18,9 +18,6 @@ class CompanyReportData
      */
     private $translator;
 
-    /**
-     * CompanyReportData constructor.
-     */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
         $this->fieldModel = $fieldModel;

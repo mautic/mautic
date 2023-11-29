@@ -5,9 +5,6 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationEvent.
- */
 class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(UnifiedIntegrationInterface $integration)

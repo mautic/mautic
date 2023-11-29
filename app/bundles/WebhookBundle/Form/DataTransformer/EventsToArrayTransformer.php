@@ -7,9 +7,6 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class EventsToArrayTransformer.
- */
 class EventsToArrayTransformer implements DataTransformerInterface
 {
     private $webhook;

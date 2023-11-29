@@ -16,9 +16,6 @@ final class MenuHelper
      */
     private $helper;
 
-    /**
-     * MenuHelper constructor.
-     */
     public function __construct(KnpHelper $helper)
     {
         $this->helper = $helper;

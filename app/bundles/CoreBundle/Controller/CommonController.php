@@ -270,7 +270,6 @@ class CommonController extends AbstractController implements MauticController
         // forward the controller by default
         $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
 
-        // set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->addFlashMessage(

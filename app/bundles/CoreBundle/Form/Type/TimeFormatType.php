@@ -14,9 +14,6 @@ class TimeFormatType extends AbstractType
      */
     private $translator;
 
-    /**
-     * TimeFormat constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

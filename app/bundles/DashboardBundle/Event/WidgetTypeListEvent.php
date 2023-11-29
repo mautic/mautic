@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WidgetTypeListEvent.
- */
 class WidgetTypeListEvent extends CommonEvent
 {
     /**

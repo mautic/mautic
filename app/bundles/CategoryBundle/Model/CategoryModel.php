@@ -31,9 +31,6 @@ class CategoryModel extends FormModel
      */
     protected $requestStack;
 
-    /**
-     * CategoryModel constructor.
-     */
     public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->requestStack = $requestStack;

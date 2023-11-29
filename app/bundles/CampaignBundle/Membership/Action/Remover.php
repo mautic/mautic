@@ -28,9 +28,6 @@ class Remover
      */
     private $unscheduledMessage;
 
-    /**
-     * Remover constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         LeadEventLogRepository $leadEventLogRepository,

@@ -28,9 +28,6 @@ class DecisionExecutioner implements EventInterface
      */
     private $dispatcher;
 
-    /**
-     * DecisionExecutioner constructor.
-     */
     public function __construct(EventLogger $eventLogger, DecisionDispatcher $dispatcher)
     {
         $this->eventLogger = $eventLogger;

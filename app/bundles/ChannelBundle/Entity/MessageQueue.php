@@ -7,9 +7,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class MessageQueue.
- */
 class MessageQueue
 {
     public const STATUS_RESCHEDULED = 'rescheduled';

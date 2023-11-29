@@ -61,9 +61,6 @@ class EventLogger
      */
     private $lastUsedCampaignIdToFetchRotation;
 
-    /**
-     * EventLogger constructor.
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker,

@@ -23,9 +23,6 @@ class Calculator
      */
     private $toDateTime;
 
-    /**
-     * Calculator constructor.
-     */
     public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
     {
         $this->statsDAO     = $statsDAO;

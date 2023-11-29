@@ -37,9 +37,6 @@ class Redirect extends FormEntity
      */
     private $trackables;
 
-    /**
-     * Redirect constructor.
-     */
     public function __construct()
     {
         $this->trackables = new ArrayCollection();

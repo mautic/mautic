@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MenuHelper.
- */
 class MenuHelper
 {
     /**
@@ -39,9 +36,6 @@ class MenuHelper
      */
     protected $integrationHelper;
 
-    /**
-     * MenuHelper constructor.
-     */
     public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
         $this->security              = $security;

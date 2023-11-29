@@ -25,9 +25,6 @@ class PreferenceBuilder
      */
     private $event;
 
-    /**
-     * PreferenceBuilder constructor.
-     */
     public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
     {
         $this->logger = $logger;

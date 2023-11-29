@@ -6,9 +6,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class StageBuilderEvent.
- */
 class StageBuilderEvent extends Event
 {
     /**

@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use IP2Location\Database;
 
-/**
- * Class IP2LocationBinLookup.
- */
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
     /**

@@ -49,9 +49,6 @@ class MembershipManager
      */
     private $progressBar;
 
-    /**
-     * MembershipManager constructor.
-     */
     public function __construct(
         Adder $adder,
         Remover $remover,

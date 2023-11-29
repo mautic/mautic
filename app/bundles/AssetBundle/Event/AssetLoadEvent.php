@@ -5,9 +5,6 @@ namespace Mautic\AssetBundle\Event;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class AssetLoadEvent.
- */
 class AssetLoadEvent extends CommonEvent
 {
     /**

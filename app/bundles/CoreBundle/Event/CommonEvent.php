@@ -6,9 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CommonEvent.
- */
 class CommonEvent extends Event
 {
     /**

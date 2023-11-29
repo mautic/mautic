@@ -36,9 +36,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
      */
     private $logContactXref = [];
 
-    /**
-     * PendingEvent constructor.
-     */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         $this->config   = $config;

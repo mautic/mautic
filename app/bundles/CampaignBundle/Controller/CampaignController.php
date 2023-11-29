@@ -259,7 +259,6 @@ class CampaignController extends AbstractStandardFormController
             $page = $session->get('mautic.campaign.page', 1);
         }
 
-        // set limits
         $limit = $session->get('mautic.campaign.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {

@@ -6,9 +6,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 
-/**
- * Class ChannelSubscriptionChangeTest.
- */
 class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
     /**

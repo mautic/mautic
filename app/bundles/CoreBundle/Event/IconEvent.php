@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class IconEvent.
- */
 class IconEvent extends Event
 {
     /**

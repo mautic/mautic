@@ -19,9 +19,6 @@ class CountResult
      */
     private $maxId;
 
-    /**
-     * CountResult constructor.
-     */
     public function __construct($count, $minId, $maxId)
     {
         $this->count = (int) $count;
