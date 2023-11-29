@@ -112,11 +112,20 @@ class AmazonCallback
                         }
                     }
 
+                    $emailId = null;
+                    if (isset($payload['mail']['headers'])) {
+                        foreach ($payload['mail']['headers'] as $header) {
+                            if ('X-EMAIL-ID' === $header['name']) {
+                                $emailId = $header['value'];
+                            }
+                        }
+                    }
+                    
                     if (null == $reason) {
                         $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
                     }
 
-                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED);
+                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED, $emailId);
 
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
