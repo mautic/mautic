@@ -78,7 +78,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isContactType()
+    public function isContactType(): bool
     {
         return self::CONTACT_OBJECT === $this->object;
     }
@@ -86,7 +86,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isCompanyType()
+    public function isCompanyType(): bool
     {
         return self::COMPANY_OBJECT === $this->object;
     }
@@ -122,7 +122,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isBooleanType()
+    public function isBooleanType(): bool
     {
         return 'boolean' === $this->getType();
     }
@@ -130,7 +130,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isNumberType()
+    public function isNumberType(): bool
     {
         return 'number' === $this->getType();
     }
@@ -138,7 +138,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function isDateType()
+    public function isDateType(): bool
     {
         return 'date' === $this->getType() || $this->hasTimeParts();
     }
@@ -146,7 +146,7 @@ class ContactSegmentFilterCrate
     /**
      * @return bool
      */
-    public function hasTimeParts()
+    public function hasTimeParts(): bool
     {
         return 'datetime' === $this->getType();
     }
@@ -156,7 +156,7 @@ class ContactSegmentFilterCrate
      *
      * @return bool
      */
-    public function filterValueDoNotNeedAdjustment()
+    public function filterValueDoNotNeedAdjustment(): bool
     {
         return $this->isNumberType() || $this->isBooleanType();
     }

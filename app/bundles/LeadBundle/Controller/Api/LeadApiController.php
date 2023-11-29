@@ -708,7 +708,7 @@ class LeadApiController extends CommonApiController
      *
      * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled($form = null): bool
     {
         return false;
     }
@@ -720,7 +720,7 @@ class LeadApiController extends CommonApiController
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(Form $form, array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 

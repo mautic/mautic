@@ -67,7 +67,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     /**
      * @return bool
      */
-    public function isTracked()
+    public function isTracked(): bool
     {
         return null !== $this->getTrackedDevice();
     }

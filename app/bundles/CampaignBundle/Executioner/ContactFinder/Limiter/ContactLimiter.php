@@ -204,7 +204,7 @@ class ContactLimiter
     /**
      * @return bool
      */
-    public function hasCampaignLimit()
+    public function hasCampaignLimit(): bool
     {
         return null !== $this->campaignLimit;
     }

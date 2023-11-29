@@ -46,7 +46,7 @@ class FocusListType extends AbstractType
                 'placeholder' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
                 },
-                'disabled' => function (Options $options) {
+                'disabled' => function (Options $options): bool {
                     return empty($options['choices']);
                 },
                 'top_level'      => 'variant',

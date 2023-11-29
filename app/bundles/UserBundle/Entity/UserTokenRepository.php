@@ -14,7 +14,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
      *
      * @return bool
      */
-    public function isSecretUnique($secret)
+    public function isSecretUnique($secret): bool
     {
         $tokens = $this->createQueryBuilder('ut')
             ->where('ut.secret = :secret')
@@ -28,7 +28,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
     /**
      * @return bool
      */
-    public function verify(UserToken $token)
+    public function verify(UserToken $token): bool
     {
         /** @var UserToken[] $userTokens */
         $userTokens = $this->createQueryBuilder('ut')

@@ -710,7 +710,7 @@ class FieldModel extends FormModel
      */
     public function filterUsedFieldIds(array $ids)
     {
-        return array_filter($ids, function ($id) {
+        return array_filter($ids, function ($id): bool {
             return false === $this->isUsedField($this->getEntity($id));
         });
     }

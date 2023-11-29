@@ -55,7 +55,7 @@ class ConfigBuilderEvent extends Event
      *
      * @return bool
      */
-    public function removeForm($formAlias)
+    public function removeForm($formAlias): bool
     {
         if (isset($this->forms[$formAlias])) {
             unset($this->forms[$formAlias]);

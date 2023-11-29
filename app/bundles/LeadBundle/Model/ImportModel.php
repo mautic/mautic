@@ -284,7 +284,7 @@ class ImportModel extends FormModel
      *
      * @return bool
      */
-    public function process(Import $import, Progress $progress, $limit = 0)
+    public function process(Import $import, Progress $progress, $limit = 0): bool
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -443,7 +443,7 @@ class ImportModel extends FormModel
      *
      * @return bool
      */
-    public function hasMoreValuesThanColumns(array &$data, $headerCount)
+    public function hasMoreValuesThanColumns(array &$data, $headerCount): bool
     {
         $dataCount = count($data);
 

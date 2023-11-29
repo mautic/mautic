@@ -271,7 +271,7 @@ class BuilderEvent extends Event
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
-                function ($v) use ($filter) {
+                function ($v) use ($filter): bool {
                     return 0 === stripos($v, $filter);
                 }
             );
@@ -279,7 +279,7 @@ class BuilderEvent extends Event
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                function ($k) use ($filter) {
+                function ($k) use ($filter): bool {
                     return 0 === stripos($k, $filter);
                 }
             );

@@ -121,7 +121,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return $leadFields;
     }
 
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

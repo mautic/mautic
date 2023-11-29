@@ -43,7 +43,7 @@ class MergeValueHelper
     /**
      * @return bool
      */
-    public static function isNotEmpty($value)
+    public static function isNotEmpty($value): bool
     {
         return null !== $value && '' !== $value;
     }

@@ -175,7 +175,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -315,7 +315,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
 

@@ -272,7 +272,7 @@ class MenuHelper
      *
      * @return bool
      */
-    protected function handleParametersChecks($name, $value)
+    protected function handleParametersChecks($name, $value): bool
     {
         return $this->getParameter($name) == $value;
     }
@@ -283,7 +283,7 @@ class MenuHelper
      *
      * @return bool
      */
-    protected function handleRequestChecks($name, $value)
+    protected function handleRequestChecks($name, $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
@@ -306,7 +306,7 @@ class MenuHelper
      *
      * @return bool Returns false if the item fails the access check or any other checks
      */
-    protected function handleChecks(array $menuItem)
+    protected function handleChecks(array $menuItem): bool
     {
         if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;

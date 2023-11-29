@@ -119,7 +119,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * @return bool
      */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         if ($this->channel && $this->channel !== $channel) {
             return false;

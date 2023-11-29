@@ -188,7 +188,7 @@ class Mailbox
      *
      * @throws MailboxException
      */
-    public function isConfigured($bundleKey = null, $folderKey = null)
+    public function isConfigured($bundleKey = null, $folderKey = null): bool
     {
         if (null !== $bundleKey) {
             try {
@@ -389,7 +389,7 @@ class Mailbox
      *
      * @return bool
      */
-    protected function isConnected()
+    protected function isConnected(): bool
     {
         return $this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream);
     }
@@ -561,7 +561,7 @@ class Mailbox
      *
      * @return bool
      */
-    public function moveMail($mailId, $mailBox)
+    public function moveMail($mailId, $mailBox): bool
     {
         return imap_mail_move($this->getImapStream(), $mailId, $mailBox, CP_UID) && $this->expungeDeletedMails();
     }
@@ -1065,7 +1065,7 @@ class Mailbox
     /**
      * @return bool
      */
-    protected function isUrlEncoded($string)
+    protected function isUrlEncoded($string): bool
     {
         $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);
         $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', $string);

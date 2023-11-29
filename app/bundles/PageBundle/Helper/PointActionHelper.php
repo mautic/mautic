@@ -12,7 +12,7 @@ class PointActionHelper
      *
      * @return bool
      */
-    public static function validatePageHit($factory, $eventDetails, $action)
+    public static function validatePageHit($factory, $eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 

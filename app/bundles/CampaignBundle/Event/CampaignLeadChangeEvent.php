@@ -84,7 +84,7 @@ class CampaignLeadChangeEvent extends Event
      *
      * @return bool
      */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return 'removed' == $this->action;
     }
@@ -94,7 +94,7 @@ class CampaignLeadChangeEvent extends Event
      *
      * @return bool
      */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return 'added' == $this->action;
     }

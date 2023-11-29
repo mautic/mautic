@@ -10,7 +10,7 @@ class PointEventHelper
     /**
      * @return int
      */
-    public static function validateEmail($eventDetails, $action)
+    public static function validateEmail($eventDetails, $action): bool
     {
         if (null === $eventDetails) {
             return false;

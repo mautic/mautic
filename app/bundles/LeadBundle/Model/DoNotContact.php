@@ -37,7 +37,7 @@ class DoNotContact implements MauticModelInterface
      *
      * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
+    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null): bool
     {
         $contact = $this->leadModel->getEntity($contactId);
 

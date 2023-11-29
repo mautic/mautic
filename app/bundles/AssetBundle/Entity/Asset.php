@@ -980,7 +980,7 @@ class Asset extends FormEntity
      *
      * @return bool
      */
-    public function isImage()
+    public function isImage(): bool
     {
         $fileType = strtolower($this->getFileType());
 
@@ -1372,7 +1372,7 @@ class Asset extends FormEntity
     /**
      * @return bool
      */
-    public function isLocal()
+    public function isLocal(): bool
     {
         return 'local' === $this->storageLocation;
     }
@@ -1380,7 +1380,7 @@ class Asset extends FormEntity
     /**
      * @return bool
      */
-    public function isRemote()
+    public function isRemote(): bool
     {
         return 'remote' === $this->storageLocation;
     }

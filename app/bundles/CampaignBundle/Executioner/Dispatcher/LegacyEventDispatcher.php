@@ -307,7 +307,7 @@ class LegacyEventDispatcher
     /**
      * @return bool
      */
-    private function isFailed($result)
+    private function isFailed($result): bool
     {
         return
             false === $result

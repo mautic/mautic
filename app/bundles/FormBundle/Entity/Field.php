@@ -810,7 +810,7 @@ class Field
      *
      * @return bool
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -859,7 +859,7 @@ class Field
      *
      * @return bool
      */
-    public function showForConditionalField(array $data)
+    public function showForConditionalField(array $data): bool
     {
         if (!$parentField = $this->findParentFieldInForm()) {
             return true;
@@ -896,7 +896,7 @@ class Field
     /**
      * @return bool
      */
-    public function isCaptchaType()
+    public function isCaptchaType(): bool
     {
         return 'captcha' === $this->type;
     }
@@ -904,7 +904,7 @@ class Field
     /**
      * @return bool
      */
-    public function isFileType()
+    public function isFileType(): bool
     {
         return 'file' === $this->type;
     }

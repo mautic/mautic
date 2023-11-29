@@ -302,7 +302,7 @@ class WebhookModel extends FormModel
      *
      * @return bool
      */
-    public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
+    public function processWebhook(Webhook $webhook, WebhookQueue $queue = null): bool
     {
         // get the webhook payload
         $payload = $this->getWebhookPayload($webhook, $queue);

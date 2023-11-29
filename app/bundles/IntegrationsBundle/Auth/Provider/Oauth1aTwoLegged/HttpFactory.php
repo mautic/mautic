@@ -92,7 +92,7 @@ class HttpFactory implements AuthProviderInterface
     /**
      * @return bool
      */
-    private function credentialsAreConfigured(CredentialsInterface $credentials)
+    private function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
         return !empty($credentials->getAuthUrl()) && !empty($credentials->getConsumerKey()) && !empty($credentials->getConsumerSecret());
     }

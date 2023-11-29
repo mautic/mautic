@@ -227,7 +227,7 @@ class EventExecutioner
         $executeThese = $this->scheduleEvents($events, $contacts, $childrenCounter, $isInactive);
 
         // Execute non jump-to events normally
-        $otherEvents = $executeThese->filter(function (Event $event) {
+        $otherEvents = $executeThese->filter(function (Event $event): bool {
             return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
         });
 
@@ -238,7 +238,7 @@ class EventExecutioner
         }
 
         // Now execute jump to events
-        $jumpEvents = $executeThese->filter(function (Event $event) {
+        $jumpEvents = $executeThese->filter(function (Event $event): bool {
             return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
         });
         if ($jumpEvents->count()) {

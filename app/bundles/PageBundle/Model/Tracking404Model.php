@@ -48,7 +48,7 @@ class Tracking404Model
     /**
      * @return bool
      */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
         if (!$this->coreParametersHelper->get('do_not_track_404_anonymous')) {
             return true;

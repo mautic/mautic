@@ -404,7 +404,7 @@ class LeadTimelineEvent extends Event
      *
      * @return bool
      */
-    public function isApplicable($eventType, $inclusive = false)
+    public function isApplicable($eventType, $inclusive = false): bool
     {
         if ($this->fetchTypesOnly) {
             return false;

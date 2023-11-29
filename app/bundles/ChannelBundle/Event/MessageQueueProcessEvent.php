@@ -23,7 +23,7 @@ class MessageQueueProcessEvent extends CommonEvent
     /**
      * @return bool
      */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         return $channel === $this->entity->getChannel();
     }

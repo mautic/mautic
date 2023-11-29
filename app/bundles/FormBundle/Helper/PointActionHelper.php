@@ -7,7 +7,7 @@ class PointActionHelper
     /**
      * @return int
      */
-    public static function validateFormSubmit($eventDetails, $action)
+    public static function validateFormSubmit($eventDetails, $action): bool
     {
         $form         = $eventDetails->getForm();
         $formId       = $form->getId();

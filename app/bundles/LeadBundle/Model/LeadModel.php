@@ -1060,7 +1060,7 @@ class LeadModel extends FormModel
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true)
+    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1643,7 +1643,7 @@ class LeadModel extends FormModel
      *
      * @param int $utmId
      */
-    public function removeUtmTags(Lead $lead, $utmId)
+    public function removeUtmTags(Lead $lead, $utmId): bool
     {
         /** @var UtmTag $utmTag */
         foreach ($lead->getUtmTags() as $utmTag) {
@@ -2110,7 +2110,7 @@ class LeadModel extends FormModel
     /**
      * @return bool
      */
-    public function addToCompany(Lead $lead, $company)
+    public function addToCompany(Lead $lead, $company): bool
     {
         // check if lead is in company already
         if (!$company instanceof Company) {

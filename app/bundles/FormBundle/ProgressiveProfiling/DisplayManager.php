@@ -59,7 +59,7 @@ class DisplayManager
     /**
      * @return bool
      */
-    private function shouldDisplayNotAlwaysDisplayField(Field $field)
+    private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
     {
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
@@ -81,7 +81,7 @@ class DisplayManager
     /**
      * @return bool
      */
-    public function useProgressiveProfilingLimit()
+    public function useProgressiveProfilingLimit(): bool
     {
         return '' != $this->form->getProgressiveProfilingLimit();
     }

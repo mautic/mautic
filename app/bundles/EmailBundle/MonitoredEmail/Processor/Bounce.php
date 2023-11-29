@@ -86,7 +86,7 @@ class Bounce implements ProcessorInterface
     /**
      * @return bool
      */
-    public function process(Message $message)
+    public function process(Message $message): bool
     {
         $this->message = $message;
         $bounce        = false;

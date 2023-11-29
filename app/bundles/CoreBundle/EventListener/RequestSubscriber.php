@@ -67,7 +67,7 @@ class RequestSubscriber implements EventSubscriberInterface
     /**
      * @return bool
      */
-    private function isAjaxPost(Request $request)
+    private function isAjaxPost(Request $request): bool
     {
         return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
@@ -75,7 +75,7 @@ class RequestSubscriber implements EventSubscriberInterface
     /**
      * @return bool
      */
-    private function isSecurePath(Request $request)
+    private function isSecurePath(Request $request): bool
     {
         return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }

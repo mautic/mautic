@@ -218,7 +218,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @return string
      */
-    public function isCached()
+    public function isCached(): bool
     {
         if (!$this->cacheDir) {
             return false;

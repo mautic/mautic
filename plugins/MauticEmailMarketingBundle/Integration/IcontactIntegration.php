@@ -123,7 +123,7 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getRequiredKeyFields();
         foreach ($keys as $k => $l) {
@@ -198,7 +198,7 @@ class IcontactIntegration extends EmailAbstractIntegration
      *
      * @return bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

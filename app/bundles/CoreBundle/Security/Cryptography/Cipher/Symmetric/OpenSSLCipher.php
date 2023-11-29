@@ -62,7 +62,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
     /**
      * @return bool
      */
-    public function isSupported()
+    public function isSupported(): bool
     {
         if (!extension_loaded('openssl')) {
             return false;

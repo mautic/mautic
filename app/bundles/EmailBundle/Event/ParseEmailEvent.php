@@ -77,7 +77,7 @@ class ParseEmailEvent extends Event
      *
      * @return bool
      */
-    public function isApplicable($bundleKey, $folderKeys)
+    public function isApplicable($bundleKey, $folderKeys): bool
     {
         if (!is_array($folderKeys)) {
             $folderKeys = [$folderKeys];

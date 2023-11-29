@@ -474,7 +474,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @return bool
      */
-    public function hasGroupBy()
+    public function hasGroupBy(): bool
     {
         if (!empty($this->getReport()->getGroupBy())) {
             return true;

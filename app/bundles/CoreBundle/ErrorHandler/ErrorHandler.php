@@ -123,7 +123,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = [])
+        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -196,7 +196,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @throws \Exception
          */
-        public function handleFatal()
+        public function handleFatal(): bool
         {
             static $handlingFatal = false;
             $error                = error_get_last();

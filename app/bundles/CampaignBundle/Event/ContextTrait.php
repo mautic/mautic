@@ -11,7 +11,7 @@ trait ContextTrait
      *
      * @return bool
      */
-    public function checkContext($eventType)
+    public function checkContext($eventType): bool
     {
         if (!$this->event) {
             return false;

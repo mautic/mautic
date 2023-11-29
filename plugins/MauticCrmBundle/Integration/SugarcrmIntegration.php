@@ -661,7 +661,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }

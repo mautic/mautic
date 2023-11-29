@@ -348,7 +348,7 @@ class Webhook extends FormEntity
      *
      * @return bool
      */
-    public function addTrigger($key)
+    public function addTrigger($key): bool
     {
         if ($this->eventExists($key)) {
             return false;
@@ -369,7 +369,7 @@ class Webhook extends FormEntity
      *
      * @return bool
      */
-    public function eventExists($key)
+    public function eventExists($key): bool
     {
         foreach ($this->events as $event) {
             if ($event->getEventType() === $key) {
@@ -497,7 +497,7 @@ class Webhook extends FormEntity
         return $this;
     }
 
-    public function wasModifiedRecently()
+    public function wasModifiedRecently(): bool
     {
         $dateModified = $this->getDateModified();
 

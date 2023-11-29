@@ -205,7 +205,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -215,7 +215,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
-    public function updateDncByDate()
+    public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
         if (isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0]) {
@@ -270,7 +270,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects[] = 'Lead';
         }
 
-        $isRequired = function (array $field, $object) {
+        $isRequired = function (array $field, $object): bool {
             return
                 ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
                 ('Lead' == $object && in_array($field['name'], ['Company'])) ||
@@ -1610,7 +1610,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fromDate,
         $toDate,
         &$totalCount
-    ) {
+    ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
             'Salesforce',
@@ -2965,7 +2965,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $toDate,
         &$totalCount,
         $internalEntity
-    ) {
+    ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
             'Salesforce',

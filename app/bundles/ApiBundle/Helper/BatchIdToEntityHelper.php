@@ -179,7 +179,7 @@ class BatchIdToEntityHelper
     /**
      * @return bool
      */
-    private function isAssociativeArray(array $array)
+    private function isAssociativeArray(array $array): bool
     {
         if (empty($array)) {
             return false;

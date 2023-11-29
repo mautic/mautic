@@ -68,7 +68,7 @@ class SegmentDependencyTreeFactory
     {
         $segmentMembershipFilters = array_filter(
             $segment->getFilters(),
-            function (array $filter) {
+            function (array $filter): bool {
                 return 'leadlist' === $filter['type'];
             }
         );

@@ -50,7 +50,7 @@ class CustomContentEvent extends Event
      *
      * @return bool
      */
-    public function checkContext($viewName, $context)
+    public function checkContext($viewName, $context): bool
     {
         return $viewName === $this->viewName && $context === $this->context;
     }

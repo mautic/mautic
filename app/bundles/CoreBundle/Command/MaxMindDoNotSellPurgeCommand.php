@@ -137,7 +137,7 @@ EOT
     {
         /** @var Lead $lead */
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
-        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), function ($item) use ($ip) {
+        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), function ($item) use ($ip): bool {
             return $item->getIpAddress() == $ip;
         });
 
