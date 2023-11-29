@@ -17,7 +17,7 @@ class Remover
 
     private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
 
-    private string $unscheduledMessage;
+    private ?string $unscheduledMessage;
 
     public function __construct(
         LeadRepository $leadRepository,

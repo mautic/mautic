@@ -12,6 +12,9 @@ class IntegrationToken implements TokenInterface
     // Pull in serialize() and unserialize() methods
     use TokenSerializer;
 
+    /**
+     * @var mixed[]
+     */
     private array $extraData;
 
     public function __construct(?string $accessToken, ?string $refreshToken, $expiresAt = null, array $extraData = [])

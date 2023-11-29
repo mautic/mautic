@@ -28,9 +28,6 @@ class PathsHelper
 
     private string $kernelRootDir;
 
-    /**
-     * @var mixed
-     */
     private string $temporaryDir;
 
     private ?\Mautic\UserBundle\Entity\User $user;

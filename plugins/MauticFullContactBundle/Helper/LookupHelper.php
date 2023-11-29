@@ -20,10 +20,7 @@ class LookupHelper
 {
     protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var bool|FullContactIntegration
-     */
-    protected \Mautic\PluginBundle\Integration\AbstractIntegration|false $integration;
+    protected FullContactIntegration|bool $integration;
 
     protected \Monolog\Logger $logger;
 

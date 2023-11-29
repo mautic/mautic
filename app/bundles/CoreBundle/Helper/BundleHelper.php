@@ -4,8 +4,19 @@ namespace Mautic\CoreBundle\Helper;
 
 class BundleHelper
 {
+    /**
+     * @var mixed[]
+     */
     private array $coreBundles;
+
+    /**
+     * @var mixed[]
+     */
     private array $pluginBundles;
+
+    /**
+     * @var mixed[]
+     */
     private array $allBundles;
 
     public function __construct(array $coreBundles, array $pluginBundles)

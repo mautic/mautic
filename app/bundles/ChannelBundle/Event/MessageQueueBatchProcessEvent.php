@@ -6,12 +6,18 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MessageQueueBatchProcessEvent extends Event
 {
+    /**
+     * @var mixed[]
+     */
     private array $messages;
 
     private $channel;
 
     private $channelId;
 
+    /**
+     * @param mixed[] $messages
+     */
     public function __construct(array $messages, $channel, $channelId)
     {
         $this->messages  = $messages;

@@ -40,7 +40,7 @@ class MailHelper
 
     protected MailerInterface $mailer;
 
-    protected \Symfony\Component\Mailer\Transport\TransportInterface $transport;
+    protected TransportInterface $transport;
 
     /**
      * @var Environment
@@ -1579,10 +1579,8 @@ class MailHelper
 
     /**
      * Return transport.
-     *
-     * @return TransportInterface
      */
-    public function getTransport()
+    public function getTransport(): TransportInterface
     {
         $reflectedMailer     = new \ReflectionClass($this->mailer);
         $reflectedTransports = $reflectedMailer->getProperty('transport');

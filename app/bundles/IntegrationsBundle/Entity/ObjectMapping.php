@@ -15,10 +15,7 @@ class ObjectMapping
      */
     private $id;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private ?\DateTime $dateCreated;
+    private ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string
@@ -45,7 +42,7 @@ class ObjectMapping
      */
     private $integrationObjectId;
 
-    private ?\DateTime $lastSyncDate;
+    private ?\DateTimeInterface $lastSyncDate;
 
     /**
      * @var array

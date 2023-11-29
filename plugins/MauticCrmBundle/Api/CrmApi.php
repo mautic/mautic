@@ -7,11 +7,11 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 /**
  * Class CrmApi.
  *
- * @method createLead
+ * @method createLead()
  */
 class CrmApi
 {
-    protected \MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration $integration;
+    protected CrmAbstractIntegration $integration;
 
     public function __construct(CrmAbstractIntegration $integration)
     {

@@ -38,14 +38,44 @@ class DynamicContentType extends AbstractType
     private \Doctrine\ORM\EntityManager $em;
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
     private $fieldChoices;
+
+    /**
+     * @var array<string, string>
+     */
     private array $countryChoices;
+
+    /**
+     * @var array<string, mixed[]>
+     */
     private array $regionChoices;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $timezoneChoices;
+
+    /**
+     * @var array<string, string>
+     */
     private array $localeChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $deviceTypesChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $deviceBrandsChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $deviceOsChoices;
+
     private $tagChoices = [];
+
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**

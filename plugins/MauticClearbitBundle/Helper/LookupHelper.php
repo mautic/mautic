@@ -21,7 +21,7 @@ class LookupHelper
     /**
      * @var bool|ClearbitIntegration
      */
-    protected \Mautic\PluginBundle\Integration\AbstractIntegration|false $integration;
+    protected $integration;
 
     protected \Monolog\Logger $logger;
 

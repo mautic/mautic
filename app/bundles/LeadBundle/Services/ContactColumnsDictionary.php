@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -14,13 +15,15 @@ class ContactColumnsDictionary
 
     private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    private $fieldList = [];
+    private array $fieldsList = [];
+    private FieldList $fieldList;
 
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(FieldModel $fieldModel, FieldList $fieldList, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->fieldModel           = $fieldModel;
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->fieldList = $fieldList;
     }
 
     /**
@@ -39,26 +42,23 @@ class ContactColumnsDictionary
         return $columns;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
-        if (empty($this->fieldList)) {
-            $this->fieldList['name']        = sprintf(
+        if ($this->fieldsList === []) {
+            $this->fieldsList['name']        = sprintf(
                 '%s %s',
                 $this->translator->trans('mautic.core.firstname'),
                 $this->translator->trans('mautic.core.lastname')
             );
-            $this->fieldList['email']       = $this->translator->trans('mautic.core.type.email');
-            $this->fieldList['location']    = $this->translator->trans('mautic.lead.lead.thead.location');
-            $this->fieldList['stage']       = $this->translator->trans('mautic.lead.stage.label');
-            $this->fieldList['points']      = $this->translator->trans('mautic.lead.points');
-            $this->fieldList['last_active'] = $this->translator->trans('mautic.lead.lastactive');
-            $this->fieldList['id']          = $this->translator->trans('mautic.core.id');
-            $this->fieldList                = $this->fieldList + $this->fieldModel->getFieldList(false);
+            $this->fieldsList['email']       = $this->translator->trans('mautic.core.type.email');
+            $this->fieldsList['location']    = $this->translator->trans('mautic.lead.lead.thead.location');
+            $this->fieldsList['stage']       = $this->translator->trans('mautic.lead.stage.label');
+            $this->fieldsList['points']      = $this->translator->trans('mautic.lead.points');
+            $this->fieldsList['last_active'] = $this->translator->trans('mautic.lead.lastactive');
+            $this->fieldsList['id']          = $this->translator->trans('mautic.core.id');
+            $this->fieldsList                = $this->fieldsList + $this->fieldList->getFieldList(false);
         }
 
-        return $this->fieldList;
+        return $this->fieldsList;
     }
 }

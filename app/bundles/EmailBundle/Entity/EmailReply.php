@@ -13,10 +13,7 @@ class EmailReply
 
     private \Mautic\EmailBundle\Entity\Stat $stat;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private \DateTime $dateReplied;
+    private \DateTimeInterface $dateReplied;
 
     /**
      * @var string

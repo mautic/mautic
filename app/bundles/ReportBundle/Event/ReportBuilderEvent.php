@@ -140,7 +140,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $prefix
      *
-     * @return string[]
+     * @return array<string,array<string,string>>
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {

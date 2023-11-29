@@ -7,10 +7,13 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
 {
     /**
-     * @var string
+     * @var mixed[]
      */
     private array $settings;
 
+    /**
+     * @param mixed[] $settings
+     */
     public function __construct(UnifiedIntegrationInterface $integration, array $settings)
     {
         $this->integration = $integration;

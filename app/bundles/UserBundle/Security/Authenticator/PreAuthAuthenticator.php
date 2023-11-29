@@ -26,9 +26,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
 
     protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var requestStack|null
-     */
     protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(

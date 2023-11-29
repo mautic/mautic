@@ -4,22 +4,36 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 
+/**
+ * @template T of object
+ */
 class IteratorExportDataModel implements \Iterator
 {
     private int $position;
+
+    /**
+     * @var AbstractCommonModel<T>
+     */
     private \Mautic\CoreBundle\Model\AbstractCommonModel $model;
+
+    /**
+     * @var mixed[]
+     */
     private array $args;
+
     private $callback;
+
     private int $total;
+
     private $data;
+
     private $totalResult;
+
     private bool $skipOrdering;
 
     /**
      * @param AbstractCommonModel<T> $model
      * @param array<mixed>           $args
-     *
-     * @template T of object
      */
     public function __construct(AbstractCommonModel $model, array $args, callable $callback, bool $skipOrdering = false)
     {

@@ -45,10 +45,7 @@ class EventExecutioner
 
     private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private \DateTime $executionDate;
+    private \DateTimeInterface $executionDate;
 
     private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 

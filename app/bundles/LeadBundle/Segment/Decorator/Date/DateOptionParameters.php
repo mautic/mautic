@@ -9,7 +9,10 @@ class DateOptionParameters
 {
     private bool $hasTimePart;
 
-    private string $timeframe;
+    /**
+     * @var mixed
+     */
+    private $timeframe;
 
     private bool $requiresBetween;
 
@@ -78,7 +81,7 @@ class DateOptionParameters
     }
 
     /**
-     * @return string
+     * @return string|mixed
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {

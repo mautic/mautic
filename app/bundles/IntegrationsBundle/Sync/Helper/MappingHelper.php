@@ -30,9 +30,6 @@ class MappingHelper
 
     private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
-    /**
-     * @var ObjectMappingRepository
-     */
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(

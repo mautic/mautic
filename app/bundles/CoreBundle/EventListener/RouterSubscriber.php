@@ -11,39 +11,17 @@ class RouterSubscriber implements EventSubscriberInterface
 {
     private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var string|null
-     */
-    private $baseUrl;
+    private ?string $baseUrl;
 
-    /**
-     * @var string|null
-     */
-    private $scheme;
+    private ?string $scheme;
 
-    /**
-     * @var string|null
-     */
-    private $host;
+    private ?string $host;
 
-    /**
-     * @var string|null
-     */
     private string|int $httpsPort;
 
-    /**
-     * @var string|null
-     */
     private string|int $httpPort;
 
-    /**
-     * @param string|null $scheme
-     * @param string|null $host
-     * @param string|null $httpsPort
-     * @param string|null $httpPort
-     * @param string|null $baseUrl
-     */
-    public function __construct(RouterInterface $router, $scheme, $host, $httpsPort, $httpPort, $baseUrl)
+    public function __construct(RouterInterface $router, ?string $scheme, ?string $host, ?string $httpsPort, ?string $httpPort, ?string $baseUrl)
     {
         $this->router    = $router;
         $this->scheme    = $scheme;

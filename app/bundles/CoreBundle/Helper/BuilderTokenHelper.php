@@ -12,8 +12,14 @@ class BuilderTokenHelper
     private $isConfigured = false;
 
     private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
+
+    /**
+     * @var ModelFactory<object>
+     */
     private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
+
     private \Doctrine\DBAL\Connection $connection;
+
     private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     protected $permissionSet;
@@ -98,7 +104,7 @@ class BuilderTokenHelper
             $prefix .= '.';
         }
 
-        $exprBuilder = $this->connection->getExpressionBuilder();
+        $exprBuilder = $this->connection->createExpressionBuilder();
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(

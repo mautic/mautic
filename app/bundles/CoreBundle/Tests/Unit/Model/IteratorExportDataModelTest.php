@@ -12,17 +12,14 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|AbstractCommonModel<object>
      */
-    private $commonModel;
+    private MockObject $commonModel;
 
     /**
      * @var MockObject|CommonRepository<object>
      */
-    private $commonRepository;
+    private MockObject $commonRepository;
 
-    /**
-     * @var IteratorExportDataModel
-     */
-    private $iteratorExportDataModel;
+    private IteratorExportDataModel $iteratorExportDataModel;
 
     protected function setUp(): void
     {

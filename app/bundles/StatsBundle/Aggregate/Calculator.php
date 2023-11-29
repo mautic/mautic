@@ -10,15 +10,9 @@ class Calculator
 {
     private \Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO $statsDAO;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private ?\DateTime $fromDateTime;
+    private ?\DateTimeInterface $fromDateTime;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private ?\DateTime $toDateTime;
+    private ?\DateTimeInterface $toDateTime;
 
     public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
     {

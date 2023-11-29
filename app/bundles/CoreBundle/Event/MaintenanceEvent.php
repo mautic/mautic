@@ -8,10 +8,7 @@ class MaintenanceEvent extends Event
 {
     protected int $daysOld;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    protected \DateTime $date;
+    protected \DateTimeInterface $date;
 
     /**
      * @var array

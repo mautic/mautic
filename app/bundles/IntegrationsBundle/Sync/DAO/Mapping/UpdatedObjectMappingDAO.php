@@ -23,10 +23,7 @@ class UpdatedObjectMappingDAO
      */
     private $integrationObjectId;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private \DateTime $objectModifiedDate;
+    private \DateTimeInterface $objectModifiedDate;
 
     /**
      * @var ObjectMapping|null
