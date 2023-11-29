@@ -168,15 +168,13 @@ class SchemaHelper
         $sql = array_merge($sql, $installSchema->toSql($this->platform));
 
         // Execute drop queries
-        if (!empty($sql)) {
-            foreach ($sql as $q) {
-                try {
-                    $this->db->executeQuery($q);
-                } catch (\Exception $exception) {
-                    $this->db->close();
+        foreach ($sql as $q) {
+            try {
+                $this->db->executeQuery($q);
+            } catch (\Exception $exception) {
+                $this->db->close();
 
-                    throw $exception;
-                }
+                throw $exception;
             }
         }
 

@@ -363,18 +363,16 @@ class LeadController extends FormController
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
-        if ($socialProfiles) {
-            foreach ($socialProfiles as $integration => &$details) {
-                if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                    if ($template = $integrationObject->getSocialProfileTemplate()) {
-                        $details['social_profile_template'] = $template;
-                    }
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
                 }
+            }
 
-                if (!isset($details['social_profile_template'])) {
-                    // No profile template found
-                    unset($socialProfiles[$integration]);
-                }
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
             }
         }
 

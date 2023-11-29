@@ -324,10 +324,8 @@ class PublicController extends CommonFormController
             $assetsHelper = $this->factory->getHelper('template.assets');
             $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
 
-            if (!empty($customStylesheets)) {
-                foreach ($customStylesheets as $css) {
-                    $assetsHelper->addStylesheet($css);
-                }
+            foreach ($customStylesheets as $css) {
+                $assetsHelper->addStylesheet($css);
             }
 
             $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());

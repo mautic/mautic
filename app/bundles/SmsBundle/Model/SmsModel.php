@@ -260,15 +260,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
         $dnc     = $dncRepo->getChannelList('sms', $contactIds);
 
-        if (!empty($dnc)) {
-            foreach ($dnc as $removeMeId => $removeMeReason) {
-                $results[$removeMeId] = [
-                    'sent'   => false,
-                    'status' => 'mautic.sms.campaign.failed.not_contactable',
-                ];
+        foreach ($dnc as $removeMeId => $removeMeReason) {
+            $results[$removeMeId] = [
+                'sent'   => false,
+                'status' => 'mautic.sms.campaign.failed.not_contactable',
+            ];
 
-                unset($contacts[$removeMeId], $contactIds[$removeMeId]);
-            }
+            unset($contacts[$removeMeId], $contactIds[$removeMeId]);
         }
 
         if (!empty($contacts)) {
@@ -286,15 +284,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 'sms_message_stats'
             );
 
-            if ($queued) {
-                foreach ($queued as $queue) {
-                    $results[$queue] = [
-                        'sent'   => false,
-                        'status' => 'mautic.sms.timeline.status.scheduled',
-                    ];
+            foreach ($queued as $queue) {
+                $results[$queue] = [
+                    'sent'   => false,
+                    'status' => 'mautic.sms.timeline.status.scheduled',
+                ];
 
-                    unset($contacts[$queue]);
-                }
+                unset($contacts[$queue]);
             }
 
             $stats = [];

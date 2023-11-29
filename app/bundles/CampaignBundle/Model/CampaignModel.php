@@ -527,10 +527,8 @@ class CampaignModel extends CommonFormModel
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
 
-                if ($forms) {
-                    foreach ($forms as $form) {
-                        $choices['forms'][$form['id']] = $form['name'];
-                    }
+                foreach ($forms as $form) {
+                    $choices['forms'][$form['id']] = $form['name'];
                 }
         }
 
@@ -717,13 +715,11 @@ class CampaignModel extends CommonFormModel
             $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
 
             // Group events by type
-            if ($rawEvents) {
-                foreach ($rawEvents as $event) {
-                    if (isset($events[$event['type']])) {
-                        $events[$event['type']][] = $event['id'];
-                    } else {
-                        $events[$event['type']] = [$event['id']];
-                    }
+            foreach ($rawEvents as $event) {
+                if (isset($events[$event['type']])) {
+                    $events[$event['type']][] = $event['id'];
+                } else {
+                    $events[$event['type']] = [$event['id']];
                 }
             }
 

@@ -504,14 +504,12 @@ class FieldController extends FormController
                 $segments          = [];
                 $usedFieldsNames   = [];
 
-                if ($usedFieldIds) {
-                    // Iterating through all used fileds to get segments they are used in
-                    foreach ($usedFieldIds as $usedFieldId) {
-                        $fieldEntity = $model->getEntity($usedFieldId);
-                        foreach ($model->getFieldSegments($fieldEntity) as $segment) {
-                            $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
-                            $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
-                        }
+                // Iterating through all used fileds to get segments they are used in
+                foreach ($usedFieldIds as $usedFieldId) {
+                    $fieldEntity = $model->getEntity($usedFieldId);
+                    foreach ($model->getFieldSegments($fieldEntity) as $segment) {
+                        $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+                        $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
                     }
                 }
 

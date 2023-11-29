@@ -186,18 +186,14 @@ class TableSchemaHelper
     {
         $platform = $this->db->getDatabasePlatform();
 
-        if (!empty($this->dropTables)) {
-            foreach ($this->dropTables as $t) {
-                $this->sm->dropTable($this->prefix.$t);
-            }
+        foreach ($this->dropTables as $t) {
+            $this->sm->dropTable($this->prefix.$t);
         }
 
         $sql = $this->getSchema()->toSql($platform);
 
-        if (!empty($sql)) {
-            foreach ($sql as $s) {
-                $this->db->executeStatement($s);
-            }
+        foreach ($sql as $s) {
+            $this->db->executeStatement($s);
         }
 
         // reset schema

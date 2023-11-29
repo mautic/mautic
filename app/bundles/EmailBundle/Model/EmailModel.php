@@ -1436,14 +1436,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
-            if (!empty($dnc)) {
-                foreach ($dnc as $removeMeId => $removeMeEmail) {
-                    if ($dncAsError) {
-                        $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
-                    }
-                    unset($sendTo[$removeMeId]);
-                    unset($leadIds[$removeMeId]);
+            foreach ($dnc as $removeMeId => $removeMeEmail) {
+                if ($dncAsError) {
+                    $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
                 }
+                unset($sendTo[$removeMeId]);
+                unset($leadIds[$removeMeId]);
             }
         }
 

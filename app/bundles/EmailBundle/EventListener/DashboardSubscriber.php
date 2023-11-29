@@ -217,21 +217,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
-                        $row      = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                            [
-                                'value' => $email['count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                    $row      = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                        [
+                            'value' => $email['count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -261,21 +259,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
-                        $row      = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                            [
-                                'value' => $email['count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                    $row      = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                        [
+                            'value' => $email['count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -305,24 +301,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate(
-                            'mautic_email_action',
-                            [
-                                'objectAction' => 'view',
-                                'objectId'     => $email['id'],
-                            ]
-                        );
-                        $row = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate(
+                        'mautic_email_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $email['id'],
+                        ]
+                    );
+                    $row = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
