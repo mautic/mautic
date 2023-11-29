@@ -4,6 +4,7 @@
 !.htaccess
 !.gitkeep
 !.ddev
+.ddev/config.yaml
 !.php-cs-fixer.php
 !.github/ci-files/.my.cnf
 .ddev/mautic-preference
