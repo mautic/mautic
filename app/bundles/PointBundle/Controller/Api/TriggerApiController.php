@@ -70,6 +70,7 @@ class TriggerApiController extends CommonApiController
         $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
+        // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
         if (!$entity->getId()) {

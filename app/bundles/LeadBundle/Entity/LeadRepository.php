@@ -224,6 +224,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $leads[$r['id']] = $r;
         }
 
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('l')
             ->from(Lead::class, 'l');

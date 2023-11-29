@@ -102,6 +102,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         // Only get published
         $this->assertTrue($this->helper->getDwcsBySlotName('test', true));
 
+        // Get all
         $this->assertFalse($this->helper->getDwcsBySlotName('secondtest'));
     }
 

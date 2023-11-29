@@ -345,6 +345,7 @@ class FormController extends CommonFormController
                             $alias = $model->cleanAlias($entity->getName(), '', 10);
                             $entity->setAlias($alias);
 
+                            // Set timestamps
                             $model->setTimestamps($entity, true, false);
 
                             // Save the form first and new actions so that new fields are available to actions.

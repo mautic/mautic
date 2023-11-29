@@ -1069,6 +1069,7 @@ class PageController extends FormController
             $this->setListFilters($request->query->get('name'));
         }
 
+        // set limits
         $limit = $session->get('mautic.pageresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
 
         $page  = $page ?: 0;

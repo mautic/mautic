@@ -847,6 +847,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $page = $session->get('mautic.'.$this->getSessionBase().'.page', 1);
         }
 
+        // set limits
         $limit = $session->get('mautic.'.$this->getSessionBase().'.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {

@@ -350,7 +350,7 @@ class CoreSubscriber implements EventSubscriberInterface
         } elseif ('api' === $type) {
             $method = ['GET'];
         }
-
+        // Set requirements
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements

@@ -94,6 +94,7 @@ class ResultController extends CommonFormController
 
         $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
+        // set limits
         $limit = $pageHelper->getLimit();
         $start = $pageHelper->getStart();
 

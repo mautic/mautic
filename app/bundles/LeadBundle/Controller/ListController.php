@@ -65,6 +65,7 @@ class ListController extends FormController
 
         $this->setListFilters();
 
+        // set limits
         $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {

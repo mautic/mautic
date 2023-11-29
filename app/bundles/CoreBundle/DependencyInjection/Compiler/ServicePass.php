@@ -67,6 +67,7 @@ final class ServicePass implements CompilerPassInterface
                         $serviceNames[$name] = true;
 
                         if (!is_array($details)) {
+                            // Set parameter
                             $container->setParameter($name, $details);
                             continue;
                         }

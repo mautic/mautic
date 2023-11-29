@@ -666,10 +666,12 @@ class PublicController extends CommonFormController
             $from = filter_var($query['from'], FILTER_SANITIZE_EMAIL);
             $mailer->setFrom($from, '');
 
+            // Set Content
             $body = filter_var($query['body'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
+            // Set lead
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 

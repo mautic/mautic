@@ -105,6 +105,7 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
+        // get totals
         $device = $sq->executeQuery()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
