@@ -21,7 +21,6 @@ class ChannelType extends AbstractType
         $formModifier = function (FormEvent $event) use ($options) {
             $form = $event->getForm();
 
-            /** @var Channel $channel */
             $data = $event->getData();
             if (is_array($data)) {
                 $channelName = $data['channel'];

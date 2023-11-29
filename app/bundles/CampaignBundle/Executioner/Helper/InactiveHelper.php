@@ -45,9 +45,6 @@ class InactiveHelper
      */
     private $earliestInactiveDate;
 
-    /**
-     * InactiveHelper constructor.
-     */
     public function __construct(
         EventScheduler $scheduler,
         InactiveContactFinder $inactiveContactFinder,
@@ -65,12 +62,12 @@ class InactiveHelper
     }
 
     /**
-     * @param ArrayCollection|Event[] $decisions
+     * @param ArrayCollection<int, Event> $decisions
      */
-    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions)
+    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions): void
     {
         /**
-         * @var int
+         * @var int   $key
          * @var Event $decision
          */
         foreach ($decisions as $key => $decision) {

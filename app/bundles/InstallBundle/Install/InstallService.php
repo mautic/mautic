@@ -150,7 +150,6 @@ class InstallService
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been

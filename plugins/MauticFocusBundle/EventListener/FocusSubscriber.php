@@ -184,7 +184,7 @@ class FocusSubscriber implements EventSubscriberInterface
             $focus = $this->focusModel->getEntity($clickthrough['focus_id']);
 
             /**
-             * @var string
+             * @var string    $token
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

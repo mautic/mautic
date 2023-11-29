@@ -386,7 +386,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
-        /** @var PluginIntegrationKeyEvent $event */
         $keys = $this->dispatchIntegrationKeyEvent(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
             $keys

@@ -358,7 +358,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $pending  = $event->getPending();
 
         /**
-         * @var int
+         * @var int  $logId
          * @var Lead $contact
          */
         foreach ($contacts as $logId => $contact) {

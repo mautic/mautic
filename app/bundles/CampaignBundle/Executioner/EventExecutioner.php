@@ -384,7 +384,7 @@ class EventExecutioner
     private function checkForRemovedContacts(ArrayCollection $logs)
     {
         /**
-         * @var int
+         * @var int          $key
          * @var LeadEventLog $log
          */
         foreach ($logs as $key => $log) {

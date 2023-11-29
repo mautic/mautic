@@ -41,7 +41,7 @@ class MailboxOrganizer
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();
 
         /**
-         * @var string
+         * @var string         $name
          * @var ConfigAccessor $config
          */
         foreach ($this->mailboxes as $name => $config) {
