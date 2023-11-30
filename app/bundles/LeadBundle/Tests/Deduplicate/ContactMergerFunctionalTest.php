@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
@@ -131,5 +133,65 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $jane = $model->getEntity($jane->getId());
 
         $this->assertEquals(56, $jane->getPoints());
+    }
+
+    public function testUtmTagsAreMerged(): void
+    {
+        $model = self::$container->get('mautic.lead.model.lead');
+        \assert(LeadModel::class === get_class($model));
+
+        $em = self::$container->get('doctrine.orm.entity_manager');
+        \assert(EntityManager::class === get_class($em));
+
+        $merger = self::$container->get('mautic.lead.merger');
+        \assert(ContactMerger::class === get_class($merger));
+
+        // Merging contact
+        $bob = new Lead();
+        $bob->setFirstname('Bob')
+            ->setLastname('Smith')
+            ->setEmail('bob.smith@test.com');
+        $model->saveEntity($bob);
+
+        $bobsUtmValues = new UtmTag();
+        $bobsUtmValues->setlead($bob);
+        $bobsUtmValues->setQuery([
+            'utm_campaign' => 'test2',
+            'utm_content'  => 'test2',
+        ]);
+        $bobsUtmValues->setUtmCampaign('test2');
+        $bobsUtmValues->setUtmContent('test2');
+        $bobsUtmValues->setDateAdded(new \DateTime());
+
+        $model->getUtmTagRepository()->saveEntity($bobsUtmValues);
+        $model->setUtmTags($bobsUtmValues->getLead(), $bobsUtmValues);
+
+        // Merged contact
+        $jane = new Lead();
+        $jane->setFirstname('Jane')
+            ->setLastname('Smith')
+            ->setEmail('jane.smith@test.com');
+        $model->saveEntity($jane);
+
+        $janesUtmValues = new UtmTag();
+        $janesUtmValues->setlead($jane);
+        $janesUtmValues->setQuery([
+            'utm_campaign' => 'test1',
+            'utm_content'  => 'test1',
+        ]);
+        $janesUtmValues->setUtmCampaign('test1');
+        $janesUtmValues->setUtmContent('test1');
+        $janesUtmValues->setDateAdded(new \DateTime());
+
+        $model->getUtmTagRepository()->saveEntity($janesUtmValues);
+        $model->setUtmTags($janesUtmValues->getLead(), $janesUtmValues);
+
+        $bob     = $merger->merge($bob, $jane);
+        $utmTags = $bob->getUtmTags();
+
+        \assert($utmTags instanceof PersistentCollection);
+        $values = $utmTags->getValues();
+        \assert($values[0] instanceof UtmTag);
+        $this->assertCount(2, $values);
     }
 }

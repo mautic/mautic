@@ -10,6 +10,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
@@ -554,6 +556,32 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with($winner, ['loser', 'loser2'], null, false);
 
         $this->getMerger()->mergeTags($winner, $loser);
+    }
+
+    public function testMergeUtmTags(): void
+    {
+        $winner = new Lead();
+        $loser  = new Lead();
+        $utmTag = new UtmTag();
+        $loser->setUtmTags($utmTag);
+
+        $utmTagRepository = $this->createMock(UtmTagRepository::class);
+
+        $utmTagRepository->expects($this->once())
+            ->method('saveEntity');
+
+        $this->leadModel->expects($this->once())
+            ->method('getUtmTagRepository')
+            ->willReturn($utmTagRepository);
+
+        $this->leadModel->expects($this->once())
+            ->method('setUtmTags')
+            ->with($winner, $utmTag);
+
+        $this->leadModel->expects($this->once())
+            ->method('removeUtmTags');
+
+        $this->getMerger()->mergeUtmTags($winner, $loser);
     }
 
     public function testFullMergeThrowsSameContactException()

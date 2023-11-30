@@ -79,7 +79,8 @@ class ContactMerger
             ->mergeFieldData($winner, $loser)
             ->mergeOwners($winner, $loser)
             ->mergePoints($winner, $loser)
-            ->mergeTags($winner, $loser);
+            ->mergeTags($winner, $loser)
+            ->mergeUtmTags($winner, $loser);
 
         // Save the updated contact
         $this->leadModel->saveEntity($winner, false);
@@ -245,6 +246,24 @@ class ContactMerger
         $addTags   = $loserTags->getKeys();
 
         $this->leadModel->modifyTags($winner, $addTags, null, false);
+
+        return $this;
+    }
+
+    /**
+     * Merge UTM tags from the loser into the winner.
+     */
+    public function mergeUtmTags(Lead $winner, Lead $loser): self
+    {
+        $loserUtmTags = $loser->getUtmTags() ?? [];
+
+        foreach ($loserUtmTags as $utmTag) {
+            $utmTag->setLead($winner);
+            $this->leadModel->getUtmTagRepository()->saveEntity($utmTag);
+
+            $this->leadModel->setUtmTags($winner, $utmTag);
+            $this->leadModel->removeUtmTags($loser, $utmTag->getid());
+        }
 
         return $this;
     }
