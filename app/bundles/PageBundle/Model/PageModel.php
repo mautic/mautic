@@ -875,30 +875,56 @@ class PageModel extends FormModel
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
-     *
-     * @return array
+     * @return array<int|string>
      */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getUniqueVsReturningPieChartData(\DateTime $dateFrom, \DateTime $dateTo, bool $canViewOthers = true): array
     {
         $chart              = new PieChart();
         $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-        $filters['lead_id'] = [
-            'expression' => 'isNull',
+
+        $filters = [
+            'lead_id' => [
+                'expression' => 'isNotNull',
+            ],
+            'date_left' => [
+                'expression' => 'isNull',
+            ],
+            'redirect_id' => [
+                'expression' => 'isNull',
+            ],
+            'email_id' => [
+                'expression' => 'isNull',
+            ],
         ];
-        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+
+        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
-            $this->limitQueryToCreator($returnQ);
         }
 
-        $all       = $query->fetchCount($allQ);
-        $returning = $query->fetchCount($returnQ);
+        $allQ->resetQueryPart('select')->select('t.id');
+        $allQ->groupBy('t.lead_id');
+
+        // fetch all group by lead_id
+        $q  = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(*) as count')
+            ->from(
+                sprintf('(%s)', $allQ->getSQL()), 'tt'
+            );
+        $q->setParameters($allQ->getParameters());
+        $all       = $query->fetchCount($q);
+
+        // date_left is NULL more like 1 mean returned visitor
+        $allQ->having('COUNT(t.id) > 1');
+        $q  = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(*) as count')
+            ->from(
+                sprintf('(%s)', $allQ->getSQL()), 'tt'
+            );
+        $q->setParameters($allQ->getParameters());
+        $returning = $query->fetchCount($q);
+
         $unique    = $all - $returning;
         $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
         $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
