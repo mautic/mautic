@@ -65,6 +65,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
             ],
+            'l.created_by' => [
+                'label'   => 'mautic.lead.report.created_by',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ucb.first_name, " ", ucb.last_name)',
+            ],
             'x.title' => [
                 'label' => 'Title',
                 'type'  => 'string',
@@ -202,6 +207,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.report.owner_lastname',
                 'type'  => 'string',
             ],
+            'l.created_by' => [
+                'label'   => 'mautic.lead.report.created_by',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ucb.first_name, " ", ucb.last_name)',
+            ],
             'x.title' => [
                 'label' => 'Title',
                 'type'  => 'string',
@@ -256,6 +266,14 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ],
             'x.owner_id' => [
                 'label' => 'mautic.lead.list.filter.owner',
+                'type'  => 'select',
+                'list'  => [
+                    1 => 'John Doe',
+                    2 => 'Joe Smith',
+                ],
+            ],
+            'x.created_by' => [
+                'label' => 'mautic.lead.list.filter.created_by',
                 'type'  => 'select',
                 'list'  => [
                     1 => 'John Doe',
