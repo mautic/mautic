@@ -201,10 +201,22 @@ class MauticMap {
 
     setMapValues(values) {
         const mapObject = this.map.vectorMap('get', 'mapObject');
-
+        const dataSeries = mapObject.series.regions[0];
         this.mapData = values;
         mapObject.reset();
-        mapObject.series.regions[0].setValues(values);
+
+        if (this.type === MauticMap.TYPES['regions'] && dataSeries) {
+            // Force map color scaling
+            this.unsetExtremeValues(dataSeries);
+            dataSeries.setValues(values);
+        } else if (this.type === MauticMap.TYPES['markers']) {
+            this.settings.markers[0].setValues(values)
+        }
+    }
+
+    unsetExtremeValues(dataSeries) {
+        dataSeries.params.min = undefined;
+        dataSeries.params.max = undefined;
     }
 
     initMap() {
