@@ -9,15 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class AddColumnEvent extends Event
 {
-    /**
-     * @var LeadField
-     */
-    private $leadField;
+    private \Mautic\LeadBundle\Entity\LeadField $leadField;
 
-    /**
-     * @var bool
-     */
-    private $shouldProcessInBackground;
+    private bool $shouldProcessInBackground;
 
     public function __construct(LeadField $leadField, bool $shouldProcessInBackground)
     {

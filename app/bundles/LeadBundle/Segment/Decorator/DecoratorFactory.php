@@ -12,35 +12,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecoratorFactory
 {
-    /**
-     * @var ContactSegmentFilterDictionary
-     */
-    private $contactSegmentFilterDictionary;
+    private \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
-    /**
-     * @var BaseDecorator
-     */
-    private $baseDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\BaseDecorator $baseDecorator;
 
-    /**
-     * @var CustomMappedDecorator
-     */
-    private $customMappedDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator $customMappedDecorator;
 
-    /**
-     * @var CompanyDecorator
-     */
-    private $companyDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\CompanyDecorator $companyDecorator;
 
-    /**
-     * @var DateOptionFactory
-     */
-    private $dateOptionFactory;
+    private \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory $dateOptionFactory;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,

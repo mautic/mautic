@@ -8,10 +8,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateDefault implements FilterDecoratorInterface
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
 
     /**
      * @var string

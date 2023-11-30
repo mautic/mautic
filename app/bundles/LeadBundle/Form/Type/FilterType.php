@@ -18,15 +18,9 @@ class FilterType extends AbstractType
 {
     use FilterTrait;
 
-    /**
-     * @var FormAdjustmentsProviderInterface
-     */
-    private $formAdjustmentsProvider;
+    private \Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface $formAdjustmentsProvider;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     public function __construct(
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,

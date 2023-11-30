@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class PrimaryCompanyHelper
 {
-    private $companyLeadRepository;
+    private \Mautic\LeadBundle\Entity\CompanyLeadRepository $companyLeadRepository;
 
     /**
      * PrimaryCompanyHelper constructor.

@@ -13,20 +13,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AvatarHelper
-     */
-    private $avatarHelper;
+    private \Mautic\LeadBundle\Twig\Helper\AvatarHelper $avatarHelper;
 
-    /**
-     * @var FormUploader
-     */
-    private $uploader;
+    private \Mautic\FormBundle\Helper\FormUploader $uploader;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     public function __construct(AvatarHelper $avatarHelper, FormUploader $uploader, LeadModel $leadModel)
     {

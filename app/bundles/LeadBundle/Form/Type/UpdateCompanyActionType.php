@@ -10,10 +10,7 @@ class UpdateCompanyActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
     public function __construct(FieldModel $fieldModel)
     {

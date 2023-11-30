@@ -18,15 +18,9 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
     public function __construct(
         LeadEventLogRepository $eventLogRepository,

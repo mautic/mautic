@@ -8,10 +8,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 class SegmentCountCacheHelper
 {
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
 
     public function __construct(CacheStorageHelper $cacheStorageHelper)
     {

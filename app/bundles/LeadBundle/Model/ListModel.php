@@ -51,35 +51,20 @@ class ListModel extends FormModel
 {
     use OperatorListTrait;
 
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
+    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
-    /**
-     * @var ContactSegmentService
-     */
-    private $leadSegmentService;
+    private \Mautic\LeadBundle\Segment\ContactSegmentService $leadSegmentService;
 
     /**
      * @var mixed[]
      */
     private $choiceFieldsCache = [];
 
-    /**
-     * @var SegmentChartQueryFactory
-     */
-    private $segmentChartQueryFactory;
+    private \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory $segmentChartQueryFactory;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private \Mautic\LeadBundle\Helper\SegmentCountCacheHelper $segmentCountCacheHelper;
 
     public function __construct(
         CategoryModel $categoryModel,

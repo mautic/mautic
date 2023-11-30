@@ -11,20 +11,11 @@ use Psr\Log\LoggerInterface;
 
 class CustomFieldIndex
 {
-    /**
-     * @var IndexSchemaHelper
-     */
-    private $indexSchemaHelper;
+    private \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $indexSchemaHelper;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private \Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     public function __construct(
         IndexSchemaHelper $indexSchemaHelper,

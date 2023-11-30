@@ -13,10 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
     public function __construct(EntityManager $em)
     {

@@ -12,10 +12,7 @@ class SegmentReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_MEMBERSHIP = 'segment.membership';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
     public function __construct(FieldsBuilder $fieldsBuilder)
     {

@@ -11,10 +11,7 @@ use Twig\TwigFunction;
 
 class LeadExtension extends AbstractExtension
 {
-    /**
-     * @var AvatarHelper
-     */
-    protected $avatarHelper;
+    protected \Mautic\LeadBundle\Twig\Helper\AvatarHelper $avatarHelper;
 
     public function __construct(AvatarHelper $avatarHelper)
     {

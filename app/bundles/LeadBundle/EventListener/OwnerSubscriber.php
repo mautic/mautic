@@ -16,15 +16,9 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private $ownerFieldSprintf = '{ownerfield=%s}';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var array

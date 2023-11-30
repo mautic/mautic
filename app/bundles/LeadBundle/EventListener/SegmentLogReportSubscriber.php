@@ -12,10 +12,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_LOG = 'segment.log';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
     public function __construct(FieldsBuilder $fieldsBuilder)
     {

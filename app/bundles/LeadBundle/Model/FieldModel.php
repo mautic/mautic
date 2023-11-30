@@ -431,45 +431,21 @@ class FieldModel extends FormModel
         ],
     ];
 
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
+    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
 
-    /**
-     * @var CustomFieldColumn
-     */
-    private $customFieldColumn;
+    private \Mautic\LeadBundle\Field\CustomFieldColumn $customFieldColumn;
 
-    /**
-     * @var FieldSaveDispatcher
-     */
-    private $fieldSaveDispatcher;
+    private \Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher $fieldSaveDispatcher;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
-    /**
-     * @var ListModel
-     */
-    private $leadListModel;
+    private \Mautic\LeadBundle\Model\ListModel $leadListModel;
 
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private \Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
+    private \Mautic\LeadBundle\Field\FieldList $fieldList;
 
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
+    private \Mautic\LeadBundle\Field\LeadFieldSaver $leadFieldSaver;
 
     public function __construct(
         ColumnSchemaHelper $columnSchemaHelper,

@@ -21,20 +21,11 @@ class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(EntityManager $entityManager, RouterInterface $router, TranslatorInterface $translator)
     {

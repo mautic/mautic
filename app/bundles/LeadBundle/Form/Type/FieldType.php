@@ -30,20 +30,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
-    /**
-     * @var IdentifierFields
-     */
-    private $identifierFields;
+    private \Mautic\LeadBundle\Field\IdentifierFields $identifierFields;
 
     public function __construct(EntityManagerInterface $em, Translator $translator, IdentifierFields $identifierFields)
     {

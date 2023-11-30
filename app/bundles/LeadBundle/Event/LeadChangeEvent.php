@@ -7,17 +7,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadChangeEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $oldLead;
+    private \Mautic\LeadBundle\Entity\Lead $oldLead;
 
     private $oldTrackingId;
 
-    /**
-     * @var Lead
-     */
-    private $newLead;
+    private \Mautic\LeadBundle\Entity\Lead $newLead;
 
     private $newTrackingId;
 

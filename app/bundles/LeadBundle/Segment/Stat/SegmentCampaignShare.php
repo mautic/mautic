@@ -8,20 +8,11 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 class SegmentCampaignShare
 {
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
     {
