@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
@@ -58,7 +59,8 @@ class IpLookupHelper
         RequestStack $requestStack,
         EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        AbstractLookup $ipLookup = null
+        AbstractLookup $ipLookup = null,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
     ) {
         $this->requestStack          = $requestStack;
         $this->em                    = $em;
@@ -163,15 +165,21 @@ class IpLookupHelper
             $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
 
             $ipAddress->setDoNotTrackList($doNotTrack);
-
             if ($ipAddress->isTrackable() && $request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (false !== strpos($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
-                        continue;
+                        break;
                     }
+                }
+
+                // second check for bots  https://github.com/matomo-org/device-detector
+                $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+                if ($deviceDetector->isBot()) {
+                    $doNotTrack[] = $ip;
+                    $ipAddress->setDoNotTrackList($doNotTrack);
                 }
             }
 

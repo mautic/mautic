@@ -2,15 +2,24 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var DeviceDetector|(DeviceDetector&object&\PHPUnit\Framework\MockObject\MockObject)|(DeviceDetector&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private DeviceDetector|\PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+
+    private DeviceDetectorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -18,7 +27,34 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $this->deviceDetectorFactory = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $this->deviceDetector        = $this->createMock(DeviceDetector::class);
+
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
+    public function testDeviceDetectorBotsDetectionTrue(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(true);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertFalse($ip->getIpAddress()->isTrackable());
+    }
+
+    public function testDeviceDetectorBotsDetectionFalse(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
+
+        $this->deviceDetector
+            ->method('isBot')
+            ->willReturn(false);
+
+        $ip = $this->getIpHelper($request);
+        $this->assertTrue($ip->getIpAddress()->isTrackable());
     }
 
     /**
@@ -97,8 +133,8 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $request
-     * @param null $mockCoreParametersHelper
+     * @param Request|null $request
+     * @param null         $mockCoreParametersHelper
      *
      * @return IpLookupHelper
      */
@@ -137,6 +173,14 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(null);
         }
 
-        return new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper);
+        $this->deviceDetectorFactory->expects($this->any())
+            ->method('create')
+            ->willReturnCallback(
+                function () {
+                    return $this->deviceDetector;
+                }
+            );
+
+        return new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, null, $this->deviceDetectorFactory);
     }
 }
