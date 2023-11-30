@@ -629,7 +629,7 @@ class LeadRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject): array
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
         $queryBuilder      = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $leadCampaignAlias = 'lc';
@@ -648,11 +648,12 @@ class LeadRepository extends CommonRepository
         )
         ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
         ->andWhere("$leadCampaignAlias.manually_removed = :false")
-        ->andWhere("$leadCampaignAlias.date_added >= :dateFrom")
+        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
         ->groupBy("$leadAlias.country")
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
-        ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'));
+        ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
+        ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
     }

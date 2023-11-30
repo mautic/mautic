@@ -120,7 +120,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
+        return $this->em->getRepository(CampaignLead::class);
     }
 
     /**
@@ -197,7 +197,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
     {
-        if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
+        if ($entity instanceof CampaignLead) {
             return null;
         }
 
@@ -647,7 +647,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(CampaignLead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -663,7 +663,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(CampaignLead::class)->getLeads($campaignId, $eventId);
     }
 
     /**
@@ -848,16 +848,12 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
 
-        if (empty($eventsIds)) {
-            return [];
-        }
-
         /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
         $query               = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom);
+        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
-        if ($entity->getEmailSendEvents()->count() > 0) {
+        if ($eventsEmailsSend->count() > 0) {
             $emailStats            = $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
             $results['read_count'] = $results['clicked_through_count'] = [];
 
@@ -875,8 +871,8 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @return array{}|array<int, array<string, string|null>>
      */
-    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject): array
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject, \DateTime $dateToObject): array
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject);
+        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }
 }
