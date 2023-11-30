@@ -75,7 +75,17 @@ class MailHelper
     /**
      * @var string
      */
+    protected $bcc;
+
+    /**
+     * @var string
+     */
     protected $systemReplyTo;
+
+    /**
+     * @var string
+     */
+    protected $systemBcc;
 
     /**
      * @var string
@@ -231,12 +241,13 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
+    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null, $bcc = null)
     {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
         $this->transport = $this->getTransport();
 
+        $systemBccEmail     = $factory->getParameter('mailer_default_bcc');
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
         $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
         $systemFromName     = $this->cleanName(
@@ -244,6 +255,7 @@ class MailHelper
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
+        $this->setDefaultBcc($bcc, $systemBccEmail);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -334,6 +346,11 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
             $this->setReplyTo($this->replyTo);
         }
+
+        if (empty($this->message->getBcc()) && !empty($this->bcc)) {
+            $this->setBcc($this->bcc);
+        }
+
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
@@ -624,6 +641,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->replyTo             = $this->systemReplyTo;
+            $this->bcc                 = $this->systemBcc;
             $this->headers             = [];
             $this->source              = [];
             $this->assets              = [];
@@ -1285,6 +1303,9 @@ class MailHelper
 
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
+            if (empty($bccAddress)) {
+                $bccAddress = $this->systemBcc;
+            }
             if (!empty($bccAddress)) {
                 $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
@@ -2066,5 +2087,11 @@ class MailHelper
     private function getMessageInstance(): MauticMessage
     {
         return new MauticMessage();
+    }
+
+    private function setDefaultBcc($overrideBcc, $systemBcc)
+    {
+        $this->systemBcc = $overrideBcc ?: $systemBcc;
+        $this->bcc       = $this->systemBcc;
     }
 }

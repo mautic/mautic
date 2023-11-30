@@ -33,6 +33,9 @@
                 {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
                 {{ _self.row_if_exists(fields, 'mailer_custom_headers') }}
             </div>
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'mailer_default_bcc') }}
+            </div>
         </div>
     </div>
 {% endif %}
