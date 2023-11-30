@@ -41,6 +41,7 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -49,6 +50,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
@@ -210,7 +213,7 @@ class SubmissionModel extends CommonFormModel
      */
     public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
     {
-        $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
+        $leadFields = $this->leadFieldModel->getFieldListWithProperties(false, true);
 
         // everything matches up so let's save the results
         $submission = new Submission();
@@ -406,7 +409,11 @@ class SubmissionModel extends CommonFormModel
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            try {
+                $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            } catch (\Exception $exception) {
+                return ['errors' => $exception->getMessage()];
+            }
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
@@ -1152,6 +1159,41 @@ class SubmissionModel extends CommonFormModel
 
         // last active time
         $lead->setLastActive(new \DateTime());
+
+        // set stage
+        if (!empty($data['stage'])) {
+            $stage = $this->em->getRepository(Stage::class)->findByIdOrName($data['stage']);
+            if (empty($stage)) {
+                throw new ValidationException($this->translator->trans('mautic.lead.import.stage.not.exists', ['%id%' => $data['stage']]));
+            }
+            $lead->setStage($stage);
+
+            // add a contact stage change log
+            $log = new StagesChangeLog();
+            $log->setStage($stage);
+            $log->setEventName($stage->getId().':'.$stage->getName());
+            $log->setLead($lead);
+            $log->setActionName(
+                $this->translator->trans(
+                    'mautic.stage.import.action.name',
+                    [
+                        '%name%' => $this->userHelper->getUser()->getUsername(),
+                    ]
+                )
+            );
+            $log->setDateAdded(new \DateTime());
+            $lead->stageChangeLog($log);
+        }
+
+        // set owner
+        if (isset($data['owner']) || isset($data['ownerbyid'])) {
+            $userRepo  = $this->em->getRepository(User::class);
+            $condition = isset($data['owner']) ? ['email' => $data['owner']] : ['id' => $data['ownerbyid']];
+            $user      = $userRepo->findOneBy($condition);
+            if (isset($user)) {
+                $lead->setOwner($user);
+            }
+        }
 
         // create a new lead
         $lead->setManipulator(new LeadManipulator(

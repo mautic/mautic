@@ -914,7 +914,7 @@ class FieldModel extends FormModel
      *
      * @return array
      */
-    public function getFieldListWithProperties($object = 'lead')
+    public function getFieldListWithProperties($object = 'lead', bool $withSpecialFields = false)
     {
         $forceFilters[] = [
             'column' => 'f.object',
@@ -943,6 +943,10 @@ class FieldModel extends FormModel
                 'properties'   => $contactField['properties'],
                 'isPublished'  => $contactField['isPublished'],
             ];
+        }
+
+        if (true === $withSpecialFields && 'company' !== $object) {
+            $fields = array_merge($fields, $this->getSpecialLeadFields());
         }
 
         return $fields;
@@ -1037,5 +1041,46 @@ class FieldModel extends FormModel
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    /**
+     * Get the owner and stage fields.
+     *
+     * @return array<string, mixed>
+     */
+    private function getSpecialLeadFields(): array
+    {
+        return [
+            'owner' => [
+                'label'        => 'Owner\'s email',
+                'alias'        => 'owner',
+                'type'         => 'email',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'ownerbyid' => [
+                'label'        => 'Owner\'s id',
+                'alias'        => 'ownerbyid',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+            'stage' => [
+                'label'        => 'Stage',
+                'alias'        => 'stage',
+                'type'         => 'text',
+                'group'        => 'core',
+                'group_label'  => $this->translator->trans('mautic.lead.field.group.core'),
+                'defaultValue' => null,
+                'properties'   => [],
+                'isPublished'  => true,
+            ],
+        ];
     }
 }
