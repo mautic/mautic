@@ -360,6 +360,6 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getPlainText();
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
 
-        return $content . implode(' ', $this->getTextHeaders());
+        return $content.implode(' ', $this->getTextHeaders());
     }
 }
