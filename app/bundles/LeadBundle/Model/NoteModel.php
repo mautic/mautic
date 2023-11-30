@@ -38,9 +38,7 @@ class NoteModel extends FormModel
 
     public function getRepository(): LeadNoteRepository
     {
-        $result = $this->em->getRepository(LeadNote::class);
-
-        return $result;
+        return $this->em->getRepository(LeadNote::class);
     }
 
     /**

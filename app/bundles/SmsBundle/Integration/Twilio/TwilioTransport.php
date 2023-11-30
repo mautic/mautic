@@ -103,12 +103,10 @@ class TwilioTransport implements TransportInterface
      */
     private function createPayload(string $messagingServiceSid, string $content): array
     {
-        $payload = [
+        return [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
-
-        return $payload;
     }
 
     /**

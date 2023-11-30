@@ -58,9 +58,7 @@ class DashboardModel extends FormModel
 
     public function getRepository(): WidgetRepository
     {
-        $result = $this->em->getRepository(Widget::class);
-
-        return $result;
+        return $this->em->getRepository(Widget::class);
     }
 
     /**

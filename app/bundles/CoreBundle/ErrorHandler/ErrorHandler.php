@@ -508,9 +508,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
-                    $root = realpath(__DIR__.'/../../../../');
-
-                    return $root;
+                    return realpath(__DIR__.'/../../../../');
                 }));
 
                 if ($loader->exists('custom_offline.html.twig')) {

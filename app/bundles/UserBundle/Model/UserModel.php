@@ -62,9 +62,7 @@ class UserModel extends FormModel
 
     public function getRepository(): UserRepository
     {
-        $result = $this->em->getRepository(User::class);
-
-        return $result;
+        return $this->em->getRepository(User::class);
     }
 
     /**

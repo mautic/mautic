@@ -196,9 +196,7 @@ class SubmissionModel extends CommonFormModel
 
     public function getRepository(): SubmissionRepository
     {
-        $result = $this->em->getRepository(Submission::class);
-
-        return $result;
+        return $this->em->getRepository(Submission::class);
     }
 
     /**

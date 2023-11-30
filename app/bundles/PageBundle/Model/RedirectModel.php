@@ -39,9 +39,7 @@ class RedirectModel extends FormModel
 
     public function getRepository(): RedirectRepository
     {
-        $result = $this->em->getRepository(Redirect::class);
-
-        return $result;
+        return $this->em->getRepository(Redirect::class);
     }
 
     /**
