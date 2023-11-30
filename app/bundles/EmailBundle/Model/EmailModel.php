@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -735,7 +734,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModel
      *
      * @return array<string, array<int, array<string, int|string>>>
      *
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
     {
