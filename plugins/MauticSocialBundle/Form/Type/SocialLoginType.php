@@ -9,9 +9,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class FacebookLoginType.
- */
 class SocialLoginType extends AbstractType
 {
     /**
@@ -21,9 +18,6 @@ class SocialLoginType extends AbstractType
     private $formModel;
     private $coreParametersHelper;
 
-    /**
-     * SocialLoginType constructor.
-     */
     public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
     {
         $this->helper               = $helper;

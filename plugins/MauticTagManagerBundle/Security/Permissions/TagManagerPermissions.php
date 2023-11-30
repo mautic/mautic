@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticTagManagerBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class TagManagerPermissions.
- */
 class TagManagerPermissions extends AbstractPermissions
 {
     /**

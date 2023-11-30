@@ -11,9 +11,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
-/**
- * Class CampaignEventHelper.
- */
 class CampaignEventHelper
 {
     /**
@@ -46,9 +43,6 @@ class CampaignEventHelper
      */
     protected $clickthrough = [];
 
-    /**
-     * CampaignEventHelper constructor.
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         TrackableModel $trackableModel,

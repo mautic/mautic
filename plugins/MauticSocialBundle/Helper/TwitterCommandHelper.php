@@ -71,9 +71,6 @@ class TwitterCommandHelper
      */
     private $twitterHandleField;
 
-    /**
-     * TwitterCommandHelper constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         FieldModel $fieldModel,

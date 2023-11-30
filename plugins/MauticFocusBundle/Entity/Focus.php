@@ -10,9 +10,6 @@ use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Focus.
- */
 class Focus extends FormEntity
 {
     /**

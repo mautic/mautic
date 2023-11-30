@@ -62,9 +62,6 @@ class FocusModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * FocusModel constructor.
-     */
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,

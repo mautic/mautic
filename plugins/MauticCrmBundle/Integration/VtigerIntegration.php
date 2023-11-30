@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-/**
- * Class VtigerIntegration.
- */
 class VtigerIntegration extends CrmAbstractIntegration
 {
     private $authorzationError = '';

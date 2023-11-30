@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-/**
- * Class TagRepository.
- */
 class TagRepository extends BaseTagRepository
 {
     /**

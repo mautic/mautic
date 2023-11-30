@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-/**
- * Class MailchimpIntegration.
- */
 class MailchimpIntegration extends EmailAbstractIntegration
 {
     /**
