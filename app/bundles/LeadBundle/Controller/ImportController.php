@@ -536,10 +536,8 @@ class ImportController extends FormController
      *
      * @param FormInterface<FormInterface> $form
      * @param string                       $object
-     *
-     * @return bool
      */
-    protected function importInBrowser(FormInterface $form, $object)
+    protected function importInBrowser(FormInterface $form, $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 
@@ -562,10 +560,8 @@ class ImportController extends FormController
      *
      * @param FormInterface<FormInterface> $form
      * @param string                       $object
-     *
-     * @return bool
      */
-    protected function importInCli(FormInterface $form, $object)
+    protected function importInCli(FormInterface $form, $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 

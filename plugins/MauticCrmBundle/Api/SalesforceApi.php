@@ -567,7 +567,7 @@ class SalesforceApi extends CrmApi
     /**
      * @throws RetryRequestException
      */
-    private function checkIfLockedRequestShouldBeRetried()
+    private function checkIfLockedRequestShouldBeRetried(): bool
     {
         // The record is locked so let's wait a a few seconds and retry
         if ($this->requestCounter < $this->maxLockRetries) {

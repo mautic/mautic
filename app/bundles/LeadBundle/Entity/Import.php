@@ -214,10 +214,8 @@ class Import extends FormEntity
 
     /**
      * Checks if the import has everything needed to proceed.
-     *
-     * @return bool
      */
-    public function canProceed()
+    public function canProceed(): bool
     {
         if (!in_array($this->getStatus(), [self::QUEUED, self::DELAYED])) {
             $this->setStatusInfo('Import could not be triggered since it is not queued nor delayed');

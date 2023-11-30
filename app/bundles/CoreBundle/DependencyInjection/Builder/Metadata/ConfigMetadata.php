@@ -78,7 +78,7 @@ class ConfigMetadata
 
                 $serviceGroup = new \Tightenco\Collect\Support\Collection($serviceGroup);
                 $filtered     = $serviceGroup->reject(
-                    function ($serviceDefinition) {
+                    function ($serviceDefinition): bool {
                         // Remove optional services (has argument optional = true) if the service class does not exist
                         return is_array($serviceDefinition)
                             && isset($serviceDefinition['optional'])

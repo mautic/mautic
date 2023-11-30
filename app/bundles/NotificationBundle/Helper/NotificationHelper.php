@@ -191,7 +191,7 @@ JS;
         }
     }
 
-    private function hasScript()
+    private function hasScript(): bool
     {
         $landingPage = true;
         $server      = $this->requestStack->getCurrentRequest()->server;

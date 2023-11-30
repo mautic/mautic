@@ -105,7 +105,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }
@@ -184,10 +184,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }

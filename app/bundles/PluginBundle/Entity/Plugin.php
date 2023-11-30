@@ -193,10 +193,7 @@ class Plugin extends CommonEntity
         return $this->primaryDescription ?: $this->description;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSecondaryDescription()
+    public function hasSecondaryDescription(): bool
     {
         return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }

@@ -51,10 +51,7 @@ class ConfigAccessor
         return $this->getPath().'_'.$this->getUser();
     }
 
-    /**
-     * @return bool
-     */
-    public function isConfigured()
+    public function isConfigured(): bool
     {
         return $this->getHost() && $this->getFolder();
     }

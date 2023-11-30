@@ -87,11 +87,9 @@ class SchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function createDatabase()
+    public function createDatabase(): bool
     {
         try {
             $this->db->connect();

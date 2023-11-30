@@ -81,20 +81,16 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was removed from the campaign.
-     *
-     * @return bool
      */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return 'removed' == $this->action;
     }
 
     /**
      * Lead was added to the campaign.
-     *
-     * @return bool
      */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return 'added' == $this->action;
     }

@@ -79,7 +79,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            function ($value) {
+            function ($value): bool {
                 return !is_null($value) && '' !== $value;
             }
         );

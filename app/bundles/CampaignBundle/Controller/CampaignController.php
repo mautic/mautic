@@ -616,10 +616,8 @@ class CampaignController extends AbstractStandardFormController
      * @param Campaign $entity
      * @param null     $objectId
      * @param bool     $isClone
-     *
-     * @return bool
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
     {
         if (empty($this->campaignEvents)) {
             // set the error

@@ -267,10 +267,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $tables;
     }
 
-    /**
-     * @return bool
-     */
-    public function isJoinTable($table)
+    public function isJoinTable($table): bool
     {
         $queryParts = $this->getQueryParts();
 

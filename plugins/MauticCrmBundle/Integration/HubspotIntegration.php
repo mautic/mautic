@@ -312,10 +312,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
 
