@@ -19,10 +19,7 @@ class MessageQueueBatchProcessEvent extends Event
         $this->channelId = $channelId;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         return $channel === $this->channel;
     }

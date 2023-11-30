@@ -345,10 +345,8 @@ class Webhook extends FormEntity
      * Takes a trigger (event type) and builds the Event object form it if it doesn't exist already.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public function addTrigger($key)
+    public function addTrigger($key): bool
     {
         if ($this->eventExists($key)) {
             return false;
@@ -366,10 +364,8 @@ class Webhook extends FormEntity
      * Check if an event exists comared to its type.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public function eventExists($key)
+    public function eventExists($key): bool
     {
         foreach ($this->events as $event) {
             if ($event->getEventType() === $key) {
@@ -497,7 +493,7 @@ class Webhook extends FormEntity
         return $this;
     }
 
-    public function wasModifiedRecently()
+    public function wasModifiedRecently(): bool
     {
         $dateModified = $this->getDateModified();
 

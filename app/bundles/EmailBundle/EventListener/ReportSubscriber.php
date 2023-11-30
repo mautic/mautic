@@ -793,7 +793,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined($query, $table, $fromAlias, $alias)
+    private function isJoined($query, $table, $fromAlias, $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {

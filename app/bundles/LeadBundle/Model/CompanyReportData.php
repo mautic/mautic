@@ -45,10 +45,7 @@ class CompanyReportData
         return array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
     }
 
-    /**
-     * @return bool
-     */
-    public function eventHasCompanyColumns(ReportGeneratorEvent $event)
+    public function eventHasCompanyColumns(ReportGeneratorEvent $event): bool
     {
         $companyColumns = $this->getCompanyData();
         foreach ($companyColumns as $key => $column) {

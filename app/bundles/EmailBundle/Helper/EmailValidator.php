@@ -56,7 +56,7 @@ class EmailValidator
      *
      * @returns bool
      */
-    public function isValidFormat($address)
+    public function isValidFormat($address): bool
     {
         return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL);
     }

@@ -207,11 +207,9 @@ class TableSchemaHelper
      * @param string $table
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false)
+    public function checkTableExists($table, $throwException = false): bool
     {
         if ($this->sm->tablesExist($this->prefix.$table)) {
             if ($throwException) {

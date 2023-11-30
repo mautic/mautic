@@ -176,10 +176,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -870,10 +868,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $choices;
     }
 
-    /**
-     * @return bool
-     */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): bool
     {
         if (!$this->isAuthorized()) {
             return false;
@@ -888,7 +883,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    function ($contact) {
+                    function ($contact): bool {
                         return 'lead' === $contact['internal_entity'];
                     }
                 ), 'integration_entity_id');

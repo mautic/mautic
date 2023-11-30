@@ -76,7 +76,7 @@ trait VariantModelTrait
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null)
+    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 

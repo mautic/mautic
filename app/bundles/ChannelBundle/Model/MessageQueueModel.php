@@ -131,8 +131,6 @@ class MessageQueueModel extends FormModel
      * @param int      $priority
      * @param int|null $campaignEventId
      * @param array    $options
-     *
-     * @return bool
      */
     public function queue(
         $leads,
@@ -143,7 +141,7 @@ class MessageQueueModel extends FormModel
         $priority = 1,
         $campaignEventId = null,
         $options = []
-    ) {
+    ): bool {
         $messageQueues = [];
 
         $scheduledDate = (new \DateTime())->add($scheduledInterval);

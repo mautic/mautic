@@ -158,7 +158,7 @@ class IpAddress
     /**
      * Determine if this IP is trackable.
      */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
         foreach ($this->doNotTrack as $ip) {
             if (false !== strpos($ip, '/')) {

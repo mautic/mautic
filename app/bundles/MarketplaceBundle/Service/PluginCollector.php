@@ -57,7 +57,7 @@ class PluginCollector
     {
         $mauticVersion = ThisRelease::getMetadata()->getVersion();
 
-        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion) {
+        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion): bool {
             if (
                 !empty($entry->minimumMauticVersion) &&
                 !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
