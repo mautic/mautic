@@ -737,8 +737,6 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param resource     $handle
      * @param array<mixed> $row
-     *
-     * @return false|int
      */
     private function putCsvExportRow($handle, array $row): bool|int
     {

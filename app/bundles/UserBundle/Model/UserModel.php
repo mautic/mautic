@@ -355,7 +355,6 @@ class UserModel extends FormModel
      * Set user preference.
      *
      * @param null $value
-     * @param User $user
      */
     public function setPreference($key, $value = null, User $user = null)
     {
@@ -375,7 +374,6 @@ class UserModel extends FormModel
      * Get user preference.
      *
      * @param null $default
-     * @param User $user
      */
     public function getPreference($key, $default = null, User $user = null)
     {
