@@ -11,20 +11,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AssetListType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $corePermissions;
 
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     public function __construct(
         CorePermissions $corePermissions,

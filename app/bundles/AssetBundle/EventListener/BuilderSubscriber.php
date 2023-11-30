@@ -20,25 +20,13 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $assetToken = '{assetlink=(.*?)}';
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var TokenHelper
-     */
-    private $tokenHelper;
+    private \Mautic\AssetBundle\Helper\TokenHelper $tokenHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 
     public function __construct(
         CorePermissions $security,
