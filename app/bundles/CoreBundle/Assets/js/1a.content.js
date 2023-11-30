@@ -713,9 +713,9 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.stopPageLoadingBar();
     }
 
-    const maps= document.querySelectorAll('[data-load="map"]');
+    const maps= mQuery(container).find('[data-load="map"]');
     if(maps.length) {
-        maps.forEach(map => map.addEventListener('click', () => {
+        maps.each((index,map) => map.addEventListener('click', () => {
             const scopeId = event.target.getAttribute('href');
             const scope = mQuery(scopeId);
 
