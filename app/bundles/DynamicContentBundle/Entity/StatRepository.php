@@ -64,8 +64,7 @@ class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by dynamic content Id.
      *
-     * @param array     $dynamicContentIds
-     * @param \DateTime $fromDate
+     * @param array $dynamicContentIds
      */
     public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
     {

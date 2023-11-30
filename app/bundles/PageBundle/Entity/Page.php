@@ -631,8 +631,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set category.
      *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
-     *
      * @return Page
      */
     public function setCategory(Category $category = null)

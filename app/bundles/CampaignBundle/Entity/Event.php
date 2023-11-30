@@ -638,8 +638,6 @@ class Event implements ChannelInterface
     /**
      * Add children.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
-     *
      * @return Event
      */
     public function addChild(Event $children)
@@ -651,8 +649,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove children.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
      */
     public function removeChild(Event $children)
     {
@@ -709,8 +705,6 @@ class Event implements ChannelInterface
 
     /**
      * Set parent.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $parent
      *
      * @return Event
      */

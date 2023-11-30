@@ -8,8 +8,6 @@ class CampaignEventHelper
 {
     /**
      * Determine if this campaign applies.
-     *
-     * @param CampaignLeadChangeEvent $eventDetails
      */
     public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event): bool
     {

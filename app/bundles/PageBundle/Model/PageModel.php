@@ -937,9 +937,6 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     *
      * @return array
      */
     public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
@@ -1010,11 +1007,9 @@ class PageModel extends FormModel
     /**
      * Get a list of pages created in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */

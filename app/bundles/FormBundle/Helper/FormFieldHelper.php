@@ -70,8 +70,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * FormFieldHelper constructor.
-     *
-     * @param ValidatorInterface $validator
      */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {

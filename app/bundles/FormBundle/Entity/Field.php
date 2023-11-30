@@ -805,8 +805,6 @@ class Field
      * Decide if the field should be displayed based on thr progressive profiling conditions.
      *
      * @param array|null $submissions
-     * @param Lead       $lead
-     * @param Form       $form
      */
     public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
     {

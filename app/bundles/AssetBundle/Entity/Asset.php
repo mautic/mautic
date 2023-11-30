@@ -274,8 +274,6 @@ class Asset extends FormEntity
 
     /**
      * Sets file.
-     *
-     * @param File $file
      */
     public function setFile(File $file = null)
     {
@@ -619,8 +617,6 @@ class Asset extends FormEntity
 
     /**
      * Set category.
-     *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
      *
      * @return Asset
      */

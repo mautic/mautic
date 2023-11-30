@@ -141,8 +141,6 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
-     *
      * @return array<mixed, array<string, mixed>>
      */
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null): array
@@ -182,8 +180,6 @@ class DownloadRepository extends CommonRepository
     /**
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
-     *
-     * @param \DateTime $fromDate
      *
      * @return array<mixed, array<string, mixed>>
      */

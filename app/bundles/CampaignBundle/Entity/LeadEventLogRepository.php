@@ -132,8 +132,6 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's upcoming events.
      *
-     * @param array $options
-     *
      * @return array
      */
     public function getUpcomingEvents(array $options = null)

@@ -571,8 +571,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -784,9 +782,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @param UserInterface $user
-     *
-     * Needed for SAML to work correctly
+     * Needed for SAML to work correctly.
      */
     public function isEqualTo(UserInterface $user)
     {

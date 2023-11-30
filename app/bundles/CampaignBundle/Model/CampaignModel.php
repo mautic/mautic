@@ -552,7 +552,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param Lead $lead
      * @param bool $forList
      *
      * @return mixed
@@ -782,9 +781,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      */

@@ -713,8 +713,6 @@ class LeadApiController extends CommonApiController
 
     /**
      * Helper method to be used in FrequencyRuleTrait.
-     *
-     * @param array $data
      */
     protected function isFormValid(Form $form, array $data = null): bool
     {

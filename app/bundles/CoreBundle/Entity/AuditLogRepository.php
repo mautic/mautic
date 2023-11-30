@@ -14,8 +14,6 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param array $filters
-     *
      * @return int
      */
     public function getAuditLogsCount(Lead $lead, array $filters = null)
@@ -45,9 +43,8 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     * @param int   $page
-     * @param int   $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -100,8 +97,6 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     *
      * @return array
      */
     public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
