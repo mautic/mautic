@@ -2,9 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
-/**
- * Class AddressList.
- */
 class Address
 {
     /**

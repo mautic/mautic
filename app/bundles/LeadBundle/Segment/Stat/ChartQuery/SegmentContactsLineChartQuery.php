@@ -168,7 +168,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
             ->setFirstResult(0)
             ->setMaxResults(1);
 
-        return $subQuery->execute()->fetchOne();
+        return $subQuery->executeQuery()->fetchOne();
     }
 
     /**
@@ -243,7 +243,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $compositeExpressionReflectionParts = $compositeExpressionReflection->getProperty('parts');
         $compositeExpressionReflectionParts->setAccessible(true);
         $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
-        $newParts = array_filter($parts, function ($val) use ($joinAlias) {
+        $newParts = array_filter($parts, function ($val) use ($joinAlias): bool {
             return 0 !== strpos($val, "$joinAlias.");
         });
         $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);

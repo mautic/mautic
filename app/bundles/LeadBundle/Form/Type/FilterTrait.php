@@ -326,7 +326,7 @@ trait FilterTrait
                                     ->where('l.id REGEXP :regex')
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
-                                $qb->execute()->fetchAllAssociative();
+                                $qb->executeQuery()->fetchAllAssociative();
                             } catch (\Exception $exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }
@@ -350,11 +350,9 @@ trait FilterTrait
                 ]
             );
         } else {
-            if (!empty($customOptions['constraints'])) {
-                foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if ('NotBlank' === get_class($constraint)) {
-                        array_splice($customOptions['constraints'], $i, 1);
-                    }
+            foreach ($customOptions['constraints'] as $i => $constraint) {
+                if ('NotBlank' === get_class($constraint)) {
+                    array_splice($customOptions['constraints'], $i, 1);
                 }
             }
             $form->add(

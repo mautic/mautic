@@ -45,9 +45,6 @@ class Unsubscribe implements ProcessorInterface
      */
     private $doNotContact;
 
-    /**
-     * Bounce constructor.
-     */
     public function __construct(
         TransportInterface $transport,
         ContactFinder $contactFinder,
@@ -62,10 +59,7 @@ class Unsubscribe implements ProcessorInterface
         $this->doNotContact  = $doNotContact;
     }
 
-    /**
-     * @return bool
-     */
-    public function process(Message $message)
+    public function process(Message $message): bool
     {
         $this->message = $message;
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for an unsubscription');

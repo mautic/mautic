@@ -12,18 +12,12 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class DynamicContentFilterEntryFiltersType.
- */
 class DynamicContentFilterEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
     private $translator;
 
-    /**
-     * DynamicContentFilterEntryFiltersType constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

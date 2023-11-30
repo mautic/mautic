@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
@@ -114,7 +115,7 @@ class InstallService
      */
     private function localConfig(): string
     {
-        return (string) $this->pathsHelper->getSystemPath('local_config', false);
+        return ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app');
     }
 
     /**
@@ -149,7 +150,6 @@ class InstallService
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been

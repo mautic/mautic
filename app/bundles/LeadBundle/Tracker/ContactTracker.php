@@ -81,9 +81,6 @@ class ContactTracker
      */
     private $leadFieldModel;
 
-    /**
-     * ContactTracker constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         ContactTrackingServiceInterface $contactTrackingService,
@@ -350,10 +347,7 @@ class ContactTracker
         $lead->setFields($fields);
     }
 
-    /**
-     * @return bool
-     */
-    private function useSystemContact()
+    private function useSystemContact(): bool
     {
         return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
     }

@@ -5,9 +5,6 @@ namespace Mautic\CategoryBundle\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class CategoryEvent.
- */
 class CategoryEvent extends CommonEvent
 {
     /**

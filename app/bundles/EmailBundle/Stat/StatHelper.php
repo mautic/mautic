@@ -25,9 +25,6 @@ class StatHelper
      */
     private $deleteUs = [];
 
-    /**
-     * StatHelper constructor.
-     */
     public function __construct(StatRepository $statRepository)
     {
         $this->repo = $statRepository;

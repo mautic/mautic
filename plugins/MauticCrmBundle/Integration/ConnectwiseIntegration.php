@@ -176,10 +176,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -559,10 +557,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    /**
-     * @return IntegrationEntity|object|null
-     */
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
+    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
@@ -638,16 +633,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
                 if (isset($config['push_activities']) and true == $config['push_activities']) {
-                    $savedEntities = $this->createActivity($config['campaign_task'], $id, $lead->getId());
-                    if ($savedEntities) {
-                        $integrationEntities[] = $savedEntities;
+                    $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                    if ($savedEntity instanceof IntegrationEntity) {
+                        $integrationEntities[] = $savedEntity;
                     }
                 }
 
-                if (!empty($integrationEntities)) {
-                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
-                    $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
-                }
+                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
             }
@@ -863,24 +856,19 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $choices   = [];
         $campaigns = $this->getCampaigns();
 
-        if (!empty($campaigns)) {
-            foreach ($campaigns as $campaign) {
-                if (isset($campaign['id'])) {
-                    $choices[] = [
-                        'value' => $campaign['id'],
-                        'label' => $campaign['name'],
-                    ];
-                }
+        foreach ($campaigns as $campaign) {
+            if (isset($campaign['id'])) {
+                $choices[] = [
+                    'value' => $campaign['id'],
+                    'label' => $campaign['name'],
+                ];
             }
         }
 
         return $choices;
     }
 
-    /**
-     * @return bool
-     */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): bool
     {
         if (!$this->isAuthorized()) {
             return false;
@@ -895,7 +883,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    function ($contact) {
+                    function ($contact): bool {
                         return 'lead' === $contact['internal_entity'];
                     }
                 ), 'integration_entity_id');
@@ -1021,11 +1009,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return IntegrationEntity|null
-     *
      * @throws ApiErrorException
      */
-    public function createActivity($config, $cwContactId, $leadId)
+    public function createActivity($config, $cwContactId, $leadId): ?IntegrationEntity
     {
         if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [

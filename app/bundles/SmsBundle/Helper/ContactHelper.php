@@ -25,9 +25,6 @@ class ContactHelper
      */
     private $phoneNumberHelper;
 
-    /**
-     * ContactHelper constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         Connection $connection,
@@ -61,7 +58,7 @@ class ContactHelper
                 )
             )
             ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $ids = array_column($foundContacts, 'id');

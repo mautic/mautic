@@ -312,10 +312,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
 
@@ -485,25 +483,24 @@ class HubspotIntegration extends CrmAbstractIntegration
                 } else {
                     $results['results'] = array_merge($results, $data['results']);
                 }
-                if (isset($results['results'])) {
-                    foreach ($results['results'] as $company) {
-                        if (isset($company['properties'])) {
-                            $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
-                            $company     = $this->getMauticCompany($companyData);
-                            if ($id) {
-                                return $company;
-                            }
-                            if ($company) {
-                                ++$executed;
-                                $this->em->detach($company);
-                            }
+
+                foreach ($results['results'] as $company) {
+                    if (isset($company['properties'])) {
+                        $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
+                        $company     = $this->getMauticCompany($companyData);
+                        if ($id) {
+                            return $company;
+                        }
+                        if ($company) {
+                            ++$executed;
+                            $this->em->detach($company);
                         }
                     }
-                    if (isset($data['hasMore']) and $data['hasMore']) {
-                        $params['offset'] = $data['offset'];
-                        if ($params['offset'] < strtotime($params['start'])) {
-                            $this->getCompanies($params, $id, $executed);
-                        }
+                }
+                if (isset($data['hasMore']) and $data['hasMore']) {
+                    $params['offset'] = $data['offset'];
+                    if ($params['offset'] < strtotime($params['start'])) {
+                        $this->getCompanies($params, $id, $executed);
                     }
                 }
 

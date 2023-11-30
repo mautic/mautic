@@ -22,40 +22,19 @@ use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var AnalyticsHelper
-     */
-    private $analyticsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AnalyticsHelper $analyticsHelper;
 
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
+    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         AssetModel $assetModel,
@@ -149,7 +128,7 @@ class FormSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
 
         /**
-         * @var Form
+         * @var Form   $form
          * @var Asset  $asset
          * @var string $message
          * @var bool   $messengerMode
@@ -160,7 +139,11 @@ class FormSubscriber implements EventSubscriberInterface
             'message'       => $message,
             'messengerMode' => $messengerMode,
         ]    = $event->getPostSubmitCallback('asset.download_file');
-        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]).'&stream=0';
+
+        $url = $this->assetModel->generateUrl($asset, true, [
+            'lead'    => $event->getLead() ? $event->getLead()->getId() : null,
+            'channel' => ['form' => $form->getId()],
+            ]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);

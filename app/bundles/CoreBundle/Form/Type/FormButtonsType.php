@@ -10,9 +10,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FormButtonsType.
- */
 class FormButtonsType extends AbstractType
 {
     /**

@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class SecondsConversionTransformer.
- */
 class SecondsConversionTransformer implements DataTransformerInterface
 {
     private $viewFormat;

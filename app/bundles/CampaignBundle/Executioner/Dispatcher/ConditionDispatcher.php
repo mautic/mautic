@@ -15,9 +15,6 @@ class ConditionDispatcher
      */
     private $dispatcher;
 
-    /**
-     * ConditionDispatcher constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

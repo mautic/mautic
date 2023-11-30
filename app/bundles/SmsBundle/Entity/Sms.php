@@ -14,9 +14,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Sms.
- */
 class Sms extends FormEntity
 {
     /**
@@ -180,12 +177,10 @@ class Sms extends FormEntity
                         ]
                     );
 
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                ->atPath('lists')
-                                ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                            ->atPath('lists')
+                            ->addViolation();
                     }
                 }
             },

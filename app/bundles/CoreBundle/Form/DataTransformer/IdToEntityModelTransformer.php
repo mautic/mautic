@@ -7,9 +7,6 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
- * Class IdToEntityModelTransformer.
- */
 class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
@@ -86,8 +83,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
 
             $entity = $this->em
                 ->getRepository($this->repository)
-                ->findOneBy([$this->id => $id])
-            ;
+                ->findOneBy([$this->id => $id]);
 
             if (null === $entity) {
                 throw new TransformationFailedException(sprintf('An entity with a/an '.$this->id.' of "%s" does not exist!', $id));

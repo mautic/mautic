@@ -6,9 +6,6 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class JsController.
- */
 class JsController extends CommonController
 {
     /**

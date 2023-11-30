@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-/**
- * Class TwitterIntegration.
- */
 class TwitterIntegration extends SocialIntegration
 {
     /**

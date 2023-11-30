@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialEvent.
- */
 class SocialEvent extends CommonEvent
 {
     /**

@@ -10,16 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class CategoryBundlesType.
- */
 class CategoryBundlesType extends AbstractType
 {
     private $dispatcher;
 
-    /**
-     * CategoryBundlesType constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

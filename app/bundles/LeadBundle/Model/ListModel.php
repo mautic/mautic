@@ -924,7 +924,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if (in_array(0, $segments)) {
             $qAll = $this->em->getConnection()->createQueryBuilder();
@@ -941,7 +941,7 @@ class ListModel extends FormModel
             if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
-            $resultsAll = $qAll->execute()->fetchAllAssociative();
+            $resultsAll = $qAll->executeQuery()->fetchAllAssociative();
             $results    = array_merge($results, $resultsAll);
         }
 
@@ -1021,7 +1021,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr($result['stage'], 0, 12);
@@ -1086,7 +1086,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
@@ -1274,10 +1274,8 @@ class ListModel extends FormModel
             case null:
                 $choices['categories'] = [];
                 $categories            = $this->categoryModel->getLookupResults('segment');
-                if ($categories) {
-                    foreach ($categories as $category) {
-                        $choices['categories'][$category['id']] = $category['title'];
-                    }
+                foreach ($categories as $category) {
+                    $choices['categories'][$category['id']] = $category['title'];
                 }
         }
 

@@ -451,7 +451,7 @@ class ImportController extends FormController
 
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
-                        $this->addFlashMessage('mautic.'.$object.'.batch.import.created');
+                        $this->addFlashMessage('mautic.lead.batch.import.created');
                         $this->resetImport($object);
 
                         return $this->indexAction($request);
@@ -536,10 +536,8 @@ class ImportController extends FormController
      *
      * @param FormInterface<FormInterface> $form
      * @param string                       $object
-     *
-     * @return bool
      */
-    protected function importInBrowser(FormInterface $form, $object)
+    protected function importInBrowser(FormInterface $form, $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 
@@ -562,10 +560,8 @@ class ImportController extends FormController
      *
      * @param FormInterface<FormInterface> $form
      * @param string                       $object
-     *
-     * @return bool
      */
-    protected function importInCli(FormInterface $form, $object)
+    protected function importInCli(FormInterface $form, $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 

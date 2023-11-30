@@ -51,7 +51,6 @@ class DynamicContentController extends FormController
 
         $this->setListFilters();
 
-        // set limits
         $limit = $request->getSession()->get('mautic.dynamicContent.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -438,7 +437,7 @@ class DynamicContentController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('dynamicContent');
         $entity = $model->getEntity($objectId);
@@ -457,7 +456,7 @@ class DynamicContentController extends FormController
             $entity = clone $entity;
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**

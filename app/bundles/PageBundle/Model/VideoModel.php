@@ -35,9 +35,6 @@ class VideoModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * VideoModel constructor.
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker,

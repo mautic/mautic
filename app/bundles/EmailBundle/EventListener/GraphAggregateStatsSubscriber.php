@@ -14,9 +14,6 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
      */
     private $statsCollectionHelper;
 
-    /**
-     * GraphAggregateStatsSubscriber constructor.
-     */
     public function __construct(StatsCollectionHelper $statsCollectionHelper)
     {
         $this->statsCollectionHelper = $statsCollectionHelper;

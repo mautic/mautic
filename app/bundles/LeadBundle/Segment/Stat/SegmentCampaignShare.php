@@ -23,9 +23,6 @@ class SegmentCampaignShare
      */
     private $entityManager;
 
-    /**
-     * SegmentCampaignShare constructor.
-     */
     public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
     {
         $this->campaignModel      = $campaignModel;
@@ -62,7 +59,7 @@ class SegmentCampaignShare
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
-        $campaigns = $q->execute()->fetchAllAssociative();
+        $campaigns = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists

@@ -32,7 +32,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'login';
+    public const LOGIN_ROUTE       = 'login';
+    public const LOGIN_CHECK_ROUTE = 'mautic_user_logincheck';
 
     private UserPasswordHasher $hasher;
 
@@ -71,7 +72,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public function supports(Request $request): bool
     {
-        return self::LOGIN_ROUTE === $request->attributes->get('_route')
+        return self::LOGIN_CHECK_ROUTE === $request->attributes->get('_route')
             && $request->isMethod(Request::METHOD_POST);
     }
 
@@ -81,8 +82,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     public function getCredentials(Request $request): array
     {
         $credentials = [
-            'username'    => $request->request->get('username'),
-            'password'    => $request->request->get('password'),
+            'username'    => $request->request->get('_username'),
+            'password'    => $request->request->get('_password'),
             'csrf_token'  => $request->request->get('_csrf_token'),
             'integration' => $request->get('integration'),
         ];

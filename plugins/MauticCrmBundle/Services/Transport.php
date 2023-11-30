@@ -11,9 +11,6 @@ class Transport implements TransportInterface
      */
     private $client;
 
-    /**
-     * TransportService constructor.
-     */
     public function __construct(Client $client)
     {
         $this->client = $client;

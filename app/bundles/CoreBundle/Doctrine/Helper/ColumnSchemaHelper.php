@@ -198,11 +198,9 @@ class ColumnSchemaHelper
      * @param string $column
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkColumnExists($column, $throwException = false)
+    public function checkColumnExists($column, $throwException = false): bool
     {
         // check to ensure column doesn't exist
         if ($this->toTable->hasColumn($column)) {

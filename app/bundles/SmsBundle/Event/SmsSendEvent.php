@@ -5,9 +5,6 @@ namespace Mautic\SmsBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class SmsSendEvent.
- */
 class SmsSendEvent extends CommonEvent
 {
     /**

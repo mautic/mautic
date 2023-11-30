@@ -40,9 +40,6 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    /**
-     * IntegrationObjectToken constructor.
-     */
     public function __construct(string $token)
     {
         $this->token = $token;

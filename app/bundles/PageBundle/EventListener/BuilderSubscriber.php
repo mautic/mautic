@@ -90,9 +90,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     public const successmessage    = '{successmessage}';
     public const identifierToken   = '{leadidentifier}';
 
-    /**
-     * BuilderSubscriber constructor.
-     */
     public function __construct(
         CorePermissions $security,
         TokenHelper $tokenHelper,

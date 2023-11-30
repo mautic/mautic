@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\RandomHelper;
 
-/**
- * Class RandomHelper.
- */
 final class RandomHelper implements RandomHelperInterface
 {
     /**

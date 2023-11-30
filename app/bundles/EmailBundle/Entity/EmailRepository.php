@@ -36,7 +36,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -63,7 +63,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc     = count($results) ? $results[0] : null;
 
@@ -123,6 +123,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');
@@ -206,7 +207,7 @@ class EmailRepository extends CommonRepository
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
-                ->execute()
+                ->executeQuery()
                 ->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
@@ -325,7 +326,7 @@ class EmailRepository extends CommonRepository
             return $q;
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
@@ -530,11 +531,13 @@ class EmailRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $relatedIds)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Up the read/sent counts.
+     *
+     * @deprecated use upCountSent or incrementRead method
      *
      * @param int        $id
      * @param string     $type
@@ -562,7 +565,84 @@ class EmailRepository extends CommonRepository
         $retrialLimit = 3;
         while ($retrialLimit >= 0) {
             try {
-                $q->execute();
+                $q->executeStatement();
+
+                return;
+            } catch (\Doctrine\DBAL\Exception $e) {
+                --$retrialLimit;
+                if (0 === $retrialLimit) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function upCountSent(int $id, int $increaseBy = 1, bool $variant = false): void
+    {
+        if ($increaseBy <= 0) {
+            return;
+        }
+
+        $connection  = $this->getEntityManager()->getConnection();
+        $updateQuery = $connection->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'emails')
+            ->set('sent_count', 'sent_count + :increaseBy')
+            ->where('id = :id');
+
+        if ($variant) {
+            $updateQuery->set('variant_sent_count', 'variant_sent_count + :increaseBy');
+        }
+
+        $updateQuery
+            ->setParameter('increaseBy', $increaseBy)
+            ->setParameter('id', $id);
+
+        // Try to execute 3 times before throwing the exception
+        $retrialLimit = 3;
+        while ($retrialLimit >= 0) {
+            try {
+                $updateQuery->executeStatement();
+
+                return;
+            } catch (\Doctrine\DBAL\Exception $e) {
+                --$retrialLimit;
+                if (0 === $retrialLimit) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    public function incrementRead(int $emailId, int $statId, bool $isVariant = false): void
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('es.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+            ->where('es.id = :statId')
+            ->andWhere('es.is_read = 1');
+
+        $q->update(MAUTIC_TABLE_PREFIX.'emails', 'e')
+            ->set('read_count', 'read_count + 1')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('e.id', ':emailId'),
+                    $q->expr()->notIn('e.id', $subQuery->getSQL())
+                )
+            )
+            ->setParameter('emailId', $emailId)
+            ->setParameter('statId', $statId);
+
+        if ($isVariant) {
+            $q->set('variant_read_count', 'variant_read_count + 1');
+        }
+
+        // Try to execute 3 times before throwing the exception
+        $retrialLimit = 3;
+        while ($retrialLimit >= 0) {
+            try {
+                $q->executeStatement();
 
                 return;
             } catch (\Doctrine\DBAL\Exception $e) {

@@ -2,9 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-/**
- * Class FoursquareIntegration.
- */
 class FoursquareIntegration extends SocialIntegration
 {
     /**

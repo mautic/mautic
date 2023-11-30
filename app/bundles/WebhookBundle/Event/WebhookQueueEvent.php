@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 
-/**
- * Class WebhookQueueEvent.
- */
 class WebhookQueueEvent extends CommonEvent
 {
     /**

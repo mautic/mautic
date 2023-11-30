@@ -92,9 +92,6 @@ class SubmissionEvent extends CommonEvent
      */
     private $postSubmitPayload;
 
-    /**
-     * SubmissionEvent constructor.
-     */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
         $this->entity  = $submission;
@@ -298,10 +295,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
 
-    /**
-     * @return int
-     */
-    public function hasPostSubmitCallbacks()
+    public function hasPostSubmitCallbacks(): bool
     {
         return count($this->callbacks) || count($this->callbackResponses);
     }

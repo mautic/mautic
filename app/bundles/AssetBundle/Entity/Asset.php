@@ -977,10 +977,8 @@ class Asset extends FormEntity
 
     /**
      * Decides if an asset is image displayable by browser.
-     *
-     * @return bool
      */
-    public function isImage()
+    public function isImage(): bool
     {
         $fileType = strtolower($this->getFileType());
 
@@ -1369,18 +1367,12 @@ class Asset extends FormEntity
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isLocal()
+    public function isLocal(): bool
     {
         return 'local' === $this->storageLocation;
     }
 
-    /**
-     * @return bool
-     */
-    public function isRemote()
+    public function isRemote(): bool
     {
         return 'remote' === $this->storageLocation;
     }

@@ -19,9 +19,6 @@ class KeysEncryptionEvent extends Event
      */
     private $keys;
 
-    /**
-     * KeysEncryptionEvent constructor.
-     */
     public function __construct(Integration $integrationConfiguration, array $keys)
     {
         $this->integrationConfiguration = $integrationConfiguration;

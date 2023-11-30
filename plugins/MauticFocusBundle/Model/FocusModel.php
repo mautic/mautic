@@ -4,10 +4,12 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use MatthiasMullie\Minify;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -25,7 +27,6 @@ use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -61,9 +62,6 @@ class FocusModel extends FormModel
      */
     protected $contactTracker;
 
-    /**
-     * FocusModel constructor.
-     */
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
@@ -206,9 +204,9 @@ class FocusModel extends FormModel
 
             $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
-                'js'    => \Minify_HTML::minify($javascript),
-                'focus' => \Minify_HTML::minify($content['focus']),
-                'form'  => \Minify_HTML::minify($content['form']),
+                'js'    => (new Minify\JS($javascript))->minify(),
+                'focus' => InputHelper::minifyHTML($content['focus']),
+                'form'  => InputHelper::minifyHTML($content['form']),
             ];
 
             if (!$byPassCache) {
@@ -354,7 +352,6 @@ class FocusModel extends FormModel
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
-                /** @var Request $data */
                 $typeId = null;
                 break;
             case Stat::TYPE_CLICK:

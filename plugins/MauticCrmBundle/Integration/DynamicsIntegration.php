@@ -105,7 +105,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }
@@ -184,10 +184,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -276,7 +274,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if (null === $leadObject || !array_key_exists('value', $leadObject)) {
                             return [];
                         }
-                        /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
                             $type      = 'string';

@@ -7,9 +7,6 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SchedulerSubscriber.
- */
 class SchedulerSubscriber implements EventSubscriberInterface
 {
     /**

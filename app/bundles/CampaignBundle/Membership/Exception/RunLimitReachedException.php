@@ -9,9 +9,6 @@ class RunLimitReachedException extends \Exception
      */
     private $contactsProcessed;
 
-    /**
-     * MaxContactsReachedException constructor.
-     */
     public function __construct($contactsProcessed)
     {
         $this->contactsProcessed = (int) $contactsProcessed;

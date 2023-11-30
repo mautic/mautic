@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -41,7 +42,7 @@ class Configurator
 
     public function __construct(PathsHelper $pathsHelper)
     {
-        $this->filename   = $pathsHelper->getSystemPath('local_config');
+        $this->filename   = ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app');
         $this->parameters = $this->read();
     }
 

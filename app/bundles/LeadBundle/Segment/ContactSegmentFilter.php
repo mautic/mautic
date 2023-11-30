@@ -182,10 +182,8 @@ class ContactSegmentFilter
 
     /**
      * Whether the filter references another ContactSegment.
-     *
-     * @return bool
      */
-    public function isContactSegmentReference()
+    public function isContactSegmentReference(): bool
     {
         return 'leadlist' === $this->getField();
     }

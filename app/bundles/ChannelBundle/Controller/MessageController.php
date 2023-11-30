@@ -23,9 +23,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MessageController.
- */
 class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
@@ -196,7 +193,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId)
     {
         return $this->deleteStandard($request, $objectId);
     }

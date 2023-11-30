@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class QueueEmailEvent.
- */
 class QueueEmailEvent extends Event
 {
     /**

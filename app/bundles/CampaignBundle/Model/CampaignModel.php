@@ -534,10 +534,8 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
 
-                if ($forms) {
-                    foreach ($forms as $form) {
-                        $choices['forms'][$form['id']] = $form['name'];
-                    }
+                foreach ($forms as $form) {
+                    $choices['forms'][$form['id']] = $form['name'];
                 }
         }
 
@@ -724,13 +722,11 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
             $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
 
             // Group events by type
-            if ($rawEvents) {
-                foreach ($rawEvents as $event) {
-                    if (isset($events[$event['type']])) {
-                        $events[$event['type']][] = $event['id'];
-                    } else {
-                        $events[$event['type']] = [$event['id']];
-                    }
+            foreach ($rawEvents as $event) {
+                if (isset($events[$event['type']])) {
+                    $events[$event['type']][] = $event['id'];
+                } else {
+                    $events[$event['type']] = [$event['id']];
                 }
             }
 
@@ -740,7 +736,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
 
                     if ($this->coreParametersHelper->get('campaign_use_summary')) {
                         $q       = $query->prepareTimeDataQuery('campaign_summary', 'date_triggered', $filter, 'triggered_count + non_action_path_taken_count', 'sum');
-                        $rawData = $q->execute()->fetchAllAssociative();
+                        $rawData = $q->executeQuery()->fetchAllAssociative();
                     } else {
                         // Exclude failed events
                         $failedSq = $this->em->getConnection()->createQueryBuilder();
@@ -754,7 +750,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
                         ];
 
                         $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                        $rawData = $q->execute()->fetchAllAssociative();
+                        $rawData = $q->executeQuery()->fetchAllAssociative();
                     }
 
                     if (!empty($rawData)) {

@@ -11,9 +11,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class VariantType.
- */
 class VariantType extends AbstractType
 {
     /**

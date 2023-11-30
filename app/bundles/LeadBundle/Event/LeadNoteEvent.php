@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
-/**
- * Class LeadNoteEvent.
- */
 class LeadNoteEvent extends CommonEvent
 {
     /**

@@ -43,9 +43,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
      */
     protected $app;
 
-    /**
-     * CatchExceptionMiddleware constructor.
-     */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app                 = $app;

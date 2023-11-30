@@ -17,9 +17,6 @@ class EvaluatedContacts
      */
     private $failed;
 
-    /**
-     * EvaluatedContacts constructor.
-     */
     public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
     {
         $this->passed = (null === $passed) ? new ArrayCollection() : $passed;

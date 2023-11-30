@@ -285,4 +285,48 @@ class AjaxController extends CommonAjaxController
             'delivered'   => $deliveredCount,
         ]);
     }
+
+    public function heatmapAction(Request $request, EmailModel $model): JsonResponse
+    {
+        $emailId     = (int) $request->query->get('id');
+        $email       = $model->getEntity($emailId);
+
+        if (null === $email) {
+            return $this->sendJsonResponse([
+                'message' => $this->translator->trans('mautic.api.call.notfound'),
+            ], 404);
+        }
+
+        if (!$this->security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $content           = $email->getCustomHtml();
+        $clickStats        = $model->getEmailClickStats($emailId);
+        $totalUniqueClicks = array_sum(array_column($clickStats, 'unique_hits'));
+        $totalClicks       = array_sum(array_column($clickStats, 'hits'));
+        foreach ($clickStats as &$stat) {
+            $stat['unique_hits_rate'] = round($totalUniqueClicks > 0 ? ($stat['unique_hits'] / $totalUniqueClicks) : 0, 4);
+            $stat['unique_hits_text'] = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['unique_hits']]);
+            $stat['hits_rate']        = round($totalClicks > 0 ? ($stat['hits'] / $totalClicks) : 0, 4);
+            $stat['hits_text']        = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['hits']]);
+        }
+        $legendTemplate = $this->renderView('@MauticEmail/Heatmap/heatmap_legend.html.twig', [
+            'totalClicks'       => $totalClicks,
+            'totalUniqueClicks' => $totalUniqueClicks,
+        ]);
+
+        return $this->sendJsonResponse([
+            'content'           => $content,
+            'clickStats'        => $clickStats,
+            'totalUniqueClicks' => $totalUniqueClicks,
+            'totalClicks'       => $totalClicks,
+            'legendTemplate'    => $legendTemplate,
+        ]);
+    }
 }

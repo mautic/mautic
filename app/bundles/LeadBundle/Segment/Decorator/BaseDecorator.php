@@ -8,9 +8,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
-/**
- * Class BaseDecorator.
- */
 class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
@@ -20,9 +17,6 @@ class BaseDecorator implements FilterDecoratorInterface
      */
     protected $contactSegmentFilterOperator;
 
-    /**
-     * BaseDecorator constructor.
-     */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator
     ) {
@@ -134,9 +128,6 @@ class BaseDecorator implements FilterDecoratorInterface
         return $filter;
     }
 
-    /**
-     * @return bool
-     */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return false;

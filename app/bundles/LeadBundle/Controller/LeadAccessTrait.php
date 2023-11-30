@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class LeadAccessTrait.
- */
 trait LeadAccessTrait
 {
     /**

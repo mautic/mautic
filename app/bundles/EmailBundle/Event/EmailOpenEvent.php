@@ -7,9 +7,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class EmailOpenEvent.
- */
 class EmailOpenEvent extends CommonEvent
 {
     /**

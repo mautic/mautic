@@ -1098,6 +1098,118 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "exsesx",
+      "name": "Oleh Vanin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399517?v=4",
+      "profile": "https://exsesx.dev/",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "mallezie",
+      "name": "Tim Mallezie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1926222?v=4",
+      "profile": "https://github.com/mallezie",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "staabm",
+      "name": "Markus Staab",
+      "avatar_url": "https://avatars.githubusercontent.com/u/120441?v=4",
+      "profile": "https://staabm.github.io/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "code5rick",
+      "name": "code5rick",
+      "avatar_url": "https://avatars.githubusercontent.com/u/131262825?v=4",
+      "profile": "https://github.com/code5rick",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jcrandell7",
+      "name": "jcrandell7",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59890399?v=4",
+      "profile": "https://github.com/jcrandell7",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "driskell",
+      "name": "Jason Woods",
+      "avatar_url": "https://avatars.githubusercontent.com/u/939815?v=4",
+      "profile": "https://github.com/driskell",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "enkhjargal",
+      "name": "Enkhjargal Lkhagvaa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2686495?v=4",
+      "profile": "http://enkhjargal.me",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "alexbusu-motork",
+      "name": "alexbusu-motork",
+      "avatar_url": "https://avatars.githubusercontent.com/u/149699605?v=4",
+      "profile": "https://github.com/alexbusu-motork",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "davidgorges",
+      "name": "David Gorges",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3885619?v=4",
+      "profile": "http://www.davidgorges.de",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "notz",
+      "name": "Gernot Pansy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/697251?v=4",
+      "profile": "https://github.com/notz",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "andersonjeccel",
+      "name": "andersonjeccel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116097999?v=4",
+      "profile": "https://github.com/andersonjeccel",
+      "contributions": [
+        "code",
+        "a11y"
+      ]
+    },
+    {
+      "login": "pasxel",
+      "name": "Alexei Pl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1814849?v=4",
+      "profile": "https://github.com/pasxel",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -38,15 +38,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    /**
-     * @var AssetModel
-     */
-    protected $assetModel;
+    protected \Mautic\AssetBundle\Model\AssetModel $assetModel;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(AssetModel $assetModel, RouterInterface $router)
     {
@@ -113,21 +107,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['title'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                            [
-                                'value' => $asset['download_count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['title'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                        [
+                            'value' => $asset['download_count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -159,18 +151,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['name'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['name'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([

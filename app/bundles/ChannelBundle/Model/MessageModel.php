@@ -43,9 +43,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     protected static $channels;
 
-    /**
-     * MessageModel constructor.
-     */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->channelListHelper = $channelListHelper;

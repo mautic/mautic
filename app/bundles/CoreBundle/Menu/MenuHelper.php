@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MenuHelper.
- */
 class MenuHelper
 {
     /**
@@ -39,9 +36,6 @@ class MenuHelper
      */
     protected $integrationHelper;
 
-    /**
-     * MenuHelper constructor.
-     */
     public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
         $this->security              = $security;
@@ -275,10 +269,8 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
-    protected function handleParametersChecks($name, $value)
+    protected function handleParametersChecks($name, $value): bool
     {
         return $this->getParameter($name) == $value;
     }
@@ -286,10 +278,8 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
-    protected function handleRequestChecks($name, $value)
+    protected function handleRequestChecks($name, $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
@@ -312,7 +302,7 @@ class MenuHelper
      *
      * @return bool Returns false if the item fails the access check or any other checks
      */
-    protected function handleChecks(array $menuItem)
+    protected function handleChecks(array $menuItem): bool
     {
         if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;

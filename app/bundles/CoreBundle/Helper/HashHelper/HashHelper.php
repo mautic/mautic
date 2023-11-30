@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\HashHelper;
 
-/**
- * Class HashHelper.
- */
 final class HashHelper implements HashHelperInterface
 {
     /**

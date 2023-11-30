@@ -386,7 +386,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
-        /** @var PluginIntegrationKeyEvent $event */
         $keys = $this->dispatchIntegrationKeyEvent(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
             $keys
@@ -858,7 +857,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $internalEntityId,
         array $internal = null,
         $persist = true
-    ) {
+    ): ?IntegrationEntity {
         $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
         $entity = new IntegrationEntity();
@@ -1653,8 +1652,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Takes profile data from an integration and maps it to Mautic's lead fields.
      *
-     * @param array $config
-     * @param null  $object
+     * @param array       $config
+     * @param string|null $object
      *
      * @return array
      */

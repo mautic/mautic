@@ -7,9 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Plugin.
- */
 class Plugin extends CommonEntity
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
@@ -196,10 +193,7 @@ class Plugin extends CommonEntity
         return $this->primaryDescription ?: $this->description;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSecondaryDescription()
+    public function hasSecondaryDescription(): bool
     {
         return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }

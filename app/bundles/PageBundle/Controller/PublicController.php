@@ -49,7 +49,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
-        /** @var Page $entity */
+        /** @var Page|bool $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         // Do not hit preference center pages
@@ -290,7 +290,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        if ($tracking404Model->isTrackable()) {
+        if (false !== $entity && $tracking404Model->isTrackable()) {
             $tracking404Model->hitPage($entity, $request);
         }
 
@@ -430,11 +430,9 @@ class PublicController extends CommonFormController
         ContactRequestHelper $contactRequestHelper,
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
-        LoggerInterface $mauticLogger,
+        LoggerInterface $logger,
         $redirectId
     ) {
-        $logger = $mauticLogger;
-
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -476,6 +474,7 @@ class PublicController extends CommonFormController
 
                 try {
                     $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+
                     $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it

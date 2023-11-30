@@ -24,9 +24,6 @@ class ConditionEvent extends CampaignExecutionEvent
      */
     private $passed = false;
 
-    /**
-     * DecisionEvent constructor.
-     */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->eventConfig = $config;

@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\Validator\Constraints\Blank;
@@ -15,9 +16,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class FormFieldHelper.
- */
 class FormFieldHelper extends AbstractFormFieldHelper
 {
     /**
@@ -195,8 +193,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'url':
             case 'date':
             case 'datetime':
+                if ('tel' === $field->getType()) {
+                    $sanitizedValue = InputHelper::clean($value);
+                } else {
+                    $sanitizedValue = $this->sanitizeValue($value);
+                }
                 if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$this->sanitizeValue($value).'"'
+                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
                         .$match[4].'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }

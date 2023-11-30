@@ -11,9 +11,6 @@ class ConfigType extends AbstractType
 {
     protected $fieldModel;
 
-    /**
-     * ConfigType constructor.
-     */
     public function __construct(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;

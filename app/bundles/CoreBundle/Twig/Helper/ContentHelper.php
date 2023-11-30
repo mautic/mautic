@@ -19,9 +19,6 @@ final class ContentHelper
      */
     private $dispatcher;
 
-    /**
-     * UIHelper constructor.
-     */
     public function __construct(Environment $twig, EventDispatcherInterface $dispatcher)
     {
         $this->twig       = $twig;

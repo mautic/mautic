@@ -5,9 +5,6 @@ namespace Mautic\ChannelBundle\Event;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ChannelBroadcastEvent.
- */
 class ChannelBroadcastEvent extends Event
 {
     /**
@@ -74,9 +71,6 @@ class ChannelBroadcastEvent extends Event
      */
     private $threadId;
 
-    /**
-     * MaintenanceEvent constructor.
-     */
     public function __construct($channel, $channelId, OutputInterface $output)
     {
         $this->channel = $channel;
@@ -122,10 +116,7 @@ class ChannelBroadcastEvent extends Event
         return $this->results;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         if ($this->channel && $this->channel !== $channel) {
             return false;

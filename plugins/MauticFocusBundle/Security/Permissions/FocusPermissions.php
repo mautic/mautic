@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class MauticFocusPermissions.
- */
 class FocusPermissions extends AbstractPermissions
 {
     /**

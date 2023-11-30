@@ -14,25 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var DownloadRepository
-     */
-    private $downloadRepository;
+    private \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository;
 
     public function __construct(
         AssetModel $assetModel,

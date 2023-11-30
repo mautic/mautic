@@ -38,9 +38,6 @@ class FeedbackLoop implements ProcessorInterface
      */
     private $doNotContact;
 
-    /**
-     * FeedbackLoop constructor.
-     */
     public function __construct(
         ContactFinder $contactFinder,
         TranslatorInterface $translator,
@@ -53,10 +50,7 @@ class FeedbackLoop implements ProcessorInterface
         $this->doNotContact  = $doNotContact;
     }
 
-    /**
-     * @return bool
-     */
-    public function process(Message $message)
+    public function process(Message $message): bool
     {
         $this->message = $message;
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a feedback loop report');

@@ -527,12 +527,10 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base = 'media/js/ckeditor4/';
+        $base    = 'media/libraries/ckeditor/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
-            $base.'adapters/jquery.js?v'.$this->version,
-            'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v'.$this->version,
         ];
     }
 
@@ -736,11 +734,11 @@ final class AssetsHelper
     }
 
     /**
-     * @param string $siteUrl
+     * @param ?string $siteUrl can be null on installation
      */
     public function setSiteUrl($siteUrl): void
     {
-        if ('/' === substr($siteUrl, -1)) {
+        if ($siteUrl && '/' === substr($siteUrl, -1)) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 

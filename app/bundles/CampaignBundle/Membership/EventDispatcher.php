@@ -15,9 +15,6 @@ class EventDispatcher
      */
     private $dispatcher;
 
-    /**
-     * EventDispatcher constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

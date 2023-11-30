@@ -6,9 +6,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LogoutEvent.
- */
 class LogoutEvent extends Event
 {
     /**
@@ -26,9 +23,6 @@ class LogoutEvent extends Event
      */
     private $request;
 
-    /**
-     * LogoutEvent constructor.
-     */
     public function __construct(User $user, Request $request)
     {
         $this->user    = $user;

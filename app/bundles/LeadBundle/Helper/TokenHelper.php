@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**

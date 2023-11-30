@@ -31,9 +31,6 @@ class CategoryModel extends FormModel
      */
     protected $requestStack;
 
-    /**
-     * CategoryModel constructor.
-     */
     public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->requestStack = $requestStack;
@@ -179,10 +176,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults($bundle, $filter = '', $limit = 10)
+    public function getLookupResults($bundle, $filter = '', $limit = 10): array
     {
         static $results = [];
 

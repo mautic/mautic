@@ -11,9 +11,6 @@ class TrailingSlashHelper
      */
     private $coreParametersHelper;
 
-    /**
-     * TrailingSlashHelper constructor.
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;

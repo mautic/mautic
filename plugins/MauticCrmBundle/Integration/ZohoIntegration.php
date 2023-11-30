@@ -181,8 +181,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
             $objects               = $data['data'];
-            /** @var array $rows */
-            $integrationEntities = [];
+            $integrationEntities   = [];
             /** @var array $objects */
             foreach ($objects as $recordId => $entityData) {
                 $isModified = false;
@@ -484,9 +483,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
-                if (!array_key_exists('page', $oparams)) {
-                    $oparams['page'] = 1;
-                }
+                $oparams['page'] = 1;
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
@@ -559,9 +556,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
-                if (!array_key_exists('page', $oparams)) {
-                    $oparams['page'] = 1;
-                }
+                $oparams['page'] = 1;
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);

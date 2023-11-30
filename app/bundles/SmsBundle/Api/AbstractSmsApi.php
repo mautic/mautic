@@ -18,9 +18,6 @@ abstract class AbstractSmsApi implements TransportInterface
      */
     protected $pageTrackableModel;
 
-    /**
-     * AbstractSmsApi constructor.
-     */
     public function __construct(TrackableModel $pageTrackableModel)
     {
         $this->pageTrackableModel = $pageTrackableModel;

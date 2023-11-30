@@ -32,9 +32,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Set timezone.
-     */
     public function onKernelRequestSetTimezone(RequestEvent $event)
     {
         $request = $event->getRequest();

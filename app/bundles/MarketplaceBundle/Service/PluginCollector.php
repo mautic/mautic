@@ -57,7 +57,7 @@ class PluginCollector
     {
         $mauticVersion = ThisRelease::getMetadata()->getVersion();
 
-        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion) {
+        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion): bool {
             if (
                 !empty($entry->minimumMauticVersion) &&
                 !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
@@ -95,7 +95,7 @@ class PluginCollector
             ];
         }
 
-        /** @var array<int,AllowlistEntry[]> */
+        /** @var array<int, AllowlistEntry[]> $chunks */
         $chunks = array_chunk($this->allowlistedPackages, $limit);
         // Array keys start at 0 but page numbers start at 1
         $pageChunk = $page - 1;

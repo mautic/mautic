@@ -26,9 +26,6 @@ class ActionExecutioner implements EventInterface
      */
     private $eventLogger;
 
-    /**
-     * ActionExecutioner constructor.
-     */
     public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {
         $this->dispatcher         = $dispatcher;
@@ -60,7 +57,6 @@ class ActionExecutioner implements EventInterface
         // Execute to process the batch of contacts
         $pendingEvent = $this->dispatcher->dispatchEvent($config, $event, $logs);
 
-        /** @var ArrayCollection $contacts */
         $passed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getSuccessful());
         $failed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getFailures());
 

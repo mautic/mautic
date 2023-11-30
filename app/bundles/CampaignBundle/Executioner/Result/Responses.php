@@ -18,9 +18,6 @@ class Responses
      */
     private $conditionResponses = [];
 
-    /**
-     * DecisionResponses constructor.
-     */
     public function setFromLogs(ArrayCollection $logs)
     {
         /** @var LeadEventLog $log */

@@ -14,18 +14,12 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class DwcEntryFiltersType.
- */
 class DwcEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
     private $translator;
 
-    /**
-     * DwcEntryFiltersType constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

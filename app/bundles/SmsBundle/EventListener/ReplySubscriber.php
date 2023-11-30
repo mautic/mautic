@@ -17,9 +17,6 @@ class ReplySubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * ReplySubscriber constructor.
-     */
     public function __construct(Translator $translator, LeadEventLogRepository $eventLogRepository)
     {
         $this->translator         = $translator;

@@ -57,9 +57,6 @@ class EventScheduler
      */
     private $coreParametersHelper;
 
-    /**
-     * EventScheduler constructor.
-     */
     public function __construct(
         LoggerInterface $logger,
         EventLogger $eventLogger,
@@ -296,11 +293,9 @@ class EventScheduler
 
     public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
-        if (null !== $event) {
-            if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
-                // Event has days in week specified. Needs to be recalculated to the next day configured
-                return true;
-            }
+        if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
+            // Event has days in week specified. Needs to be recalculated to the next day configured
+            return true;
         }
 
         return $this->shouldSchedule($executionDate, $now);

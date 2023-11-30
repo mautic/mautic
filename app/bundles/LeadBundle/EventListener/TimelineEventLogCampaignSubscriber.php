@@ -23,9 +23,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
      */
     private $userHelper;
 
-    /**
-     * TimelineEventLogCampaignSubscriber constructor.
-     */
     public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, Translator $translator)
     {
         $this->eventLogRepository = $eventLogRepository;

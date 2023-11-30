@@ -36,10 +36,8 @@ class FormRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param null   $formType
-     *
-     * @return array
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null)
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -187,7 +185,7 @@ class FormRepository extends CommonRepository
             $query->setMaxResults((int) $options['limit']);
         }
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**

@@ -10,10 +10,8 @@ class CampaignEventHelper
      * Determine if this campaign applies.
      *
      * @param CampaignLeadChangeEvent $eventDetails
-     *
-     * @return bool
      */
-    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event): bool
     {
         if (null == $eventDetails) {
             return true;
