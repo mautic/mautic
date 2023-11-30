@@ -17,7 +17,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
     /**
      * @var AbstractIntegration
      */
-    private $integration;
+    private \Mautic\PluginBundle\Integration\UnifiedIntegrationInterface $integration;
 
     public function __construct(UnifiedIntegrationInterface $integration)
     {
