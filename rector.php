@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -17,6 +18,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         '*.html.php',
         ContainerGetToConstructorInjectionRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+        ],
+
+        ReturnTypeFromReturnDirectArrayRector::class => [
+            // require bit test update
+            __DIR__ . '/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
     ]);
 
@@ -67,8 +73,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 =======
 =======
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class,
+<<<<<<< HEAD
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
 >>>>>>> 7e6b4bdd00 ([type-declarations] Add known return array type declarations)
+=======
+        ReturnTypeFromReturnDirectArrayRector::class,
+>>>>>>> 4ad5a8a981 (skip case)
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
 >>>>>>> ac92883e64 ([type-declarations] Add return type declaration based on constants)
         \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
