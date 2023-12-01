@@ -595,8 +595,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set owner.
      *
-     * @param User $owner
-     *
      * @return Lead
      */
     public function setOwner(User $owner = null)
@@ -1394,8 +1392,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set stage.
-     *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
      *
      * @return Stage
      */

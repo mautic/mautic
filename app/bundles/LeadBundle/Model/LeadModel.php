@@ -1201,15 +1201,14 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     * @param null         $importId
-     * @param bool         $skipIfExists
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param null  $tags
+     * @param bool  $persist
+     * @param null  $importId
+     * @param bool  $skipIfExists
      *
      * @return bool|null
      *
@@ -1997,11 +1996,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */

@@ -300,8 +300,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)

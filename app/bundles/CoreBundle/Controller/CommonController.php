@@ -608,8 +608,6 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Renders notification info for ajax.
      *
-     * @param Request $request
-     *
      * @return array
      */
     protected function getNotificationContent(Request $request = null)

@@ -56,9 +56,7 @@ class EventLogModel extends AbstractCommonModel
 
     public function getRepository(): LeadEventLogRepository
     {
-        $result = $this->em->getRepository(LeadEventLog::class);
-
-        return $result;
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**

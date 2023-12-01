@@ -1084,12 +1084,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead lists.
      *
-     * @param array           $lists
-     * @param int|null        $limit
-     * @param int|null        $batch        True to process and batch all pending leads
-     * @param OutputInterface $output
-     * @param int             $minContactId
-     * @param int             $maxContactId
+     * @param array    $lists
+     * @param int|null $limit
+     * @param int|null $batch        True to process and batch all pending leads
+     * @param int      $minContactId
+     * @param int      $maxContactId
      *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
@@ -1597,7 +1596,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Send an email to lead(s).
      *
      * @param array|int $users
-     * @param array     $lead
      * @param bool      $saveStat
      *
      * @return bool|string[]
@@ -2099,11 +2097,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a list of emails in a date range, grouped by a stat date count.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2140,11 +2136,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a list of emails in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */

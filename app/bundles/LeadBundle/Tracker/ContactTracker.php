@@ -333,9 +333,6 @@ class ContactTracker
         return $lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     private function hydrateCustomFieldData(Lead $lead = null)
     {
         if (null === $lead) {

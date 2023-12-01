@@ -961,8 +961,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Form $unsubscribeForm
-     *
      * @return $this
      */
     public function setUnsubscribeForm(Form $unsubscribeForm = null)
@@ -981,8 +979,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Page $preferenceCenter
-     *
      * @return $this
      */
     public function setPreferenceCenter(Page $preferenceCenter = null)

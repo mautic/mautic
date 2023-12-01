@@ -20,7 +20,6 @@ class HitRepository extends CommonRepository
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
-     * @param Lead          $lead
      *
      * @return bool
      */
@@ -124,8 +123,7 @@ class HitRepository extends CommonRepository
     /**
      * Get an array of hits via an email clickthrough.
      *
-     * @param \DateTime $fromDate
-     * @param int       $code
+     * @param int $code
      */
     public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200): array
     {
@@ -260,7 +258,6 @@ class HitRepository extends CommonRepository
      * Get the number of bounces.
      *
      * @param array|string $pageIds
-     * @param \DateTime    $fromDate
      * @param bool         $isVariantCheck
      *
      * @return array

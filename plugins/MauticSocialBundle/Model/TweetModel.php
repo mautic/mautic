@@ -207,16 +207,12 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
 
     public function getRepository(): TweetRepository
     {
-        $result = $this->em->getRepository(Tweet::class);
-
-        return $result;
+        return $this->em->getRepository(Tweet::class);
     }
 
     public function getStatRepository(): TweetStatRepository
     {
-        $result = $this->em->getRepository(TweetStat::class);
-
-        return $result;
+        return $this->em->getRepository(TweetStat::class);
     }
 
     /**

@@ -211,8 +211,6 @@ class Submission
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Submission
      */
     public function setIpAddress(IpAddress $ipAddress = null)
@@ -256,8 +254,6 @@ class Submission
 
     /**
      * Set page.
-     *
-     * @param \Mautic\PageBundle\Entity\Page $page
      *
      * @return Submission
      */

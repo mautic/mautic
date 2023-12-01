@@ -295,9 +295,6 @@ class WebhookModel extends FormModel
         }
     }
 
-    /**
-     * @param WebhookQueue $queue
-     */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null): bool
     {
         // get the webhook payload
@@ -469,8 +466,6 @@ class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @param WebhookQueue $queue
      *
      * @return array
      */

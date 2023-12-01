@@ -136,11 +136,11 @@ class ColumnSchemaHelper
     /**
      * Add a column to the table.
      *
-     * @param array $column
      *                           ['name']    string (required) unique name of column; cannot already exist
      *                           ['type']    string (optional) Doctrine type for column; defaults to text
      *                           ['options'] array  (optional) Defining options for column
-     * @param bool  $checkExists Check if table exists; pass false if this has already been done
+     *
+     * @param bool $checkExists Check if table exists; pass false if this has already been done
      *
      * @return $this
      *

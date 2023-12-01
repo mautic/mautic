@@ -96,7 +96,6 @@ class TableSchemaHelper
     /**
      * Add a table to the db.
      *
-     * @param array $table
      *                     ['name']    string (required) unique name of table; cannot already exist
      *                     ['columns'] array  (optional) Array of columns to add in the format of
      *                     array(

@@ -196,9 +196,7 @@ class SubmissionModel extends CommonFormModel
 
     public function getRepository(): SubmissionRepository
     {
-        $result = $this->em->getRepository(Submission::class);
-
-        return $result;
+        return $this->em->getRepository(Submission::class);
     }
 
     /**
@@ -739,8 +737,6 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param resource     $handle
      * @param array<mixed> $row
-     *
-     * @return false|int
      */
     private function putCsvExportRow($handle, array $row): bool|int
     {
