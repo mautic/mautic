@@ -184,10 +184,8 @@ class DashboardModel extends FormModel
 
     /**
      * Creates a new Widget object from an array data.
-     *
-     * @return Widget
      */
-    public function populateWidgetEntity(array $data)
+    public function populateWidgetEntity(array $data): Widget
     {
         $entity = new Widget();
 

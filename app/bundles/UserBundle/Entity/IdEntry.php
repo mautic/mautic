@@ -64,10 +64,7 @@ class IdEntry
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getExpiryTime()
+    public function getExpiryTime(): \DateTime
     {
         $dt = new \DateTime();
         $dt->setTimestamp($this->expiryTimestamp);

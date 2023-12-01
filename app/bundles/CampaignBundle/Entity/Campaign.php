@@ -334,10 +334,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->events;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getRootEvents()
+    public function getRootEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
         $events   = $this->getEvents()->matching($criteria);
@@ -355,10 +352,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getInactionBasedEvents()
+    public function getInactionBasedEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
         $events   = $this->getEvents()->matching($criteria);
@@ -376,10 +370,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getEventsByType($type)
+    public function getEventsByType($type): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->getEvents()->matching($criteria);

@@ -20,10 +20,7 @@ class ConditionDispatcher
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @return ConditionEvent
-     */
-    public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log)
+    public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log): ConditionEvent
     {
         $event = new ConditionEvent($config, $log);
         $this->dispatcher->dispatch($event, $config->getEventName());

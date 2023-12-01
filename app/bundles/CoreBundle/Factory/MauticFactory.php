@@ -207,10 +207,8 @@ class MauticFactory
      * @param string $string
      * @param string $format
      * @param string $tz
-     *
-     * @return DateTimeHelper
      */
-    public function getDate($string = null, $format = null, $tz = 'local')
+    public function getDate($string = null, $format = null, $tz = 'local'): DateTimeHelper
     {
         return new DateTimeHelper($string, $format, $tz);
     }

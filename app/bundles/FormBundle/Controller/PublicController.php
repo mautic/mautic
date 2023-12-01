@@ -342,10 +342,8 @@ class PublicController extends CommonFormController
 
     /**
      * Generates JS file for automatic form generation.
-     *
-     * @return Response
      */
-    public function generateAction(Request $request)
+    public function generateAction(Request $request): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);

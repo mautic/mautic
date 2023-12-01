@@ -137,7 +137,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->defaultTheme = $defaultTheme;
     }
 
-    public function createThemeHelper($themeName)
+    public function createThemeHelper($themeName): twigThemeHelper
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;

@@ -47,11 +47,9 @@ class RequestStorageHelper
      *
      * @param string $key
      *
-     * @return Request
-     *
      * @throws \UnexpectedValueException
      */
-    public function getRequest($key)
+    public function getRequest($key): Request
     {
         $error = "Request with key '{$key}' was not found.";
         $key   = $this->removeCachePrefix($key);

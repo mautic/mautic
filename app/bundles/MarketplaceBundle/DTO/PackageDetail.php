@@ -35,7 +35,7 @@ final class PackageDetail
         $this->time             = $time;
     }
 
-    public static function fromArray(array $array)
+    public static function fromArray(array $array): self
     {
         return new self(
             new PackageBase(

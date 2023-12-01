@@ -30,11 +30,9 @@ class PublicController extends FormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \InvalidArgumentException
      */
-    public function callbackAction(Request $request, LoggerInterface $mauticLogger, LookupHelper $lookupHelper)
+    public function callbackAction(Request $request, LoggerInterface $mauticLogger, LookupHelper $lookupHelper): Response
     {
         if (!$request->request->has('body') || !$request->request->has('id')
             || !$request->request->has('type')

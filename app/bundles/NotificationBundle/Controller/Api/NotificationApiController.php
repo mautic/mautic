@@ -47,10 +47,8 @@ class NotificationApiController extends CommonApiController
 
     /**
      * Receive Web Push subscription request.
-     *
-     * @return JsonResponse
      */
-    public function subscribeAction(Request $request)
+    public function subscribeAction(Request $request): JsonResponse
     {
         $osid = $request->get('osid');
         if ($osid) {

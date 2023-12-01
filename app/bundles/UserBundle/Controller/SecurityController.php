@@ -111,20 +111,16 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginAction($integration)
+    public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginCheckAction($integration)
+    public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
 

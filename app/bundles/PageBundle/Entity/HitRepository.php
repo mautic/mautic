@@ -227,10 +227,8 @@ class HitRepository extends CommonRepository
      * Get the latest hit.
      *
      * @param array $options
-     *
-     * @return \DateTime
      */
-    public function getLatestHit($options)
+    public function getLatestHit($options): \DateTime
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit latest_hit')

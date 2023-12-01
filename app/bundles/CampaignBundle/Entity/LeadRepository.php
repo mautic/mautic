@@ -352,10 +352,8 @@ class LeadRepository extends CommonRepository
     /**
      * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
-     *
-     * @return CountResult
      */
-    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): CountResult
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return new CountResult(0, 0, 0);
@@ -429,10 +427,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param int $campaignId
-     *
-     * @return CountResult
      */
-    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter): CountResult
     {
         $segments = $this->getCampaignSegments($campaignId);
 

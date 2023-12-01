@@ -48,10 +48,7 @@ class SecurityController extends CommonController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function loginCheckAction()
+    public function loginCheckAction(): Response
     {
         return new Response('', 400);
     }

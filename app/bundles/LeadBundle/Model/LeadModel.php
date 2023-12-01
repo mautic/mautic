@@ -2286,10 +2286,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $persist
-     *
-     * @return Lead
      */
-    protected function createNewContact(IpAddress $ip, $persist = true)
+    protected function createNewContact(IpAddress $ip, $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

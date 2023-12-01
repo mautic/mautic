@@ -1177,7 +1177,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return ArrayCollection<int, Lead>
      */
-    public function getContactCollection(array $ids)
+    public function getContactCollection(array $ids): ArrayCollection
     {
         if (empty($ids)) {
             return new ArrayCollection();

@@ -46,11 +46,9 @@ class ContactSegmentQueryBuilder
      * @param int                   $segmentId
      * @param ContactSegmentFilters $segmentFilters
      *
-     * @return QueryBuilder
-     *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false)
+    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -98,11 +96,9 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function wrapInCount(QueryBuilder $qb)
+    public function wrapInCount(QueryBuilder $qb): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
