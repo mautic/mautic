@@ -20,7 +20,7 @@ class TweetListType extends AbstractType
                 'modal_header'        => 'mautic.integration.Twitter.new.tweet',
                 'model'               => 'social.tweet',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'   => 'tweet',
                         'filter' => '$data',

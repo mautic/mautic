@@ -239,10 +239,8 @@ class BuilderEvent extends Event
 
     /**
      * Get text of the search filter.
-     *
-     * @return array
      */
-    public function getTokenFilter()
+    public function getTokenFilter(): array
     {
         return [
             'target' => $this->tokenFilterTarget,

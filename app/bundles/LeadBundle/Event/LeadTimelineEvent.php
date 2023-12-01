@@ -347,10 +347,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetch start/limit for queries.
-     *
-     * @return array
      */
-    public function getEventLimit()
+    public function getEventLimit(): array
     {
         return [
             'leadId' => ($this->lead instanceof Lead) ? $this->lead->getId() : null,
@@ -435,10 +433,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get the date range to get counts by.
-     *
-     * @return array
      */
-    public function getCountDateRange()
+    public function getCountDateRange(): array
     {
         return ['from' => $this->dateFrom, 'to' => $this->dateTo];
     }

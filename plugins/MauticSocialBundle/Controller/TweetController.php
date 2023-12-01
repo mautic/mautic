@@ -68,10 +68,8 @@ class TweetController extends FormController
 
     /**
      * Define options to pass to the form when it's being created.
-     *
-     * @return array
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [
             'update_select'      => $this->getUpdateSelect(),

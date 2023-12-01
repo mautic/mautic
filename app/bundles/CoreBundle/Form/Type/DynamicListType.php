@@ -55,7 +55,7 @@ class DynamicListType extends AbstractType
                         'preaddon'      => function (Options $options) {
                             return $options['remove_icon'];
                         },
-                        'preaddon_attr' => function (Options $options) {
+                        'preaddon_attr' => function (Options $options): array {
                             return [
                                 'onclick' => $options['remove_onclick'],
                             ];

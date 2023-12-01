@@ -59,10 +59,8 @@ class LanguageHelper
      * Extracts a downloaded package for the specified language.
      *
      * This will attempt to download the package if it is not found
-     *
-     * @return array
      */
-    public function extractLanguagePackage($languageCode)
+    public function extractLanguagePackage($languageCode): array
     {
         $packagePath = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 
@@ -226,10 +224,8 @@ class LanguageHelper
      * Fetches a language package from the remote server.
      *
      * @param string $languageCode
-     *
-     * @return array
      */
-    public function fetchPackage($languageCode)
+    public function fetchPackage($languageCode): array
     {
         // Check if we have a cache file, generate it if not
         if (!is_readable($this->cacheFile)) {

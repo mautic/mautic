@@ -20,7 +20,7 @@ trait TranslationModelTrait
      *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
-    public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null)
+    public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null): array
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 

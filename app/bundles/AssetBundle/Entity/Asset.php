@@ -996,7 +996,7 @@ class Asset extends FormEntity
      *
      * @return string
      */
-    public function getFileExtensions()
+    public function getFileExtensions(): array
     {
         return [
             'excel' => [
@@ -1322,10 +1322,8 @@ class Asset extends FormEntity
 
     /**
      * @param string $unit
-     *
-     * @return array
      */
-    public static function convertBytesToUnit($size, $unit = '')
+    public static function convertBytesToUnit($size, $unit = ''): array
     {
         $unit = strtoupper($unit);
 

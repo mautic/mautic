@@ -31,10 +31,8 @@ class IcontactIntegration extends EmailAbstractIntegration
 
     /**
      * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret.
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'API-AppId'    => 'mautic.icontact.keyfield.appid',
@@ -43,10 +41,7 @@ class IcontactIntegration extends EmailAbstractIntegration
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [
             'API-Password',

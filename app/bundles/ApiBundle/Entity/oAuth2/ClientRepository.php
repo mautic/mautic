@@ -52,7 +52,7 @@ class ClientRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['c.name', 'ASC'],

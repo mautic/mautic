@@ -30,10 +30,8 @@ class FullContactIntegration extends AbstractIntegration
     /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         // Do not rename field. fullcontact.js depends on it
         return [

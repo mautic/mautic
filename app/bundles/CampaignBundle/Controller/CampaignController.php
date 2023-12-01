@@ -841,10 +841,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionEvents($id)
+    protected function getSessionEvents($id): array
     {
         $session = $this->getCurrentRequest()->getSession();
 
@@ -858,10 +856,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionSources($id, $isClone = false)
+    protected function getSessionSources($id, $isClone = false): array
     {
         $session = $this->getCurrentRequest()->getSession();
 

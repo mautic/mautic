@@ -95,10 +95,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [];
     }
@@ -121,10 +119,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return 'hapikey';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }
@@ -144,7 +139,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return array<string,bool>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => false,
@@ -175,7 +170,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }

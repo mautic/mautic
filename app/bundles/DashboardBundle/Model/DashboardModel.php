@@ -114,10 +114,8 @@ class DashboardModel extends FormModel
      * Useful for dashboard exports.
      *
      * @param string $name
-     *
-     * @return array
      */
-    public function toArray($name)
+    public function toArray($name): array
     {
         return [
             'name'        => $name,

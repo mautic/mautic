@@ -14,7 +14,7 @@ class PieChart extends AbstractChart implements ChartInterface
     /**
      * Render chart data.
      */
-    public function render($withCounts = true)
+    public function render($withCounts = true): array
     {
         $data = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
 

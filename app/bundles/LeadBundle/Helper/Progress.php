@@ -139,10 +139,8 @@ class Progress
 
     /**
      * Convert this object to a simple array.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             $this->done,

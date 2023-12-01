@@ -1102,7 +1102,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $maxContactId = null,
         int $maxThreads = null,
         int $threadId = null
-    ) {
+    ): array {
         // get the leads
         if (empty($lists)) {
             $lists = $email->getLists();

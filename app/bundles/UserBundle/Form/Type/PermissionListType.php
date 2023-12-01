@@ -20,7 +20,7 @@ class PermissionListType extends AbstractType
             'multiple'          => true,
             'expanded'          => true,
             'label_attr'        => ['class' => 'control-label'],
-            'attr'              => function (Options $options) {
+            'attr'              => function (Options $options): array {
                 return [
                     'data-permission' => $options['bundle'].':'.$options['level'],
                     'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',

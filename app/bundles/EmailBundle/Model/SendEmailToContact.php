@@ -382,10 +382,7 @@ class SendEmailToContact
         --$this->emailSentCounts[$emailId];
     }
 
-    /**
-     * @return array
-     */
-    protected function queueTokenizedEmail()
+    protected function queueTokenizedEmail(): array
     {
         list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
 

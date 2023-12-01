@@ -17,7 +17,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [
             'facebook',
@@ -27,7 +27,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'share_button',
@@ -144,7 +144,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'about'       => ['type' => 'string'],

@@ -26,10 +26,7 @@ class RelativeDate
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    private function getRelativeDateTranslationKeys()
+    private function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',

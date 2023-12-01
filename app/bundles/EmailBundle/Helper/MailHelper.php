@@ -1998,10 +1998,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return array
-     */
-    private function buildMetadata($name, array $tokens)
+    private function buildMetadata($name, array $tokens): array
     {
         return [
             'name'        => $name,

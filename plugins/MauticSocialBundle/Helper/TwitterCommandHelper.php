@@ -379,7 +379,7 @@ class TwitterCommandHelper
      *
      * @return array($firstName, $lastName)
      */
-    private function splitName($name)
+    private function splitName($name): array
     {
         // array the entire name
         $nameParts = explode(' ', $name);

@@ -110,10 +110,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return self::$types;
     }
 
-    /**
-     * @return array
-     */
-    public static function getListTypes()
+    public static function getListTypes(): array
     {
         return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
@@ -121,7 +118,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * @return array{0: bool, 1:string}
      */
-    public static function validateProperties($type, &$properties)
+    public static function validateProperties($type, &$properties): array
     {
         if (!array_key_exists($type, self::$types)) {
             // ensure the field type is supported
@@ -213,10 +210,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * Get date field choices.
-     *
-     * @return array
      */
-    public function getDateChoices()
+    public function getDateChoices(): array
     {
         return [
             'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),

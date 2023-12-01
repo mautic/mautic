@@ -195,7 +195,7 @@ trait TranslationEntityTrait
      *
      * @return array|\Doctrine\Common\Collections\ArrayCollection
      */
-    public function getTranslations($onlyChildren = false)
+    public function getTranslations($onlyChildren = false): array
     {
         $parent = $this->getTranslationParent();
 

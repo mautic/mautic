@@ -110,7 +110,7 @@ class DoctrineStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }

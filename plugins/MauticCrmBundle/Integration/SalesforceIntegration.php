@@ -83,10 +83,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'client_id'     => 'mautic.integration.keyfield.consumerid',
@@ -96,18 +94,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * Get the keys for the refresh token and expiry.
-     *
-     * @return array
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return ['refresh_token', ''];
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -388,10 +381,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     *
-     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object, $params = [])
+    public function amendLeadDataBeforeMauticPopulate($data, $object, $params = []): array
     {
         $updated               = 0;
         $created               = 0;
@@ -1092,7 +1083,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
@@ -1825,10 +1816,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $updateEntity;
     }
 
-    /**
-     * @return array
-     */
-    protected function getRequiredFieldString(array $config, array $availableFields, $object)
+    protected function getRequiredFieldString(array $config, array $availableFields, $object): array
     {
         $requiredFields = $this->getRequiredFields($availableFields[$object]);
 
@@ -1841,10 +1829,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$requiredFields, $requiredString];
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($config)
+    protected function prepareFieldsForPush($config): array
     {
         $leadFields = array_unique(array_values($config['leadFields']));
         $leadFields = array_combine($leadFields, $leadFields);
@@ -1934,10 +1919,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param int $totalUpdated
      * @param int $totalCreated
      * @param int $totalErrored
-     *
-     * @return array
      */
-    protected function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0)
+    protected function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): array
     {
         if (is_array($response)) {
             foreach ($response as $item) {
@@ -2622,7 +2605,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    public function pushCompanies($params = [])
+    public function pushCompanies($params = []): array
     {
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);

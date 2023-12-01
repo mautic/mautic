@@ -10,9 +10,6 @@ class BouncedHelper extends AbstractHelper
 {
     public const NAME = 'email-bounced';
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return self::NAME;

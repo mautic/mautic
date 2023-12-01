@@ -174,10 +174,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getDncReasons()
+    private function getDncReasons(): array
     {
         return [
             0 => $this->translator->trans('mautic.lead.report.dnc_contactable'),

@@ -9,9 +9,6 @@ class OpenedHelper extends AbstractHelper
 {
     public const NAME = 'email-opened';
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return self::NAME;

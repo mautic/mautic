@@ -39,7 +39,7 @@ class WidgetRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['w.ordering', 'ASC'],

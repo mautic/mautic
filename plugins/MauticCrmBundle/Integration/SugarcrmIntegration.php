@@ -99,10 +99,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return 'Sugarcrm';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         // Only push_lead is currently supported for version 7
         return ['push_lead', 'get_leads', 'push_leads'];
@@ -130,10 +127,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [
             'client_secret',
@@ -154,7 +149,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * SugarCRM 7 refresh tokens.
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return [
             'refresh_token',
@@ -218,10 +213,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'sugarcrm_url'  => 'mautic.sugarcrm.form.url',
@@ -1431,7 +1424,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
      *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
-    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
+    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
     {
         $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ('Leads' == $object) ? 'checkemail' : 'checkemail_contacts';
@@ -1599,10 +1592,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $response
-     *
-     * @return array
      */
-    protected function processCompositeResponse($response)
+    protected function processCompositeResponse($response): array
     {
         $created         = 0;
         $errored         = 0;

@@ -169,10 +169,8 @@ class NotificationModel extends FormModel
      * @param null $afterId
      * @param bool $includeRead
      * @param int  $limit
-     *
-     * @return array
      */
-    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
+    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null): array
     {
         if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];

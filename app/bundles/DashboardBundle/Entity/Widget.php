@@ -408,10 +408,7 @@ class Widget extends FormEntity
         return $this->loadTime;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name'     => $this->getName(),

@@ -20,10 +20,7 @@ class TelizeLookup extends AbstractRemoteDataLookup
         return "https://telize-v1.p.mashape.com/geoip/{$this->ip}";
     }
 
-    /**
-     * @return array
-     */
-    protected function getHeaders()
+    protected function getHeaders(): array
     {
         return [
             'X-Mashape-Key' => $this->auth,

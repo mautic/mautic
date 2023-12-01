@@ -70,7 +70,7 @@ class FocusRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             [$this->getTableAlias().'.name', 'ASC'],

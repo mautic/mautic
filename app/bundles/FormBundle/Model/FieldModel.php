@@ -67,7 +67,7 @@ class FieldModel extends CommonFormModel
     /**
      * @deprecated to be removed in Mautic 4. This method is not used anymore.
      */
-    public function getObjectFields($object = 'lead')
+    public function getObjectFields($object = 'lead'): array
     {
         $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
         $choices = [];

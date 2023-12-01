@@ -90,8 +90,6 @@ class MaxMindDoNotSellDownloadHelper
 
     /**
      * Service URL.
-     *
-     * @return string
      */
     public function getRemoteDataStoreDownloadUrl(): string
     {
