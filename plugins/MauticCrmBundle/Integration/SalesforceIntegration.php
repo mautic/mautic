@@ -193,9 +193,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 'oauth2';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;
@@ -1081,7 +1078,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function pushLeads($params = []): array
     {
@@ -2603,7 +2600,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function pushCompanies($params = []): array
     {

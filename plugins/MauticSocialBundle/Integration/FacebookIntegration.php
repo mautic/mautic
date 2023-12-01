@@ -15,7 +15,7 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function getIdentifierFields(): array
     {

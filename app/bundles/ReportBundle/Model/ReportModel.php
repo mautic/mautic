@@ -497,11 +497,7 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-<<<<<<< HEAD
-     * @return array
-=======
-     * @param FormFactoryInterface $formFactory
->>>>>>> 7e6b4bdd00 ([type-declarations] Add known return array type declarations)
+     * @return mixed[]
      */
     public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = []): array
     {

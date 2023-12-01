@@ -994,7 +994,7 @@ class Asset extends FormEntity
     /**
      * Returns array of common extensions.
      *
-     * @return string
+     * @return array<string, string[]>
      */
     public function getFileExtensions(): array
     {

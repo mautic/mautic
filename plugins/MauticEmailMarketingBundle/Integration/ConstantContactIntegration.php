@@ -177,11 +177,6 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|null
-     */
     public function getFormType(): string
     {
         return ConstantContactType::class;

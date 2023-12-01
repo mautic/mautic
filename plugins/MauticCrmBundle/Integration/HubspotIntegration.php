@@ -167,8 +167,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
     public function getDataPriority(): bool
     {

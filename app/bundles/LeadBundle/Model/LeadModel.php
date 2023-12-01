@@ -2173,6 +2173,9 @@ class LeadModel extends FormModel
         return [];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function setPrimaryCompany($companyId, $leadId)
     {
         $companyArray      = [];

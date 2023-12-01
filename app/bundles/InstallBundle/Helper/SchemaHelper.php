@@ -119,12 +119,10 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
-     *
      * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
-    public function installSchema()
+    public function installSchema(): bool
     {
         $sm = $this->db->getSchemaManager();
 

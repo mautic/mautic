@@ -175,9 +175,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;
@@ -719,7 +716,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function pushLeads($params = []): array
     {

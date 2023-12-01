@@ -824,7 +824,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function pushLeads($params = []): array
     {
@@ -1139,8 +1139,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
     public function getDataPriority(): bool
     {

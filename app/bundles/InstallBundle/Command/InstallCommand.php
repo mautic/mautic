@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -261,6 +262,8 @@ class InstallCommand extends Command
 
                         if (empty($options['force'])) {
                             // Ask user to confirm install when optional settings missing
+
+                            /** @var QuestionHelper $helper */
                             $helper   = $this->getHelper('question');
                             $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 

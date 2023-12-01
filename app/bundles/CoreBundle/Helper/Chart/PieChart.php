@@ -12,7 +12,7 @@ class PieChart extends AbstractChart implements ChartInterface
     protected $totalCount = 0;
 
     /**
-     * Render chart data.
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function render($withCounts = true): array
     {

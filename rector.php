@@ -17,12 +17,17 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         '*/Tests/*',
         '*.html.php',
         ContainerGetToConstructorInjectionRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+            // Requires quite a refactoring.
+            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
         ],
 
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
-            __DIR__ . '/app/bundles/LeadBundle/Model/LeadModel.php',
+            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+        ],
+
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
         ],
     ]);
 
@@ -64,23 +69,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
-<<<<<<< HEAD
-<<<<<<< HEAD
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
-
-=======
-=======
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class,
-<<<<<<< HEAD
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
->>>>>>> 7e6b4bdd00 ([type-declarations] Add known return array type declarations)
-=======
-        ReturnTypeFromReturnDirectArrayRector::class,
->>>>>>> 4ad5a8a981 (skip case)
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
->>>>>>> ac92883e64 ([type-declarations] Add return type declaration based on constants)
         \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
         \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
         \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,

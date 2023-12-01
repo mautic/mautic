@@ -228,11 +228,6 @@ class IcontactIntegration extends EmailAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|null
-     */
     public function getFormType(): string
     {
         return IcontactType::class;

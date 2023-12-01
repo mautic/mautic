@@ -66,6 +66,8 @@ class FieldModel extends CommonFormModel
 
     /**
      * @deprecated to be removed in Mautic 4. This method is not used anymore.
+     *
+     * @return array{mixed[], mixed[]}
      */
     public function getObjectFields($object = 'lead'): array
     {

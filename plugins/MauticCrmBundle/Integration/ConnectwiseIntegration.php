@@ -167,9 +167,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return 'basic';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;

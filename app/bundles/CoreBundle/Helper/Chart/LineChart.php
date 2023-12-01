@@ -55,7 +55,7 @@ class LineChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Render chart data.
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function render(): array
     {
