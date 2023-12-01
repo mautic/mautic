@@ -12,9 +12,7 @@
 .panel2 label {
     font-size:1em;
 }
-.panel:hover, .panel2:hover {
-    border-color:#ccc;
-}
+
 
 .form-submitaction-group-header {
     font-size: 1.1em;
