@@ -126,10 +126,8 @@ class HitRepository extends CommonRepository
      *
      * @param \DateTime $fromDate
      * @param int       $code
-     *
-     * @return array
      */
-    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200)
+    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

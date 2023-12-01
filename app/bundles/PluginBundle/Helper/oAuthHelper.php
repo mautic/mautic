@@ -92,10 +92,8 @@ class oAuthHelper
 
     /**
      * Get OAuth 1.0 Headers.
-     *
-     * @return array
      */
-    private function getOauthHeaders()
+    private function getOauthHeaders(): array
     {
         $oauth = [
             'oauth_consumer_key'     => $this->clientId,

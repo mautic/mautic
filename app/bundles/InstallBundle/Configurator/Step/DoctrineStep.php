@@ -117,8 +117,10 @@ class DoctrineStep implements StepInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed[]
      */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         $parameters = [];
 

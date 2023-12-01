@@ -470,10 +470,7 @@ class LeadListRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * @return array
-     */
-    public function getRelativeDateStrings()
+    public function getRelativeDateStrings(): array
     {
         $keys = self::getRelativeDateTranslationKeys();
 

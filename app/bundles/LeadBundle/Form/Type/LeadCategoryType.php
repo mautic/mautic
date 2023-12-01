@@ -20,7 +20,7 @@ class LeadCategoryType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices'           => function (Options $options) {
+            'choices'           => function (Options $options): array {
                 $categories = $this->categoryModel->getLookupResults('global');
                 $choices    = [];
 

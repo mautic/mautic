@@ -166,6 +166,8 @@ class IntegrationEntityRepository extends CommonRepository
      * @param null         $toDate
      * @param array|string $integrationEntity
      * @param array        $excludeIntegrationIds
+     *
+     * @return mixed[]
      */
     public function findLeadsToUpdate(
         $integration,
@@ -176,7 +178,7 @@ class IntegrationEntityRepository extends CommonRepository
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
-    ) {
+    ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
         } else {

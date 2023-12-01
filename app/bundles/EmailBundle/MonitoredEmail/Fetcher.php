@@ -143,10 +143,7 @@ class Fetcher
         return $messages;
     }
 
-    /**
-     * @return array
-     */
-    private function getConfigs()
+    private function getConfigs(): array
     {
         $mailboxes = [];
         foreach ($this->mailboxes as $mailbox) {

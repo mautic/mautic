@@ -1320,11 +1320,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getCampaignChoices()
+    public function getCampaignChoices(): array
     {
         $choices   = [];
         $campaigns = $this->getCampaigns();
@@ -1444,10 +1442,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getMixedLeadFields($fields, $object)
+    public function getMixedLeadFields($fields, $object): array
     {
         $mixedFields = array_filter($fields['leadFields']);
         $fields      = [];

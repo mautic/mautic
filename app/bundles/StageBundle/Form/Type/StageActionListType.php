@@ -20,7 +20,7 @@ class StageActionListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $stages = $this->model->getUserStages();
 
                 $choices = [];

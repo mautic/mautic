@@ -100,10 +100,8 @@ trait FrequencyRuleTrait
      * @param null $leadChannels
      * @param bool $isPublic
      * @param null $frequencyRules
-     *
-     * @return array
      */
-    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false): array
     {
         $data = [];
 

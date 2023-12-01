@@ -29,10 +29,8 @@ class ReloadHelper
 
     /**
      * Disables plugins that are in the database but are missing in the filesystem.
-     *
-     * @return array
      */
-    public function disableMissingPlugins(array $allPlugins, array $installedPlugins)
+    public function disableMissingPlugins(array $allPlugins, array $installedPlugins): array
     {
         $disabledPlugins = [];
 
@@ -50,10 +48,8 @@ class ReloadHelper
     /**
      * Re-enables plugins that were disabled because they were missing in the filesystem
      * but appeared in it again.
-     *
-     * @return array
      */
-    public function enableFoundPlugins(array $allPlugins, array $installedPlugins)
+    public function enableFoundPlugins(array $allPlugins, array $installedPlugins): array
     {
         $enabledPlugins = [];
 
@@ -70,10 +66,8 @@ class ReloadHelper
 
     /**
      * Updates plugins that exist in the filesystem and in the database and their version changed.
-     *
-     * @return array
      */
-    public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas)
+    public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
         $updatedPlugins = [];
 
@@ -110,10 +104,8 @@ class ReloadHelper
 
     /**
      * Installs plugins that does not exist in the database yet.
-     *
-     * @return array
      */
-    public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas)
+    public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
         $installedPlugins = [];
 

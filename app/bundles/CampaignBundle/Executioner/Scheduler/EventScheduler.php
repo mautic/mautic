@@ -241,11 +241,9 @@ class EventScheduler
     /**
      * @param ArrayCollection|Event[] $events
      *
-     * @return array
-     *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate)
+    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate): array
     {
         $eventExecutionDates = [];
 

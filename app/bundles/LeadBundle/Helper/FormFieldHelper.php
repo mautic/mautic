@@ -154,10 +154,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return array_combine($countries, $countries);
     }
 
-    /**
-     * @return array
-     */
-    public static function getRegionChoices()
+    public static function getRegionChoices(): array
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);

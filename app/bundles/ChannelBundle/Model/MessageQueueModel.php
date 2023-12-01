@@ -63,8 +63,6 @@ class MessageQueueModel extends FormModel
      * @param string $statTableName
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
     public function processFrequencyRules(
         array &$leads,
@@ -77,7 +75,7 @@ class MessageQueueModel extends FormModel
         $statTableName = 'email_stats',
         $statContactColumn = 'lead_id',
         $statSentColumn = 'date_sent'
-    ) {
+    ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 

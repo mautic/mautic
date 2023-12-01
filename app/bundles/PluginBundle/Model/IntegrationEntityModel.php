@@ -42,7 +42,10 @@ class IntegrationEntityModel extends FormModel
         );
     }
 
-    public function getRecordList($integrationObject)
+    /**
+     * @return array<mixed, array<'id', mixed>>
+     */
+    public function getRecordList($integrationObject): array
     {
         $recordList = [];
 

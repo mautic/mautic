@@ -823,10 +823,8 @@ class LeadModel extends FormModel
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
-     *
-     * @return array
      */
-    public function organizeFieldsByGroup($fields)
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -1135,10 +1133,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $manuallyAdded
-     *
-     * @return array
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true)
+    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true): array
     {
         $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
 
@@ -1193,10 +1189,7 @@ class LeadModel extends FormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadCategories(Lead $lead)
+    public function getLeadCategories(Lead $lead): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
         $leadCategoryList = [];
@@ -1912,10 +1905,8 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -2132,10 +2123,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getContactChannels(Lead $lead)
+    public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 
@@ -2151,10 +2140,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getDoNotContactChannels(Lead $lead)
+    public function getDoNotContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 

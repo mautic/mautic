@@ -97,10 +97,8 @@ class FormBuilderEvent extends Event
 
     /**
      * Get submit actions by groups.
-     *
-     * @return array
      */
-    public function getSubmitActionGroups()
+    public function getSubmitActionGroups(): array
     {
         $actions = $this->getSubmitActions();
         $groups  = [];

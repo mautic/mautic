@@ -85,10 +85,8 @@ class StageBuilderEvent extends Event
 
     /**
      * Gets a list of actions supported by the choice form field.
-     *
-     * @return array
      */
-    public function getActionList()
+    public function getActionList(): array
     {
         $list    = [];
         $actions = $this->getActions();
@@ -99,7 +97,10 @@ class StageBuilderEvent extends Event
         return $list;
     }
 
-    public function getActionChoices()
+    /**
+     * @return mixed[]
+     */
+    public function getActionChoices(): array
     {
         $choices = [];
         $actions = $this->getActions();

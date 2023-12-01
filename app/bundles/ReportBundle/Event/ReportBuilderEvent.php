@@ -238,7 +238,10 @@ class ReportBuilderEvent extends AbstractReportEvent
         ];
     }
 
-    public function getChannelColumns()
+    /**
+     * @return array<MauticReportBuilder::*, mixed[]>
+     */
+    public function getChannelColumns(): array
     {
         $channelColumns = [
             MauticReportBuilder::CHANNEL_COLUMN_CATEGORY_ID => [

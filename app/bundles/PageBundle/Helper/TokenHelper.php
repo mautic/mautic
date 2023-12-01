@@ -16,10 +16,7 @@ class TokenHelper
         $this->model = $model;
     }
 
-    /**
-     * @return array
-     */
-    public function findPageTokens($content, $clickthrough = [])
+    public function findPageTokens($content, $clickthrough = []): array
     {
         preg_match_all('/{pagelink=(.*?)}/', $content, $matches);
 

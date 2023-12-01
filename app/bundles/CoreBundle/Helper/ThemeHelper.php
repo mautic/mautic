@@ -238,7 +238,10 @@ class ThemeHelper implements ThemeHelperInterface
         $this->filesystem->dumpFile($configJsonPath, json_encode($config));
     }
 
-    public function getOptionalSettings()
+    /**
+     * @return mixed[]
+     */
+    public function getOptionalSettings(): array
     {
         $minors = [];
 

@@ -98,10 +98,8 @@ class BuilderEvent extends Event
 
     /**
      * Get list of AB Test winner criteria.
-     *
-     * @return array
      */
-    public function getAbTestWinnerCriteria()
+    public function getAbTestWinnerCriteria(): array
     {
         uasort(
             $this->abTestWinnerCriteria,

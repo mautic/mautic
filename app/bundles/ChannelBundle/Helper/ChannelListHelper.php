@@ -31,10 +31,8 @@ class ChannelListHelper
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getChannelList()
+    public function getChannelList(): array
     {
         $channels = [];
         foreach ($this->getChannels() as $channel => $details) {

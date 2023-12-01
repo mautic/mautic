@@ -29,10 +29,8 @@ trait FormFieldTrait
 
     /**
      * @param bool $asTokens
-     *
-     * @return array
      */
-    protected function getFormFields($formId, $asTokens = true)
+    protected function getFormFields($formId, $asTokens = true): array
     {
         $fields   = $this->fieldModel->getSessionFields($formId);
         $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];

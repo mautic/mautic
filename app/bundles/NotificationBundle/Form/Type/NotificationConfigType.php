@@ -92,7 +92,7 @@ class NotificationConfigType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'validation_groups' => function (FormInterface $form) {
+            'validation_groups' => function (FormInterface $form): array {
                 $data   = $form->getData();
                 $groups = ['Default'];
                 if (!$data['webhook_send_notification_to_author']) {

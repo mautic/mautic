@@ -6,10 +6,8 @@ class Address
 {
     /**
      * @param string $addresses String of email address from an email header
-     *
-     * @return array
      */
-    public static function parseList($addresses)
+    public static function parseList($addresses): array
     {
         $results         = [];
         $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');

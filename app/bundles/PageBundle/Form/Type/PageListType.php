@@ -37,7 +37,7 @@ class PageListType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($model, $canViewOther) {
+                'choices' => function (Options $options) use ($model, $canViewOther): array {
                     $choices       = [];
                     $publishedOnly = $options['published_only'] ?? false;
                     $pages         = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);

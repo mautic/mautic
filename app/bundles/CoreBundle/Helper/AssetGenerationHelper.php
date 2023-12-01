@@ -240,10 +240,8 @@ class AssetGenerationHelper
      * @param string $ext
      * @param string $env
      * @param array  $assets
-     *
-     * @return array
      */
-    protected function findAssets($dir, $ext, $env, &$assets)
+    protected function findAssets($dir, $ext, $env, &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -330,10 +328,8 @@ class AssetGenerationHelper
 
     /**
      * Find asset overrides in the template.
-     *
-     * @return array
      */
-    protected function findOverrides($env, &$assets)
+    protected function findOverrides($env, &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');

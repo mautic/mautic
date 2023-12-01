@@ -1012,10 +1012,7 @@ class Mailbox
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getParameters($partStructure)
+    protected function getParameters($partStructure): array
     {
         $params = [];
         if (!empty($partStructure->parameters)) {
