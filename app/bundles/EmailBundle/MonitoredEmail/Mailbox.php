@@ -315,9 +315,8 @@ class Mailbox
     /**
      * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
      *
-     * @param int   $options
-     * @param int   $retriesNum
-     * @param array $params
+     * @param int $options
+     * @param int $retriesNum
      */
     public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null)
     {
@@ -793,10 +792,8 @@ class Mailbox
      * Get mail data.
      *
      * @param bool $markAsSeen
-     *
-     * @return Message
      */
-    public function getMail($mailId, $markAsSeen = true)
+    public function getMail($mailId, $markAsSeen = true): Message
     {
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);
@@ -1012,10 +1009,7 @@ class Mailbox
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getParameters($partStructure)
+    protected function getParameters($partStructure): array
     {
         $params = [];
         if (!empty($partStructure->parameters)) {

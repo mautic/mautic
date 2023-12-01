@@ -22,8 +22,6 @@ class ErrorHandlingListener implements EventSubscriberInterface
 
     /**
      * ErrorHandlingListener constructor.
-     *
-     * @param LoggerInterface $debugLogger
      */
     public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger = null)
     {

@@ -122,7 +122,7 @@ class TransportChain
      *
      * @return TransportInterface[]
      */
-    public function getEnabledTransports()
+    public function getEnabledTransports(): array
     {
         $enabled = [];
         foreach ($this->transports as $alias => $transport) {

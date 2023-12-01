@@ -76,12 +76,10 @@ class ReportDAO
     }
 
     /**
-     * @return InformationChangeRequestDAO
-     *
      * @throws ObjectNotFoundException
      * @throws FieldNotFoundException
      */
-    public function getInformationChangeRequest($objectName, $objectId, $fieldName)
+    public function getInformationChangeRequest($objectName, $objectId, $fieldName): InformationChangeRequestDAO
     {
         if (empty($this->objects[$objectName][$objectId])) {
             throw new ObjectNotFoundException($objectName.':'.$objectId);

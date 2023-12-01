@@ -201,7 +201,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
     }
 
-    public function getEmailCountStatsAction(Request $request)
+    public function getEmailCountStatsAction(Request $request): JsonResponse
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');

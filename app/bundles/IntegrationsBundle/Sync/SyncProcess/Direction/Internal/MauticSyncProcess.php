@@ -114,12 +114,10 @@ class MauticSyncProcess
     }
 
     /**
-     * @return OrderDAO
-     *
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      */
-    public function getSyncOrder(ReportDAO $syncReport)
+    public function getSyncOrder(ReportDAO $syncReport): OrderDAO
     {
         $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 

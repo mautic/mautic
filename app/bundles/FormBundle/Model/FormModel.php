@@ -961,11 +961,9 @@ class FormModel extends CommonFormModel
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -1017,10 +1015,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Extract script from html.
-     *
-     * @return array
      */
-    private function extractScriptTag($html)
+    private function extractScriptTag($html): array
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();

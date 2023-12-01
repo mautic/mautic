@@ -36,10 +36,8 @@ class StatRepository extends CommonRepository
      * Updates lead ID (e.g. after a lead merge).
      *
      * @param null $listId
-     *
-     * @return array
      */
-    public function getSentStats($notificationId, $listId = null)
+    public function getSentStats($notificationId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -222,10 +220,8 @@ class StatRepository extends CommonRepository
      * Get sent counts based grouped by notification Id.
      *
      * @param array $notificationIds
-     *
-     * @return array
      */
-    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')

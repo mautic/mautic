@@ -17,7 +17,6 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     protected $vars;
 
     /**
-     * @param Request     $request
      * @param string|null $template
      */
     public function __construct(Request $request = null, $template = null, array $vars = [])

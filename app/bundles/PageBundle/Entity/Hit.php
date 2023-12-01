@@ -610,8 +610,6 @@ class Hit
     /**
      * Set page.
      *
-     * @param Page $page
-     *
      * @return Hit
      */
     public function setPage(Page $page = null)

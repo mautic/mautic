@@ -823,10 +823,8 @@ class LeadModel extends FormModel
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
-     *
-     * @return array
      */
-    public function organizeFieldsByGroup($fields)
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -1135,10 +1133,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $manuallyAdded
-     *
-     * @return array
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true)
+    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true): array
     {
         $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
 
@@ -1193,10 +1189,7 @@ class LeadModel extends FormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadCategories(Lead $lead)
+    public function getLeadCategories(Lead $lead): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
         $leadCategoryList = [];
@@ -1208,15 +1201,14 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     * @param null         $importId
-     * @param bool         $skipIfExists
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param null  $tags
+     * @param bool  $persist
+     * @param null  $importId
+     * @param bool  $skipIfExists
      *
      * @return bool|null
      *
@@ -1912,10 +1904,8 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -2006,11 +1996,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2132,10 +2120,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getContactChannels(Lead $lead)
+    public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 
@@ -2151,10 +2137,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getDoNotContactChannels(Lead $lead)
+    public function getDoNotContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 
@@ -2299,10 +2283,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $persist
-     *
-     * @return Lead
      */
-    protected function createNewContact(IpAddress $ip, $persist = true)
+    protected function createNewContact(IpAddress $ip, $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

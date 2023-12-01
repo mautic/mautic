@@ -84,10 +84,8 @@ class PointBuilderEvent extends Event
 
     /**
      * Gets a list of actions supported by the choice form field.
-     *
-     * @return array
      */
-    public function getActionList()
+    public function getActionList(): array
     {
         $list    = [];
         $actions = $this->getActions();
@@ -98,7 +96,10 @@ class PointBuilderEvent extends Event
         return $list;
     }
 
-    public function getActionChoices()
+    /**
+     * @return mixed[]
+     */
+    public function getActionChoices(): array
     {
         $choices = [];
         foreach ($this->actions as $k => $c) {

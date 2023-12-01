@@ -157,10 +157,8 @@ class CommonController extends AbstractController implements MauticController
      * Determines if ajax content should be returned or direct content (page refresh).
      *
      * @param array $args
-     *
-     * @return JsonResponse|Response
      */
-    public function delegateView($args)
+    public function delegateView($args): Response
     {
         $request = $this->getCurrentRequest();
         $bundle  = $request->query->get('bundle');
@@ -299,10 +297,8 @@ class CommonController extends AbstractController implements MauticController
      * Generates html for ajax request.
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
-     *
-     * @return Response
      */
-    public function ajaxAction(Request $request, $args = [])
+    public function ajaxAction(Request $request, $args = []): Response
     {
         defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
 
@@ -611,8 +607,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @param Request $request
      *
      * @return array
      */

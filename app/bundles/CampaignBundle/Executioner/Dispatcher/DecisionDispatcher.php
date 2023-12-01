@@ -33,10 +33,8 @@ class DecisionDispatcher
 
     /**
      * @param mixed $passthrough
-     *
-     * @return DecisionEvent
      */
-    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
+    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough): DecisionEvent
     {
         $event = new DecisionEvent($config, $log, $passthrough);
         $this->dispatcher->dispatch($event, $config->getEventName());
@@ -44,10 +42,7 @@ class DecisionDispatcher
         return $event;
     }
 
-    /**
-     * @return DecisionEvent
-     */
-    public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log)
+    public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log): DecisionEvent
     {
         $event = new DecisionEvent($config, $log);
 

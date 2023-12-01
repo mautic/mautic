@@ -153,10 +153,8 @@ class UserRepository extends CommonRepository
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         $q = $this->createQueryBuilder('u');
 

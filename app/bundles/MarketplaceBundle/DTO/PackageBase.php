@@ -33,7 +33,7 @@ final class PackageBase
         $this->type        = $type;
     }
 
-    public static function fromArray(array $array)
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['name'],

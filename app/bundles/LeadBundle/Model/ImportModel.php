@@ -505,10 +505,8 @@ class ImportModel extends FormModel
      * Initialize LeadEventLog object and configure it as the import event.
      *
      * @param int $lineNumber
-     *
-     * @return LeadEventLog
      */
-    public function initEventLog(Import $import, $lineNumber)
+    public function initEventLog(Import $import, $lineNumber): LeadEventLog
     {
         $eventLog = new LeadEventLog();
         $eventLog->setUserId($import->getCreatedBy())
@@ -685,7 +683,6 @@ class ImportModel extends FormModel
      * Logs a debug message if in dev environment.
      *
      * @param string $msg
-     * @param Import $import
      */
     protected function logDebug($msg, Import $import = null)
     {

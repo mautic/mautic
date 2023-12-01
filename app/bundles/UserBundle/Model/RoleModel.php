@@ -20,9 +20,7 @@ class RoleModel extends FormModel
 {
     public function getRepository(): RoleRepository
     {
-        $result = $this->em->getRepository(Role::class);
-
-        return $result;
+        return $this->em->getRepository(Role::class);
     }
 
     /**

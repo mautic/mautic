@@ -455,8 +455,10 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get total number of events for pagination.
+     *
+     * @return mixed[]
      */
-    public function getEventCounter()
+    public function getEventCounter(): array
     {
         // BC support for old formats
         foreach ($this->events as $type => $events) {

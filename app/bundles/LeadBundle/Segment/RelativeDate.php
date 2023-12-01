@@ -14,10 +14,7 @@ class RelativeDate
         $this->translator = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public function getRelativeDateStrings()
+    public function getRelativeDateStrings(): array
     {
         $keys = $this->getRelativeDateTranslationKeys();
 

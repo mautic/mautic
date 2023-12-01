@@ -911,10 +911,8 @@ class FieldModel extends FormModel
 
     /**
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldListWithProperties($object = 'lead')
+    public function getFieldListWithProperties($object = 'lead'): array
     {
         $forceFilters[] = [
             'column' => 'f.object',

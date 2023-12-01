@@ -252,10 +252,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(Form $form)
+    public static function determineValidationGroups(Form $form): array
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
@@ -574,8 +571,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -787,9 +782,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @param UserInterface $user
-     *
-     * Needed for SAML to work correctly
+     * Needed for SAML to work correctly.
      */
     public function isEqualTo(UserInterface $user)
     {

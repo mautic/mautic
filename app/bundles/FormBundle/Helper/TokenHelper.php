@@ -23,10 +23,7 @@ class TokenHelper
         $this->security  = $security;
     }
 
-    /**
-     * @return array
-     */
-    public function findFormTokens($content)
+    public function findFormTokens($content): array
     {
         $tokens = [];
 

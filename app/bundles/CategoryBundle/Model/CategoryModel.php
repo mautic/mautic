@@ -40,9 +40,7 @@ class CategoryModel extends FormModel
 
     public function getRepository(): CategoryRepository
     {
-        $result = $this->em->getRepository(Category::class);
-
-        return $result;
+        return $this->em->getRepository(Category::class);
     }
 
     public function getNameGetter()

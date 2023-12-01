@@ -261,10 +261,8 @@ class WebhookModel extends FormModel
 
     /**
      * Creates a WebhookQueue entity, sets the date and returns the created entity.
-     *
-     * @return WebhookQueue
      */
-    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = [])
+    public function queueWebhook(Webhook $webhook, $event, $payload, array $serializationGroups = []): WebhookQueue
     {
         $serializedPayload = $this->serializeData($payload, $serializationGroups);
 
@@ -297,9 +295,6 @@ class WebhookModel extends FormModel
         }
     }
 
-    /**
-     * @param WebhookQueue $queue
-     */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null): bool
     {
         // get the webhook payload
@@ -471,8 +466,6 @@ class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @param WebhookQueue $queue
      *
      * @return array
      */

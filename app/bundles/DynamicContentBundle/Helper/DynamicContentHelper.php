@@ -122,10 +122,8 @@ class DynamicContentHelper
     /**
      * @param string    $content
      * @param Lead|null $lead
-     *
-     * @return array
      */
-    public function findDwcTokens($content, $lead)
+    public function findDwcTokens($content, $lead): array
     {
         preg_match_all('/{dwc=(.*?)}/', $content, $matches);
 

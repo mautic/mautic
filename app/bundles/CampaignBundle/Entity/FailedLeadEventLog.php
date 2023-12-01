@@ -66,8 +66,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param LeadEventLog $log
-     *
      * @return FailedLeadEventLog
      */
     public function setLog(LeadEventLog $log = null)
@@ -90,8 +88,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return FailedLeadEventLog
      */
     public function setDateAdded(\DateTime $dateAdded = null)

@@ -11,11 +11,9 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 class DsnParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message)
+    public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
         $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;

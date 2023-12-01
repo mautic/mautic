@@ -19,10 +19,8 @@ class LeadRepository extends CommonRepository
      * Get the details of leads added to a campaign.
      *
      * @param null $leads
-     *
-     * @return array
      */
-    public function getLeadDetails($campaignId, $leads = null)
+    public function getLeadDetails($campaignId, $leads = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
@@ -165,10 +163,8 @@ class LeadRepository extends CommonRepository
      * @param int $campaignId
      * @param int $decisionId
      * @param int $parentDecisionId
-     *
-     * @return array
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
     {
         // Main query
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
@@ -304,10 +300,7 @@ class LeadRepository extends CommonRepository
         return $totalCount;
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignMembers(array $contactIds, Campaign $campaign)
+    public function getCampaignMembers(array $contactIds, Campaign $campaign): array
     {
         $qb = $this->createQueryBuilder('l');
 
@@ -332,10 +325,7 @@ class LeadRepository extends CommonRepository
         return $campaignMembers;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactRotations(array $contactIds, $campaignId)
+    public function getContactRotations(array $contactIds, $campaignId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.lead_id, cl.rotation')
@@ -362,10 +352,8 @@ class LeadRepository extends CommonRepository
     /**
      * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
-     *
-     * @return CountResult
      */
-    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): CountResult
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return new CountResult(0, 0, 0);
@@ -439,10 +427,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param int $campaignId
-     *
-     * @return CountResult
      */
-    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter): CountResult
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -465,10 +451,7 @@ class LeadRepository extends CommonRepository
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
-    /**
-     * @return array
-     */
-    public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
+    public function getOrphanedContacts($campaignId, ContactLimiter $limiter): array
     {
         $segments = $this->getCampaignSegments($campaignId);
 

@@ -97,10 +97,8 @@ class FormBuilderEvent extends Event
 
     /**
      * Get submit actions by groups.
-     *
-     * @return array
      */
-    public function getSubmitActionGroups()
+    public function getSubmitActionGroups(): array
     {
         $actions = $this->getSubmitActions();
         $groups  = [];
@@ -174,7 +172,6 @@ class FormBuilderEvent extends Event
     /**
      * Add a field validator.
      *
-     * @param array $validator
      *                         $validator = [
      *                         'eventName' => (required) Event name to dispatch to validate the form; it will recieve a ValidationEvent object
      *                         'fieldType' => (optional) Optional filter to validate only a specific type of field; otherwise every field

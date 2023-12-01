@@ -278,8 +278,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseFromDate
-     *
      * @return FrequencyRule
      */
     public function setPauseFromDate(\DateTime $pauseFromDate = null)
@@ -300,8 +298,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseToDate
-     *
      * @return FrequencyRule
      */
     public function setPauseToDate(\DateTime $pauseToDate = null)

@@ -58,9 +58,7 @@ class DashboardModel extends FormModel
 
     public function getRepository(): WidgetRepository
     {
-        $result = $this->em->getRepository(Widget::class);
-
-        return $result;
+        return $this->em->getRepository(Widget::class);
     }
 
     /**
@@ -184,10 +182,8 @@ class DashboardModel extends FormModel
 
     /**
      * Creates a new Widget object from an array data.
-     *
-     * @return Widget
      */
-    public function populateWidgetEntity(array $data)
+    public function populateWidgetEntity(array $data): Widget
     {
         $entity = new Widget();
 

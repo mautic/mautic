@@ -101,12 +101,12 @@ class InactiveHelperTest extends TestCase
 
         $this->eventLogRepository->expects($this->once())
             ->method('getDatesExecuted')
-            ->willReturn(new ArrayCollection([
+            ->willReturn([
                 $leadNegative->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadNegative2->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadPositive->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-            ]));
+            ]);
 
         /** @var LeadEventLog&MockObject */
         $log = $this->createMock(LeadEventLog::class);

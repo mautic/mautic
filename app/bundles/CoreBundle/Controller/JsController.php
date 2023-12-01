@@ -8,10 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
-    /**
-     * @return Response
-     */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);

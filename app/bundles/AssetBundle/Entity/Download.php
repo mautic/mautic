@@ -232,8 +232,6 @@ class Download
     /**
      * Set asset.
      *
-     * @param Asset $asset
-     *
      * @return Download
      */
     public function setAsset(Asset $asset = null)

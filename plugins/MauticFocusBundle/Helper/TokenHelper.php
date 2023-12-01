@@ -33,10 +33,7 @@ class TokenHelper
         $this->security = $security;
     }
 
-    /**
-     * @return array
-     */
-    public function findFocusTokens($content)
+    public function findFocusTokens($content): array
     {
         $regex = '/'.$this->regex.'/i';
 

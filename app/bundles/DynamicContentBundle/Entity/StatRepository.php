@@ -13,10 +13,7 @@ class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return array
-     */
-    public function getSentStats($dynamicContentId)
+    public function getSentStats($dynamicContentId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -67,12 +64,9 @@ class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by dynamic content Id.
      *
-     * @param array     $dynamicContentIds
-     * @param \DateTime $fromDate
-     *
-     * @return array
+     * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')

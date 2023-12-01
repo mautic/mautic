@@ -49,10 +49,7 @@ class AssetListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getAssetChoices()
+    private function getAssetChoices(): array
     {
         $choices   = [];
         $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');

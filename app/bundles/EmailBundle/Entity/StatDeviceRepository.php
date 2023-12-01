@@ -11,8 +11,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class StatDeviceRepository extends CommonRepository
 {
     /**
-     * @param \DateTime $fromDate
-     *
      * @return array
      */
     public function getDeviceStats($emailIds, \DateTime $fromDate = null, \DateTime $toDate = null)

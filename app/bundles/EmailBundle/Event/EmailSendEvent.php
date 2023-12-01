@@ -311,10 +311,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Generate a clickthrough array for URLs.
-     *
-     * @return array
      */
-    public function generateClickthrough()
+    public function generateClickthrough(): array
     {
         $source       = $this->getSource();
         $email        = $this->getEmail();
@@ -361,8 +359,7 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getContent();
         $content .= $this->getPlainText();
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
-        $content .= implode(' ', $this->getTextHeaders());
 
-        return $content;
+        return $content.implode(' ', $this->getTextHeaders());
     }
 }

@@ -440,10 +440,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get list of sources for a campaign.
-     *
-     * @return array
      */
-    public function getLeadSources($campaign)
+    public function getLeadSources($campaign): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -554,7 +552,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param Lead $lead
      * @param bool $forList
      *
      * @return mixed
@@ -784,9 +781,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      */
@@ -797,10 +793,7 @@ class CampaignModel extends CommonFormModel
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignIdsWithDependenciesOnSegment($segmentId)
+    public function getCampaignIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities = $this->getRepository()->getEntities(
             [

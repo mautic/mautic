@@ -308,10 +308,7 @@ class SchemaHelper
         return $sql;
     }
 
-    /**
-     * @return array
-     */
-    protected function dropExistingSchema($tables, $mauticTables)
+    protected function dropExistingSchema($tables, $mauticTables): array
     {
         $sql = [];
 

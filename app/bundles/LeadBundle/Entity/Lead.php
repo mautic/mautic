@@ -595,8 +595,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set owner.
      *
-     * @param User $owner
-     *
      * @return Lead
      */
     public function setOwner(User $owner = null)
@@ -1395,8 +1393,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set stage.
      *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
-     *
      * @return Stage
      */
     public function setStage(Stage $stage = null)
@@ -1882,8 +1878,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used mostly when batching to generate preferred channels without hydrating associations one at a time.
+     *
+     * @return array<mixed, array<'dnc'|'frequency', mixed>>
      */
-    public static function generateChannelRules(array $frequencyRules, array $dncRules)
+    public static function generateChannelRules(array $frequencyRules, array $dncRules): array
     {
         $rules             = [];
         $dncFrequencyRules = [];

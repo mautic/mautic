@@ -583,9 +583,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Get an array of rows from one table using DBAL.
      *
-     * @param int   $start
-     * @param int   $limit
-     * @param array $select
+     * @param int $start
+     * @param int $limit
      *
      * @return array
      */
@@ -670,12 +669,11 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Gets a list of published entities as an array id => label.
      *
-     * @param CompositeExpression $expr
-     * @param array               $parameters   Parameters used in $expr
-     * @param string              $labelColumn  Column that houses the label
-     * @param string              $valueColumn  Column that houses the value
-     * @param string              $extraColumns String of extra select columns
-     * @param int                 $limit        Limit for results
+     * @param array  $parameters   Parameters used in $expr
+     * @param string $labelColumn  Column that houses the label
+     * @param string $valueColumn  Column that houses the value
+     * @param string $extraColumns String of extra select columns
+     * @param int    $limit        Limit for results
      *
      * @return array
      */

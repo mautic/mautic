@@ -70,8 +70,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * FormFieldHelper constructor.
-     *
-     * @param ValidatorInterface $validator
      */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
@@ -133,10 +131,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * @param Field $f
-     *
-     * @return array
      */
-    public function validateFieldValue($type, $value, $f = null)
+    public function validateFieldValue($type, $value, $f = null): array
     {
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {
