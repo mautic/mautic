@@ -90,191 +90,192 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-md-9">
-    {% if packageDetail.packageBase.description %}
-    <div class="bg-auto">
-        <div class="pr-md pl-md pt-lg pb-lg">
+<div class="column-wrapper">
+    <div class="col-md-9">
+        {% if packageDetail.packageBase.description %}
+        <div class="bg-auto">
+            <div class="text-muted" style="margin-bottom: 48px;">{{ packageDetail.packageBase.description|purify }}</div>
+        </div>
+        {% endif %}
+
+        <div class="panel">
+                <h3 class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</h3>
+                <div>{{ 'marketplace.package.cli.install.descr'|trans({
+                '%vendor%' : packageDetail.packageBase.getVendorName(),
+                '%package%' : packageDetail.packageBase.getPackageName(),
+            })|purify }}</div>
+        </div>
+
+        <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
+        </div>
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>{% trans %}marketplace.package.attribute{% endtrans %}</th>
+                    <th>{% trans %}mautic.core.details{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% trans %}marketplace.package.version{% endtrans %}</td>
+                    <td>
+                        {% if not latestVersion %}
+                            <div class="text-danger">
+                                {% trans %}marketplace.latest.version.missing{% endtrans %}
+                            </div>
+                        {% else %}
+                            <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ latestVersion.version|escape }}" id="latest-version" target="_blank" rel="noopener noreferrer">
+                                <strong>{{ latestVersion.version }}</strong>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if latestVersion is not empty %}
+                    <tr>
+                        <td>{% trans %}marketplace.package.version.release.date{% endtrans %}</td>
+                        <td title="{{ dateToText(latestVersion.time) }}">
+                            {{ dateToDate(latestVersion.time) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{% trans %}marketplace.package.license{% endtrans %}</td>
+                        <td>{{ latestVersion.license|join(', ')|escape }}</td>
+                    </tr>
+                    {% if latestVersion.homepage %}
+                        <tr>
+                            <td>{% trans %}marketplace.package.homepage{% endtrans %}</td>
+                            <td>{{ latestVersion.homepage|escape }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td>
+                            {% trans %}marketplace.package.required.packages{% endtrans %}
+                            ({{ latestVersion.require|length }})
+                        </td>
+                        <td>{{ latestVersion.require|keys|join(', ')|escape }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
+        </div>
+        <table class="table table-bordered table-striped mb-0" id="stable-version">
+            <thead>
+                <tr>
+                    <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+                    <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for version in packageDetail.versions.sortByLatest() %}
+                <tr>
+                    <td>
+                        {% if version.isStable() or version.isPreRelease() %}
+                            <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ version.version|escape }}" target="_blank" rel="noopener noreferrer">
+                            {% if version.isStable() %}
+                                <b>{{ version.version|escape }}</b>
+                            {% else %}
+                                {{ version.version|escape }}
+                            {% endif %}
+                            </a>
+                        {% else %}
+                            <i>{{ version.version|escape }}</i>
+                        {% endif %}
+                    </td>
+                    <td title="{{ dateToText(version.time) }}">
+                        {{ dateToFullConcat(version.time) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        </div>
+    </div>
+
+    <div class="col-md-3 panel pb-lg">
+        <div class="panel">
+            <h3 class="pt-lg pl-sm">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
+        {% for maintainer in packageDetail.maintainers %}
             <div class="box-layout">
-                <div class="col-xs-10">
-                    <div class="text-muted">{{ packageDetail.packageBase.description|purify }}</div>
+                <div class="col-xs-3 va-m">
+                    <div class="panel-body">
+                        <span class="img-wrapper img-rounded">
+                            <img class="img" src="{{ maintainer.avatar|escape }}">
+                        </span>
+                    </div>
+                </div>
+                <div class="col-xs-9 va-t">
+                    <div class="panel-body">
+                        <h4 class="fw-sb mb-xs ellipsis">
+                            {{ maintainer.name|title|escape }}
+                        </h4>
+                        <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
+                            {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
+                        </a>
+                    </div>
                 </div>
             </div>
+        {% endfor %}
         </div>
-    </div>
-    {% endif %}
 
-    <div class="panel">
-        <div class="panel-heading">
-            <div class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</div>
-        </div>
-        <div class="panel-body">{{ 'marketplace.package.cli.install.descr'|trans({
-            '%vendor%' : packageDetail.packageBase.getVendorName(),
-            '%package%' : packageDetail.packageBase.getPackageName(),
-        })|purify }}</div>
-    </div>
-
-    <div class="panel">
-    <div class="panel-heading">
-        <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
-    </div>
-    <table class="table table-bordered table-striped mb-0">
-        <tr>
-            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
-            <td>
-                {% if not latestVersion %}
-                    <div class="text-danger">
-                        {% trans %}marketplace.latest.version.missing{% endtrans %}
-                    </div>
-                {% else %}
-                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ latestVersion.version|escape }}" id="latest-version" target="_blank" rel="noopener noreferrer">
-                        <strong>{{ latestVersion.version }}</strong>
-                    </a>
-                {% endif %}
-            </td>
-        </tr>
-        {% if latestVersion is not empty %}
+        <div class="panel">
+            <h3 class="pt-lg pl-sm">{% trans %}marketplace.package.github.info{% endtrans %}</h3>
+        <table class="table mb-0" id="github-info">
             <tr>
-                <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
-                <td title="{{ dateToText(latestVersion.time) }}">
-                    {{ dateToDate(latestVersion.time) }}
+                <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+                <td>
+                    <a href="{{ packageDetail.packageBase.repository|escape }}" target="_blank" rel="noopener noreferrer" >
+                        {{ packageDetail.packageBase.name|escape }}
+                    </a>
                 </td>
             </tr>
             <tr>
-                <th>{% trans %}marketplace.package.license{% endtrans %}</th>
-                <td>{{ latestVersion.license|join(', ')|escape }}</td>
+                <th>{% trans %}marketplace.package.github.stars{% endtrans %}</th>
+                <td>{{ packageDetail.githubInfo.stars|escape }}</td>
             </tr>
-            {% if latestVersion.homepage %}
-                <tr>
-                    <th>{% trans %}marketplace.package.homepage{% endtrans %}</th>
-                    <td>{{ latestVersion.homepage|escape }}</td>
-                </tr>
-            {% endif %}
             <tr>
-                <th>
-                    {% trans %}marketplace.package.required.packages{% endtrans %}
-                    ({{ latestVersion.require|length }})
-                </th>
-                <td>{{ latestVersion.require|keys|join(', ')|escape }}</td>
+                <th>{% trans %}marketplace.package.github.watchers{% endtrans %}</th>
+                <td>{{ packageDetail.githubInfo.watchers|escape }}</td>
             </tr>
-        {% endif %}
-    </table>
-    </div>
-
-    <div class="panel">
-    <div class="panel-heading">
-        <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
-    </div>
-    <table class="table table-bordered table-striped mb-0">
-        <tr>
-            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
-            <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
-        </tr>
-        {% for version in packageDetail.versions.sortByLatest() %}
-        <tr>
-            <td>
-                {% if version.isStable() or version.isPreRelease() %}
-                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ version.version|escape }}" target="_blank" rel="noopener noreferrer" >
-                    {% if version.isStable() %}
-                        <b>{{ version.version|escape }}</b>
-                    {% else %}
-                        {{ version.version|escape }}
-                    {% endif %}
-                    </a>
-                {% else %}
-                    <i>{{ version.version|escape }}</i>
-                {% endif %}
-            </td>
-            <td title="{{ dateToText(version.time) }}">
-                {{ dateToFullConcat(version.time) }}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    </div>
-</div>
-
-<div class="col-md-3 panel pb-lg">
-    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
-    {% for maintainer in packageDetail.maintainers %}
-        <div class="box-layout">
-            <div class="col-xs-3 va-m">
-                <div class="panel-body">
-                    <span class="img-wrapper img-rounded">
-                        <img class="img" src="{{ maintainer.avatar|escape }}">
-                    </span>
-                </div>
-            </div>
-            <div class="col-xs-9 va-t">
-                <div class="panel-body">
-                    <h4 class="fw-sb mb-xs ellipsis">
-                        {{ maintainer.name|title|escape }}
-                    </h4>
-                    <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
-                        {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
-                    </a>
-                </div>
-            </div>
+            <tr>
+                <th>{% trans %}marketplace.package.github.open.issues{% endtrans %}</th>
+                <td>{{ packageDetail.githubInfo.openIssues|escape }}</td>
+            </tr>
+        </table>
         </div>
-    {% endfor %}
 
-    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.github.info{% endtrans %}</h3>
-    <table class="table mb-0">
-        <tr>
-            <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
-            <td>
-                <a href="{{ packageDetail.packageBase.repository|escape }}" target="_blank" rel="noopener noreferrer" >
-                    {{ packageDetail.packageBase.name|escape }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.github.stars{% endtrans %}</th>
-            <td>{{ packageDetail.githubInfo.stars|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.github.watchers{% endtrans %}</th>
-            <td>{{ packageDetail.githubInfo.watchers|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.github.forks{% endtrans %}</th>
-            <td>{{ packageDetail.githubInfo.forks|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.github.open.issues{% endtrans %}</th>
-            <td>{{ packageDetail.githubInfo.openIssues|escape }}</td>
-        </tr>
-    </table>
 
-    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.packagist.info{% endtrans %}</h3>
-    <table class="table mb-0">
-        <tr>
-            <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
-            <td>
-                <a href="{{ packageDetail.packageBase.url|escape }}" target="_blank" rel="noopener noreferrer" >
-                    {{ packageDetail.packageBase.name|escape }}
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.total.downloads{% endtrans %}</th>
-            <td>{{ packageDetail.packageBase.downloads|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.monthly.downloads{% endtrans %}</th>
-            <td>{{ packageDetail.monthlyDownloads|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.daily.downloads{% endtrans %}</th>
-            <td>{{ packageDetail.dailyDownloads|escape }}</td>
-        </tr>
-        <tr>
-            <th>{% trans %}marketplace.package.create.date{% endtrans %}</th>
-            <td title="{{ dateToText(packageDetail.time) }}">
-                {{ dateToDate(packageDetail.time) }}
-            </td>
-        </tr>
-    </table>
+        <h3 class="pt-lg pl-sm">{% trans %}marketplace.package.packagist.info{% endtrans %}</h3>
+        <table class="table mb-0" id="packagist-info">
+            <tr>
+                <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+                <td>
+                    <a href="{{ packageDetail.packageBase.url|escape }}" target="_blank" rel="noopener noreferrer" >
+                        {{ packageDetail.packageBase.name|escape }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans %}marketplace.package.total.downloads{% endtrans %}</th>
+                <td>{{ packageDetail.packageBase.downloads|escape }}</td>
+            </tr>
+            <tr>
+                <th>{% trans %}marketplace.package.create.date{% endtrans %}</th>
+                <td title="{{ dateToText(packageDetail.time) }}">
+                    {{ dateToDate(packageDetail.time) }}
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
+
 
 {{- include('@MauticCore/Helper/modal.html.twig', {
     'id'            : 'InstallationInProgressModal',
