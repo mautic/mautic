@@ -31,6 +31,8 @@ class IcontactIntegration extends EmailAbstractIntegration
 
     /**
      * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret.
+     *
+     * @return array<string, string>
      */
     public function getRequiredKeyFields(): array
     {

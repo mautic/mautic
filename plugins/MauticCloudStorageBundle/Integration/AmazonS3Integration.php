@@ -56,7 +56,7 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, string>
      */
     public function getRequiredKeyFields(): array
     {

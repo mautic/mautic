@@ -32,7 +32,7 @@ class TwilioIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, string>
      */
     public function getRequiredKeyFields(): array
     {
