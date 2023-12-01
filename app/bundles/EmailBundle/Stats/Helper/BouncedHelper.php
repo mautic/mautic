@@ -13,7 +13,7 @@ class BouncedHelper extends AbstractHelper
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }

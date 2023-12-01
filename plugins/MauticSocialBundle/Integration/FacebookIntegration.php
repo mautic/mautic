@@ -168,7 +168,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return FacebookType::class;
     }

@@ -299,7 +299,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return TwitterType::class;
     }

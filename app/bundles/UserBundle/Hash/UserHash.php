@@ -11,7 +11,7 @@ class UserHash
      *
      * @return string
      */
-    public static function getFakeUserHash()
+    public static function getFakeUserHash(): string
     {
         return self::FAKE_USER_HASH;
     }

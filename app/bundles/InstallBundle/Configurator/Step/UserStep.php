@@ -35,7 +35,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return UserStepType::class;
     }

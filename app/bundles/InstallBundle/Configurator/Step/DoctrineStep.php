@@ -83,7 +83,7 @@ class DoctrineStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return DoctrineStepType::class;
     }

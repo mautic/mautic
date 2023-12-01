@@ -35,7 +35,7 @@ class MarketplacePermissions extends AbstractPermissions
         return $this->config->marketplaceIsEnabled();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return self::BASE;
     }
