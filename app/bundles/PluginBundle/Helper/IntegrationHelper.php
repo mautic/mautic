@@ -92,7 +92,7 @@ class IntegrationHelper
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
+    public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
         // Build the service classes
         if (empty($this->available)) {
@@ -540,7 +540,7 @@ class IntegrationHelper
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
 
             /**
-             * @var string
+             * @var string                                               $integration
              * @var \Mautic\PluginBundle\Integration\AbstractIntegration $details
              */
             foreach ($socialIntegrations as $integration => $details) {

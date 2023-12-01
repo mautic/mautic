@@ -29,9 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonController
 {
     /**
@@ -39,11 +36,9 @@ class AjaxController extends CommonController
      * @param int   $statusCode
      * @param bool  $addIgnoreWdt
      *
-     * @return JsonResponse
-     *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true)
+    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 
@@ -509,7 +504,7 @@ class AjaxController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
-            if (!$zipper->extractTo(dirname($this->getParameter('kernel.project_dir')).'/app/upgrade')) {
+            if (!$zipper->extractTo(dirname($this->getParameter('mautic.application_dir')).'/app/upgrade')) {
                 $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
                 $dataArray['message']    = $translator->trans(
                     'mautic.core.update.error',
@@ -549,9 +544,9 @@ class AjaxController extends CommonController
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
-        if (is_dir(dirname($this->getParameter('kernel.project_dir')).'/app/upgrade')) {
+        if (is_dir(dirname($this->getParameter('mautic.application_dir')).'/app/upgrade')) {
             $iterator = new \FilesystemIterator(
-                dirname($this->getParameter('kernel.project_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
+                dirname($this->getParameter('mautic.application_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
             );
 
             /** @var \FilesystemIterator $file */
@@ -563,7 +558,7 @@ class AjaxController extends CommonController
             }
 
             // Should be empty now, nuke the folder
-            @rmdir(dirname($this->getParameter('kernel.project_dir')).'/app/upgrade');
+            @rmdir(dirname($this->getParameter('mautic.application_dir')).'/app/upgrade');
         }
 
         $cacheDir = $pathsHelper->getSystemPath('cache');
@@ -603,7 +598,7 @@ class AjaxController extends CommonController
             }
         }
 
-        $iterator = new \FilesystemIterator($this->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->getParameter('mautic.application_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];

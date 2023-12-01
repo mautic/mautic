@@ -823,10 +823,8 @@ class LeadModel extends FormModel
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
-     *
-     * @return array
      */
-    public function organizeFieldsByGroup($fields)
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -1060,7 +1058,7 @@ class LeadModel extends FormModel
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true)
+    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1135,10 +1133,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $manuallyAdded
-     *
-     * @return array
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true)
+    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true): array
     {
         $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
 
@@ -1193,10 +1189,7 @@ class LeadModel extends FormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadCategories(Lead $lead)
+    public function getLeadCategories(Lead $lead): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
         $leadCategoryList = [];
@@ -1208,15 +1201,14 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     * @param null         $importId
-     * @param bool         $skipIfExists
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param null  $tags
+     * @param bool  $persist
+     * @param null  $importId
+     * @param bool  $skipIfExists
      *
      * @return bool|null
      *
@@ -1643,7 +1635,7 @@ class LeadModel extends FormModel
      *
      * @param int $utmId
      */
-    public function removeUtmTags(Lead $lead, $utmId)
+    public function removeUtmTags(Lead $lead, $utmId): bool
     {
         /** @var UtmTag $utmTag */
         foreach ($lead->getUtmTags() as $utmTag) {
@@ -1834,33 +1826,29 @@ class LeadModel extends FormModel
 
         if ('top' == $flag) {
             $topLists = $this->leadListModel->getTopLists(6, $dateFrom, $dateTo);
-            if ($topLists) {
-                foreach ($topLists as $list) {
-                    $filter['leadlist_id'] = [
-                        'value'            => $list['id'],
-                        'list_column_name' => 't.id',
-                    ];
-                    $all = $query->fetchTimeData('leads', 'date_added', $filter);
-                    $chart->setDataset($list['name'].': '.$allLeadsT, $all);
-                }
+            foreach ($topLists as $list) {
+                $filter['leadlist_id'] = [
+                    'value'            => $list['id'],
+                    'list_column_name' => 't.id',
+                ];
+                $all = $query->fetchTimeData('leads', 'date_added', $filter);
+                $chart->setDataset($list['name'].': '.$allLeadsT, $all);
             }
         } elseif ('topIdentifiedVsAnonymous' == $flag) {
             $topLists = $this->leadListModel->getTopLists(3, $dateFrom, $dateTo);
-            if ($topLists) {
-                foreach ($topLists as $list) {
-                    $anonymousFilter['leadlist_id'] = [
-                        'value'            => $list['id'],
-                        'list_column_name' => 't.id',
-                    ];
-                    $identifiedFilter['leadlist_id'] = [
-                        'value'            => $list['id'],
-                        'list_column_name' => 't.id',
-                    ];
-                    $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
-                    $anonymous  = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
-                    $chart->setDataset($list['name'].': '.$identifiedT, $identified);
-                    $chart->setDataset($list['name'].': '.$anonymousT, $anonymous);
-                }
+            foreach ($topLists as $list) {
+                $anonymousFilter['leadlist_id'] = [
+                    'value'            => $list['id'],
+                    'list_column_name' => 't.id',
+                ];
+                $identifiedFilter['leadlist_id'] = [
+                    'value'            => $list['id'],
+                    'list_column_name' => 't.id',
+                ];
+                $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
+                $anonymous  = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
+                $chart->setDataset($list['name'].': '.$identifiedT, $identified);
+                $chart->setDataset($list['name'].': '.$anonymousT, $anonymous);
             }
         } elseif ('identified' == $flag) {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
@@ -1916,10 +1904,8 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getLeadMapData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -2010,11 +1996,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2111,10 +2095,7 @@ class LeadModel extends FormModel
         return $event->getEventCounter();
     }
 
-    /**
-     * @return bool
-     */
-    public function addToCompany(Lead $lead, $company)
+    public function addToCompany(Lead $lead, $company): bool
     {
         // check if lead is in company already
         if (!$company instanceof Company) {
@@ -2139,10 +2120,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getContactChannels(Lead $lead)
+    public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 
@@ -2158,10 +2137,8 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getDoNotContactChannels(Lead $lead)
+    public function getDoNotContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
 
@@ -2255,15 +2232,13 @@ class LeadModel extends FormModel
         $entities         = [];
         $contactCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        if (!empty($contactCompanies)) {
-            foreach ($contactCompanies as $contactCompany) {
-                $company  = $this->companyModel->getEntity($contactCompany['company_id']);
-                $oldScore = $company->getScore();
-                $newScore = $score + $oldScore;
-                $company->setScore($newScore);
-                $entities[] = $company;
-                $success    = true;
-            }
+        foreach ($contactCompanies as $contactCompany) {
+            $company  = $this->companyModel->getEntity($contactCompany['company_id']);
+            $oldScore = $company->getScore();
+            $newScore = $score + $oldScore;
+            $company->setScore($newScore);
+            $entities[] = $company;
+            $success    = true;
         }
 
         if (!empty($entities)) {
@@ -2308,10 +2283,8 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $persist
-     *
-     * @return Lead
      */
-    protected function createNewContact(IpAddress $ip, $persist = true)
+    protected function createNewContact(IpAddress $ip, $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();
@@ -2356,7 +2329,6 @@ class LeadModel extends FormModel
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
 
-        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go

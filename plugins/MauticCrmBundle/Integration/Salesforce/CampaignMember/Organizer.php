@@ -22,9 +22,6 @@ class Organizer
      */
     private $contacts = [];
 
-    /**
-     * ObjectOrganizer constructor.
-     */
     public function __construct(array $records)
     {
         $this->records = $records;

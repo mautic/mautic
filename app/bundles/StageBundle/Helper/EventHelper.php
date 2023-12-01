@@ -4,9 +4,6 @@ namespace Mautic\StageBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class EventHelper.
- */
 class EventHelper
 {
     /**

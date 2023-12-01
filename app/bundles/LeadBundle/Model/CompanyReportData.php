@@ -18,9 +18,6 @@ class CompanyReportData
      */
     private $translator;
 
-    /**
-     * CompanyReportData constructor.
-     */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
         $this->fieldModel = $fieldModel;
@@ -48,10 +45,7 @@ class CompanyReportData
         return array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
     }
 
-    /**
-     * @return bool
-     */
-    public function eventHasCompanyColumns(ReportGeneratorEvent $event)
+    public function eventHasCompanyColumns(ReportGeneratorEvent $event): bool
     {
         $companyColumns = $this->getCompanyData();
         foreach ($companyColumns as $key => $column) {
@@ -89,10 +83,8 @@ class CompanyReportData
     /**
      * @param Field[] $fields
      * @param string  $prefix
-     *
-     * @return array
      */
-    private function getFieldColumns($fields, $prefix)
+    private function getFieldColumns($fields, $prefix): array
     {
         $columns = [];
         foreach ($fields as $f) {

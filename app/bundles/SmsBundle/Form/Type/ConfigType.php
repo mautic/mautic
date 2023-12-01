@@ -9,9 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
@@ -26,9 +23,6 @@ class ConfigType extends AbstractType
      */
     private $translator;
 
-    /**
-     * ConfigType constructor.
-     */
     public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
     {
         $this->transportChain = $transportChain;

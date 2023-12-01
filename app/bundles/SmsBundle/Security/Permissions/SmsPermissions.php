@@ -5,9 +5,6 @@ namespace Mautic\SmsBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class SmsPermissions.
- */
 class SmsPermissions extends AbstractPermissions
 {
     /**

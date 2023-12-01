@@ -22,9 +22,6 @@ class DisplayManager
      */
     private $displayCounter;
 
-    /**
-     * DisplayManager constructor.
-     */
     public function __construct(Form $form, array $viewOnlyFields = [])
     {
         $this->form           = $form;
@@ -59,14 +56,11 @@ class DisplayManager
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function shouldDisplayNotAlwaysDisplayField(Field $field)
+    private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
     {
-        /** @var Field $fieldFromArray */
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
+            /** @var Field $fieldFromArray */
             if (in_array($field->getType(), $this->viewOnlyFields)) {
                 continue;
             }
@@ -81,10 +75,7 @@ class DisplayManager
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function useProgressiveProfilingLimit()
+    public function useProgressiveProfilingLimit(): bool
     {
         return '' != $this->form->getProgressiveProfilingLimit();
     }

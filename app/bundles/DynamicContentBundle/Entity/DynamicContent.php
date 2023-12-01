@@ -86,9 +86,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     private $slotName;
 
-    /**
-     * DynamicContent constructor.
-     */
     public function __construct()
     {
         $this->stats               = new ArrayCollection();
@@ -194,12 +191,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                    ->atPath('slotName')
-                                    ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                                ->atPath('slotName')
+                                ->addViolation();
                     }
                     $violations = $validator->validate(
                         $dwc->getFilters(),
@@ -212,12 +207,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                    ->atPath('filters')
-                                    ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                                ->atPath('filters')
+                                ->addViolation();
                     }
                 }
             },

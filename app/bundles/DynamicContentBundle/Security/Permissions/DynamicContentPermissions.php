@@ -5,9 +5,6 @@ namespace Mautic\DynamicContentBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class NotificationPermissions.
- */
 class DynamicContentPermissions extends AbstractPermissions
 {
     /**

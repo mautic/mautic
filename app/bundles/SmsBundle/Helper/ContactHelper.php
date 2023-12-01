@@ -25,9 +25,6 @@ class ContactHelper
      */
     private $phoneNumberHelper;
 
-    /**
-     * ContactHelper constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
         Connection $connection,
@@ -41,11 +38,9 @@ class ContactHelper
     /**
      * @param string $number
      *
-     * @return ArrayCollection
-     *
      * @throws NumberNotFoundException
      */
-    public function findContactsByNumber($number)
+    public function findContactsByNumber($number): ArrayCollection
     {
         // Who knows what the number was originally formatted as so let's try a few
         $searchForNumbers = $this->phoneNumberHelper->getFormattedNumberList($number);

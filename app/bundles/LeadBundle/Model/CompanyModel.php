@@ -74,9 +74,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     protected $companyDeduper;
 
-    /**
-     * CompanyModel constructor.
-     */
     public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel = $leadFieldModel;
@@ -210,10 +207,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
-     *
-     * @return array
      */
-    public function organizeFieldsByGroup($fields)
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -412,7 +407,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $lead->addUpdatedField('company', $companyName)
                     ->setDateModified(new \DateTime());
 
-                /** @var LeadRepository */
+                /** @var LeadRepository $leadRepository */
                 $leadRepository = $this->em->getRepository(Lead::class);
                 $leadRepository->saveEntity($lead);
             }

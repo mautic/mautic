@@ -7,9 +7,6 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\SmsBundle\Broadcast\BroadcastExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class BroadcastSubscriber.
- */
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     /**
@@ -17,9 +14,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
      */
     private $broadcastExecutioner;
 
-    /**
-     * BroadcastSubscriber constructor.
-     */
     public function __construct(BroadcastExecutioner $broadcastExecutioner)
     {
         $this->broadcastExecutioner = $broadcastExecutioner;

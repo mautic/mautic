@@ -93,7 +93,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
-        $canViewOthers = $event->hasPermission('form:forms:viewother');
+        $canViewOthers = $event->hasPermission('lead:leads:viewother');
 
         if ('created.leads.in.time' == $event->getType()) {
             $widget = $event->getWidget();
@@ -170,24 +170,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($lists) {
-                    foreach ($lists as &$list) {
-                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
-                        $contactUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
-                        $row        = [
-                            [
-                                'value' => $list['name'],
-                                'type'  => 'link',
-                                'link'  => $listUrl,
-                            ],
-                            [
-                                'value' => $list['leads'],
-                                'type'  => 'link',
-                                'link'  => $contactUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($lists as &$list) {
+                    $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
+                    $contactUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
+                    $row        = [
+                        [
+                            'value' => $list['name'],
+                            'type'  => 'link',
+                            'link'  => $listUrl,
+                        ],
+                        [
+                            'value' => $list['leads'],
+                            'type'  => 'link',
+                            'link'  => $contactUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -330,21 +328,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($owners) {
-                    foreach ($owners as &$owner) {
-                        $ownerUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $owner['owner_id']]);
-                        $row      = [
-                            [
-                                'value' => $owner['first_name'].' '.$owner['last_name'],
-                                'type'  => 'link',
-                                'link'  => $ownerUrl,
-                            ],
-                            [
-                                'value' => $owner['leads'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($owners as &$owner) {
+                    $ownerUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $owner['owner_id']]);
+                    $row      = [
+                        [
+                            'value' => $owner['first_name'].' '.$owner['last_name'],
+                            'type'  => 'link',
+                            'link'  => $ownerUrl,
+                        ],
+                        [
+                            'value' => $owner['leads'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -385,21 +381,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items    = [];
 
                 // Build table rows with links
-                if ($creators) {
-                    foreach ($creators as &$creator) {
-                        $creatorUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $creator['created_by']]);
-                        $row        = [
-                            [
-                                'value' => $creator['created_by_user'],
-                                'type'  => 'link',
-                                'link'  => $creatorUrl,
-                            ],
-                            [
-                                'value' => $creator['leads'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($creators as &$creator) {
+                    $creatorUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $creator['created_by']]);
+                    $row        = [
+                        [
+                            'value' => $creator['created_by_user'],
+                            'type'  => 'link',
+                            'link'  => $creatorUrl,
+                        ],
+                        [
+                            'value' => $creator['leads'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -439,19 +433,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 }
 
                 // Build table rows with links
-                if ($leads) {
-                    foreach ($leads as &$lead) {
-                        $leadUrl = isset($lead['id']) ? $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]) : '';
-                        $type    = isset($lead['id']) ? 'link' : 'text';
-                        $row     = [
-                            [
-                                'value' => $lead['name'],
-                                'type'  => $type,
-                                'link'  => $leadUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($leads as &$lead) {
+                    $leadUrl = isset($lead['id']) ? $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]) : '';
+                    $type    = isset($lead['id']) ? 'link' : 'text';
+                    $row     = [
+                        [
+                            'value' => $lead['name'],
+                            'type'  => $type,
+                            'link'  => $leadUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -484,29 +476,27 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items    = [];
 
                 // Build table rows with links
-                if ($segments) {
-                    foreach ($segments as $segment) {
-                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
-                        $buildTime  = explode(':', gmdate('H:i:s', (int) $segment->getLastBuiltTime()));
-                        $timeString = $this->dateHelper->formatRange(
-                            new \DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
-                        );
+                foreach ($segments as $segment) {
+                    $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
+                    $buildTime  = explode(':', gmdate('H:i:s', (int) $segment->getLastBuiltTime()));
+                    $timeString = $this->dateHelper->formatRange(
+                        new \DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
+                    );
 
-                        $row        = [
-                            [
-                                'value' => $segment->getName(),
-                                'type'  => 'link',
-                                'link'  => $listUrl,
-                            ],
-                            [
-                                'value' => $segment->getCreatedByUser(),
-                            ],
-                            [
-                                'value' => $timeString,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                    $row        = [
+                        [
+                            'value' => $segment->getName(),
+                            'type'  => 'link',
+                            'link'  => $listUrl,
+                        ],
+                        [
+                            'value' => $segment->getCreatedByUser(),
+                        ],
+                        [
+                            'value' => $timeString,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([

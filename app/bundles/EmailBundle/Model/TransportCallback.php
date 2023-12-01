@@ -26,9 +26,6 @@ class TransportCallback
      */
     private $statRepository;
 
-    /**
-     * TransportCallback constructor.
-     */
     public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
     {
         $this->dncModel       = $dncModel;

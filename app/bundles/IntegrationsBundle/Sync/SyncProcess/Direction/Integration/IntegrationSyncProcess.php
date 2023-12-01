@@ -129,11 +129,9 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @return OrderDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncOrder(ReportDAO $syncReport)
+    public function getSyncOrder(ReportDAO $syncReport): OrderDAO
     {
         $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 

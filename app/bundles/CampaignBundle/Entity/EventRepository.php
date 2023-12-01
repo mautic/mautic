@@ -128,10 +128,7 @@ class EventRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignEvents($campaignId)
+    public function getCampaignEvents($campaignId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
@@ -264,10 +261,8 @@ class EventRepository extends CommonRepository
 
     /**
      * Get an array of events that have been triggered by this lead.
-     *
-     * @return array
      */
-    public function getLeadTriggeredEvents($leadId)
+    public function getLeadTriggeredEvents($leadId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')

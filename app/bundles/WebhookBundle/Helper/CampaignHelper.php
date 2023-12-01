@@ -128,10 +128,8 @@ class CampaignHelper
 
     /**
      * Translates tokens to values.
-     *
-     * @return array
      */
-    private function getTokenValues(array $rawTokens, Lead $contact)
+    private function getTokenValues(array $rawTokens, Lead $contact): array
     {
         $values        = [];
         $contactValues = $this->getContactValues($contact);

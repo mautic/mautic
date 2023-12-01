@@ -154,9 +154,6 @@ class Mailbox
 
     private $folders = [];
 
-    /**
-     * Mailbox constructor.
-     */
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
         $this->mailboxes = $parametersHelper->get('monitored_email', []);
@@ -187,11 +184,9 @@ class Mailbox
      * @param null $bundleKey
      * @param null $folderKey
      *
-     * @return bool
-     *
      * @throws MailboxException
      */
-    public function isConfigured($bundleKey = null, $folderKey = null)
+    public function isConfigured($bundleKey = null, $folderKey = null): bool
     {
         if (null !== $bundleKey) {
             try {
@@ -320,9 +315,8 @@ class Mailbox
     /**
      * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
      *
-     * @param int   $options
-     * @param int   $retriesNum
-     * @param array $params
+     * @param int $options
+     * @param int $retriesNum
      */
     public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null)
     {
@@ -389,10 +383,8 @@ class Mailbox
 
     /**
      * Check if the stream is connected.
-     *
-     * @return bool
      */
-    protected function isConnected()
+    protected function isConnected(): bool
     {
         return $this->isConfigured() && $this->imapStream && is_resource($this->imapStream) && @imap_ping($this->imapStream);
     }
@@ -561,10 +553,8 @@ class Mailbox
 
     /**
      * Move mail to another box.
-     *
-     * @return bool
      */
-    public function moveMail($mailId, $mailBox)
+    public function moveMail($mailId, $mailBox): bool
     {
         return imap_mail_move($this->getImapStream(), $mailId, $mailBox, CP_UID) && $this->expungeDeletedMails();
     }
@@ -802,10 +792,8 @@ class Mailbox
      * Get mail data.
      *
      * @param bool $markAsSeen
-     *
-     * @return Message
      */
-    public function getMail($mailId, $markAsSeen = true)
+    public function getMail($mailId, $markAsSeen = true): Message
     {
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);
@@ -1021,10 +1009,7 @@ class Mailbox
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getParameters($partStructure)
+    protected function getParameters($partStructure): array
     {
         $params = [];
         if (!empty($partStructure->parameters)) {
@@ -1065,10 +1050,7 @@ class Mailbox
         return $newString;
     }
 
-    /**
-     * @return bool
-     */
-    protected function isUrlEncoded($string)
+    protected function isUrlEncoded($string): bool
     {
         $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);
         $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', $string);

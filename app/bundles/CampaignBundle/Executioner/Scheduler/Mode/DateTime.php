@@ -12,9 +12,6 @@ class DateTime implements ScheduleModeInterface
      */
     private $logger;
 
-    /**
-     * DateTime constructor.
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;

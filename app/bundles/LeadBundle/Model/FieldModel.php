@@ -710,7 +710,7 @@ class FieldModel extends FormModel
      */
     public function filterUsedFieldIds(array $ids)
     {
-        return array_filter($ids, function ($id) {
+        return array_filter($ids, function ($id): bool {
             return false === $this->isUsedField($this->getEntity($id));
         });
     }
@@ -911,10 +911,8 @@ class FieldModel extends FormModel
 
     /**
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldListWithProperties($object = 'lead')
+    public function getFieldListWithProperties($object = 'lead'): array
     {
         $forceFilters[] = [
             'column' => 'f.object',

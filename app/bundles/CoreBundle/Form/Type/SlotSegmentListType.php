@@ -13,9 +13,6 @@ class SlotSegmentListType extends SlotType
      */
     private $translator;
 
-    /**
-     * ConfigType constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

@@ -29,6 +29,7 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CLICK_PREFIX         = 'cut';
     public const TRACKABLE_PREFIX     = 'tr';
     public const REDIRECT_PREFIX      = 'pr';
+    public const CLICK_THROUGH_PREFIX = 'ct';
 
     public const DNC_COLUMNS = [
         'unsubscribed' => [
@@ -242,6 +243,26 @@ class ReportSubscriber implements EventSubscriberInterface
                 'label' => 'mautic.email.report.variant_read_count',
                 'type'  => 'int',
             ],
+            'click_through_count' => [
+                'alias'   => 'click_through_count',
+                'label'   => 'mautic.email.report.click_through_count',
+                'type'    => 'string',
+                'formula' => 'IFNULL('.self::CLICK_THROUGH_PREFIX.'.click_through_count, 0)',
+            ],
+            'click_through_rate' => [
+                'alias'   => 'click_through_rate',
+                'label'   => 'mautic.email.report.click_through_rate',
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'sent_count * 100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'click_to_open_rate' => [
+                'alias'   => 'click_to_open_rate',
+                'label'   => 'mautic.email.report.click_to_open_rate',
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'read_count * 100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
         ];
 
         $columns = array_merge(
@@ -264,6 +285,9 @@ class ReportSubscriber implements EventSubscriberInterface
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
             // Ratios are not applicable for individual stats
             unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
+
+            // Click through value are not applicable for individual stats
+            unset($columns['click_through_count'], $columns['click_through_rate'], $columns['click_to_open_rate']);
 
             // Email counts are not applicable for individual stats
             unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
@@ -335,11 +359,12 @@ class ReportSubscriber implements EventSubscriberInterface
         $qb         = $event->getQueryBuilder();
         $hasGroupBy = $event->hasGroupBy();
 
-        // channel_url_trackables subquery
-        $qbcut             = $this->db->createQueryBuilder();
-        $useDncColumns     = $event->usesColumn(array_keys(self::DNC_COLUMNS));
-        $useVariantColumns = $event->usesColumn(array_keys(self::EMAIL_VARIANT_COLUMNS));
-        $useClickColumns   = $event->usesColumn(array_keys(self::CLICK_COLUMNS)) || $event->usesColumn('is_hit');
+        $qbcut                  = $this->db->createQueryBuilder(); // channel_url_trackables subquery
+        $qbct                   = $this->db->createQueryBuilder(); // click-though subquery
+        $useDncColumns          = $event->usesColumn(array_keys(self::DNC_COLUMNS));
+        $useVariantColumns      = $event->usesColumn(array_keys(self::EMAIL_VARIANT_COLUMNS));
+        $useClickColumns        = $event->usesColumn(array_keys(self::CLICK_COLUMNS)) || $event->usesColumn('is_hit');
+        $useClickThroughColumns = $event->usesColumn(['click_through_count', 'click_through_rate', 'click_to_open_rate']);
 
         switch ($context) {
             case self::CONTEXT_EMAILS:
@@ -367,6 +392,17 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($useDncColumns) {
                     $this->addDNCTableForEmails($qb);
+                }
+
+                if ($useClickThroughColumns) {
+                    $qbct->select(
+                        'COUNT(DISTINCT ph.lead_id) AS click_through_count',
+                        'cut.channel_id',
+                    )
+                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+                        ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
+                        ->groupBy('cut.channel_id');
+                    $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'e.id = ct.channel_id');
                 }
 
                 break;
@@ -757,7 +793,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined($query, $table, $fromAlias, $alias)
+    private function isJoined($query, $table, $fromAlias, $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {

@@ -29,9 +29,6 @@ class TwilioTransport implements TransportInterface
      */
     private $client;
 
-    /**
-     * TwilioTransport constructor.
-     */
     public function __construct(Configuration $configuration, LoggerInterface $logger)
     {
         $this->logger        = $logger;
@@ -106,12 +103,10 @@ class TwilioTransport implements TransportInterface
      */
     private function createPayload(string $messagingServiceSid, string $content): array
     {
-        $payload = [
+        return [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
-
-        return $payload;
     }
 
     /**

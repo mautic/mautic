@@ -8,9 +8,6 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ReportBuilderEvent.
- */
 class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
@@ -241,7 +238,10 @@ class ReportBuilderEvent extends AbstractReportEvent
         ];
     }
 
-    public function getChannelColumns()
+    /**
+     * @return array<MauticReportBuilder::*, mixed[]>
+     */
+    public function getChannelColumns(): array
     {
         $channelColumns = [
             MauticReportBuilder::CHANNEL_COLUMN_CATEGORY_ID => [

@@ -303,10 +303,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Go through the raw data and add the missing times.
-     *
-     * @return array
      */
-    public function completeTimeData($rawData, $countAverage = false)
+    public function completeTimeData($rawData, $countAverage = false): array
     {
         $data          = [];
         $averageCounts = [];

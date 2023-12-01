@@ -22,9 +22,6 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private $grapesJsBuilderModel;
 
-    /**
-     * EmailSubscriber constructor.
-     */
     public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel)
     {
         $this->config               = $config;

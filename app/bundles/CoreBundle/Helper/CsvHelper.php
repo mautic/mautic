@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class CsvHelper.
- */
 class CsvHelper
 {
     /**
@@ -43,10 +40,7 @@ class CsvHelper
         return array_map('trim', $headers);
     }
 
-    /**
-     * @return array
-     */
-    public static function convertHeadersIntoFields(array $headers)
+    public static function convertHeadersIntoFields(array $headers): array
     {
         sort($headers);
 

@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-/**
- * Class MailchimpIntegration.
- */
 class MailchimpIntegration extends EmailAbstractIntegration
 {
     /**
@@ -143,10 +140,8 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
     /**
      * @param array $config
-     *
-     * @return bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);

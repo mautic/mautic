@@ -86,9 +86,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     protected ?\DateTime $now = null;
 
-    /**
-     * ScheduledExecutioner constructor.
-     */
     public function __construct(
         LeadEventLogRepository $repository,
         LoggerInterface $logger,

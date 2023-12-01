@@ -44,7 +44,7 @@ class PostCountModel extends AbstractCommonModel
      *
      * @return boolean
      */
-    public function updatePostCount($monitor, \DateTime $postDate)
+    public function updatePostCount($monitor, \DateTime $postDate): bool
     {
         // query the db for posts on this date
         $q    = $this->getRepository()->createQueryBuilder($this->getRepository()->getTableAlias());

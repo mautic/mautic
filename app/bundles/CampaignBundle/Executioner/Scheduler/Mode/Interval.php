@@ -31,9 +31,6 @@ class Interval implements ScheduleModeInterface
      */
     private $defaultTimezone;
 
-    /**
-     * Interval constructor.
-     */
     public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
     {
         $this->logger               = $logger;
@@ -120,7 +117,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -151,10 +148,8 @@ class Interval implements ScheduleModeInterface
 
     /**
      * Checks if an event has a relative time configured.
-     *
-     * @return bool
      */
-    public function isContactSpecificExecutionDateRequired(Event $event)
+    public function isContactSpecificExecutionDateRequired(Event $event): bool
     {
         if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event)) {
             return false;

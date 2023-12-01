@@ -6,20 +6,14 @@ use Mautic\AssetBundle\Model\AssetModel;
 
 class TokenHelper
 {
-    /**
-     * @var AssetModel
-     */
-    protected $model;
+    protected \Mautic\AssetBundle\Model\AssetModel $model;
 
     public function __construct(AssetModel $model)
     {
         $this->model = $model;
     }
 
-    /**
-     * @return array
-     */
-    public function findAssetTokens($content, $clickthrough = [])
+    public function findAssetTokens($content, $clickthrough = []): array
     {
         $tokens = [];
 

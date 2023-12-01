@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-/**
- * Class SortableValueLabelListType.
- */
 class SortableValueLabelListType extends AbstractType
 {
     /**

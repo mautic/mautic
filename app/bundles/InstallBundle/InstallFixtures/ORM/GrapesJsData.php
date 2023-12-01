@@ -32,8 +32,8 @@ class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, C
 
     public function load(ObjectManager $manager): void
     {
-        $projectDir               = $this->container->get('kernel')->getProjectDir();
-        $grapeJsBuilderConfigPath = $projectDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
+        $applicationDir           = $this->container->get('kernel')->getApplicationDir();
+        $grapeJsBuilderConfigPath = $applicationDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
 
         if (!file_exists($grapeJsBuilderConfigPath)) {
             return;

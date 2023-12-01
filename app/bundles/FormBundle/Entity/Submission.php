@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class Submission.
- */
 class Submission
 {
     /**
@@ -214,8 +211,6 @@ class Submission
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Submission
      */
     public function setIpAddress(IpAddress $ipAddress = null)
@@ -259,8 +254,6 @@ class Submission
 
     /**
      * Set page.
-     *
-     * @param \Mautic\PageBundle\Entity\Page $page
      *
      * @return Submission
      */

@@ -9,9 +9,6 @@ use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Monolog\Logger;
 
-/**
- * Class DoctrineSubscriber.
- */
 class DoctrineSubscriber implements EventSubscriber
 {
     /**
@@ -19,9 +16,6 @@ class DoctrineSubscriber implements EventSubscriber
      */
     private $logger;
 
-    /**
-     * DoctrineSubscriber constructor.
-     */
     public function __construct(Logger $logger)
     {
         $this->logger = $logger;

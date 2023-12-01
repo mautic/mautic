@@ -9,9 +9,6 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class MenuBuilder.
- */
 class MenuBuilder
 {
     /**
@@ -34,9 +31,6 @@ class MenuBuilder
      */
     private $menuHelper;
 
-    /**
-     * MenuBuilder constructor.
-     */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
         $this->factory    = $knpFactory;

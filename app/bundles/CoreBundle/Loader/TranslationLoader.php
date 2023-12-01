@@ -9,9 +9,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-/**
- * Class TranslationLoader.
- */
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     /**
@@ -24,9 +21,6 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      */
     private $pathsHelper;
 
-    /**
-     * TranslationLoader constructor.
-     */
     public function __construct(BundleHelper $bundleHelper, PathsHelper $pathsHelper)
     {
         $this->bundleHelper = $bundleHelper;

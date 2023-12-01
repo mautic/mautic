@@ -253,10 +253,7 @@ class Form extends FormEntity
         ]));
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
     {
         $data   = $form->getData();
         $groups = ['form'];
@@ -528,10 +525,7 @@ class Form extends FormEntity
         return $this->fields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldAliases()
+    public function getFieldAliases(): array
     {
         $aliases = [];
         $fields  = $this->getFields();
@@ -791,10 +785,7 @@ class Form extends FormEntity
         return $this->formAttributes;
     }
 
-    /**
-     * @return bool
-     */
-    public function isStandalone()
+    public function isStandalone(): bool
     {
         return 'campaign' != $this->formType;
     }

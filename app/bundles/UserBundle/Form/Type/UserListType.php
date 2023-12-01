@@ -43,10 +43,7 @@ class UserListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getUserChoices()
+    private function getUserChoices(): array
     {
         $choices = [];
         $users   = $this->userModel->getRepository()->getEntities(

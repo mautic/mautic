@@ -90,7 +90,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
                 $this->batchLimiters  = $batchLimiters;
             }
 
-            public function getDoNotContactParts()
+            public function getDoNotContactParts(): DoNotContactParts
             {
                 return new DoNotContactParts('dnc_unsubscribed');
             }

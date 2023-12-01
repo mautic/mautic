@@ -74,10 +74,7 @@ class ScheduleController extends CommonAjaxController
         return $this->flushFlash();
     }
 
-    /**
-     * @return JsonResponse
-     */
-    private function flushFlash()
+    private function flushFlash(): JsonResponse
     {
         return new JsonResponse(['flashes' => $this->getFlashContent()]);
     }

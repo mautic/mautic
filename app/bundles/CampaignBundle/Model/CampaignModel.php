@@ -440,10 +440,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get list of sources for a campaign.
-     *
-     * @return array
      */
-    public function getLeadSources($campaign)
+    public function getLeadSources($campaign): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -527,10 +525,8 @@ class CampaignModel extends CommonFormModel
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
 
-                if ($forms) {
-                    foreach ($forms as $form) {
-                        $choices['forms'][$form['id']] = $form['name'];
-                    }
+                foreach ($forms as $form) {
+                    $choices['forms'][$form['id']] = $form['name'];
                 }
         }
 
@@ -556,7 +552,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param Lead $lead
      * @param bool $forList
      *
      * @return mixed
@@ -717,13 +712,11 @@ class CampaignModel extends CommonFormModel
             $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
 
             // Group events by type
-            if ($rawEvents) {
-                foreach ($rawEvents as $event) {
-                    if (isset($events[$event['type']])) {
-                        $events[$event['type']][] = $event['id'];
-                    } else {
-                        $events[$event['type']] = [$event['id']];
-                    }
+            foreach ($rawEvents as $event) {
+                if (isset($events[$event['type']])) {
+                    $events[$event['type']][] = $event['id'];
+                } else {
+                    $events[$event['type']] = [$event['id']];
                 }
             }
 
@@ -788,9 +781,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      */
@@ -801,10 +793,7 @@ class CampaignModel extends CommonFormModel
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignIdsWithDependenciesOnSegment($segmentId)
+    public function getCampaignIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities = $this->getRepository()->getEntities(
             [

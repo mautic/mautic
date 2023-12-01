@@ -15,9 +15,6 @@ class AssetExtension extends AbstractExtension
      */
     protected $assetsHelper;
 
-    /**
-     * AssetExtension constructor.
-     */
     public function __construct(AssetsHelper $assetsHelper)
     {
         $this->assetsHelper = $assetsHelper;

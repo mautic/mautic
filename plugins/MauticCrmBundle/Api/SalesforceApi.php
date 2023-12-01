@@ -87,11 +87,9 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getPerson(array $data)
+    public function getPerson(array $data): array
     {
         $config    = $this->integration->mergeConfigToFeatureSettings([]);
         $queryUrl  = $this->integration->getQueryUrl();
@@ -129,11 +127,9 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getCompany(array $data)
+    public function getCompany(array $data): array
     {
         $config    = $this->integration->mergeConfigToFeatureSettings([]);
         $queryUrl  = $this->integration->getQueryUrl();
@@ -413,11 +409,9 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function checkCampaignMembership($campaignId, $object, array $people)
+    public function checkCampaignMembership($campaignId, $object, array $people): array
     {
         $campaignMembers = [];
         if (!empty($people)) {
@@ -567,7 +561,7 @@ class SalesforceApi extends CrmApi
     /**
      * @throws RetryRequestException
      */
-    private function checkIfLockedRequestShouldBeRetried()
+    private function checkIfLockedRequestShouldBeRetried(): bool
     {
         // The record is locked so let's wait a a few seconds and retry
         if ($this->requestCounter < $this->maxLockRetries) {

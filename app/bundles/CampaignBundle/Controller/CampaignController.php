@@ -259,7 +259,6 @@ class CampaignController extends AbstractStandardFormController
             $page = $session->get('mautic.campaign.page', 1);
         }
 
-        // set limits
         $limit = $session->get('mautic.campaign.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -617,10 +616,8 @@ class CampaignController extends AbstractStandardFormController
      * @param Campaign $entity
      * @param null     $objectId
      * @param bool     $isClone
-     *
-     * @return bool
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
     {
         if (empty($this->campaignEvents)) {
             // set the error

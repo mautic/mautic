@@ -5,9 +5,6 @@ namespace Mautic\UserBundle\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class AuthenticationContentEvent.
- */
 class AuthenticationContentEvent extends Event
 {
     /**
@@ -25,9 +22,6 @@ class AuthenticationContentEvent extends Event
      */
     protected $postLogout = false;
 
-    /**
-     * AuthenticationContentEvent constructor.
-     */
     public function __construct(Request $request)
     {
         $this->request    = $request;

@@ -23,12 +23,10 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-/**
- * Class MailHelper.
- */
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
@@ -392,17 +390,15 @@ class MailHelper
             }
 
             // Attach assets
-            if (!empty($this->assets)) {
-                /** @var \Mautic\AssetBundle\Entity\Asset $asset */
-                foreach ($this->assets as $asset) {
-                    if (!in_array($asset->getId(), $this->attachedAssets)) {
-                        $this->attachedAssets[] = $asset->getId();
-                        $this->attachFile(
-                            $asset->getFilePath(),
-                            $asset->getOriginalFileName(),
-                            $asset->getMime()
-                        );
-                    }
+            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            foreach ($this->assets as $asset) {
+                if (!in_array($asset->getId(), $this->attachedAssets)) {
+                    $this->attachedAssets[] = $asset->getId();
+                    $this->attachFile(
+                        $asset->getFilePath(),
+                        $asset->getOriginalFileName(),
+                        $asset->getMime()
+                    );
                 }
             }
 
@@ -676,34 +672,13 @@ class MailHelper
         // Headers
         /** @var HeaderInterface $header */
         foreach ($message->getHeaders()->all() as $header) {
-            $headerBody = $header->getBody();
-            if ($headerBody instanceof \DateTimeInterface) {
-                // It's not possible to replace tokens in \DateTime objects
-                // because they can't contain tokens
+            // It only makes sense to tokenize headers that can be interpreted as text.
+            if (!$header instanceof UnstructuredHeader) {
                 continue;
             }
-
-            $updated = false;
-            if (is_array($headerBody)) {
-                $bodyReplaced = [];
-                foreach ($headerBody as $key => $value) {
-                    $count1             = $count2             = 0;
-                    $key                = is_string($key) ? str_ireplace($search, $replace, $key, $count1) : $key;
-                    $value              = is_string($value) ? str_ireplace($search, $replace, $value, $count2) : $value;
-                    $bodyReplaced[$key] = $value;
-                    if ($count1 + $count2) {
-                        $updated = true;
-                    }
-                }
-            } else {
-                $bodyReplaced = str_ireplace($search, $replace, $headerBody, $updated);
-            }
-
-            if (!empty($updated)) {
-                $header->setBody($bodyReplaced);
-            }
-
-            unset($headerBody, $bodyReplaced);
+            $headerBody   = $header->getBody();
+            $bodyReplaced = str_ireplace($search, $replace, $headerBody);
+            $header->setBody($bodyReplaced);
         }
 
         // Parts (plaintext)
@@ -790,9 +765,6 @@ class MailHelper
         unset($content);
     }
 
-    /**
-     * Set subject.
-     */
     public function setSubject($subject)
     {
         $this->subject = $subject;
@@ -1265,7 +1237,7 @@ class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
+    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
         if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1456,9 +1428,6 @@ class MailHelper
         $this->globalTokens = array_merge($this->globalTokens, $tokens);
     }
 
-    /**
-     * Set tokens.
-     */
     public function setTokens(array $tokens)
     {
         $this->globalTokens = $tokens;
@@ -1748,10 +1717,8 @@ class MailHelper
      * @param bool|true   $persist
      * @param string|null $emailAddress
      * @param null        $listId
-     *
-     * @return Stat
      */
-    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
         // create a stat
         $stat = new Stat();

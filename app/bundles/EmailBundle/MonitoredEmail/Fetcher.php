@@ -41,9 +41,6 @@ class Fetcher
      */
     private $processedMessageCounter = 0;
 
-    /**
-     * Fetcher constructor.
-     */
     public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
         $this->imapHelper = $imapHelper;
@@ -146,10 +143,7 @@ class Fetcher
         return $messages;
     }
 
-    /**
-     * @return array
-     */
-    private function getConfigs()
+    private function getConfigs(): array
     {
         $mailboxes = [];
         foreach ($this->mailboxes as $mailbox) {

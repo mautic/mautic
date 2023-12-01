@@ -6,9 +6,6 @@ class ConfigAccessor
 {
     private $config;
 
-    /**
-     * ConfigAccessor constructor.
-     */
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -54,10 +51,7 @@ class ConfigAccessor
         return $this->getPath().'_'.$this->getUser();
     }
 
-    /**
-     * @return bool
-     */
-    public function isConfigured()
+    public function isConfigured(): bool
     {
         return $this->getHost() && $this->getFolder();
     }

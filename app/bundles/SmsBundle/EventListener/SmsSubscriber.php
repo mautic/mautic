@@ -128,8 +128,9 @@ class SmsSubscriber implements EventSubscriberInterface
                 );
 
                 $shortenEnabled = $this->coreParametersHelper->get('shortener_sms_enable', false);
+
                 /**
-                 * @var string
+                 * @var string    $token
                  * @var Trackable $trackable
                  */
                 foreach ($trackables as $token => $trackable) {

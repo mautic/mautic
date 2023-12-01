@@ -28,9 +28,6 @@ class KickoffContactFinder
      */
     private $logger;
 
-    /**
-     * KickoffContactFinder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, LoggerInterface $logger)
     {
         $this->leadRepository     = $leadRepository;

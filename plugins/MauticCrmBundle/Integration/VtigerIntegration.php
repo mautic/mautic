@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-/**
- * Class VtigerIntegration.
- */
 class VtigerIntegration extends CrmAbstractIntegration
 {
     private $authorzationError = '';
@@ -162,9 +159,9 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $vTigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;

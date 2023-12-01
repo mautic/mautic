@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class SearchStringHelper.
- */
 class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;
@@ -38,10 +35,6 @@ class SearchStringHelper
 
     /**
      * SearchStringHelper constructor.
-     *
-     * @param array $needsParsing
-     * @param array $needsClosing
-     * @param array $closingChars
      */
     public function __construct(array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
     {
@@ -60,9 +53,6 @@ class SearchStringHelper
 
     /**
      * @param string $input
-     * @param array  $needsParsing
-     * @param array  $needsClosing
-     * @param array  $closingChars
      *
      * @return \stdClass
      */

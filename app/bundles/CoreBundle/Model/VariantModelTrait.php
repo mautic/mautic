@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Model;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
-/**
- * Class VariantModelTrait.
- */
 trait VariantModelTrait
 {
     /**
@@ -79,7 +76,7 @@ trait VariantModelTrait
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null)
+    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 
@@ -139,9 +136,6 @@ trait VariantModelTrait
         }
     }
 
-    /**
-     * @param \DateTime $variantStartDate
-     */
     protected function resetVariants($entity, $relatedIds = null, \DateTime $variantStartDate = null)
     {
         $repo = $this->getRepository();

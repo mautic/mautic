@@ -419,10 +419,8 @@ class ReportType extends AbstractType
      * Extracts the keys from the table_list option and builds an array of tables for the select list.
      *
      * @param array $tables Array with the table list and columns
-     *
-     * @return array
      */
-    private function buildTableSourceList($tables)
+    private function buildTableSourceList($tables): array
     {
         $temp = array_keys($tables);
 

@@ -25,9 +25,6 @@ class Tracking404Model
      */
     private $coreParametersHelper;
 
-    /**
-     * Tracking404Model constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         ContactTracker $contactTracker,
@@ -48,10 +45,7 @@ class Tracking404Model
         $this->pageModel->hitPage($entity, $request, 404);
     }
 
-    /**
-     * @return bool
-     */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
         if (!$this->coreParametersHelper->get('do_not_track_404_anonymous')) {
             return true;

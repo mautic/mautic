@@ -303,20 +303,16 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it.
-     *
-     * @return bool
      */
-    public function shouldAppendClickthrough()
+    public function shouldAppendClickthrough(): bool
     {
         return !$this->isInternalSend() && null === $this->getEmail();
     }
 
     /**
      * Generate a clickthrough array for URLs.
-     *
-     * @return array
      */
-    public function generateClickthrough()
+    public function generateClickthrough(): array
     {
         $source       = $this->getSource();
         $email        = $this->getEmail();
@@ -363,8 +359,7 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getContent();
         $content .= $this->getPlainText();
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
-        $content .= implode(' ', $this->getTextHeaders());
 
-        return $content;
+        return $content.implode(' ', $this->getTextHeaders());
     }
 }

@@ -153,11 +153,9 @@ class CorePermissions
     /**
      * Generates the bit value for the bundle's permission.
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    public function generatePermissions(array $permissions)
+    public function generatePermissions(array $permissions): array
     {
         $entities = [];
 
@@ -406,10 +404,8 @@ class CorePermissions
      * Retrieves all permissions.
      *
      * @param bool $forJs
-     *
-     * @return array
      */
-    public function getAllPermissions($forJs = false)
+    public function getAllPermissions($forJs = false): array
     {
         $permissionObjects = $this->getPermissionObjects();
         $permissions       = [];

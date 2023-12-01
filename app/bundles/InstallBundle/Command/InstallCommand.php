@@ -41,7 +41,7 @@ class InstallCommand extends Command
     {
         $this
             ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from app/config/local.php and command line options/arguments, where the latter takes precedence.')
+            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,

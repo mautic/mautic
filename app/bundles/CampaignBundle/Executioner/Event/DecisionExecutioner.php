@@ -28,9 +28,6 @@ class DecisionExecutioner implements EventInterface
      */
     private $dispatcher;
 
-    /**
-     * DecisionExecutioner constructor.
-     */
     public function __construct(EventLogger $eventLogger, DecisionDispatcher $dispatcher)
     {
         $this->eventLogger = $eventLogger;
@@ -65,11 +62,9 @@ class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
         \assert($config instanceof DecisionAccessor);
         $evaluatedContacts = new EvaluatedContacts();

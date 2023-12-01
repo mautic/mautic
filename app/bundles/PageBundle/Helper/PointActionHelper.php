@@ -5,17 +5,12 @@ namespace Mautic\PageBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PointActionHelper.
- */
 class PointActionHelper
 {
     /**
      * @param MauticFactory $factory
-     *
-     * @return bool
      */
-    public static function validatePageHit($factory, $eventDetails, $action)
+    public static function validatePageHit($factory, $eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 

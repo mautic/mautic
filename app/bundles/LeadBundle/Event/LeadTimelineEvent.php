@@ -391,10 +391,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Returns the lead ID if any.
-     *
-     * @return int|null
      */
-    public function getLeadId()
+    public function getLeadId(): ?int
     {
         return ($this->lead instanceof Lead) ? $this->lead->getId() : null;
     }
@@ -403,10 +401,8 @@ class LeadTimelineEvent extends Event
      * Determine if an event type should be included.
      *
      * @param bool $inclusive
-     *
-     * @return bool
      */
-    public function isApplicable($eventType, $inclusive = false)
+    public function isApplicable($eventType, $inclusive = false): bool
     {
         if ($this->fetchTypesOnly) {
             return false;
@@ -459,8 +455,10 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get total number of events for pagination.
+     *
+     * @return mixed[]
      */
-    public function getEventCounter()
+    public function getEventCounter(): array
     {
         // BC support for old formats
         foreach ($this->events as $type => $events) {

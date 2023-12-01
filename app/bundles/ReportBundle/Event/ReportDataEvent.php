@@ -4,9 +4,6 @@ namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
 
-/**
- * Class ReportDataEvent.
- */
 class ReportDataEvent extends AbstractReportEvent
 {
     /**
@@ -24,9 +21,6 @@ class ReportDataEvent extends AbstractReportEvent
      */
     private $totalResults = 0;
 
-    /**
-     * ReportDataEvent constructor.
-     */
     public function __construct(Report $report, array $data, $totalResults, array $options)
     {
         $this->context      = $report->getSource();

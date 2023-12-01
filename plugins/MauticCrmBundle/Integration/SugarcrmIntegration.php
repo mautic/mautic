@@ -289,11 +289,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -658,10 +656,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -730,10 +726,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             return empty($error);
         } else {
-            if ($this->isConfigured()) {
-                // SugarCRM 7 uses password grant type so login each time to ensure session is valid
-                $this->authCallback();
-            }
+            // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+            $this->authCallback();
 
             return parent::isAuthorized();
         }
@@ -1220,10 +1214,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array  $fields
      * @param array  $keys
      * @param string $object
-     *
-     * @return array
      */
-    public function cleanSugarData($fields, $keys, $object)
+    public function cleanSugarData($fields, $keys, $object): array
     {
         $leadFields = [];
 
@@ -1393,10 +1385,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         // uncheck
         // If DNC doesn't exist set to 1
-        if (!empty($sugarDncKeys)) {
-            foreach ($sugarDncKeys as $sugarDncKey) {
-                $body[] = ['name' => $sugarDncKey, 'value' => 0];
-            }
+        foreach ($sugarDncKeys as $sugarDncKey) {
+            $body[] = ['name' => $sugarDncKey, 'value' => 0];
         }
     }
 

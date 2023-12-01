@@ -10,9 +10,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Class UpdateController.
- */
 class UpdateController extends CommonController
 {
     /**
@@ -55,7 +52,7 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->getParameter('mautic.application_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];

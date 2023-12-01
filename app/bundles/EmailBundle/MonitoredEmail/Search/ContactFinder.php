@@ -25,9 +25,6 @@ class ContactFinder
      */
     private $logger;
 
-    /**
-     * ContactFinder constructor.
-     */
     public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
     {
         $this->statRepository = $statRepository;
@@ -57,10 +54,7 @@ class ContactFinder
         return $this->findByAddress($contactEmail);
     }
 
-    /**
-     * @return Result
-     */
-    public function findByHash($hash)
+    public function findByHash($hash): Result
     {
         $result = new Result();
         $this->logger->debug('MONITORED EMAIL: Searching for a contact by hash '.$hash);
@@ -76,10 +70,7 @@ class ContactFinder
         return $result;
     }
 
-    /**
-     * @return Result
-     */
-    public function findByAddress($address)
+    public function findByAddress($address): Result
     {
         $result = new Result();
         // Search by email address

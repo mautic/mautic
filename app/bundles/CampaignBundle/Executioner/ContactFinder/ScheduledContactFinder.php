@@ -22,9 +22,6 @@ class ScheduledContactFinder
      */
     private $logger;
 
-    /**
-     * ScheduledContactFinder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
     {
         $this->leadRepository = $leadRepository;

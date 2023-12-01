@@ -42,50 +42,26 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AssetModel extends FormModel
 {
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
+    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
     /**
      * @var int
      */
     protected $maxAssetSize;
 
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface $deviceCreatorService;
 
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
+    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface $deviceDetectorFactory;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(
         LeadModel $leadModel,
@@ -637,10 +613,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -665,11 +639,9 @@ class AssetModel extends FormModel
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */

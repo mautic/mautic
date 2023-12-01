@@ -9,9 +9,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class TweetSendType.
- */
 class TweetSendType extends AbstractType
 {
     /**

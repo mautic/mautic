@@ -12,9 +12,6 @@ class Parser
      */
     private $message;
 
-    /**
-     * Parser constructor.
-     */
     public function __construct(Message $message)
     {
         $this->message = $message;
@@ -23,11 +20,9 @@ class Parser
     /**
      * Only sure way is to parse the content for the stat ID otherwise attempt the from.
      *
-     * @return RepliedEmail
-     *
      * @throws ReplyNotFound
      */
-    public function parse()
+    public function parse(): RepliedEmail
     {
         if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', $this->message->textHtml, $parts)) {
             throw new ReplyNotFound();

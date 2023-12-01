@@ -19,7 +19,7 @@ class ReportDataAdapter
         $this->reportModel = $reportModel;
     }
 
-    public function getReportData(Report $report, ReportExportOptions $reportExportOptions)
+    public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult
     {
         $options                    = [];
         $options['paginate']        = true;

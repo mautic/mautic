@@ -43,10 +43,7 @@ class RoleListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getRoleChoices()
+    private function getRoleChoices(): array
     {
         $choices = [];
         $roles   = $this->roleModel->getRepository()->getEntities(

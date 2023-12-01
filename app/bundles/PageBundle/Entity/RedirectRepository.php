@@ -28,8 +28,6 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param Email $email
-     *
      * @return array
      */
     public function findByIds(array $ids, Email $email = null)

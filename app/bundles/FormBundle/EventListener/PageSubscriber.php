@@ -36,9 +36,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $security;
 
-    /**
-     * PageSubscriber constructor.
-     */
     public function __construct(
         FormModel $formModel,
         BuilderTokenHelperFactory $builderTokenHelperFactory,

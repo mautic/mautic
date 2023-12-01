@@ -38,9 +38,6 @@ class BroadcastExecutioner
      */
     private $translator;
 
-    /**
-     * BroadcastExecutioner constructor.
-     */
     public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
     {
         $this->smsModel       = $smsModel;

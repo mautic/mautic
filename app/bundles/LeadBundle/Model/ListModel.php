@@ -1274,10 +1274,8 @@ class ListModel extends FormModel
             case null:
                 $choices['categories'] = [];
                 $categories            = $this->categoryModel->getLookupResults('segment');
-                if ($categories) {
-                    foreach ($categories as $category) {
-                        $choices['categories'][$category['id']] = $category['title'];
-                    }
+                foreach ($categories as $category) {
+                    $choices['categories'][$category['id']] = $category['title'];
                 }
         }
 

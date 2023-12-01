@@ -8,17 +8,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class DsnParser.
- */
 class DsnParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message)
+    public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
         $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;

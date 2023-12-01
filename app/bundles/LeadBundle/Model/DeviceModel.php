@@ -30,9 +30,6 @@ class DeviceModel extends FormModel
      */
     private $leadDeviceRepository;
 
-    /**
-     * DeviceModel constructor.
-     */
     public function __construct(
         LeadDeviceRepository $leadDeviceRepository,
         EntityManager $em,

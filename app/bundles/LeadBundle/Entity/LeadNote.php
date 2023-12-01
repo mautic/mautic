@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadNote.
- */
 class LeadNote extends FormEntity
 {
     /**

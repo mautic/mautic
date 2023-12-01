@@ -263,9 +263,9 @@ class ConfigController extends FormController
         // Import the current local configuration, $parameters is defined in this file
 
         $parameters = [];
-        /** @var array $parameters */
         include $localConfigFile;
 
+        /** @var mixed[] $parameters */
         $localParams = $parameters;
 
         foreach ($forms as &$form) {

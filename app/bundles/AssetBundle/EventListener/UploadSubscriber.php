@@ -14,20 +14,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
+    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
 
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
+    private \Mautic\CoreBundle\Validator\FileUploadValidator $fileUploadValidator;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
     {

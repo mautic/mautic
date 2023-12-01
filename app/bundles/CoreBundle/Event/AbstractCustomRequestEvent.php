@@ -24,8 +24,6 @@ abstract class AbstractCustomRequestEvent extends Event
 
     /**
      * AbstractCustomRequestEvent constructor.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request = null)
     {

@@ -137,7 +137,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->defaultTheme = $defaultTheme;
     }
 
-    public function createThemeHelper($themeName)
+    public function createThemeHelper($themeName): twigThemeHelper
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
@@ -238,7 +238,10 @@ class ThemeHelper implements ThemeHelperInterface
         $this->filesystem->dumpFile($configJsonPath, json_encode($config));
     }
 
-    public function getOptionalSettings()
+    /**
+     * @return mixed[]
+     */
+    public function getOptionalSettings(): array
     {
         $minors = [];
 

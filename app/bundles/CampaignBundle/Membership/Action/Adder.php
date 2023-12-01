@@ -23,19 +23,13 @@ class Adder
      */
     private $leadEventLogRepository;
 
-    /**
-     * Adder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
         $this->leadRepository         = $leadRepository;
         $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
-    /**
-     * @return CampaignMember
-     */
-    public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
+    public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember
     {
         // BC support for prior to 2.14.
         // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed

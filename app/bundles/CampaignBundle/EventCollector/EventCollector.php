@@ -33,9 +33,6 @@ class EventCollector
      */
     private $events;
 
-    /**
-     * EventCollector constructor.
-     */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translator = $translator;

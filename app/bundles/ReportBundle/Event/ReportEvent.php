@@ -5,9 +5,6 @@ namespace Mautic\ReportBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\ReportBundle\Entity\Report;
 
-/**
- * Class ReportEvent.
- */
 class ReportEvent extends CommonEvent
 {
     /**

@@ -142,7 +142,7 @@ class MonitoringModel extends FormModel
     /**
      * @return string[]
      */
-    public function getNetworkTypes()
+    public function getNetworkTypes(): array
     {
         $types = [];
         foreach ($this->networkTypes as $type => $data) {

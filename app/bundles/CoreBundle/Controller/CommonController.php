@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -155,10 +157,8 @@ class CommonController extends AbstractController implements MauticController
      * Determines if ajax content should be returned or direct content (page refresh).
      *
      * @param array $args
-     *
-     * @return JsonResponse|Response
      */
-    public function delegateView($args)
+    public function delegateView($args): Response
     {
         $request = $this->getCurrentRequest();
         $bundle  = $request->query->get('bundle');
@@ -202,6 +202,16 @@ class CommonController extends AbstractController implements MauticController
 
         $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
         $response = new Response('', $code);
+
+        if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
+            $event = $this->dispatcher->dispatch(
+                new CustomTemplateEvent($request, $template, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
+            );
+
+            $template   = $event->getTemplate();
+            $parameters = $event->getVars();
+        }
 
         return $this->render($template, $parameters, $response);
     }
@@ -258,7 +268,6 @@ class CommonController extends AbstractController implements MauticController
         // forward the controller by default
         $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
 
-        // set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->addFlashMessage(
@@ -288,10 +297,8 @@ class CommonController extends AbstractController implements MauticController
      * Generates html for ajax request.
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
-     *
-     * @return Response
      */
-    public function ajaxAction(Request $request, $args = [])
+    public function ajaxAction(Request $request, $args = []): Response
     {
         defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
 
@@ -600,8 +607,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @param Request $request
      *
      * @return array
      */

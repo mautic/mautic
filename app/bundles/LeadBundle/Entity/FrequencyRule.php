@@ -7,9 +7,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class FrequencyRule.
- */
 class FrequencyRule extends CommonEntity
 {
     public const TIME_DAY   = 'DAY';
@@ -281,8 +278,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseFromDate
-     *
      * @return FrequencyRule
      */
     public function setPauseFromDate(\DateTime $pauseFromDate = null)
@@ -303,8 +298,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseToDate
-     *
      * @return FrequencyRule
      */
     public function setPauseToDate(\DateTime $pauseToDate = null)

@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class EmailSendType.
- */
 class StageActionChangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

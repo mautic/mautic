@@ -2,9 +2,6 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-/**
- * Class PointEventHelper.
- */
 class PointEventHelper
 {
     /**

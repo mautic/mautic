@@ -13,9 +13,6 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignReplySubscriber.
- */
 class CampaignReplySubscriber implements EventSubscriberInterface
 {
     public const TYPE = 'sms.reply';
@@ -30,9 +27,6 @@ class CampaignReplySubscriber implements EventSubscriberInterface
      */
     private $realTimeExecutioner;
 
-    /**
-     * CampaignReplySubscriber constructor.
-     */
     public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
     {
         $this->transportChain      = $transportChain;

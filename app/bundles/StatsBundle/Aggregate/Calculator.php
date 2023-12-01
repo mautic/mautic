@@ -23,9 +23,6 @@ class Calculator
      */
     private $toDateTime;
 
-    /**
-     * Calculator constructor.
-     */
     public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
     {
         $this->statsDAO     = $statsDAO;
@@ -36,11 +33,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
      * @throws \Exception
      */
-    public function getSumsByYear($labelFormat = 'Y')
+    public function getSumsByYear($labelFormat = 'Y'): StatDAO
     {
         $statDAO  = new StatDAO();
         $lastYear = $this->fromDateTime ? $this->fromDateTime->format('Y') : null;
@@ -66,11 +61,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
      * @throws \Exception
      */
-    public function getSumsByMonth($labelFormat = 'Y-m')
+    public function getSumsByMonth($labelFormat = 'Y-m'): StatDAO
     {
         $statDAO   = new StatDAO();
         $lastMonth = $this->fromDateTime ? $this->fromDateTime->format('Y-m') : null;
@@ -96,11 +89,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
      * @throws \Exception
      */
-    public function getSumsByDay($labelFormat = 'Y-m-d')
+    public function getSumsByDay($labelFormat = 'Y-m-d'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d') : null;
@@ -126,11 +117,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
      * @throws \Exception
      */
-    public function getSumsByWeek($labelFormat = 'Y-W')
+    public function getSumsByWeek($labelFormat = 'Y-W'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-W') : null;
@@ -160,11 +149,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
      * @throws \Exception
      */
-    public function getCountsByHour($labelFormat = 'Y-m-d H')
+    public function getCountsByHour($labelFormat = 'Y-m-d H'): StatDAO
     {
         $statDAO  = new StatDAO();
         $lastHour = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d H') : null;
@@ -187,7 +174,7 @@ class Calculator
         return $statDAO;
     }
 
-    public function getSum()
+    public function getSum(): StatDAO
     {
         $statDAO = new StatDAO();
         $sum     = 0;

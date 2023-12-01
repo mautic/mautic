@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WidgetDetailEvent.
- */
 class WidgetDetailEvent extends CommonEvent
 {
     protected $widget;
@@ -218,10 +215,8 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Checks the cache for the widget data.
      * If cache exists, it sets the TemplateData.
-     *
-     * @return string
      */
-    public function isCached()
+    public function isCached(): bool
     {
         if (!$this->cacheDir) {
             return false;

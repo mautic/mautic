@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Event;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class FocusViewEvent.
- */
 class FocusViewEvent extends Event
 {
     /**

@@ -21,9 +21,6 @@ class DoNotContact implements MauticModelInterface
      */
     protected $dncRepo;
 
-    /**
-     * DoNotContact constructor.
-     */
     public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
     {
         $this->leadModel = $leadModel;
@@ -37,10 +34,8 @@ class DoNotContact implements MauticModelInterface
      * @param string    $channel
      * @param bool|true $persist
      * @param int|null  $reason
-     *
-     * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
+    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null): bool
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -172,10 +167,8 @@ class DoNotContact implements MauticModelInterface
 
     /**
      * @param null $comments
-     *
-     * @return DNC
      */
-    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null)
+    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
     {
         $dnc = new DNC();
 

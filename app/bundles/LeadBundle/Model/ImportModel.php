@@ -68,9 +68,6 @@ class ImportModel extends FormModel
      */
     protected $leadEventLogRepo;
 
-    /**
-     * ImportModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         LeadModel $leadModel,
@@ -284,10 +281,8 @@ class ImportModel extends FormModel
      * Import the CSV file from configuration in the $import entity.
      *
      * @param int $limit Number of records to import before delaying the import
-     *
-     * @return bool
      */
-    public function process(Import $import, Progress $progress, $limit = 0)
+    public function process(Import $import, Progress $progress, $limit = 0): bool
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -443,10 +438,8 @@ class ImportModel extends FormModel
      * If it is more, return true.
      *
      * @param int $headerCount
-     *
-     * @return bool
      */
-    public function hasMoreValuesThanColumns(array &$data, $headerCount)
+    public function hasMoreValuesThanColumns(array &$data, $headerCount): bool
     {
         $dataCount = count($data);
 
@@ -512,10 +505,8 @@ class ImportModel extends FormModel
      * Initialize LeadEventLog object and configure it as the import event.
      *
      * @param int $lineNumber
-     *
-     * @return LeadEventLog
      */
-    public function initEventLog(Import $import, $lineNumber)
+    public function initEventLog(Import $import, $lineNumber): LeadEventLog
     {
         $eventLog = new LeadEventLog();
         $eventLog->setUserId($import->getCreatedBy())
@@ -692,7 +683,6 @@ class ImportModel extends FormModel
      * Logs a debug message if in dev environment.
      *
      * @param string $msg
-     * @param Import $import
      */
     protected function logDebug($msg, Import $import = null)
     {

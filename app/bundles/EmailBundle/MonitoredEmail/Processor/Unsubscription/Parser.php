@@ -12,20 +12,15 @@ class Parser
      */
     protected $message;
 
-    /**
-     * Parser constructor.
-     */
     public function __construct(Message $message)
     {
         $this->message = $message;
     }
 
     /**
-     * @return UnsubscribedEmail
-     *
      * @throws UnsubscriptionNotFound
      */
-    public function parse()
+    public function parse(): UnsubscribedEmail
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {

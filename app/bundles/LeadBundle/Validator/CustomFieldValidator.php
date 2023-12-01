@@ -57,10 +57,9 @@ class CustomFieldValidator
      */
     private function getFieldByAlias(string $alias): LeadField
     {
-        /** @var LeadField|null */
         $field = $this->fieldModel->getEntityByAlias($alias);
 
-        if (!$field) {
+        if (!$field instanceof LeadField) {
             throw new RecordNotFoundException($this->translator->trans('mautic.lead.contact.field.not.found', ['%alias%' => $alias], 'validators'));
         }
 

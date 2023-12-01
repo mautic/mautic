@@ -6,9 +6,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-/**
- * Class IdentifyCompanyHelper.
- */
 class IdentifyCompanyHelper
 {
     /**
@@ -84,7 +81,7 @@ class IdentifyCompanyHelper
         return [$companyData, $companyEntities];
     }
 
-    private static function hasCompanyParameters(array $parameters, CompanyModel $companyModel)
+    private static function hasCompanyParameters(array $parameters, CompanyModel $companyModel): bool
     {
         $companyFields = $companyModel->fetchCompanyFields();
         foreach ($parameters as $alias => $value) {

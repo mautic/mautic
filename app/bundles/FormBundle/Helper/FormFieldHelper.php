@@ -16,9 +16,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class FormFieldHelper.
- */
 class FormFieldHelper extends AbstractFormFieldHelper
 {
     /**
@@ -73,8 +70,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * FormFieldHelper constructor.
-     *
-     * @param ValidatorInterface $validator
      */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
@@ -136,10 +131,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * @param Field $f
-     *
-     * @return array
      */
-    public function validateFieldValue($type, $value, $f = null)
+    public function validateFieldValue($type, $value, $f = null): array
     {
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {

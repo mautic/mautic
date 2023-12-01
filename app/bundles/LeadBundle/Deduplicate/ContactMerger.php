@@ -47,9 +47,6 @@ class ContactMerger
      */
     protected $dispatcher;
 
-    /**
-     * ContactMerger constructor.
-     */
     public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
         $this->leadModel  = $leadModel;

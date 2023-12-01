@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-/**
- * Class CompanyDecorator.
- */
 class CompanyDecorator extends BaseDecorator
 {
     /**

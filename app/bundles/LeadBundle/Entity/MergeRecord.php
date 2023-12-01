@@ -87,8 +87,6 @@ class MergeRecord
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return MergeRecord
      */
     public function setDateAdded(\DateTime $dateAdded = null)

@@ -9,9 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class Hit.
- */
 class Hit
 {
     /**
@@ -612,8 +609,6 @@ class Hit
 
     /**
      * Set page.
-     *
-     * @param Page $page
      *
      * @return Hit
      */

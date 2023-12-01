@@ -10,9 +10,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CsvExporter.
- */
 class ExcelExporter
 {
     /**

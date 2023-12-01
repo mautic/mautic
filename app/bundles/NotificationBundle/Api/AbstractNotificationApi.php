@@ -14,9 +14,6 @@ abstract class AbstractNotificationApi
     protected TrackableModel $trackableModel;
     protected IntegrationHelper $integrationHelper;
 
-    /**
-     * AbstractNotificationApi constructor.
-     */
     public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
     {
         $this->http              = $http;

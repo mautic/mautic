@@ -7,9 +7,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CampaignEventJumpToEventType.
- */
 class CampaignEventJumpToEventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

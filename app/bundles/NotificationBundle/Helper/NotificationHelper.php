@@ -48,9 +48,6 @@ class NotificationHelper
      */
     private $doNotContact;
 
-    /**
-     * NotificationHelper constructor.
-     */
     public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {
         $this->em                   = $em;
@@ -194,7 +191,7 @@ JS;
         }
     }
 
-    private function hasScript()
+    private function hasScript(): bool
     {
         $landingPage = true;
         $server      = $this->requestStack->getCurrentRequest()->server;

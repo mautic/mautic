@@ -5,9 +5,6 @@ namespace Mautic\FormBundle\Helper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
@@ -20,19 +17,13 @@ class TokenHelper
      */
     protected $security;
 
-    /**
-     * TokenHelper constructor.
-     */
     public function __construct(FormModel $formModel, CorePermissions $security)
     {
         $this->formModel = $formModel;
         $this->security  = $security;
     }
 
-    /**
-     * @return array
-     */
-    public function findFormTokens($content)
+    public function findFormTokens($content): array
     {
         $tokens = [];
 

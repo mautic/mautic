@@ -2,15 +2,9 @@
 
 namespace Mautic\AssetBundle\Helper;
 
-/**
- * Class PointActionHelper.
- */
 class PointActionHelper
 {
-    /**
-     * @return bool
-     */
-    public static function validateAssetDownload($eventDetails, $action)
+    public static function validateAssetDownload($eventDetails, $action): bool
     {
         $assetId       = $eventDetails->getId();
         $limitToAssets = $action['properties']['assets'];

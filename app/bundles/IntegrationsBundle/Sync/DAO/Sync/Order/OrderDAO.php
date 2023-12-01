@@ -273,7 +273,7 @@ class OrderDAO
     /**
      * @return ObjectChangeDAO[]
      */
-    public function getSuccessfullySyncedObjects()
+    public function getSuccessfullySyncedObjects(): array
     {
         $synced = [];
         foreach ($this->changedObjects as $objectChanges) {

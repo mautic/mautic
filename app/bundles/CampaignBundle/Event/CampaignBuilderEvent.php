@@ -38,9 +38,6 @@ class CampaignBuilderEvent extends Event
      */
     private $sortCache = [];
 
-    /**
-     * CampaignBuilderEvent constructor.
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

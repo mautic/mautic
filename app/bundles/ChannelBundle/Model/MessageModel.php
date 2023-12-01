@@ -43,9 +43,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     protected static $channels;
 
-    /**
-     * MessageModel constructor.
-     */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->channelListHelper = $channelListHelper;
@@ -163,10 +160,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {

@@ -8,9 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ThemeListType.
- */
 class ThemeListType extends AbstractType
 {
     /**
@@ -18,9 +15,6 @@ class ThemeListType extends AbstractType
      */
     private $themeHelper;
 
-    /**
-     * ThemeListType constructor.
-     */
     public function __construct(ThemeHelperInterface $helper)
     {
         $this->themeHelper = $helper;

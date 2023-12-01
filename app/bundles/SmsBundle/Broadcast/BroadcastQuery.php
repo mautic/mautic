@@ -28,9 +28,6 @@ class BroadcastQuery
      */
     private $query;
 
-    /**
-     * BroadcastQuery constructor.
-     */
     public function __construct(EntityManager $entityManager, SmsModel $smsModel)
     {
         $this->entityManager = $entityManager;

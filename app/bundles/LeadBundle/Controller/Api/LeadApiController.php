@@ -563,10 +563,8 @@ class LeadApiController extends CommonApiController
         }
 
         // keep existing tags
-        if (count($entity->getTags()) > 0) {
-            foreach ($entity->getTags() as $tag) {
-                $parameters['tags'][] = $tag->getId();
-            }
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
         }
 
         // keep existing owner if it is not set or should be reset to null
@@ -707,22 +705,16 @@ class LeadApiController extends CommonApiController
      * Helper method to be used in FrequencyRuleTrait.
      *
      * @param Form $form
-     *
-     * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled($form = null): bool
     {
         return false;
     }
 
     /**
      * Helper method to be used in FrequencyRuleTrait.
-     *
-     * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(Form $form, array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 

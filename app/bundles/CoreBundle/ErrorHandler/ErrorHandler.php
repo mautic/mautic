@@ -119,11 +119,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
          * @param int    $line
          * @param array  $context
          *
-         * @return bool
-         *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = [])
+        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -196,7 +194,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @throws \Exception
          */
-        public function handleFatal()
+        public function handleFatal(): bool
         {
             static $handlingFatal = false;
             $error                = error_get_last();
@@ -510,9 +508,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
-                    $root = realpath(__DIR__.'/../../../../');
-
-                    return $root;
+                    return realpath(__DIR__.'/../../../../');
                 }));
 
                 if ($loader->exists('custom_offline.html.twig')) {

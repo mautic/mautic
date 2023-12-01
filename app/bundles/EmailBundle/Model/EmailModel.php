@@ -610,10 +610,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -673,10 +671,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -1088,12 +1084,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead lists.
      *
-     * @param array           $lists
-     * @param int|null        $limit
-     * @param int|null        $batch        True to process and batch all pending leads
-     * @param OutputInterface $output
-     * @param int             $minContactId
-     * @param int             $maxContactId
+     * @param array    $lists
+     * @param int|null $limit
+     * @param int|null $batch        True to process and batch all pending leads
+     * @param int      $minContactId
+     * @param int      $maxContactId
      *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
@@ -1436,14 +1431,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
-            if (!empty($dnc)) {
-                foreach ($dnc as $removeMeId => $removeMeEmail) {
-                    if ($dncAsError) {
-                        $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
-                    }
-                    unset($sendTo[$removeMeId]);
-                    unset($leadIds[$removeMeId]);
+            foreach ($dnc as $removeMeId => $removeMeEmail) {
+                if ($dncAsError) {
+                    $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
                 }
+                unset($sendTo[$removeMeId]);
+                unset($leadIds[$removeMeId]);
             }
         }
 
@@ -1603,7 +1596,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Send an email to lead(s).
      *
      * @param array|int $users
-     * @param array     $lead
      * @param bool      $saveStat
      *
      * @return bool|string[]
@@ -1763,10 +1755,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
      *
      * @param string $idHash
-     *
-     * @return EmailSendEvent
      */
-    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = [])
+    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = []): EmailSendEvent
     {
         $event = new EmailSendEvent(
             null,
@@ -1833,10 +1823,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string $comments
      * @param bool   $flush
      * @param null   $leadId
-     *
-     * @return array
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -2109,11 +2097,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a list of emails in a date range, grouped by a stat date count.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2150,11 +2136,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a list of emails in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2207,10 +2191,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -2353,10 +2335,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmailsIdsWithDependenciesOnSegment($segmentId)
+    public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities =  $this->getEntities(
             [

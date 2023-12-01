@@ -63,8 +63,6 @@ class MessageQueueModel extends FormModel
      * @param string $statTableName
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
     public function processFrequencyRules(
         array &$leads,
@@ -77,7 +75,7 @@ class MessageQueueModel extends FormModel
         $statTableName = 'email_stats',
         $statContactColumn = 'lead_id',
         $statSentColumn = 'date_sent'
-    ) {
+    ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 
@@ -97,27 +95,25 @@ class MessageQueueModel extends FormModel
         );
 
         $queuedContacts = [];
-        if (!empty($dontSendTo)) {
-            foreach ($dontSendTo as $frequencyRuleMet) {
-                // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
-                $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
-                if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
-                    $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
-                } else {
-                    // Queue this message to be processed by frequency and priority
-                    $this->queue(
-                        [$leads[$frequencyRuleMet['lead_id']]],
-                        $channel,
-                        $channelId,
-                        $scheduleInterval,
-                        $attempts,
-                        $priority,
-                        $campaignEventId
-                    );
-                }
-                $queuedContacts[$frequencyRuleMet['lead_id']] = $frequencyRuleMet['lead_id'];
-                unset($leads[$frequencyRuleMet['lead_id']]);
+        foreach ($dontSendTo as $frequencyRuleMet) {
+            // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
+            $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
+            if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
+                $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
+            } else {
+                // Queue this message to be processed by frequency and priority
+                $this->queue(
+                    [$leads[$frequencyRuleMet['lead_id']]],
+                    $channel,
+                    $channelId,
+                    $scheduleInterval,
+                    $attempts,
+                    $priority,
+                    $campaignEventId
+                );
             }
+            $queuedContacts[$frequencyRuleMet['lead_id']] = $frequencyRuleMet['lead_id'];
+            unset($leads[$frequencyRuleMet['lead_id']]);
         }
 
         return $queuedContacts;
@@ -133,8 +129,6 @@ class MessageQueueModel extends FormModel
      * @param int      $priority
      * @param int|null $campaignEventId
      * @param array    $options
-     *
-     * @return bool
      */
     public function queue(
         $leads,
@@ -145,7 +139,7 @@ class MessageQueueModel extends FormModel
         $priority = 1,
         $campaignEventId = null,
         $options = []
-    ) {
+    ): bool {
         $messageQueues = [];
 
         $scheduledDate = (new \DateTime())->add($scheduledInterval);

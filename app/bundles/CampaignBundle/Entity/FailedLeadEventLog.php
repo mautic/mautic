@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class LeadEventLog.
- */
 class FailedLeadEventLog
 {
     /**
@@ -69,8 +66,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param LeadEventLog $log
-     *
      * @return FailedLeadEventLog
      */
     public function setLog(LeadEventLog $log = null)
@@ -93,8 +88,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return FailedLeadEventLog
      */
     public function setDateAdded(\DateTime $dateAdded = null)

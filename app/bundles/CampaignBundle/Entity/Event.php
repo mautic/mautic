@@ -9,9 +9,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 
-/**
- * Class Event.
- */
 class Event implements ChannelInterface
 {
     public const TYPE_DECISION  = 'decision';
@@ -641,8 +638,6 @@ class Event implements ChannelInterface
     /**
      * Add children.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
-     *
      * @return Event
      */
     public function addChild(Event $children)
@@ -654,8 +649,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove children.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $children
      */
     public function removeChild(Event $children)
     {
@@ -712,8 +705,6 @@ class Event implements ChannelInterface
 
     /**
      * Set parent.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $parent
      *
      * @return Event
      */

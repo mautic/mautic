@@ -393,8 +393,6 @@ class SubmissionRepository extends CommonRepository
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
      *
-     * @param \DateTime $fromDate
-     *
      * @return mixed
      */
     public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
@@ -437,10 +435,8 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * Validates that an array of submission IDs belong to a specific form.
-     *
-     * @return array
      */
-    public function validateSubmissions($ids, $formId)
+    public function validateSubmissions($ids, $formId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')

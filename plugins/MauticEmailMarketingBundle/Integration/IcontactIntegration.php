@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-/**
- * Class IcontactIntegration.
- */
 class IcontactIntegration extends EmailAbstractIntegration
 {
     /**
@@ -120,10 +117,7 @@ class IcontactIntegration extends EmailAbstractIntegration
         return parent::makeRequest($url, $parameters, $method, $settings);
     }
 
-    /**
-     * @return bool
-     */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getRequiredKeyFields();
         foreach ($keys as $k => $l) {
@@ -195,10 +189,8 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @param array                          $config
-     *
-     * @return bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

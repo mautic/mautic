@@ -4,9 +4,6 @@ namespace Mautic\PageBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class UntrackableUrlsEvent.
- */
 class UntrackableUrlsEvent extends Event
 {
     /**
@@ -23,9 +20,6 @@ class UntrackableUrlsEvent extends Event
      */
     private $content;
 
-    /**
-     * TrackableEvent constructor.
-     */
     public function __construct($content)
     {
         $this->content = $content;

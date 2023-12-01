@@ -5,15 +5,9 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class PointEventHelper.
- */
 class PointEventHelper
 {
-    /**
-     * @return int
-     */
-    public static function validateEmail($eventDetails, $action)
+    public static function validateEmail($eventDetails, $action): bool
     {
         if (null === $eventDetails) {
             return false;
@@ -49,7 +43,6 @@ class PointEventHelper
         if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 

@@ -67,9 +67,6 @@ class TrackableModel extends AbstractCommonModel
      */
     private $contactFieldUrlTokens;
 
-    /**
-     * TrackableModel constructor.
-     */
     public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->redirectModel       = $redirectModel;
@@ -273,7 +270,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<string, Redirect|Trackable>
      */
-    protected function createTrackingTokens(array $entities)
+    protected function createTrackingTokens(array $entities): array
     {
         $tokens = [];
         foreach ($entities as $trackable) {
@@ -375,10 +372,8 @@ class TrackableModel extends AbstractCommonModel
      * Find URLs in plain text and parse into trackables.
      *
      * @param string $text Plain text content
-     *
-     * @return array
      */
-    protected function extractTrackablesFromText($text)
+    protected function extractTrackablesFromText($text): array
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
         $text = strip_tags($text);
@@ -399,10 +394,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Create a Trackable entity.
-     *
-     * @return Trackable
      */
-    protected function createTrackableEntity($url, $channel, $channelId)
+    protected function createTrackableEntity($url, $channel, $channelId): Trackable
     {
         $redirect = $this->getRedirectModel()->createRedirectEntity($url);
 
@@ -486,10 +479,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Determines if a URL/token is in the do not track list.
-     *
-     * @return bool
      */
-    protected function isInDoNotTrack($url)
+    protected function isInDoNotTrack($url): bool
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
@@ -542,10 +533,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * @param bool $forceScheme
-     *
-     * @return bool
      */
-    protected function isValidUrl($url, $forceScheme = true)
+    protected function isValidUrl($url, $forceScheme = true): bool
     {
         $urlParts = (!is_array($url)) ? parse_url($url) : $url;
 
@@ -809,10 +798,7 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    /**
-     * @return bool
-     */
-    private function isContactFieldToken($token)
+    private function isContactFieldToken($token): bool
     {
         return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
     }

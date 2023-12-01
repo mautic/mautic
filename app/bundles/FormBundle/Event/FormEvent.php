@@ -5,9 +5,6 @@ namespace Mautic\FormBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Form;
 
-/**
- * Class FormEvent.
- */
 class FormEvent extends CommonEvent
 {
     /**

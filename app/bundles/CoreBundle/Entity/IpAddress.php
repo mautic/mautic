@@ -6,17 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class IpAddress.
- */
 class IpAddress
 {
     /**
      * Set by factory of configured IPs to not track.
-     *
-     * @var array
      */
-    private $doNotTrack = [];
+    private array $doNotTrack = [];
 
     /**
      * @var int
@@ -163,33 +158,31 @@ class IpAddress
     /**
      * Determine if this IP is trackable.
      */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
-        if (!empty($this->doNotTrack)) {
-            foreach ($this->doNotTrack as $ip) {
-                if (false !== strpos($ip, '/')) {
-                    // has a netmask range
-                    // https://gist.github.com/tott/7684443
-                    list($range, $netmask) = explode('/', $ip, 2);
-                    $range_decimal         = ip2long($range);
-                    $ip_decimal            = ip2long($this->ipAddress);
-                    $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
-                    $netmask_decimal       = ~$wildcard_decimal;
+        foreach ($this->doNotTrack as $ip) {
+            if (false !== strpos($ip, '/')) {
+                // has a netmask range
+                // https://gist.github.com/tott/7684443
+                list($range, $netmask) = explode('/', $ip, 2);
+                $range_decimal         = ip2long($range);
+                $ip_decimal            = ip2long($this->ipAddress);
+                $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
+                $netmask_decimal       = ~$wildcard_decimal;
 
-                    if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if ($ip === $this->ipAddress) {
+                if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
                     return false;
                 }
 
-                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
-                    return false;
-                }
+                continue;
+            }
+
+            if ($ip === $this->ipAddress) {
+                return false;
+            }
+
+            if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                return false;
             }
         }
 

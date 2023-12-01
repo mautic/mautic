@@ -18,10 +18,8 @@ class EmailRepository extends CommonRepository
      * Get an array of do not email.
      *
      * @param array $leadIds
-     *
-     * @return array
      */
-    public function getDoNotEmailList($leadIds = [])
+    public function getDoNotEmailList($leadIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -123,6 +121,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');

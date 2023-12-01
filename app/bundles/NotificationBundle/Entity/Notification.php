@@ -14,9 +14,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Notification.
- */
 class Notification extends FormEntity
 {
     /**
@@ -124,9 +121,6 @@ class Notification extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Notification constructor.
-     */
     public function __construct()
     {
         $this->lists = new ArrayCollection();
@@ -217,6 +211,24 @@ class Notification extends FormEntity
             new NotBlank(
                 [
                     'message' => 'mautic.core.name.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'heading',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.title.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'message',
+            new NotBlank(
+                [
+                    'message' => 'mautic.lead.email.body.required',
                 ]
             )
         );

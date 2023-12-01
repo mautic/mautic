@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 
-/**
- * Class NotificationClickEvent.
- */
 class NotificationClickEvent extends CommonEvent
 {
     private $request;

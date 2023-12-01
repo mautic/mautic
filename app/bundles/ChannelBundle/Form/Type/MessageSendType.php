@@ -10,17 +10,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class MessageSendType.
- */
 class MessageSendType extends AbstractType
 {
     protected $router;
     protected $messageModel;
 
-    /**
-     * MessageSendType constructor.
-     */
     public function __construct(RouterInterface $router, MessageModel $messageModel)
     {
         $this->router       = $router;

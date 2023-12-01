@@ -20,10 +20,8 @@ class TimezoneResolver
 
     /**
      * @param bool $hasTimePart
-     *
-     * @return DateTimeHelper
      */
-    public function getDefaultDate($hasTimePart)
+    public function getDefaultDate($hasTimePart): DateTimeHelper
     {
         /**
          * $hasTimePart tells us if field in a database is date or datetime

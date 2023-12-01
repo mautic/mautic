@@ -23,9 +23,6 @@ class MailboxOrganizer
      */
     protected $containers = [];
 
-    /**
-     * MailboxOrganizer constructor.
-     */
     public function __construct(ParseEmailEvent $event, array $mailboxes)
     {
         $this->event     = $event;
@@ -41,7 +38,7 @@ class MailboxOrganizer
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();
 
         /**
-         * @var string
+         * @var string         $name
          * @var ConfigAccessor $config
          */
         foreach ($this->mailboxes as $name => $config) {

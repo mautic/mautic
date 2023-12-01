@@ -60,9 +60,6 @@ class LegacyEventDispatcher
      */
     private $contactTracker;
 
-    /**
-     * LegacyEventDispatcher constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         EventScheduler $scheduler,
@@ -189,10 +186,7 @@ class LegacyEventDispatcher
         }
     }
 
-    /**
-     * @return CampaignExecutionEvent
-     */
-    private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
+    private function dispatchEventName($eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
     {
         @trigger_error('eventName is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);
 
@@ -307,10 +301,7 @@ class LegacyEventDispatcher
         $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
     }
 
-    /**
-     * @return bool
-     */
-    private function isFailed($result)
+    private function isFailed($result): bool
     {
         return
             false === $result

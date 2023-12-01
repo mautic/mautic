@@ -43,9 +43,6 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
      */
     protected $emailModel;
 
-    /**
-     * DashboardSubscriber constructor.
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;

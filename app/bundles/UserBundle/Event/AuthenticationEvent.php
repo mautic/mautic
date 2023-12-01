@@ -14,9 +14,6 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class AuthenticationEvent.
- */
 class AuthenticationEvent extends Event
 {
     /**

@@ -196,9 +196,7 @@ class SubmissionModel extends CommonFormModel
 
     public function getRepository(): SubmissionRepository
     {
-        $result = $this->em->getRepository(Submission::class);
-
-        return $result;
+        return $this->em->getRepository(Submission::class);
     }
 
     /**
@@ -461,12 +459,10 @@ class SubmissionModel extends CommonFormModel
         if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
-            if (!empty($campaigns)) {
-                /** @var Campaign $campaign */
-                foreach ($campaigns as $campaign) {
-                    if ($campaign->isPublished()) {
-                        $this->membershipManager->addContact($lead, $campaign);
-                    }
+            /** @var Campaign $campaign */
+            foreach ($campaigns as $campaign) {
+                if ($campaign->isPublished()) {
+                    $this->membershipManager->addContact($lead, $campaign);
                 }
             }
         }
@@ -741,8 +737,6 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param resource     $handle
      * @param array<mixed> $row
-     *
-     * @return false|int
      */
     private function putCsvExportRow($handle, array $row): bool|int
     {
@@ -970,11 +964,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * Create/update lead from form submit.
      *
-     * @return Lead
-     *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -1020,7 +1012,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields) {
+        $getCompanyData = function ($currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company'=> 'company']);

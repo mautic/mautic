@@ -6,9 +6,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WebhookBuilderEvent.
- */
 class WebhookBuilderEvent extends Event
 {
     /**

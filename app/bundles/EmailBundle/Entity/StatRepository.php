@@ -54,10 +54,8 @@ class StatRepository extends CommonRepository
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
-        if ($result) {
-            foreach ($result as $row) {
-                $data[$row['date_hit']] = $row['url'];
-            }
+        foreach ($result as $row) {
+            $data[$row['date_hit']] = $row['url'];
         }
 
         return $data;
@@ -167,10 +165,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array
      */
-    public function getSentStats($emailIds, $listId = null)
+    public function getSentStats($emailIds, $listId = null): array
     {
         if (!is_array($emailIds)) {
             $emailIds = [(int) $emailIds];
@@ -516,8 +512,12 @@ class StatRepository extends CommonRepository
 
         $results = $query->execute()->fetchAssociative();
 
-        $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
-        unset($results['sent']);
+        if ($results) {
+            $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
+            unset($results['sent']);
+        } else {
+            $results['ignored'] = $results['sent'] = $results['read'] = $results['failed']  = 0;
+        }
 
         return $results;
     }
@@ -545,10 +545,8 @@ class StatRepository extends CommonRepository
      * Get sent counts based grouped by email Id.
      *
      * @param array $emailIds
-     *
-     * @return array
      */
-    public function getSentCounts($emailIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($emailIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
@@ -653,7 +651,7 @@ class StatRepository extends CommonRepository
     /**
      * @return array Formatted as [contactId => sentCount]
      */
-    public function getSentCountForContacts(array $contacts, $emailId)
+    public function getSentCountForContacts(array $contacts, $emailId): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
