@@ -8,7 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerExecutedEvent extends Event
 {
-    /** @var TriggerEventEntity */
     private TriggerEventEntity $triggerEvent;
 
     private \Mautic\LeadBundle\Entity\Lead $lead;
