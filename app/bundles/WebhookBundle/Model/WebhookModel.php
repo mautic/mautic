@@ -225,7 +225,7 @@ class WebhookModel extends FormModel
 
     public function queueWebhooksByType($type, $payload, array $groups = [])
     {
-        return $this->queueWebhooks(
+        $this->queueWebhooks(
             $this->getEventWebooksByType($type),
             $payload,
             $groups
