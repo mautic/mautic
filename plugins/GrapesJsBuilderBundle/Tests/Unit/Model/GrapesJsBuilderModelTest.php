@@ -171,8 +171,6 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 ++$this->saveEntityCallCount;
 
                 Assert::assertSame('</mjml>', $entity->getCustomMjml());
-
-                return 0;
             }
         };
 

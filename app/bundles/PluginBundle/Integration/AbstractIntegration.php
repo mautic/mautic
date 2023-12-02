@@ -1341,7 +1341,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public activity.
      *
-     * @return array
+     * @return array|void
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
