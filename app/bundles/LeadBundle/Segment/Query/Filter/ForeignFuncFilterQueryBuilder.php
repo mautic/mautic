@@ -22,7 +22,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
-        $filterGlue      = $filter->getGlue();
         $filterAggr      = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();

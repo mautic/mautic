@@ -131,8 +131,6 @@ class PublicController extends CommonFormController
         $template   = null;
         $session    = $request->getSession();
 
-        $this->getModel('lead');
-
         if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();

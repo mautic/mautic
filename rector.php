@@ -29,6 +29,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
         ],
+
+        \Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector::class => [
+            // unsed variable to clear garbage collector
+            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
+        ],
     ]);
 
     $rectorConfig->parallel();

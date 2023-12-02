@@ -306,8 +306,9 @@ class SugarcrmApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $this->integration->getIntegrationSettings()->getFeatureSettings();
-        $tokenData = $this->integration->getKeys();
+        $tokenData            = $this->integration->getKeys();
+
+        // 1st : set_entries to return name_value_lists (array of arrays of name/value)
         $set_name_value_lists = [];
         // set relationship
         $module_names     = []; // Contacts or Leads
