@@ -32,7 +32,9 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.issue.tracker'|trans,
-        'iconClass' : 'fa fa-question',
+        'svgIcon' : '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Zm0-2a8 8 0 1 0 0-16.001A8 8 0 0 0 12 20Zm-1-5h2v2h-2v-2Zm2-1.645V14h-2v-1.5a1 1 0 0 1 1-1 1.5 1.5 0 1 0-1.471-1.794l-1.962-.393A3.5 3.5 0 1 1 13 13.355Z"></path>
+  </svg>',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -46,7 +48,9 @@
             'data-toggle' : '',
         },
         'btnText'   : 'marketplace.package.wiki'|trans,
-        'iconClass' : 'fa fa-book',
+        'svgIcon' : '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 3.993A1 1 0 0 1 2.992 3h18.016c.548 0 .992.445.992.993v16.014a1 1 0 0 1-.992.993H2.992A.993.993 0 0 1 2 20.007V3.993ZM11 5H4v14h7V5Zm2 0v14h7V5h-7Zm1 2h5v2h-5V7Zm0 3h5v2h-5v-2Z"></path>
+  </svg>',
         'primary'   : false,
     }}) %}
 {% endif %}
@@ -95,7 +99,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="column-wrapper">
+<div class="column-wrapper-xl">
     <div class="col-md-9">
         {% if packageDetail.packageBase.description %}
         <div class="bg-auto">
@@ -110,10 +114,11 @@
                 '%package%' : packageDetail.packageBase.getPackageName(),
             })|purify }}</div>
         </div>
-
-        <div class="panel">
+        <div class="column-wrapper-m">
+            <div class="panel">
         <div class="panel-heading">
-            <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
+            <h3 class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</h3>
+            <div class="text-muted">{% trans %}marketplace.package.later.stable.version.about{% endtrans %}</div>
         </div>
         <table class="table table-bordered table-striped mb-0">
             <thead>
@@ -168,7 +173,8 @@
 
         <div class="panel">
         <div class="panel-heading">
-            <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
+            <h3 class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</h3>
+            <div class="text-muted">{% trans %}marketplace.package.all.versions.about{% endtrans %}</div>
         </div>
         <table class="table table-bordered table-striped mb-0" id="stable-version">
             <thead>
@@ -203,12 +209,14 @@
 
         </div>
     </div>
+        </div>
+
 
     <div class="col-md-3 panel pb-lg">
         <div class="panel">
             <h3 class="pt-lg">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
         {% for maintainer in packageDetail.maintainers %}
-            <div class="column-wrapper-s flex-middle">
+            <div class="column-wrapper-xs flex-middle">
                 <div>
                     <div>
                         <span class="img-wrapper img-rounded" style="width: 32px; height: 32px; margin-right: 10px;">
@@ -231,17 +239,19 @@
         </div>
 
         <div class="panel">
-            <div class="column-wrapper-s">
-                <svg title="{% trans %}marketplace.package.github.info{% endtrans %}" aria-label="{% trans %}marketplace.package.github.info{% endtrans %}" width="30" height="30" fill="currentColor" style="margin-left: 8px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div class="column-wrapper-xs">
+                <svg aria-label="{% trans %}marketplace.package.github.info{% endtrans %}" width="30" height="30" fill="currentColor" style="margin-left: 5px;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <title>{% trans %}marketplace.package.github.info{% endtrans %}</title>
                     <path d="M12 2C6.475 2 2 6.475 2 12a9.994 9.994 0 0 0 6.838 9.488c.5.087.687-.213.687-.476 0-.237-.013-1.024-.013-1.862-2.512.463-3.162-.612-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.338 1.087 2.912.825.088-.65.35-1.087.638-1.337-2.225-.25-4.55-1.113-4.55-4.938 0-1.088.387-1.987 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.026a9.28 9.28 0 0 1 2.5-.338c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.024 2.75-1.024.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.687 0 3.838-2.337 4.688-4.562 4.938.362.312.675.912.675 1.85 0 1.337-.013 2.412-.013 2.75 0 .262.188.574.688.474A10.016 10.016 0 0 0 22 12c0-5.525-4.475-10-10-10Z"></path>
                 </svg>
-                <svg title="{% trans %}marketplace.package.packagist.info{% endtrans %}" aria-label="{% trans %}marketplace.package.packagist.info{% endtrans %}" width="30" height="30" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg aria-label="{% trans %}marketplace.package.packagist.info{% endtrans %}" width="30" height="30" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <title>{% trans %}marketplace.package.packagist.info{% endtrans %}</title>
                     <path d="M21.993 7.949a.96.96 0 0 0-.029-.214c-.007-.025-.021-.05-.03-.074-.021-.057-.04-.113-.07-.165-.016-.027-.038-.05-.057-.075-.032-.045-.063-.091-.102-.13-.023-.022-.053-.04-.078-.061-.039-.032-.075-.067-.12-.094-.004-.003-.009-.003-.014-.006l-.008-.006-8.979-4.99a1.002 1.002 0 0 0-.97-.001l-9.021 4.99c-.003.003-.006.007-.011.01l-.01.004c-.035.02-.061.049-.094.073-.036.027-.074.05-.106.082-.03.03-.053.067-.079.102-.027.035-.057.066-.079.104-.026.043-.04.092-.059.139-.014.033-.032.064-.041.1a.975.975 0 0 0-.029.21c-.001.017-.007.032-.007.05v8.002c0 .362.197.697.515.873l8.978 4.988h.001l.002.002.02.01c.043.024.09.038.135.055.032.012.063.03.097.038.166.043.34.043.506 0 .033-.009.064-.026.097-.038.045-.017.092-.03.135-.055l.02-.01.002-.002h.001l8.978-4.988a.998.998 0 0 0 .513-.873V7.996c0-.017-.006-.031-.007-.048ZM11.972 11.87 5.058 8.005 7.82 6.476l6.834 3.904-2.682 1.49Zm.048-7.718 6.921 3.847-2.244 1.247-6.83-3.903 2.153-1.191ZM13 19.299l.002-5.678L16 11.942v3.056l2-1v-3.176l2-1.118v5.704l-7 3.89Z"></path>
                 </svg>
             </div>
         <table class="table mb-0" id="github-info">
             <tr>
-                <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+                <th>{% trans %}marketplace.package.repository.github{% endtrans %}</th>
                 <td>
                     <a href="{{ packageDetail.packageBase.repository|escape }}" target="_blank" rel="noopener noreferrer" >
                         {{ packageDetail.packageBase.name|escape }}
@@ -261,7 +271,7 @@
                 <td>{{ packageDetail.githubInfo.openIssues|escape }}</td>
             </tr>
             <tr>
-                <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+                <th>{% trans %}marketplace.package.repository.packagist{% endtrans %}</th>
                 <td>
                     <a href="{{ packageDetail.packageBase.url|escape }}" target="_blank" rel="noopener noreferrer" >
                         {{ packageDetail.packageBase.name|escape }}
