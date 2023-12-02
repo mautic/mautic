@@ -74,7 +74,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param string $key
      */
-    public function setConfig(array $config, $key = null)
+    public function setConfig(array $config, $key = null): void
     {
         if ($key) {
             $this->config[$key] = $config;
@@ -94,7 +94,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param array|string $fields
      */
-    public function unsetIfEmpty($fields)
+    public function unsetIfEmpty($fields): void
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -211,7 +211,7 @@ class ConfigEvent extends CommonEvent
     /**
      * @param array $normData
      */
-    public function setNormData($normData)
+    public function setNormData($normData): void
     {
         $this->normData = $normData;
     }

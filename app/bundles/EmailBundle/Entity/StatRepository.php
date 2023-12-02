@@ -476,7 +476,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $timeToReadParser = function (&$stat) {
+        $timeToReadParser = function (&$stat): void {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
                 $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
@@ -582,7 +582,7 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
@@ -594,12 +594,12 @@ class StatRepository extends CommonRepository
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
     }
 
-    public function deleteStats(array $ids)
+    public function deleteStats(array $ids): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

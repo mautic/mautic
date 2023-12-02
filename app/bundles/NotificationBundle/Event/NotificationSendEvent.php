@@ -40,7 +40,7 @@ class NotificationSendEvent extends CommonEvent
     /**
      * @param string $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }

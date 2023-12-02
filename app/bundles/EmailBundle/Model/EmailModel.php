@@ -313,12 +313,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
     }
 
-    /**
-     * Save an array of entities.
-     *
-     * @return array
-     */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -349,7 +344,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -1800,7 +1795,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param string $email
      */
-    public function removeDoNotContact($email)
+    public function removeDoNotContact($email): void
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -1866,7 +1861,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the email table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
@@ -1921,7 +1916,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $counts = array_column($result, 'count');
         $total  = array_sum($counts);
 
-        array_walk($counts, function (&$percentage) use ($total) {
+        array_walk($counts, function (&$percentage) use ($total): void {
             $percentage = round(($percentage / $total) * 100, 1);
         });
 
@@ -2227,7 +2222,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $results;
     }
 
-    private function getContactCompanies(array &$sendTo)
+    private function getContactCompanies(array &$sendTo): void
     {
         $fetchCompanies = [];
         foreach ($sendTo as $key => $contact) {

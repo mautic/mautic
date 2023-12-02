@@ -34,7 +34,7 @@ class FieldValueTransformer
         $this->router = $router;
     }
 
-    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
+    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
         if (true === $this->isTransformed) {
             return;

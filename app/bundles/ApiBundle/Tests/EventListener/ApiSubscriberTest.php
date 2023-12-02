@@ -63,7 +63,7 @@ class ApiSubscriberTest extends CommonMocks
         $this->coreParametersHelper->expects($this->never())
             ->method('get');
 
-        $this->assertNull($this->subscriber->onKernelRequest($this->event));
+        $this->subscriber->onKernelRequest($this->event);
     }
 
     public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void

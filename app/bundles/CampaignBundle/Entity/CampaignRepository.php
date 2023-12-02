@@ -42,7 +42,7 @@ class CampaignRepository extends CommonRepository
      * @param object $entity
      * @param bool   $flush
      */
-    public function deleteEntity($entity, $flush = true)
+    public function deleteEntity($entity, $flush = true): void
     {
         // Null parents of associated events first
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();

@@ -326,7 +326,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeKickoff()
+    private function executeKickoff(): void
     {
         // trigger starting action events for newly added contacts
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
@@ -343,7 +343,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeScheduled()
+    private function executeScheduled(): void
     {
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
 
@@ -358,7 +358,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeInactive()
+    private function executeInactive(): void
     {
         // find and trigger "no" path events
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.negative').'</comment>');

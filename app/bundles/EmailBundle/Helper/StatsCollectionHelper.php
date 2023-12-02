@@ -112,7 +112,7 @@ class StatsCollectionHelper
         \DateTime $toDateTime,
         EmailStatOptions $options,
         StatCollection $statCollection
-    ) {
+    ): void {
         $this->helperContainer->getHelper($statName)->generateStats($fromDateTime, $toDateTime, $options, $statCollection);
     }
 }

@@ -41,7 +41,7 @@ class Category extends FormEntity
      */
     private $bundle;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -63,7 +63,7 @@ class Category extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'title',
@@ -87,7 +87,7 @@ class Category extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('category')
             ->addListProperties(
@@ -171,23 +171,15 @@ class Category extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Category
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
-
-        return $this;
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -196,21 +188,15 @@ class Category extends FormEntity
     }
 
     /**
-     * Set color.
-     *
      * @param string $color
-     *
-     * @return Category
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
         $this->isChanged('color', $color);
         $this->color = $color;
     }
 
     /**
-     * Get color.
-     *
      * @return string
      */
     public function getColor()
@@ -219,13 +205,9 @@ class Category extends FormEntity
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
-     *
-     * @return Category
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): void
     {
         $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;

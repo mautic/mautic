@@ -237,7 +237,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function executeOrRescheduleEvent()
+    private function executeOrRescheduleEvent(): void
     {
         // Use the same timestamp across all contacts processed
         $now = $this->now ?? new \DateTime();
@@ -257,7 +257,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function executeScheduled($eventId, \DateTime $now)
+    private function executeScheduled($eventId, \DateTime $now): void
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
@@ -288,7 +288,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
+    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false): void
     {
         $toBeRescheduled     = new ArrayCollection();
         $latestExecutionDate = $now;

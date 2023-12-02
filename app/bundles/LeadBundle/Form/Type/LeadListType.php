@@ -18,7 +18,7 @@ class LeadListType extends AbstractType
         $this->segmentModel = $segmentModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => function (Options $options): array {

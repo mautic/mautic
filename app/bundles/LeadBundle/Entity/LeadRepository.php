@@ -58,7 +58,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Used by search functions to search social profiles.
      */
-    public function setAvailableSocialFields(array $fields)
+    public function setAvailableSocialFields(array $fields): void
     {
         $this->availableSocialFields = $fields;
     }
@@ -66,7 +66,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Used by search functions to search using aliases as commands.
      */
-    public function setAvailableSearchFields(array $fields)
+    public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
     }
@@ -74,12 +74,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Sets trigger model.
      */
-    public function setTriggerModel(TriggerModel $triggerModel)
+    public function setTriggerModel(TriggerModel $triggerModel): void
     {
         $this->triggerModel = $triggerModel;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -456,7 +456,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
             $args,
-            function ($r) {
+            function ($r): void {
                 if (!empty($this->triggerModel)) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
@@ -1021,10 +1021,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Updates lead's lastActive with now date/time.
      *
      * @param int $leadId
-     *
-     * @return void
      */
-    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null)
+    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null): void
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1279,7 +1277,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param mixed $whereExpression
      * @param mixed $having
      */
-    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
+    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {
         $primaryTable = $tables[0];
         unset($tables[0]);

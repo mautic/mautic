@@ -30,7 +30,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     /**
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;

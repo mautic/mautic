@@ -18,7 +18,7 @@ class LeadFieldsType extends AbstractType
         $this->fieldModel = $fieldModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {

@@ -78,7 +78,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a lead generation action to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('lead.pointschange', [
             'group'       => 'mautic.lead.lead.submitaction',

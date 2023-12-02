@@ -36,12 +36,12 @@ class CompanyEvent extends CommonEvent
     /**
      * Sets the Company entity.
      */
-    public function setCompany(Company $company)
+    public function setCompany(Company $company): void
     {
         $this->entity = $company;
     }
 
-    public function changeScore($score)
+    public function changeScore($score): void
     {
         $this->score = $score;
     }

@@ -88,7 +88,7 @@ class DisplayManager
         return $this->displayCounter;
     }
 
-    public function increaseDisplayedFields(Field $field)
+    public function increaseDisplayedFields(Field $field): void
     {
         if (!in_array($field->getType(), $this->viewOnlyFields)) {
             $this->displayCounter->increaseDisplayedFields();

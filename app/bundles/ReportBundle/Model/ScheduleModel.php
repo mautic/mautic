@@ -35,7 +35,7 @@ class ScheduleModel
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }
 
-    public function reportWasScheduled(Report $report)
+    public function reportWasScheduled(Report $report): void
     {
         $this->schedulerPlanner->computeScheduler($report);
     }

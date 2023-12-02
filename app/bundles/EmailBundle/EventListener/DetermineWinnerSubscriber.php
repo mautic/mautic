@@ -43,7 +43,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on open rate.
      */
-    public function onDetermineOpenRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineOpenRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
@@ -137,7 +137,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on clickthrough rates.
      */
-    public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];

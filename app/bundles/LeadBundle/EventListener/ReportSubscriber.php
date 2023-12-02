@@ -111,7 +111,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -214,7 +214,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -398,7 +398,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
             self::CONTEXT_LEADS,
@@ -709,7 +709,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addColumns($fields);
     }
 
-    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $pointColumns = [
             'lp.id' => [
@@ -765,7 +765,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
-    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $frequencyColumns = [
             'lf.frequency_number' => [
@@ -809,7 +809,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $type
      */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type): void
     {
         $attributionColumns = [
             'log.campaign_id' => [
@@ -932,7 +932,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
 

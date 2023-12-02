@@ -18,7 +18,7 @@ class CommonEntity
      */
     protected $pastChanges = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -130,16 +130,13 @@ class CommonEntity
         return $this->changes;
     }
 
-    /**
-     * @return void
-     */
-    public function resetChanges()
+    public function resetChanges(): void
     {
         $this->pastChanges = $this->changes;
         $this->changes     = [];
     }
 
-    public function setChanges(array $changes)
+    public function setChanges(array $changes): void
     {
         $this->changes = $changes;
     }

@@ -40,7 +40,7 @@ class PreAuthorizationEventListener
         }
     }
 
-    public function onPostAuthorizationProcess(PreAuthorizationEvent $event)
+    public function onPostAuthorizationProcess(PreAuthorizationEvent $event): void
     {
         if ($event->isAuthorizedClient()) {
             if (null !== $client = $event->getClient()) {

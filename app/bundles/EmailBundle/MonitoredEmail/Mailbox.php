@@ -240,7 +240,7 @@ class Mailbox
      *
      * @param null $settings
      */
-    public function setImapPath($settings = null)
+    public function setImapPath($settings = null): void
     {
         if (null == $settings) {
             $settings = $this->settings;
@@ -268,7 +268,7 @@ class Mailbox
     /**
      * Override mailbox settings.
      */
-    public function setMailboxSettings(array $settings)
+    public function setMailboxSettings(array $settings): void
     {
         $this->settings = array_merge($this->settings, $settings);
 
@@ -315,7 +315,7 @@ class Mailbox
      * @param int $options
      * @param int $retriesNum
      */
-    public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null)
+    public function setConnectionArgs($options = 0, $retriesNum = 0, array $params = null): void
     {
         $this->imapOptions    = $options;
         $this->imapRetriesNum = $retriesNum;
@@ -325,7 +325,7 @@ class Mailbox
     /**
      * Switch to another box.
      */
-    public function switchFolder($folder)
+    public function switchFolder($folder): void
     {
         if ($folder != $this->imapFolder) {
             $this->imapFullPath = $this->imapPath.$folder;
@@ -1109,7 +1109,7 @@ class Mailbox
         }
     }
 
-    private function createAttachmentsDir(PathsHelper $pathsHelper)
+    private function createAttachmentsDir(PathsHelper $pathsHelper): void
     {
         if (!isset($this->settings['use_attachments']) || !$this->settings['use_attachments']) {
             return;

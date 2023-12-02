@@ -120,7 +120,7 @@ class DynamicContentRepository extends CommonRepository
      *
      * @param int $increaseBy
      */
-    public function upSentCount($id, $increaseBy = 1)
+    public function upSentCount($id, $increaseBy = 1): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

@@ -62,7 +62,7 @@ class RouterSubscriber implements EventSubscriberInterface
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    public function setRouterRequestContext(RequestEvent $event)
+    public function setRouterRequestContext(RequestEvent $event): void
     {
         if (empty($this->host)) {
             return;

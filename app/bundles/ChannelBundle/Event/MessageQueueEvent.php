@@ -29,7 +29,7 @@ class MessageQueueEvent extends CommonEvent
     /**
      * @param MessageQueue $entity
      */
-    public function setMessageQueue($entity)
+    public function setMessageQueue($entity): void
     {
         $this->entity = $entity;
     }

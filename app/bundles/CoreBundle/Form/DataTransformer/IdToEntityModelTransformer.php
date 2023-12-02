@@ -121,7 +121,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $repo
      */
-    public function setRepository($repo)
+    public function setRepository($repo): void
     {
         $this->repository = $repo;
     }
@@ -131,7 +131,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $id
      */
-    public function setIdentifier($id)
+    public function setIdentifier($id): void
     {
         $this->id = $id;
     }

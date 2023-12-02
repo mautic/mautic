@@ -100,7 +100,7 @@ class ParseEmailEvent extends Event
      * @param string $criteria   Should be a string using combinations of Mautic\EmailBundle\MonitoredEmail\Mailbox::CRITERIA_* constants
      * @param bool   $markAsSeen Mark the message as read after being processed
      */
-    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria, $markAsSeen = true)
+    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria, $markAsSeen = true): void
     {
         if (!is_array($folderKeys)) {
             $folderKeys = [$folderKeys];

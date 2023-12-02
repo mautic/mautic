@@ -30,7 +30,7 @@ class FilterType extends AbstractType
         $this->listModel               = $listModel;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $fieldChoices = $this->listModel->getChoiceFields();
 
@@ -50,7 +50,7 @@ class FilterType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($fieldChoices) {
+        $formModifier = function (FormEvent $event) use ($fieldChoices): void {
             $data        = (array) $event->getData();
             $form        = $event->getForm();
             $fieldAlias  = $data['field'] ?? null;
@@ -113,7 +113,7 @@ class FilterType extends AbstractType
         $builder->add('type', HiddenType::class);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -123,7 +123,7 @@ class FilterType extends AbstractType
         );
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }

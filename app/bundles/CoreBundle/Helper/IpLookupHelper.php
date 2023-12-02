@@ -224,7 +224,7 @@ class IpLookupHelper
         $ips = explode(',', $ip);
         array_walk(
             $ips,
-            function (&$val) {
+            function (&$val): void {
                 $val = trim($val);
             }
         );

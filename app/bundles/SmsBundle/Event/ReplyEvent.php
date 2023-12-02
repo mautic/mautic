@@ -47,7 +47,7 @@ class ReplyEvent extends Event
         return $this->message;
     }
 
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

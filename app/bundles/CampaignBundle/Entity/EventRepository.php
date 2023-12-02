@@ -190,7 +190,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleI'lting a campaign.
      */
-    public function nullEventParents($campaignId)
+    public function nullEventParents($campaignId): void
     {
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
@@ -202,7 +202,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      */
-    public function nullEventRelationships($events)
+    public function nullEventRelationships($events): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')

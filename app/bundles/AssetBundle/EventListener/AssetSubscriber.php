@@ -34,7 +34,7 @@ class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onAssetPostSave(Events\AssetEvent $event)
+    public function onAssetPostSave(Events\AssetEvent $event): void
     {
         $asset = $event->getAsset();
         if ($details = $event->getChanges()) {
@@ -53,7 +53,7 @@ class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onAssetDelete(Events\AssetEvent $event)
+    public function onAssetDelete(Events\AssetEvent $event): void
     {
         $asset = $event->getAsset();
         $log   = [

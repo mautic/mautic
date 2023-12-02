@@ -69,7 +69,7 @@ trait TranslationEntityTrait
     /**
      * Remove translation.
      */
-    public function removeTranslationChild(TranslationEntityInterface $child)
+    public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
     }
@@ -113,7 +113,7 @@ trait TranslationEntityTrait
     /**
      * Remove translation parent.
      */
-    public function removeTranslationParent()
+    public function removeTranslationParent(): void
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', '');
@@ -182,7 +182,7 @@ trait TranslationEntityTrait
     /**
      * Clear translations.
      */
-    public function clearTranslations()
+    public function clearTranslations(): void
     {
         $this->translationChildren = new ArrayCollection();
         $this->translationParent   = null;

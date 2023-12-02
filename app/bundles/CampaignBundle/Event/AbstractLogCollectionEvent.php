@@ -113,7 +113,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
         return $this->logs->get($this->logContactXref[$id]);
     }
 
-    private function extractContacts()
+    private function extractContacts(): void
     {
         /** @var LeadEventLog $log */
         foreach ($this->logs as $log) {

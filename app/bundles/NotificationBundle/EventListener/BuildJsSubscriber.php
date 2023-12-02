@@ -44,7 +44,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 

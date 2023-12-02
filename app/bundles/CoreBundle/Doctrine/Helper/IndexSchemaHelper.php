@@ -78,7 +78,7 @@ class IndexSchemaHelper
         return $this;
     }
 
-    public function allowColumn($name)
+    public function allowColumn($name): void
     {
         $this->allowedColumns[] = $name;
     }
@@ -131,7 +131,7 @@ class IndexSchemaHelper
     /**
      * Execute changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->sm->getDatabasePlatform();
 

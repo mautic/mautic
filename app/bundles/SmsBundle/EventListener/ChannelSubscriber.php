@@ -30,7 +30,7 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addChannel(

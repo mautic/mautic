@@ -86,7 +86,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Set the translation key prefix.
      */
-    public function setTranslationKeyPrefix()
+    public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
@@ -177,7 +177,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
-    public function populateField($field, $value, $formName, &$formHtml)
+    public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 

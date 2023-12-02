@@ -17,7 +17,7 @@ class SentHelper extends AbstractHelper
     /**
      * @throws \Exception
      */
-    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
+    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $useGeneratedColumn = $this->generatedColumnsProvider->generatedColumnsAreSupported() && 'd' == $options->getUnit();
         $column             = $useGeneratedColumn ? 'generated_sent_date' : 'date_sent';

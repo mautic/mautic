@@ -33,7 +33,7 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'       => 'mautic.form.point.action',
@@ -49,7 +49,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for form submit.
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $this->pointModel->triggerAction('form.submit', $event->getSubmission());
     }

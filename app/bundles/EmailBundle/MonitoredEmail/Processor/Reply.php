@@ -74,7 +74,7 @@ class Reply implements ProcessorInterface
         $this->addressHelper    = $addressHelper;
     }
 
-    public function process(Message $message)
+    public function process(Message $message): void
     {
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$message->id.' for a reply');
 
@@ -163,7 +163,7 @@ class Reply implements ProcessorInterface
         }
     }
 
-    private function dispatchEvent(Stat $stat)
+    private function dispatchEvent(Stat $stat): void
     {
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
             $this->contactTracker->setTrackedContact($stat->getLead());

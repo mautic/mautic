@@ -69,7 +69,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onEmailPostSave(Events\EmailEvent $event)
+    public function onEmailPostSave(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         if ($details = $event->getChanges()) {
@@ -88,7 +88,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onEmailDelete(Events\EmailEvent $event)
+    public function onEmailDelete(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         $log   = [
@@ -105,7 +105,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email has failed.
      */
-    public function onEmailFailed(Events\QueueEmailEvent $event)
+    public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
         $message    = $event->getMessage();
         $leadIdHash = $message->getLeadIdHash();
@@ -125,7 +125,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email is resent.
      */
-    public function onEmailResend(Events\QueueEmailEvent $event)
+    public function onEmailResend(Events\QueueEmailEvent $event): void
     {
         $message    = $event->getMessage();
         $leadIdHash = $message->getLeadIdHash();

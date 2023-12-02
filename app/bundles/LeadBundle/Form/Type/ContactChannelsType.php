@@ -25,7 +25,7 @@ class ContactChannelsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $showContactFrequency         = $this->coreParametersHelper->get('show_contact_frequency');
         $showContactPauseDates        = $this->coreParametersHelper->get('show_contact_pause_dates');
@@ -180,7 +180,7 @@ class ContactChannelsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(

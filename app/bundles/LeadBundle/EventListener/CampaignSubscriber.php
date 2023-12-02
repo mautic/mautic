@@ -120,7 +120,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add actions
         $action = [
@@ -398,7 +398,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
             return;

@@ -139,14 +139,14 @@ EOT
 
         $transifex->getApiConnector()->fulfillPromises(
             $queue,
-            function (ResponseInterface $response, Promise $promise) use ($output) {
+            function (ResponseInterface $response, Promise $promise) use ($output): void {
                 try {
                     $this->languageHelper->createLanguageFile($promise->getFilePath(), $response->getBody()->__toString());
                 } catch (\Exception $exception) {
                     $output->writeln($exception->getMessage());
                 }
             },
-            function (ResponseException $exception) use ($output) {
+            function (ResponseException $exception) use ($output): void {
                 $output->writeln($exception->getMessage());
             }
         );

@@ -35,7 +35,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on number of asset downloads.
      */
-    public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
         $repo       = $this->em->getRepository(Download::class);
         $parameters = $event->getParameters();

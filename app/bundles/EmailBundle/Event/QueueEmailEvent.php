@@ -33,7 +33,7 @@ class QueueEmailEvent extends Event
     /**
      * Sets whether the sending of the message should be tried again.
      */
-    public function tryAgain()
+    public function tryAgain(): void
     {
         $this->retry = true;
     }

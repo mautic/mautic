@@ -59,7 +59,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManager(EntityManager $em): void
     {
         $this->em = $em;
     }
@@ -67,7 +67,7 @@ class SchemaHelper
     /**
      * Test db connection.
      */
-    public function testConnection()
+    public function testConnection(): void
     {
         if (isset($this->dbParams['dbname'])) {
             // Test connection credentials

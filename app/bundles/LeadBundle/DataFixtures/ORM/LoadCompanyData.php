@@ -21,7 +21,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
         $this->companyModel = $companyModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $today     = new \DateTime();
         $companies = CsvHelper::csv_to_array(__DIR__.'/fakecompanydata.csv');

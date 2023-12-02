@@ -58,7 +58,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /*
     * Change lead event
     */
-    public function onLeadSave(LeadEvent $event)
+    public function onLeadSave(LeadEvent $event): void
     {
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead                  = $event->getLead();

@@ -60,10 +60,8 @@ class CategoryModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return mixed
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {

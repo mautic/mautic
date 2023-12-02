@@ -34,7 +34,7 @@ class TriggerEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function setTrigger(Trigger $trigger)
+    public function setTrigger(Trigger $trigger): void
     {
         $this->entity = $trigger;
     }

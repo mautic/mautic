@@ -59,7 +59,7 @@ class NotificationSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(NotificationEvent $event)
+    public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
@@ -77,7 +77,7 @@ class NotificationSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(NotificationEvent $event)
+    public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         $log    = [
@@ -90,7 +90,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

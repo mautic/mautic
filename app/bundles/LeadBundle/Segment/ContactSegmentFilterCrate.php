@@ -154,7 +154,7 @@ class ContactSegmentFilterCrate
         return $this->sourceArray;
     }
 
-    private function setOperator(array $filter)
+    private function setOperator(array $filter): void
     {
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 

@@ -30,7 +30,7 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'       => 'mautic.asset.actions',
@@ -46,7 +46,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for asset download.
      */
-    public function onAssetDownload(AssetLoadEvent $event)
+    public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();
 

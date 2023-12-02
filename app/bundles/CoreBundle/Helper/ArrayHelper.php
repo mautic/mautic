@@ -115,7 +115,7 @@ class ArrayHelper
 
         array_walk_recursive(
             $multidimensionalArray,
-            function ($value, $key) use (&$flattenedArray) {
+            function ($value, $key) use (&$flattenedArray): void {
                 $flattenedArray[$key] = $value;
             }
         );

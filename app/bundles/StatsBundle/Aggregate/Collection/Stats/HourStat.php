@@ -35,7 +35,7 @@ class HourStat
     /**
      * @param int $count
      */
-    public function setCount($count)
+    public function setCount($count): void
     {
         $this->count = (int) $count;
     }

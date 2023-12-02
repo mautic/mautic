@@ -310,7 +310,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         array_walk(
             $columns,
-            function (&$column, $key, $prefix) {
+            function (&$column, $key, $prefix): void {
                 $column = trim($column);
                 if (1 === count(explode('.', $column))) {
                     $column = $prefix.$column;
@@ -600,7 +600,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity) {
+            function ($entity): void {
                 $this->preSerializeEntity($entity);
             }
         );

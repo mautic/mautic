@@ -27,7 +27,7 @@ class TrackingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onIdentifyContact(ContactIdentificationEvent $event)
+    public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

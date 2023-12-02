@@ -78,7 +78,7 @@ class DecisionEvent extends CampaignExecutionEvent
     /**
      * Note that this decision is a match and the child events should be executed.
      */
-    public function setAsApplicable()
+    public function setAsApplicable(): void
     {
         $this->applicable = true;
     }
@@ -95,10 +95,10 @@ class DecisionEvent extends CampaignExecutionEvent
      * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
-        $this->log->setChannel($this->channel)
-            ->setChannelId($this->channelId);
+        $this->log->setChannel($this->channel);
+        $this->log->setChannelId($this->channelId);
     }
 
     /**

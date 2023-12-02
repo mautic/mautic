@@ -27,7 +27,7 @@ class RestrictionHelper
         $this->displayMode      = $mode;
     }
 
-    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
+    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
             $restrictedFields = $this->restrictedFields;
@@ -48,7 +48,7 @@ class RestrictionHelper
         }
     }
 
-    private function restrictField(FormInterface $childType, FormInterface $parentType)
+    private function restrictField(FormInterface $childType, FormInterface $parentType): void
     {
         switch ($this->displayMode) {
             case self::MODE_MASK:

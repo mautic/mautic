@@ -30,7 +30,7 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,

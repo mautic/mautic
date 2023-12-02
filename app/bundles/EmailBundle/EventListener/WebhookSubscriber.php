@@ -37,7 +37,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $mailSend= [
@@ -77,7 +77,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             EmailEvents::EMAIL_ON_OPEN,

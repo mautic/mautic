@@ -449,7 +449,7 @@ class InstallCommand extends Command
      *
      * @param array<string,string> $messages
      */
-    private function handleInstallerErrors(OutputInterface $output, array $messages)
+    private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
             $output->writeln("  - [$type] $message");

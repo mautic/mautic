@@ -562,7 +562,7 @@ class FieldModel extends FormModel
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -597,15 +597,13 @@ class FieldModel extends FormModel
      * @param array $entities
      * @param bool  $unlock
      *
-     * @return array|void
-     *
      * @throws AbortColumnCreateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
@@ -617,7 +615,7 @@ class FieldModel extends FormModel
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         parent::deleteEntity($entity);
 
@@ -730,7 +728,7 @@ class FieldModel extends FormModel
      *
      * @param int $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list, $start = 1)
+    public function reorderFieldsByList(array $list, $start = 1): void
     {
         $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {

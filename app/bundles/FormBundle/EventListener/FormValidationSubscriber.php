@@ -45,7 +45,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
             'phone.validation',
@@ -71,7 +71,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
     /**
      * Custom validation.
      */
-    public function onFormValidate(Events\ValidationEvent $event)
+    public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();
 
@@ -81,7 +81,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function fieldEmailValidation(Events\ValidationEvent $event)
+    private function fieldEmailValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
         $value = $event->getValue();
@@ -97,7 +97,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function fieldTelValidation(Events\ValidationEvent $event)
+    private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
         $value = $event->getValue();

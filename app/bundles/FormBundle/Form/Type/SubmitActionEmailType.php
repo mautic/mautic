@@ -39,7 +39,7 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $data = (isset($options['data']['subject']))
             ? $options['data']['subject']
@@ -148,7 +148,7 @@ class SubmitActionEmailType extends AbstractType
         return 'form_submitaction_sendemail';
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);
     }

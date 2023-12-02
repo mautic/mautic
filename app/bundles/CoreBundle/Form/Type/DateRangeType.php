@@ -21,7 +21,7 @@ class DateRangeType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $humanFormat     = 'M j, Y';
         $sessionDateFrom = $this->session->get('mautic.daterange.form.from');

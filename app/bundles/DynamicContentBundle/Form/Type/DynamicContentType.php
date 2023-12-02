@@ -80,7 +80,7 @@ class DynamicContentType extends AbstractType
         );
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('dynamicContent.dynamicContent', $options));
@@ -263,7 +263,7 @@ class DynamicContentType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 // delete default prototype values
                 $data = $event->getData();
                 unset($data['filters']['__name__']);
@@ -275,7 +275,7 @@ class DynamicContentType extends AbstractType
     /**
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => DynamicContent::class,
@@ -289,7 +289,7 @@ class DynamicContentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields']       = $this->fieldChoices;
         $view->vars['countries']    = $this->countryChoices;
@@ -302,7 +302,7 @@ class DynamicContentType extends AbstractType
         $view->vars['locales']      = $this->localeChoices;
     }
 
-    private function filterFieldChoices()
+    private function filterFieldChoices(): void
     {
         unset($this->fieldChoices['company']);
         $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');

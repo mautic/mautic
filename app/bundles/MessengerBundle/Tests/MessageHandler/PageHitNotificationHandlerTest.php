@@ -23,11 +23,14 @@ class PageHitNotificationHandlerTest extends TestCase
     public function testInvoke(): void
     {
         [$hitId, $pageId, $leadId, $redirectId]                 = [rand(1, 1000), rand(1, 1000), rand(1, 1000), rand(1, 1000)];
-        [$hitObject, $pageObject, $leadObject, $redirectObject] = [
+
+        $redirectObject = new Redirect();
+        $redirectObject->setRedirectId((string) $redirectId);
+
+        [$hitObject, $pageObject, $leadObject] = [
             (new Hit())->setCode(7),
             (new Page())->setAlias('james_bond'),
             (new Lead())->setId($leadId),
-            (new Redirect())->setRedirectId((string) $redirectId),
         ];
 
         $hitRepoMock = $this->createMock(HitRepository::class);

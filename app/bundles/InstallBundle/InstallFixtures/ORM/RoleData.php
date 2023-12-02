@@ -26,7 +26,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
         return ['group_install', 'group_mautic_install_data'];
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         if ($this->hasReference('admin-role')) {
             return;

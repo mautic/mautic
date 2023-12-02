@@ -43,7 +43,7 @@ class FieldType extends AbstractType
         $this->identifierFields = $identifierFields;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
@@ -331,7 +331,7 @@ class FieldType extends AbstractType
                         case 'datetime':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object) && false === \DateTime::createFromFormat('Y-m-d H:i', $object)) {
                                             $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                         }
@@ -342,7 +342,7 @@ class FieldType extends AbstractType
                         case 'date':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate($object, new Assert\Date());
@@ -358,7 +358,7 @@ class FieldType extends AbstractType
                         case 'time':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate(
@@ -418,14 +418,14 @@ class FieldType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier, $disableDefaultValue) {
+            function (FormEvent $event) use ($formModifier, $disableDefaultValue): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
                 $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
@@ -580,7 +580,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class StatHelperPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $definition     = $container->getDefinition('mautic.email.stats.helper_container');
         $taggedServices = $container->findTaggedServiceIds('mautic.email_stat_helper');

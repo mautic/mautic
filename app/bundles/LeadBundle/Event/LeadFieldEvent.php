@@ -29,7 +29,7 @@ class LeadFieldEvent extends CommonEvent
     /**
      * Sets the LeadField entity.
      */
-    public function setField(LeadField $field)
+    public function setField(LeadField $field): void
     {
         $this->entity = $field;
     }

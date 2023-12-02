@@ -55,7 +55,7 @@ class FieldType extends AbstractType
         $this->mappedFieldCollector = $mappedFieldCollector;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Populate settings
         $cleanMasks = [
@@ -615,7 +615,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

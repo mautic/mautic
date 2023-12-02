@@ -20,7 +20,7 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $action = [
             'group'     => 'mautic.plugin.point.action',

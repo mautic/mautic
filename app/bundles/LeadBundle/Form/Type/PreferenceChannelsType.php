@@ -17,7 +17,7 @@ class PreferenceChannelsType extends AbstractType
         $this->leadModel = $leadModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model = $this->leadModel;
 

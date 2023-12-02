@@ -35,7 +35,7 @@ class StatDevice
      */
     private $dateOpened;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -63,7 +63,7 @@ class StatDevice
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -96,7 +96,7 @@ class StatDevice
     /**
      * @param mixed $ip
      */
-    public function setIpAddress(IpAddress $ip)
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -112,7 +112,7 @@ class StatDevice
     /**
      * @param Stat
      */
-    public function setStat(Stat $stat)
+    public function setStat(Stat $stat): void
     {
         $this->stat = $stat;
     }
@@ -128,7 +128,7 @@ class StatDevice
     /**
      * @param mixed $dateOpened
      */
-    public function setDateOpened($dateOpened)
+    public function setDateOpened($dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }
@@ -144,7 +144,7 @@ class StatDevice
     /**
      * @param mixed $device
      */
-    public function setDevice(LeadDevice $device)
+    public function setDevice(LeadDevice $device): void
     {
         $this->device = $device;
     }

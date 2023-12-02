@@ -151,7 +151,7 @@ class KickoffExecutioner implements ExecutionerInterface
      * @throws NoContactsFoundException
      * @throws NotSchedulableException
      */
-    private function executeOrScheduleEvent()
+    private function executeOrScheduleEvent(): void
     {
         // Use the same timestamp across all contacts processed
         $now = new \DateTime();

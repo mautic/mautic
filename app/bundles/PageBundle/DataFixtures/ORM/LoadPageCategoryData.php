@@ -20,7 +20,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $this->categoryModel = $categoryModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $today  = new \DateTime();
         $cat    = new Category();

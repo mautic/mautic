@@ -33,7 +33,7 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function configureAction(CampaignBuilderEvent $event)
+    public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'lead.deletecontact',
@@ -54,7 +54,7 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function deleteContacts(PendingEvent $event)
+    public function deleteContacts(PendingEvent $event): void
     {
         $contactIds = $event->getContactIds();
 

@@ -54,7 +54,7 @@ class EventScheduler
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact)
+    public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact): void
     {
         $contacts = new ArrayCollection([$contact]);
 
@@ -64,7 +64,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -92,7 +92,7 @@ class EventScheduler
         $this->scheduleEventForContacts($event, $config, $executionDate, $contacts, $isInactiveEvent);
     }
 
-    public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn)
+    public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn): void
     {
         $log->setTriggerDate($toBeExecutedOn);
         $this->eventLogger->persistLog($log);
@@ -106,7 +106,7 @@ class EventScheduler
     /**
      * @param ArrayCollection|LeadEventLog[] $logs
      */
-    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn)
+    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn): void
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn);
@@ -123,7 +123,7 @@ class EventScheduler
     /**
      * @deprecated since Mautic 3. To be removed in Mautic 4. Use rescheduleFailures instead.
      */
-    public function rescheduleFailure(LeadEventLog $log)
+    public function rescheduleFailure(LeadEventLog $log): void
     {
         try {
             $this->reschedule($log, $this->getRescheduleDate($log));
@@ -132,7 +132,7 @@ class EventScheduler
         }
     }
 
-    public function rescheduleFailures(ArrayCollection $logs)
+    public function rescheduleFailures(ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -317,7 +317,7 @@ class EventScheduler
     /**
      * @param bool $isReschedule
      */
-    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
+    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false): void
     {
         $this->dispatcher->dispatch(
             new ScheduledEvent($config, $log, $isReschedule),
@@ -328,7 +328,7 @@ class EventScheduler
     /**
      * @param bool $isReschedule
      */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false): void
     {
         if (!$logs->count()) {
             return;
@@ -343,7 +343,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {
             // Create the entry

@@ -34,7 +34,7 @@ class EmailValidationEvent extends Event
         return $this->address;
     }
 
-    public function setInvalid($reason)
+    public function setInvalid($reason): void
     {
         $this->isValid       = false;
         $this->invalidReason = $reason;

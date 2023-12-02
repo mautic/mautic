@@ -17,7 +17,7 @@ class PointActionUrlHitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
             'label'      => 'mautic.page.point.action.form.page.url',
@@ -39,7 +39,7 @@ class PointActionUrlHitType extends AbstractType
             ],
         ]);
 
-        $formModifier = function (FormInterface $form, $data) use ($builder) {
+        $formModifier = function (FormInterface $form, $data) use ($builder): void {
             $unit = (isset($data['accumulative_time_unit'])) ? $data['accumulative_time_unit'] : 'H';
             $form->add('accumulative_time_unit', HiddenType::class, [
                 'data' => $unit,
@@ -106,14 +106,14 @@ class PointActionUrlHitType extends AbstractType
         };
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
         );
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }

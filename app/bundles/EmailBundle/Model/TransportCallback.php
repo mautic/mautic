@@ -38,7 +38,7 @@ class TransportCallback
      * @param string $comments
      * @param int    $dncReason
      */
-    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED)
+    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED): void
     {
         $result = $this->finder->findByHash($hashId);
 
@@ -60,7 +60,7 @@ class TransportCallback
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByAddress($address, $comments, $dncReason = DNC::BOUNCED, $channelId = null)
+    public function addFailureByAddress($address, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $result = $this->finder->findByAddress($address);
 
@@ -76,13 +76,13 @@ class TransportCallback
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByContactId($id, $comments, $dncReason = DNC::BOUNCED, $channelId = null)
+    public function addFailureByContactId($id, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $channel = ($channelId) ? ['email' => $channelId] : 'email';
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    private function updateStatDetails(Stat $stat, $comments, $dncReason)
+    private function updateStatDetails(Stat $stat, $comments, $dncReason): void
     {
         if (DNC::BOUNCED === $dncReason) {
             $stat->setIsFailed(true);

@@ -12,7 +12,7 @@ class TagRepository extends CommonRepository
     /**
      * Delete orphan tags that are not associated with any lead.
      */
-    public function deleteOrphans()
+    public function deleteOrphans(): void
     {
         $qb       = $this->_em->getConnection()->createQueryBuilder();
         $havingQb = $this->_em->getConnection()->createQueryBuilder();

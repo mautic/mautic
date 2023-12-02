@@ -172,7 +172,7 @@ class ContactRequestHelper
         throw new ContactNotFoundException();
     }
 
-    private function setEmailFromClickthroughIdentification(array $clickthrough)
+    private function setEmailFromClickthroughIdentification(array $clickthrough): void
     {
         if (!$this->coreParametersHelper->get('track_by_tracking_url') || !empty($queryFields['email'])) {
             return;
@@ -192,7 +192,7 @@ class ContactRequestHelper
         }
     }
 
-    private function prepareContactFromRequest()
+    private function prepareContactFromRequest(): void
     {
         $ipAddress          = $this->ipLookupHelper->getIpAddress();
         $contactIpAddresses = $this->trackedContact->getIpAddresses();

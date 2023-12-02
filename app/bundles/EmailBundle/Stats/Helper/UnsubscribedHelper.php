@@ -18,7 +18,7 @@ class UnsubscribedHelper extends AbstractHelper
     /**
      * @throws \Exception
      */
-    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
+    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $query = $this->getQuery($fromDateTime, $toDateTime);
         $q     = $query->prepareTimeDataQuery('lead_donotcontact', 'date_added');

@@ -17,7 +17,7 @@ class FailedHelper extends AbstractHelper
     /**
      * @throws \Exception
      */
-    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection)
+    public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $query = $this->getQuery($fromDateTime, $toDateTime);
         $q     = $query->prepareTimeDataQuery('email_stats', 'date_sent', $options->getFilters());

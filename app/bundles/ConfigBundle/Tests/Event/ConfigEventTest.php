@@ -20,7 +20,8 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         // Config defined with setter
         $key    = 'defined';
         $config = ['config' => []];
-        $this->assertNull($event->setConfig($config, $key));
+
+        $event->setConfig($config, $key);
         $this->assertEquals($config, $event->getConfig($key));
 
         // Config not found by key so complete config returned;
@@ -42,12 +43,14 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $preserved = 'preserved';
         $result    = [$preserved];
-        $this->assertNull($event->unsetIfEmpty($preserved));
+
+        $event->unsetIfEmpty($preserved);
         $this->assertEquals($result, $event->getPreservedFields());
 
         $preserved = ['preserved' => 'value'];
         $result    = array_merge($result, $preserved);
-        $this->assertNull($event->unsetIfEmpty($preserved));
+
+        $event->unsetIfEmpty($preserved);
         $this->assertEquals($result, $event->getPreservedFields());
     }
 
@@ -126,7 +129,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $normData = ['norm'];
 
-        $this->assertNull($event->setNormData($normData));
+        $event->setNormData($normData);
         $this->assertEquals($normData, $event->getNormData());
     }
 }

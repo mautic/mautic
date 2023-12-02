@@ -430,7 +430,7 @@ class LeadModel extends FormModel
      * @param Lead $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -504,7 +504,7 @@ class LeadModel extends FormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);
@@ -686,7 +686,7 @@ class LeadModel extends FormModel
     /**
      * Disassociates a user from leads.
      */
-    public function disassociateOwner($userId)
+    public function disassociateOwner($userId): void
     {
         $leads = $this->getRepository()->findByOwner($userId);
         foreach ($leads as $lead) {
@@ -927,7 +927,7 @@ class LeadModel extends FormModel
      * @param array|LeadList $lists
      * @param bool           $manuallyAdded
      */
-    public function addToLists($lead, $lists, $manuallyAdded = true)
+    public function addToLists($lead, $lists, $manuallyAdded = true): void
     {
         $this->leadListModel->addLead($lead, $lists, $manuallyAdded);
     }
@@ -937,7 +937,7 @@ class LeadModel extends FormModel
      *
      * @param bool $manuallyRemoved
      */
-    public function removeFromLists($lead, $lists, $manuallyRemoved = true)
+    public function removeFromLists($lead, $lists, $manuallyRemoved = true): void
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
@@ -1121,7 +1121,7 @@ class LeadModel extends FormModel
         return $results;
     }
 
-    public function removeFromCategories($categories)
+    public function removeFromCategories($categories): void
     {
         $deleteCats = [];
         if (is_array($categories)) {
@@ -1466,7 +1466,7 @@ class LeadModel extends FormModel
      *
      * @param bool|false $removeOrphans
      */
-    public function setTags(Lead $lead, array $tags, $removeOrphans = false)
+    public function setTags(Lead $lead, array $tags, $removeOrphans = false): void
     {
         /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
@@ -1513,7 +1513,7 @@ class LeadModel extends FormModel
     /**
      * Update a leads UTM tags.
      */
-    public function setUtmTags(Lead $lead, UtmTag $utmTags)
+    public function setUtmTags(Lead $lead, UtmTag $utmTags): void
     {
         $lead->setUtmTags($utmTags);
 
@@ -1525,7 +1525,7 @@ class LeadModel extends FormModel
      *
      * @param array $params
      */
-    public function addUTMTags(Lead $lead, $params)
+    public function addUTMTags(Lead $lead, $params): void
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
@@ -1636,7 +1636,7 @@ class LeadModel extends FormModel
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, function (&$val) {
+        array_walk($tags, function (&$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::clean($val);
         });
@@ -1674,7 +1674,7 @@ class LeadModel extends FormModel
         if (!empty($removeTags)) {
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
-            array_walk($removeTags, function (&$val) {
+            array_walk($removeTags, function (&$val): void {
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
                 $val = InputHelper::clean($val);
             });
@@ -1705,7 +1705,7 @@ class LeadModel extends FormModel
      *
      * @param int[] $companies
      */
-    public function modifyCompanies(Lead $lead, array $companies)
+    public function modifyCompanies(Lead $lead, array $companies): void
     {
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -2206,7 +2206,7 @@ class LeadModel extends FormModel
         return $success;
     }
 
-    public function updateLeadOwner(Lead $lead, $ownerId)
+    public function updateLeadOwner(Lead $lead, $ownerId): void
     {
         $owner = $this->em->getReference(User::class, $ownerId);
         $lead->setOwner($owner);
@@ -2214,7 +2214,7 @@ class LeadModel extends FormModel
         parent::saveEntity($lead);
     }
 
-    private function processManipulator(Lead $lead)
+    private function processManipulator(Lead $lead): void
     {
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved

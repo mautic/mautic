@@ -36,7 +36,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(is_resource($handler));
 
-        $handler = $exportHandler->closeHandler($handler);
+        $exportHandler->closeHandler($handler);
 
         $this->assertFalse(is_resource($handler));
         $this->assertNull($handler);

@@ -160,7 +160,7 @@ class CampaignModel extends CommonFormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
@@ -444,7 +444,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Add and/or delete lead sources from a campaign.
      */
-    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
+    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources): void
     {
         foreach ($addedSources as $type => $sources) {
             foreach ($sources as $id => $label) {

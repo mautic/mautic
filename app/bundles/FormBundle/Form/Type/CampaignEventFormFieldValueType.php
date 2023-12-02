@@ -26,7 +26,7 @@ class CampaignEventFormFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'form',
@@ -66,7 +66,7 @@ class CampaignEventFormFieldValueType extends AbstractType
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data    = $e->getData();
             $form    = $e->getForm();
             $fields  = [];

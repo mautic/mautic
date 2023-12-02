@@ -56,7 +56,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -101,7 +101,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -131,7 +131,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($qb);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;

@@ -60,7 +60,7 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $extraClasses = '';
 
@@ -114,12 +114,12 @@ class DynamicContentFilterEntryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->fieldChoices;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -129,7 +129,7 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    private function filterFieldChoices()
+    private function filterFieldChoices(): void
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],

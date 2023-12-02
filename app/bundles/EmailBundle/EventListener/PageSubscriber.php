@@ -46,7 +46,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for page hits.
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onPageHit(Events\PageHitEvent $event): void
     {
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();

@@ -149,7 +149,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now)
+    private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now): void
     {
         $children = clone $children;
 
@@ -181,7 +181,7 @@ class RealTimeExecutioner
      * @throws DecisionNotApplicableException
      * @throws Exception\CannotProcessEventException
      */
-    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null)
+    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 

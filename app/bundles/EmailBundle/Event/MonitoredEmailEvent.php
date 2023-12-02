@@ -43,7 +43,7 @@ class MonitoredEmailEvent extends Event
      *
      * @param string $default
      */
-    public function addFolder($bundleKey, $folderKey, $label, $default = '')
+    public function addFolder($bundleKey, $folderKey, $label, $default = ''): void
     {
         $keyName = ($folderKey) ? $bundleKey.'_'.$folderKey : $bundleKey;
 

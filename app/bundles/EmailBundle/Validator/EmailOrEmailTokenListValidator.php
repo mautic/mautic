@@ -58,7 +58,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
     private function makeEmailOrEmailTokenValidator(): callable
     {
-        return function (string $emailOrToken) {
+        return function (string $emailOrToken): void {
             try {
                 // Try to validate if the value is an email address.
                 $this->emailValidator->validate($emailOrToken);

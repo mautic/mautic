@@ -62,7 +62,7 @@ final class UpdateTranslationsStep implements StepInterface
         }
     }
 
-    private function updateLanguage(string $locale, string $name)
+    private function updateLanguage(string $locale, string $name): void
     {
         // We don't need to update en_US, that comes with the main package
         if ('en_US' === $locale) {

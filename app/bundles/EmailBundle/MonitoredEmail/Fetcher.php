@@ -61,7 +61,7 @@ class Fetcher
     /**
      * @param int $limit
      */
-    public function fetch($limit = null)
+    public function fetch($limit = null): void
     {
         /** @var ParseEmailEvent $event */
         $event = $this->dispatcher->dispatch(new ParseEmailEvent(), EmailEvents::EMAIL_PRE_FETCH);

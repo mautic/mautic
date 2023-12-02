@@ -150,7 +150,7 @@ class Import extends FormEntity
         $this->priority = self::LOW;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('imports')
@@ -174,7 +174,7 @@ class Import extends FormEntity
             ->addNullableField('properties', Types::JSON);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
             ['message' => 'mautic.lead.import.dir.notblank']
@@ -188,7 +188,7 @@ class Import extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('import')
             ->addListProperties(
@@ -330,7 +330,7 @@ class Import extends FormEntity
      * Not removing the CSV file is not considered a big trouble.
      * It will be removed on the next cache:clear.
      */
-    public function removeFile()
+    public function removeFile(): void
     {
         $file = $this->getFilePath();
 
@@ -740,10 +740,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return Import
-     */
-    public function setLastLineImported($line)
+    public function setLastLineImported($line): void
     {
         $this->properties['line'] = (int) $line;
     }

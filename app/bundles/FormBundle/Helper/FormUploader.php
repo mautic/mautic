@@ -69,7 +69,7 @@ class FormUploader
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
     }
 
-    public function deleteAllFilesOfFormField(Field $field)
+    public function deleteAllFilesOfFormField(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -79,7 +79,7 @@ class FormUploader
         $this->fileUploader->delete($uploadDir);
     }
 
-    public function deleteFilesOfForm(Form $form)
+    public function deleteFilesOfForm(Form $form): void
     {
         $formId        = $form->getId() ?: $form->deletedId;
         $formUploadDir = $this->getUploadDirOfForm($formId);
@@ -89,7 +89,7 @@ class FormUploader
     /**
      * @todo Refactor code that result can be accessed normally and not only as a array of values
      */
-    public function deleteUploadedFiles(Submission $submission)
+    public function deleteUploadedFiles(Submission $submission): void
     {
         $fields = $submission->getForm()->getFields();
         foreach ($fields as $field) {
@@ -97,7 +97,7 @@ class FormUploader
         }
     }
 
-    private function deleteFileOfFormField(Submission $submission, Field $field)
+    private function deleteFileOfFormField(Submission $submission, Field $field): void
     {
         $alias   = $field->getAlias();
         $results = $submission->getResults();
@@ -138,7 +138,7 @@ class FormUploader
      * Fix iOS picture orientation after upload PHP
      * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
      */
-    private function fixRotationJPG($filename)
+    private function fixRotationJPG($filename): void
     {
         if (IMAGETYPE_JPEG != exif_imagetype($filename)) {
             return;

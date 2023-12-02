@@ -40,7 +40,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
         // Determine if this is https
@@ -196,7 +196,7 @@ JS;
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
-    public function onBuildJsForVideo(BuildJsEvent $event)
+    public function onBuildJsForVideo(BuildJsEvent $event): void
     {
         $formSubmitUrl = $this->router->generate(
             'mautic_form_postresults_ajax',
@@ -495,7 +495,7 @@ JS;
         $event->appendJs($js, 'Mautic Gated Videos');
     }
 
-    public function onBuildJsForTrackingEvent(BuildJsEvent $event)
+    public function onBuildJsForTrackingEvent(BuildJsEvent $event): void
     {
         $js = '';
 
