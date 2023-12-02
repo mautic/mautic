@@ -12,15 +12,9 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private array $fields;
 
-    /**
-     * @var int
-     */
-    private $level;
+    private int $level;
 
     /**
      * @var string|null

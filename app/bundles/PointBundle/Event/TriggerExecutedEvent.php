@@ -9,10 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 class TriggerExecutedEvent extends Event
 {
     /** @var TriggerEventEntity */
-    private $triggerEvent;
+    private TriggerEventEntity $triggerEvent;
 
-    /** @var Lead */
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     /** @var bool */
     private $result;

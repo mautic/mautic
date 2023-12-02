@@ -13,22 +13,15 @@ class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
-     *
-     * @var bool
      */
-    private $configIsWritable;
+    private bool $configIsWritable;
 
     /**
      * Path to the kernel root.
-     *
-     * @var string
      */
-    private $projectDir;
+    private string $projectDir;
 
-    /**
-     * @var OpenSSLCipher
-     */
-    private $openSSLCipher;
+    private \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher $openSSLCipher;
 
     /**
      * Absolute path to cache directory.

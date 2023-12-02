@@ -34,10 +34,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'point:points:viewother',
     ];
 
-    /**
-     * @var PointModel
-     */
-    protected $pointModel;
+    protected \Mautic\PointBundle\Model\PointModel $pointModel;
 
     public function __construct(PointModel $pointModel)
     {

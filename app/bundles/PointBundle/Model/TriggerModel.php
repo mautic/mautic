@@ -36,32 +36,18 @@ class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var TriggerEventModel
-     */
-    protected $pointTriggerEventModel;
+    protected \Mautic\PointBundle\Model\TriggerEventModel $pointTriggerEventModel;
 
     /**
      * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
      */
-    protected $mauticFactory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     /**
      * @var array<string,array<string,mixed>>

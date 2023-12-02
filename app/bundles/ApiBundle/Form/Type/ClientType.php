@@ -23,30 +23,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private \Symfony\Component\Validator\Validator\ValidatorInterface $validator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+    private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
     public function __construct(
         RequestStack $requestStack,

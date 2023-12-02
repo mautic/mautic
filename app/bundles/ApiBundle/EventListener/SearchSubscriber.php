@@ -11,20 +11,11 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ClientModel
-     */
-    private $apiClientModel;
+    private \Mautic\ApiBundle\Model\ClientModel $apiClientModel;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(ClientModel $apiClientModel, CorePermissions $security, Environment $twig)
     {
