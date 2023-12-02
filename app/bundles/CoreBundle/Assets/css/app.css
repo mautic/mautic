@@ -215,7 +215,7 @@ body > #app-wrapper {
 }
 @media (min-width: 767px) {
   .header-fixed #app-header.navbar ~ #app-content > .content-body {
-    padding: 100px 50px 46px 50px;
+    padding: 100px 80px 46px;
   }
 }
 #app-header.navbar .navbar-nocollapse:before,
@@ -1198,7 +1198,7 @@ h6,
   font-size: 56px !important;
 }
 .page-header {
-  padding: 15px;
+  padding: 15px 0;
   margin: 0;
   border-bottom: 0;;
 }
