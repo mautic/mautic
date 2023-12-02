@@ -5501,7 +5501,12 @@ button.list-group-item-danger.active:focus {
   line-height: 1.3;
 }
 .panel {
-  margin-bottom: 80px;
+  margin-bottom: 40px;
+}
+@media (min-width: 1000px) {
+  .panel {
+    margin-bottom: 80px;
+  }
 }
 .panel-body {
   padding: 15px;

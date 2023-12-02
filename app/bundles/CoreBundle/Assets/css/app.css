@@ -211,7 +211,7 @@ body > #app-wrapper {
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 .header-fixed #app-header.navbar ~ #app-content > .content-body {
-  padding: 20px;
+  padding: 60px 20px 20px;
 }
 @media (min-width: 767px) {
   .header-fixed #app-header.navbar ~ #app-content > .content-body {
@@ -2638,7 +2638,7 @@ ul.line-legend li {
   gap: 0;
   flex-direction: column;
 }
-@media (min-width: 1000px) {
+@media (min-width: 1200px) {
   .column-wrapper-xl, .column-wrapper-l, .column-wrapper-m, .column-wrapper-s {
     flex-direction: row;
   }
