@@ -6,9 +6,6 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var string
-     */
     private array $settings;
 
     public function __construct(UnifiedIntegrationInterface $integration, array $settings)
