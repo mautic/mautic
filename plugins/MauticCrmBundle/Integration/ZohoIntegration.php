@@ -659,7 +659,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws \InvalidArgumentException
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -1246,7 +1246,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param int    $counter
      * @param int    $errorCounter
      */
-    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
+    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, false, $mapper);
@@ -1259,7 +1259,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param int    $counter
      * @param int    $errorCounter
      */
-    private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
+    private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, true, $mapper);

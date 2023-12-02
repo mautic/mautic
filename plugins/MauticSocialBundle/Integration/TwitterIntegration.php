@@ -170,10 +170,7 @@ class TwitterIntegration extends SocialIntegration
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if (!isset($socialCache['id'])) {
             $this->getUserData($identifier, $socialCache);

@@ -59,7 +59,7 @@ class LookupHelper
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
+    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false): void
     {
         if (!$lead->getEmail()) {
             return;
@@ -98,7 +98,7 @@ class LookupHelper
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
+    public function lookupCompany(Company $company, $notify = false, $checkAuto = false): void
     {
         if (!$website = $company->getFieldValue('companywebsite')) {
             return;

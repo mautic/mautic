@@ -22,7 +22,7 @@ class RemoteAssetBrowseSubscriber implements EventSubscriberInterface
     /**
      * Fetches the connector for an event's integration.
      */
-    public function onAssetRemoteBrowse(Events\RemoteAssetBrowseEvent $event)
+    public function onAssetRemoteBrowse(Events\RemoteAssetBrowseEvent $event): void
     {
         /** @var CloudStorageIntegration $integration */
         $integration = $event->getIntegration();

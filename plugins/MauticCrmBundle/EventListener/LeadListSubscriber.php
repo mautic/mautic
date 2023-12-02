@@ -48,7 +48,7 @@ class LeadListSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
+    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event): void
     {
         $services = $this->helper->getIntegrationObjects();
         $choices  = [];
@@ -67,7 +67,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName) {
+                            function (&$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );

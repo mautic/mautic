@@ -62,7 +62,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         $builder->add(
             'updateBlanks',
@@ -894,7 +894,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
-    private function createIntegrationEntities($ids, $object, $integrationEntityRepo)
+    private function createIntegrationEntities($ids, $object, $integrationEntityRepo): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);

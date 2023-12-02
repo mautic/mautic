@@ -30,7 +30,7 @@ class FocusPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('focus', 'categories', $builder, $data);
         $this->addExtendedFormFields('focus', 'items', $builder, $data);

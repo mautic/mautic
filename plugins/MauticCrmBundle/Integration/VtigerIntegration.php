@@ -240,7 +240,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
         if (!empty($mappedData)) {
             // vtiger requires assigned_user_id so default to authenticated user
@@ -253,7 +253,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(

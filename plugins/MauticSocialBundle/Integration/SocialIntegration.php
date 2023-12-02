@@ -83,7 +83,7 @@ abstract class SocialIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $name     = strtolower($this->getName());
@@ -177,10 +177,7 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @param array $settings
-     */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields($settings = []): void
     {
         $settings['feature_settings']['objects'] = ['Company'];
     }

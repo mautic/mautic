@@ -40,7 +40,7 @@ class StatSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPageHit(PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event): void
     {
         $hit    = $event->getHit();
         $source = $hit->getSource();
@@ -58,7 +58,7 @@ class StatSubscriber implements EventSubscriberInterface
     /**
      * Note if this submission is from a focus submit.
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         // Check the request for a focus field
         $mauticform = $this->requestStack->getCurrentRequest()->request->get('mauticform') ?? [];

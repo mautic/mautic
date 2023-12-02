@@ -16,7 +16,7 @@ class ConfigType extends AbstractType
         $this->fieldModel = $fieldModel;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $leadFields = $this->fieldModel->getFieldList(false, false);
 

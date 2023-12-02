@@ -82,10 +82,8 @@ class FoursquareIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @return array
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("users/{$id}");
@@ -101,12 +99,7 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array|void
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = [

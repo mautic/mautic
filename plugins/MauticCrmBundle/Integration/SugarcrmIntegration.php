@@ -969,7 +969,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [
@@ -1346,7 +1346,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Update body to sync.
      */
-    private function pushDncToSugar(array $lead, array &$body)
+    private function pushDncToSugar(array $lead, array &$body): void
     {
         $features = $this->settings->getFeatureSettings();
         // update DNC sync disabled
@@ -1382,7 +1382,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead = null, array $data)
+    private function fetchDncToMautic(Lead $lead = null, array $data): void
     {
         if (is_null($lead)) {
             return;

@@ -100,7 +100,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /*
      * Check and hijack the form's generate link if the ID has mf- in it
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
             // get the current event request
@@ -124,7 +124,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFocusPostSave(FocusEvent $event)
+    public function onFocusPostSave(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         if ($details = $event->getChanges()) {
@@ -143,7 +143,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFocusDelete(FocusEvent $event)
+    public function onFocusDelete(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         $log    = [
@@ -157,7 +157,7 @@ class FocusSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
