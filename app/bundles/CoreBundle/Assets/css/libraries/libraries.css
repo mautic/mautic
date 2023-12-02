@@ -3083,16 +3083,16 @@ select[multiple].input-lg {
   }
 }
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 0;
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
-  vertical-align: middle;
   touch-action: manipulation;
   cursor: pointer;
   background-image: none;
-  text-align: start;
   padding: 6px 12px;
   font-size: 13px;
   line-height: 1.3856;
@@ -4784,9 +4784,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   position: relative;
   float: left;
   padding: 16px;
-  margin-left: -1px;
   line-height: 1.3856;
-  color: #4E5D9D;
   text-decoration: none;
   background-color: #fff;
   border: 2px solid transparent;
@@ -4795,14 +4793,18 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   align-items: center;
   justify-content: center;
   display: flex;
+  transition: background var(--timing), color var(--timing);
 }
 .pagination > li > a:hover,
-.pagination > li > span:hover,
+.pagination > li > span:hover
+{
+  z-index: 2;
+  color: var(--link-primary-hover);
+  background-color: var(--background-hover);
+}
 .pagination > li > a:focus,
 .pagination > li > span:focus {
-  z-index: 2;
-  color: #3d497b;
-  background-color: var(--background-hover);
+  border-color: var(--button-primary);
 }
 .pagination > li:first-child > a,
 .pagination > li:first-child > span {
@@ -4820,10 +4822,9 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > .active > a:focus,
 .pagination > .active > span:focus {
   z-index: 3;
-  color: #3d497b;
+  color: var(--link-primary);
   cursor: default;
-  background-color: #ebedf0;
-  border-color: #ddd;
+  border-bottom-color: var(--button-primary);
 }
 .pagination > .disabled > span,
 .pagination > .disabled > span:hover,
