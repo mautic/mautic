@@ -127,6 +127,11 @@ body > #app-wrapper {
 .header-fixed #app-header.navbar ~ #app-content > .content-body {
   padding-top: 60px;
 }
+@media (min-width: 767px) {
+  .header-fixed #app-header.navbar ~ #app-content > .content-body {
+    padding: 100px 80px 46px;
+  }
+}
 #app-header.navbar .navbar-nocollapse:before,
 #app-header.navbar .navbar-nocollapse:after {
   display: table;
@@ -1109,7 +1114,6 @@ h6,
   font-size: 56px !important;
 }
 .page-header {
-  background-color: #fbfbfb;
   padding: 15px;
   margin: 0;
   border-bottom: 0;
@@ -1498,6 +1502,10 @@ blockquote > p:after {
 }
 .ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible {
   z-index: 99999 !important;
+}
+.ck-body-wrapper {
+  position: fixed;
+  z-index: 99999;
 }
 a.media {
   display: block;
