@@ -8,6 +8,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class UserToken
 {
     /**
+     * @var int
+     */
+    private $id;
+
+    /**
      * @var User
      */
     private $user;

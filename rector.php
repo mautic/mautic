@@ -18,6 +18,27 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ContainerGetToConstructorInjectionRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
         ],
+
+        \Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
+            // entity
+            __DIR__.'/ app/bundles/UserBundle/Entity/UserToken.php',
+            // typo BC
+            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
+        ],
+
+        \Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
+        ],
+
+        \Rector\DeadCode\Rector\If_\UnwrapFutureCompatibleIfPhpVersionRector::class => [
+            // version support check
+            __DIR__.'/app/bundles/InstallBundle/Configurator/Step/CheckStep.php',
+        ],
+
+        \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class => [
+            // casting arrays
+            __DIR__.'/app/bundles/PluginBundle/Facade/ReloadFacade.php',
+        ],
     ]);
 
     $rectorConfig->parallel();
@@ -53,25 +74,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         // @todo implement the whole set. Start rule by rule below.
-        \Rector\Set\ValueObject\SetList::DEAD_CODE
+        \Rector\Set\ValueObject\SetList::DEAD_CODE,
     ]);
 
     // Define what single rules will be applied
     $rectorConfig->rules([
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
-
-        \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
-        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
-        \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
-        \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class,
-        \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
-        \Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class,
-        \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
         ContainerGetToConstructorInjectionRector::class,
     ]);
 };

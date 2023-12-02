@@ -38,7 +38,7 @@ class ReloadFacade
         $enabledPlugins          = $this->reloadHelper->enableFoundPlugins($plugins, $installedPlugins);
         $updatedPlugins          = $this->reloadHelper->updatePlugins($plugins, $installedPlugins, $pluginMetadata, $installedPluginsSchemas);
         $installedPlugins        = $this->reloadHelper->installPlugins($plugins, $installedPlugins, $pluginMetadata, $installedPluginsSchemas);
-        $persist                 = array_values($disabledPlugins + $enabledPlugins + $updatedPlugins + $installedPlugins);
+        $persist                 = array_values((array) ($disabledPlugins + $enabledPlugins + $updatedPlugins + $installedPlugins));
 
         $this->pluginModel->saveEntities($persist);
 

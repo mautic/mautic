@@ -614,7 +614,6 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         $object         = 'contacts';
-        $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
 
         $readOnlyFields = $this->getReadOnlyFields($object);

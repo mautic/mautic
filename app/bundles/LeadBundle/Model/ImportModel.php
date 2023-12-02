@@ -426,6 +426,9 @@ class ImportModel extends FormModel
             }
         }
 
+        // Close the file
+        $file = null;
+
         return true;
     }
 

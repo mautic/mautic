@@ -64,6 +64,7 @@ class DisplayManager
                 continue;
             }
 
+            /** @var Field $fieldFromArray */
             if ($field->getId() === $fieldFromArray->getId()) {
                 if (($this->displayCounter->getDisplayFields() + ($this->displayCounter->getAlwaysDisplayFields() - $this->displayCounter->getAlreadyAlwaysDisplayed())) >= $this->form->getProgressiveProfilingLimit()) {
                     return false;

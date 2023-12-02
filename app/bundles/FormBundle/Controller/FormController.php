@@ -725,6 +725,7 @@ class FormController extends CommonFormController
 
         // Get field and action settings
         $availableFields = $this->fieldHelper->getChoiceList($customComponents['fields']);
+
         $this->clearSessionComponents($request, $objectId);
         $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
         // load existing fields into session

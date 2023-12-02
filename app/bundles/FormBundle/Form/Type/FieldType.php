@@ -71,8 +71,6 @@ class FieldType extends AbstractType
         $allowCustomAlias       =
         $addDefaultValue        =
         $addLabelAttributes     =
-        $addInputAttributes     =
-        $addContainerAttributes =
         $addMappedFieldList     =
         $addSaveResult          =
         $addBehaviorFields      =
