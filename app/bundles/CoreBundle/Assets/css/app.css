@@ -112,8 +112,8 @@
   --letter-spacing-h3: -1.3px;
   --letter-spacing-h4: -0.5px;
   --link-primary: #3358FF;
-  --link-primary-hover: #394687;
-  --link-secondary: #394687;
+  --link-primary-hover: #0026CF;
+  --link-secondary: #0026CF;
   --link-inverse: #78a9ff;
   --link-visited: #8a3ffc;
   --icon-primary: #161616;
@@ -125,13 +125,13 @@
   --icon-disabled: #16161640;
   --button-primary: #3358FF;
   --button-primary-hover: #0353e9;
-  --button-primary-active: #273271;
+  --button-primary-active: #001D9C;
   --button-secondary: #393939;
   --button-secondary-hover: #4c4c4c;
   --button-secondary-active: #6f6f6f;
   --button-tertiary: #3358FF;
   --button-tertiary-hover: #0353e9;
-  --button-tertiary-active: #273271;
+  --button-tertiary-active: #001D9C;
   --button-danger-primary: #da1e28;
   --button-danger-secondary: #da1e28;
   --button-danger-hover: #ba1b23;
