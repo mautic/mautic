@@ -6,9 +6,6 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
 class ContactLimiter
 {
-    /**
-     * @var int|null
-     */
     private int $batchLimit;
 
     /**
@@ -54,8 +51,6 @@ class ContactLimiter
     private $campaignLimitUsed;
 
     /**
-     * ContactLimiter constructor.
-     *
      * @param int      $batchLimit
      * @param int|null $contactId
      * @param int|null $minContactId

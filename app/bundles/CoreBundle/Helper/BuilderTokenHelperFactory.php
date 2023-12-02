@@ -9,8 +9,14 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 class BuilderTokenHelperFactory
 {
     private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
+
+    /**
+     * @var ModelFactory<object>
+     */
     private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
+
     private \Doctrine\DBAL\Connection $connection;
+
     private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     /**

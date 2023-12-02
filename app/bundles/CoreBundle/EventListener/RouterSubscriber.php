@@ -26,14 +26,8 @@ class RouterSubscriber implements EventSubscriberInterface
      */
     private $host;
 
-    /**
-     * @var string|null
-     */
     private string|int $httpsPort;
 
-    /**
-     * @var string|null
-     */
     private string|int $httpPort;
 
     /**

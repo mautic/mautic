@@ -7,7 +7,17 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 class IteratorExportDataModel implements \Iterator
 {
     private int $position;
+
+    /**
+     * @var AbstractCommonModel<T>
+     *
+     * @template T of object
+     */
     private \Mautic\CoreBundle\Model\AbstractCommonModel $model;
+
+    /**
+     * @var mixed[]
+     */
     private array $args;
     private $callback;
     private int $total;
