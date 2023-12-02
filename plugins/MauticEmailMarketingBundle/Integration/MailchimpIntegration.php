@@ -176,9 +176,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         $settings                           = parent::getFormSettings();
         $settings['dynamic_contact_fields'] = true;
