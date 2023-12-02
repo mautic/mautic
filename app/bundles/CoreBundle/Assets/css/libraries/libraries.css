@@ -1084,18 +1084,18 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #4E5D9D;
+  color: var(--link-primary);
   text-decoration: none;
   font-weight: bold;
+  transition: color var(--timing);
 }
 a:hover,
 a:focus {
-  color: #3d497b;
+  color: var(--link-primary-hover);
   text-decoration: underline;
 }
 a:focus {
-  outline: 5px auto -webkit-focus-ring-color;
-  outline-offset: -2px;
+  border-color: var(--button-primary);
 }
 figure {
   margin: 0;
@@ -1521,11 +1521,10 @@ samp {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 code {
-  padding: 2px 4px;
+  padding: 2px 6px;
   font-size: 90%;
   color: #c7254e;
   background-color: #f9f2f4;
-  border-radius: 3px;
 }
 kbd {
   padding: 2px 4px;
@@ -2365,6 +2364,7 @@ th {
 }
 .table tr {
   background-color: var(--layer);
+  transition: background var(--timing);
 }
 #github-info tr, #packagist-info tr {
   background-color: transparent;
@@ -2655,17 +2655,15 @@ output {
   line-height: 1.3856;
   color: #596776;
   background-color: transparent;
-  border: none;
+  border: 2px solid transparent;
   transition: background-color var(--timing);
 }
 .form-control:hover {
   background-color: var(--background-hover);
 }
 .form-control:focus {
-  border-color: #bcbcbc;
+  border-color: var(--button-primary);
   outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(188, 188, 188, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(188, 188, 188, 0.6);
 }
 .form-control::-moz-placeholder {
   color: #999;
@@ -3022,7 +3020,7 @@ select[multiple].input-lg {
     width: auto;
   }
   .form-inline .input-group > .form-control {
-    width: 100%;
+    width: 250px;
   }
   .form-inline .control-label {
     margin-bottom: 0;
@@ -3711,6 +3709,9 @@ tbody.collapse.in {
   padding: 14px;
   height: 48px;
 }
+.btn-group > .btn > span > span, .btn-group-vertical > .btn > span > span {
+  margin-right: 32px;
+}
 .btn-group > .btn:not(.dropdown-toggle),
 .btn-group-vertical > .btn:not(.dropdown-toggle) {
   min-width: 175px;
@@ -3749,14 +3750,14 @@ tbody.collapse.in {
 }
 .btn-group > .btn:first-child {
   margin-left: 0;
-  background-color: var(--button-primary);
-  color: var(--text-on-color);
 }
-.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+.btn-group > .btn:first-child:not(.dropdown-toggle) {
   background-color: var(--button-primary);
-  margin-right: 8px;
   color: var(--text-on-color);
   transition: background var(--timing), color var(--timing);
+}
+.btn-group > .btn:first-child:not(.dropdown-toggle):hover {
+background-color: var(--button-primary-hover);
 }
 .btn-group > .btn:last-child:not(:first-child),
 .btn-group > .dropdown-toggle:not(:first-child) {
