@@ -2510,8 +2510,6 @@ ul.line-legend li {
   left: 0;
   right: 0;
   border-radius: inherit;
-  -webkit-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.3);
 }
 .img-wrapper img {
   border-radius: inherit;
@@ -2657,6 +2655,14 @@ ul.line-legend li {
     gap: 80px;
     flex-direction: row;
   }
+}
+.column-wrapper-s {
+  display: flex;
+  gap: 5px;
+  flex-direction: row;
+}
+.flex-middle {
+  align-items: center;
 }
 .panel-heading {
   padding: 16px 16px 24px 16px;

@@ -2372,7 +2372,7 @@ th {
 #github-info td, #github-info th, #packagist-info td, #packagist-info th {
   padding: 8px;
 }
-.table-hover > tbody > tr:hover {
+.table-hover > tbody > tr:hover, .table tr:hover {
   background-color: var(--layer-hover);
 }
 .table > tbody > tr > td, .table > tfoot > tr > td {
