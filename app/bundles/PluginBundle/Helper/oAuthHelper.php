@@ -24,7 +24,7 @@ class oAuthHelper
 
     private $settings;
 
-    private $request;
+    private ?\Symfony\Component\HttpFoundation\Request $request;
 
     public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {

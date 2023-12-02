@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(
         AuditLogModel $auditLogModel

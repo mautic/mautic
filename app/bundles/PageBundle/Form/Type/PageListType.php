@@ -11,10 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageListType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $model;
+    private \Mautic\PageBundle\Model\PageModel $model;
 
     /**
      * @var bool

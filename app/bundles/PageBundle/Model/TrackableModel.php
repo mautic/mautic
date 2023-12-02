@@ -52,15 +52,9 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
-    /**
-     * @var RedirectModel
-     */
-    protected $redirectModel;
+    protected \Mautic\PageBundle\Model\RedirectModel $redirectModel;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
     /**
      * @var array|null

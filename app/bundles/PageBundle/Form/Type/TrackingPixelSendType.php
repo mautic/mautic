@@ -11,10 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TrackingPixelSendType extends AbstractType
 {
-    /**
-     * @var TrackingHelper
-     */
-    protected $trackingHelper;
+    protected \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
 
     public function __construct(TrackingHelper $trackingHelper)
     {

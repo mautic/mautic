@@ -15,20 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FeatureSettingsType extends AbstractType
 {
-    /**
-     * @var SessionInterface
-     */
-    protected $session;
+    protected \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(
         SessionInterface $session,

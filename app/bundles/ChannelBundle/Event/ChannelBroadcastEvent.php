@@ -28,10 +28,7 @@ class ChannelBroadcastEvent extends Event
      */
     protected $results = [];
 
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
+    protected \Symfony\Component\Console\Output\OutputInterface $output;
 
     /**
      * Min contact ID filter can be used for process parallelization.

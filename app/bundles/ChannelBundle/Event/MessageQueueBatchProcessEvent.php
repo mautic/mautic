@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MessageQueueBatchProcessEvent extends Event
 {
-    private $messages = [];
+    private array $messages;
 
     private $channel;
 
