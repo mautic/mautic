@@ -12,10 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
 
     private TranslatorInterface $translator;
 

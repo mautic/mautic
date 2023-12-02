@@ -77,15 +77,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
-    /**
-     * @var Connection
-     */
-    private $db;
+    private \Doctrine\DBAL\Connection $db;
 
-    /**
-     * @var Report
-     */
-    private $entity;
+    private \Mautic\ReportBundle\Entity\Report $entity;
 
     /**
      * @var string
@@ -95,12 +89,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * @var EventDispatcher
      */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {

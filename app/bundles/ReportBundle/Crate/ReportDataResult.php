@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
 class ReportDataResult
 {
-    /**
-     * @var int
-     */
-    private $totalResults;
+    private int $totalResults;
 
     /**
      * @var array

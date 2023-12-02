@@ -11,20 +11,14 @@ use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
 class SchedulerPlanner
 {
-    /**
-     * @var DateBuilder
-     */
-    private $dateBuilder;
+    private \Mautic\ReportBundle\Scheduler\Date\DateBuilder $dateBuilder;
 
     /**
      * @var SchedulerRepository
      */
-    private $schedulerRepository;
+    private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(DateBuilder $dateBuilder, EntityManager $entityManager)
     {

@@ -29,15 +29,9 @@ class ReportBuilderEvent extends AbstractReportEvent
         'line',
     ];
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * Container with registered graphs.
@@ -53,7 +47,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      */
     private $leadFields = [];
 
-    private $reportHelper;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     private ?string $reportSource;
 
@@ -146,7 +140,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $prefix
      *
-     * @return string[]
+     * @return array<string,array<string,string>>
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {

@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SchedulerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\SendSchedule $sendSchedule;
 
     public function __construct(SendSchedule $sendSchedule)
     {

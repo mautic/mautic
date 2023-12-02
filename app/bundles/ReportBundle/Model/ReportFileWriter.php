@@ -9,15 +9,9 @@ use Mautic\ReportBundle\Exception\FileIOException;
 
 class ReportFileWriter
 {
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
+    private \Mautic\ReportBundle\Model\CsvExporter $csvExporter;
 
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
+    private \Mautic\ReportBundle\Model\ExportHandler $exportHandler;
 
     public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
     {

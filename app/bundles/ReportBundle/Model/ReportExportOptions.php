@@ -11,10 +11,7 @@ class ReportExportOptions
      */
     private $batchSize;
 
-    /**
-     * @var int
-     */
-    private $page;
+    private int $page;
 
     /**
      * @var \DateTimeInterface

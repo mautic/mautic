@@ -12,10 +12,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    /**
-     * @var SchedulerBuilder
-     */
-    private $schedulerBuilder;
+    private \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder $schedulerBuilder;
 
     public function __construct(SchedulerBuilder $schedulerBuilder)
     {
