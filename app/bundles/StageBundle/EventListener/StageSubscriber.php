@@ -34,7 +34,7 @@ class StageSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onStagePostSave(Events\StageEvent $event)
+    public function onStagePostSave(Events\StageEvent $event): void
     {
         $stage = $event->getStage();
         if ($details = $event->getChanges()) {
@@ -53,7 +53,7 @@ class StageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onStageDelete(Events\StageEvent $event)
+    public function onStageDelete(Events\StageEvent $event): void
     {
         $stage = $event->getStage();
         $log   = [

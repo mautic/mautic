@@ -29,7 +29,7 @@ class UserEvent extends CommonEvent
     /**
      * Sets the User entity.
      */
-    public function setUser(User $user)
+    public function setUser(User $user): void
     {
         $this->entity = $user;
     }

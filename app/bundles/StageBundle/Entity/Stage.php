@@ -67,7 +67,7 @@ class Stage extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('stages')
@@ -90,7 +90,7 @@ class Stage extends FormEntity
         $builder->addCategory();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -100,7 +100,7 @@ class Stage extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stage')
             ->addListProperties(
@@ -226,7 +226,7 @@ class Stage extends FormEntity
     /**
      * Remove log.
      */
-    public function removeLog(LeadStageLog $log)
+    public function removeLog(LeadStageLog $log): void
     {
         $this->log->removeElement($log);
     }
@@ -302,7 +302,7 @@ class Stage extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }

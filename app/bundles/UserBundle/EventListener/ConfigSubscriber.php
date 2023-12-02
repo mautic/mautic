@@ -28,7 +28,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addFileFields($this->fileFields)
             ->addForm(
@@ -42,7 +42,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');

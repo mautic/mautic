@@ -90,7 +90,7 @@ class Webhook extends FormEntity
         $this->logs   = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhooks')
@@ -125,7 +125,7 @@ class Webhook extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hook')
             ->addListProperties(
@@ -143,7 +143,7 @@ class Webhook extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -321,10 +321,8 @@ class Webhook extends FormEntity
 
     /**
      * This builds a simple array with subscribed events.
-     *
-     * @return array
      */
-    public function buildTriggers()
+    public function buildTriggers(): void
     {
         foreach ($this->events as $event) {
             $this->triggers[] = $event->getEventType();
@@ -334,7 +332,7 @@ class Webhook extends FormEntity
     /**
      * Takes the array of triggers and builds events from them if they don't exist already.
      */
-    public function setTriggers(array $triggers)
+    public function setTriggers(array $triggers): void
     {
         foreach ($triggers as $key) {
             $this->addTrigger($key);

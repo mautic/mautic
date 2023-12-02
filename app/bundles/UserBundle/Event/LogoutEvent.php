@@ -40,7 +40,7 @@ class LogoutEvent extends Event
     /**
      * Add value to session after it's been cleared.
      */
-    public function setPostSessionItem($key, $value)
+    public function setPostSessionItem($key, $value): void
     {
         $this->session[$key] = $value;
     }

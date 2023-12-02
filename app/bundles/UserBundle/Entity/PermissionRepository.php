@@ -13,7 +13,7 @@ class PermissionRepository extends CommonRepository
     /**
      * Delete all permissions for a specific role.
      */
-    public function purgeRolePermissions(Role $role)
+    public function purgeRolePermissions(Role $role): void
     {
         $query = $this
             ->createQueryBuilder('p')

@@ -26,7 +26,7 @@ class UserRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    public function setLastLogin($user)
+    public function setLastLogin($user): void
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
@@ -37,7 +37,7 @@ class UserRepository extends CommonRepository
         ], ['id' => (int) $user->getId()]);
     }
 
-    public function setLastActive($user)
+    public function setLastActive($user): void
     {
         $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
