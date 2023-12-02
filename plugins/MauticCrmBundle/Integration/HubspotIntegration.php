@@ -610,12 +610,6 @@ class HubspotIntegration extends CrmAbstractIntegration
         $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
 
-        // @todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
-        $updateFields = array_intersect_key(
-            $createFields,
-            $fieldsToUpdate
-        );
-
         $readOnlyFields = $this->getReadOnlyFields($object);
 
         $createFields = array_filter(

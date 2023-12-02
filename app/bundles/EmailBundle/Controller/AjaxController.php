@@ -107,7 +107,7 @@ class AjaxController extends CommonAjaxController
     public function generatePlaintTextAction(Request $request)
     {
         $custom = $request->request->get('custom');
-        $id     = $request->request->get('id');
+        $request->request->get('id');
 
         $parser = new PlainTextHelper(
             [

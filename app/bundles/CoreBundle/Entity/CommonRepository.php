@@ -1561,7 +1561,6 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {
-        $isOrm       = $query instanceof QueryBuilder;
         $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn', 'between', 'notBetween'];
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
         $andOr       = ['andX', 'orX'];
