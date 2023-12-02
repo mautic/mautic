@@ -149,7 +149,6 @@ class FormUploader
         }
         $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
         $ort1 = $ort;
-        $exif = exif_read_data($filename, '', true);
         if (!empty($ort1)) {
             $image = imagecreatefromjpeg($filename);
             $ort   = $ort1;

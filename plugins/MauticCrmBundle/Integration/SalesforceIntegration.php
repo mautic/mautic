@@ -1487,7 +1487,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $mauticData = [];
-        $objectId   = null;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);

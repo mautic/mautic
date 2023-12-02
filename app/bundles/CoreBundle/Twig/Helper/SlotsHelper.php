@@ -154,7 +154,7 @@ final class SlotsHelper
 
     public function inBuilder(bool $bool): void
     {
-        $this->inBuilder = (bool) $bool;
+        $this->inBuilder = $bool;
     }
 
     /**

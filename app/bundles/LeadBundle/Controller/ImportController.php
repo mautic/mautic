@@ -357,26 +357,19 @@ class ImportController extends FormController
                                 }
 
                                 $this->session->set('mautic.'.$object.'.import.config', $config);
+                                $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                $file->seek(PHP_INT_MAX);
+                                $linecount = $file->key();
+                                if (!empty($headers) && is_array($headers)) {
+                                    $headers = CsvHelper::sanitizeHeaders($headers);
 
-                                if (false !== $file) {
-                                    // Get the headers for matching
-                                    $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                                    $this->session->set('mautic.'.$object.'.import.headers', $headers);
+                                    $this->session->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
+                                    $this->session->set('mautic.'.$object.'.import.importfields', CsvHelper::convertHeadersIntoFields($headers));
+                                    $this->session->set('mautic.'.$object.'.import.progress', [0, $linecount]);
+                                    $this->session->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
-                                    // Get the number of lines so we can track progress
-                                    $file->seek(PHP_INT_MAX);
-                                    $linecount = $file->key();
-
-                                    if (!empty($headers) && is_array($headers)) {
-                                        $headers = CsvHelper::sanitizeHeaders($headers);
-
-                                        $this->session->set('mautic.'.$object.'.import.headers', $headers);
-                                        $this->session->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
-                                        $this->session->set('mautic.'.$object.'.import.importfields', CsvHelper::convertHeadersIntoFields($headers));
-                                        $this->session->set('mautic.'.$object.'.import.progress', [0, $linecount]);
-                                        $this->session->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
-
-                                        return $this->newAction($request, 0, true);
-                                    }
+                                    return $this->newAction($request, 0, true);
                                 }
                             } catch (FileException $e) {
                                 if (false !== strpos($e->getMessage(), 'upload_max_filesize')) {

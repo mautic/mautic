@@ -52,7 +52,7 @@ class FieldChangeRepository extends CommonRepository
         }
 
         $qb->setParameter('objectType', $objectType)
-            ->setParameter('objectId', (int) $objectId);
+            ->setParameter('objectId', $objectId);
 
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')

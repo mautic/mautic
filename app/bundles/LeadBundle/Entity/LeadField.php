@@ -81,13 +81,6 @@ class LeadField extends FormEntity
     private $isUniqueIdentifer = false;
 
     /**
-     * Workaround for incorrectly spelled $isUniqueIdentifer.
-     *
-     * @var bool
-     */
-    private $isUniqueIdentifier = false;
-
-    /**
      * @var int|null
      */
     private $order = 1;
@@ -742,7 +735,6 @@ class LeadField extends FormEntity
      */
     public function identifierWorkaround()
     {
-        $this->isUniqueIdentifier = $this->isUniqueIdentifer;
     }
 
     /**

@@ -859,15 +859,13 @@ class Mailbox
 
         // Parse X headers
         $tempArray = explode("\n", $header);
-        if (is_array($tempArray) && count($tempArray)) {
-            $headers = [];
-            foreach ($tempArray as $line) {
-                if (preg_match('/^X-(.*?): (.*?)$/is', trim($line), $matches)) {
-                    $headers['x-'.strtolower($matches[1])] = $matches[2];
-                }
+        $headers   = [];
+        foreach ($tempArray as $line) {
+            if (preg_match('/^X-(.*?): (.*?)$/is', trim($line), $matches)) {
+                $headers['x-'.strtolower($matches[1])] = $matches[2];
             }
-            $mail->xHeaders = $headers;
         }
+        $mail->xHeaders = $headers;
 
         return $mail;
     }

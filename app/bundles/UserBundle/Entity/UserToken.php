@@ -8,11 +8,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class UserToken
 {
     /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var User
      */
     private $user;
@@ -30,7 +25,7 @@ class UserToken
     /**
      * @var \DateTimeInterface|null
      */
-    private $expiration = null;
+    private $expiration;
 
     /**
      * @var bool

@@ -40,7 +40,7 @@ class SummaryRepository extends CommonRepository
                 ]
             )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
-            ->where('cs.campaign_id = '.(int) $campaignId)
+            ->where('cs.campaign_id = '.$campaignId)
             ->groupBy('cs.event_id');
 
         if ($dateFrom && $dateTo) {

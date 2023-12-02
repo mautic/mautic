@@ -51,7 +51,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        return (isset($featureSettings['auto_create_user'])) ? (bool) $featureSettings['auto_create_user'] : false;
+        return isset($featureSettings['auto_create_user']) && (bool) $featureSettings['auto_create_user'];
     }
 
     /**
@@ -142,7 +142,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.integration.sso.auto_create_user',
-                    'data'  => (isset($data['auto_create_user'])) ? (bool) $data['auto_create_user'] : false,
+                    'data'  => isset($data['auto_create_user']) && (bool) $data['auto_create_user'],
                     'attr'  => [
                         'tooltip' => 'mautic.integration.sso.auto_create_user.tooltip',
                     ],

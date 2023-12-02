@@ -171,7 +171,7 @@ class InstallController extends CommonController
             if ($index < $this->configurator->getStepCount()) {
                 // On to the next step
 
-                return $this->redirectToRoute('mautic_installer_step', ['index' => (int) $index]);
+                return $this->redirectToRoute('mautic_installer_step', ['index' => $index]);
             } else {
                 $siteUrl  = $request->getSchemeAndHttpHost().$request->getBaseUrl();
                 $messages = $this->installer->createFinalConfigStep($siteUrl);

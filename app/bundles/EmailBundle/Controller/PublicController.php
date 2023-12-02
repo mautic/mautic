@@ -62,12 +62,9 @@ class PublicController extends CommonFormController
                 // Convert emoji
                 $content = EmojiHelper::toEmoji($content, 'short');
                 $subject = EmojiHelper::toEmoji($subject, 'short');
-
                 // Replace tokens
-                if (!empty($tokens)) {
-                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
-                }
+                $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
             } else {
                 $subject = '';
                 $content = '';
@@ -131,8 +128,7 @@ class PublicController extends CommonFormController
         $template   = null;
         $session    = $request->getSession();
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->getModel('lead');
+        $this->getModel('lead');
 
         if (!empty($stat)) {
             if ($email = $stat->getEmail()) {

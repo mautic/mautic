@@ -414,9 +414,9 @@ class MailHelper
                 $this->errors['failures'] = array_unique(
                     array_merge(
                         $failures,
-                        array_keys((array) $this->message->getTo()),
-                        array_keys((array) $this->message->getCc()),
-                        array_keys((array) $this->message->getBcc())
+                        array_keys($this->message->getTo()),
+                        array_keys($this->message->getCc()),
+                        array_keys($this->message->getBcc())
                     )
                 );
 

@@ -402,23 +402,18 @@ class TriggerController extends FormController
             // lock the entity
             $model->lockEntity($entity);
         }
-
-        if ($cleanSlate) {
-            // clean slate
-            $this->clearSessionComponents($request, $objectId);
-
-            // load existing events into session
-            $triggerEvents   = [];
-            $existingActions = $entity->getEvents()->toArray();
-            foreach ($existingActions as $a) {
-                $id     = $a->getId();
-                $action = $a->convertToArray();
-                unset($action['form']);
-                $triggerEvents[$id] = $action;
-            }
-            $session->set('mautic.point.'.$objectId.'.triggerevents.modified', $triggerEvents);
-            $deletedEvents = [];
+        $this->clearSessionComponents($request, $objectId);
+        // load existing events into session
+        $triggerEvents   = [];
+        $existingActions = $entity->getEvents()->toArray();
+        foreach ($existingActions as $a) {
+            $id     = $a->getId();
+            $action = $a->convertToArray();
+            unset($action['form']);
+            $triggerEvents[$id] = $action;
         }
+        $session->set('mautic.point.'.$objectId.'.triggerevents.modified', $triggerEvents);
+        $deletedEvents = [];
 
         return $this->delegateView([
             'viewParameters' => [

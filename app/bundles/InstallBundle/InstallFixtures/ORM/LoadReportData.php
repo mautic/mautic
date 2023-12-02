@@ -15,11 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * {@inheritdoc}
      */
     public static function getGroups(): array
@@ -32,7 +27,6 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $this->container = $container;
     }
 
     public function load(ObjectManager $manager)

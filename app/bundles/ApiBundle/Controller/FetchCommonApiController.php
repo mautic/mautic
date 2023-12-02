@@ -121,7 +121,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @var AbstractCommonModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * The level parent/children should stop loading if applicable.

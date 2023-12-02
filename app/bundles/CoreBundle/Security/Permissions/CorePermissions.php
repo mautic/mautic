@@ -391,9 +391,9 @@ class CorePermissions
             } else {
                 return false;
             }
-        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
+        } elseif ($own && $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
-        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
+        } elseif ($other && $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;

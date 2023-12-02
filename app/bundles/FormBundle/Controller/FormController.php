@@ -725,121 +725,108 @@ class FormController extends CommonFormController
 
         // Get field and action settings
         $availableFields = $this->fieldHelper->getChoiceList($customComponents['fields']);
+        $this->clearSessionComponents($request, $objectId);
+        $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
+        // load existing fields into session
+        $modifiedFields   = [];
+        $existingFields   = $entity->getFields()->toArray();
+        $submitButton     = false;
+        foreach ($existingFields as $formField) {
+            // Check to see if the field still exists
 
-        if ($cleanSlate) {
-            // clean slate
-            $this->clearSessionComponents($request, $objectId);
-            $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
-
-            // load existing fields into session
-            $modifiedFields   = [];
-            $existingFields   = $entity->getFields()->toArray();
-            $submitButton     = false;
-
-            foreach ($existingFields as $formField) {
-                // Check to see if the field still exists
-
-                if ('button' == $formField->getType()) {
-                    // submit button found
-                    $submitButton = true;
-                }
-                if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
-                    continue;
-                }
-
-                $id    = $formField->getId();
-                $field = $formField->convertToArray();
-
-                if (!$id) {
-                    // Cloned entity
-                    $id = $field['id'] = $field['sessionId'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                }
-
-                unset($field['form']);
-
-                if (isset($customComponents['fields'][$field['type']])) {
-                    // Set the custom parameters
-                    $field['customParameters'] = $customComponents['fields'][$field['type']];
-                }
-
-                $field['formId']     = $objectId;
-                $modifiedFields[$id] = $field;
-
-                if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
-                    $this->alreadyMappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
-                }
+            if ('button' == $formField->getType()) {
+                // submit button found
+                $submitButton = true;
+            }
+            if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
+                continue;
             }
 
-            if (!$submitButton) { // means something deleted the submit button from the form
-                // add a submit button
-                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
-                $field = new Field();
+            $id    = $formField->getId();
+            $field = $formField->convertToArray();
 
-                $modifiedFields[$keyId]                    = $field->convertToArray();
-                $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
-                $modifiedFields[$keyId]['alias']           = 'submit';
-                $modifiedFields[$keyId]['showLabel']       = 1;
-                $modifiedFields[$keyId]['type']            = 'button';
-                $modifiedFields[$keyId]['id']              = $keyId;
-                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
-                $modifiedFields[$keyId]['formId']          = $objectId;
-                unset($modifiedFields[$keyId]['form']);
+            if (!$id) {
+                // Cloned entity
+                $id = $field['id'] = $field['sessionId'] = 'new'.hash('sha1', uniqid(mt_rand()));
             }
 
-            if (!empty($reorder)) {
-                uasort(
-                    $modifiedFields,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
+            unset($field['form']);
 
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
-                );
+            if (isset($customComponents['fields'][$field['type']])) {
+                // Set the custom parameters
+                $field['customParameters'] = $customComponents['fields'][$field['type']];
             }
 
-            $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
-            $deletedFields = [];
+            $field['formId']     = $objectId;
+            $modifiedFields[$id] = $field;
 
-            // Load existing actions into session
-            $modifiedActions = [];
-            $existingActions = $entity->getActions()->toArray();
-
-            foreach ($existingActions as $formAction) {
-                // Check to see if the action still exists
-                if (!isset($customComponents['actions'][$formAction->getType()])) {
-                    continue;
-                }
-
-                $id     = $formAction->getId();
-                $action = $formAction->convertToArray();
-
-                if (!$id) {
-                    // Cloned entity so use a random Id instead
-                    $action['id'] = $id = 'new'.hash('sha1', uniqid(mt_rand()));
-                }
-                unset($action['form']);
-
-                $modifiedActions[$id] = $action;
+            if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
+                $this->alreadyMappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
             }
-
-            if (!empty($reorder)) {
-                uasort(
-                    $modifiedActions,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
-                );
-            }
-
-            $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
-            $deletedActions = [];
         }
+        if (!$submitButton) { // means something deleted the submit button from the form
+            // add a submit button
+            $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+            $field = new Field();
+
+            $modifiedFields[$keyId]                    = $field->convertToArray();
+            $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
+            $modifiedFields[$keyId]['alias']           = 'submit';
+            $modifiedFields[$keyId]['showLabel']       = 1;
+            $modifiedFields[$keyId]['type']            = 'button';
+            $modifiedFields[$keyId]['id']              = $keyId;
+            $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+            $modifiedFields[$keyId]['formId']          = $objectId;
+            unset($modifiedFields[$keyId]['form']);
+        }
+        if (!empty($reorder)) {
+            uasort(
+                $modifiedFields,
+                function ($a, $b) {
+                    if ($a['order'] == $b['order']) {
+                        return 0;
+                    }
+
+                    return $a['order'] < $b['order'] ? -1 : 1;
+                }
+            );
+        }
+        $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
+        $deletedFields = [];
+        // Load existing actions into session
+        $modifiedActions = [];
+        $existingActions = $entity->getActions()->toArray();
+        foreach ($existingActions as $formAction) {
+            // Check to see if the action still exists
+            if (!isset($customComponents['actions'][$formAction->getType()])) {
+                continue;
+            }
+
+            $id     = $formAction->getId();
+            $action = $formAction->convertToArray();
+
+            if (!$id) {
+                // Cloned entity so use a random Id instead
+                $action['id'] = $id = 'new'.hash('sha1', uniqid(mt_rand()));
+            }
+            unset($action['form']);
+
+            $modifiedActions[$id] = $action;
+        }
+        if (!empty($reorder)) {
+            uasort(
+                $modifiedActions,
+                function ($a, $b) {
+                    if ($a['order'] == $b['order']) {
+                        return 0;
+                    }
+
+                    return $a['order'] < $b['order'] ? -1 : 1;
+                }
+            );
+        }
+        $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
+        $deletedActions = [];
 
         return $this->delegateView(
             [

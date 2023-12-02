@@ -1224,8 +1224,7 @@ class DsnParser
                     break;
                 case 'delivered':
                 case 'relayed':
-                case 'expanded': // unhandled cases
-                    break;
+                case 'expanded':
                 default:
                     break;
             }

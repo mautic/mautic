@@ -64,7 +64,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
             $firstId = 0;
 
             // create the tables passed in LoadFormData fixture.
-            foreach ($formEntities as $key => $form) {
+            foreach ($formEntities as $form) {
                 $this->formModel->generateHtml($form);
 
                 if ($form->getId() < 1) {

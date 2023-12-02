@@ -859,7 +859,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 // logic. In query, Sum(manually_removed) should be less than the current)
                 $pluck    = count($imploder);
-                $imploder = (string) implode(',', $imploder);
+                $imploder = implode(',', $imploder);
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('duplicate.lead_id')

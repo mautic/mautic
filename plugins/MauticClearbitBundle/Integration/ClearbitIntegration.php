@@ -52,7 +52,7 @@ class ClearbitIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.clearbit.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.clearbit.auto_update.tooltip',
                     ],
@@ -65,7 +65,7 @@ class ClearbitIntegration extends AbstractIntegration
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**

@@ -129,7 +129,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $startTime   = microtime(true);
             $processed   = $this->listModel->rebuildListLeads($segment, $batch, $max, $output);
             $rebuildTime = round(microtime(true) - $startTime, 2);
-            if (0 >= (int) $max) {
+            if (0 >= $max) {
                 // Only full segment rebuilds count
                 $segment->setLastBuiltDateToCurrentDatetime();
                 $segment->setLastBuiltTime($rebuildTime);

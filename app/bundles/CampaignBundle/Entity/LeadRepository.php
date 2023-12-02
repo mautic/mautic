@@ -536,7 +536,7 @@ class LeadRepository extends CommonRepository
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+            $qb->expr()->eq('cl.campaign_id', $campaignId)
         );
 
         if ($campaignCanBeRestarted) {

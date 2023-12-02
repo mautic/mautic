@@ -38,7 +38,7 @@ class SecuritySubscriber implements EventSubscriberInterface
 
     public function onSecurityInteractiveLogin(LoginEvent $event)
     {
-        $userId   = (int) $event->getUser()->getId();
+        $userId   = $event->getUser()->getId();
         $useName  = $event->getUser()->getUsername();
 
         $log     = [

@@ -103,6 +103,6 @@ class Tag
 
     private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim((string) $tag));
+        return InputHelper::string(trim($tag));
     }
 }

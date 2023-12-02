@@ -41,8 +41,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
 
-        $filterGlueFunc = $filterGlue.'Where';
-
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
         // for aggregate function we need to create new alias and not reuse the old one
