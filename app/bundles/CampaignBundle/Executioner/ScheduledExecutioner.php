@@ -24,35 +24,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $repo;
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $repo;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
+    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
-    /**
-     * @var ScheduledContactFinder
-     */
-    private $scheduledContactFinder;
+    private \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder $scheduledContactFinder;
 
     /**
      * @var Campaign

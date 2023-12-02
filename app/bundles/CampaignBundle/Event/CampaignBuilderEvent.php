@@ -26,10 +26,7 @@ class CampaignBuilderEvent extends Event
      */
     private $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * Holds info if some property has been already sorted or not.

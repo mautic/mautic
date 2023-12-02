@@ -11,25 +11,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MenuBuilder
 {
-    /**
-     * @var FactoryInterface
-     */
-    private $factory;
+    private \Knp\Menu\FactoryInterface $factory;
 
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
+    private \Knp\Menu\Matcher\MatcherInterface $matcher;
 
     /**
      * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     private $dispatcher;
 
-    /**
-     * @var \Mautic\CoreBundle\Menu\MenuHelper
-     */
-    private $menuHelper;
+    private \Mautic\CoreBundle\Menu\MenuHelper $menuHelper;
 
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {

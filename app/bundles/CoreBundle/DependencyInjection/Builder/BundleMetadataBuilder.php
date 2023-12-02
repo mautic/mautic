@@ -8,15 +8,9 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetada
 
 class BundleMetadataBuilder
 {
-    /**
-     * @var array
-     */
-    private $paths;
+    private array $paths;
 
-    /**
-     * @var array
-     */
-    private $symfonyBundles;
+    private array $symfonyBundles;
 
     /**
      * @var array

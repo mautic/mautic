@@ -35,7 +35,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @var \DateTimeInterface
      */
-    private $now;
+    private \DateTime $now;
 
     /**
      * @throws \Exception

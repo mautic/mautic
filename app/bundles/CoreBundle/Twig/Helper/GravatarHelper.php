@@ -9,25 +9,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class GravatarHelper
 {
-    /**
-     * @var bool
-     */
-    private $devMode;
+    private bool $devMode;
 
     /**
      * @var array<string>
      */
-    private $devHosts = [];
+    private array $devHosts;
 
-    /**
-     * @var DefaultAvatarHelper
-     */
-    private $defaultAvatarHelper;
+    private \Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper $defaultAvatarHelper;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(
         DefaultAvatarHelper $defaultAvatarHelper,

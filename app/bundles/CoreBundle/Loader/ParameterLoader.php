@@ -9,15 +9,9 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    /**
-     * @var string
-     */
-    private $rootPath;
+    private string $rootPath;
 
-    /**
-     * @var string
-     */
-    private $configBaseDir;
+    private string $configBaseDir;
 
     /**
      * @var ParameterBag

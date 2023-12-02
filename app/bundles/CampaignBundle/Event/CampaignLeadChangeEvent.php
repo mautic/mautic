@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CampaignLeadChangeEvent extends Event
 {
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private \Mautic\CampaignBundle\Entity\Campaign $campaign;
 
     /**
      * @var Lead

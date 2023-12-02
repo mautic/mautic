@@ -12,15 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignListType extends AbstractType
 {
-    /**
-     * @var CampaignModel
-     */
-    private $model;
+    private \Mautic\CampaignBundle\Model\CampaignModel $model;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var bool

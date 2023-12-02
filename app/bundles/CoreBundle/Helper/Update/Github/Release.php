@@ -12,20 +12,14 @@ class Release
      */
     private $version;
 
-    /**
-     * @var string
-     */
-    private $downloadUrl;
+    private string $downloadUrl;
 
     /**
      * @var string
      */
     private $announcementUrl;
 
-    /**
-     * @var string
-     */
-    private $stability;
+    private string $stability;
 
     private Metadata $metadata;
 

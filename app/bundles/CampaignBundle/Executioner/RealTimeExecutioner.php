@@ -21,15 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var Lead
@@ -41,45 +35,24 @@ class RealTimeExecutioner
      */
     private $events;
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
 
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
+    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
 
-    /**
-     * @var Executioner
-     */
-    private $decisionExecutioner;
+    private Executioner $decisionExecutioner;
 
-    /**
-     * @var EventCollector
-     */
-    private $collector;
+    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     /**
      * @var Responses
      */
     private $responses;
 
-    /**
-     * @var DecisionHelper
-     */
-    private $decisionHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
 
     public function __construct(
         LoggerInterface $logger,

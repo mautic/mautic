@@ -29,55 +29,25 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
-    /**
-     * @var MenuHelper
-     */
-    private $menuHelper;
+    private \Mautic\CoreBundle\Menu\MenuHelper $menuHelper;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $securityContext;
+    private \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface $securityContext;
 
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
+    private \Mautic\FormBundle\Entity\FormRepository $formRepository;
 
     public function __construct(
         BundleHelper $bundleHelper,

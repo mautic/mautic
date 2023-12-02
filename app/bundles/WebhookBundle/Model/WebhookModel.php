@@ -97,10 +97,7 @@ class WebhookModel extends FormModel
      */
     protected $logMax;
 
-    /**
-     * @var SerializerInterface
-     */
-    protected $serializer;
+    protected \JMS\Serializer\SerializerInterface $serializer;
 
     /**
      * Queued events default order by dir
@@ -110,10 +107,7 @@ class WebhookModel extends FormModel
      */
     protected $eventsOrderByDir;
 
-    /**
-     * @var Client
-     */
-    private $httpClient;
+    private \Mautic\WebhookBundle\Http\Client $httpClient;
 
     /**
      * Timestamp when the webhook processing starts.

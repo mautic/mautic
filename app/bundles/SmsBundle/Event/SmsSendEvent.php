@@ -17,10 +17,7 @@ class SmsSendEvent extends CommonEvent
      */
     protected $content;
 
-    /**
-     * @var Lead
-     */
-    protected $lead;
+    protected \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @param string $content

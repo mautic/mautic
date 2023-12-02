@@ -11,10 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
+    private \Mautic\SmsBundle\Model\SmsModel $smsModel;
 
     private LeadRepository $leadRepository;
 
@@ -23,20 +20,14 @@ class BroadcastExecutioner
      */
     private $contactLimiter;
 
-    /**
-     * @var BroadcastQuery
-     */
-    private $broadcastQuery;
+    private \Mautic\SmsBundle\Broadcast\BroadcastQuery $broadcastQuery;
 
     /**
      * @var BroadcastResult
      */
     private $result;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
     {

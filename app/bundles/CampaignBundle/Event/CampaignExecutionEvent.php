@@ -44,10 +44,7 @@ class CampaignExecutionEvent extends Event
      */
     protected $eventSettings;
 
-    /**
-     * @var LeadEventLog|null
-     */
-    protected $log;
+    protected ?\Mautic\CampaignBundle\Entity\LeadEventLog $log;
 
     /**
      * @var bool

@@ -19,30 +19,15 @@ class MembershipManager
     public const ACTION_ADDED   = 'added';
     public const ACTION_REMOVED = 'removed';
 
-    /**
-     * @var Adder
-     */
-    private $adder;
+    private \Mautic\CampaignBundle\Membership\Action\Adder $adder;
 
-    /**
-     * @var Remover
-     */
-    private $remover;
+    private \Mautic\CampaignBundle\Membership\Action\Remover $remover;
 
-    /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
+    private \Mautic\CampaignBundle\Membership\EventDispatcher $eventDispatcher;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var ProgressBar

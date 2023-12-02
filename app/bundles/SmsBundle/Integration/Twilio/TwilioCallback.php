@@ -13,15 +13,9 @@ use Twilio\Exceptions\ConfigurationException;
 
 class TwilioCallback implements CallbackInterface
 {
-    /**
-     * @var ContactHelper
-     */
-    private $contactHelper;
+    private \Mautic\SmsBundle\Helper\ContactHelper $contactHelper;
 
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private \Mautic\SmsBundle\Integration\Twilio\Configuration $configuration;
 
     public function __construct(ContactHelper $contactHelper, Configuration $configuration)
     {

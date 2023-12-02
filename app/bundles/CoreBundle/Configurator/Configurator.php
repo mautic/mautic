@@ -14,10 +14,8 @@ class Configurator
 {
     /**
      * Configuration filename.
-     *
-     * @var string
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Array containing the steps.
@@ -38,7 +36,7 @@ class Configurator
      *
      * @var array<string, mixed>
      */
-    protected $parameters;
+    protected array $parameters;
 
     public function __construct(PathsHelper $pathsHelper)
     {

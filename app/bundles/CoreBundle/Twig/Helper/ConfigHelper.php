@@ -13,10 +13,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  */
 final class ConfigHelper
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

@@ -32,30 +32,15 @@ class ConfigType extends AbstractType
 {
     private Shortener $shortenerFactory;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LanguageHelper
-     */
-    private $langHelper;
+    private \Mautic\CoreBundle\Helper\LanguageHelper $langHelper;
 
-    /**
-     * @var array
-     */
-    private $supportedLanguages;
+    private array $supportedLanguages;
 
-    /**
-     * @var IpLookupFactory
-     */
-    private $ipLookupFactory;
+    private \Mautic\CoreBundle\Factory\IpLookupFactory $ipLookupFactory;
 
-    /**
-     * @var AbstractLookup
-     */
-    private $ipLookup;
+    private ?\Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup;
 
     public function __construct(
         TranslatorInterface $translator,

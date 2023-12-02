@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,30 +35,18 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
 
     /**
      * @var ModelFactory<object>
      */
     protected ModelFactory $modelFactory;
 
-    /**
-     * @var User
-     */
-    protected $user;
+    protected ?\Mautic\UserBundle\Entity\User $user;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     protected Translator $translator;
 
@@ -67,10 +54,7 @@ class CommonController extends AbstractController implements MauticController
 
     protected ?CorePermissions $security = null;
 
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
+    private \Mautic\CoreBundle\Service\FlashBag $flashBag;
 
     protected ManagerRegistry $doctrine;
 

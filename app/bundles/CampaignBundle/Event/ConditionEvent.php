@@ -9,15 +9,9 @@ class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
+    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
 
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
+    private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
 
     /**
      * @var bool

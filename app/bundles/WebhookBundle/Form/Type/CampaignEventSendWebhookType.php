@@ -13,10 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignEventSendWebhookType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

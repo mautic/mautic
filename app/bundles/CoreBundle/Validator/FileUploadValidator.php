@@ -11,7 +11,7 @@ class FileUploadValidator
     /**
      * @param TranslatorInterface $translator
      */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

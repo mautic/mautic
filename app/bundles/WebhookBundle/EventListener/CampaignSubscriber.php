@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignHelper
-     */
-    private $campaignHelper;
+    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
 
     public function __construct(CampaignHelper $campaignHelper)
     {

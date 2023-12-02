@@ -13,15 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecisionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,

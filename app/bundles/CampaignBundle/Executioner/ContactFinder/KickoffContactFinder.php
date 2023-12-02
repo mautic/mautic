@@ -13,20 +13,11 @@ use Psr\Log\LoggerInterface;
 
 class KickoffContactFinder
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
+    private \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, LoggerInterface $logger)
     {
