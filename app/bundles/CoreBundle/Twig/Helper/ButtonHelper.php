@@ -304,14 +304,19 @@ final class ButtonHelper
                 $attr .= " $k=".'"'.$v.'"';
             }
 
-            $buttonContent = (isset($button['iconClass'])) ? '<i class="'.$button['iconClass'].'"></i> ' : '';
+            $buttonContent = '';
             if (!empty($button['btnText'])) {
                 $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
             }
+            if (isset($button['svgIcon'])) {
+                $buttonContent .= ' ' . $button['svgIcon']; // Adiciona o SVG após o texto
+            } elseif (isset($button['iconClass'])) {
+                $buttonContent .= ' <i class="'.$button['iconClass'].'"></i>'; // Mantenha essa linha caso ainda precise de ícones do Font Awesome
+            }
             $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
-        }
+            }
 
-        return $buttons;
+            return $buttons;
     }
 
     /**
