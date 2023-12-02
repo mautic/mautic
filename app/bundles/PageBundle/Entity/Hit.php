@@ -26,10 +26,7 @@ class Hit
      */
     private $dateLeft;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var Redirect|null
@@ -620,9 +617,7 @@ class Hit
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return ?Page
      */
     public function getPage()
     {
