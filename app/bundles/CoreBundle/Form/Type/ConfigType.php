@@ -488,7 +488,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
                 ],
-                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
+                'data'     => isset($options['data']['ip_lookup_create_organization']) && (bool) $options['data']['ip_lookup_create_organization'],
                 'required' => false,
             ]
         );

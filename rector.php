@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
+use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
@@ -76,12 +77,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
-<<<<<<< HEAD
         RemoveUnusedVariableAssignRector::class,
-        \Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector::class,
-=======
+        RemoveUselessVarTagRector::class,
+        \Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector::class,
         \Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector::class,
->>>>>>> 358cc1ff2b ([dead-code] Remove default property null)
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
@@ -89,8 +88,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
         \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
-        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
         \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
+        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
         \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class,
         \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
