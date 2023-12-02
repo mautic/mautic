@@ -1322,10 +1322,10 @@ mark,
   text-transform: capitalize;
 }
 .text-muted {
-  color: #a0acb8;
+  color: var(--text-secondary);
 }
 .text-primary {
-  color: #4E5D9D;
+  color: var(--text-primary);
 }
 a.text-primary:hover,
 a.text-primary:focus {
@@ -1654,8 +1654,6 @@ pre code {
 .col-lg-12 {
   position: relative;
   min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
 }
 .col-xs-1,
 .col-xs-2,
@@ -3573,7 +3571,6 @@ tbody.collapse.in {
   float: left;
   min-width: 160px;
   padding-inline-start: 0;
-  margin: 2px 0 0;
   font-size: 13px;
   text-align: left;
   list-style: none;

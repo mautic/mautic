@@ -1237,9 +1237,6 @@ h6,
 .tt-u {
   text-transform: uppercase;
 }
-.text-muted {
-  color: #8393a2;
-}
 a.text-muted:hover,
 a.text-muted:focus {
   color: #68798a;
@@ -2636,18 +2633,29 @@ ul.line-legend li {
 .app-sidebar .progress {
   background-color: #232b34;
 }
-.column-wrapper {
+.column-wrapper-xl, .column-wrapper-l, .column-wrapper-m, .column-wrapper-s {
   display: flex;
   gap: 0;
   flex-direction: column;
 }
-@media (min-width: 767px) {
-  .column-wrapper {
-    gap: 80px;
+@media (min-width: 1000px) {
+  .column-wrapper-xl, .column-wrapper-l, .column-wrapper-m, .column-wrapper-s {
     flex-direction: row;
   }
+  .column-wrapper-xl {
+    gap: 100px;
+  }
+  .column-wrapper-l {
+    gap: 75px;
+  }
+  .column-wrapper-m {
+    gap: 50px;
+  }
+  .column-wrapper-s {
+    gap: 25px;
+  }
 }
-.column-wrapper-s {
+.column-wrapper-xs {
   display: flex;
   gap: 5px;
   flex-direction: row;
@@ -2659,8 +2667,6 @@ ul.line-legend li {
   padding: 16px 16px 24px 16px;
   background-color: var(--layer);
   color: var(--text-primary);
-  font-size: var(--heading-03);
-  letter-spacing: var(--letter-spacing-h4);
 }
 .panel-heading:before,
 .panel-heading:after {
