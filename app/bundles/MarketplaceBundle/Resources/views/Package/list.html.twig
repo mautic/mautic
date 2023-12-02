@@ -23,8 +23,6 @@
     }) -}}
 {% endblock %}
 
-
-
 {% block content %}
     {% if isIndex %}
         {% if isComposerEnabled %}
@@ -35,12 +33,41 @@
             <div class="alert alert-warning" role="alert">
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
+<div class="column-wrapper-m" style="margin-bottom: 40px;">
+            <div class="card card-gradient">
+                <div>
+                    <h3>Do you need help?</h3>
+                    <div>Access our documentation or ask someone in the community.</div>
+                </div>
+                <div class="link-group">
+                    <a class="link" href="https://docs.mautic.org/en/plugins">
+                        <span>Read the docs</span>
+                    </a>
+                    <a class="link" href="https://community.mautic.org/">
+                        <span>Ask in community</span>
+                    </a>
+                </div>
+            </div>
+            <div class="card">
+                <div>
+                    <h3>Are you a developer?</h3>
+                    <div>Join us by creating a plugin and extend features.</div>
+                </div>
+                <div class="link-group">
+                    <a class="link" href="https://developer.mautic.org/#plugins">
+                        <span>Get started</span>
+                    </a>
+                </div>
+        </div>
+</div>
         {% endif %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+
+        <div class="panel panel-default bdr-t-wdh-0 mb-0" id="search-bar">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,
             }) -}}
+        </div>
             <div class="page-list">
                 {{ block('listResults') }}
             </div>
@@ -131,8 +158,8 @@
         </table>
     </div>
     <div class="panel-footer">
-
-        {{- include(
+        <div class="panel">
+            {{- include(
             '@MauticCore/Helper/pagination.html.twig',
             {
                 'totalItems' : count,
@@ -143,7 +170,11 @@
                 'routeBase'  : constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST'),
             }
         ) -}}
+        </div>
+
+
     </div>
+
     {% else %}
         {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'marketplace.noresults.tip'}) -}}
     {% endif %}
