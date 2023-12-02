@@ -76,8 +76,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+<<<<<<< HEAD
         RemoveUnusedVariableAssignRector::class,
         \Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector::class,
+=======
+        \Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector::class,
+>>>>>>> 358cc1ff2b ([dead-code] Remove default property null)
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,

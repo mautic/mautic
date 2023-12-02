@@ -30,7 +30,7 @@ class UserToken
     /**
      * @var \DateTimeInterface|null
      */
-    private $expiration = null;
+    private $expiration;
 
     /**
      * @var bool

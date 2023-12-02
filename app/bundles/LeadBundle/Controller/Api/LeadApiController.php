@@ -48,7 +48,7 @@ class LeadApiController extends CommonApiController
     /**
      * @var LeadModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private DoNotContactModel $doNotContactModel;
 

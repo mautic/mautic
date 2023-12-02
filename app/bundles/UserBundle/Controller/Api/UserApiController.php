@@ -30,7 +30,7 @@ class UserApiController extends CommonApiController
     /**
      * @var UserModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private UserPasswordHasherInterface $hasher;
 
