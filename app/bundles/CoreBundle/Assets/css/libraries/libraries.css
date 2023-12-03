@@ -3589,7 +3589,7 @@ tbody.collapse.in {
   background-color: #eaeaea;
 }
 .dropdown-menu > li > a {
-  display: block;
+  display: flex;
   clear: both;
   font-weight: 400;
   line-height: 1.3856;
@@ -3600,8 +3600,7 @@ tbody.collapse.in {
   margin-top: -1px;
   padding: 16px;
   height: 48px;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
+
   background-color: transparent;
   transition: background var(--timing);
 }
@@ -3614,7 +3613,6 @@ tbody.collapse.in {
 .dropdown-menu > .active > a:focus {
   color: #fff;
   text-decoration: none;
-  background-color: #4E5D9D;
   outline: 0;
 }
 .dropdown-menu > .disabled > a,
@@ -3705,8 +3703,8 @@ tbody.collapse.in {
 .btn-group > .btn > span > span, .btn-group-vertical > .btn > span > span {
   margin-right: 32px;
 }
-.btn-group > .btn:not(.dropdown-toggle),
-.btn-group-vertical > .btn:not(.dropdown-toggle) {
+.btn-group > .btn-default:not(.dropdown-toggle),
+.btn-group-vertical > .btn-default:not(.dropdown-toggle) {
   min-width: 175px;
 }
 .btn-group > .btn:hover,
@@ -3744,7 +3742,7 @@ tbody.collapse.in {
 .btn-group > .btn:first-child {
   margin-left: 0;
 }
-.btn-group > .btn:first-child:not(.dropdown-toggle) {
+.btn-group > .btn-default:first-child:not(.dropdown-toggle) {
   background-color: var(--button-primary);
   color: var(--text-on-color);
   transition: background var(--timing), color var(--timing);

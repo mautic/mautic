@@ -215,22 +215,19 @@ body > #app-wrapper {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  background-color: #ffffff;
+  background-color: var(--background);
   float: left;
   z-index: 1005;
-  min-height: 60px;
-  border-width: 0;
+  height: 48px;
+  border-bottom: 1px solid var(--border-subtle);
   border-radius: 0;
   margin-bottom: 0;
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 .header-fixed #app-header.navbar {
   position: fixed;
   right: 0;
   left: 0;
   top: 0;
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 .header-fixed #app-header.navbar ~ #app-content > .content-body {
   padding: 60px 20px 20px;
@@ -278,7 +275,7 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a {
   color: rgba(0, 0, 0, 0.6);
-  line-height: 60px;
+  line-height: 48px;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -296,8 +293,8 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > img,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .img-wrapper {
   display: inline-block;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   margin-top: -11px;
   margin-bottom: -11px;
 }
@@ -364,9 +361,6 @@ body > #app-wrapper {
   margin-top: 5px;
   left: 15px;
   float: left;
-  background-color: #fff;
-  border: 1px solid #eee;
-  border: 1px solid rgba(0, 0, 0, 0.06);
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
