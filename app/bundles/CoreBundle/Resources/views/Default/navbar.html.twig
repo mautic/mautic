@@ -5,24 +5,30 @@
 <div class="navbar-nocollapse">
     <!-- start: left nav -->
     <ul class="nav navbar-nav navbar-left">
-        <li class="visible-xs">
-            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="ltr">
-                <i class="fa fa-navicon fs-16"></i>
-            </a>
-        </li>
-        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
     </ul>
     <!--/ end: left nav -->
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
         {{ include('@MauticCore/Menu/profile.html.twig') }}
-        <li>
-            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
-                <i class="fa fa-cog fs-16"></i>
+        <li class="std-tollbar btn-group">
+            <a class="btn btn-ghost" href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.5 3h-3v3h3V3Z"></path>
+                    <path d="M6 3H3v3h3V3Z"></path>
+                    <path d="M21 3h-3v3h3V3Z"></path>
+                    <path d="M13.5 10.5h-3v3h3v-3Z"></path>
+                    <path d="M6 10.5H3v3h3v-3Z"></path>
+                    <path d="M21 10.5h-3v3h3v-3Z"></path>
+                    <path d="M13.5 18h-3v3h3v-3Z"></path>
+                    <path d="M6 18H3v3h3v-3Z"></path>
+                    <path d="M21 18h-3v3h3v-3Z"></path>
+                </svg>
             </a>
         </li>
+
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
     {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
