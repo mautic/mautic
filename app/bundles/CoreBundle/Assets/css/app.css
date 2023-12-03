@@ -81,6 +81,7 @@
   --field: #f4f4f4;
   --field-alternate: #ffffff;
   --field-hover: #e8e8e8;
+  --focus: #3358FF;
   --border-interactive: #4E5D9D;
   --border-subtle: #e0e0e0;
   --border-subtle-alternate: #c6c6c6;
@@ -1768,11 +1769,6 @@ label.list-group-item:focus {
 }
 .dropdown-menu > li > a .fa {
   min-width: 15px;
-}
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus {
-  z-index: 2;
-  background-color: var(--background-inverse-hover);
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,

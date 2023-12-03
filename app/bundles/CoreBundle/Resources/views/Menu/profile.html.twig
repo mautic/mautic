@@ -1,19 +1,18 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="btn-ghost dropdown-toggle" data-toggle="dropdown" href="#">
+    <a class="btn btn-icon-only dropdown-toggle" data-toggle="dropdown" href="#">
         <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
-        <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
     </a>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
+            <button href="{{ path('mautic_user_account') }}" data-toggle="ajax">
                 <i class="fa fa-user fs-14"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
-            </a>
+            </button>
         </li>
         <li>
-            <a href="{{ path('mautic_user_logout') }}">
+            <button href="{{ path('mautic_user_logout') }}">
                 <i class="fa fa-sign-out fs-14"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
-            </a>
+            </button>
         </li>
 
         {% if inline %}

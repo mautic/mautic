@@ -8,31 +8,19 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
+                        <button  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
                             data-target="#MauticSharedModal"
                             data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
                             <i class="fa fa-pencil"></i> Edit
-                        </a>
+                        </button>
                     </li>
-                    <li role="separator" class="divider"></li>
-                    <li  class="dropdown-header">
-                        {{ 'mautic.dashboard.widget.load.time'|trans({'%time%': (widget.loadTime * 1000)|round(1)}) }}
-                    </li>
-                    <li  class="dropdown-header">
-                        {% if widget.isCached %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
-                        {% else %}
-                            {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
-                        {% endif %}
-                    </li>
-                    <li role="separator" class="divider"></li>
                     <li>
-                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
+                        <button  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
                             class="remove-widget">
                             <i class="fa fa-remove"></i> Remove
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </div>

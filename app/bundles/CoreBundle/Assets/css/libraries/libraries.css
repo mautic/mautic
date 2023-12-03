@@ -3084,6 +3084,7 @@ select[multiple].input-lg {
 }
 .btn {
   display: inline-flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   margin-bottom: 0;
@@ -3093,7 +3094,8 @@ select[multiple].input-lg {
   touch-action: manipulation;
   cursor: pointer;
   background-image: none;
-  padding: 6px 12px;
+  padding: 16px;
+  height: 48px;
   font-size: 13px;
   line-height: 1.3856;
   border: 2px solid transparent;
@@ -3104,6 +3106,10 @@ select[multiple].input-lg {
   user-select: none;
   transition: background var(--timing), border var(--timing);
 }
+.btn-primary, .btn-secondary, .btn-tertiary, .btn-ghost, .btn-danger-primary, .btn-danger-tertiary {
+  min-width: 175px;
+}
+
 .btn:focus,
 .btn:active:focus,
 .btn.active:focus,
@@ -3145,9 +3151,6 @@ fieldset[disabled] a.btn {
 .btn-default.focus {
   color: #5d6c7c;
 }
-.btn-ghost {
-  background-color: transparent;
-}
 .btn-default:hover, .btn-ghost:hover, #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
   background-color: var(--background-hover);
 }
@@ -3185,41 +3188,24 @@ fieldset[disabled] .btn-default.focus {
   background-color: #5d6c7c;
 }
 .btn-primary {
-  color: #fff;
-  background-color: #4E5D9D;
-  border-color: #4E5D9D;
+  background-color: var(--button-primary);
+  color: var(--text-on-color);
 }
 .btn-primary:focus,
 .btn-primary.focus {
-  color: #fff;
-  background-color: #3d497b;
-  border-color: #242b48;
+  border-color: var(--focus);
 }
 .btn-primary:hover {
-  color: #fff;
-  background-color: #3d497b;
-  border-color: #3a4574;
+  background-color: var(--button-primary-hover);
 }
 .btn-primary:active,
 .btn-primary.active,
 .open > .dropdown-toggle.btn-primary {
-  color: #fff;
-  background-color: #3d497b;
-  background-image: none;
-  border-color: #3a4574;
+  background-color: var(--button-primary-active);
 }
-.btn-primary:active:hover,
-.btn-primary.active:hover,
-.open > .dropdown-toggle.btn-primary:hover,
-.btn-primary:active:focus,
-.btn-primary.active:focus,
-.open > .dropdown-toggle.btn-primary:focus,
-.btn-primary:active.focus,
-.btn-primary.active.focus,
-.open > .dropdown-toggle.btn-primary.focus {
-  color: #fff;
-  background-color: #313b63;
-  border-color: #242b48;
+.btn-primary:disabled {
+  background-color: var(--button-disabled);
+  color: var(--text-on-color-disabled);
 }
 .btn-primary.disabled:hover,
 .btn-primary[disabled]:hover,
@@ -3236,6 +3222,79 @@ fieldset[disabled] .btn-primary.focus {
 .btn-primary .badge {
   color: #4E5D9D;
   background-color: #fff;
+}
+.btn-secondary {
+  background-color: var(--button-secondary);
+  color: var(--text-on-color);
+}
+.btn-secondary:hover {
+  background-color: var(--button-secondary-hover);
+}
+.btn-secondary:active {
+  background-color: var(--button-secondary-active);
+}
+.btn-secondary:disabled {
+  background-color: var(--button-disabled);
+  color: var(--text-on-color-disabled);
+}
+.btn-tertiary {
+  background-color: transparent;
+  color: var(--button-tertiary);
+  border-color: var(--button-tertiary);
+}
+.btn-tertiary:hover {
+  color: var(--text-inverse);
+  background-color: var(--button-tertiary-hover);
+}
+.btn-tertiary:active {
+  color: var(--text-inverse);
+  background-color: var(--button-tertiary-active);
+}
+.btn-tertiary:focus {
+  color: var(--text-inverse);
+  background-color: var(--button-tertiary-hover);
+}
+.btn-tertiary:disabled {
+  color: var(--text-disabled);
+  background-color: transparent;
+  border-color: var(--button-disabled);
+}
+.btn-ghost {
+  background-color: transparent;
+  color: var(--link-primary);
+}
+.btn-ghost:hover {
+  background-color: var(--background-hover);
+  color: var(--link-primary-hover);
+}
+.btn-ghost:active {
+  background-color: var(--background-active);
+}
+.btn-ghost:focus {
+  border-color: var(--focus);
+}
+.btn-ghost:disabled {
+  color: var(--text-disabled);
+}
+.btn-icon-only {
+  color: var(--icon-primary);
+  background-color: transparent;
+  min-width: 48px;
+}
+.btn-icon-only:hover {
+  background-color: var(--background-hover);
+}
+.btn-icon-only:active {
+  background-color: var(--background-active);
+}
+.btn-icon-only:focus {
+  border-color: var(--focus);
+}
+.btn-icon-only:selected {
+  background-color: var(--background-selected);
+}
+.btn-icon-only:disabled {
+  background-color: var(--icon-disabled);
 }
 .btn-success {
   color: #fff;
@@ -3396,29 +3455,23 @@ fieldset[disabled] .btn-warning.focus {
   color: #FDB933;
   background-color: #fff;
 }
-.btn-danger {
-  color: #fff;
-  background-color: #F86B4F;
-  border-color: #F86B4F;
+.btn-danger, .btn-danger-primary {
+  background-color: var(--button-danger-primary);
+  color: var(--text-on-color);
 }
 .btn-danger:focus,
-.btn-danger.focus {
-  color: #fff;
-  background-color: #f6421e;
-  border-color: #c02608;
+.btn-danger.focus,
+.btn-danger-primary:focus {
+  border-color: var(--focus);
 }
-.btn-danger:hover {
-  color: #fff;
-  background-color: #f6421e;
-  border-color: #f63a14;
+.btn-danger:hover, .btn-danger-primary:hover {
+  background-color: var(--button-danger-hover);
 }
 .btn-danger:active,
 .btn-danger.active,
-.open > .dropdown-toggle.btn-danger {
-  color: #fff;
-  background-color: #f6421e;
-  background-image: none;
-  border-color: #f63a14;
+.open > .dropdown-toggle.btn-danger,
+.btn-danger-primary:active {
+  background-color: var(--button-danger-active);
 }
 .btn-danger:active:hover,
 .btn-danger.active:hover,
@@ -3441,13 +3494,52 @@ fieldset[disabled] .btn-danger:hover,
 fieldset[disabled] .btn-danger:focus,
 .btn-danger.disabled.focus,
 .btn-danger[disabled].focus,
-fieldset[disabled] .btn-danger.focus {
-  background-color: #F86B4F;
-  border-color: #F86B4F;
+fieldset[disabled] .btn-danger.focus,
+.btn-danger-primary:disabled {
+  background-color: var(--button-disabled);
+  color: var(--text-on-color-disabled);
 }
 .btn-danger .badge {
   color: #F86B4F;
   background-color: #fff;
+}
+.btn-danger-tertiary {
+  border-color: var(--button-danger-secondary);
+  color: var(--button-danger-secondary);
+}
+.btn-danger-tertiary:hover {
+  background-color: var(--button-danger-hover);
+  color: var(--text-on-color);
+}
+.btn-danger-tertiary:active {
+  background-color: var(--button-danger-active);
+  color: var(--text-on-color);
+}
+.btn-danger-tertiary:focus {
+  border-color: var(--focus);
+}
+.btn-danger-tertiary:disabled {
+  background-color: var(--button-disabled);
+  color: var(--text-disabled);
+}
+.btn-danger-ghost {
+  background-color: transparent;
+  color: var(--button-danger-secondary);
+}
+.btn-danger-ghost:hover {
+  background-color: var(--button-danger-hover);
+  color: var(--text-on-color);
+}
+.btn-danger-ghost:active {
+  background-color: var(--button-danger-active);
+  color: var(--text-on-color);
+}
+.btn-danger-ghost:focus {
+  border-color: var(--focus);
+}
+.btn-danger-ghost:disabled {
+  background-color: var(--button-disabled);
+  color: var(--text-disabled);
 }
 .btn-link {
   font-weight: 400;
@@ -3591,7 +3683,10 @@ tbody.collapse.in {
   overflow: hidden;
   background-color: #eaeaea;
 }
-.dropdown-menu > li > a {
+.dropdown-menu > li {
+  display: flex;
+}
+.dropdown-menu > li > button {
   display: flex;
   clear: both;
   font-weight: 400;
@@ -3603,30 +3698,33 @@ tbody.collapse.in {
   margin-top: -1px;
   padding: 16px;
   height: 48px;
-
+  flex-grow: 1;
   background-color: transparent;
   transition: background var(--timing);
+  border: none;
 }
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus, {
+.dropdown-menu > li > button:hover,
+.dropdown-menu > li > button:focus {
   text-decoration: none;
+  z-index: 2;
+  background-color: var(--background-inverse-hover);
 }
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
+.dropdown-menu > .active > button,
+.dropdown-menu > .active > button:hover,
+.dropdown-menu > .active > button:focus {
   color: #fff;
   text-decoration: none;
   outline: 0;
 }
-.dropdown-menu > .disabled > a,
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus,
-.dropdown-menu > li > a.disabled {
+.dropdown-menu > .disabled > button,
+.dropdown-menu > .disabled > button:hover,
+.dropdown-menu > .disabled > button:focus,
+.dropdown-menu > li > button.disabled {
   color: #a0acb8;
 }
-.dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus,
-.dropdown-menu > li > a.disabled {
+.dropdown-menu > .disabled > button:hover,
+.dropdown-menu > .disabled > button:focus,
+.dropdown-menu > li > button.disabled {
   text-decoration: none;
   cursor: not-allowed;
   background-color: transparent;
@@ -3750,9 +3848,7 @@ tbody.collapse.in {
   color: var(--text-on-color);
   transition: background var(--timing), color var(--timing);
 }
-.btn-group > .btn:first-child:not(.dropdown-toggle):hover {
-background-color: var(--button-primary-hover);
-}
+
 .btn-group > .btn:last-child:not(:first-child),
 .btn-group > .dropdown-toggle:not(:first-child) {
   border-top-left-radius: 0;
@@ -4037,11 +4133,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .nav > li {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: row;
 }
 .nav > li > a {
   position: relative;
-  display: block;
+  display: flex;
   padding: 10px 18px;
 }
 .nav > li > a:hover,
@@ -4058,12 +4155,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   text-decoration: none;
   cursor: not-allowed;
   background-color: transparent;
-}
-.nav .open > a,
-.nav .open > a:hover,
-.nav .open > a:focus {
-  background-color: #f0f0f0;
-  border-color: #4E5D9D;
 }
 .nav .nav-divider {
   height: 1px;
@@ -4395,15 +4486,15 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     border: 0;
     box-shadow: none;
   }
-  .navbar-nav .open .dropdown-menu > li > a,
+  .navbar-nav .open .dropdown-menu > li > button,
   .navbar-nav .open .dropdown-menu .dropdown-header {
     padding: 5px 15px 5px 25px;
   }
-  .navbar-nav .open .dropdown-menu > li > a {
+  .navbar-nav .open .dropdown-menu > li > button {
     line-height: 18px;
   }
-  .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-nav .open .dropdown-menu > li > a:focus {
+  .navbar-nav .open .dropdown-menu > li > button:hover,
+  .navbar-nav .open .dropdown-menu > li > button:focus {
     background-image: none;
   }
 }
@@ -4597,23 +4688,23 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   background-color: #e7e7e7;
 }
 @media (max-width: 767px) {
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+  .navbar-default .navbar-nav .open .dropdown-menu > li > button {
     color: #777;
   }
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+  .navbar-default .navbar-nav .open .dropdown-menu > li > button:hover,
+  .navbar-default .navbar-nav .open .dropdown-menu > li > button:focus {
     color: #333;
     background-color: transparent;
   }
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > button,
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > button:hover,
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > button:focus {
     color: #555;
     background-color: #e7e7e7;
   }
-  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,
-  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,
-  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > button,
+  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > button:hover,
+  .navbar-default .navbar-nav .open .dropdown-menu > .disabled > button:focus {
     color: #ccc;
     background-color: transparent;
   }
@@ -4699,23 +4790,23 @@ fieldset[disabled] .navbar-default .btn-link:focus {
   .navbar-inverse .navbar-nav .open .dropdown-menu .divider {
     background-color: #080808;
   }
-  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+  .navbar-inverse .navbar-nav .open .dropdown-menu > li > button {
     color: #cbd2d8;
   }
-  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:focus {
+  .navbar-inverse .navbar-nav .open .dropdown-menu > li > button:hover,
+  .navbar-inverse .navbar-nav .open .dropdown-menu > li > button:focus {
     color: #fff;
     background-color: transparent;
   }
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:focus {
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > button,
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > button:hover,
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .active > button:focus {
     color: #fff;
     background-color: #080808;
   }
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a,
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:hover,
-  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > button,
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > button:hover,
+  .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > button:focus {
     color: #444;
     background-color: transparent;
   }

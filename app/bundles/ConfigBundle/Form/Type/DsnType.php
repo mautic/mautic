@@ -124,7 +124,7 @@ class DsnType extends AbstractType
                     'label'    => $options['test_button']['label'],
                     'required' => false,
                     'attr'     => [
-                        'class'   => 'btn btn-info config-dsn-test-button',
+                        'class'   => 'btn btn-ghost config-dsn-test-button',
                         'onclick' => sprintf('Mautic.configDnsTestExecute(this, "%s", "%s")', $options['test_button']['action'], $name),
                     ],
                 ]

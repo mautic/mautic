@@ -14,7 +14,7 @@
   {% if permissions['lead:leads:create'] %}
       {% set pageButtons = pageButtons|merge([{
           'attr': {
-              'class': 'btn btn-default btn-nospin quickadd',
+              'class': 'btn btn-primary btn-nospin quickadd',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
@@ -76,7 +76,7 @@
     {% set toolbarButtons = [
         {
           'attr': {
-              'class': 'hidden-xs btn btn-default btn-sm btn-nospin',
+              'class': 'hidden-xs btn btn-icon-only btn-nospin',
               'href': 'javascript: void(0)',
               'onclick': 'Mautic.toggleLiveLeadListUpdate();',
               'id': 'liveModeButton',
@@ -90,7 +90,7 @@
     {% if 'list' == indexMode %}
         {% set toolbarButtons = toolbarButtons|merge([{
             'attr': {
-                'class': 'hidden-xs btn btn-default btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ''),
+                'class': 'hidden-xs btn btn-icon-only btn-nospin'~(anonymousShowing ? ' btn-primary' : ''),
                 'href': 'javascript: void(0)',
                 'onclick': 'Mautic.toggleAnonymousLeads();',
                 'id': 'anonymousLeadButton',
