@@ -9,7 +9,7 @@ use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 abstract class CloudStorageIntegration extends AbstractIntegration
 {
     /**
-     * @var Adapter
+     * @var Adapter|null
      */
     protected $adapter;
 

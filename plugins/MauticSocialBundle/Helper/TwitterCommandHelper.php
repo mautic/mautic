@@ -365,7 +365,7 @@ class TwitterCommandHelper
      *
      * @param int $mid
      *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring
+     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring|null
      */
     public function getMonitor($mid)
     {

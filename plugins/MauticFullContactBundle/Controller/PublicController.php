@@ -204,7 +204,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $lead instanceof \Mautic\LeadBundle\Entity\Lead && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {
@@ -235,7 +235,7 @@ class PublicController extends FormController
      */
     private function compcallbackAction(LoggerInterface $mauticLogger, $result, $validatedRequest): Response
     {
-        $notify = $validatedRequest['notify'];
+        $notify  = $validatedRequest['notify'];
 
         try {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -361,7 +361,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $company instanceof \Mautic\LeadBundle\Entity\Company) {
+                if ($notify) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {

@@ -789,8 +789,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\LeadBundle\Entity\Company $company
-     * @param array                             $config
+     * @param \Mautic\LeadBundle\Entity\Company|null $company
+     * @param array                                  $config
      *
      * @return array|bool
      */

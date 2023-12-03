@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormBuilder;
 class AmazonS3Integration extends CloudStorageIntegration
 {
     /**
-     * @var ResolvableFilesystem
+     * @var ResolvableFilesystem|null
      */
     private $fileSystem;
 

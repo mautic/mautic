@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -159,7 +158,6 @@ class FocusSubscriber implements EventSubscriberInterface
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
-        /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();

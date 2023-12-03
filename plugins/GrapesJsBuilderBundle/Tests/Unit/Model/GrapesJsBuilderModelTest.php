@@ -44,11 +44,9 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function saveEntity($entity, $flush = true)
+            public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
-
-                return 0;
             }
         };
 
@@ -66,11 +64,9 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 return null;
             }
 
-            public function saveEntity($entity, $flush = true)
+            public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
-
-                return 0;
             }
         };
 

@@ -53,7 +53,6 @@ class LeadListSubscriber implements EventSubscriberInterface
         $services = $this->helper->getIntegrationObjects();
         $choices  = [];
 
-        /** @var CrmAbstractIntegration $integration */
         foreach ($services as $integration) {
             if (!$integration instanceof \MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration || !$integration->getIntegrationSettings()->isPublished()) {
                 continue;

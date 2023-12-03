@@ -101,12 +101,7 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array|void
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = [

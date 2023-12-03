@@ -515,7 +515,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed|null  $identifiers
      * @param string|null $object
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
@@ -584,7 +584,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 } catch (\Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
-                    return;
+                    return null;
                 }
             }
         }
