@@ -170,7 +170,7 @@ class FocusSubscriber implements EventSubscriberInterface
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );
 
-            if ($lead && $lead->getId()) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $lead->getId()) {
                 $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
             }
 

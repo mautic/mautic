@@ -79,7 +79,7 @@ class PageSubscriber implements EventSubscriberInterface
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $focus = $this->model->getEntity($id);
-                if (null !== $focus
+                if ($focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

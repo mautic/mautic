@@ -45,7 +45,7 @@ class TokenHelper
             foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
                 $focus = $this->model->getEntity($id);
-                if (null !== $focus
+                if ($focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

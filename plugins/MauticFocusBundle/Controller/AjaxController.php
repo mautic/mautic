@@ -65,7 +65,7 @@ class AjaxController extends CommonAjaxController
             $model   = $this->getModel('focus');
 
             $focus = $model->getEntity($focusId);
-            if (null === $focus) {
+            if (!$focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
@@ -110,7 +110,7 @@ class AjaxController extends CommonAjaxController
             $model   = $this->getModel('focus');
 
             $focus = $model->getEntity($focusId);
-            if (null === $focus) {
+            if (!$focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),

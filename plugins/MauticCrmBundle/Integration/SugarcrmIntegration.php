@@ -329,7 +329,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         if (!isset($sugarFields[$sObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sObject);
 
-                            if (null != $fields && !empty($fields)) {
+                            if (!empty($fields)) {
                                 if (isset($fields['module_fields']) && !empty($fields['module_fields'])) {
                                     // 6.x/community
 
@@ -888,7 +888,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $detachClass           = Lead::class;
                         $company               = null;
                         $this->fetchDncToMautic($entity, $data);
-                        if ($entity && isset($dataObject['account_id'.$newName]) && '' != trim($dataObject['account_id'.$newName])) {
+                        if ($entity instanceof \Mautic\LeadBundle\Entity\Lead && isset($dataObject['account_id'.$newName]) && '' != trim($dataObject['account_id'.$newName])) {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',

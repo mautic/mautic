@@ -798,7 +798,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
-        if (empty($config['companyFields']) || !$company) {
+        if (empty($config['companyFields']) || !$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return [];
         }
         $object     = 'company';
