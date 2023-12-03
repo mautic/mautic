@@ -305,7 +305,7 @@ class TrackableModel extends AbstractCommonModel
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
-        uksort($this->contentReplacements['second_pass'], function ($a, $b) {
+        uksort($this->contentReplacements['second_pass'], function ($a, $b): int {
             return strlen($b) - strlen($a);
         });
 
