@@ -5610,10 +5610,9 @@ button.list-group-item-danger.active:focus {
   padding: 15px;
 }
 .panel-heading {
+  display: flex;
+  flex-direction: column;
   padding: 10px 15px;
-  border-bottom: 1px solid transparent;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
 }
 .panel-heading > .dropdown .dropdown-toggle {
   color: inherit;
