@@ -3589,7 +3589,7 @@ tbody.collapse.in {
   background-color: #eaeaea;
 }
 .dropdown-menu > li > a {
-  display: block;
+  display: flex;
   clear: both;
   font-weight: 400;
   line-height: 1.3856;
@@ -3600,8 +3600,6 @@ tbody.collapse.in {
   margin-top: -1px;
   padding: 16px;
   height: 48px;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
   background-color: transparent;
   transition: background var(--timing);
 }
@@ -4608,7 +4606,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
     color: #555;
-    background-color: #e7e7e7;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,

@@ -364,9 +364,6 @@ body > #app-wrapper {
   margin-top: 5px;
   left: 15px;
   float: left;
-  background-color: #fff;
-  border: 1px solid #eee;
-  border: 1px solid rgba(0, 0, 0, 0.06);
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
