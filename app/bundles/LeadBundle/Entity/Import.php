@@ -118,12 +118,12 @@ class Import extends FormEntity
     private $status;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     private $dateStarted;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     private $dateEnded;
 
@@ -585,7 +585,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateStarted()
     {
@@ -642,7 +642,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateEnded()
     {

@@ -265,7 +265,8 @@ class ConfigController extends FormController
         $parameters = [];
         include $localConfigFile;
 
-        /** @var mixed[] $parameters */
+        /** @var array<string, mixed> $parameters */
+        /** @var array<string, mixed> $localParams */
         $localParams = $parameters;
 
         foreach ($forms as &$form) {

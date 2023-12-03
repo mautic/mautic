@@ -188,7 +188,7 @@ class EventScheduler
             $compareFromDateTime = clone $compareFromDateTime;
         }
 
-        if (!$comparedToDateTime instanceof \DateTime) {
+        if (!$comparedToDateTime instanceof \DateTimeInterface) {
             $comparedToDateTime = clone $compareFromDateTime;
         } else {
             // Prevent comparisons from modifying original object

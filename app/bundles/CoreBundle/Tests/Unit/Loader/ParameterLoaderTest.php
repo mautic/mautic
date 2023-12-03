@@ -29,7 +29,6 @@ class ParameterLoaderTest extends TestCase
     public function testDefaultParametersAreLoaded(): void
     {
         $loader = new ParameterLoader(__DIR__.'/TestRoot/app');
-        $this->assertIsArray($loader->getDefaultParameters());
         $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
     }
 }

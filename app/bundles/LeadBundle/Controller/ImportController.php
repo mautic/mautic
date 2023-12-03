@@ -668,8 +668,7 @@ class ImportController extends FormController
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
-            $request = $this->getCurrentRequest();
-            \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
+            $request              = $this->getCurrentRequest();
             $parameters['object'] = $request->get('object', 'contacts');
         }
 
@@ -735,8 +734,7 @@ class ImportController extends FormController
     private function dispatchImportOnInit(): ImportInitEvent
     {
         $request = $this->getCurrentRequest();
-        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
-        $event = new ImportInitEvent($request->get('object'));
+        $event   = new ImportInitEvent($request->get('object'));
 
         $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
 

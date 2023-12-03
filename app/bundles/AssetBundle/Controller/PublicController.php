@@ -21,14 +21,14 @@ class PublicController extends CommonFormController
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->getModel('asset');
 
-        /** @var \Mautic\AssetBundle\Entity\Asset $entity */
+        /** @var \Mautic\AssetBundle\Entity\Asset|null $entity */
         $entity = $model->getEntityBySlugs($slug);
 
         if ($entity instanceof \Mautic\AssetBundle\Entity\Asset) {
             $published = $entity->isPublished();
 
             // make sure the asset is published or deny access if not
-            if ((!$published) && (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
+            if (!$published && (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
                 $model->trackDownload($entity, $request, 401);
 
                 return $this->accessDenied();

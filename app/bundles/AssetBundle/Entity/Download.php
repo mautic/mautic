@@ -244,7 +244,7 @@ class Download
     /**
      * Get asset.
      *
-     * @return Asset
+     * @return Asset|null
      */
     public function getAsset()
     {

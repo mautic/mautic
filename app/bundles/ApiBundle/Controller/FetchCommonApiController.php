@@ -188,7 +188,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $this->coreParametersHelper = $coreParametersHelper;
         $this->factory              = $factory;
 
-        if ($this->model instanceof \Mautic\CoreBundle\Model\AbstractCommonModel && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
+        if ($this->model instanceof AbstractCommonModel && !$this->permissionBase) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
     }

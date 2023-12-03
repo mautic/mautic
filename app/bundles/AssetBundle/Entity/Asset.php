@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -54,7 +53,7 @@ class Asset extends FormEntity
     private $originalFileName;
 
     /**
-     * @var File
+     * @var File|null
      */
     private $file;
 
@@ -272,9 +271,6 @@ class Asset extends FormEntity
         return $this->id;
     }
 
-    /**
-     * Sets file.
-     */
     public function setFile(File $file = null)
     {
         $this->file = $file;
@@ -288,9 +284,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Get file.
-     *
-     * @return UploadedFile
+     * @return File|null
      */
     public function getFile()
     {

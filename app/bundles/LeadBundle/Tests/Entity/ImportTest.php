@@ -120,7 +120,7 @@ class ImportTest extends StandardImportTestHelper
         $startDate = $import->getDateStarted();
 
         $this->assertSame(Import::IN_PROGRESS, $import->getStatus());
-        $this->assertTrue($startDate instanceof \DateTime);
+        $this->assertInstanceOf(\DateTimeInterface::class, $startDate);
 
         // But the date started will not change when started for the second time.
         $import->end(false);

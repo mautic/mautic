@@ -51,14 +51,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $this->getTrackedDevice() instanceof \Mautic\LeadBundle\Entity\LeadDevice;
     }
 
-    /**
-     * @return LeadDevice
-     */
-    public function getTrackedDevice()
+    public function getTrackedDevice(): ?LeadDevice
     {
         if (!$this->security->isAnonymous()) {
             // Do not track Mautic users
-            return;
+            return null;
         }
 
         if ($this->trackedDevice) {

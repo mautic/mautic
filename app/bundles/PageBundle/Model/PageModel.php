@@ -1069,7 +1069,7 @@ class PageModel extends FormModel
             }
         }
 
-        if ($queryHasUtmTags && $lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+        if ($queryHasUtmTags) {
             $utmTags = new UtmTag();
             $utmTags->setDateAdded($hit->getDateHit());
             $utmTags->setUrl($hit->getUrl());

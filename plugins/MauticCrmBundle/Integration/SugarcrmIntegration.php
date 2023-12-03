@@ -329,7 +329,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         if (!isset($sugarFields[$sObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sObject);
 
-                            if (null != $fields && !empty($fields)) {
+                            if (!empty($fields)) {
                                 if (isset($fields['module_fields']) && !empty($fields['module_fields'])) {
                                     // 6.x/community
 

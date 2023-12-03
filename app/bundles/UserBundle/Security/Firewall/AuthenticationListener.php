@@ -70,6 +70,8 @@ final class AuthenticationListener
         $request = $event->getRequest();
         $token   = new PluginToken($this->providerKey, $request->get('integration', null));
 
+        $response = null;
+
         try {
             $authToken = $this->authenticationManager->authenticate($token);
 

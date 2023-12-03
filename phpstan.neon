@@ -6,6 +6,7 @@ parameters:
 	tmpDir: ./var/cache/phpstan
 	level: 6
 	reportUnmatchedIgnoredErrors: false
+	treatPhpDocTypesAsCertain: false
 	parallel:
 		maximumNumberOfProcesses: 4
 		processTimeout: 1000.0

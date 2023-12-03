@@ -25,20 +25,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private $eventLogger;
+    private MockObject $eventLogger;
 
-    /**
-     * @var Interval
-     */
-    private $intervalScheduler;
+    private Interval $intervalScheduler;
 
     /**
      * @var DateTime

@@ -847,7 +847,7 @@ class ListController extends FormController
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $request = $this->getCurrentRequest();
-        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
+
         $session        = $request->getSession();
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
@@ -910,7 +910,6 @@ class ListController extends FormController
         $this->listFilters = $listFilters;
 
         $request = $this->getCurrentRequest();
-        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
 
         return parent::getIndexItems(
             $start,

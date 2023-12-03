@@ -92,7 +92,7 @@ class FailedLeadEventLog
      */
     public function setDateAdded(\DateTime $dateAdded = null)
     {
-        if (!$dateAdded instanceof \DateTime) {
+        if (!$dateAdded instanceof \DateTimeInterface) {
             $dateAdded = new \DateTime();
         }
 

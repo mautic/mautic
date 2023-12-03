@@ -975,15 +975,15 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      *
-     * @param \DateTime|null $triggerRestrictedStartHour
+     * @param \DateTime|string|null $triggerRestrictedStartHour
      *
      * @return self
      */
     public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
     {
-        if (!$triggerRestrictedStartHour instanceof \DateTime) {
+        if (empty($triggerRestrictedStartHour)) {
             $triggerRestrictedStartHour = null;
-        } elseif (!$triggerRestrictedStartHour instanceof \DateTime) {
+        } elseif (!$triggerRestrictedStartHour instanceof \DateTimeInterface) {
             $triggerRestrictedStartHour = new \DateTime($triggerRestrictedStartHour);
         }
 
@@ -1007,13 +1007,13 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      *
-     * @param \DateTime|null $triggerRestrictedStopHour
+     * @param \DateTime|string|null $triggerRestrictedStopHour
      *
      * @return self
      */
     public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
     {
-        if (!$triggerRestrictedStopHour instanceof \DateTime) {
+        if (empty($triggerRestrictedStopHour)) {
             $triggerRestrictedStopHour = null;
         } elseif (!$triggerRestrictedStopHour instanceof \DateTime) {
             $triggerRestrictedStopHour = new \DateTime($triggerRestrictedStopHour);

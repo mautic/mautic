@@ -29,7 +29,7 @@ class EventCollector
     private $eventsArray = [];
 
     /**
-     * @var EventAccessor
+     * @var EventAccessor|null
      */
     private $events;
 
@@ -48,7 +48,7 @@ class EventCollector
             $this->buildEventList();
         }
 
-        if (!$this->events instanceof \Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor) {
+        if (!$this->events instanceof EventAccessor) {
             $this->events = new EventAccessor($this->eventsArray);
         }
 

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 class QueryBuilder extends BaseQueryBuilder
 {
     /**
-     * @var ExpressionBuilder
+     * @var ExpressionBuilder|null
      */
     private $_expr;
 
