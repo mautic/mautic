@@ -110,7 +110,7 @@
   --letter-spacing-p: -0.3px;
   --letter-spacing-h1: -2.7px;
   --letter-spacing-h2: -1.5px;
-  --letter-spacing-h3: -1.3px;
+  --letter-spacing-h3: -1px;
   --letter-spacing-h4: -0.5px;
   --link-primary: #3358FF;
   --link-primary-hover: #0026CF;
@@ -1761,7 +1761,6 @@ label.list-group-item:focus {
   border-radius: 0;
   border-width: 0;
   margin-bottom: 0;
-  margin-top: -5px;
   margin-bottom: -5px;
 }
 .dropdown-menu .panel .panel-heading {
@@ -4719,19 +4718,18 @@ label.required:after {
 }
 .search-container {
   position: relative;
-  line-height: 60px;
+  line-height: 48px;
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 .search-container .search {
-  border: 1px solid #fff;
+  border: 2px solid transparent;
   position: absolute;
   left: 0px;
-  width: 24px;
-  height: 34px;
+  width: 8px;
+  height: 48px;
   padding: 0 0 0 24px;
-  margin: 12px 0 0 5px;
   z-index: 1;
   -webkit-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -4740,12 +4738,13 @@ label.required:after {
 .search-container a.search-button {
   color: rgba(0, 0, 0, 0.6);
   position: absolute;
-  left: 12px;
   z-index: 5;
+  height: 48px;
 }
 .search-container.active .search {
-  width: 225px;
-  border: 1px solid #d5d5d5;
+  width: 500px;
+  border: 2px solid var(--focus);
+  padding: 0 16px 0 64px;
 }
 .search-container.active i {
   color: #4E5D9D;
