@@ -341,7 +341,7 @@ final class ButtonHelper
                 $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
             }
             if (isset($button['svgIcon'])) {
-                $buttonContent .= ' ' . $button['svgIcon'];
+                $buttonContent .= ' '.$button['svgIcon'];
             } elseif (isset($button['iconClass'])) {
                 $buttonContent .= ' <i class="'.$button['iconClass'].'"></i>';
             }
