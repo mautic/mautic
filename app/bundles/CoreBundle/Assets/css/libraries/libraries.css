@@ -3151,7 +3151,7 @@ fieldset[disabled] a.btn {
 .btn-default.focus {
   color: #5d6c7c;
 }
-.btn-default:hover, .btn-ghost:hover, #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
+.btn-default:hover, .btn-ghost:hover {
   background-color: var(--background-hover);
 }
 .btn-default:active,
@@ -4134,7 +4134,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav > li {
   position: relative;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 .nav > li > a {
   position: relative;
@@ -4144,7 +4144,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav > li > a:hover,
 .nav > li > a:focus {
   text-decoration: none;
-  background-color: #f0f0f0;
 }
 .nav > li.disabled > a {
   color: #a0acb8;
@@ -4317,7 +4316,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   position: relative;
   min-height: 50px;
   margin-bottom: 18px;
-  border: 1px solid transparent;
 }
 @media (min-width: 768px) {
   .navbar {

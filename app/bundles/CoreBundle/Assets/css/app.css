@@ -64,8 +64,8 @@
   --background-active: #8d8d8d80;
   --background-selected: #8d8d8d33;
   --background-selected-hover: #8d8d8d52;
-  --background-inverse: #393939;
-  --background-inverse-hover: #4c4c4c;
+  --background-inverse: #161616;
+  --background-inverse-hover: #8d8d8d29;
   --background-brand: #3358FF;
   --layer: #f4f4f4;
   --layer-alternate: #ffffff;
@@ -216,7 +216,7 @@ body > #app-wrapper {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  background-color: var(--background);
+  background-color: var(--background-inverse);
   float: left;
   z-index: 1005;
   height: 48px;
@@ -275,7 +275,7 @@ body > #app-wrapper {
   float: left;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-inverse);
   line-height: 48px;
   padding-top: 0;
   padding-bottom: 0;
@@ -332,13 +332,11 @@ body > #app-wrapper {
   right: 4px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
-  color: rgba(0, 0, 0, 0.7);
+  background-color: var(--background-inverse-hover);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:active,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:focus,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a.active {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
   outline: 0;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-custom {
@@ -365,13 +363,9 @@ body > #app-wrapper {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a:hover,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a:focus {
-  color: rgba(0, 0, 0, 0.7);
-  background-color: #f5f5f5;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .badge,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .bullet,
@@ -515,7 +509,7 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left {
   width: 230px;
   left: -230px;
-  background-color: #1d232b;
+  background-color: var(--layer);
   box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
   -webkit-transition: all 0.3s ease;
@@ -549,33 +543,27 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
-.app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-group:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 50px;
-  bottom: 0;
-  border-bottom: 1px solid #202830;
-}
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  display: flex;
+  flex-grow: 1;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
-  background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  background-color: var(--layer-hover);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a {
-  background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  background-color: var(--layer-selected);
+}
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a:hover,
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a:hover {
+  background-color: var(--layer-selected-hover);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > .nav-submenu {
-  background-color: #171c22;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
-  background-color: #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu:after {
   background-color: #212831;
@@ -585,15 +573,14 @@ body > #app-wrapper {
   box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  font-weight: normal;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:focus {
-  color: rgba(255, 255, 255, 0.8);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.open > a {
-  color: rgba(255, 255, 255, 0.8);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav .nav-heading {
   color: rgba(255, 255, 255, 0.25);
@@ -608,9 +595,9 @@ body > #app-wrapper {
 .app-sidebar.sidebar-right {
   width: 230px;
   right: -230px;
-  background-color: #1d232b;
+  background-color: var(--background-inverse);
   box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.05);
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-inverse);
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
@@ -624,21 +611,12 @@ body > #app-wrapper {
   padding-left: 1px;
   top: 60px;
 }
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 50px;
-  bottom: 0;
-  border-bottom: 1px solid #202830;
-}
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:focus {
-  background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
+  background-color: var(--background-inverse-hover);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > a {
@@ -748,10 +726,11 @@ body > #app-wrapper {
 }
 .app-sidebar .nav-sidebar > .nav > li > a {
   overflow: hidden;
-  padding: 12px 20px;
+  padding: 16px;
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
+  height: 48PX;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .text {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -847,7 +826,6 @@ body > #app-wrapper {
     left: 0;
   }
   .app-sidebar.sidebar-left ~ #app-header.navbar {
-    left: 230px;
   }
   .app-sidebar.sidebar-left ~ #app-content {
     margin-left: 230px;
@@ -1436,7 +1414,7 @@ blockquote > p:after {
   min-width: 13px;
   order: 2;
 }
-.btn span, .dropdown-menu > li > a > span {
+.btn span, .dropdown-menu > li > button > span {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4736,7 +4714,7 @@ label.required:after {
   transition: all 0.5s ease;
 }
 .search-container a.search-button {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-inverse);
   position: absolute;
   z-index: 5;
   height: 48px;

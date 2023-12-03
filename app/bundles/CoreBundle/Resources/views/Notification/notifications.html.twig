@@ -2,16 +2,19 @@
     <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification btn btn-icon-only btn-nospin" data-toggle="dropdown">
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
-        <span class="fa fa-bell fs-16"></span>
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 17h2v2H2v-2h2v-7a8 8 0 1 1 16 0v7Zm-2 0v-7a6 6 0 1 0-12 0v7h12Zm-9 4h6v2H9v-2Z"></path>
+        </svg>
     </a>
     <div class="dropdown-menu notifications-panel">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <h4 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
-                        <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
-                    </h4>
-                </div>
+        <div class="panel panel-default content-widget">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 16px; background-color: var(--layer);">
+                    <h5 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}</h5>
+                        <button href="javascript:void(0);" class="btn btn-icon-only btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 10.583 4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414L12 13.41l-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.633l4.95 4.95Z"></path>
+                            </svg></button>
+
+
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
                 <div class="scroll-content slimscroll" style="height:250px;" id="notifications">
