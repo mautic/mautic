@@ -127,9 +127,6 @@ abstract class AbstractFormController extends CommonController
     protected function isFormCancelled(FormInterface $form)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
 
         $formData = $request->request->get($form->getName());
 
@@ -144,9 +141,6 @@ abstract class AbstractFormController extends CommonController
     protected function isFormApplied(FormInterface $form)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
 
         $formData = $request->request->get($form->getName());
 
@@ -163,9 +157,6 @@ abstract class AbstractFormController extends CommonController
     protected function isFormValid(FormInterface $form)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
 
         // bind request to the form
         $form->handleRequest($request);
@@ -229,9 +220,6 @@ abstract class AbstractFormController extends CommonController
     protected function refererPostActionVars($vars)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
 
         if (empty($request->server->get('HTTP_REFERER'))) {
             return $vars;

@@ -514,7 +514,7 @@ class ConfigType extends AbstractType
             $form = $event->getForm();
 
             $ipServiceName = (isset($data['ip_lookup_service'])) ? $data['ip_lookup_service'] : null;
-            if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
+            if ($ipServiceName && ($lookupService = $ipLookupFactory->getService($ipServiceName)) instanceof \Mautic\CoreBundle\IpLookup\AbstractLookup) {
                 if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
                     $form->add(
                         'ip_lookup_config',
@@ -735,7 +735,7 @@ class ConfigType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
+        $view->vars['ipLookupAttribution'] = ($this->ipLookup instanceof \Mautic\CoreBundle\IpLookup\AbstractLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
     /**

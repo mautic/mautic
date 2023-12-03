@@ -466,7 +466,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 return json_encode($dataArray);
             }
 
-            if ('dev' == self::$environment || $this->displayErrors) {
+            if ('dev' == self::$environment || $this->displayErrors instanceof \Psr\Log\LoggerInterface) {
                 $error['file']          = str_replace(self::$root, '', $error['file']);
                 $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
                 $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";

@@ -38,7 +38,7 @@ class CacheStorageHelper
     protected $connection;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $cacheDir;
 

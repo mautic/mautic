@@ -421,7 +421,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     public function getExpressionBuilder()
     {
-        if (null === $this->expressionBuilder) {
+        if (!$this->expressionBuilder instanceof \Doctrine\Common\Collections\ExpressionBuilder) {
             $this->expressionBuilder = new ExpressionBuilder();
         }
 
@@ -700,7 +700,7 @@ class CommonRepository extends ServiceEntityRepository
           ->from($tableName, $alias)
           ->orderBy($prefix.$labelColumn);
 
-        if (null !== $expr && $expr->count()) {
+        if ($expr instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression && $expr->count()) {
             $q->where($expr);
         }
 

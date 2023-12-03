@@ -27,7 +27,7 @@ class DefaultController extends CommonController
             $pageModel = $this->getModel('page');
             $page      = $pageModel->getEntity($root);
 
-            if (empty($page)) {
+            if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
                 return $this->notFound();
             }
 

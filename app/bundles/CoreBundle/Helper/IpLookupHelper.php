@@ -79,7 +79,7 @@ class IpLookupHelper
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null !== $request) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $ipHolders = [
                 'HTTP_CLIENT_IP',
                 'HTTP_X_FORWARDED_FOR',
@@ -164,7 +164,7 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if ($ipAddress->isTrackable() && $request) {
+            if ($ipAddress->isTrackable() && $request instanceof \Symfony\Component\HttpFoundation\Request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (false !== strpos($userAgent, $bot)) {

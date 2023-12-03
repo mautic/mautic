@@ -343,7 +343,7 @@ class AjaxController extends CommonController
 
         if (method_exists($entity, 'getCheckedOutBy')) {
             $checkedOut = $entity->getCheckedOutBy();
-            if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
+            if (!empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 // entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);

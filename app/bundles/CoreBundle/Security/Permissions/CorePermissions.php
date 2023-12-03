@@ -243,7 +243,7 @@ class CorePermissions
         // Initialize all permission classes if
         $this->getPermissionObjects();
 
-        if (null === $userEntity) {
+        if (!$userEntity instanceof \Mautic\UserBundle\Entity\User) {
             $userEntity = $this->userHelper->getUser();
         }
 
@@ -333,7 +333,7 @@ class CorePermissions
             } else {
                 // check against bundle permissions class
                 $permissionObject = $this->getPermissionObject($parts[0], false);
-                $result[$p]       = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
+                $result[$p]       = $permissionObject instanceof \Mautic\CoreBundle\Security\Permissions\AbstractPermissions && $permissionObject->isSupported($parts[1], $parts[2]);
             }
         }
 

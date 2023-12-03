@@ -179,7 +179,7 @@ class MauticFactory
     public function getRequest()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (empty($request)) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             // likely in a test as the request is not populated for outside the container
             $request      = Request::createFromGlobals();
             $requestStack = new RequestStack();

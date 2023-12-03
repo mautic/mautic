@@ -112,11 +112,11 @@ class NotificationModel extends FormModel
         string $deduplicateValue = null,
         \DateTime $deduplicateDateTimeFrom = null
     ) {
-        if (null === $user) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
             $user = $this->userHelper->getUser();
         }
 
-        if (null === $user || !$user->getId()) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User || !$user->getId()) {
             // ensure notifications aren't written for non users
             return;
         }

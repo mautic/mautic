@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -11,9 +12,6 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FileEncodingValidator extends ConstraintValidator
 {
-    /**
-     * @param LeadField $field
-     */
     public function validate($field, Constraint $constraint)
     {
         /*
@@ -21,7 +19,7 @@ class FileEncodingValidator extends ConstraintValidator
             and the file path will be an empty string "". If that is the case
             no further checks are required. Just return.
         */
-        if (!$field || '' === $field->getPathname() || null === $field->getPathname()) {
+        if (!$field instanceof UploadedFile || '' === $field->getPathname() || null === $field->getPathname()) {
             return;
         }
 

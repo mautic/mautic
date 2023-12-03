@@ -77,7 +77,7 @@ class ExceptionListener extends ErrorListener
 
             $wrapper = $e;
 
-            while ($prev = $wrapper->getPrevious()) {
+            while (($prev = $wrapper->getPrevious()) instanceof \Throwable) {
                 if ($exception === $wrapper = $prev) {
                     throw $e;
                 }
