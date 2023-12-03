@@ -2700,8 +2700,6 @@ ul.line-legend li {
   clear: both;
 }
 .panel-heading .panel-title {
-  display: table-cell;
-  width: 1%;
   vertical-align: middle;
   font-weight: 600;
 }
