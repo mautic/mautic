@@ -3145,7 +3145,10 @@ fieldset[disabled] a.btn {
 .btn-default.focus {
   color: #5d6c7c;
 }
-.btn-default:hover {
+.btn-ghost {
+  background-color: transparent;
+}
+.btn-default:hover, .btn-ghost:hover, #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
   background-color: var(--background-hover);
 }
 .btn-default:active,

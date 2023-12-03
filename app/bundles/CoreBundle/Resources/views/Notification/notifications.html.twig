@@ -4,13 +4,13 @@
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
         <span class="fa fa-bell fs-16"></span>
     </a>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu notifications-panel">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title">
-                    <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
+                    <h4 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
                         <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
-                    </h6>
+                    </h4>
                 </div>
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">

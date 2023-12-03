@@ -332,7 +332,6 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
   color: rgba(0, 0, 0, 0.7);
-  background-color: transparent;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:active,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:focus,
