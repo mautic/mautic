@@ -169,7 +169,7 @@ class AssetModel extends FormModel
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if (null !== $lead) {
+                    if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
                         $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
@@ -211,7 +211,7 @@ class AssetModel extends FormModel
                 $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
                 $trackingId                = null;
                 $trackingNewlyGenerated    = false;
-                if (null !== $trackedDevice) {
+                if ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
                     $trackingId             = $trackedDevice->getTrackingId();
                     $trackingNewlyGenerated = !$wasTrackedAlready;
                 }
@@ -285,7 +285,7 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
 
-        if (null !== $request) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $download->setReferer($request->server->get('HTTP_REFERER'));
         }
 
@@ -418,7 +418,7 @@ class AssetModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new AssetEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

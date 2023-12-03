@@ -155,7 +155,7 @@ class OrderDAO
         $integrationObjectId,
         ?\DateTimeInterface $objectModifiedDate = null
     ): void {
-        if (null === $objectModifiedDate) {
+        if (!$objectModifiedDate instanceof \DateTimeInterface) {
             $objectModifiedDate = new \DateTime();
         }
 
@@ -192,7 +192,7 @@ class OrderDAO
      */
     public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
-        if (null === $objectModifiedDate) {
+        if (!$objectModifiedDate instanceof \DateTimeInterface) {
             $objectModifiedDate = new \DateTime();
         }
 

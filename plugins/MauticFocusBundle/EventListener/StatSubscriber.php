@@ -49,7 +49,7 @@ class StatSubscriber implements EventSubscriberInterface
             $sourceId = $hit->getSourceId();
             $focus    = $this->model->getEntity($sourceId);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus && $focus->isPublished()) {
                 $this->model->addStat($focus, Stat::TYPE_CLICK, $hit, $hit->getLead());
             }
         }
@@ -67,7 +67,7 @@ class StatSubscriber implements EventSubscriberInterface
         if (!empty($id)) {
             $focus = $this->model->getEntity($id);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof \MauticPlugin\MauticFocusBundle\Entity\Focus && $focus->isPublished()) {
                 // Make sure the form is still applicable
                 $form = $event->getSubmission()->getForm();
                 if ((int) $form->getId() === (int) $focus->getForm()) {

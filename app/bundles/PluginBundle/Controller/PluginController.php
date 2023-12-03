@@ -153,7 +153,7 @@ class PluginController extends FormController
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
         // Verify that the requested integration exists
-        if (empty($integrationObject)) {
+        if (!$integrationObject instanceof \Mautic\PluginBundle\Integration\AbstractIntegration) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
 

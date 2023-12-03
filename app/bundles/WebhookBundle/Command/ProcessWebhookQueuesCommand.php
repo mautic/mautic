@@ -51,7 +51,7 @@ class ProcessWebhookQueuesCommand extends Command
 
         if ($id) {
             $webhook  = $this->webhookModel->getEntity($id);
-            $webhooks = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhooks = ($webhook instanceof \Mautic\WebhookBundle\Entity\Webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
         } else {
             // make sure we only get published webhook entities
             $webhooks = $this->webhookModel->getEntities(

@@ -251,7 +251,7 @@ class FieldController extends FormController
             ],
         ];
         // list not found
-        if (null === $field) {
+        if (!$field instanceof \Mautic\LeadBundle\Entity\LeadField) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -399,7 +399,7 @@ class FieldController extends FormController
             $model = $this->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
-            if (null === $field) {
+            if (!$field instanceof \Mautic\LeadBundle\Entity\LeadField) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.field.error.notfound',
@@ -482,7 +482,7 @@ class FieldController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\LeadBundle\Entity\LeadField) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.field.error.notfound',

@@ -91,7 +91,7 @@ class ContactTracker
             return null;
         }
 
-        if (empty($this->trackedContact)) {
+        if (!$this->trackedContact instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->trackedContact = $this->getCurrentContact();
             $this->generateTrackingCookies();
         }
@@ -150,7 +150,7 @@ class ContactTracker
         // Generate cookies for the newly tracked contact
         $this->generateTrackingCookies();
 
-        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        if ($previouslyTrackedContact instanceof \Mautic\LeadBundle\Entity\Lead && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
@@ -160,7 +160,7 @@ class ContactTracker
      */
     public function setSystemContact(Lead $lead = null)
     {
-        if (null !== $lead) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
 
             $fields = $lead->getFields();
@@ -191,7 +191,7 @@ class ContactTracker
      */
     private function getSystemContact()
     {
-        if ($this->useSystemContact() && $this->systemContact) {
+        if ($this->useSystemContact() && $this->systemContact instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->debug('CONTACT: System lead is being used');
 
             return $this->systemContact;
@@ -225,7 +225,7 @@ class ContactTracker
 
         // Return null for leads that are from a non-trackable IP, prevent anonymous lead with a non-trackable IP to be tracked
         $ip = $this->ipLookupHelper->getIpAddress();
-        if ($ip && !$ip->isTrackable()) {
+        if ($ip instanceof \Mautic\CoreBundle\Entity\IpAddress && !$ip->isTrackable()) {
             return $lead;
         }
 
@@ -237,7 +237,7 @@ class ContactTracker
             $this->hydrateCustomFieldData($lead);
         }
 
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             // Check to see if a contact is being tracked via the old cookie method in order to migrate them to the new
             $lead = $this->contactTrackingService->getTrackedLead();
         }
@@ -256,7 +256,7 @@ class ContactTracker
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        if ($ip && !$ip->isTrackable()) {
+        if ($ip instanceof \Mautic\CoreBundle\Entity\IpAddress && !$ip->isTrackable()) {
             // Don't save leads that are from a non-trackable IP by default
             return $this->createNewContact($ip, false);
         }
@@ -308,7 +308,7 @@ class ContactTracker
 
     private function hydrateCustomFieldData(Lead $lead = null)
     {
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -319,7 +319,7 @@ class ContactTracker
 
     private function useSystemContact(): bool
     {
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
+        return $this->isUserSession() || $this->systemContact instanceof \Mautic\LeadBundle\Entity\Lead || defined('IN_MAUTIC_CONSOLE') || !$this->requestStack->getCurrentRequest() instanceof \Symfony\Component\HttpFoundation\Request;
     }
 
     /**
@@ -348,7 +348,7 @@ class ContactTracker
     private function generateTrackingCookies()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($leadId = $this->trackedContact->getId() && null !== $request) {
+        if ($leadId = $this->trackedContact->getId() && $request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $request->server->get('HTTP_USER_AGENT'));
         }
     }

@@ -273,7 +273,7 @@ class TriggerModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
@@ -368,7 +368,7 @@ class TriggerModel extends CommonFormModel
             return false;
         }
 
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $lead = $this->contactTracker->getContact();
         }
 

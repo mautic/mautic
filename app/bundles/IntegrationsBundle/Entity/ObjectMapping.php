@@ -134,7 +134,7 @@ class ObjectMapping
      */
     public function __construct(?\DateTime $dateCreated = null)
     {
-        if (null === $dateCreated) {
+        if (!$dateCreated instanceof \DateTime) {
             $dateCreated = new \DateTime();
         }
 
@@ -287,7 +287,7 @@ class ObjectMapping
      */
     public function setLastSyncDate($lastSyncDate)
     {
-        if (null === $lastSyncDate) {
+        if (!$lastSyncDate instanceof \DateTimeInterface) {
             $lastSyncDate = new \DateTime();
         }
 

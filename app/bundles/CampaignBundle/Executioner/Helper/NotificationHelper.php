@@ -56,7 +56,7 @@ class NotificationHelper
     public function notifyOfFailure(Lead $contact, Event $event)
     {
         $user = $this->getUser($contact, $event);
-        if (!$user || !$user->getId()) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User || !$user->getId()) {
             return;
         }
 
@@ -86,7 +86,7 @@ class NotificationHelper
          */
         $user = $this->getUser(new Lead(), $event);
 
-        if (!$user || !$user->getId()) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User || !$user->getId()) {
             return;
         }
 

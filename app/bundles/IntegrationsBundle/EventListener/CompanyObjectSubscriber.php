@@ -90,7 +90,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Company::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
             return;
         }
 
@@ -159,7 +159,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 
         $company = $this->companyObjectHelper->findObjectById($event->getId());
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return;
         }
 

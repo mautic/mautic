@@ -553,7 +553,7 @@ class WebhookModel extends FormModel
     public function getEventsOrderbyDir(Webhook $webhook = null)
     {
         // Try to get the value from Webhook
-        if ($webhook && $orderByDir = $webhook->getEventsOrderbyDir()) {
+        if ($webhook instanceof \Mautic\WebhookBundle\Entity\Webhook && $orderByDir = $webhook->getEventsOrderbyDir()) {
             return $orderByDir;
         }
 
@@ -590,7 +590,7 @@ class WebhookModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

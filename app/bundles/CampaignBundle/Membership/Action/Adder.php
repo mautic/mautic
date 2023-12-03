@@ -64,7 +64,7 @@ class Adder
             throw new ContactCannotBeAddedToCampaignException('Contacts cannot restart the campaign');
         }
 
-        if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
+        if ($wasRemoved && !$isManualAction && !$campaignMember->getDateLastExited() instanceof \DateTimeInterface) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
 
             throw new ContactCannotBeAddedToCampaignException('Contact was manually removed');

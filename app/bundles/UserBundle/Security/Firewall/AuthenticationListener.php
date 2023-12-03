@@ -61,7 +61,7 @@ final class AuthenticationListener
 
     public function __invoke(RequestEvent $event): void
     {
-        if (null !== $this->tokenStorage->getToken()) {
+        if ($this->tokenStorage->getToken() instanceof \Symfony\Component\Security\Core\Authentication\Token\TokenInterface) {
             $this->setActivePermissionsOnAuthToken();
 
             return;
@@ -84,7 +84,7 @@ final class AuthenticationListener
                     if ('api' != $this->providerKey) {
                         $response = $this->onSuccess($request, $authToken, $response);
                     }
-                } elseif (empty($response)) {
+                } elseif (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
                     throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
                 }
             }
@@ -94,7 +94,7 @@ final class AuthenticationListener
             }
         }
 
-        if (!empty($response)) {
+        if ($response instanceof \Symfony\Component\HttpFoundation\Response) {
             $event->setResponse($response);
         }
     }
@@ -116,7 +116,7 @@ final class AuthenticationListener
         $loginEvent = new InteractiveLoginEvent($request, $token);
         $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
 
-        if (null === $response) {
+        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }
 

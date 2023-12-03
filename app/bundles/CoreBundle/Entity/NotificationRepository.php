@@ -87,7 +87,7 @@ class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return null === $result ? null : $result->getDateAdded();
+        return $result instanceof \Mautic\CoreBundle\Entity\Notification ? $result->getDateAdded() : null;
     }
 
     /**

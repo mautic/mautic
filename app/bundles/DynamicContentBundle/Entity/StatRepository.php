@@ -75,7 +75,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
             );
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

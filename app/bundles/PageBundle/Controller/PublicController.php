@@ -402,7 +402,7 @@ class PublicController extends CommonFormController
 
         $lead          = $contactTracker->getContact();
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice ? $trackedDevice->getTrackingId() : null);
 
         $sessionValue   = $trackingHelper->getSession(true);
 
@@ -441,7 +441,7 @@ class PublicController extends CommonFormController
 
         $logger->debug('Executing Redirect: '.$redirect);
 
-        if (null === $redirect || !$redirect->isPublished(false)) {
+        if (!$redirect instanceof \Mautic\PageBundle\Entity\Redirect || !$redirect->isPublished(false)) {
             $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
 
             $url = ($redirect) ? $redirect->getUrl() : 'n/a';
@@ -624,7 +624,7 @@ class PublicController extends CommonFormController
         if ($this->security->isAnonymous()) {
             $lead          = $contactTracker->getContact();
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
-            $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+            $trackingId    = ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice ? $trackedDevice->getTrackingId() : null);
             $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,

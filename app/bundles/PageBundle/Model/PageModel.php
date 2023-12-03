@@ -317,7 +317,7 @@ class PageModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new PageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -470,12 +470,12 @@ class PageModel extends FormModel
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
 
-            if (null !== $companyChangeLog) {
+            if ($companyChangeLog instanceof \Mautic\LeadBundle\Entity\CompanyChangeLog) {
                 $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         }
 
-        if (!$lead || !$lead->getId()) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
             // Lead came from a non-trackable IP so ignore
             return;
         }
@@ -730,7 +730,7 @@ class PageModel extends FormModel
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
 
-        if (null !== $hitDate) {
+        if ($hitDate instanceof \DateTimeInterface) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
@@ -1069,7 +1069,7 @@ class PageModel extends FormModel
             }
         }
 
-        if ($queryHasUtmTags && $lead) {
+        if ($queryHasUtmTags && $lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $utmTags = new UtmTag();
             $utmTags->setDateAdded($hit->getDateHit());
             $utmTags->setUrl($hit->getUrl());

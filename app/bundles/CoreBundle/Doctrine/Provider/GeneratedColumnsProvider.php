@@ -50,7 +50,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
     public function getGeneratedColumns(): GeneratedColumns
     {
-        if (null !== $this->generatedColumns) {
+        if ($this->generatedColumns instanceof \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns) {
             return $this->generatedColumns;
         }
 

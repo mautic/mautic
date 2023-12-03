@@ -146,7 +146,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -198,7 +198,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -249,7 +249,7 @@ class LeadApiController extends CommonApiController
     public function getListsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
+        if ($entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -288,7 +288,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -317,7 +317,7 @@ class LeadApiController extends CommonApiController
     public function getCampaignsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
+        if ($entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             if (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -363,7 +363,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -411,7 +411,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -456,7 +456,7 @@ class LeadApiController extends CommonApiController
 
         $entity = $this->model->getEntity((int) $id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 
@@ -488,7 +488,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 

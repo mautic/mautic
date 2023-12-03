@@ -43,7 +43,7 @@ class SummaryRepository extends CommonRepository
             ->where('cs.campaign_id = '.(int) $campaignId)
             ->groupBy('cs.event_id');
 
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $q->andWhere('cs.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);

@@ -101,7 +101,7 @@ class CompanyApiController extends CommonApiController
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return $this->notFound();
         }
 
@@ -130,7 +130,7 @@ class CompanyApiController extends CommonApiController
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return $this->notFound();
         }
 

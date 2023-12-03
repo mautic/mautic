@@ -41,7 +41,7 @@ class CookieHelper implements EventSubscriberInterface
      */
     public function getCookie(string $key, $default = null)
     {
-        if (null === $this->getRequest()) {
+        if (!$this->getRequest() instanceof \Symfony\Component\HttpFoundation\Request) {
             return $default;
         }
 
@@ -96,7 +96,7 @@ class CookieHelper implements EventSubscriberInterface
 
     private function getRequest(): ?Request
     {
-        if (null !== $this->request) {
+        if ($this->request instanceof \Symfony\Component\HttpFoundation\Request) {
             return $this->request;
         }
 

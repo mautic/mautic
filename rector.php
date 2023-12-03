@@ -65,6 +65,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
+        \Rector\Set\ValueObject\SetList::INSTANCEOF,
     ]);
 
     // Define what single rules will be applied

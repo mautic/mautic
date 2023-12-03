@@ -395,7 +395,7 @@ class AjaxController extends CommonAjaxController
         $lead     = $leadModel->getEntity($leadId);
         $campaign = $campaignModel->getEntity($campaignId);
 
-        if (null === $lead || null === $campaign) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             return $this->sendJsonResponse($dataArray);
         }
 
@@ -604,7 +604,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($emailId);
 
-        if (null !== $email
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email
             && $this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -633,7 +633,7 @@ class AjaxController extends CommonAjaxController
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
 
-        if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
             /** @var \Doctrine\ORM\PersistentCollection $leadTags */

@@ -165,7 +165,7 @@ class InactiveHelper
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
             $executionDate = $this->scheduler->getExecutionDateTime($event, $lastActiveDate);
-            if (!$earliestDate || $executionDate < $earliestDate) {
+            if (!$earliestDate instanceof \DateTimeInterface || $executionDate < $earliestDate) {
                 $earliestDate = $executionDate;
             }
         }

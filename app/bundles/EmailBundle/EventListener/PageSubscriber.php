@@ -51,7 +51,7 @@ class PageSubscriber implements EventSubscriberInterface
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();
 
-        if ($redirect && $email = $hit->getEmail()) {
+        if ($redirect instanceof \Mautic\PageBundle\Entity\Redirect && $email = $hit->getEmail()) {
             // click trigger condition
             $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
@@ -61,7 +61,7 @@ class PageSubscriber implements EventSubscriberInterface
                 $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
-            if (empty($stat)) {
+            if (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
                     $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());

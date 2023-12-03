@@ -309,7 +309,7 @@ class TriggerController extends FormController
         ];
 
         // form not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\PointBundle\Entity\Trigger) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -492,7 +492,7 @@ class TriggerController extends FormController
             \assert($model instanceof TriggerModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\PointBundle\Entity\Trigger) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.trigger.error.notfound',
@@ -555,7 +555,7 @@ class TriggerController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\PointBundle\Entity\Trigger) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.trigger.error.notfound',

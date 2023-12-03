@@ -69,7 +69,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $stageId = (int) $config['stage'];
         $stage   = $this->stageModel->getEntity($stageId);
 
-        if (!$stage || !$stage->isPublished()) {
+        if (!$stage instanceof \Mautic\StageBundle\Entity\Stage || !$stage->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.stage.campaign.event.stage_missing'));
 
             return;

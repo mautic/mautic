@@ -223,7 +223,7 @@ class EventLogModel extends AbstractCommonModel
     public function saveEntity(LeadEventLog $entity)
     {
         $triggerDate = $entity->getTriggerDate();
-        if (null === $triggerDate) {
+        if (!$triggerDate instanceof \DateTimeInterface) {
             // Reschedule for now
             $triggerDate = new \DateTime();
         }

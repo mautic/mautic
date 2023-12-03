@@ -47,7 +47,7 @@ class TrackingSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($stat->getEmail() && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
+        if ($stat->getEmail() instanceof \Mautic\EmailBundle\Entity\Email && (int) $stat->getEmail()->getId() !== (int) $clickthrough['channel']['email']) {
             // ID mismatch - fishy so use tracked lead
             return;
         }

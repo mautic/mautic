@@ -174,7 +174,7 @@ class ClientType extends AbstractType
 
                         $errors = $this->validator->validate($uri, $urlConstraint);
 
-                        if (!empty($errors)) {
+                        if ($errors instanceof \Symfony\Component\Validator\ConstraintViolationListInterface) {
                             foreach ($errors as $error) {
                                 $form['redirectUris']->addError(new FormError($error->getMessage()));
                             }

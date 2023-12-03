@@ -93,7 +93,7 @@ class EmailSendEvent extends CommonEvent
 
         if (isset($args['internalSend'])) {
             $this->internalSend = $args['internalSend'];
-        } elseif (null !== $helper) {
+        } elseif ($helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $this->internalSend = $helper->isInternalSend();
         }
 
@@ -117,7 +117,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function inTokenizationMode()
     {
-        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->inTokenizationMode() : false;
     }
 
     /**
@@ -127,7 +127,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->getEmail() : $this->email;
     }
 
     /**
@@ -137,7 +137,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getContent($replaceTokens = false)
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $content = $this->helper->getBody();
         } else {
             $content = $this->content;
@@ -151,7 +151,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setContent($content)
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $this->helper->setBody($content, 'text/html', null, true);
         } else {
             $this->content = $content;
@@ -166,7 +166,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getPlainText()
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             return $this->helper->getPlainText();
         } else {
             return $this->plainText;
@@ -175,7 +175,7 @@ class EmailSendEvent extends CommonEvent
 
     public function setPlainText($content)
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $this->helper->setPlainText($content);
         } else {
             $this->plainText = $content;
@@ -203,7 +203,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSubject()
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             return $this->helper->getSubject();
         } else {
             return $this->subject;
@@ -217,7 +217,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setSubject($subject)
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $this->helper->setSubject($subject);
         } else {
             $this->subject = $subject;
@@ -239,7 +239,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return (null !== $this->helper) ? $this->helper->getLead() : $this->lead;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->getLead() : $this->lead;
     }
 
     /**
@@ -247,7 +247,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getIdHash()
     {
-        return (null !== $this->helper) ? $this->helper->getIdHash() : $this->idHash;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->getIdHash() : $this->idHash;
     }
 
     /**
@@ -255,7 +255,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSource()
     {
-        return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->getSource() : $this->source;
     }
 
     public function addTokens(array $tokens)
@@ -277,7 +277,7 @@ class EmailSendEvent extends CommonEvent
     {
         $tokens = $this->tokens;
 
-        if ($includeGlobal && null !== $this->helper) {
+        if ($includeGlobal && $this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $tokens = array_merge($this->helper->getGlobalTokens(), $tokens);
         }
 
@@ -286,7 +286,7 @@ class EmailSendEvent extends CommonEvent
 
     public function addTextHeader($name, $value)
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             $this->helper->addCustomHeader($name, $value);
         } else {
             $this->textHeaders[$name] = $value;
@@ -298,7 +298,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTextHeaders()
     {
-        return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
+        return ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**
@@ -306,7 +306,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function shouldAppendClickthrough(): bool
     {
-        return !$this->isInternalSend() && null === $this->getEmail();
+        return !$this->isInternalSend() && !$this->getEmail() instanceof \Mautic\EmailBundle\Entity\Email;
     }
 
     /**
@@ -338,7 +338,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getContentHash()
     {
-        if (null !== $this->helper) {
+        if ($this->helper instanceof \Mautic\EmailBundle\Helper\MailHelper) {
             return $this->helper->getContentHash();
         } else {
             return md5($this->getContent().$this->getPlainText());

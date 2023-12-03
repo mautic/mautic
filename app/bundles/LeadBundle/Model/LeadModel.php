@@ -412,7 +412,7 @@ class LeadModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new LeadEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -496,7 +496,7 @@ class LeadModel extends FormModel
             $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
         }
 
-        if (null !== $changeLogEntity) {
+        if ($changeLogEntity instanceof \Mautic\LeadBundle\Entity\CompanyChangeLog) {
             $this->em->detach($changeLogEntity);
         }
     }
@@ -1448,7 +1448,7 @@ class LeadModel extends FormModel
                 $this->addToLists($lead, [$list]);
             }
 
-            if (null !== $company) {
+            if ($company instanceof \Mautic\LeadBundle\Entity\Company) {
                 $this->companyModel->addLeadToCompany($company, $lead);
                 $this->setPrimaryCompany($company->getId(), $lead->getId());
             }
@@ -2061,7 +2061,7 @@ class LeadModel extends FormModel
         }
 
         // company does not exist anymore
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return false;
         }
 
@@ -2219,7 +2219,7 @@ class LeadModel extends FormModel
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved
             $manipulator = $lead->getManipulator();
-            if (null !== $manipulator && !$manipulator->wasLogged()) {
+            if ($manipulator instanceof \Mautic\LeadBundle\DataObject\LeadManipulator && !$manipulator->wasLogged()) {
                 $manipulationLog = new LeadEventLog();
                 $manipulationLog->setLead($lead)
                     ->setBundle($manipulator->getBundleName())

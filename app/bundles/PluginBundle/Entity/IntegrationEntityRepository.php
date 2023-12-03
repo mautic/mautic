@@ -206,7 +206,7 @@ class IntegrationEntityRepository extends CommonRepository
             }
             $sub = null;
             foreach ($integrationEntity as $key => $entity) {
-                if (null === $sub) {
+                if (!$sub instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression) {
                     $sub = CompositeExpression::or($q->expr()->eq('i.integration_entity', ':entity'.$key));
                     $q->setParameter('entity'.$key, $entity);
                     continue;

@@ -38,7 +38,7 @@ class RedirectRepository extends CommonRepository
             $q->expr()->in('r.id', ':ids')
         );
 
-        if (null === $email) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
             $expr->add(
                 $q->expr()->isNull('r.email')
             );

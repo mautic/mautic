@@ -280,7 +280,7 @@ class EmailController extends FormController
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if (null === $email) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
 
@@ -647,7 +647,7 @@ class EmailController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -893,7 +893,7 @@ class EmailController extends FormController
             \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\EmailBundle\Entity\Email) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.email.error.notfound',
@@ -1063,7 +1063,7 @@ class EmailController extends FormController
             \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\EmailBundle\Entity\Email) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.email.error.notfound',
@@ -1136,7 +1136,7 @@ class EmailController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -1283,7 +1283,7 @@ class EmailController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\EmailBundle\Entity\Email) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.email.error.notfound',
@@ -1339,7 +1339,7 @@ class EmailController extends FormController
         $entity = $model->getEntity($objectId);
 
         // not found or not allowed
-        if (null === $entity
+        if (!$entity instanceof \Mautic\EmailBundle\Entity\Email
             || (!$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',

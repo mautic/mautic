@@ -271,7 +271,7 @@ class ObjectChangeGenerator
 
         // If we know certain change datetime and it's newer than possible change datetime
         // then we have to update possible change datetime otherwise comparision doesn't work correctly
-        if ($certainChangeDateTime && ($certainChangeDateTime > $possibleChangeDateTime)) {
+        if ($certainChangeDateTime instanceof \DateTimeInterface && ($certainChangeDateTime > $possibleChangeDateTime)) {
             $possibleChangeDateTime = $certainChangeDateTime;
         }
 

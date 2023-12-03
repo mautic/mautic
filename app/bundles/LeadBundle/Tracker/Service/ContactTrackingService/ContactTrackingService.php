@@ -47,7 +47,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             return null;
         }
 
@@ -69,7 +69,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
             // Check if this contact was merged into another and if so, return the new contact
             $lead = $this->mergeRecordRepository->findMergedContact($leadId);
 
-            if (null === $lead) {
+            if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                 return null;
             }
 

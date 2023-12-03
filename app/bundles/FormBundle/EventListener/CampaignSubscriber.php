@@ -113,7 +113,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $lead = $event->getLead();
 
-        if (!$lead || !$lead->getId()) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
             return $event->setResult(false);
         }
 

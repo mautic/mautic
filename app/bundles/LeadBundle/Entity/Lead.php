@@ -620,7 +620,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return ($this->getOwner() instanceof \Mautic\UserBundle\Entity\User) ? $this->getOwner() : $this->getCreatedBy();
     }
 
     /**
@@ -1496,7 +1496,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function checkDateAdded()
     {
-        if (null === $this->getDateAdded()) {
+        if (!$this->getDateAdded() instanceof \DateTimeInterface) {
             $this->setDateAdded(new \DateTime());
         }
     }

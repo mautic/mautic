@@ -290,7 +290,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $points            = $event->getConfig()['points'];
         $somethingHappened = false;
 
-        if (null !== $lead && !empty($points)) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && !empty($points)) {
             $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
             $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
             $pointGroupId             = $event->getConfig()['group'] ?? null;
@@ -460,7 +460,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
 
-            if (null !== $companyChangeLog) {
+            if ($companyChangeLog instanceof \Mautic\LeadBundle\Entity\CompanyChangeLog) {
                 $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         } else {
@@ -476,7 +476,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $lead   = $event->getLead();
         $result = false;
 
-        if (!$lead || !$lead->getId()) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
             return $event->setResult(false);
         }
 

@@ -409,7 +409,7 @@ class InstallService
             $existingUser = null;
         }
 
-        if (null !== $existingUser) {
+        if ($existingUser instanceof \Mautic\UserBundle\Entity\User) {
             $user = $existingUser;
         } else {
             $user = new User();
@@ -479,7 +479,7 @@ class InstallService
             );
         }
 
-        if (!empty($adminRole)) {
+        if ($adminRole instanceof \Mautic\UserBundle\Entity\Role) {
             $user->setRole($adminRole);
 
             try {

@@ -102,7 +102,7 @@ class CampaignExecutionEvent extends Event
         }
 
         $leadFields             = $isLeadEntity ? $lead->getProfileFields() : $lead;
-        $leadFields['owner_id'] = $isLeadEntity && ($owner = $lead->getOwner()) ? $owner->getId() : 0;
+        $leadFields['owner_id'] = $isLeadEntity && (($owner = $lead->getOwner()) instanceof \Mautic\UserBundle\Entity\User) ? $owner->getId() : 0;
 
         return $leadFields;
     }
@@ -223,7 +223,7 @@ class CampaignExecutionEvent extends Event
      */
     public function setChannel($channel, $channelId = null)
     {
-        if (null !== $this->log) {
+        if ($this->log instanceof \Mautic\CampaignBundle\Entity\LeadEventLog) {
             // Set the channel since we have the resource
             $this->log->setChannel($channel)
                       ->setChannelId($channelId);

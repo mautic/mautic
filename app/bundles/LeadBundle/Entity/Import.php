@@ -599,7 +599,7 @@ class Import extends FormEntity
      */
     public function start()
     {
-        if (empty($this->getDateStarted())) {
+        if (!$this->getDateStarted() instanceof \DateTimeInterface) {
             $this->setDateStarted(new \DateTime());
         }
 

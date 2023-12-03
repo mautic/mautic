@@ -229,7 +229,7 @@ class EmailRepository extends CommonRepository
                 )
             );
 
-        if (null !== $maxDate) {
+        if ($maxDate instanceof \DateTime) {
             $segmentQb->andWhere($segmentQb->expr()->lte('ll.date_added', ':max_date'));
             $segmentQb->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
         }

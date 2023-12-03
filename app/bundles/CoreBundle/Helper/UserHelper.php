@@ -27,7 +27,7 @@ class UserHelper
         $user  = null;
         $token = $this->tokenStorage->getToken();
 
-        if (null !== $token) {
+        if ($token instanceof \Symfony\Component\Security\Core\Authentication\Token\TokenInterface) {
             $user = $token->getUser();
         }
 

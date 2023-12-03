@@ -91,7 +91,7 @@ class MergeRecord
      */
     public function setDateAdded(\DateTime $dateAdded = null)
     {
-        if (null === $dateAdded) {
+        if (!$dateAdded instanceof \DateTime) {
             $dateAdded = new \DateTime();
         }
 

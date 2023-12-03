@@ -46,11 +46,11 @@ class DecisionHelper
         // Check if parent taken path is the path of this event, otherwise exit
         $parentEvent = $event->getParent();
 
-        if (null !== $parentEvent && null !== $event->getDecisionPath()) {
+        if ($parentEvent instanceof \Mautic\CampaignBundle\Entity\Event && null !== $event->getDecisionPath()) {
             $rotation    = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
             $log         = $parentEvent->getLogByContactAndRotation($contact, $rotation);
 
-            if (null === $log) {
+            if (!$log instanceof \Mautic\CampaignBundle\Entity\LeadEventLog) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             }
 

@@ -241,7 +241,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         /** @var Lead $lead */
         foreach ($entities as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
-            if (!empty($this->triggerModel)) {
+            if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
                 $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
             }
 
@@ -394,7 +394,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $entity;
         }
 
-        if (!empty($this->triggerModel)) {
+        if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
             $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
         }
 
@@ -457,7 +457,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'lead',
             $args,
             function ($r) {
-                if (!empty($this->triggerModel)) {
+                if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
                 $r->setAvailableSocialFields($this->availableSocialFields);
@@ -645,7 +645,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (false === strpos($column, '.')) {
                         $column = "entity.$column";
                     }
-                    if (null === $expr) {
+                    if (!$expr instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression) {
                         $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
                         $qb->andWhere($expr);
                         continue;
@@ -661,7 +661,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $args['qb']    = $qb;
         $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
 
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);

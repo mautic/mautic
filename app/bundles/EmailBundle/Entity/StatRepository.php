@@ -339,7 +339,7 @@ class StatRepository extends CommonRepository
                 )
             )->setParameter('false', false, 'boolean');
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
@@ -558,7 +558,7 @@ class StatRepository extends CommonRepository
                 )
             )->setParameter('false', false, 'boolean');
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

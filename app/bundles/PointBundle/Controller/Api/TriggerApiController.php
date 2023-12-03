@@ -177,7 +177,7 @@ class TriggerApiController extends CommonApiController
 
         $entity = $this->model->getEntity($triggerId);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\PointBundle\Entity\Trigger) {
             return $this->notFound();
         }
 

@@ -21,7 +21,7 @@ class FileEncodingValidator extends ConstraintValidator
             and the file path will be an empty string "". If that is the case
             no further checks are required. Just return.
         */
-        if (!$field || '' === $field->getPathname() || null === $field->getPathname()) {
+        if (!$field instanceof \Mautic\CoreBundle\Form\Validator\Constraints\LeadField || '' === $field->getPathname() || null === $field->getPathname()) {
             return;
         }
 

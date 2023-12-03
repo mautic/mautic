@@ -155,7 +155,7 @@ class MobileNotificationController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.mobile_notification.page', 1);
 
-        if (null === $notification) {
+        if (!$notification instanceof \Mautic\NotificationBundle\Entity\Notification) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
 
@@ -410,7 +410,7 @@ class MobileNotificationController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\NotificationBundle\Entity\Notification) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -604,7 +604,7 @@ class MobileNotificationController extends FormController
             \assert($model instanceof NotificationModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\NotificationBundle\Entity\Notification) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.notification.error.notfound',
@@ -675,7 +675,7 @@ class MobileNotificationController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\NotificationBundle\Entity\Notification) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.notification.error.notfound',

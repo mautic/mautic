@@ -91,7 +91,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
             return;
         }
 
@@ -163,7 +163,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 
         $contact = $this->contactObjectHelper->findObjectById($event->getId());
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 

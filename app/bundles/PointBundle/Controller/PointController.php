@@ -233,7 +233,7 @@ class PointController extends AbstractFormController
         ];
 
         // form not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\PointBundle\Entity\Point) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -386,7 +386,7 @@ class PointController extends AbstractFormController
             \assert($model instanceof PointModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\PointBundle\Entity\Point) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.error.notfound',
@@ -449,7 +449,7 @@ class PointController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\PointBundle\Entity\Point) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.error.notfound',

@@ -188,7 +188,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $this->coreParametersHelper = $coreParametersHelper;
         $this->factory              = $factory;
 
-        if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
+        if ($this->model instanceof \Mautic\CoreBundle\Model\AbstractCommonModel && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
     }
@@ -215,7 +215,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
             && !$this->security->isGranted($this->permissionBase.':viewother')
-            && null !== $user = $userHelper->getUser()
+            && ($user = $userHelper->getUser()) instanceof \Mautic\UserBundle\Entity\User
         ) {
             $this->listFilters[] = [
                 'column' => $tableAlias.'.createdBy',
@@ -387,7 +387,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             throw new \RuntimeException('Request is not set.');
         }
 

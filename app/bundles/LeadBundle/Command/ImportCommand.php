@@ -63,7 +63,7 @@ EOT
             $import = $this->importModel->getImportToProcess();
 
             // No import waiting in the queue. Finish silently.
-            if (null === $import) {
+            if (!$import instanceof \Mautic\LeadBundle\Entity\Import) {
                 return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }

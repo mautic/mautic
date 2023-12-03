@@ -22,16 +22,16 @@ class FuzzyEvidence implements JudgementModeInterface
         }
 
         if (
-            $leftChangeRequest->getCertainChangeDateTime() &&
-            $rightChangeRequest->getPossibleChangeDateTime() &&
+            $leftChangeRequest->getCertainChangeDateTime() instanceof \DateTimeInterface &&
+            $rightChangeRequest->getPossibleChangeDateTime() instanceof \DateTimeInterface &&
             $leftChangeRequest->getCertainChangeDateTime() > $rightChangeRequest->getPossibleChangeDateTime()
         ) {
             return $leftChangeRequest;
         }
 
         if (
-            $rightChangeRequest->getCertainChangeDateTime() &&
-            $leftChangeRequest->getPossibleChangeDateTime() &&
+            $rightChangeRequest->getCertainChangeDateTime() instanceof \DateTimeInterface &&
+            $leftChangeRequest->getPossibleChangeDateTime() instanceof \DateTimeInterface &&
             $rightChangeRequest->getCertainChangeDateTime() > $leftChangeRequest->getPossibleChangeDateTime()
         ) {
             return $rightChangeRequest;

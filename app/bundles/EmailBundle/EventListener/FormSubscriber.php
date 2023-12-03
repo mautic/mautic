@@ -85,7 +85,7 @@ class FormSubscriber implements EventSubscriberInterface
         $emailId    = isset($properties['useremail']) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
         $email      = $this->emailModel->getEntity($emailId);
 
-        if (null === $email || false === $email->isPublished()) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || false === $email->isPublished()) {
             return;
         }
 

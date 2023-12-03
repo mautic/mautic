@@ -171,7 +171,7 @@ class PointModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new PointEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -222,7 +222,7 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        if (null !== $typeId && MAUTIC_ENV === 'prod' && null !== $this->requestStack->getMainRequest()) {
+        if (null !== $typeId && MAUTIC_ENV === 'prod' && $this->requestStack->getMainRequest() instanceof \Symfony\Component\HttpFoundation\Request) {
             // let's prevent some unnecessary DB calls
             $session         = $this->requestStack->getMainRequest()->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', []);
@@ -240,10 +240,10 @@ class PointModel extends CommonFormModel
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         $hasLeadPointChanges = false;
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $lead = $this->contactTracker->getContact();
 
-            if (null === $lead || !$lead->getId()) {
+            if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
                 return;
             }
         }
@@ -308,7 +308,7 @@ class PointModel extends CommonFormModel
 
                     $pointsChangeLogEntryName = $action->getId().': '.$action->getName();
                     $pointGroup               = $action->getGroup();
-                    if (!empty($pointGroup)) {
+                    if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
                         $this->pointGroupModel->adjustPoints($lead, $pointGroup, $delta);
                     } else {
                         $lead->adjustPoints($delta);

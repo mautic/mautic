@@ -30,7 +30,7 @@ class Allowlist
 
     public function getAllowList(): ?DTOAllowlist
     {
-        if (!empty($this->allowlist)) {
+        if ($this->allowlist instanceof DTOAllowlist) {
             return $this->allowlist;
         }
 

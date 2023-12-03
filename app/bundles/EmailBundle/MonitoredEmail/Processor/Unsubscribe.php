@@ -95,7 +95,7 @@ class Unsubscribe implements ProcessorInterface
 
         $stat    = $searchResult->getStat();
         $channel = 'email';
-        if ($stat && $email = $stat->getEmail()) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && ($email = $stat->getEmail()) instanceof \Mautic\EmailBundle\Entity\Email) {
             // We know the email ID so set it to append to the the DNC record
             $channel = ['email' => $email->getId()];
         }

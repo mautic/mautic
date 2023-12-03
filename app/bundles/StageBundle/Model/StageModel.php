@@ -127,7 +127,7 @@ class StageModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new StageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

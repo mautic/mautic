@@ -93,9 +93,9 @@ class CommonController extends AbstractController implements MauticController
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
+        $request = $this->requestStack instanceof \Symfony\Component\HttpFoundation\RequestStack ? $this->requestStack->getCurrentRequest() : null;
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             throw new \RuntimeException('Request is not set.');
         }
 
@@ -508,7 +508,7 @@ class CommonController extends AbstractController implements MauticController
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
             $page = $pageModel->getEntity($page_404);
-            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug = $pageModel->generateSlug($page);
 
                 return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
@@ -612,7 +612,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getNotificationContent(Request $request = null)
     {
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             $request = $this->getCurrentRequest();
         }
 

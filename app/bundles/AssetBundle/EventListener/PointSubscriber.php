@@ -50,7 +50,7 @@ class PointSubscriber implements EventSubscriberInterface
     {
         $asset = $event->getRecord()->getAsset();
 
-        if (null !== $asset) {
+        if ($asset instanceof \Mautic\AssetBundle\Entity\Asset) {
             $this->pointModel->triggerAction('asset.download', $asset);
         }
     }

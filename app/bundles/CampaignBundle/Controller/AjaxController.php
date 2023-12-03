@@ -134,7 +134,7 @@ class AjaxController extends CommonAjaxController
                                     ['dateTriggered' => 'desc']
                                 );
 
-                if ($log && ($log->getTriggerDate() > new \DateTime())) {
+                if ($log instanceof \Mautic\CampaignBundle\Entity\LeadEventLog && ($log->getTriggerDate() > new \DateTime())) {
                     return $log;
                 }
             }

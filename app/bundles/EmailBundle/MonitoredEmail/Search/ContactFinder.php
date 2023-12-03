@@ -62,7 +62,7 @@ class ContactFinder
         /** @var Stat $stat */
         $stat = $this->statRepository->findOneBy(['trackingHash' => $hash]);
         $this->logger->debug("MONITORED EMAIL: HashId of $hash found in return path");
-        if ($stat && $stat->getLead()) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && $stat->getLead() instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->debug("MONITORED EMAIL: Stat ID {$stat->getId()} found for hash $hash");
             $result->setStat($stat);
         }

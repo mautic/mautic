@@ -174,7 +174,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
 
-        if (null !== $email) {
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
             $this->realTimeExecutioner->execute('email.open', $email, 'email', $email->getId());
         }
     }
@@ -190,7 +190,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
-        if (null !== $email) {
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
             $this->realTimeExecutioner->execute('email.reply', $email, 'email', $email->getId());
         }
     }
@@ -252,7 +252,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 
-        if (!$email || !$email->isPublished()) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || !$email->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
 
             return;

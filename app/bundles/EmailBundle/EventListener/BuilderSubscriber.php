@@ -301,7 +301,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
-        if (empty($lead['id']) && $email) {
+        if (empty($lead['id']) && $email instanceof \Mautic\EmailBundle\Entity\Email) {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));

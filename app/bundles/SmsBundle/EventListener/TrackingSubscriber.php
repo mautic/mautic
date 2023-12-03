@@ -47,7 +47,7 @@ class TrackingSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($stat->getSms() && (int) $stat->getSms()->getId() !== (int) $clickthrough['channel']['sms']) {
+        if ($stat->getSms() instanceof \Mautic\SmsBundle\Entity\Sms && (int) $stat->getSms()->getId() !== (int) $clickthrough['channel']['sms']) {
             // ID mismatch - fishy so use tracked lead
             return;
         }

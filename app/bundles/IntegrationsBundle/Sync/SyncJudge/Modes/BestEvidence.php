@@ -24,7 +24,7 @@ class BestEvidence implements JudgementModeInterface
         } catch (ConflictUnresolvedException $exception) {
         }
 
-        if (null === $leftChangeRequest->getPossibleChangeDateTime() || null === $rightChangeRequest->getPossibleChangeDateTime()) {
+        if (!$leftChangeRequest->getPossibleChangeDateTime() instanceof \DateTimeInterface || !$rightChangeRequest->getPossibleChangeDateTime() instanceof \DateTimeInterface) {
             throw new ConflictUnresolvedException();
         }
 

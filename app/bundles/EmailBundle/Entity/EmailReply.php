@@ -78,7 +78,7 @@ class EmailReply
         $this->id          = Uuid::uuid4()->toString();
         $this->stat        = $stat;
         $this->messageId   = $messageId;
-        $this->dateReplied = (null === $dateReplied) ? new \DateTime() : $dateReplied;
+        $this->dateReplied = ($dateReplied instanceof \DateTime) ? $dateReplied : new \DateTime();
     }
 
     /**

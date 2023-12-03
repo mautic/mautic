@@ -230,7 +230,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('s.notification_id', $notificationIds)
             );
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

@@ -1961,7 +1961,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $logger = $this->logger;
 
         if ($e instanceof ApiErrorException) {
-            if (null === $this->adminUsers) {
+            if (!$this->adminUsers instanceof \Doctrine\ORM\Tools\Pagination\Paginator) {
                 $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
                     [
                         'filter' => [
@@ -1985,7 +1985,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 ]
             );
 
-            if ($contact || $contact = $e->getContact()) {
+            if ($contact instanceof \Mautic\LeadBundle\Entity\Lead || ($contact = $e->getContact()) instanceof \Mautic\LeadBundle\Entity\Lead) {
                 // Append a link to the contact
                 $contactId   = $contact->getId();
                 $contactName = $contact->getPrimaryIdentifier();
@@ -2346,7 +2346,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
-        if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
+        if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity instanceof \Mautic\CoreBundle\Entity\CommonEntity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);

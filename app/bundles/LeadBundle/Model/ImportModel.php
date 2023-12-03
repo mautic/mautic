@@ -365,7 +365,7 @@ class ImportModel extends FormModel
 
             // Release entities in Doctrine's memory to prevent memory leak
             $this->em->detach($eventLog);
-            if (null !== $leadEntity = $eventLog->getLead()) {
+            if (($leadEntity = $eventLog->getLead()) instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $this->em->detach($leadEntity);
 
                 $company        = $leadEntity->getCompany();
@@ -648,7 +648,7 @@ class ImportModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new ImportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

@@ -634,7 +634,7 @@ class LeadController extends FormController
             ],
         ];
         // lead not found
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -833,7 +833,7 @@ class LeadController extends FormController
             ],
         ];
 
-        if (null === $mainLead) {
+        if (!$mainLead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -908,7 +908,7 @@ class LeadController extends FormController
                     $secLeadId = $data['lead_to_merge'];
                     $secLead   = $model->getEntity($secLeadId);
 
-                    if (null === $secLead) {
+                    if (!$secLead instanceof \Mautic\LeadBundle\Entity\Lead) {
                         return $this->postActionRedirect(
                             array_merge(
                                 $postActionVars,
@@ -1001,7 +1001,7 @@ class LeadController extends FormController
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
-        if (null === $lead
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead
             || !$this->security->hasEntityAccess(
                 'lead:leads:editown',
                 'lead:leads:editother',
@@ -1094,7 +1094,7 @@ class LeadController extends FormController
             \assert($model instanceof LeadModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.lead.error.notfound',
@@ -1165,7 +1165,7 @@ class LeadController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.lead.error.notfound',
@@ -1347,7 +1347,7 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
 
-        if (null === $lead
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead
             || !$this->security->hasEntityAccess(
                 'lead:leads:viewown',
                 'lead:leads:viewother',
@@ -2039,7 +2039,7 @@ class LeadController extends FormController
         $lead      = $leadModel->getEntity($contactId);
         $dataType  = $request->get('filetype', 'csv');
 
-        if (empty($lead)) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound();
         }
 

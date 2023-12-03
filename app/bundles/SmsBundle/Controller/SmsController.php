@@ -147,7 +147,7 @@ class SmsController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
 
-        if (null === $sms) {
+        if (!$sms instanceof \Mautic\SmsBundle\Entity\Sms) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
 
@@ -398,7 +398,7 @@ class SmsController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\SmsBundle\Entity\Sms) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -586,7 +586,7 @@ class SmsController extends FormController
             \assert($model instanceof SmsModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\SmsBundle\Entity\Sms) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.sms.error.notfound',
@@ -655,7 +655,7 @@ class SmsController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\SmsBundle\Entity\Sms) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.sms.error.notfound',
@@ -707,7 +707,7 @@ class SmsController extends FormController
         $sms      = $model->getEntity($objectId);
         $security = $this->security;
 
-        if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
+        if ($sms instanceof \Mautic\SmsBundle\Entity\Sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,

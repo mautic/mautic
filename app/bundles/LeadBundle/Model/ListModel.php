@@ -252,7 +252,7 @@ class ListModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new LeadListEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -420,7 +420,7 @@ class ListModel extends FormModel
                     $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
 
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -503,7 +503,7 @@ class ListModel extends FormModel
                     $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 

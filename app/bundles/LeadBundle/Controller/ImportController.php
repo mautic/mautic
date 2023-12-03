@@ -669,7 +669,7 @@ class ImportController extends FormController
     {
         if (!isset($parameters['object'])) {
             $request = $this->getCurrentRequest();
-            \assert(null !== $request);
+            \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
             $parameters['object'] = $request->get('object', 'contacts');
         }
 
@@ -735,7 +735,7 @@ class ImportController extends FormController
     private function dispatchImportOnInit(): ImportInitEvent
     {
         $request = $this->getCurrentRequest();
-        \assert(null !== $request);
+        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
         $event = new ImportInitEvent($request->get('object'));
 
         $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);

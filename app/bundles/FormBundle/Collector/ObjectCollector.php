@@ -21,7 +21,7 @@ final class ObjectCollector implements ObjectCollectorInterface
 
     public function getObjects(): ObjectCollection
     {
-        if (null === $this->objects) {
+        if (!$this->objects instanceof \Mautic\FormBundle\Collection\ObjectCollection) {
             $this->collect();
         }
 

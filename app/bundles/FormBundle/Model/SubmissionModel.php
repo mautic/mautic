@@ -384,7 +384,7 @@ class SubmissionModel extends CommonFormModel
         $lead = $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
@@ -408,7 +408,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice ? $trackedDevice->getTrackingId() : null);
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -1180,7 +1180,7 @@ class SubmissionModel extends CommonFormModel
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
-            if (null !== $companyChangeLog) {
+            if ($companyChangeLog instanceof \Mautic\LeadBundle\Entity\CompanyChangeLog) {
                 $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         }

@@ -289,7 +289,7 @@ class ContactSegmentQueryBuilder
     private function getSegmentEdges($segmentId)
     {
         $segment = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\LeadList::class)->find($segmentId);
-        if (null === $segment) {
+        if (!$segment instanceof \Mautic\LeadBundle\Entity\LeadList) {
             return [];
         }
 

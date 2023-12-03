@@ -614,7 +614,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new CompanyEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -759,7 +759,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
         }
 
@@ -928,11 +928,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             ->setDateModified(new \DateTime());
         $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
 
-        if (null !== $newPrimaryCompany) {
+        if ($newPrimaryCompany instanceof \Mautic\LeadBundle\Entity\Company) {
             $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);
         }
 
-        if (null !== $companyLead) {
+        if ($companyLead instanceof \Mautic\LeadBundle\Entity\CompanyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
         }
     }

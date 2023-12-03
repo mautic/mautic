@@ -181,14 +181,14 @@ class EventScheduler
      */
     public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
     {
-        if (null === $compareFromDateTime) {
+        if (!$compareFromDateTime instanceof \DateTimeInterface) {
             $compareFromDateTime = new \DateTime();
         } else {
             // Prevent comparisons from modifying original object
             $compareFromDateTime = clone $compareFromDateTime;
         }
 
-        if (null === $comparedToDateTime) {
+        if (!$comparedToDateTime instanceof \DateTime) {
             $comparedToDateTime = clone $compareFromDateTime;
         } else {
             // Prevent comparisons from modifying original object

@@ -101,7 +101,7 @@ class PointGroupModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new Events\GroupEvent($entity);
             }
             $this->dispatcher->dispatch($event, $name);
@@ -116,7 +116,7 @@ class PointGroupModel extends CommonFormModel
     {
         $contactScore = $contact->getGroupScore($group);
 
-        if (empty($contactScore)) {
+        if (!$contactScore instanceof \Mautic\PointBundle\Entity\GroupContactScore) {
             $contactScore = new GroupContactScore();
             $contactScore->setContact($contact);
             $contactScore->setGroup($group);

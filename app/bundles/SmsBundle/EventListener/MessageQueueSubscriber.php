@@ -47,7 +47,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
 
         /** @var MessageQueue $message */
         foreach ($messages as $message) {
-            if ($sms && $message->getLead() && $sms->isPublished()) {
+            if ($sms instanceof \Mautic\SmsBundle\Entity\Sms && $message->getLead() instanceof \Mautic\LeadBundle\Entity\Lead && $sms->isPublished()) {
                 $contact = $message->getLead();
                 $mobile  = $contact->getMobile();
                 $phone   = $contact->getPhone();

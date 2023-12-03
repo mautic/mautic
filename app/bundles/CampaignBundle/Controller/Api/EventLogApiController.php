@@ -164,7 +164,7 @@ class EventLogApiController extends FetchCommonApiController
         $eventModel = $this->getModel('campaign.event');
         /** @var Event $event */
         $event = $eventModel->getEntity($eventId);
-        if (null === $event || !$event->getId()) {
+        if (!$event instanceof \Mautic\CampaignBundle\Entity\Event || !$event->getId()) {
             return $this->notFound();
         }
 

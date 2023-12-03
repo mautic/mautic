@@ -46,7 +46,7 @@ class Widget
         /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);
 
-        if (null === $widget || !$widget->getId()) {
+        if (!$widget instanceof \Mautic\DashboardBundle\Entity\Widget || !$widget->getId()) {
             throw new NotFoundHttpException('Not found.');
         }
 

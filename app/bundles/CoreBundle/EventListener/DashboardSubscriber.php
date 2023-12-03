@@ -103,7 +103,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
 
                     $routeName = 'mautic_'.$log['bundle'].'_action';
-                    if (null !== $item && null !== $this->router->getRouteCollection()->get($routeName)) {
+                    if (null !== $item && $this->router->getRouteCollection()->get($routeName) instanceof \Symfony\Component\Routing\Route) {
                         $log['route'] = $this->router->generate(
                             $routeName,
                             ['objectAction' => 'view', 'objectId' => $log['objectId']]

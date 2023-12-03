@@ -42,7 +42,7 @@ class EmailGraphStatsController extends AbstractController
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if (null === $email || !$security->hasEntityAccess(
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || !$security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()

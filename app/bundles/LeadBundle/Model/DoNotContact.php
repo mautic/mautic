@@ -80,7 +80,7 @@ class DoNotContact implements MauticModelInterface
         $dnc     = null;
         $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             // Contact not found, nothing to do
             return false;
         }
@@ -114,7 +114,7 @@ class DoNotContact implements MauticModelInterface
             }
         }
 
-        if (null !== $dnc && $persist) {
+        if ($dnc instanceof \Mautic\LeadBundle\Entity\DoNotContact && $persist) {
             // Use model saveEntity to trigger events for DNC change
             $this->leadModel->saveEntity($contact);
             $this->dncRepo->detachEntities($dncEntities->toArray());

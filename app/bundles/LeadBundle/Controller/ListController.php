@@ -659,7 +659,7 @@ class ListController extends FormController
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
-            if (null === $lead) {
+            if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.lead.error.notfound',
@@ -669,7 +669,7 @@ class ListController extends FormController
                 'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
-            } elseif (null === $list) {
+            } elseif (!$list instanceof \Mautic\LeadBundle\Entity\LeadList) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.list.error.notfound',
@@ -735,7 +735,7 @@ class ListController extends FormController
             $filters = [];
         }
 
-        if (null === $list) {
+        if (!$list instanceof \Mautic\LeadBundle\Entity\LeadList) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
@@ -847,7 +847,7 @@ class ListController extends FormController
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $request = $this->getCurrentRequest();
-        \assert(null !== $request);
+        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
         $session        = $request->getSession();
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
         $updatedFilters = $request->get('filters', false);
@@ -910,7 +910,7 @@ class ListController extends FormController
         $this->listFilters = $listFilters;
 
         $request = $this->getCurrentRequest();
-        \assert(null !== $request);
+        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
 
         return parent::getIndexItems(
             $start,

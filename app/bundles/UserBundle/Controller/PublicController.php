@@ -32,7 +32,7 @@ class PublicController extends FormController
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
                 try {
-                    if (null !== $user) {
+                    if ($user instanceof \Mautic\UserBundle\Entity\User) {
                         $model->sendResetEmail($user);
                     }
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');

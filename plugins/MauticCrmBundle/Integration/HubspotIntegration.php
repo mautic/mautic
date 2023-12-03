@@ -431,9 +431,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                         if (is_array($contact)) {
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
-                            if ($contact && !$contact->isNewlyCreated()) { // updated
+                            if ($contact instanceof \Mautic\LeadBundle\Entity\Lead && !$contact->isNewlyCreated()) { // updated
                                 $executed[0] = $executed[0] + 1;
-                            } elseif ($contact && $contact->isNewlyCreated()) { // newly created
+                            } elseif ($contact instanceof \Mautic\LeadBundle\Entity\Lead && $contact->isNewlyCreated()) { // newly created
                                 $executed[1] = $executed[1] + 1;
                             }
 

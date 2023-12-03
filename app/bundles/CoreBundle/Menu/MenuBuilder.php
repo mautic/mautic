@@ -74,7 +74,7 @@ class MenuBuilder
                     return $item;
                 }
 
-                if ($item->getChildren() && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
+                if ($item->getChildren() && ($current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) instanceof \Knp\Menu\ItemInterface) {
                     return $current_child;
                 }
             }

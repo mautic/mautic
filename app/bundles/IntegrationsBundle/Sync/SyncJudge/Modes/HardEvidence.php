@@ -19,7 +19,7 @@ class HardEvidence implements JudgementModeInterface
         InformationChangeRequestDAO $leftChangeRequest,
         InformationChangeRequestDAO $rightChangeRequest
     ): InformationChangeRequestDAO {
-        if (null === $leftChangeRequest->getCertainChangeDateTime() || null === $rightChangeRequest->getCertainChangeDateTime()) {
+        if (!$leftChangeRequest->getCertainChangeDateTime() instanceof \DateTimeInterface || !$rightChangeRequest->getCertainChangeDateTime() instanceof \DateTimeInterface) {
             throw new ConflictUnresolvedException();
         }
 

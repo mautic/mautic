@@ -84,7 +84,7 @@ class CampaignApiController extends CommonApiController
     public function addLeadAction($id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
+        if ($entity instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
@@ -117,7 +117,7 @@ class CampaignApiController extends CommonApiController
     public function removeLeadAction($id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
+        if ($entity instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             $lead = $this->checkLeadAccess($leadId, 'edit');
             if ($lead instanceof Response) {
                 return $lead;
@@ -264,7 +264,7 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             return $this->notFound();
         }
 
@@ -309,7 +309,7 @@ class CampaignApiController extends CommonApiController
         }
 
         $original = $this->model->getEntity($campaignId);
-        if (empty($original)) {
+        if (!$original instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             return $this->notFound();
         }
         $entity = clone $original;

@@ -50,7 +50,7 @@ class ClientModel extends FormModel
             return $this->apiMode;
         }
 
-        if (null !== $request = $this->requestStack->getCurrentRequest()) {
+        if (($request = $this->requestStack->getCurrentRequest()) instanceof \Symfony\Component\HttpFoundation\Request) {
             return $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', self::DEFAULT_API_MODE));
         }
 
@@ -129,7 +129,7 @@ class ClientModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new ClientEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

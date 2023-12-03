@@ -230,7 +230,7 @@ class LeadEventLog implements ChannelInterface
     public function setDateTriggered(\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
-        if (null !== $dateTriggered) {
+        if ($dateTriggered instanceof \DateTimeInterface) {
             $this->setIsScheduled(false);
         }
 
@@ -531,7 +531,7 @@ class LeadEventLog implements ChannelInterface
     {
         $log = $this->getFailedLog();
 
-        return !empty($log);
+        return $log instanceof \Mautic\CampaignBundle\Entity\FailedLeadEventLog;
     }
 
     /**

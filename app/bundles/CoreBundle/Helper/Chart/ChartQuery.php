@@ -139,7 +139,7 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
-            if ($this->dateFrom && $this->dateTo) {
+            if ($this->dateFrom instanceof \DateTimeInterface && $this->dateTo instanceof \DateTimeInterface) {
                 // Between is faster so if we know both dates...
                 /** @var \DateTime $dateFrom */
                 $dateFrom = clone $this->dateFrom;

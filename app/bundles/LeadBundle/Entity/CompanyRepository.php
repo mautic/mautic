@@ -451,7 +451,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
-        if (null !== $expr && $expr->count()) {
+        if ($expr instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression && $expr->count()) {
             $q->where($expr);
         }
 

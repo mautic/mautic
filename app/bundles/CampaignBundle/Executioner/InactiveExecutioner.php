@@ -243,7 +243,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts && $contacts->count()) {
+                while ($contacts instanceof \Doctrine\Common\Collections\ArrayCollection && $contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 

@@ -155,7 +155,7 @@ class ClientController extends FormController
 
             $client = $model->getEntity($clientId);
 
-            if (null === $client) {
+            if (!$client instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -316,7 +316,7 @@ class ClientController extends FormController
         ];
 
         // client not found
-        if (null === $client) {
+        if (!$client instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -425,7 +425,7 @@ class ClientController extends FormController
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model  = $this->clientModel;
             $entity = $model->getEntity($objectId);
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',

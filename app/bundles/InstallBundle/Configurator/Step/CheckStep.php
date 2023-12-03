@@ -75,7 +75,7 @@ class CheckStep implements StepInterface
 
         $this->configIsWritable = $configurator->isFileWritable();
         $this->projectDir       = $projectDir;
-        if (!empty($request)) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
         $this->openSSLCipher    = $openSSLCipher;

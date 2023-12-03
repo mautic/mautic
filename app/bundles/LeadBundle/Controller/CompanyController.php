@@ -351,7 +351,7 @@ class CompanyController extends FormController
         ];
 
         // form not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\LeadBundle\Entity\Company) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -706,7 +706,7 @@ class CompanyController extends FormController
             \assert($model instanceof CompanyModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\LeadBundle\Entity\Company) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.company.error.notfound',
@@ -771,7 +771,7 @@ class CompanyController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\LeadBundle\Entity\Company) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.company.error.notfound',
@@ -844,7 +844,7 @@ class CompanyController extends FormController
             ],
         ];
 
-        if (null === $secondaryCompany) {
+        if (!$secondaryCompany instanceof \Mautic\LeadBundle\Entity\Company) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -880,7 +880,7 @@ class CompanyController extends FormController
                     $primaryMergeId = $data['company_to_merge'];
                     $primaryCompany = $model->getEntity($primaryMergeId);
 
-                    if (null === $primaryCompany) {
+                    if (!$primaryCompany instanceof \Mautic\LeadBundle\Entity\Company) {
                         return $this->postActionRedirect(
                             array_merge(
                                 $postActionVars,
@@ -984,7 +984,7 @@ class CompanyController extends FormController
         $company       = $companyModel->getEntity($companyId);
         $dataType      = $request->get('filetype', 'csv');
 
-        if (empty($company)) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return $this->notFound();
         }
 

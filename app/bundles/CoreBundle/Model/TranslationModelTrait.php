@@ -61,7 +61,7 @@ trait TranslationModelTrait
             }
 
             // Check request for language
-            if (null !== $request) {
+            if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
                 $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
                 if (!empty($browserLanguages)) {
                     $browserLanguages = explode(',', $browserLanguages);

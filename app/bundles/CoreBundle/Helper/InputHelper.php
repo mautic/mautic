@@ -58,7 +58,7 @@ class InputHelper
      */
     private static function getFilter($html = false, $strict = false)
     {
-        if (empty(self::$htmlFilter)) {
+        if (!self::$htmlFilter instanceof \Joomla\Filter\InputFilter) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
             self::$htmlFilter->tagBlacklist = [
@@ -516,7 +516,7 @@ class InputHelper
     public static function transliterate($value)
     {
         $transId = 'Any-Latin; Latin-ASCII';
-        if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
+        if (function_exists('transliterator_transliterate') && ($trans = \Transliterator::create($transId)) instanceof \Transliterator) {
             // Use intl by default
             return $trans->transliterate($value);
         }

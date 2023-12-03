@@ -32,7 +32,7 @@ class HitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
         // If we know the lead, use that to determine uniqueness
-        if (null !== $lead && $lead->getId()) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $lead->getId()) {
             $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
         } else {
             $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
@@ -293,7 +293,7 @@ class HitRepository extends CommonRepository
             $q->expr()->isNull('h.date_left')
         );
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt   = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
             $expr = $expr->with(

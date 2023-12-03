@@ -106,7 +106,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        if (!$this->adapter || !$this->fileSystem) {
+        if (!$this->adapter instanceof \Gaufrette\Adapter || !$this->fileSystem instanceof \Gaufrette\Extras\Resolvable\ResolvableFilesystem) {
             $keys = $this->getDecryptedApiKeys();
 
             $s3Args = [

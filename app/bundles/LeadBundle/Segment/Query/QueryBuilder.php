@@ -393,7 +393,7 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function createQueryBuilder(Connection $connection = null): QueryBuilder
     {
-        if (null === $connection) {
+        if (!$connection instanceof \Doctrine\DBAL\Connection) {
             $connection = $this->connection;
         }
 

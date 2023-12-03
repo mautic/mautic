@@ -201,7 +201,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new NotificationEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

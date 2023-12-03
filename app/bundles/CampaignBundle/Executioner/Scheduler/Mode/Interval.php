@@ -170,8 +170,8 @@ class Interval implements ScheduleModeInterface
 
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
-        return null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+        return !$event->getTriggerHour() instanceof \DateTimeInterface &&
+            (!$event->getTriggerRestrictedStartHour() instanceof \DateTimeInterface || !$event->getTriggerRestrictedStopHour() instanceof \DateTimeInterface) &&
             empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
@@ -196,7 +196,7 @@ class Interval implements ScheduleModeInterface
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour of %s', $eventId, $contact->getId(), $hour->format('H:i e'))
             );
             $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $eventId, $compareFromDateTime);
-        } elseif ($startTime && $endTime) {
+        } elseif ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
             $this->logger->debug(
                 sprintf(
                     'CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour range of %s to %s',

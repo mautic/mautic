@@ -229,7 +229,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return ($this->getOwner() instanceof \Mautic\UserBundle\Entity\User) ? $this->getOwner() : $this->getCreatedBy();
     }
 
     /**

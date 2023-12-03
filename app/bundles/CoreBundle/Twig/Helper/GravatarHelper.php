@@ -51,7 +51,7 @@ final class GravatarHelper
     {
         $request      = $this->requestStack->getCurrentRequest();
         $localDefault = ($this->devMode
-            || ($request
+            || ($request instanceof \Symfony\Component\HttpFoundation\Request
                 && in_array(
                     $request->getClientIp(),
                     array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1'])

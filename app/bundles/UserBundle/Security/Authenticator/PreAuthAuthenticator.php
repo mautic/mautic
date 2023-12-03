@@ -107,7 +107,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                 }
             }
 
-            if (!$authenticated && empty($response)) {
+            if (!$authenticated && !$response instanceof \Symfony\Component\HttpFoundation\Response) {
                 throw new AuthenticationException('mautic.user.auth.error.invalidlogin');
             }
         }

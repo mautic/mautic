@@ -51,7 +51,7 @@ class SendEmailToUser
 
         $email = $this->emailModel->getEntity($emailToUserAccessor->getEmailID());
 
-        if (!$email || !$email->isPublished()) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || !$email->isPublished()) {
             throw new EmailCouldNotBeSentException('Email not found or published');
         }
 

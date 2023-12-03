@@ -351,7 +351,7 @@ trait FilterTrait
             );
         } else {
             foreach ($customOptions['constraints'] as $i => $constraint) {
-                if ('NotBlank' === get_class($constraint)) {
+                if ($constraint instanceof \NotBlank) {
                     array_splice($customOptions['constraints'], $i, 1);
                 }
             }

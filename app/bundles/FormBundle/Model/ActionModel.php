@@ -57,7 +57,7 @@ class ActionModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        if (empty($options['formId']) && null !== $entity->getForm()) {
+        if (empty($options['formId']) && $entity->getForm() instanceof \Mautic\FormBundle\Entity\Form) {
             $options['formId'] = $entity->getForm()->getId();
         }
 

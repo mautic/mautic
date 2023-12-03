@@ -113,7 +113,7 @@ class EmailSubscriber implements EventSubscriberInterface
         if (isset($leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
-            if (null !== $stat) {
+            if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
                     '%subject%' => EmojiHelper::toShort($message->getSubject()),
                 ]);
@@ -132,7 +132,7 @@ class EmailSubscriber implements EventSubscriberInterface
 
         if (isset($leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($leadIdHash);
-            if (null !== $stat) {
+            if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();

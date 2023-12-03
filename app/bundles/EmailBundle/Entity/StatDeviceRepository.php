@@ -32,14 +32,14 @@ class StatDeviceRepository extends CommonRepository
 
         $qb->groupBy('es.list_id, d.device');
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $qb->andWhere(
                 $qb->expr()->gte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
-        if (null !== $toDate) {
+        if ($toDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($toDate);
             $qb->andWhere(

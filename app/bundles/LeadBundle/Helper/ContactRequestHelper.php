@@ -132,7 +132,7 @@ class ContactRequestHelper
                 true
             );
 
-            if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
+            if ($this->trackedContact instanceof \Mautic\LeadBundle\Entity\Lead && $this->trackedContact->getId() && $foundContact->getId()) {
                 try {
                     $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
                 } catch (SameContactException $exception) {
@@ -178,7 +178,7 @@ class ContactRequestHelper
             return;
         }
 
-        if (empty($clickthrough['lead']) || !$foundContact = $this->leadModel->getEntity($clickthrough['lead'])) {
+        if (empty($clickthrough['lead']) || !($foundContact = $this->leadModel->getEntity($clickthrough['lead'])) instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -230,7 +230,7 @@ class ContactRequestHelper
      */
     private function mergeWithTrackedContact(Lead $foundContact)
     {
-        if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
+        if ($this->trackedContact instanceof \Mautic\LeadBundle\Entity\Lead && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {
                 return $this->contactMerger->merge($this->trackedContact, $foundContact);
             } catch (SameContactException $exception) {

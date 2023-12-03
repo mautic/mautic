@@ -832,7 +832,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        if (null !== $event && !$event instanceof LeadFieldEvent) {
+        if ($event instanceof \Symfony\Contracts\EventDispatcher\Event && !$event instanceof LeadFieldEvent) {
             throw new \RuntimeException('Event should be LeadFieldEvent|null.');
         }
 

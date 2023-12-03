@@ -981,7 +981,7 @@ class Event implements ChannelInterface
      */
     public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
     {
-        if (empty($triggerRestrictedStartHour)) {
+        if (!$triggerRestrictedStartHour instanceof \DateTime) {
             $triggerRestrictedStartHour = null;
         } elseif (!$triggerRestrictedStartHour instanceof \DateTime) {
             $triggerRestrictedStartHour = new \DateTime($triggerRestrictedStartHour);
@@ -1013,7 +1013,7 @@ class Event implements ChannelInterface
      */
     public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
     {
-        if (empty($triggerRestrictedStopHour)) {
+        if (!$triggerRestrictedStopHour instanceof \DateTime) {
             $triggerRestrictedStopHour = null;
         } elseif (!$triggerRestrictedStopHour instanceof \DateTime) {
             $triggerRestrictedStopHour = new \DateTime($triggerRestrictedStopHour);

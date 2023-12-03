@@ -215,7 +215,7 @@ class ReportModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new ReportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -584,7 +584,7 @@ class ReportModel extends FormModel
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
             if (!empty($selectedGraphs)) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
-                if (empty($query)) {
+                if (!$query instanceof \Doctrine\DBAL\Query\QueryBuilder) {
                     $query = $reportGenerator->getQuery();
                 }
 

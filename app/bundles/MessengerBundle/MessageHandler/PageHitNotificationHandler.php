@@ -74,7 +74,7 @@ class PageHitNotificationHandler implements MessageHandlerInterface
         }
 
         //  Lead IS mandatory field
-        if (null === $lead = $this->leadRepository->find($message->getLeadId())) {
+        if (!($lead = $this->leadRepository->find($message->getLeadId())) instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->error('Invalid lead id #'.$message->getLeadId(), ['message' => $message]);
 
             throw new InvalidPayloadException('Invalid lead id', (array) $message);

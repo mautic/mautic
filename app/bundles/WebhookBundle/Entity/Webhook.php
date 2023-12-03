@@ -497,7 +497,7 @@ class Webhook extends FormEntity
     {
         $dateModified = $this->getDateModified();
 
-        if (null === $dateModified) {
+        if (!$dateModified instanceof \DateTimeInterface) {
             return false;
         }
 

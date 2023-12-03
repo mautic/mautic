@@ -306,7 +306,7 @@ class MailHelper
         $ownerSignature = false;
         if (!$isQueueFlush) {
             $emailToSend = $this->getEmail();
-            if (!empty($emailToSend)) {
+            if ($emailToSend instanceof \Mautic\EmailBundle\Entity\Email) {
                 if ($emailToSend->getUseOwnerAsMailer()) {
                     $owner = $this->getContactOwner($this->lead);
                     if (!empty($owner)) {
@@ -550,7 +550,7 @@ class MailHelper
 
                 $email = $this->getEmail();
 
-                if (!empty($email)) {
+                if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
                     if ($email->getUseOwnerAsMailer() && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
                     } elseif (!empty($email->getFromAddress())) {
@@ -1383,7 +1383,7 @@ class MailHelper
 
         // Personal and transactional emails do not contain unsubscribe header
         $email = $this->getEmail();
-        if (empty($email) || self::EMAIL_TYPE_TRANSACTIONAL === $this->getEmailType()) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || self::EMAIL_TYPE_TRANSACTIONAL === $this->getEmailType()) {
             return $headers;
         }
 
@@ -1768,7 +1768,7 @@ class MailHelper
         $emailModel = $this->factory->getModel('email');
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
-        $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
+        $id = ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
             $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
@@ -1919,7 +1919,7 @@ class MailHelper
         $owner = false;
         $email = $this->getEmail();
 
-        if (!empty($email)) {
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
             if ($email->getUseOwnerAsMailer() && is_array($contact) && isset($contact['id'])) {
                 if (!isset($contact['owner_id'])) {
                     $contact['owner_id'] = 0;
@@ -2003,13 +2003,13 @@ class MailHelper
         return [
             'name'        => $name,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'emailId'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getId() : null,
+            'emailName'   => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
+            'utmTags'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getUtmTags() : [],
         ];
     }
 

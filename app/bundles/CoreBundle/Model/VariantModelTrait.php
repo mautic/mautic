@@ -149,7 +149,7 @@ trait VariantModelTrait
                 $relatedIds[] = $entity->getId();
             }
 
-            if (null === $variantStartDate) {
+            if (!$variantStartDate instanceof \DateTime) {
                 $variantStartDate = new \DateTime();
             }
 

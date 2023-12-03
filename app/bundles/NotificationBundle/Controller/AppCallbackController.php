@@ -24,7 +24,7 @@ class AppCallbackController extends CommonController
         /** @var Lead $contact */
         $contact = $contactRepo->findOneBy($matchData);
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             $contact = new Lead();
             $contact->setEmail($requestBody['email']);
             $contact->setLastActive(new \DateTime());

@@ -45,7 +45,7 @@ class ScheduleController extends CommonAjaxController
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
-        if (empty($report)) {
+        if (!$report instanceof \Mautic\ReportBundle\Entity\Report) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash();

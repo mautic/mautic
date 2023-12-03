@@ -56,7 +56,7 @@ class AjaxController extends CommonAjaxController
         $pending  = $request->request->get('pending', 0);
         $limit    = $request->request->get('batchlimit', 100);
 
-        if ($objectId && $entity = $model->getEntity($objectId)) {
+        if ($objectId && ($entity = $model->getEntity($objectId)) instanceof \Mautic\EmailBundle\Entity\Email) {
             $dataArray['success'] = 1;
             $session              = $request->getSession();
             $progress             = $session->get('mautic.email.send.progress', [0, (int) $pending]);
@@ -268,7 +268,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('email');
 
             $email = $model->getEntity($emailId);
-            if (null === $email) {
+            if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
@@ -291,7 +291,7 @@ class AjaxController extends CommonAjaxController
         $emailId     = (int) $request->query->get('id');
         $email       = $model->getEntity($emailId);
 
-        if (null === $email) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->sendJsonResponse([
                 'message' => $this->translator->trans('mautic.api.call.notfound'),
             ], 404);

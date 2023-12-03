@@ -24,7 +24,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
         $entity = $model->getEntityBySlugs($slug);
 
-        if (!empty($entity)) {
+        if ($entity instanceof \Mautic\AssetBundle\Entity\Asset) {
             $published = $entity->isPublished();
 
             // make sure the asset is published or deny access if not

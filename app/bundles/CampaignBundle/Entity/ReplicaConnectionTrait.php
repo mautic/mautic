@@ -23,7 +23,7 @@ trait ReplicaConnectionTrait
         $connection = $this->getEntityManager()->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
             if (
-                !$limiter
+                !$limiter instanceof \Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter
                 || !($limiter->getContactId() || $limiter->getContactIdList())
             ) {
                 $connection->ensureConnectedToReplica();

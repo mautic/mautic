@@ -204,7 +204,7 @@ class ResultController extends CommonFormController
         $results     = $submission->getResults();
         $fieldEntity = $submission->getFieldByAlias($field);
 
-        if (empty($results[$field]) || null === $fieldEntity) {
+        if (empty($results[$field]) || !$fieldEntity instanceof \Mautic\FormBundle\Entity\Field) {
             throw $this->createNotFoundException();
         }
 

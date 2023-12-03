@@ -297,7 +297,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new MessageEvent($entity, $isNew);
             }
             $this->dispatcher->dispatch($event, $name);

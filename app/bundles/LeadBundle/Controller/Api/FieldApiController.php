@@ -43,7 +43,7 @@ class FieldApiController extends CommonApiController
         $fieldModel = $modelFactory->getModel('lead.field');
         \assert($fieldModel instanceof FieldModel);
         $request = $requestStack->getCurrentRequest();
-        \assert(null !== $request);
+        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
 
         $this->model           = $fieldModel;
         $this->fieldObject     = $request->get('object');

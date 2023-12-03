@@ -210,7 +210,7 @@ class ObjectChangeDAO
      */
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)
     {
-        if (null === $changeDateTime) {
+        if (!$changeDateTime instanceof \DateTimeInterface) {
             $changeDateTime = new \DateTime();
         }
 

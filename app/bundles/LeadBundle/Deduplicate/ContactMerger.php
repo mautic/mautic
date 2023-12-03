@@ -194,7 +194,7 @@ class ContactMerger
         $oldOwner = $winner->getOwner();
         $newOwner = $loser->getOwner();
 
-        if (null === $oldOwner && null !== $newOwner) {
+        if (!$oldOwner instanceof \Mautic\UserBundle\Entity\User && $newOwner instanceof \Mautic\UserBundle\Entity\User) {
             $winner->setOwner($newOwner);
 
             $this->logger->debug("CONTACT: New owner of {$winner->getId()} is {$newOwner->getId()}");

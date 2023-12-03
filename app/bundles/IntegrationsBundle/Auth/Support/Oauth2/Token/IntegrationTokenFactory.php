@@ -29,7 +29,7 @@ class IntegrationTokenFactory implements TokenFactoryInterface
         // Read "refresh_token" attribute
         if (isset($data['refresh_token'])) {
             $refreshToken = $data['refresh_token'];
-        } elseif (null !== $previousToken) {
+        } elseif ($previousToken instanceof \kamermans\OAuth2\Token\TokenInterface) {
             // When requesting a new access token with a refresh token, the
             // server may not resend a new refresh token. In that case we
             // should keep the previous refresh token as valid.

@@ -250,7 +250,7 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -351,7 +351,7 @@ class DynamicContentController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.dynamicContent.page', 1);
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
 
@@ -485,7 +485,7 @@ class DynamicContentController extends FormController
             \assert($model instanceof DynamicContentModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.dynamicContent.error.notfound',
@@ -551,7 +551,7 @@ class DynamicContentController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.dynamicContent.error.notfound',

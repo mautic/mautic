@@ -195,7 +195,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $emailId = (int) $event->getString();
         /** @var Email $email */
         $email = $this->emailRepository->getEntity($emailId);
-        if (null !== $email) {
+        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
             $variantIds = $email->getRelatedEntityIds();
             $nq         = $this->emailRepository->getEmailPendingQuery($emailId, $variantIds);
             if (!$nq instanceof QueryBuilder) {

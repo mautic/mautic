@@ -62,7 +62,7 @@ class SyncDateHelper
             return $this->lastObjectSyncDates[$key];
         }
 
-        if (MauticSyncDataExchange::NAME !== $integration && $lastSync = $this->getLastSyncDateForObject($integration, $object)) {
+        if (MauticSyncDataExchange::NAME !== $integration && ($lastSync = $this->getLastSyncDateForObject($integration, $object)) instanceof \DateTimeImmutable) {
             // Use the latest sync date recorded
             $this->lastObjectSyncDates[$key] = $lastSync;
         } else {
@@ -113,7 +113,7 @@ class SyncDateHelper
         $lastSync = new \DateTimeImmutable($result, new \DateTimeZone('UTC'));
 
         // The last sync is out of the requested sync date/time range
-        if ($this->syncFromDateTime && $lastSync < $this->syncFromDateTime) {
+        if ($this->syncFromDateTime instanceof \DateTimeInterface && $lastSync < $this->syncFromDateTime) {
             return null;
         }
 

@@ -21,7 +21,7 @@ class UTCDateTimeType extends DateTimeType
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if (null === $value) {
+        if (!$value instanceof \DateTime) {
             return null;
         }
 

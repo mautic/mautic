@@ -53,7 +53,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $asset = $event->getRecord()->getAsset();
 
-        if (null !== $asset) {
+        if ($asset instanceof \Mautic\AssetBundle\Entity\Asset) {
             $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }

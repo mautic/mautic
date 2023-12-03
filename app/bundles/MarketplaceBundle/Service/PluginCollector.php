@@ -31,7 +31,7 @@ class PluginCollector
     {
         $allowlist = $this->allowlist->getAllowList();
 
-        if (!empty($allowlist)) {
+        if ($allowlist instanceof \Mautic\MarketplaceBundle\DTO\Allowlist) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
             $payload                   = $this->getAllowlistedPackages($page, $limit);
         } else {

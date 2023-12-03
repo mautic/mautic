@@ -27,7 +27,7 @@ class Collector
      */
     public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, FetchOptions $fetchOptions = null)
     {
-        if (null === $fetchOptions) {
+        if (!$fetchOptions instanceof \Mautic\StatsBundle\Event\Options\FetchOptions) {
             $fetchOptions = new FetchOptions();
         }
 

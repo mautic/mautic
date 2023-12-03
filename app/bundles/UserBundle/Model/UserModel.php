@@ -208,7 +208,7 @@ class UserModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new UserEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

@@ -159,7 +159,7 @@ class LeadTimelineEvent extends Event
     {
         if ($this->countOnly) {
             // BC support for old format
-            if ($this->groupUnit && $this->chartQuery) {
+            if ($this->groupUnit && $this->chartQuery instanceof \Mautic\CoreBundle\Helper\Chart\ChartQuery) {
                 $countData = [
                     [
                         'date'  => $data['timestamp'],

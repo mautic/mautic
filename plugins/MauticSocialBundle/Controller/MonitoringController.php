@@ -254,7 +254,7 @@ class MonitoringController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -398,7 +398,7 @@ class MonitoringController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details';
 
-        if (null === $monitoringEntity) {
+        if (!$monitoringEntity instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_social_index', ['page' => $page]);
 
@@ -511,7 +511,7 @@ class MonitoringController extends FormController
             $model  = $this->getModel('social.monitoring');
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.social.monitoring.error.notfound',
@@ -584,7 +584,7 @@ class MonitoringController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.social.monitoring.error.notfound',

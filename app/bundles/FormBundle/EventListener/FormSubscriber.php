@@ -148,7 +148,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = null !== $lead ? $lead->getEmail() : null;
+        $leadEmail = $lead instanceof \Mautic\LeadBundle\Entity\Lead ? $lead->getEmail() : null;
         $ccEmails  = $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
@@ -189,8 +189,8 @@ class FormSubscriber implements EventSubscriberInterface
             $this->mailer->send(true);
         }
 
-        $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
+        $owner = $lead instanceof \Mautic\LeadBundle\Entity\Lead ? $lead->getOwner() : null;
+        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && $owner instanceof \Mautic\UserBundle\Entity\User) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 

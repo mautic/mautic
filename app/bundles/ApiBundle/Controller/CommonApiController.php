@@ -505,7 +505,7 @@ class CommonApiController extends FetchCommonApiController
             $headers = [];
             // return the newly created entities location if applicable
             if (in_array($statusCode, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED])) {
-                $route = (null !== $this->router->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
+                $route = ($this->router->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone') instanceof \Symfony\Component\Routing\Route)
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
                     $route,
@@ -566,7 +566,7 @@ class CommonApiController extends FetchCommonApiController
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
-            if (null === $category) {
+            if (!$category instanceof \Mautic\CategoryBundle\Entity\Category) {
                 throw new \UnexpectedValueException("Category $categoryId does not exist");
             }
 

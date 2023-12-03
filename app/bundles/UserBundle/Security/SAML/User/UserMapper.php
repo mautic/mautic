@@ -74,7 +74,7 @@ class UserMapper implements UsernameMapperInterface
 
             foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                 $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
-                if ($attribute && $attribute->getFirstAttributeValue()) {
+                if ($attribute instanceof \LightSaml\Model\Assertion\Attribute && $attribute->getFirstAttributeValue()) {
                     $attributes[$key] = $attribute->getFirstAttributeValue();
                 }
             }

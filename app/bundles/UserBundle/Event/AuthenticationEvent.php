@@ -189,7 +189,7 @@ class AuthenticationEvent extends Event
         $this->authenticatingService = $service;
         $this->isAuthenticated       = true;
 
-        if (null !== $user) {
+        if ($user instanceof \Mautic\UserBundle\Entity\User) {
             $this->setUser($user, $createIfNotExists);
         }
 

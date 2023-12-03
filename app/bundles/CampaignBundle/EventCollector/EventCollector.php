@@ -48,7 +48,7 @@ class EventCollector
             $this->buildEventList();
         }
 
-        if (empty($this->events)) {
+        if (!$this->events instanceof \Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor) {
             $this->events = new EventAccessor($this->eventsArray);
         }
 

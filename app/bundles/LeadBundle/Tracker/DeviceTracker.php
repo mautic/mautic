@@ -60,7 +60,7 @@ class DeviceTracker
 
         if ( // Do not create a new device if
             // ... the device is new
-            $trackedDevice && $trackedDevice->getId()
+            $trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice && $trackedDevice->getId()
             && // ... the device is the same
             $trackedDevice->getSignature() === $currentDevice->getSignature()
             && // ... the contact given is the same as the owner of the device tracked
@@ -84,7 +84,7 @@ class DeviceTracker
     {
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
-        if (null !== $trackedDevice) {
+        if ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
             $this->logger->debug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 

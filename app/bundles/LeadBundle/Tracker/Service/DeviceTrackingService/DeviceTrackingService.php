@@ -48,7 +48,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
     public function isTracked(): bool
     {
-        return null !== $this->getTrackedDevice();
+        return $this->getTrackedDevice() instanceof \Mautic\LeadBundle\Entity\LeadDevice;
     }
 
     /**
@@ -81,7 +81,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false)
     {
         $trackedDevice = $this->getTrackedDevice();
-        if (null !== $trackedDevice && false === $replaceExistingTracking) {
+        if ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice && false === $replaceExistingTracking) {
             return $trackedDevice;
         }
 
@@ -95,7 +95,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             ]
         );
 
-        if (null !== $existingDevice) {
+        if ($existingDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
             $device = $existingDevice;
         }
 
@@ -125,7 +125,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             return null;
         }
 
@@ -147,7 +147,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         do {
             $generatedIdentifier = $this->randomHelper->generate(23);
             $device              = $this->leadDeviceRepository->getByTrackingId($generatedIdentifier);
-        } while (null !== $device);
+        } while ($device instanceof \Mautic\LeadBundle\Entity\LeadDevice);
 
         return $generatedIdentifier;
     }

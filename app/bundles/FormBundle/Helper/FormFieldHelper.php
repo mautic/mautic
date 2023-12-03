@@ -75,7 +75,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $this->translator = $translator;
 
-        if (null === $validator) {
+        if (!$validator instanceof \Symfony\Component\Validator\Validator\ValidatorInterface) {
             $validator = $validator = Validation::createValidator();
         }
         $this->validator = $validator;
@@ -164,7 +164,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     foreach ($violations as $v) {
                         $transParameters = $v->getParameters();
 
-                        if (null !== $f) {
+                        if ($f instanceof \Mautic\FormBundle\Entity\Field) {
                             $transParameters['%label%'] = '&quot;'.$f->getLabel().'&quot;';
                         }
 

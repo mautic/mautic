@@ -809,7 +809,7 @@ class Field
     public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
-        if (null !== $form && true === $form->getInKioskMode()) {
+        if ($form instanceof \Mautic\FormBundle\Entity\Form && true === $form->getInKioskMode()) {
             return true;
         }
 
@@ -829,7 +829,7 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if (null !== $lead
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead
                 && $this->mappedField
                 && 'contact' === $this->mappedObject
                 && !empty($lead->getFieldValue($this->mappedField))
@@ -839,7 +839,7 @@ class Field
             }
         }
 
-        if ($displayManager && $displayManager->useProgressiveProfilingLimit()) {
+        if ($displayManager instanceof \Mautic\FormBundle\ProgressiveProfiling\DisplayManager && $displayManager->useProgressiveProfilingLimit()) {
             if (!$displayManager->showForField($this)) {
                 return false;
             }

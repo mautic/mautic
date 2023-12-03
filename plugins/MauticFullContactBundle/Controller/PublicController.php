@@ -204,7 +204,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $lead && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && $lead instanceof \Mautic\LeadBundle\Entity\Lead && (!isset($lead->imported) || !$lead->imported)) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {
@@ -361,7 +361,7 @@ class PublicController extends FormController
             }
         } catch (\Exception $ex) {
             try {
-                if ($notify && $company) {
+                if ($notify && $company instanceof \Mautic\LeadBundle\Entity\Company) {
                     /** @var UserModel $userModel */
                     $userModel = $this->getModel('user');
                     if ($user = $userModel->getEntity($notify)) {

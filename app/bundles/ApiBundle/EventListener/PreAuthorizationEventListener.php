@@ -52,12 +52,10 @@ class PreAuthorizationEventListener
     public function onPostAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($event->isAuthorizedClient()) {
-            if (null !== $client = $event->getClient()) {
-                $user = $this->getUser($event);
-                $client->addUser($user);
-                $this->em->persist($client);
-                $this->em->flush();
-            }
+            $user = $this->getUser($event);
+            $client->addUser($user);
+            $this->em->persist($client);
+            $this->em->flush();
         }
     }
 

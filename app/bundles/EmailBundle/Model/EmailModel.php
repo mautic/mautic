@@ -452,7 +452,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new EmailEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -502,7 +502,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
-        if (null !== $lead) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             // Set the lead as current lead
             if ($activeRequest) {
                 $this->contactTracker->setTrackedContact($lead);
@@ -542,7 +542,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->em->persist($stat);
 
         // Only up counts if associated with both an email and lead
-        if ($firstTime && $email && $lead) {
+        if ($firstTime && $email instanceof \Mautic\EmailBundle\Entity\Email && $lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             try {
                 $this->getRepository()->incrementRead($email->getId(), $stat->getId(), $email->isVariant());
             } catch (\Exception $exception) {
@@ -584,7 +584,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->flushAndCatch();
             }
 
-            if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
+            if ($hitDateTime instanceof \DateTimeInterface && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
@@ -1133,7 +1133,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $failedCount            = 0;
 
         $progress = false;
-        if ($batch && $output) {
+        if ($batch && $output instanceof \Symfony\Component\Console\Output\OutputInterface) {
             $progressCounter = 0;
             $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             if (!$totalLeadCount) {

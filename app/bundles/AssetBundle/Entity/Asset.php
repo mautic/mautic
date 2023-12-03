@@ -295,7 +295,7 @@ class Asset extends FormEntity
     public function getFile()
     {
         // if file is not set, try to find it at temp folder
-        if ($this->isLocal() && empty($this->file)) {
+        if ($this->isLocal() && !$this->file instanceof \Symfony\Component\HttpFoundation\File\File) {
             $tempFile = $this->loadFile(true);
 
             if ($tempFile) {
@@ -676,7 +676,7 @@ class Asset extends FormEntity
 
     public function preUpload()
     {
-        if (null !== $this->getFile()) {
+        if ($this->getFile() instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
                 $this->setTitle($this->file->getClientOriginalName());
@@ -698,7 +698,7 @@ class Asset extends FormEntity
     public function upload()
     {
         // the file property can be empty if the field is not required
-        if (null === $this->getFile()) {
+        if (!$this->getFile() instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
             // check for the remote and set type data
             if ($this->isRemote()) {
                 $this->setFileInfoFromFile();
@@ -874,7 +874,7 @@ class Asset extends FormEntity
             return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
         }
 
-        if (null === $this->loadFile()) {
+        if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
             return '';
         }
 
@@ -907,7 +907,7 @@ class Asset extends FormEntity
             return $fileInfo;
         }
 
-        if (null === $this->loadFile()) {
+        if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
             return '';
         }
 
@@ -937,7 +937,7 @@ class Asset extends FormEntity
             return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         }
 
-        if (null === $this->loadFile()) {
+        if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
             return '';
         }
 
@@ -1257,7 +1257,7 @@ class Asset extends FormEntity
                 $this->setSize(round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD)));
             }
 
-            if (null === $this->loadFile()) {
+            if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
                 return 0;
             }
 

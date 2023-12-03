@@ -695,7 +695,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     public function isAdmin()
     {
-        if (null !== $this->role) {
+        if ($this->role instanceof \Mautic\UserBundle\Entity\Role) {
             return $this->role->isAdmin();
         } else {
             return false;

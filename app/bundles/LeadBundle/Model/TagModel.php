@@ -104,7 +104,7 @@ class TagModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new TagEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

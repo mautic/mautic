@@ -44,7 +44,7 @@ class PublicController extends CommonFormController
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             if ($this->security->isAnonymous()) {
                 $model->hitEmail($stat, $request, true);
             }
@@ -134,7 +134,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -164,7 +164,7 @@ class PublicController extends CommonFormController
             $template = $theme->getTheme();
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
             if ($lead = $stat->getLead()) {
@@ -218,7 +218,7 @@ class PublicController extends CommonFormController
 
                 $formView = $form->createView();
                 /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
+                if ($email instanceof \Mautic\EmailBundle\Entity\Email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
                     if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
@@ -327,7 +327,7 @@ class PublicController extends CommonFormController
         \assert($model instanceof EmailModel);
         $stat = $model->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
@@ -429,7 +429,7 @@ class PublicController extends CommonFormController
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
-        if (null === $emailEntity) {
+        if (!$emailEntity instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->notFound();
         }
 
@@ -622,7 +622,7 @@ class PublicController extends CommonFormController
             $lead = $repo->getLeadByEmail($email);
             if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
-                if (null === $lead) {
+                if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                     continue;
                 }
             }
@@ -633,14 +633,14 @@ class PublicController extends CommonFormController
             $stat = $model->getEmailStatus($idHash);
 
             // stat doesn't exist, create one
-            if (null === $stat) {
+            if (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 $lead['email'] = $email; // needed for stat
                 $stat          = $this->addStat($mailer, $lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
 
-            if ($stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
+            if ($stat instanceof \Mautic\EmailBundle\Entity\Stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $request); // add email event
             }
         }

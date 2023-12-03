@@ -50,7 +50,7 @@ class DynamicContentApiController extends CommonController
         $lead          = $contactRequestHelper->getContactFromQuery($pageModel->getHitQuery($request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $deviceId      = ($trackedDevice instanceof \Mautic\LeadBundle\Entity\LeadDevice ? $trackedDevice->getTrackingId() : null);
 
         return empty($content)
             ? new Response('', Response::HTTP_NO_CONTENT)

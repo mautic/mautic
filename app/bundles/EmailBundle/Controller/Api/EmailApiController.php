@@ -97,7 +97,7 @@ class EmailApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (null === $entity || !$entity->isPublished()) {
+        if (!$entity instanceof \Mautic\EmailBundle\Entity\Email || !$entity->isPublished()) {
             return $this->notFound();
         }
 
@@ -136,7 +136,7 @@ class EmailApiController extends CommonApiController
     public function sendLeadAction(Request $request, $id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
+        if ($entity instanceof \Mautic\EmailBundle\Entity\Email) {
             if (!$this->checkEntityAccess($entity)) {
                 return $this->accessDenied();
             }

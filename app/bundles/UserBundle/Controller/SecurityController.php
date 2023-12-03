@@ -72,7 +72,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
 
         $error = $authenticationUtils->getLastAuthenticationError();
 
-        if (null !== $error) {
+        if ($error instanceof \Symfony\Component\Security\Core\Exception\AuthenticationException) {
             if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
