@@ -6,20 +6,11 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportDataEvent extends AbstractReportEvent
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+    private array $data;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options;
 
-    /**
-     * @var int
-     */
-    private $totalResults = 0;
+    private int $totalResults;
 
     public function __construct(Report $report, array $data, $totalResults, array $options)
     {

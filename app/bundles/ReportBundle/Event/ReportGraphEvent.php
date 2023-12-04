@@ -7,15 +7,9 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportGraphEvent extends AbstractReportEvent
 {
-    /**
-     * @var array
-     */
-    private $requestedGraphs = [];
+    private array $requestedGraphs;
 
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
+    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
 
     /**
      * Constructor.

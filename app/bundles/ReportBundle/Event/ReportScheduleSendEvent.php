@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ReportScheduleSendEvent extends Event
 {
-    /**
-     * @var Scheduler
-     */
-    private $scheduler;
+    private \Mautic\ReportBundle\Entity\Scheduler $scheduler;
 
     /**
      * @var string

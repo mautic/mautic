@@ -10,15 +10,9 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
-    /**
-     * @var ReportModel
-     */
-    protected $reportModel;
+    protected \Mautic\ReportBundle\Model\ReportModel $reportModel;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     /**
      * Define the name of the bundle/category of the widget(s).
