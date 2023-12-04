@@ -13,7 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\Notification\Notifier;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
@@ -22,9 +21,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SyncService implements SyncServiceInterface
 {
-    /**
-     * @var SyncDataExchangeInterface
-     */
     private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $internalSyncDataExchange;
 
     private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
