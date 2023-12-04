@@ -82,7 +82,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -232,7 +232,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['f.name', 'ASC'],

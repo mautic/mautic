@@ -100,10 +100,8 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -164,7 +162,7 @@ class SmsRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],

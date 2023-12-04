@@ -43,11 +43,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             $this->getClientIdKey()     => 'mautic.zoho.form.client_id',
@@ -125,10 +123,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return $this->getApiUrl().'/oauth/v2/auth';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -136,7 +131,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * Refresh tokens.
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return [
             'refresh_token',
@@ -829,9 +824,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $maxRecords = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -1144,10 +1139,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }

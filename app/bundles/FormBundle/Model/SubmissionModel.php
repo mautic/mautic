@@ -1027,7 +1027,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2) {
+        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)

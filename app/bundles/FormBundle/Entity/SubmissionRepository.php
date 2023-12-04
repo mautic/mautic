@@ -219,7 +219,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         $activePage = $args['activePage'];
 
@@ -277,7 +277,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['s.date_submitted', 'ASC'],

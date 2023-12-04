@@ -250,10 +250,7 @@ class Mailbox
         $this->imapFullPath = $paths['full'];
     }
 
-    /**
-     * @return array
-     */
-    public function getImapPath($settings)
+    public function getImapPath($settings): array
     {
         if (!isset($settings['encryption'])) {
             $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';

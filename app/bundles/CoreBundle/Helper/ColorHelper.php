@@ -73,10 +73,8 @@ class ColorHelper
 
     /**
      * Returns array of [R, G, B] of current state.
-     *
-     * @return array
      */
-    public function getColorArray()
+    public function getColorArray(): array
     {
         return [$this->red, $this->green, $this->blue];
     }

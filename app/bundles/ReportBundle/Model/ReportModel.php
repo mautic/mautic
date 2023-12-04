@@ -497,9 +497,9 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = [])
+    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = []): array
     {
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));

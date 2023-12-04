@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -16,7 +17,17 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         '*/Tests/*',
         '*.html.php',
         ContainerGetToConstructorInjectionRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+            // Requires quite a refactoring.
+            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
+        ],
+
+        ReturnTypeFromReturnDirectArrayRector::class => [
+            // require bit test update
+            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+        ],
+
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
         ],
     ]);
 
@@ -61,7 +72,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
-
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
         \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
         \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
         \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,

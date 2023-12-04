@@ -9,7 +9,7 @@ class TagRepository extends BaseTagRepository
     /**
      * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],

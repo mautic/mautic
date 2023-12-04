@@ -51,10 +51,7 @@ class CompanyReportData
         return false;
     }
 
-    /**
-     * @return array
-     */
-    private function getCompanyColumns()
+    private function getCompanyColumns(): array
     {
         return [
             'comp.id' => [

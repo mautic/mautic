@@ -88,10 +88,8 @@ class ImportController extends FormController
      * @param string  $orderBy
      * @param string  $orderByDir
      * @param mixed[] $args
-     *
-     * @return array
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $object = $this->session->get('mautic.import.object');
 

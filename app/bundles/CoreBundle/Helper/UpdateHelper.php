@@ -79,10 +79,8 @@ class UpdateHelper
      * Fetches a download package from the remote server.
      *
      * @param string $package
-     *
-     * @return array
      */
-    public function fetchPackage($package)
+    public function fetchPackage($package): array
     {
         // GET the update data
         try {

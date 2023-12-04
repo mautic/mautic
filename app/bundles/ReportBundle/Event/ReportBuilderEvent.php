@@ -183,10 +183,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Get IP Address column.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getIpColumn($prefix = 'i.')
+    public function getIpColumn($prefix = 'i.'): array
     {
         return [
             $prefix.'ip_address' => [
@@ -200,10 +198,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Add category columns.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCategoryColumns($prefix = 'c.')
+    public function getCategoryColumns($prefix = 'c.'): array
     {
         return [
             $prefix.'id' => [
@@ -221,10 +217,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add campaign columns joined by the campaign lead event log table.
-     *
-     * @return array
      */
-    public function getCampaignByChannelColumns()
+    public function getCampaignByChannelColumns(): array
     {
         return [
             'clel.campaign_id' => [

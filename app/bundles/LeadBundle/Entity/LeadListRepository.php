@@ -413,10 +413,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -482,10 +480,7 @@ class LeadListRepository extends CommonRepository
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    public static function getRelativeDateTranslationKeys()
+    public static function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',
@@ -507,7 +502,7 @@ class LeadListRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['l.name', 'ASC'],

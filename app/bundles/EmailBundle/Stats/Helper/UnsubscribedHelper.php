@@ -10,10 +10,7 @@ class UnsubscribedHelper extends AbstractHelper
 {
     public const NAME = 'email-unsubscribed';
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }

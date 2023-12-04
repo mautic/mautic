@@ -112,10 +112,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get the groups available for fields.
-     *
-     * @return array
      */
-    public function getFieldGroups()
+    public function getFieldGroups(): array
     {
         return ['core', 'professional', 'other'];
     }
@@ -169,7 +167,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         $unique                  = $this->generateRandomParameterName();

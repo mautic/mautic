@@ -291,10 +291,7 @@ class RoleController extends FormController
         ]);
     }
 
-    /**
-     * @return array
-     */
-    private function getPermissionsConfig(Entity\Role $role)
+    private function getPermissionsConfig(Entity\Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
         $translator        = $this->translator;

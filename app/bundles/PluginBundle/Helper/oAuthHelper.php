@@ -41,10 +41,7 @@ class oAuthHelper
         $this->request           = $request;
     }
 
-    /**
-     * @return array
-     */
-    public function getAuthorizationHeader($url, $parameters, $method)
+    public function getAuthorizationHeader($url, $parameters, $method): array
     {
         // Get standard OAuth headers
         $headers = $this->getOauthHeaders();

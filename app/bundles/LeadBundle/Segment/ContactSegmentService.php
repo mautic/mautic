@@ -68,11 +68,9 @@ class ContactSegmentService
     /**
      * @param array|null $batchLimiters for debug purpose only
      *
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null)
+    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null): array
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -168,12 +166,10 @@ class ContactSegmentService
     }
 
     /**
-     * @return array
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = [])
+    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = []): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder = $this->contactSegmentQueryBuilder->wrapInCount($queryBuilder);
@@ -188,12 +184,10 @@ class ContactSegmentService
     /**
      * @param int|null $limit
      *
-     * @return array
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 

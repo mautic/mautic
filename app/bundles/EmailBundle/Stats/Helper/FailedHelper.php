@@ -9,10 +9,7 @@ class FailedHelper extends AbstractHelper
 {
     public const NAME = 'email-failed';
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }

@@ -9,10 +9,7 @@ class SentHelper extends AbstractHelper
 {
     public const NAME = 'email-sent';
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }

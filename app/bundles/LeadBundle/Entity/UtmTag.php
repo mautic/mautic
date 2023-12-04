@@ -391,10 +391,8 @@ class UtmTag
 
     /**
      * Available fields and it's setters.
-     *
-     * @return array
      */
-    public function getFieldSetterList()
+    public function getFieldSetterList(): array
     {
         return [
             'utm_campaign' => 'setUtmCampaign',

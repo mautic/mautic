@@ -8,7 +8,7 @@ class TagManagerIntegration extends AbstractIntegration
 {
     public const PLUGIN_NAME = 'TagManager';
 
-    public function getName()
+    public function getName(): string
     {
         return self::PLUGIN_NAME;
     }

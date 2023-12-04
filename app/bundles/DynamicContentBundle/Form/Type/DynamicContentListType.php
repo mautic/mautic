@@ -20,7 +20,7 @@ class DynamicContentListType extends AbstractType
                 'modal_header'        => 'mautic.dynamicContent.header.new',
                 'model'               => 'dynamicContent',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'    => 'dynamicContent',
                         'filter'  => '$data',

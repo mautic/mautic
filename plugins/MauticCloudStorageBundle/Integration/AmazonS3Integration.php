@@ -56,9 +56,9 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'client_id'     => 'mautic.integration.keyfield.clientid',

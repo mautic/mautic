@@ -27,10 +27,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return 'Dynamics CRM';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -49,9 +46,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'resource'      => 'mautic.integration.dynamics.resource',
@@ -122,10 +119,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Get the keys for the refresh token and expiry.
-     *
-     * @return array
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return ['refresh_token', 'expires_on'];
     }
@@ -182,9 +177,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;
@@ -726,9 +718,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {

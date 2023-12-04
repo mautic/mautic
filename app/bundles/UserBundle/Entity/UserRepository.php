@@ -226,7 +226,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
@@ -321,7 +321,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['u.lastName', 'ASC'],

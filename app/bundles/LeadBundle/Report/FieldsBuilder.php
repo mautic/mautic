@@ -119,10 +119,7 @@ class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseLeadColumns()
+    private function getBaseLeadColumns(): array
     {
         return [
             'l.id' => [
@@ -158,10 +155,7 @@ class FieldsBuilder
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseCompanyColumns()
+    private function getBaseCompanyColumns(): array
     {
         return [
             'comp.id' => [

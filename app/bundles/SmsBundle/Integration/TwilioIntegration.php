@@ -26,17 +26,15 @@ class TwilioIntegration extends AbstractIntegration
         return 'app/bundles/SmsBundle/Assets/img/Twilio.png';
     }
 
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return ['password'];
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'username' => 'mautic.sms.config.form.sms.username',

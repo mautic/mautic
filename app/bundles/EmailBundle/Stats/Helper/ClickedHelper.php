@@ -9,10 +9,7 @@ class ClickedHelper extends AbstractHelper
 {
     public const NAME = 'email-clicked';
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }

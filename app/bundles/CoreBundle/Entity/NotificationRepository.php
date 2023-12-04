@@ -17,10 +17,8 @@ class NotificationRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getDefaultOrder()
+    public function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],

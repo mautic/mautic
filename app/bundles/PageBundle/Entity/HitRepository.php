@@ -321,10 +321,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Get array of dwell time labels with ranges.
-     *
-     * @return array
      */
-    public function getDwellTimeLabels()
+    public function getDwellTimeLabels(): array
     {
         return [
             [
@@ -442,10 +440,8 @@ class HitRepository extends CommonRepository
      * Count stats from hit times.
      *
      * @param array $times
-     *
-     * @return array
      */
-    public function countStats($times)
+    public function countStats($times): array
     {
         return [
             'sum'     => array_sum($times),

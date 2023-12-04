@@ -123,7 +123,7 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['f.order', 'ASC'],

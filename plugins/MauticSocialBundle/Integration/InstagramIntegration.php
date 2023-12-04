@@ -15,7 +15,7 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',
@@ -127,7 +127,7 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'full_name' => ['type' => 'string'],

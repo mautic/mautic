@@ -183,10 +183,7 @@ class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    /**
-     * @return array
-     */
-    protected function getCache($entity, $notify)
+    protected function getCache($entity, $notify): array
     {
         /** @var User $user */
         $user      = $this->userHelper->getUser();

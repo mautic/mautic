@@ -18,10 +18,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         return 'Vtiger';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead'];
     }
@@ -35,11 +32,9 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'url'       => 'mautic.vtiger.form.url',

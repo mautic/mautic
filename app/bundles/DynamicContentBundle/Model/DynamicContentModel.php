@@ -115,7 +115,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         return $formFactory->create(DynamicContentType::class, $entity, $options);
     }
 
-    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
+    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot): void
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 

@@ -534,10 +534,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $contacts;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldGroups()
+    public function getFieldGroups(): array
     {
         return ['core', 'social', 'personal', 'professional'];
     }
@@ -703,10 +700,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the command where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command             = $filter->command;
         $string              = $filter->string;
@@ -1014,10 +1009,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Returns the array of columns with the default order.
-     *
-     * @return array
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['l.last_active', 'DESC'],
