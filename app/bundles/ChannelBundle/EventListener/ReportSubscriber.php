@@ -14,15 +14,9 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(CompanyReportData $companyReportData, RouterInterface $router)
     {

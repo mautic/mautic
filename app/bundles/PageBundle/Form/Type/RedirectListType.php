@@ -9,10 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RedirectListType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

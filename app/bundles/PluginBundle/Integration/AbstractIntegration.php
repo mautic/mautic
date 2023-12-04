@@ -2091,9 +2091,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Returns settings for the integration form.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         $type               = $this->getAuthenticationType();
         $enableDataPriority = $this->getDataPriority();

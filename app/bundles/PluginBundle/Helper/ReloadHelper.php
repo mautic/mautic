@@ -14,10 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ReloadHelper
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
+    private \Mautic\CoreBundle\Factory\MauticFactory $factory;
 
     private EventDispatcherInterface $eventDispatcher;
 

@@ -20,20 +20,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TrackingEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private \Mautic\LeadBundle\Entity\Lead $contact;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
-    /**
-     * @var ParameterBag
-     */
-    private $response;
+    private \Symfony\Component\HttpFoundation\ParameterBag $response;
 
     public function __construct(Lead $contact, Request $request, array $mtcSessionResponses)
     {

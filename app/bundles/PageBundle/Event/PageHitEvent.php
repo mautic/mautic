@@ -12,10 +12,7 @@ class PageHitEvent extends CommonEvent
 
     protected $code;
 
-    /**
-     * @var Page
-     */
-    protected $page;
+    protected ?\Mautic\PageBundle\Entity\Page $page = null;
 
     /**
      * @var array

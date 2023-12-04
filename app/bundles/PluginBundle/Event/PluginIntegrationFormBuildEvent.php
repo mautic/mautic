@@ -7,15 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
-    /**
-     * @var FormBuilderInterface
-     */
-    private $builder;
+    private \Symfony\Component\Form\FormBuilderInterface $builder;
 
     public function __construct(UnifiedIntegrationInterface $integration, FormBuilderInterface $builder, array $options)
     {

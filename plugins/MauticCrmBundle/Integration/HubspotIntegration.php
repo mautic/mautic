@@ -137,7 +137,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array<string,bool>
+     * @return array<string, bool>
      */
     public function getFormSettings(): array
     {

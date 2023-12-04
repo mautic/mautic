@@ -13,10 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class IntegrationsListType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(IntegrationHelper $integrationHelper)
     {

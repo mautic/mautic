@@ -118,9 +118,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get form settings; authorization is not needed since it is done when a user logs in.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => true,

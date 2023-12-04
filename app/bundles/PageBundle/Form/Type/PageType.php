@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -32,30 +31,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageType extends AbstractType
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var \Mautic\PageBundle\Model\PageModel
-     */
-    private $model;
+    private \Mautic\PageBundle\Model\PageModel $model;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private ?\Mautic\UserBundle\Entity\User $user;
 
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
+    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
     public function __construct(
         EntityManager $entityManager,
