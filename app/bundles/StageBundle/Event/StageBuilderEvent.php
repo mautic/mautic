@@ -103,7 +103,7 @@ class StageBuilderEvent extends Event
     public function getActionChoices(): array
     {
         $choices = [];
-        $actions = $this->getActions();
+        $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }

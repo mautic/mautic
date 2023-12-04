@@ -590,7 +590,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Leads')
     {
         $params['max_results'] = 100;
-        $config                = $this->mergeConfigToFeatureSettings([]);
 
         if (!isset($params['offset'])) {
             // First call

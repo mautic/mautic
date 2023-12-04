@@ -131,9 +131,6 @@ class PublicController extends CommonFormController
         $template   = null;
         $session    = $request->getSession();
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->getModel('lead');
-
         if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();

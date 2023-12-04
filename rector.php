@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -17,7 +19,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         '*/Tests/*',
         '*.html.php',
         ContainerGetToConstructorInjectionRector::class => [
-            // Requires quite a refactoring.
+            // Requires quite a refactoring
             __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
         ],
 
@@ -26,12 +28,17 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class => [
+        ReturnTypeFromStrictBoolReturnExprRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
+            // requires quite a refactoring
+            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
+        ],
+
+        RemoveUnusedVariableAssignRector::class => [
+            // unset variable to clear garbage collector
+            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
         ],
     ]);
-
-    $rectorConfig->parallel();
 
     foreach (['dev', 'test', 'prod'] as $environment) {
         $environmentCap = ucfirst($environment);
@@ -69,10 +76,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        RemoveUnusedVariableAssignRector::class,
+        \Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
         \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
         \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector::class,
+        ReturnTypeFromStrictBoolReturnExprRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
         \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
