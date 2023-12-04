@@ -8,10 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class EntityDescriptorStore implements EntityDescriptorStoreInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     /**
      * @var EntityDescriptor

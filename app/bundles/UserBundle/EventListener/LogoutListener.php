@@ -10,20 +10,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
+    protected \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var \Mautic\UserBundle\Entity\User|null
-     */
-    protected $user;
+    protected ?\Mautic\UserBundle\Entity\User $user;
 
     public function __construct(UserModel $userModel, EventDispatcherInterface $dispatcher, UserHelper $userHelper)
     {

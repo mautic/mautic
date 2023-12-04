@@ -9,10 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleListType extends AbstractType
 {
-    /**
-     * @var RoleModel
-     */
-    private $roleModel;
+    private \Mautic\UserBundle\Model\RoleModel $roleModel;
 
     public function __construct(RoleModel $roleModel)
     {

@@ -8,20 +8,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LogoutEvent extends Event
 {
-    /**
-     * @var User
-     */
-    private $user;
+    private \Mautic\UserBundle\Entity\User $user;
 
     /**
      * @var array
      */
     private $session = [];
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     public function __construct(User $user, Request $request)
     {
