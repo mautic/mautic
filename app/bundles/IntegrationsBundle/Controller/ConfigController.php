@@ -132,7 +132,7 @@ class ConfigController extends AbstractFormController
         }
 
         // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
-        $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
+        $configEvent = new ConfigSaveEvent($this->integrationConfiguration, $form);
         $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
