@@ -79,25 +79,13 @@ class LeadModel extends FormModel
 
     public const CHANNEL_FEATURE = 'contact_preference';
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /**
      * @var FieldModel
@@ -109,35 +97,17 @@ class LeadModel extends FormModel
      */
     protected $leadFields = [];
 
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
+    protected \Mautic\LeadBundle\Model\ListModel $leadListModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
+    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $formFactory;
+    protected \Symfony\Component\Form\FormFactoryInterface $formFactory;
 
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
+    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var UserProvider
-     */
-    protected $userProvider;
+    protected \Mautic\UserBundle\Security\Provider\UserProvider $userProvider;
 
     protected $leadTrackingId;
 
@@ -151,25 +121,13 @@ class LeadModel extends FormModel
      */
     protected $availableLeadFields = [];
 
-    /**
-     * @var EmailValidator
-     */
-    protected $emailValidator;
+    protected \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
+    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
 
-    /**
-     * @var IpAddressModel
-     */
-    private $ipAddressModel;
+    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
 
     /**
      * @var bool

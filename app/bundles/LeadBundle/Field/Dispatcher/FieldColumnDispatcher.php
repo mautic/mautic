@@ -13,15 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var BackgroundSettings
-     */
-    private $backgroundSettings;
+    private \Mautic\LeadBundle\Field\Settings\BackgroundSettings $backgroundSettings;
 
     public function __construct(EventDispatcherInterface $dispatcher, BackgroundSettings $backgroundSettings)
     {

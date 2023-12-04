@@ -17,20 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
     public function __construct(Translator $translator, LeadModel $leadModel, FieldModel $fieldModel)
     {

@@ -13,15 +13,9 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
     public function __construct(
         FieldsBuilder $fieldsBuilder,

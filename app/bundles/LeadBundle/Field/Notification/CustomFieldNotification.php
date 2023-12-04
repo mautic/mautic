@@ -13,20 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         NotificationModel $notificationModel,

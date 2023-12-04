@@ -24,10 +24,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      */
     protected $operators;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     private string $search;
 

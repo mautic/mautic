@@ -13,40 +13,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
-    /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
+    private \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManagerInterface $entityManager;
 
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
+    private \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository;
 
-    /**
-     * @var RandomHelperInterface
-     */
-    private $randomHelper;
+    private \Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface $randomHelper;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     /**
      * @var LeadDevice
      */
     private $trackedDevice;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(
         CookieHelper $cookieHelper,

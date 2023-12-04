@@ -38274,11 +38274,6 @@ parameters:
 			path: app/bundles/LeadBundle/Event/CategoryChangeEvent.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\CategoryChangeEvent\\:\\:\\$category has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/CategoryChangeEvent.php
-
-		-
 			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\CategoryChangeEvent\\:\\:\\$lead has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/CategoryChangeEvent.php
@@ -38509,11 +38504,6 @@ parameters:
 			path: app/bundles/LeadBundle/Event/LeadChangeCompanyEvent.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\LeadChangeCompanyEvent\\:\\:\\$company has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadChangeCompanyEvent.php
-
-		-
 			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\LeadChangeCompanyEvent\\:\\:\\$lead has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/LeadChangeCompanyEvent.php
@@ -38634,24 +38624,9 @@ parameters:
 			path: app/bundles/LeadBundle/Event/LeadMergeEvent.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\LeadMergeEvent\\:\\:\\$loser has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadMergeEvent.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\LeadMergeEvent\\:\\:\\$victor has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadMergeEvent.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\LeadNoteEvent\\:\\:setLeadNote\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/LeadNoteEvent.php
-
-		-
-			message: "#^Instanceof between Mautic\\\\LeadBundle\\\\Entity\\\\Lead and Mautic\\\\LeadBundle\\\\Entity\\\\Lead will always evaluate to true\\.$#"
-			count: 2
-			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\LeadTimelineEvent\\:\\:__construct\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
@@ -38869,11 +38844,6 @@ parameters:
 			path: app/bundles/LeadBundle/Event/ListChangeEvent.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\ListChangeEvent\\:\\:\\$list has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/ListChangeEvent.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\ListPreProcessListEvent\\:\\:__construct\\(\\) has parameter \\$list with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/ListPreProcessListEvent.php
@@ -38915,16 +38885,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Event\\\\PointsChangeEvent\\:\\:__construct\\(\\) has parameter \\$old with no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\PointsChangeEvent\\:\\:\\$new has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Event\\\\PointsChangeEvent\\:\\:\\$old has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
@@ -39279,11 +39239,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(LeadModel\\)\\: Unexpected token \"\\\\n     \", expected variable at offset 27 on line 2$#"
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/FormSubscriber.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\EventListener\\\\FormSubscriber\\:\\:\\$leadModel has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/FormSubscriber.php
 
@@ -40622,11 +40577,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/ContactColumnsType.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\ContactColumnsType\\:\\:\\$columnsDictionary has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/ContactColumnsType.php
-
-		-
 			message: "#^Class Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\ContactFrequencyType extends generic class Symfony\\\\Component\\\\Form\\\\AbstractType but does not specify its types\\: TData$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/ContactFrequencyType.php
@@ -40658,16 +40608,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\DashboardLeadsLifetimeWidgetType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/DashboardLeadsLifetimeWidgetType.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\DashboardLeadsLifetimeWidgetType\\:\\:\\$segmentModel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/DashboardLeadsLifetimeWidgetType.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\DashboardLeadsLifetimeWidgetType\\:\\:\\$translator has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/DashboardLeadsLifetimeWidgetType.php
 
@@ -40822,11 +40762,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/LeadCategoryType.php
 
 		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\LeadCategoryType\\:\\:\\$categoryModel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/LeadCategoryType.php
-
-		-
 			message: """
 				#^Call to deprecated method getFieldList\\(\\) of class Mautic\\\\LeadBundle\\\\Model\\\\FieldModel\\:
 				Use FieldList\\:\\:getFieldList method instead$#
@@ -40951,11 +40886,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\ListType\\:\\:configureOptions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Form/Type/ListType.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Form\\\\Type\\\\ListType\\:\\:\\$translator has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Form/Type/ListType.php
 
@@ -41325,27 +41255,12 @@ parameters:
 			path: app/bundles/LeadBundle/Helper/FieldAliasHelper.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Helper\\\\FormFieldHelper\\:\\:getCountryChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Helper/FormFieldHelper.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Helper\\\\FormFieldHelper\\:\\:getDateChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Helper/FormFieldHelper.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Helper\\\\FormFieldHelper\\:\\:getListTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Helper/FormFieldHelper.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Helper\\\\FormFieldHelper\\:\\:getRegionChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Helper/FormFieldHelper.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Helper\\\\FormFieldHelper\\:\\:getTimezonesChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Helper/FormFieldHelper.php
 
@@ -41496,11 +41411,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$companyLeadRepository with type Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository is incompatible with native type Mautic\\\\LeadBundle\\\\Entity\\\\CompanyLeadRepository\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Helper/PrimaryCompanyHelper.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Helper\\\\PrimaryCompanyHelper\\:\\:\\$companyLeadRepository has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Helper/PrimaryCompanyHelper.php
 
@@ -43892,32 +43802,20 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/TableSchemaColumnsCache.php
 
 		-
+			message: """
+				#^Call to deprecated method getFieldList\\(\\) of class Mautic\\\\LeadBundle\\\\Model\\\\FieldModel\\:
+				Use FieldList\\:\\:getFieldList method instead$#
+			"""
+			count: 1
+			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
+
+		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:getColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:getFields\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:\\$coreParametersHelper has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:\\$fieldList has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:\\$fieldModel has no type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Services\\\\ContactColumnsDictionary\\:\\:\\$translator has no type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
 

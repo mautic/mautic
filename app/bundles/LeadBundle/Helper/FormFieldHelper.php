@@ -144,7 +144,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     public static function getCountryChoices()
     {
@@ -154,6 +154,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return array_combine($countries, $countries);
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public static function getRegionChoices(): array
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
@@ -171,7 +174,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * Symfony deprecated and changed Symfony\Component\Form\Extension\Core\Type\TimezoneType::getTimezones to private
      * in 3.0 - so duplicated code here.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getTimezonesChoices()
     {
@@ -204,7 +207,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array<string,string>
+     * @return array<string, string>
      */
     public static function getLocaleChoices()
     {

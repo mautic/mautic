@@ -11,10 +11,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     /**
      * {@inheritdoc}

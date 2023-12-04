@@ -16,10 +16,8 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
 
     /**
      * @deprecated to be removed in Mautic 3
-     *
-     * @var TranslatorInterface
      */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @deprecated to be removed in Mautic 3

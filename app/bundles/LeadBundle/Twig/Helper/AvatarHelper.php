@@ -15,25 +15,13 @@ final class AvatarHelper
      * @var array<string>
      */
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var GravatarHelper
-     */
-    private $gravatarHelper;
+    private \Mautic\CoreBundle\Twig\Helper\GravatarHelper $gravatarHelper;
 
-    /**
-     * @var DefaultAvatarHelper
-     */
-    private $defaultAvatarHelper;
+    private \Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper $defaultAvatarHelper;
 
     public function __construct(
         AssetsHelper $assetsHelper,

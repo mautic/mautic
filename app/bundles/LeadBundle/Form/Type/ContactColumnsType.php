@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactColumnsType extends AbstractType
 {
-    private $columnsDictionary;
+    private \Mautic\LeadBundle\Services\ContactColumnsDictionary $columnsDictionary;
 
     public function __construct(ContactColumnsDictionary $columnsDictionary)
     {

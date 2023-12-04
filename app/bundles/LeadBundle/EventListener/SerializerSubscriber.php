@@ -10,10 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(
         RequestStack $requestStack

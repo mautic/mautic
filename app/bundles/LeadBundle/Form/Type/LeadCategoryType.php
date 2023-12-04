@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadCategoryType extends AbstractType
 {
-    private $categoryModel;
+    private \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
     public function __construct(CategoryModel $categoryModel)
     {

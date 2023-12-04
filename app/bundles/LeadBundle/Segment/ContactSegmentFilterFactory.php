@@ -10,20 +10,11 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContactSegmentFilterFactory
 {
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
+    private \Mautic\LeadBundle\Segment\TableSchemaColumnsCache $schemaCache;
 
-    /**
-     * @var Container
-     */
-    private $container;
+    private \Symfony\Component\DependencyInjection\Container $container;
 
-    /**
-     * @var DecoratorFactory
-     */
-    private $decoratorFactory;
+    private \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory $decoratorFactory;
 
     public function __construct(
         TableSchemaColumnsCache $schemaCache,

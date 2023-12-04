@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ChannelSubscriptionChange extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var string

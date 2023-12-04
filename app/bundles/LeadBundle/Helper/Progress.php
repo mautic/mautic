@@ -22,10 +22,7 @@ class Progress
      */
     protected $done = 0;
 
-    /**
-     * @var OutputInterface|null
-     */
-    protected $output;
+    protected ?\Symfony\Component\Console\Output\OutputInterface $output;
 
     /**
      * @var ProgressBar|null

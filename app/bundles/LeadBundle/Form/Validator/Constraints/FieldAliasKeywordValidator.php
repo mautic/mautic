@@ -24,25 +24,13 @@ class FieldAliasKeywordValidator extends ConstraintValidator
 
     private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    /**
-     * @var FieldAliasHelper
-     */
-    private $aliasHelper;
+    private \Mautic\LeadBundle\Helper\FieldAliasHelper $aliasHelper;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
     {

@@ -12,10 +12,7 @@ class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
 
-    /**
-     * @var ContactSegmentFilterOperator
-     */
-    protected $contactSegmentFilterOperator;
+    protected \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator $contactSegmentFilterOperator;
 
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator

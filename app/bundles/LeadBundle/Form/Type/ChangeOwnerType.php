@@ -10,10 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChangeOwnerType extends AbstractType
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
     public function __construct(UserModel $userModel)
     {

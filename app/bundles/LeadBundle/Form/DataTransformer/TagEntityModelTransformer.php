@@ -9,10 +9,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class TagEntityModelTransformer implements DataTransformerInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
     /**
      * @var string

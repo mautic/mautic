@@ -8,10 +8,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class FieldToOrderTransformer implements DataTransformerInterface
 {
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
     public function __construct(LeadFieldRepository $leadFieldRepository)
     {

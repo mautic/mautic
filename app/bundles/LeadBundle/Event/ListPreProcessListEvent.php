@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class ListPreProcessListEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $list;
+    protected array $list;
 
     protected $result;
 

@@ -7,9 +7,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadMergeEvent extends Event
 {
-    private $victor;
+    private \Mautic\LeadBundle\Entity\Lead $victor;
 
-    private $loser;
+    private \Mautic\LeadBundle\Entity\Lead $loser;
 
     public function __construct(Lead $victor, Lead $loser)
     {

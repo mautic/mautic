@@ -38,35 +38,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
+    protected \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $config;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $config;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    protected $leadEventLogRepo;
+    protected \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
         PathsHelper $pathsHelper,
