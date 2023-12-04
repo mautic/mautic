@@ -19,15 +19,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MauticSyncProcess
 {
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
 
-    /**
-     * @var ObjectChangeGenerator
-     */
-    private $objectChangeGenerator;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator $objectChangeGenerator;
 
     /**
      * @var InputOptionsDAO

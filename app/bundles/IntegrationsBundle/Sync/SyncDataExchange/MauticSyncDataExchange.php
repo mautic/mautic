@@ -28,35 +28,17 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     public const OBJECT_COMPANY = 'company';
 
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepository;
+    private \Mautic\IntegrationsBundle\Entity\FieldChangeRepository $fieldChangeRepository;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
-    /**
-     * @var FullObjectReportBuilder
-     */
-    private $fullObjectReportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $fullObjectReportBuilder;
 
-    /**
-     * @var PartialObjectReportBuilder
-     */
-    private $partialObjectReportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $partialObjectReportBuilder;
 
-    /**
-     * @var OrderExecutioner
-     */
-    private $orderExecutioner;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner $orderExecutioner;
 
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,

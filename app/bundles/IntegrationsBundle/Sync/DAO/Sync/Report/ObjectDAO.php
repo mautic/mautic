@@ -23,10 +23,7 @@ class ObjectDAO
      */
     private $fields = [];
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
+    private ?\DateTimeInterface $changeDateTime;
 
     /**
      * @param string $object

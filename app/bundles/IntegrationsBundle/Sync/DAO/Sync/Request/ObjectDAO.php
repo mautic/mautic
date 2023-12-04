@@ -6,30 +6,20 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
 class ObjectDAO
 {
-    /**
-     * @var string
-     */
-    private $object;
+    private string $object;
 
     /**
      * Date/time based on last synced date for the object or the start date/time fed through the command's arguments.
      * This value does not change between iterations.
-     *
-     * @var \DateTimeInterface|null
      */
-    private $fromDateTime;
+    private ?\DateTimeInterface $fromDateTime;
 
     /**
      * Date/Time the sync started.
-     *
-     * @var \DateTimeInterface|null
      */
-    private $toDateTime;
+    private ?\DateTimeInterface $toDateTime;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $objectLastSyncDateTime;
+    private ?\DateTimeInterface $objectLastSyncDateTime;
 
     /**
      * @var string[]

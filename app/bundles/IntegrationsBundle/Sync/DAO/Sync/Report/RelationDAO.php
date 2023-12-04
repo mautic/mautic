@@ -6,30 +6,15 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 class RelationDAO
 {
-    /**
-     * @var string
-     */
-    private $objectName;
+    private string $objectName;
 
-    /**
-     * @var string
-     */
-    private $relFieldName;
+    private string $relFieldName;
 
-    /**
-     * @var string
-     */
-    private $relObjectName;
+    private string $relObjectName;
 
-    /**
-     * @var string
-     */
-    private $objectIntegrationId;
+    private string $objectIntegrationId;
 
-    /**
-     * @var string
-     */
-    private $relObjectIntegrationId;
+    private string $relObjectIntegrationId;
 
     /**
      * @var int

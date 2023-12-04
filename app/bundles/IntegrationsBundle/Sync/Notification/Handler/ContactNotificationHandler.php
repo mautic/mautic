@@ -16,25 +16,13 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 
 class ContactNotificationHandler implements HandlerInterface
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Writer $writer;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventRepository;
+    private \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventRepository;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
-    /**
-     * @var UserSummaryNotificationHelper
-     */
-    private $userNotificationHelper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper $userNotificationHelper;
 
     /**
      * @var string

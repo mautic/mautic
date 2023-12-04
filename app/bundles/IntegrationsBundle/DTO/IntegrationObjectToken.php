@@ -10,10 +10,7 @@ namespace Mautic\IntegrationsBundle\DTO;
  */
 class IntegrationObjectToken
 {
-    /**
-     * @var string
-     */
-    private $token;
+    private string $token;
 
     /**
      * @var string

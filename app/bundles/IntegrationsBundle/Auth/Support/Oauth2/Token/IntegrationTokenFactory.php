@@ -8,7 +8,7 @@ use kamermans\OAuth2\Token\TokenInterface;
 
 class IntegrationTokenFactory implements TokenFactoryInterface
 {
-    private $extraKeysToStore = [];
+    private array $extraKeysToStore;
 
     public function __construct(array $extraKeysToStore = [])
     {

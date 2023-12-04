@@ -6,25 +6,16 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class RemappedObjectDAO
 {
-    /**
-     * @var string
-     */
-    private $integration;
+    private string $integration;
 
     /**
      * @var mixed
      */
     private $oldObjectId;
 
-    /**
-     * @var string
-     */
-    private $oldObjectName;
+    private string $oldObjectName;
 
-    /**
-     * @var string
-     */
-    private $newObjectName;
+    private string $newObjectName;
 
     /**
      * @var mixed

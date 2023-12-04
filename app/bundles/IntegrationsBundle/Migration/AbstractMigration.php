@@ -9,15 +9,9 @@ use Doctrine\ORM\EntityManager;
 
 abstract class AbstractMigration implements MigrationInterface
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    protected \Doctrine\ORM\EntityManager $entityManager;
 
-    /**
-     * @var string
-     */
-    protected $tablePrefix;
+    protected string $tablePrefix;
 
     /**
      * @var string[]

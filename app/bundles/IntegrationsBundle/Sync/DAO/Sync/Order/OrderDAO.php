@@ -11,10 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 
 class OrderDAO
 {
-    /**
-     * @var \DateTimeInterface
-     */
-    private $syncDateTime;
+    private \DateTimeInterface $syncDateTime;
 
     /**
      * @var bool

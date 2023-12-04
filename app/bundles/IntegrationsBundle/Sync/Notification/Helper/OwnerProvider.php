@@ -15,15 +15,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProvider
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,

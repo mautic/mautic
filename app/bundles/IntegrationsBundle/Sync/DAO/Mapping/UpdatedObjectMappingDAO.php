@@ -26,7 +26,7 @@ class UpdatedObjectMappingDAO
     /**
      * @var \DateTimeInterface
      */
-    private $objectModifiedDate;
+    private \DateTime $objectModifiedDate;
 
     /**
      * @var ObjectMapping|null
