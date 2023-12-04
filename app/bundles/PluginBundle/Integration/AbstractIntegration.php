@@ -1360,10 +1360,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Generates current URL to set as referer for curl calls.
-     *
-     * @return string
      */
-    protected function getRefererUrl()
+    protected function getRefererUrl(): ?string
     {
         return ($this->request) ? $this->request->getRequestUri() : null;
     }
