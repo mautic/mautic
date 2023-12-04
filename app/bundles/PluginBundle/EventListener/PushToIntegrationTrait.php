@@ -41,18 +41,20 @@ trait PushToIntegrationTrait
     }
 
     /**
-     * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
+     * Used because the Point trigger actions have not been converted to Events yet and thus must leverage a callback.
+     *
+     * @param array<string, array<string, int|string>|null> $config
+     * @param Lead                                          $lead
+     * @param mixed[]                                       $errors
      *
      * @return bool
      */
     protected static function pushIt($config, $lead, &$errors)
     {
-        $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
-        $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
-        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
-            ? $config['campaign_member_status']['campaign_member_status'] : null;
-        $services = static::$integrationHelper->getIntegrationObjects($integration);
-        $success  = true;
+        $integration         = (!empty($config['integration'])) ? $config['integration'] : null;
+        $integrationCampaign = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
+        $services            = static::$integrationHelper->getIntegrationObjects($integration);
+        $success             = true;
 
         foreach ($services as $s) {
             /** @var AbstractIntegration $s */
@@ -72,7 +74,7 @@ trait PushToIntegrationTrait
             }
 
             if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
-                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus, $personIds)) {
+                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $personIds, $config)) {
                     $success = false;
                     if ($error = $s->getLastIntegrationError()) {
                         $errors[] = $error;
