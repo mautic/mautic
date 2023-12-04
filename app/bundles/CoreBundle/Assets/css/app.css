@@ -1414,7 +1414,7 @@ blockquote > p:after {
   min-width: 13px;
   order: 2;
 }
-.btn span, .dropdown-menu > li > button > span {
+.btn span, .dropdown-menu > li > a > span {
   display: flex;
   align-items: center;
   justify-content: space-between;

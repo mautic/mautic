@@ -8,19 +8,19 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <button  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
                             data-target="#MauticSharedModal"
                             data-header="{{ 'mautic.dashboard.widget.header.edit'|trans }}">
                             <i class="fa fa-pencil"></i> Edit
-                        </button>
+                        </a>
                     </li>
                     <li>
-                        <button  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
+                        <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'delete', 'objectId': widget.id}) }}"
                             data-header="{{ 'mautic.dashboard.widget.header.delete'|trans }}"
                             class="remove-widget">
                             <i class="fa fa-remove"></i> Remove
-                        </button>
+                        </a>
                     </li>
                 </ul>
             </div>

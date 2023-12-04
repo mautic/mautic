@@ -313,7 +313,7 @@ final class ButtonHelper
             } elseif (isset($button['iconClass'])) {
                 $buttonContent .= ' <i class="'.$button['iconClass'].'"></i>';
             }
-            $buttons .= "{$this->wrapOpeningTag}<button{$attr}><span{$tooltip}>{$buttonContent}</span></button>{$this->wrapClosingTag}\n";
+            $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
         }
 
         return $buttons;
