@@ -12,15 +12,9 @@ class ApiEntityEvent extends CommonEvent
      */
     protected $entity;
 
-    /**
-     * @var array
-     */
-    protected $entityRequestParameters;
+    protected array $entityRequestParameters;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @param object $entity

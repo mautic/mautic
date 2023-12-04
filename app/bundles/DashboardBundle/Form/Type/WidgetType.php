@@ -24,10 +24,7 @@ class WidgetType extends AbstractType
      */
     protected $dispatcher;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
     {

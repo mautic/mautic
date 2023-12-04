@@ -11,20 +11,11 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(
         StageModel $stageModel,

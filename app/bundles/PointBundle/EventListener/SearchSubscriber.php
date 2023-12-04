@@ -12,25 +12,13 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    private $pointModel;
+    private \Mautic\PointBundle\Model\PointModel $pointModel;
 
-    /**
-     * @var TriggerModel
-     */
-    private $pointTriggerModel;
+    private \Mautic\PointBundle\Model\TriggerModel $pointTriggerModel;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(
         PointModel $pointModel,

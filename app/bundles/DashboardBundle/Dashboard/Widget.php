@@ -14,20 +14,11 @@ class Widget
     public const FORMAT_HUMAN = 'M j, Y';
     public const FORMAT_MYSQL = 'Y-m-d';
 
-    /**
-     * @var DashboardModel
-     */
-    private $dashboardModel;
+    private \Mautic\DashboardBundle\Model\DashboardModel $dashboardModel;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var Session
-     */
-    private $session;
+    private \Symfony\Component\HttpFoundation\Session\Session $session;
 
     public function __construct(DashboardModel $dashboardModel, UserHelper $userHelper, Session $session)
     {

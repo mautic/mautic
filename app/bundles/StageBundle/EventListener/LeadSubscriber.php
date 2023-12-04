@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StagesChangeLogRepository
-     */
-    private $stagesChangeLogRepository;
+    private \Mautic\LeadBundle\Entity\StagesChangeLogRepository $stagesChangeLogRepository;
 
-    /**
-     * @var LeadStageLogRepository
-     */
-    private $leadStageLogRepository;
+    private \Mautic\StageBundle\Entity\LeadStageLogRepository $leadStageLogRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         StagesChangeLogRepository $stagesChangeLogRepository,

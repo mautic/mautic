@@ -34,10 +34,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'stage:stages:viewother',
     ];
 
-    /**
-     * @var StageModel
-     */
-    protected $stageModel;
+    protected \Mautic\StageBundle\Model\StageModel $stageModel;
 
     public function __construct(StageModel $stageModel)
     {
