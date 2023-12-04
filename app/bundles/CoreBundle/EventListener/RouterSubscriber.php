@@ -9,10 +9,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouterSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * @var string|null
@@ -29,15 +26,9 @@ class RouterSubscriber implements EventSubscriberInterface
      */
     private $host;
 
-    /**
-     * @var string|null
-     */
-    private $httpsPort;
+    private string|int $httpsPort;
 
-    /**
-     * @var string|null
-     */
-    private $httpPort;
+    private string|int $httpPort;
 
     /**
      * @param string|null $scheme

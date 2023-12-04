@@ -6,10 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class UpgradeEvent extends Event
 {
-    /**
-     * @var array
-     */
-    protected $status = [];
+    protected array $status;
 
     public function __construct(array $status)
     {

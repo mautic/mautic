@@ -11,15 +11,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    /**
-     * @var AbstractEventAccessor
-     */
-    protected $config;
+    protected \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $config;
 
-    /**
-     * @var Event
-     */
-    protected $event;
+    protected \Mautic\CampaignBundle\Entity\Event $event;
 
     /**
      * @var ArrayCollection

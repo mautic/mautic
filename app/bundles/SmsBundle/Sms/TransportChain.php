@@ -12,17 +12,14 @@ class TransportChain
     /**
      * @var TransportInterface[]
      */
-    private $transports;
+    private array $transports;
 
     /**
      * @var string
      */
     private $primaryTransport;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /**
      * @param string $primaryTransport

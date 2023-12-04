@@ -13,20 +13,11 @@ class Remover
 {
     public const NAME = 'removed';
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
 
-    /**
-     * @var string
-     */
-    private $unscheduledMessage;
+    private ?string $unscheduledMessage;
 
     public function __construct(
         LeadRepository $leadRepository,

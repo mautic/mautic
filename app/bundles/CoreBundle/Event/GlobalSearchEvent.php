@@ -12,10 +12,7 @@ class GlobalSearchEvent extends Event
      */
     protected $results = [];
 
-    /**
-     * @var string
-     */
-    protected $searchString;
+    protected string $searchString;
 
     /**
      * @var Translator

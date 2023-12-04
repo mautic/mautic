@@ -13,15 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MembershipManager
-     */
-    private $membershipManager;
+    private \Mautic\CampaignBundle\Membership\MembershipManager $membershipManager;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
     {

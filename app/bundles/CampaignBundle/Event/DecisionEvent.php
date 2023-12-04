@@ -9,15 +9,9 @@ class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
+    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
 
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
+    private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
 
     /**
      * Anything that the dispatching listener wants to pass through to other listeners.

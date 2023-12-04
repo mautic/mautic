@@ -14,15 +14,9 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private \Mautic\SmsBundle\Integration\Twilio\Configuration $configuration;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var Client

@@ -7,10 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class GroupExecutionDateDAO
 {
-    /**
-     * @var \DateTimeInterface
-     */
-    private $executionDate;
+    private \DateTimeInterface $executionDate;
 
     /**
      * @var ArrayCollection

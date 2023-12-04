@@ -10,20 +10,11 @@ use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
 class ContactHelper
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var PhoneNumberHelper
-     */
-    private $phoneNumberHelper;
+    private \Mautic\CoreBundle\Helper\PhoneNumberHelper $phoneNumberHelper;
 
     public function __construct(
         LeadRepository $leadRepository,

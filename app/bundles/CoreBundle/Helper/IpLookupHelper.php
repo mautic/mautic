@@ -9,20 +9,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    protected \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var AbstractLookup
-     */
-    protected $ipLookup;
+    protected ?\Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup;
 
     /**
      * @var array
@@ -49,10 +40,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         RequestStack $requestStack,

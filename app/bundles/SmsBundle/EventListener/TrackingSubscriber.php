@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\SmsBundle\Entity\StatRepository $statRepository;
 
     public function __construct(StatRepository $statRepository)
     {

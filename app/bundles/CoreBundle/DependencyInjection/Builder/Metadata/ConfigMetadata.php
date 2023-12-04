@@ -7,10 +7,7 @@ use Tightenco\Collect\Support\Collection;
 
 class ConfigMetadata
 {
-    /**
-     * @var BundleMetadata
-     */
-    private $metadata;
+    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
     /**
      * @var array

@@ -16,10 +16,7 @@ class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 
-    /**
-     * @var ConditionDispatcher
-     */
-    private $dispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher $dispatcher;
 
     public function __construct(ConditionDispatcher $dispatcher)
     {

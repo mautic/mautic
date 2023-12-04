@@ -4,19 +4,12 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 class CoreParametersHelper
 {
-    /**
-     * @var ParameterBag
-     */
-    private $parameters;
+    private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
 
     /**
      * @var array

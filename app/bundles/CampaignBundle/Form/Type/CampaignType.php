@@ -20,15 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(CorePermissions $security, TranslatorInterface $translator)
     {

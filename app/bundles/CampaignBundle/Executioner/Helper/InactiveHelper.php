@@ -13,30 +13,15 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
-    /**
-     * @var InactiveContactFinder
-     */
-    private $inactiveContactFinder;
+    private \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder $inactiveContactFinder;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $eventLogRepository;
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     private DecisionHelper $decisionHelper;
 

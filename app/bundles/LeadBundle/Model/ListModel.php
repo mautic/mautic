@@ -267,9 +267,9 @@ class ListModel extends FormModel
     /**
      * Get a list of field choices for filters.
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getChoiceFields(string $search = '')
+    public function getChoiceFields(string $search = ''): array
     {
         if ($this->choiceFieldsCache) {
             return $this->choiceFieldsCache;

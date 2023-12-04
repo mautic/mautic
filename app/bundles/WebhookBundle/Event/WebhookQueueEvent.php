@@ -8,10 +8,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 
 class WebhookQueueEvent extends CommonEvent
 {
-    /**
-     * @var Webhook
-     */
-    protected $webhook;
+    protected \Mautic\WebhookBundle\Entity\Webhook $webhook;
 
     /**
      * @param bool $isNew

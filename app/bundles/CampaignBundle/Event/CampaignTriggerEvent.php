@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CampaignTriggerEvent extends Event
 {
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
+    protected \Mautic\CampaignBundle\Entity\Campaign $campaign;
 
     /**
      * @var bool

@@ -9,15 +9,9 @@ use Twig\Environment;
 
 class MenuRenderer implements RendererInterface
 {
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
+    private \Knp\Menu\Matcher\MatcherInterface $matcher;
 
     /**
      * @var array

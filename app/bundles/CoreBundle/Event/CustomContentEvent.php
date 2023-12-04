@@ -16,10 +16,7 @@ class CustomContentEvent extends Event
      */
     protected $context;
 
-    /**
-     * @var array
-     */
-    protected $vars;
+    protected array $vars;
 
     /**
      * @var array

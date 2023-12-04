@@ -9,10 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class Client
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     /**
      * @var GuzzleClient

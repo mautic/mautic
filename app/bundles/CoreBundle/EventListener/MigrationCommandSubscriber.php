@@ -15,20 +15,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class MigrationCommandSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var VersionProviderInterface
-     */
-    private $versionProvider;
+    private \Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface $versionProvider;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     public function __construct(
         VersionProviderInterface $versionProvider,

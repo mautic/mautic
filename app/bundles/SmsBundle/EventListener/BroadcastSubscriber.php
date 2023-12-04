@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BroadcastExecutioner
-     */
-    private $broadcastExecutioner;
+    private \Mautic\SmsBundle\Broadcast\BroadcastExecutioner $broadcastExecutioner;
 
     public function __construct(BroadcastExecutioner $broadcastExecutioner)
     {

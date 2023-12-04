@@ -8,10 +8,7 @@ use Symfony\Component\Finder\Finder;
 
 class EntityMetadata
 {
-    /**
-     * @var BundleMetadata
-     */
-    private $metadata;
+    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
     /**
      * @var array

@@ -11,20 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var WebhookKillNotificator
-     */
-    private $webhookKillNotificator;
+    private \Mautic\WebhookBundle\Notificator\WebhookKillNotificator $webhookKillNotificator;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

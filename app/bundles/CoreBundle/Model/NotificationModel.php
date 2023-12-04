@@ -31,15 +31,9 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var UpdateHelper
-     */
-    protected $updateHelper;
+    protected \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper;
 
     private RequestStack $requestStack;
 

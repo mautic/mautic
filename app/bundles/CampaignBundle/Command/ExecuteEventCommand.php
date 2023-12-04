@@ -14,20 +14,11 @@ class ExecuteEventCommand extends Command
 {
     use WriteCountTrait;
 
-    /**
-     * @var ScheduledExecutioner
-     */
-    private $scheduledExecutioner;
+    private \Mautic\CampaignBundle\Executioner\ScheduledExecutioner $scheduledExecutioner;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
+    private \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
 
     public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {

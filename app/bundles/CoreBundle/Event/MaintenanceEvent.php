@@ -6,30 +6,18 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MaintenanceEvent extends Event
 {
-    /**
-     * @var int
-     */
-    protected $daysOld;
+    protected int $daysOld;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    protected $date;
+    protected \DateTimeInterface $date;
 
     /**
      * @var array
      */
     protected $stats = [];
 
-    /**
-     * @var bool
-     */
-    protected $dryRun = false;
+    protected bool $dryRun;
 
-    /**
-     * @var bool
-     */
-    protected $gdpr = false;
+    protected bool $gdpr;
 
     /**
      * @var array

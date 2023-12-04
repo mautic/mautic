@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ReplyEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private \Mautic\LeadBundle\Entity\Lead $contact;
 
     /**
      * @var string

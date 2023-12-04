@@ -11,10 +11,7 @@ use Knp\Menu\Twig\Helper as KnpHelper;
  */
 final class MenuHelper
 {
-    /**
-     * @var KnpHelper
-     */
-    private $helper;
+    private KnpHelper $helper;
 
     public function __construct(KnpHelper $helper)
     {

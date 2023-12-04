@@ -7,10 +7,7 @@ use Psr\Log\LoggerInterface;
 
 class DateTime implements ScheduleModeInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {

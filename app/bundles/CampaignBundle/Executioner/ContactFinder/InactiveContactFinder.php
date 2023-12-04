@@ -14,20 +14,11 @@ use Psr\Log\LoggerInterface;
 
 class InactiveContactFinder
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var CampaignLeadRepository
-     */
-    private $campaignLeadRepository;
+    private CampaignLeadRepository $campaignLeadRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var ArrayCollection
