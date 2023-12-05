@@ -33,7 +33,7 @@ class IcontactType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */
         $object          = $this->integrationHelper->getIntegrationObject('Icontact');
@@ -73,7 +73,7 @@ class IcontactType extends AbstractType
         ]);
 
         if (!empty($error)) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
                 $form = $event->getForm();
 
                 if ($error) {
@@ -108,7 +108,7 @@ class IcontactType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['form_area']);
     }

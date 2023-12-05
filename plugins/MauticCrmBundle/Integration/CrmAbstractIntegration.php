@@ -15,7 +15,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     protected $auth;
     protected $helper;
 
-    public function setIntegrationSettings(Integration $settings)
+    public function setIntegrationSettings(Integration $settings): void
     {
         // make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
@@ -105,7 +105,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
     }
 

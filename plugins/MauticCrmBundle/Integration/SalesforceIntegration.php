@@ -521,7 +521,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -2460,7 +2460,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
         // normalize for multiselect field
         foreach ($mappedData as &$data) {
@@ -2521,11 +2521,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $channel
      * @param string $sfObject
      *
-     * @return int
-     *
      * @throws ApiErrorException
      */
-    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = [])
+    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = []): void
     {
         $filters = [];
         $leadIds = [];
@@ -2585,7 +2583,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function updateMauticDNC($leadId, $newDncValue)
+    private function updateMauticDNC($leadId, $newDncValue): void
     {
         $lead = $this->leadModel->getEntity($leadId);
 

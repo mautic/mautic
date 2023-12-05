@@ -45,7 +45,7 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         // get api_key from plugin settings
         /** @var FullContactIntegration $myIntegration */

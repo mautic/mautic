@@ -150,7 +150,7 @@ class GrapesJsController extends CommonController
      * @param array $slots
      * @param Email $entity
      */
-    private function processEmailSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processEmailSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $content = $entity->getContent();
 
@@ -179,7 +179,7 @@ class GrapesJsController extends CommonController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processPageSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, FormFactoryInterface $formFactory, $slots, $entity)
+    private function processPageSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, FormFactoryInterface $formFactory, $slots, $entity): void
     {
         $slotsHelper->inBuilder(true);
 

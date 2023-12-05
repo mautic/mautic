@@ -58,7 +58,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     /**
      * Add or edit email settings entity based on request.
      */
-    public function addOrEditEntity(Email $email)
+    public function addOrEditEntity(Email $email): void
     {
         if ($this->emailModel->isUpdatingTranslationChildren()) {
             return;

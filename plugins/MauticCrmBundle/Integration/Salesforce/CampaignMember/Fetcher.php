@@ -128,7 +128,7 @@ class Fetcher
     /**
      * Fetch SF leads already identified.
      */
-    private function fetchLeads()
+    private function fetchLeads(): void
     {
         if (!$campaignMembers = $this->organizer->getLeadIds()) {
             return;
@@ -158,7 +158,7 @@ class Fetcher
     /**
      * Fetch SF contacts already identified.
      */
-    private function fetchContacts()
+    private function fetchContacts(): void
     {
         if (!$campaignMembers = $this->organizer->getContactIds()) {
             return;
@@ -188,7 +188,7 @@ class Fetcher
     /**
      * Fetch SF campaign members already identified.
      */
-    private function fetchCampaignMembers()
+    private function fetchCampaignMembers(): void
     {
         if (!$this->mauticIds) {
             return;
@@ -211,7 +211,7 @@ class Fetcher
     /**
      * Fetch a list of all identified objects for SF contacts and leads.
      */
-    private function fetchNewlyCreated()
+    private function fetchNewlyCreated(): void
     {
         if (!$allUnknownContacts = array_merge($this->unknownLeadIds, $this->unknownContactIds)) {
             return;

@@ -802,10 +802,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
-     *
-     * @return int
      */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 

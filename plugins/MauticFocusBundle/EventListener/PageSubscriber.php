@@ -61,7 +61,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
@@ -69,7 +69,7 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $regex   = '/'.$this->regex.'/i';

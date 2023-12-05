@@ -55,9 +55,6 @@ class InstagramIntegration extends SocialIntegration
         return "https://api.instagram.com/v1/$endpoint";
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUserData($identifier, &$socialCache)
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {

@@ -21,7 +21,7 @@ class TweetSendType extends AbstractType
         $this->router = $router;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'channelId',
@@ -99,7 +99,7 @@ class TweetSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }
