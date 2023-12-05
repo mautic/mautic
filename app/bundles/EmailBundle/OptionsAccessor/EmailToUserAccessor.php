@@ -7,13 +7,9 @@ use Mautic\UserBundle\Entity\User;
 
 class EmailToUserAccessor
 {
-    /** @var array */
-    private $config;
+    private array $config;
 
-    /**
-     * @var ArrayStringTransformer
-     */
-    private $transformer;
+    private \Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer $transformer;
 
     public function __construct(array $config)
     {

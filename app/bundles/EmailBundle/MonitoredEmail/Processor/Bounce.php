@@ -20,50 +20,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
-    /**
-     * @var TransportInterface
-     */
-    protected $transport;
+    protected \Symfony\Component\Mailer\Transport\TransportInterface $transport;
 
-    /**
-     * @var ContactFinder
-     */
-    protected $contactFinder;
+    protected \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
 
-    /**
-     * @var StatRepository
-     */
-    protected $statRepository;
+    protected \Mautic\EmailBundle\Entity\StatRepository $statRepository;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var string
      */
     protected $bouncerAddress;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var Message
      */
     protected $message;
 
-    /**
-     * @var DoNotContact
-     */
-    protected $doNotContact;
+    protected \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
 
     public function __construct(
         TransportInterface $transport,

@@ -4,8 +4,14 @@ namespace Mautic\EmailBundle\MonitoredEmail\Accessor;
 
 class ConfigAccessor
 {
-    private $config;
+    /**
+     * @var mixed[]
+     */
+    private array $config;
 
+    /**
+     * @param mixed[] $config
+     */
     public function __construct(array $config)
     {
         $this->config = $config;

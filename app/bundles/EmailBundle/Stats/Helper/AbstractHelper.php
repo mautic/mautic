@@ -17,20 +17,11 @@ abstract class AbstractHelper implements StatHelperInterface
     use FilterTrait;
     use DateRangeUnitTrait;
 
-    /**
-     * @var Collector
-     */
-    private $collector;
+    private \Mautic\StatsBundle\Aggregate\Collector $collector;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
+    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    protected $generatedColumnsProvider;
+    protected \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
 
     public function __construct(
         Collector $collector,

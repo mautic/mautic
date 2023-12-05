@@ -8,15 +8,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailReplyEvent extends Event
 {
-    /**
-     * @var Email
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email;
 
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private \Mautic\EmailBundle\Entity\Stat $stat;
 
     public function __construct(Stat $stat)
     {

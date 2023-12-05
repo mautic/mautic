@@ -15,15 +15,9 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
+    private \Mautic\LeadBundle\Helper\PrimaryCompanyHelper $primaryCompanyHelper;
 
     public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
     {

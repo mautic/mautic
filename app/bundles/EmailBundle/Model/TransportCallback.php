@@ -11,20 +11,11 @@ use Mautic\LeadBundle\Model\DoNotContact;
 
 class TransportCallback
 {
-    /**
-     * @var DoNotContact
-     */
-    private $dncModel;
+    private \Mautic\LeadBundle\Model\DoNotContact $dncModel;
 
-    /**
-     * @var ContactFinder
-     */
-    private $finder;
+    private \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $finder;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
 
     public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
     {

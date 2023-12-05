@@ -38,10 +38,7 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
+    protected \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
     public function __construct(EmailModel $emailModel)
     {

@@ -14,10 +14,7 @@ class EmailOpenEvent extends CommonEvent
      */
     private $request;
 
-    /**
-     * @var Email
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email;
 
     /**
      * @var bool
