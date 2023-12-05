@@ -42,7 +42,7 @@ class Redirect extends FormEntity
         $this->trackables = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -73,7 +73,7 @@ class Redirect extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('redirect')
             ->addListProperties(
@@ -111,7 +111,7 @@ class Redirect extends FormEntity
     /**
      * @param string $redirectId
      */
-    public function setRedirectId($redirectId = null)
+    public function setRedirectId($redirectId = null): void
     {
         if (null === $redirectId) {
             $redirectId = substr(hash('sha1', uniqid(mt_rand())), 0, 25);
@@ -130,7 +130,7 @@ class Redirect extends FormEntity
     /**
      * @param string $url
      */
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->url = $url;
     }

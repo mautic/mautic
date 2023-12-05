@@ -29,7 +29,7 @@ class PageEvent extends CommonEvent
     /**
      * Sets the Page entity.
      */
-    public function setPage(Page $page)
+    public function setPage(Page $page): void
     {
         $this->entity = $page;
     }

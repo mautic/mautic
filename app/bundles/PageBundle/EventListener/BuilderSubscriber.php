@@ -103,7 +103,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(Events\PageBuilderEvent $event)
+    public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
@@ -328,7 +328,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(Events\PageDisplayEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $page    = $event->getPage();
@@ -680,7 +680,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $langbar;
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -688,7 +688,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();

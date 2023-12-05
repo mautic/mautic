@@ -61,7 +61,7 @@ class PageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
@@ -174,7 +174,7 @@ class PageType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $formModifier = function (FormInterface $form, $isVariant) {
+        $formModifier = function (FormInterface $form, $isVariant): void {
             if ($isVariant) {
                 $form->add(
                     'variantSettings',
@@ -189,7 +189,7 @@ class PageType extends AbstractType
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier(
                     $event->getForm(),
                     $event->getData()->getVariantParent()
@@ -200,7 +200,7 @@ class PageType extends AbstractType
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 if (isset($data['variantParent'])) {
                     $formModifier(
@@ -343,7 +343,7 @@ class PageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Page::class,

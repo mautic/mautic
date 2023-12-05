@@ -34,7 +34,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
-    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
@@ -119,7 +119,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
-    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
+    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];

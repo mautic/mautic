@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigTrackingPageType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.config.form.track.by.tracking.url',

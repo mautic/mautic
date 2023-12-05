@@ -123,7 +123,7 @@ class PageModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setCatInUrl($catInUrl)
+    public function setCatInUrl($catInUrl): void
     {
         $this->catInUrl = $catInUrl;
     }
@@ -161,7 +161,7 @@ class PageModel extends FormModel
      * @param Page $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 
@@ -211,7 +211,7 @@ class PageModel extends FormModel
     /**
      * @param Page $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -780,7 +780,7 @@ class PageModel extends FormModel
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
             ->andWhere('p.created_by = :userId')
@@ -1072,7 +1072,7 @@ class PageModel extends FormModel
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead)
+    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';

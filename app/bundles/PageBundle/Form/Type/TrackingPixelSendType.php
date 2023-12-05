@@ -18,7 +18,7 @@ class TrackingPixelSendType extends AbstractType
         $this->trackingHelper = $trackingHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();
 

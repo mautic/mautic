@@ -217,7 +217,7 @@ class PageRepository extends CommonRepository
     /**
      * Resets variant_start_date and variant_hits.
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants($relatedIds, $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(int) $relatedIds];
@@ -241,7 +241,7 @@ class PageRepository extends CommonRepository
      * @param bool|false $unique
      * @param bool|false $variant
      */
-    public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false)
+    public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

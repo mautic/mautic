@@ -23,7 +23,7 @@ class RedirectGenerationEvent extends CommonEvent
      * @param string $key
      * @param mixed  $value
      */
-    public function setInClickthrough($key, $value)
+    public function setInClickthrough($key, $value): void
     {
         $this->clickthrough[$key] = $value;
     }

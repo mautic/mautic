@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DashboardHitsInTimeWidgetType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('flag', ChoiceType::class, [
                 'label'   => 'mautic.page.visit.flag.filter',
