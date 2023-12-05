@@ -56,7 +56,7 @@ final class RemoveDeletedFilesStep implements StepInterface
         @unlink($this->appRoot.'/deleted_files.txt');
     }
 
-    private function deleteFile(string $file)
+    private function deleteFile(string $file): void
     {
         $path = $this->appRoot.'/'.$file;
 

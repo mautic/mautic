@@ -353,7 +353,7 @@ class LanguageHelper
         }
     }
 
-    private function loadSupportedLanguages()
+    private function loadSupportedLanguages(): void
     {
         // Find available translations
         $finder = new Finder();

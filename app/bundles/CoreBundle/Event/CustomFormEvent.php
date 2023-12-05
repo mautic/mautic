@@ -95,7 +95,7 @@ class CustomFormEvent extends Event
         $this->listeners[$eventName][] = $listener;
     }
 
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->subscribers[] = $subscriber;
     }

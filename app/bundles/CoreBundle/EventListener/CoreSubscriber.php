@@ -92,7 +92,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(ControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(ControllerEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMainRequest()) {
             return;
@@ -107,7 +107,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Set vars on login.
      */
-    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER')) {
             return;
@@ -151,7 +151,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildMenu(MenuEvent $event)
+    public function onBuildMenu(MenuEvent $event): void
     {
         $name    = $event->getType();
         $bundles = $this->bundleHelper->getMauticBundles(true);
@@ -264,7 +264,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFetchIcons(IconEvent $event)
+    public function onFetchIcons(IconEvent $event): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
         $icons   = $session->get('mautic.menu.icons', []);
@@ -302,7 +302,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
+    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];

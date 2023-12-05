@@ -39,7 +39,7 @@ class MenuHelper
      * @param int    $defaultPriority
      * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -145,7 +145,7 @@ class MenuHelper
      * @param bool $appendOrphans
      * @param int  $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main'): void
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
@@ -184,7 +184,7 @@ class MenuHelper
     /**
      * Sort menu items by priority.
      */
-    public function sortByPriority(&$menuItems, $defaultPriority = 9999)
+    public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
             $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;

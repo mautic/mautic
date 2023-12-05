@@ -216,7 +216,7 @@ class UpdateHelper
         return $checkResults;
     }
 
-    private function sendStats()
+    private function sendStats(): void
     {
         if (!$statUrl = $this->coreParametersHelper->get('stats_update_url')) {
             // Stat collection disabled

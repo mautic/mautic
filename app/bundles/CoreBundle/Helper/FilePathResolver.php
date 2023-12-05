@@ -70,7 +70,7 @@ class FilePathResolver
     /**
      * @param string $path
      */
-    public function delete($path)
+    public function delete($path): void
     {
         if (!$this->filesystem->exists($path)) {
             return;

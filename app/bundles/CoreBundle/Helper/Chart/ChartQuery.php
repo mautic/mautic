@@ -77,7 +77,7 @@ class ChartQuery extends AbstractChart
         $this->setDateRange($dateFrom, $dateTo);
     }
 
-    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
+    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider): void
     {
         $this->generatedColumnProvider = $generatedColumnProvider;
     }
@@ -88,7 +88,7 @@ class ChartQuery extends AbstractChart
      * @param QueryBuilder $query
      * @param array        $filters
      */
-    public function applyFilters(&$query, $filters)
+    public function applyFilters(&$query, $filters): void
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
@@ -127,7 +127,7 @@ class ChartQuery extends AbstractChart
      * @param string       $dateColumn
      * @param string       $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't')
+    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -229,7 +229,7 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -539,7 +539,7 @@ class ChartQuery extends AbstractChart
      * @param int    $endSecond
      * @param string $tablePrefix
      */
-    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
+    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');

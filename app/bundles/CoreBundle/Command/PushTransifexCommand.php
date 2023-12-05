@@ -121,7 +121,7 @@ EOT
 
         $transifex->getApiConnector()->fulfillPromises(
             $promises,
-            function (ResponseInterface $response, Promise $promise) use ($output) {
+            function (ResponseInterface $response, Promise $promise) use ($output): void {
                 $output->writeln(
                     $this->translator->trans(
                         'mautic.core.command.transifex_resource_updated',
@@ -129,7 +129,7 @@ EOT
                     )
                 );
             },
-            function (ResponseException $exception, Promise $promise) use ($output) {
+            function (ResponseException $exception, Promise $promise) use ($output): void {
                 $output->writeln($promise->getFilePath());
                 $output->writeln($exception->getMessage());
             }

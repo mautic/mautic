@@ -17,7 +17,7 @@ class ThemeListType extends AbstractType
         $this->themeHelper = $helper;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

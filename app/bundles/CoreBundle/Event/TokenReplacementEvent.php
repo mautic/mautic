@@ -70,7 +70,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param CommonEntity|string|null $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
@@ -102,7 +102,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough)
+    public function setClickthrough($clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }
@@ -115,7 +115,7 @@ class TokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function addToken($token, $value)
+    public function addToken($token, $value): void
     {
         $this->tokens[$token] = $value;
     }

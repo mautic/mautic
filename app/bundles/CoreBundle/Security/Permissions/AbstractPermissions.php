@@ -23,7 +23,7 @@ abstract class AbstractPermissions
      * This method is called before the permissions object is used.
      * Define permissions with `addExtendedPermissions` here instead of constructor.
      */
-    public function definePermissions()
+    public function definePermissions(): void
     {
         // Override this method in the final class
     }
@@ -85,7 +85,7 @@ abstract class AbstractPermissions
     /**
      * Builds the bundle's specific form elements for its permissions.
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
     }
 
@@ -302,7 +302,7 @@ abstract class AbstractPermissions
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
      */
-    public function parseForJavascript(array &$perms)
+    public function parseForJavascript(array &$perms): void
     {
     }
 

@@ -46,7 +46,7 @@ class GlobalSearchEvent extends Event
      * @param string $header  String name for section header
      * @param array  $results Array of HTML output that will be wrapped in <li /> elements
      */
-    public function addResults($header, array $results)
+    public function addResults($header, array $results): void
     {
         $header                 = $this->translator->trans($header);
         $this->results[$header] = $results;

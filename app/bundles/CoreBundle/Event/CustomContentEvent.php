@@ -53,7 +53,7 @@ class CustomContentEvent extends Event
     /**
      * @param string $content
      */
-    public function addContent($content)
+    public function addContent($content): void
     {
         $this->content[] = $content;
     }
@@ -61,7 +61,7 @@ class CustomContentEvent extends Event
     /**
      * @param string $template
      */
-    public function addTemplate($template, array $vars = [])
+    public function addTemplate($template, array $vars = []): void
     {
         $this->templates[] = [
             'template' => $template,

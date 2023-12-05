@@ -177,7 +177,7 @@ class AssetGenerationHelper
                         "$assetsFullPath/css",
                         "$assetsFullPath/js",
                     ];
-                    array_walk($checkPaths, function ($path) {
+                    array_walk($checkPaths, function ($path): void {
                         if (!file_exists($path)) {
                             mkdir($path);
                         }

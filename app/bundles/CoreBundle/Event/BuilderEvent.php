@@ -31,7 +31,7 @@ class BuilderEvent extends Event
     /**
      * @param int $priority
      */
-    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
+    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = []): void
     {
         $this->slotTypes[$key] = [
             'header'   => $this->translator->trans($header),
@@ -67,7 +67,7 @@ class BuilderEvent extends Event
         return $this->slotTypes;
     }
 
-    public function addSection($key, $header, $icon, $content, $form, $priority = 0)
+    public function addSection($key, $header, $icon, $content, $form, $priority = 0): void
     {
         $this->sections[$key] = [
             'header'   => $this->translator->trans($header),
@@ -167,10 +167,10 @@ class BuilderEvent extends Event
     /**
      * @param bool $convertToLinks
      */
-    public function addTokens(array $tokens, $convertToLinks = false)
+    public function addTokens(array $tokens, $convertToLinks = false): void
     {
         if ($convertToLinks) {
-            array_walk($tokens, function (&$val, $key) {
+            array_walk($tokens, function (&$val, $key): void {
                 $val = 'a:'.$val;
             });
         }
@@ -178,7 +178,7 @@ class BuilderEvent extends Event
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    public function addToken($key, $value)
+    public function addToken($key, $value): void
     {
         $this->tokens[$key] = $value;
     }
@@ -299,7 +299,7 @@ class BuilderEvent extends Event
         $labelColumn = 'name',
         $valueColumn = 'id',
         $convertToLinks = false
-    ) {
+    ): void {
         $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
         if (null == $tokens) {
             $tokens = [];

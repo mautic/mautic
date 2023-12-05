@@ -177,7 +177,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array $entities
      */
-    public function deleteEntities($entities)
+    public function deleteEntities($entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -200,7 +200,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return int
      */
-    public function deleteEntity($entity, $flush = true)
+    public function deleteEntity($entity, $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
@@ -210,7 +210,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    public function detachEntities(array $entities)
+    public function detachEntities(array $entities): void
     {
         foreach ($entities as $entity) {
             $this->getEntityManager()->detach($entity);
@@ -220,7 +220,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param mixed $entity
      */
-    public function detachEntity($entity)
+    public function detachEntity($entity): void
     {
         $this->getEntityManager()->detach($entity);
     }
@@ -781,7 +781,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array|ArrayCollection $entities
      */
-    public function saveEntities($entities)
+    public function saveEntities($entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -891,7 +891,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param User $user
      */
-    public function setCurrentUser($user)
+    public function setCurrentUser($user): void
     {
         if (!$user instanceof User) {
             // just create a blank user entity
@@ -900,7 +900,7 @@ class CommonRepository extends ServiceEntityRepository
         $this->currentUser = $user;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $translator;
     }
@@ -1771,7 +1771,7 @@ class CommonRepository extends ServiceEntityRepository
         return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }
 
-    private function convertOrmPropertiesToColumns(array &$filters, array $properties)
+    private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
             $key   = (isset($f['col'])) ? 'col' : 'column';

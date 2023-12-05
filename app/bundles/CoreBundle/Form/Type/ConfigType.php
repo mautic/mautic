@@ -58,7 +58,7 @@ class ConfigType extends AbstractType
         $this->shortenerFactory    = $shortenerFactory;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('last_shown_tab', HiddenType::class);
 
@@ -494,7 +494,7 @@ class ConfigType extends AbstractType
         );
 
         $ipLookupFactory = $this->ipLookupFactory;
-        $formModifier    = function (FormEvent $event) use ($ipLookupFactory) {
+        $formModifier    = function (FormEvent $event) use ($ipLookupFactory): void {
             $data = $event->getData();
             $form = $event->getForm();
 
@@ -515,14 +515,14 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
@@ -718,7 +718,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }

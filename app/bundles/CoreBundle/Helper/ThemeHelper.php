@@ -111,7 +111,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->defaultThemes;
     }
 
-    public function setDefaultTheme($defaultTheme)
+    public function setDefaultTheme($defaultTheme): void
     {
         $this->defaultTheme = $defaultTheme;
     }

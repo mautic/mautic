@@ -207,7 +207,7 @@ class StatsEvent extends Event
     /**
      * Add an array of results and if so, stop propagation.
      */
-    public function setResults(array $results)
+    public function setResults(array $results): void
     {
         $this->results    = $results;
         $this->hasResults = true;

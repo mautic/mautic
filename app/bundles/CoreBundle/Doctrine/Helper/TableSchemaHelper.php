@@ -175,7 +175,7 @@ class TableSchemaHelper
     /**
      * Executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();
 

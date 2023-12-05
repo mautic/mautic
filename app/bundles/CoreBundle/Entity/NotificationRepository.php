@@ -28,7 +28,7 @@ class NotificationRepository extends CommonRepository
     /**
      * Mark user notifications as read.
      */
-    public function markAllReadForUser($userId)
+    public function markAllReadForUser($userId): void
     {
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
@@ -41,7 +41,7 @@ class NotificationRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
-    public function clearNotificationsForUser($userId, $id = null, $limit = null)
+    public function clearNotificationsForUser($userId, $id = null, $limit = null): void
     {
         if (!empty($id)) {
             $this->getEntityManager()->getConnection()->update(

@@ -57,7 +57,7 @@ abstract class AbstractFormFieldHelper
         $this->setTranslationKeyPrefix();
     }
 
-    public function setTranslator(Translator $translator)
+    public function setTranslator(Translator $translator): void
     {
         $this->translator = $translator;
     }

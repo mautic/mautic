@@ -84,7 +84,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
     }
 
-    private function addMiddlewares(array $middlewares, ?string $env = null)
+    private function addMiddlewares(array $middlewares, ?string $env = null): void
     {
         $prefix = 'Mautic\\Middleware\\';
 

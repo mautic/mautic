@@ -29,7 +29,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
@@ -43,7 +43,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();
 

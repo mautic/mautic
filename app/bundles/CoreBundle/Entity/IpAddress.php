@@ -28,7 +28,7 @@ class IpAddress
      */
     private $ipDetails;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -52,7 +52,7 @@ class IpAddress
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('ipAddress')
             ->addListProperties(
@@ -140,7 +140,7 @@ class IpAddress
     /**
      * Set list of IPs to not track.
      */
-    public function setDoNotTrackList(array $ips)
+    public function setDoNotTrackList(array $ips): void
     {
         $this->doNotTrack = $ips;
     }

@@ -35,7 +35,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $args)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $args): void
     {
         // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
@@ -115,7 +115,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
         $tables = $schema->getTables();

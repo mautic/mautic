@@ -41,7 +41,7 @@ class RequestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function validateCsrfTokenForAjaxPost(RequestEvent $event)
+    public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {
         $request = $event->getRequest();
 

@@ -195,7 +195,7 @@ final class AssetsHelper
     public function addScript($script, $location = 'head', $async = false, $name = null)
     {
         $assets     = &$this->assets[$this->context];
-        $addScripts = function ($s) use ($location, &$assets, $async, $name) {
+        $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
@@ -258,7 +258,7 @@ final class AssetsHelper
      */
     public function addStylesheet($stylesheet)
     {
-        $addSheet = function ($s) {
+        $addSheet = function ($s): void {
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }
