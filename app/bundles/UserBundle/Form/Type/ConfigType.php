@@ -32,7 +32,7 @@ class ConfigType extends AbstractType
         $this->translator = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $samlEntityIdChoices = ['', $this->parameters->get('mautic.site_url')];
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
@@ -200,7 +200,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }

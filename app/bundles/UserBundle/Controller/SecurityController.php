@@ -105,7 +105,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * Do nothing.
      */
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
     }
 

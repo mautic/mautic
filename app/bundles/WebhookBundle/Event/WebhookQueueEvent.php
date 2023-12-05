@@ -33,7 +33,7 @@ class WebhookQueueEvent extends CommonEvent
     /**
      * Sets the WebhookQueue entity.
      */
-    public function setWebhookQueue(WebhookQueue $webhookQueue)
+    public function setWebhookQueue(WebhookQueue $webhookQueue): void
     {
         $this->entity = $webhookQueue;
     }
@@ -51,7 +51,7 @@ class WebhookQueueEvent extends CommonEvent
     /**
      * Sets the Webhook entity.
      */
-    public function setWebhook(Webhook $webhook)
+    public function setWebhook(Webhook $webhook): void
     {
         $this->webhook = $webhook;
     }

@@ -56,7 +56,7 @@ class Role extends FormEntity
         $this->users       = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -87,7 +87,7 @@ class Role extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -97,7 +97,7 @@ class Role extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('role')
             ->addListProperties(
@@ -164,7 +164,7 @@ class Role extends FormEntity
     /**
      * Remove permissions.
      */
-    public function removePermission(Permission $permissions)
+    public function removePermission(Permission $permissions): void
     {
         $this->permissions->removeElement($permissions);
     }
@@ -242,7 +242,7 @@ class Role extends FormEntity
     /**
      * Simply used to store a readable format of permissions for the changelog.
      */
-    public function setRawPermissions(array $permissions)
+    public function setRawPermissions(array $permissions): void
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
@@ -273,7 +273,7 @@ class Role extends FormEntity
     /**
      * Remove users.
      */
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }

@@ -45,7 +45,7 @@ class WebhookKillNotificator
     /**
      * @param string $reason Translatable key
      */
-    public function send(Webhook $webhook, $reason)
+    public function send(Webhook $webhook, $reason): void
     {
         $subject = $this->translator->trans('mautic.webhook.stopped');
         $reason  = $this->translator->trans($reason);
