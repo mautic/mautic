@@ -34,7 +34,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on number of form submissions.
      */
-    public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
+    public function onDetermineSubmissionWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];

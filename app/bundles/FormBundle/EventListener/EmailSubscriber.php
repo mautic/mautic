@@ -19,7 +19,7 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria

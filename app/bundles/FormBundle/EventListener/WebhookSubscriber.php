@@ -32,7 +32,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $formSubmit = [
@@ -44,7 +44,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
     }
 
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             FormEvents::FORM_ON_SUBMIT,

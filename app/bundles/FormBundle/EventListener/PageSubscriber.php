@@ -50,7 +50,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
@@ -68,7 +68,7 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $page    = $event->getPage();

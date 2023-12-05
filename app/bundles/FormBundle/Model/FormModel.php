@@ -214,7 +214,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    public function setFields(Form $entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields): void
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
@@ -268,7 +268,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    public function deleteFields(Form $entity, $sessionFields)
+    public function deleteFields(Form $entity, $sessionFields): void
     {
         if (empty($sessionFields)) {
             return;
@@ -291,7 +291,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    private function handleFilesDelete(Field $field)
+    private function handleFilesDelete(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -300,7 +300,7 @@ class FormModel extends CommonFormModel
         $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
-    public function setActions(Form $entity, $sessionActions)
+    public function setActions(Form $entity, $sessionActions): void
     {
         $order           = 1;
         $existingActions = $entity->getActions()->toArray();
@@ -352,7 +352,7 @@ class FormModel extends CommonFormModel
     /**
      * @param array $actions
      */
-    public function deleteActions(Form $entity, $actions)
+    public function deleteActions(Form $entity, $actions): void
     {
         if (empty($actions)) {
             return;
@@ -377,7 +377,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -591,7 +591,7 @@ class FormModel extends CommonFormModel
      * @param bool $isNew
      * @param bool $dropExisting
      */
-    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
+    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false): void
     {
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
@@ -621,7 +621,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         /* @var Form $entity */
         $this->deleteFormFiles($entity);
@@ -651,7 +651,7 @@ class FormModel extends CommonFormModel
         return $entities;
     }
 
-    private function deleteFormFiles(Form $form)
+    private function deleteFormFiles(Form $form): void
     {
         $this->formUploader->deleteFilesOfForm($form);
     }
@@ -790,7 +790,7 @@ class FormModel extends CommonFormModel
     /**
      * Writes in form values from get parameters.
      */
-    public function populateValuesWithGetParameters(Form $form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml): void
     {
         $formName = $form->generateFormName();
         $request  = $this->requestStack->getCurrentRequest();
@@ -810,7 +810,7 @@ class FormModel extends CommonFormModel
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml)
+    public function populateValuesWithLead(Form $form, &$formHtml): void
     {
         $formName          = $form->generateFormName();
         $fields            = $form->getFields();
@@ -953,7 +953,7 @@ class FormModel extends CommonFormModel
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html)
+    private function loadHTML(&$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
