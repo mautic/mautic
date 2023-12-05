@@ -219,7 +219,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    public function setActionFeedback($key, $feedback)
+    public function setActionFeedback($key, $feedback): void
     {
         $this->feedback[$key] = $feedback;
     }
@@ -252,7 +252,7 @@ class SubmissionEvent extends CommonEvent
         $this->context = $context;
     }
 
-    public function setAction(?Action $action = null)
+    public function setAction(?Action $action = null): void
     {
         $this->action = $action;
         if (!is_null($action)) {

@@ -25,9 +25,9 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $this->submissionModel = $submissionModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $importResults = function ($results) {
+        $importResults = function ($results): void {
             foreach ($results as $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());

@@ -440,7 +440,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param Submission $submission
      */
-    public function deleteEntity($submission)
+    public function deleteEntity($submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
@@ -483,7 +483,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $viewOnlyFields) {
+                    function () use ($results, $form, $viewOnlyFields): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -526,7 +526,7 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $name, $viewOnlyFields) {
+                        function () use ($results, $form, $name, $viewOnlyFields): void {
                             $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
@@ -592,7 +592,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results) {
+                    function () use ($results): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -632,7 +632,7 @@ class SubmissionModel extends CommonFormModel
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($results, $name) {
+                    function () use ($results, $name): void {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
 
@@ -907,7 +907,7 @@ class SubmissionModel extends CommonFormModel
 
         $actions->filter(function (Action $action) use ($availableActions) {
             return array_key_exists($action->getType(), $availableActions);
-        })->map(function (Action $action) use ($event, $availableActions) {
+        })->map(function (Action $action) use ($event, $availableActions): void {
             $event->setAction($action);
             $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });

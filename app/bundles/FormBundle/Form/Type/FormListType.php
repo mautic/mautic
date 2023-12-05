@@ -24,7 +24,7 @@ class FormListType extends AbstractType
         $this->repo->setCurrentUser($userHelper->getUser());
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $viewOther = $this->viewOther;
         $repo      = $this->repo;

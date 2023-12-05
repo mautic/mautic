@@ -21,7 +21,7 @@ class FileExtensionConstraintValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!is_array($value)) {
             $this->context->buildViolation($constraint->message)

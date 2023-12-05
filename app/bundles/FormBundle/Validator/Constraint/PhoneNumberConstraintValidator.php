@@ -53,7 +53,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
      * @param mixed      $value      the value that should be validated
      * @param Constraint $constraint the constraint for the validation
      */
-    private function addViolation($value, Constraint $constraint)
+    private function addViolation($value, Constraint $constraint): void
     {
         $this->context->addViolation(
             $constraint->getMessage(),

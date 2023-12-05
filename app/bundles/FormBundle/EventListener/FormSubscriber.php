@@ -65,7 +65,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
@@ -84,7 +84,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         $log  = [
@@ -101,7 +101,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',

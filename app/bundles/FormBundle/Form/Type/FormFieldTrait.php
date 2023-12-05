@@ -17,12 +17,12 @@ trait FormFieldTrait
      */
     protected $formModel;
 
-    public function setFieldModel(FieldModel $fieldModel)
+    public function setFieldModel(FieldModel $fieldModel): void
     {
         $this->fieldModel = $fieldModel;
     }
 
-    public function setFormModel(FormModel $formModel)
+    public function setFormModel(FormModel $formModel): void
     {
         $this->formModel = $formModel;
     }

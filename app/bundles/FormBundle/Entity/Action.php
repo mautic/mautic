@@ -59,7 +59,7 @@ class Action
         $this->form = null;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -88,7 +88,7 @@ class Action
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addProperties(
@@ -104,7 +104,7 @@ class Action
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('type', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -112,7 +112,7 @@ class Action
         ]));
     }
 
-    private function isChanged($prop, $val)
+    private function isChanged($prop, $val): void
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];

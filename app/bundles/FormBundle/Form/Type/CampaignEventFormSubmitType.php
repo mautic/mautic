@@ -10,7 +10,7 @@ class CampaignEventFormSubmitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.campaign.event.forms',

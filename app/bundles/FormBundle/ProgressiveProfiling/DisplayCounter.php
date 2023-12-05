@@ -24,7 +24,7 @@ class DisplayCounter
         $this->form = $form;
     }
 
-    public function increaseDisplayedFields()
+    public function increaseDisplayedFields(): void
     {
         ++$this->displayedFields;
     }
@@ -37,7 +37,7 @@ class DisplayCounter
         return $this->displayedFields;
     }
 
-    public function increaseAlreadyAlwaysDisplayed()
+    public function increaseAlreadyAlwaysDisplayed(): void
     {
         ++$this->alreadyAlwaysDisplayed;
     }
