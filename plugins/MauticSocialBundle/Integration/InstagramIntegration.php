@@ -55,7 +55,7 @@ class InstagramIntegration extends SocialIntegration
         return "https://api.instagram.com/v1/$endpoint";
     }
 
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl('users/'.$id);
