@@ -23,7 +23,7 @@ class ConfigType extends AbstractType
         $this->translator     = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();

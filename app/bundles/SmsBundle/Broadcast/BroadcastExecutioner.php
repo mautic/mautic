@@ -37,7 +37,7 @@ class BroadcastExecutioner
         $this->leadRepository = $leadRepository;
     }
 
-    public function execute(ChannelBroadcastEvent $event)
+    public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
         $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId());
@@ -61,7 +61,7 @@ class BroadcastExecutioner
      * @throws LimitQuotaException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
      */
-    private function send(Sms $sms)
+    private function send(Sms $sms): void
     {
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
         while (!empty($contacts)) {

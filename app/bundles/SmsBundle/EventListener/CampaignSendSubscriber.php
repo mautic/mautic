@@ -36,7 +36,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addAction(
@@ -55,10 +55,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $lead  = $event->getLead();
         $smsId = (int) $event->getConfig()['sms'];

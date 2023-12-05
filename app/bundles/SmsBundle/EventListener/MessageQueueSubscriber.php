@@ -30,7 +30,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
     /**
      * Sends campaign emails.
      */
-    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
+    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('sms')) {
             return;
