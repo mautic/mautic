@@ -28,7 +28,7 @@ class UntrackableUrlsEvent extends Event
     /**
      * set a URL or token to not convert to trackables.
      */
-    public function addNonTrackable($url)
+    public function addNonTrackable($url): void
     {
         $this->doNotTrack[] = $url;
     }

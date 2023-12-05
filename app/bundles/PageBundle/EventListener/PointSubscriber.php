@@ -32,7 +32,7 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'       => 'mautic.page.point.action',
@@ -59,7 +59,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for page hits.
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onPageHit(Events\PageHitEvent $event): void
     {
         if ($event->getPage()) {
             // Mautic Landing Page was hit

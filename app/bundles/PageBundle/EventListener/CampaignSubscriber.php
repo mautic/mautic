@@ -53,7 +53,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add trigger
         $pageHitTrigger = [
@@ -102,7 +102,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger actions for page hits.
      */
-    public function onPageHit(PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event): void
     {
         $hit       = $event->getHit();
         $channel   = 'page';
