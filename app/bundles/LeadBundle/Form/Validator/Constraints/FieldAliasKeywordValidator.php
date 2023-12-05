@@ -44,7 +44,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     /**
      * @param LeadField $field
      */
-    public function validate($field, Constraint $constraint)
+    public function validate($field, Constraint $constraint): void
     {
         $oldValue = $this->em->getUnitOfWork()->getOriginalEntityData($field);
         $this->aliasHelper->makeAliasUnique($field);

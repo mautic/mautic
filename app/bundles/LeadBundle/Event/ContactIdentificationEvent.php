@@ -35,7 +35,7 @@ class ContactIdentificationEvent extends Event
     /**
      * @param string $channel
      */
-    public function setIdentifiedContact(Lead $contact, $channel)
+    public function setIdentifiedContact(Lead $contact, $channel): void
     {
         $this->identifiedContact   = $contact;
         $this->identifiedByChannel = $channel;

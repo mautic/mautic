@@ -155,7 +155,7 @@ class LeadTimelineEvent extends Event
      *
      * @param array $data Data array for the table
      */
-    public function addEvent(array $data)
+    public function addEvent(array $data): void
     {
         if ($this->countOnly) {
             // BC support for old format
@@ -303,7 +303,7 @@ class LeadTimelineEvent extends Event
      * @param string $eventTypeKey  Identifier of the event type
      * @param string $eventTypeName Name of the event type for humans
      */
-    public function addEventType($eventTypeKey, $eventTypeName)
+    public function addEventType($eventTypeKey, $eventTypeName): void
     {
         $this->eventTypes[$eventTypeKey] = $eventTypeName;
     }
@@ -474,7 +474,7 @@ class LeadTimelineEvent extends Event
      *
      * @param int|array $count
      */
-    public function addToCounter($eventType, $count)
+    public function addToCounter($eventType, $count): void
     {
         if (!isset($this->totalEvents[$eventType])) {
             $this->totalEvents[$eventType] = 0;
@@ -503,7 +503,7 @@ class LeadTimelineEvent extends Event
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
      */
-    public function subtractFromCounter($eventType, $count = 1)
+    public function subtractFromCounter($eventType, $count = 1): void
     {
         $this->totalEvents[$eventType] -= $count;
     }
@@ -513,7 +513,7 @@ class LeadTimelineEvent extends Event
      *
      * @param null $groupUnit
      */
-    public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null)
+    public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null): void
     {
         $this->countOnly  = true;
         $this->dateFrom   = $dateFrom;
@@ -545,7 +545,7 @@ class LeadTimelineEvent extends Event
     /**
      * Add a serializer group for API formatting.
      */
-    public function addSerializerGroup($group)
+    public function addSerializerGroup($group): void
     {
         if (is_array($group)) {
             $this->serializerGroups = array_merge(
@@ -568,7 +568,7 @@ class LeadTimelineEvent extends Event
     /**
      * Will cause isApplicable to return false for all in order to just compile a list of event types.
      */
-    public function fetchTypesOnly()
+    public function fetchTypesOnly(): void
     {
         $this->fetchTypesOnly = true;
     }

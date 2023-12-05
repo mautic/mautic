@@ -26,7 +26,7 @@ class LeadImportFieldType extends AbstractType
         $this->entityManager = $entityManager;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         foreach ($options['all_fields'] as $optionGroup => $fields) {
@@ -143,7 +143,7 @@ class LeadImportFieldType extends AbstractType
         $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['all_fields', 'import_fields', 'object']);
         $resolver->setDefaults([

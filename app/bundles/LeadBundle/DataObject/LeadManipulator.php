@@ -90,7 +90,7 @@ class LeadManipulator
     /**
      * Set manipulator as logged so it wouldn't be logged for the second time in the same request.
      */
-    public function setAsLogged()
+    public function setAsLogged(): void
     {
         $this->logged = true;
     }

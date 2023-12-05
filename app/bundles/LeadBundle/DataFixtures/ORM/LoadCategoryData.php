@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 
 class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var CategoryRepository $categoryRepo */
         $categoryRepo = $manager->getRepository(Category::class);

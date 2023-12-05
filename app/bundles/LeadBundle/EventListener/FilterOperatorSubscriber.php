@@ -64,7 +64,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event) {
+        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event): void {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;

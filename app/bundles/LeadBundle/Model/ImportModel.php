@@ -290,7 +290,7 @@ class ImportModel extends FormModel
         $batchSize = $config['batchlimit'];
 
         // Convert to field names
-        array_walk($headers, function (&$val) {
+        array_walk($headers, function (&$val): void {
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
@@ -475,7 +475,7 @@ class ImportModel extends FormModel
      *
      * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
+    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');

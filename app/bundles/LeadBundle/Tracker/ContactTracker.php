@@ -112,7 +112,7 @@ class ContactTracker
     /**
      * Set the contact and generate cookies for future tracking.
      */
-    public function setTrackedContact(Lead $trackedContact)
+    public function setTrackedContact(Lead $trackedContact): void
     {
         $this->logger->debug("CONTACT: {$trackedContact->getId()} set as current lead.");
 
@@ -158,7 +158,7 @@ class ContactTracker
     /**
      * System contact bypasses cookie tracking.
      */
-    public function setSystemContact(Lead $lead = null)
+    public function setSystemContact(Lead $lead = null): void
     {
         if (null !== $lead) {
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
@@ -306,7 +306,7 @@ class ContactTracker
         return $lead;
     }
 
-    private function hydrateCustomFieldData(Lead $lead = null)
+    private function hydrateCustomFieldData(Lead $lead = null): void
     {
         if (null === $lead) {
             return;
@@ -330,7 +330,7 @@ class ContactTracker
         return !$this->security->isAnonymous();
     }
 
-    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId)
+    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId): void
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->debug(
@@ -345,7 +345,7 @@ class ContactTracker
         }
     }
 
-    private function generateTrackingCookies()
+    private function generateTrackingCookies(): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($leadId = $this->trackedContact->getId() && null !== $request) {

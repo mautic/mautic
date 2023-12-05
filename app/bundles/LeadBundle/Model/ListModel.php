@@ -138,11 +138,9 @@ class ListModel extends FormModel
      *
      * @param bool $unlock
      *
-     * @return mixed|void
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -561,7 +559,7 @@ class ListModel extends FormModel
      *
      * @throws \Exception
      */
-    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
+    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null): void
     {
         if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
@@ -698,7 +696,7 @@ class ListModel extends FormModel
      *
      * @throws \Exception
      */
-    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
+    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false): void
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;

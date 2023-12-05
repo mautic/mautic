@@ -36,7 +36,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFormSubmit(SubmissionEvent $submissionEvent)
+    public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {
         $fields  = $submissionEvent->getForm()->getFields();
         $contact = $submissionEvent->getLead();

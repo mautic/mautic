@@ -34,7 +34,7 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * Add a company entry to the audit log.
      */
-    public function onCompanyPostSave(Events\CompanyEvent $event)
+    public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
         if ($details = $event->getChanges()) {
@@ -53,7 +53,7 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * Add a company delete entry to the audit log.
      */
-    public function onCompanyDelete(Events\CompanyEvent $event)
+    public function onCompanyDelete(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
         $log     = [

@@ -20,7 +20,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
         $this->translator   = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $lists                                                       = $this->segmentModel->getUserLists();
         $segments                                                    = [];

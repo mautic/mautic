@@ -37,7 +37,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function configureAction(CampaignBuilderEvent $event)
+    public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'lead.adddnc',
@@ -60,7 +60,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function addDoNotContact(PendingEvent $event)
+    public function addDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
@@ -85,7 +85,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $event->passAll();
     }
 
-    public function removeDoNotContact(PendingEvent $event)
+    public function removeDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);

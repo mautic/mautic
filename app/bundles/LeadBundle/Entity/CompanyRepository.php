@@ -29,12 +29,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Used by search functions to search using aliases as commands.
      */
-    public function setAvailableSearchFields(array $fields)
+    public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }

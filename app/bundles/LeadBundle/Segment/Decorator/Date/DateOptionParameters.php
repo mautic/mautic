@@ -95,7 +95,7 @@ class DateOptionParameters
         return str_replace('mautic.lead.list.', '', $key);
     }
 
-    private function setDateTimeHelper(TimezoneResolver $timezoneResolver)
+    private function setDateTimeHelper(TimezoneResolver $timezoneResolver): void
     {
         $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
     }
