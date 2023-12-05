@@ -42,7 +42,7 @@ class UploadSubscriber implements EventSubscriberInterface
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
-    public function onPostUpload(PostUploadEvent $event)
+    public function onPostUpload(PostUploadEvent $event): void
     {
         $request   = $event->getRequest()->request;
         $response  = $event->getResponse();

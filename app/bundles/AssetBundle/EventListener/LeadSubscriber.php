@@ -49,7 +49,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'asset.download';
@@ -94,7 +94,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadChange(LeadChangeEvent $event)
+    public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
@@ -103,7 +103,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
