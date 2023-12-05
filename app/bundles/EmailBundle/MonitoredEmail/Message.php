@@ -30,7 +30,7 @@ class Message
     /** @var Attachment[] */
     protected $attachments = [];
 
-    public function addAttachment(Attachment $attachment)
+    public function addAttachment(Attachment $attachment): void
     {
         $this->attachments[$attachment->id] = $attachment;
     }

@@ -24,7 +24,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
         $this->imapHelper = $imapHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'
             : '{"config_emailconfig_monitored_email_'.$options['mailbox'].'_override_settings_1": "checked"}';
@@ -217,7 +217,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['mailbox', 'default_folder', 'general_settings']);
     }
@@ -225,7 +225,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['mailbox'] = $options['mailbox'];
     }

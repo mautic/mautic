@@ -30,7 +30,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addCondition(
             'email.validate.address',

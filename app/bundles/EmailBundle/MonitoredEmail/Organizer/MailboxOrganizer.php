@@ -26,7 +26,7 @@ class MailboxOrganizer
     /**
      * Organize the mailboxes into containers by IMAP connection and criteria.
      */
-    public function organize()
+    public function organize(): void
     {
         $criteriaRequested      = $this->event->getCriteriaRequests();
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();

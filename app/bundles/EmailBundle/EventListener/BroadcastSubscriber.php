@@ -34,7 +34,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBroadcast(ChannelBroadcastEvent $event)
+    public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('email')) {
             return;

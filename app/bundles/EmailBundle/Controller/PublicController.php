@@ -487,7 +487,7 @@ class PublicController extends CommonFormController
         $fields     = $fieldModel->getFieldList(false, false);
         array_walk(
             $fields,
-            function (&$field) {
+            function (&$field): void {
                 $field = "[$field]";
             }
         );
@@ -519,7 +519,7 @@ class PublicController extends CommonFormController
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity)
+    public function processSlots($slots, $entity): void
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
@@ -540,7 +540,7 @@ class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration)
+    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
     {
         $logger = $mauticLogger;
 
