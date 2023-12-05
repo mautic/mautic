@@ -21,7 +21,7 @@ class MobileNotificationDetailsType extends AbstractType
         $this->integrationHelper = $integrationHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings    = $integration->getIntegrationSettings()->getFeatureSettings();

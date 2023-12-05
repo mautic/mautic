@@ -30,7 +30,7 @@ class PageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings          = $integrationObject->getIntegrationSettings();
