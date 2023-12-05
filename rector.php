@@ -82,6 +82,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
         \Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector::class,
