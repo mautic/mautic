@@ -28,7 +28,7 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         return $this->settings;
     }
 
-    public function setSettings(array $settings)
+    public function setSettings(array $settings): void
     {
         $this->settings = $settings;
 

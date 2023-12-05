@@ -495,7 +495,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $results;
     }
 
-    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
+    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -511,10 +511,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    public function findLeadsToDelete($internalEntity, $leadId)
+    public function findLeadsToDelete($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -527,7 +524,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function updateErrorLeads($internalEntity, $leadId)
+    public function updateErrorLeads($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'integration_entity')

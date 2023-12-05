@@ -26,7 +26,7 @@ class PointActionEvent extends CommonEvent
         return $this->point;
     }
 
-    public function setPoint(Point $point)
+    public function setPoint(Point $point): void
     {
         $this->point = $point;
     }
@@ -39,7 +39,7 @@ class PointActionEvent extends CommonEvent
         return $this->lead;
     }
 
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }

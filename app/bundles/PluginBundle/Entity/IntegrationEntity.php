@@ -59,7 +59,7 @@ class IntegrationEntity extends CommonEntity
         $this->internal = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

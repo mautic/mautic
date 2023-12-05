@@ -45,12 +45,12 @@ class TriggerExecutedEvent extends Event
         return $this->result;
     }
 
-    public function setSucceded()
+    public function setSucceded(): void
     {
         $this->result = true;
     }
 
-    public function setFailed()
+    public function setFailed(): void
     {
         $this->result = false;
     }

@@ -57,7 +57,7 @@ class oAuthHelper
 
         if (!empty($this->settings['double_encode_basestring_parameters'])) {
             // Parameters must be encoded before going through buildBaseString
-            array_walk($parameters, function (&$val, $key, $oauth) {
+            array_walk($parameters, function (&$val, $key, $oauth): void {
                 $val = $oauth->encode($val);
             }, $this);
         }

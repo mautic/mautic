@@ -204,7 +204,7 @@ class PointModel extends CommonFormModel
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {

@@ -12,12 +12,12 @@ class FieldsType extends AbstractType
 {
     use FieldsTypeTrait;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], '', $options['limit'], $options['start']);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureFieldOptions($resolver, 'lead');
     }
@@ -30,7 +30,7 @@ class FieldsType extends AbstractType
         return 'integration_fields';
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $this->buildFieldView($view, $options);
     }

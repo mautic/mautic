@@ -28,7 +28,7 @@ class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEve
     /**
      * @param string $callbackUrl
      */
-    public function setCallbackUrl($callbackUrl)
+    public function setCallbackUrl($callbackUrl): void
     {
         $this->callbackUrl = $callbackUrl;
 
