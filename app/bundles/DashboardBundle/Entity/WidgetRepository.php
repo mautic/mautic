@@ -14,8 +14,6 @@ class WidgetRepository extends CommonRepository
      *
      * @param array $ordering
      * @param int   $userId
-     *
-     * @return string
      */
     public function updateOrdering($ordering, $userId): void
     {
