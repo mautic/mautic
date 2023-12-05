@@ -26,7 +26,7 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onStatRequest(AggregateStatRequestEvent $event)
+    public function onStatRequest(AggregateStatRequestEvent $event): void
     {
         if (!$event->checkContextPrefix(StatsCollectionHelper::GENERAL_STAT_PREFIX.'-')) {
             return;

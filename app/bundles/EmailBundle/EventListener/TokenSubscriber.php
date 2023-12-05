@@ -37,7 +37,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -75,7 +75,7 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

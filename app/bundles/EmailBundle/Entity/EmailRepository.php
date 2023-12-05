@@ -85,7 +85,7 @@ class EmailRepository extends CommonRepository
      *
      * @param int $id
      */
-    public function deleteDoNotEmailEntry($id)
+    public function deleteDoNotEmailEntry($id): void
     {
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', ['id' => (int) $id]);
     }
@@ -511,7 +511,7 @@ class EmailRepository extends CommonRepository
      * @param string[]|string|int $relatedIds
      * @param string              $date
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants($relatedIds, $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];

@@ -111,7 +111,7 @@ class SendEmailToContact
     /**
      * Flush any remaining queued contacts, process spending stats, create DNC entries and reset this class.
      */
-    public function finalFlush()
+    public function finalFlush(): void
     {
         $this->flush();
         $this->statHelper->deletePending();
@@ -200,7 +200,7 @@ class SendEmailToContact
     /**
      * @throws FailedToSendToContactException
      */
-    public function send()
+    public function send(): void
     {
         if ($this->mailer->inTokenizationMode()) {
             list($success, $errors) = $this->queueTokenizedEmail();
@@ -218,7 +218,7 @@ class SendEmailToContact
     /**
      * Reset everything.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->badEmails         = [];
         $this->errorMessages     = [];

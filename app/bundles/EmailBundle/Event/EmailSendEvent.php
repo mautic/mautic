@@ -146,7 +146,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set email content.
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true);
@@ -170,7 +170,7 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    public function setPlainText($content)
+    public function setPlainText($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setPlainText($content);
@@ -183,7 +183,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Check if plain text is empty. If yes, generate it.
      */
-    private function setGeneratedPlainText()
+    private function setGeneratedPlainText(): void
     {
         $htmlContent = $this->getContent();
         if ('' === $this->getPlainText() && '' !== $htmlContent) {
@@ -212,7 +212,7 @@ class EmailSendEvent extends CommonEvent
      *
      * @return EmailSendEvent
      */
-    public function setSubject($subject)
+    public function setSubject($subject): void
     {
         if (null !== $this->helper) {
             $this->helper->setSubject($subject);
@@ -255,12 +255,12 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
-    public function addTokens(array $tokens)
+    public function addTokens(array $tokens): void
     {
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    public function addToken($key, $value)
+    public function addToken($key, $value): void
     {
         $this->tokens[$key] = $value;
     }
@@ -281,7 +281,7 @@ class EmailSendEvent extends CommonEvent
         return $tokens;
     }
 
-    public function addTextHeader($name, $value)
+    public function addTextHeader($name, $value): void
     {
         if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);
