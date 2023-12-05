@@ -138,8 +138,6 @@ class ListModel extends FormModel
      *
      * @param bool $unlock
      *
-     * @return mixed|void
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true): void

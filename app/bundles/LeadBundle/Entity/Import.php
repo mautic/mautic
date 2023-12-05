@@ -740,9 +740,6 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return Import
-     */
     public function setLastLineImported($line): void
     {
         $this->properties['line'] = (int) $line;
