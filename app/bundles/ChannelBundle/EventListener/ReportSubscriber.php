@@ -39,7 +39,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             return;
@@ -114,7 +114,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             return;
@@ -131,7 +131,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($queryBuilder);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
         if ($event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {

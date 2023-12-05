@@ -31,7 +31,7 @@ class ChannelPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields($this->getName(), 'categories', $builder, $data);
         $this->addExtendedFormFields($this->getName(), 'messages', $builder, $data);

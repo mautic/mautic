@@ -49,7 +49,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param Message $entity
      * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = $entity->isNew();
 

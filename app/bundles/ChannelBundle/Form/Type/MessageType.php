@@ -22,7 +22,7 @@ class MessageType extends AbstractFormStandardType
         $this->security = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Add standard fields
         $options = array_merge($options, ['model_name' => 'channel.message', 'permission_base' => 'channel:messages']);
@@ -67,7 +67,7 @@ class MessageType extends AbstractFormStandardType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

@@ -31,7 +31,7 @@ class MessageSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(MessageEvent $event)
+    public function onPostSave(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         if ($details = $event->getChanges()) {
@@ -49,7 +49,7 @@ class MessageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(MessageEvent $event)
+    public function onDelete(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         $log    = [
