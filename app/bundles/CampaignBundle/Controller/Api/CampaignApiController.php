@@ -36,7 +36,7 @@ class CampaignApiController extends CommonApiController
     /**
      * @var CampaignModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private RequestStack $requestStack;
 

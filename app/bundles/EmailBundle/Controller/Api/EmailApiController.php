@@ -38,7 +38,7 @@ class EmailApiController extends CommonApiController
     /**
      * @var EmailModel|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @var array<string, mixed>
