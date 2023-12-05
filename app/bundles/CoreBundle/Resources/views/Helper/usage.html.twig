@@ -1,6 +1,7 @@
 {#
   Variables
     - title
+    - noUsages
     - stats
 #}
 {% if stats is defined and stats is not empty %}
@@ -9,6 +10,7 @@
       <tr>
         <th colspan="2" class="bg-primary segment-title">{{- title -}}</th>
       </tr>
+      {% set hasDependences = false %}
       {% for stat in stats %}
         {% if stat.ids|length > 0 %}
           <tr>
@@ -21,8 +23,14 @@
               </span>
             </td>
           </tr>
+          {% set hasDependences = true %}
         {% endif %}
       {% endfor %}
+      {% if not hasDependences %}
+        <tr>
+          <td colspan="2">{{- noUsages -}}</td>
+        </tr>
+      {% endif %}
     </tbody>
   </table>
 {% endif %}

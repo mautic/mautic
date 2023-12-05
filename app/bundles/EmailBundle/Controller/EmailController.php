@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\Form;
@@ -264,7 +265,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId, EmailDependencies $emailDependencies)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
@@ -432,7 +433,8 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'dateRangeForm'  => $dateRangeForm->createView(),
+                    'usageStats'     => $emailDependencies->getChannelsIds($email->getId()),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [
