@@ -33,13 +33,10 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $exportHandler = new ExportHandler($coreParametersHelperMock, $filePathResolver);
 
         $handler = $exportHandler->getHandler('myFile');
-
-        $this->assertTrue(is_resource($handler));
+        $this->assertIsResource($handler);
 
         $exportHandler->closeHandler($handler);
-
-        $this->assertFalse(is_resource($handler));
-        $this->assertNull($handler);
+        $this->assertIsClosedResource($handler);
     }
 
     public function testCreateDirectoryError()
