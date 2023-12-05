@@ -10,7 +10,7 @@ class NotificationClickEvent extends CommonEvent
 {
     private $request;
 
-    private $notification;
+    private \Mautic\NotificationBundle\Entity\Notification $notification;
 
     public function __construct(Stat $stat, $request)
     {

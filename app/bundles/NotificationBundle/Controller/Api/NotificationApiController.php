@@ -26,10 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class NotificationApiController extends CommonApiController
 {
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, ContactTracker $contactTracker, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {

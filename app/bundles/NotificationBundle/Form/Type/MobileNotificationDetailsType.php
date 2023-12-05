@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class MobileNotificationDetailsType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(IntegrationHelper $integrationHelper)
     {

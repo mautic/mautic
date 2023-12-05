@@ -8,10 +8,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 
 class SendingNotificationEvent extends CommonEvent
 {
-    /**
-     * @var Lead
-     */
-    protected $lead;
+    protected \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var Notification
