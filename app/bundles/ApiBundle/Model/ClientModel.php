@@ -57,7 +57,7 @@ class ClientModel extends FormModel
         return self::DEFAULT_API_MODE;
     }
 
-    public function setApiMode($apiMode)
+    public function setApiMode($apiMode): void
     {
         $this->apiMode = $apiMode;
     }

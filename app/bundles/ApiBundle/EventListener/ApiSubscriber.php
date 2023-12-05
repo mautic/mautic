@@ -42,7 +42,7 @@ class ApiSubscriber implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
@@ -98,7 +98,7 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $request      = $event->getRequest();
         $isApiRequest = RequestHelper::isApiRequest($request);

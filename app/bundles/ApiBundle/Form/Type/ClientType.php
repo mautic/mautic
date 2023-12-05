@@ -61,7 +61,7 @@ class ClientType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
@@ -144,7 +144,7 @@ class ClientType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -179,7 +179,7 @@ class ClientType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $dataClass = 'Mautic\ApiBundle\Entity\oAuth2\Client';
         $resolver->setDefaults(

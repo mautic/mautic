@@ -108,7 +108,7 @@ class BatchIdToEntityHelper
         return $orderedEntities;
     }
 
-    private function extractIds(array $parameters)
+    private function extractIds(array $parameters): void
     {
         $this->ids = [];
 
@@ -124,7 +124,7 @@ class BatchIdToEntityHelper
     /**
      * @param mixed $ids
      */
-    private function extractIdsFromIdKey($ids)
+    private function extractIdsFromIdKey($ids): void
     {
         // ['ids' => [1,2,3]]
         if (is_array($ids)) {
@@ -149,7 +149,7 @@ class BatchIdToEntityHelper
         $this->errors[] = 'mautic.api.call.id_missing';
     }
 
-    private function extractIdsFromParams(array $parameters)
+    private function extractIdsFromParams(array $parameters): void
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);
         $this->originalKeys  = array_keys($parameters);
